@@ -3885,7 +3885,7 @@ Geometry: A cylinder of radius 1.0 centered at (0,0)
 Boundary conditions:
   + xmin: Subsonic inflow #_SUBSONIC_INFLOW_ (with post-shock flow conditions)
   + xmax: Supersonic inflow #_SUPERSONIC_OUTFLOW_ (with pre-shock flow conditions)
-  + ymin and ymax: Slip walls $_SLIP_WALL_
+  + ymin and ymax: Slip walls #_SLIP_WALL_
   + zmin and zmax: Periodic #_PERIODIC_ (to simulate a 2D flow in the x-y plane)
 
 Reference:
