@@ -66,6 +66,8 @@
 #define _LLF_     "llf-char"
 /*! Steger-Warming flux splitting */
 #define _SWFS_    "steger-warming"
+/*! Rusanov flux splitting */
+#define _RUSANOV_    "rusanov"
 
 /* grid direction */
 #undef _XDIR_

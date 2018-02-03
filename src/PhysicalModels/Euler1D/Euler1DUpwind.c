@@ -363,6 +363,88 @@ int Euler1DUpwindSWFS(
   return(0);
 }
 
+/*! Rusanov's upwinding scheme.
+    \f{equation}{
+      {\bf f}_{j+1/2} = \frac{1}{2}\left[ {\bf f}_{j+1/2}^L + {\bf f}_{j+1/2}^R 
+                         - \max_{j,j+1} \nu_j \left( {\bf u}_{j+1/2}^R - {\bf u}_{j+1/2}^L  \right)\right]
+    \f}
+    where \f$\nu = c + \left|u\right|\f$.
+    + Rusanov, V. V., "The calculation of the interaction of non-stationary shock waves and obstacles," USSR 
+    Computational Mathematics and Mathematical Physics, Vol. 1, No. 2, 1962, pp. 304–320
+*/
+int Euler1DUpwindRusanov(
+                          double  *fI, /*!< Computed upwind interface flux */
+                          double  *fL, /*!< Left-biased reconstructed interface flux */
+                          double  *fR, /*!< Right-biased reconstructed interface flux */
+                          double  *uL, /*!< Left-biased reconstructed interface solution */
+                          double  *uR, /*!< Right-biased reconstructed interface solution */
+                          double  *u,  /*!< Cell-centered solution */
+                          int     dir, /*!< Spatial dimension (unused since this is a 1D system) */
+                          void    *s,  /*!< Solver object of type #HyPar */
+                          double  t    /*!< Current solution time */
+                        )
+{
+  HyPar     *solver = (HyPar*)    s;
+  Euler1D   *param  = (Euler1D*)  solver->physics;
+  int       done,k;
+  _DECLARE_IERR_;
+
+  int ndims = solver->ndims;
+  int ghosts= solver->ghosts;
+  int *dim  = solver->dim_local;
+
+  int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+
+  static double udiff[_MODEL_NVARS_], uavg[_MODEL_NVARS_];
+
+  done = 0; _ArraySetValue_(index_outer,ndims,0);
+  while (!done) {
+
+    _ArrayCopy1D_(index_outer,index_inter,ndims);
+
+    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+
+      int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
+      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
+      int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
+      int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
+      int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
+
+      _Euler1DRoeAverage_(uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
+      for (k = 0; k < _MODEL_NVARS_; k++) udiff[k] = 0.5 * (uR[_MODEL_NVARS_*p+k] - uL[_MODEL_NVARS_*p+k]);
+
+      double rho, uvel, E, P, c;
+
+      _Euler1DGetFlowVar_((u+_MODEL_NVARS_*pL),rho,uvel,E,P,param);
+      c = param->gamma*P/rho;
+      double alphaL = c + absolute(uvel);
+
+      _Euler1DGetFlowVar_((u+_MODEL_NVARS_*pR),rho,uvel,E,P,param);
+      c = param->gamma*P/rho;
+      double alphaR = c + absolute(uvel);
+
+      _Euler1DGetFlowVar_(uavg,rho,uvel,E,P,param);
+      c = param->gamma*P/rho;
+      double alphaavg = c + absolute(uvel);
+
+      double kappa = max(param->grav_field[pL],param->grav_field[pR]);
+      double alpha = kappa*max3(alphaL,alphaR,alphaavg);
+
+      for (k = 0; k < _MODEL_NVARS_; k++) {
+        fI[_MODEL_NVARS_*p+k] = 0.5 * (fL[_MODEL_NVARS_*p+k]+fR[_MODEL_NVARS_*p+k]) - alpha*udiff[k];
+      }
+
+    }
+
+    _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
+
+  }
+
+  return(0);
+}
+
 /*! The Roe upwinding scheme (#Euler1DUpwindRoe) for the partitioned hyperbolic flux that comprises
     of the acoustic waves only (see #Euler1DStiffFlux, #_Euler1DSetStiffFlux_). Thus, only the 
     characteristic fields / eigen-modes corresponding to \f$ u\pm a\f$ are used.

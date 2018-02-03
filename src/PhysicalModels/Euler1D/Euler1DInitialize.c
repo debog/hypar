@@ -16,13 +16,18 @@ double Euler1DComputeCFL (void*,void*,double,double);
 int    Euler1DFlux       (double*,double*,int,void*,double);
 int    Euler1DStiffFlux  (double*,double*,int,void*,double);
 int    Euler1DSource     (double*,double*,void*,void*,double);
-int    Euler1DUpwindRoe  (double*,double*,double*,double*,double*,double*,int,void*,double);
-int    Euler1DUpwinddFRoe(double*,double*,double*,double*,double*,double*,int,void*,double);
-int    Euler1DUpwindRF   (double*,double*,double*,double*,double*,double*,int,void*,double);
-int    Euler1DUpwinddFRF (double*,double*,double*,double*,double*,double*,int,void*,double);
-int    Euler1DUpwindLLF  (double*,double*,double*,double*,double*,double*,int,void*,double);
-int    Euler1DUpwinddFLLF(double*,double*,double*,double*,double*,double*,int,void*,double);
-int    Euler1DUpwindSWFS (double*,double*,double*,double*,double*,double*,int,void*,double);
+
+int    Euler1DUpwindRoe     (double*,double*,double*,double*,double*,double*,int,void*,double);
+int    Euler1DUpwinddFRoe   (double*,double*,double*,double*,double*,double*,int,void*,double);
+
+int    Euler1DUpwindRF      (double*,double*,double*,double*,double*,double*,int,void*,double);
+int    Euler1DUpwinddFRF    (double*,double*,double*,double*,double*,double*,int,void*,double);
+
+int    Euler1DUpwindLLF     (double*,double*,double*,double*,double*,double*,int,void*,double);
+int    Euler1DUpwinddFLLF   (double*,double*,double*,double*,double*,double*,int,void*,double);
+
+int    Euler1DUpwindSWFS    (double*,double*,double*,double*,double*,double*,int,void*,double);
+int    Euler1DUpwindRusanov (double*,double*,double*,double*,double*,double*,int,void*,double);
 
 int    Euler1DJacobian      (double*,double*,void*,int,int);
 int    Euler1DStiffJacobian (double*,double*,void*,int,int);
@@ -148,10 +153,11 @@ int Euler1DInitialize(
   solver->FFunction          = Euler1DFlux;
   solver->SFunction          = Euler1DSource;
   solver->UFunction          = Euler1DModifiedSolution;
-  if      (!strcmp(physics->upw_choice,_ROE_ )) solver->Upwind = Euler1DUpwindRoe;
-  else if (!strcmp(physics->upw_choice,_RF_  )) solver->Upwind = Euler1DUpwindRF;
-  else if (!strcmp(physics->upw_choice,_LLF_ )) solver->Upwind = Euler1DUpwindLLF;
-  else if (!strcmp(physics->upw_choice,_SWFS_)) solver->Upwind = Euler1DUpwindSWFS;
+  if      (!strcmp(physics->upw_choice,_ROE_    )) solver->Upwind = Euler1DUpwindRoe;
+  else if (!strcmp(physics->upw_choice,_RF_     )) solver->Upwind = Euler1DUpwindRF;
+  else if (!strcmp(physics->upw_choice,_LLF_    )) solver->Upwind = Euler1DUpwindLLF;
+  else if (!strcmp(physics->upw_choice,_SWFS_   )) solver->Upwind = Euler1DUpwindSWFS;
+  else if (!strcmp(physics->upw_choice,_RUSANOV_)) solver->Upwind = Euler1DUpwindRusanov;
   else {
     if (!mpi->rank) fprintf(stderr,"Error in Euler1DInitialize(): %s is not a valid upwinding scheme.\n",
                             physics->upw_choice);
