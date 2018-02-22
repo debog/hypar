@@ -17,7 +17,12 @@ int BCCleanup(void *b /*!< Boundary object of type #DomainBoundary*/)
   if (boundary->DirichletValue) free(boundary->DirichletValue);
   if (boundary->SpongeValue   ) free(boundary->SpongeValue   );
   if (boundary->FlowVelocity  ) free(boundary->FlowVelocity  );
+
   if (boundary->UnsteadyDirichletSize) free(boundary->UnsteadyDirichletSize);
   if (boundary->UnsteadyDirichletData) free(boundary->UnsteadyDirichletData);
+
+  if (boundary->UnsteadyTemperatureSize)  free(boundary->UnsteadyTemperatureSize);
+  if (boundary->UnsteadyTimeLevels)       free(boundary->UnsteadyTimeLevels);
+  if (boundary->UnsteadyTemperatureData)  free(boundary->UnsteadyTemperatureData);
   return(0);
 }

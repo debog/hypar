@@ -21,6 +21,8 @@
 #define _NOSLIP_WALL_                   "noslip-wall"
 /*! Inviscid wall boundary condition (specific to Euler/Navier-Stokes) \sa BCSlipWallU */
 #define _SLIP_WALL_                     "slip-wall"
+/*! Inviscid thermal wall boundary condition where wall temperature is specified (specific to Euler/Navier-Stokes) \sa BCThermalSlipWallU */
+#define _THERMAL_SLIP_WALL_                     "slip-wall"
 /*! Subsonic inflow boundary condition: density and velocity are specified in the input, pressure is extrapolated from the interior (specific to Euler/Navier-Stokes) \sa #BCSubsonicInflowU*/
 #define _SUBSONIC_INFLOW_               "subsonic-inflow"
 /*! Subsonic outflow boundary condition: pressure is specified in the input, density and velocity are extrapolated from the interior (specific to Euler/Navier-Stokes) \sa #BCSubsonicOutflowU */
@@ -59,6 +61,7 @@
  * a boundary zone.
 */
 typedef struct domain_boundaries {
+
   /*! Type of boundary (#_PERIODIC_, #_EXTRAPOLATE_, #_DIRICHLET_, etc) */
   char    bctype [_MAX_STRING_SIZE_]; 
   /*! Dimension along which this BC applies (For an \a n -dimensional problem, dimensions are indexed \a 0 to \a n-1 ) */
@@ -92,6 +95,13 @@ typedef struct domain_boundaries {
          *FlowVelocity,                           /*!< Boundary flow velocity (specific to Euler/Navier-Stokes) */
          FlowPressure;                            /*!< Boundary flow pressure (specific to Euler/Navier-Stokes) */
 
+  /* variables specific to the thermal slip-wall boundary condition */
+  int    *UnsteadyTemperatureSize; /*!< Size of array to hold unsteady temperature data for BCThermalSlipWallU() */
+  double *UnsteadyTimeLevels;      /*!< Array to hold the time levels for unsteady temperature data for BCThermalSlipWallU() */
+  double *UnsteadyTemperatureData; /*!< Array to hold unsteady temperature data for BCThermalSlipWallU()         */
+  /*! Filename to read in unsteady temperature data from for BCThermalSlipWallU() boundary condition */
+  char  UnsteadyTemperatureFilename[_MAX_STRING_SIZE_];
+
 
 } DomainBoundary;
 
@@ -112,6 +122,8 @@ int BCReflectU                      (void*,void*,int,int,int*,int,double*,double
 int BCNoslipWallU                   (void*,void*,int,int,int*,int,double*,double);    
 /*! Slip (inviscid) wall boundary conditions for the solution vector U */
 int BCSlipWallU                     (void*,void*,int,int,int*,int,double*,double);    
+/*! Slip (inviscid) thermal wall boundary conditions for the solution vector U */
+int BCThermalSlipWallU              (void*,void*,int,int,int*,int,double*,double);    
 /*! Subsonic inflow boundary conditions for the solution vector U */
 int BCSubsonicInflowU               (void*,void*,int,int,int*,int,double*,double);    
 /*! Subsonic outflow boundary conditions for the solution vector U */
@@ -141,6 +153,8 @@ int BCReflectDU                     (void*,void*,int,int,int*,int,double*,double
 int BCNoslipWallDU                  (void*,void*,int,int,int*,int,double*,double*,double);    
 /*! Slip (inviscid) wall boundary conditions for the "delta-solution" vector dU (for use in implicit time-integration) */
 int BCSlipWallDU                    (void*,void*,int,int,int*,int,double*,double*,double);    
+/*! Slip (inviscid) thermal wall boundary conditions for the "delta-solution" vector dU (for use in implicit time-integration) */
+int BCThermalSlipWallDU             (void*,void*,int,int,int*,int,double*,double*,double);    
 /*! Subsonic inflow boundary conditions for the "delta-solution" vector dU (for use in implicit time-integration) */
 int BCSubsonicInflowDU              (void*,void*,int,int,int*,int,double*,double*,double);    
 /*! Subsonic outflow boundary conditions for the "delta-solution" vector dU (for use in implicit time-integration) */
@@ -165,5 +179,7 @@ int BCSpongeUDummy        (void*,void*,int,int,int*,int,double*,double);
 /*! dummy function that get called during applying BCs - they don't do anything */
 int BCSpongeDUDummy       (void*,void*,int,int,int*,int,double*,double*,double);
 
+/*! Function to read in unsteady temperature data for thermal slip wall BC (BCThermalSlipWallU()) */
+int BCReadTemperatureData(void*,void*,int,int,int*);
 /*! Function to read in unsteady boundary data for turbulent inflow */
 int BCReadTurbulentInflowData(void*,void*,int,int,int*);
