@@ -22,7 +22,7 @@
 /*! Inviscid wall boundary condition (specific to Euler/Navier-Stokes) \sa BCSlipWallU */
 #define _SLIP_WALL_                     "slip-wall"
 /*! Inviscid thermal wall boundary condition where wall temperature is specified (specific to Euler/Navier-Stokes) \sa BCThermalSlipWallU */
-#define _THERMAL_SLIP_WALL_                     "slip-wall"
+#define _THERMAL_SLIP_WALL_             "thermal-slip-wall"
 /*! Subsonic inflow boundary condition: density and velocity are specified in the input, pressure is extrapolated from the interior (specific to Euler/Navier-Stokes) \sa #BCSubsonicInflowU*/
 #define _SUBSONIC_INFLOW_               "subsonic-inflow"
 /*! Subsonic outflow boundary condition: pressure is specified in the input, density and velocity are extrapolated from the interior (specific to Euler/Navier-Stokes) \sa #BCSubsonicOutflowU */
@@ -31,7 +31,7 @@
     or inflow boundary conditions are applied. Specify all flow quantities (density, velocity, and pressure) in the input; depending on whether it is inflow or outflow, the appropriate
     quantities will be used. \sa #BCSubsonicAmbivalentU 
 */
-#define _SUBSONIC_AMBIVALENT_              "subsonic-ambivalent"
+#define _SUBSONIC_AMBIVALENT_           "subsonic-ambivalent"
 /*! Supersonic inflow boundary condition: density, velocity, and pressure are specified in the input (specific to Euler/Navier-Stokes) \sa #BCSupersonicInflowU */
 #define _SUPERSONIC_INFLOW_             "supersonic-inflow"
 /*! Supersonic outflow boundary condition: all flow quantities are extrapolated from the interior (specific to Euler/Navier-Stokes) \sa BCSupersonicOutflowU */

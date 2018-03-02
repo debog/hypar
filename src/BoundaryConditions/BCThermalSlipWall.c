@@ -40,14 +40,6 @@ int BCThermalSlipWallU(
   int dim   = boundary->dim;
   int face  = boundary->face;
 
-  int     *temperature_field_size = boundary->UnsteadyTemperatureSize;
-  int     n_time_levels           = temperature_field_size[dim];
-  double  *time_levels            = boundary->UnsteadyTimeLevels;
-  double  *temperature_data       = boundary->UnsteadyTemperatureData;
-
-  int it = n_time_levels - 1;
-  while ((time_levels[it] > waqt) && (it > 0))  it--;
-
   if (ndims == 3) {
 
     /* create a fake physics object */
@@ -57,6 +49,14 @@ int BCThermalSlipWallU(
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
     if (boundary->on_this_proc) {
+
+      int     *temperature_field_size = boundary->UnsteadyTemperatureSize;
+      int     n_time_levels           = temperature_field_size[dim];
+      double  *time_levels            = boundary->UnsteadyTimeLevels;
+      double  *temperature_data       = boundary->UnsteadyTemperatureData;
+    
+      int it = n_time_levels - 1;
+      while ((time_levels[it] > waqt) && (it > 0))  it--;
 
       int bounds[ndims], indexb[ndims], indexi[ndims];
       _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
@@ -303,12 +303,6 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
         fprintf(stderr,"Error in BCReadTemperatureData(): Error (3) in file reading, count %d.\n",count);
         return(1);
       }
-      int flag = 1;
-      for (d=0; d<ndims; d++) if ((d != dim) && (size[d] != DomainSize[d])) flag = 0;
-      if (!flag) {
-        fprintf(stderr,"Error in BCReadTemperatureData(): Error (4) (dimension mismatch) in file reading, count %d.\n",count);
-        return(1);
-      }
 
       int n_data = size[dim]; /* number of time levels for which temperature data is provided */
       time_buffer = (double*) calloc (n_data,sizeof(double));
@@ -340,7 +334,7 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
         _ArrayCopy1D_(time_buffer,time_level_data,size[dim]);
 
         temperature_field_data = (double*) calloc (data_size, sizeof(double));
-        ArrayCopynD(ndims,data_buffer,temperature_field_data,size,0,0,index,nvars);
+        ArrayCopynD(ndims,data_buffer,temperature_field_data,size,0,0,index,1);
 
       } else {
 
@@ -380,6 +374,13 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
       temperature_field_size = (int*) calloc (ndims,sizeof(int));
       MPI_Irecv(temperature_field_size,ndims,MPI_INT,0,2152,mpi->world,&req);
       MPI_Wait(&req,MPI_STATUS_IGNORE);
+
+      int flag = 1;
+      for (d=0; d<ndims; d++) if ((d != dim) && (temperature_field_size[d] != DomainSize[d])) flag = 0;
+      if (!flag) {
+        fprintf(stderr,"Error in BCReadTemperatureData(): Error (4) (dimension mismatch) in file reading, rank %d.\n",mpi->rank);
+        return(1);
+      }
 
       time_level_data = (double*) calloc (temperature_field_size[dim],sizeof(double));
       MPI_Irecv(time_level_data, temperature_field_size[dim], MPI_DOUBLE,0,2154,mpi->world,&req);
