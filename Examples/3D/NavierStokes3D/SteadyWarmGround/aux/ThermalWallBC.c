@@ -42,7 +42,7 @@ int main()
   int dims_global[3], ndims, nvars, iproc[3];
   char init_file_format[1000];
 
-  /* read the parameters for the shock-turbulence interaction */
+  /* read the simulation parameters */
   ierr = ReadSolverInp(dims_global, iproc, &ndims, &nvars, init_file_format);
   if (ierr) return(ierr);
 
