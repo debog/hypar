@@ -19,6 +19,8 @@
 /* some BC types unique to the euler/navier-stokes systems */
 /*! Viscous wall boundary condition (specific to Navier-Stokes) \sa #BCNoslipWallU */
 #define _NOSLIP_WALL_                   "noslip-wall"
+/*! Viscous thermal wall boundary condition where wall temperature is specified (specific to Navier-Stokes) \sa #BCThermalNoslipWallU */
+#define _THERMAL_NOSLIP_WALL_           "thermal-noslip-wall"
 /*! Inviscid wall boundary condition (specific to Euler/Navier-Stokes) \sa BCSlipWallU */
 #define _SLIP_WALL_                     "slip-wall"
 /*! Inviscid thermal wall boundary condition where wall temperature is specified (specific to Euler/Navier-Stokes) \sa BCThermalSlipWallU */
@@ -96,10 +98,10 @@ typedef struct domain_boundaries {
          FlowPressure;                            /*!< Boundary flow pressure (specific to Euler/Navier-Stokes) */
 
   /* variables specific to the thermal slip-wall boundary condition */
-  int    *UnsteadyTemperatureSize; /*!< Size of array to hold unsteady temperature data for BCThermalSlipWallU() */
-  double *UnsteadyTimeLevels;      /*!< Array to hold the time levels for unsteady temperature data for BCThermalSlipWallU() */
-  double *UnsteadyTemperatureData; /*!< Array to hold unsteady temperature data for BCThermalSlipWallU()         */
-  /*! Filename to read in unsteady temperature data from for BCThermalSlipWallU() boundary condition */
+  int    *UnsteadyTemperatureSize; /*!< Size of array to hold unsteady temperature data for BCThermalSlipWallU() and BCThermalNoslipWallU() */
+  double *UnsteadyTimeLevels;      /*!< Array to hold the time levels for unsteady temperature data for BCThermalSlipWallU() and BCThermalNoslipWallU() */
+  double *UnsteadyTemperatureData; /*!< Array to hold unsteady temperature data for BCThermalSlipWallU() and BCThermalNoslipWallU() */
+  /*! Filename to read in unsteady temperature data from for the BCThermalSlipWallU() and BCThermalNoslipWallU() boundary condition */
   char  UnsteadyTemperatureFilename[_MAX_STRING_SIZE_];
 
 
@@ -120,6 +122,8 @@ int BCDirichletU                    (void*,void*,int,int,int*,int,double*,double
 int BCReflectU                      (void*,void*,int,int,int*,int,double*,double);    
 /*! No-slip wall (viscous) boundary conditions for the solution vector U */
 int BCNoslipWallU                   (void*,void*,int,int,int*,int,double*,double);    
+/*! No-slip thermal wall (viscous) boundary conditions for the solution vector U */
+int BCThermalNoslipWallU            (void*,void*,int,int,int*,int,double*,double);    
 /*! Slip (inviscid) wall boundary conditions for the solution vector U */
 int BCSlipWallU                     (void*,void*,int,int,int*,int,double*,double);    
 /*! Slip (inviscid) thermal wall boundary conditions for the solution vector U */
@@ -151,6 +155,8 @@ int BCDirichletDU                   (void*,void*,int,int,int*,int,double*,double
 int BCReflectDU                     (void*,void*,int,int,int*,int,double*,double*,double);    
 /*! No-slip wall (viscous) boundary conditions for the "delta-solution" vector dU (for use in implicit time-integration) */
 int BCNoslipWallDU                  (void*,void*,int,int,int*,int,double*,double*,double);    
+/*! No-slip thermal wall (viscous) boundary conditions for the "delta-solution" vector dU (for use in implicit time-integration) */
+int BCThermalNoslipWallDU           (void*,void*,int,int,int*,int,double*,double*,double);    
 /*! Slip (inviscid) wall boundary conditions for the "delta-solution" vector dU (for use in implicit time-integration) */
 int BCSlipWallDU                    (void*,void*,int,int,int*,int,double*,double*,double);    
 /*! Slip (inviscid) thermal wall boundary conditions for the "delta-solution" vector dU (for use in implicit time-integration) */

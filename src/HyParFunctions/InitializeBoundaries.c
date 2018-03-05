@@ -147,7 +147,8 @@ int InitializeBoundaries(
         ferr = fscanf(in,"%s" , boundary[n].UnsteadyDirichletFilename);
       }
 
-      if (!strcmp(boundary[n].bctype,_THERMAL_SLIP_WALL_)) {
+      if (    (!strcmp(boundary[n].bctype,_THERMAL_SLIP_WALL_))
+          ||  (!strcmp(boundary[n].bctype,_THERMAL_NOSLIP_WALL_)) ){
         boundary[n].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
                                      /* deallocated in BCCleanup.c */
         /* read the wall velocity */
@@ -268,7 +269,8 @@ int InitializeBoundaries(
       IERR BCReadTurbulentInflowData(&boundary[n],mpi,solver->ndims,solver->nvars,solver->dim_local); CHECKERR(ierr);
     }
 
-    if (!strcmp(boundary[n].bctype,_THERMAL_SLIP_WALL_)) {
+    if (    (!strcmp(boundary[n].bctype,_THERMAL_SLIP_WALL_)) 
+        ||  (!strcmp(boundary[n].bctype,_THERMAL_NOSLIP_WALL_)) ) {
       if (mpi->rank) boundary[n].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
       IERR MPIBroadcast_double(boundary[n].FlowVelocity,solver->ndims,0,&mpi->world); CHECKERR(ierr);
       /* allocate arrays and read in boundary temperature data */

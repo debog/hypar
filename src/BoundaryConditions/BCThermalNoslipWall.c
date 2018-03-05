@@ -1,6 +1,6 @@
-/*! @file BCThermalSlipWall.c
+/*! @file BCThermalNoslipWall.c
     @author Debojyoti Ghosh
-    @brief Thermal slip-wall boundary conditions
+    @brief Thermal no-slip-wall boundary conditions
 */
 
 #include <stdlib.h>
@@ -13,18 +13,18 @@
 #include <physicalmodels/euler2d.h>
 #include <physicalmodels/navierstokes3d.h>
 
-/*! Applies the thermal slip-wall boundary condition: This is specific to the 3D
+/*! Applies the thermal no-slip-wall boundary condition: This is specific to the 3D
     Navier-Stokes system (#NavierStokes3D).
-    It is used for simulating inviscid walls or symmetric boundaries, where the temperature is
-    specified. The  density and the tangential velocity at the ghost points are extrapolated
-    for the interior. The normal velocity at the ghost points is set such that the interpolated
+    It is used for simulating walls boundaries, where the temperature is specified. 
+    The density at the ghost points is extrapolated from the interior. The 
+    velocity at the ghost points is set such that the interpolated
     velocity at the boundary face is the specified wall velocity. The pressure at the ghost
     points is set by multiplying the extrapolated density by the specified temperature.
 
     \b Note: It is assumed that the temperature already contains the gas constant factor, i.e.,
     \f$ T = P/\rho\f$.
 */
-int BCThermalSlipWallU(
+int BCThermalNoslipWallU(
                          void    *b,     /*!< Boundary object of type #DomainBoundary */
                          void    *m,     /*!< MPI object of type #MPIVariables */
                          int     ndims,  /*!< Number of spatial dimensions */
@@ -86,23 +86,9 @@ int BCThermalSlipWallU(
         /* set the ghost point values */
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
         rho_gpt = rho;
-        if (dim == _XDIR_) {
-          uvel_gpt = 2.0*boundary->FlowVelocity[_XDIR_] - uvel;
-          vvel_gpt = vvel;
-          wvel_gpt = wvel;
-        } else if (dim == _YDIR_) {
-          uvel_gpt = uvel;
-          vvel_gpt = 2.0*boundary->FlowVelocity[_YDIR_] - vvel;
-          wvel_gpt = wvel;
-        } else if (dim == _ZDIR_) {
-          uvel_gpt = uvel;
-          vvel_gpt = vvel;
-          wvel_gpt = 2.0*boundary->FlowVelocity[_ZDIR_] - wvel;
-        } else {
-          uvel_gpt = 0.0;
-          vvel_gpt = 0.0;
-          wvel_gpt = 0.0;
-        }
+        uvel_gpt = 2.0*boundary->FlowVelocity[0] - uvel;
+        vvel_gpt = 2.0*boundary->FlowVelocity[1] - vvel;
+        wvel_gpt = 2.0*boundary->FlowVelocity[2] - wvel;
         pressure_gpt = rho_gpt * temperature_b;
         energy_gpt = inv_gamma_m1*pressure_gpt 
                     + 0.5 * rho_gpt 
@@ -131,7 +117,7 @@ int BCThermalSlipWallU(
     \n\n
     The above treatment is applied on the delta-solution added to the reference solution.
 */
-int BCThermalSlipWallDU(
+int BCThermalNoslipWallDU(
                          void    *b,       /*!< Boundary object of type #DomainBoundary */
                          void    *m,       /*!< MPI object of type #MPIVariables */
                          int     ndims,    /*!< Number of spatial dimensions */
