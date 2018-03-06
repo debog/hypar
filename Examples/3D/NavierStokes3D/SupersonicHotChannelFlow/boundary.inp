@@ -1,0 +1,13 @@
+6
+
+supersonic-inflow      0     1     0      0    0    0.2   -99999.0  99999.0
+1.0 2.0 0.0 0.0 0.7142857143
+extrapolate            0    -1     0      0    0    0.2   -99999.0  99999.0
+
+thermal-noslip-wall    1     1     0    1.0    0      0   -99999.0  99999.9
+0.0 0.0 0.0 temperature_ymin_bc.dat
+thermal-noslip-wall    1    -1     0    1.0    0      0   -99999.0  99999.9
+0.0 0.0 0.0 temperature_ymax_bc.dat
+
+periodic               2     1     0    1.0    0    0.2          0        0
+periodic               2    -1     0    1.0    0    0.2          0        0
