@@ -18,7 +18,7 @@ AC_ARG_WITH([scalapack_dir],AC_HELP_STRING([--with-scalapack-dir],[Specify path 
 AC_PROG_CC
 
 CFLAGS="$CFLAGS -I$includedir"
-if test "$CC" = "gcc" ; then
+if test "$GCC" = "yes" ; then
   CFLAGS="$CFLAGS -std=c99"
   LIBS="$LIBS -lm"
   MPI_CC=mpicc
