@@ -107,7 +107,7 @@ int ReadPhysicsInp(double *a_R, double *a_rho_ref, double *a_p_ref)
     } else printf("Error: Illegal format in physics.inp. Crash and burn!\n");
   }
   fclose(in);
-
+  return(0);
 }
 
 int ReadGrid(
