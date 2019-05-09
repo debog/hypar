@@ -149,6 +149,17 @@ int InitializeSolvers(
       solver->InterpolateInterfacesHyp = Interp1PrimSecondOrderCentral;
     }
 
+  } else if (!strcmp(solver->spatial_scheme_hyp,_SECOND_ORDER_MUSCL_)) {
+
+    /* Second order MUSCL scheme */
+    if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
+      solver->InterpolateInterfacesHyp = Interp1PrimSecondOrderMUSCLChar;
+    } else {
+      solver->InterpolateInterfacesHyp = Interp1PrimSecondOrderMUSCL;
+    }
+    solver->interp = (MUSCLParameters*) calloc(1,sizeof(MUSCLParameters));
+    IERR MUSCLInitialize(solver,mpi); CHECKERR(ierr);
+
   } else if (!strcmp(solver->spatial_scheme_hyp,_THIRD_ORDER_MUSCL_)) {
 
     /* Third order MUSCL scheme */
@@ -158,7 +169,7 @@ int InitializeSolvers(
       solver->InterpolateInterfacesHyp = Interp1PrimThirdOrderMUSCL;
     }
     solver->interp = (MUSCLParameters*) calloc(1,sizeof(MUSCLParameters));
-    IERR MUSCLInitialize(solver->interp,mpi); CHECKERR(ierr);
+    IERR MUSCLInitialize(solver,mpi); CHECKERR(ierr);
 
   } else if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_UPWIND_)) {
 

@@ -136,6 +136,7 @@ AC_CONFIG_FILES([
  src/ImmersedBoundaries/Makefile
  src/InterpolationFunctions/Makefile
  src/IOFunctions/Makefile
+ src/LimiterFunctions/Makefile
  src/MathFunctions/Makefile
  src/MPIFunctions/Makefile
  src/PETScFunctions/Makefile

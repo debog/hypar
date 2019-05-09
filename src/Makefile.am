@@ -7,6 +7,7 @@ SUBDIRS = \
   ImmersedBoundaries \
   InterpolationFunctions \
   IOFunctions \
+  LimiterFunctions \
   PETScFunctions \
   PhysicalModels \
   MathFunctions \
@@ -37,6 +38,7 @@ HyPar_LDADD = \
   PhysicalModels/ShallowWater1D/libShallowWater1D.a \
   PhysicalModels/ShallowWater2D/libShallowWater2D.a \
   InterpolationFunctions/libInterpolationFunctions.a \
+  LimiterFunctions/libLimiterFunctions.a \
   FirstDerivative/libFirstDerivative.a \
   SecondDerivative/libSecondDerivative.a \
   TridiagLU/libTridiagLU.a \

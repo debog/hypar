@@ -3,10 +3,14 @@
     @author Debojyoti Ghosh
 */
 
+#include "basic.h"
+
 /*! First order upwind scheme: Interp1PrimFirstOrderUpwind(), Interp1PrimFirstOrderUpwindChar() */
 #define _FIRST_ORDER_UPWIND_    "1"
 /*! Second order central scheme: Interp1PrimSecondOrderCentral(), Interp1PrimSecondOrderCentralChar() */
 #define _SECOND_ORDER_CENTRAL_  "2"
+/*! Second order MUSCL scheme: Interp1PrimSecondOrderMUSCL(), Interp1PrimSecondOrderMUSCLChar() */
+#define _SECOND_ORDER_MUSCL_     "muscl2"
 /*! Third order MUSCL scheme with Koren's limiter: Interp1PrimThirdOrderMUSCL(), Interp1PrimThirdOrderMUSCLChar() */
 #define _THIRD_ORDER_MUSCL_     "muscl3"
 /*! Fifth order upwind scheme: Interp1PrimFifthOrderUpwind(), Interp1PrimFifthOrderUpwindChar() */
@@ -94,6 +98,8 @@
 int Interp1PrimFirstOrderUpwind           (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Component-wise interpolation of the first primitive at the cell interfaces using the second-order central scheme */
 int Interp1PrimSecondOrderCentral         (double*,double*,double*,double*,int,int,void*,void*,int);
+/*! Component-wise interpolation of the first primitive at the cell interfaces using the second-order MUSCL scheme */
+int Interp1PrimSecondOrderMUSCL           (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Component-wise interpolation of the first primitive at the cell interfaces using the third-order MUSCL scheme */
 int Interp1PrimThirdOrderMUSCL            (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Component-wise interpolation of the first primitive at the cell interfaces using the fifth-order upwind scheme */
@@ -113,6 +119,8 @@ int Interp1PrimFifthOrderHCWENO           (double*,double*,double*,double*,int,i
 int Interp1PrimFirstOrderUpwindChar       (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Characteristic-based interpolation of the first primitive at the cell interfaces using the second-order central scheme */
 int Interp1PrimSecondOrderCentralChar     (double*,double*,double*,double*,int,int,void*,void*,int);
+/*! Characteristic-based interpolation of the first primitive at the cell interfaces using the second-order MUSCL scheme */
+int Interp1PrimSecondOrderMUSCLChar       (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Characteristic-based interpolation of the first primitive at the cell interfaces using the third-order MUSCL scheme */
 int Interp1PrimThirdOrderMUSCLChar        (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Characteristic-based interpolation of the first primitive at the cell interfaces using the fifth-order upwind scheme */
@@ -143,7 +151,13 @@ int InterpSetLimiterVar(double*,double*,double*,int,void*,void*);
  * This structure contains the variables/parameters needed by the MUSCL scheme.
 */
 typedef struct paramters_muscl {
-  double eps; /*!< Epsilon parameter for the limiter */
+
+  char limiter_type[_MAX_STRING_SIZE_]; /*!< Type of slope limiter */
+  double eps; /*!< Epsilon parameter for the Koren's limiter */
+
+  /*! pointer the limiter function */
+  double (*LimiterFunction) (double);
+
 } MUSCLParameters;
 int MUSCLInitialize(void*,void*);
 
