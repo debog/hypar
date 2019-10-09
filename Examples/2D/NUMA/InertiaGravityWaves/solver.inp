@@ -10,6 +10,7 @@ begin
   hyp_space_scheme    crweno5
   hyp_interp_type     components
   hyp_flux_split      yes
+  par_space_type      nonconservative-2stage
   dt                  0.25
   screen_op_iter      10
   file_op_iter        200
