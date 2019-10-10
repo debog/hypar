@@ -94,6 +94,15 @@
   -------
   + It's best to start with some examples. See the section on examples.
   + To run more cases, see the section in input files for a complete description of input files required.
+
+  Testing and Baselines
+  ---------------------
+  + A set of baselines are available at: https://bitbucket.org/deboghosh/hypar_baselines
+    These were obtained using the master branch of the main HyPar repo.
+  + The script Extras/generate_baselines.sh can be used to clone this baselines repo and
+    regenerate the solutions.
+  + The scripts Extras/test_local.sh and Extras/test_repo.sh can be used to test a local or
+    remote copy (git repo and branch) of HyPar against these baselines.
 */
 
 #include <stdio.h>
