@@ -50,8 +50,8 @@ int TimePrintStep(void *ts /*!< Object of type #TimeIntegration */)
 
     /* print physics-specific info, if available */
     for (ns = 0; ns < nsims; ns++) {
-      if (nsims > 1) printf("Physics-specific output for domain %d:\n", ns);
       if (sim[ns].solver.PrintStep) {
+        if (nsims > 1) printf("Physics-specific output for domain %d:\n", ns);
         sim[ns].solver.PrintStep( &(sim[ns].solver),
                                   &(sim[ns].mpi),
                                   TS->waqt );
