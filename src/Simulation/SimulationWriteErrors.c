@@ -25,6 +25,9 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
   int n;
 
   if (!rank) {
+
+    if (nsims > 1) printf("\n");
+
     for (n = 0; n < nsims; n++) {
 
       char  err_fname[_MAX_STRING_SIZE_],
@@ -86,16 +89,20 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
       fclose(out);
 
       /* print solution errors, conservation errors, and wall times to screen */
-      printf("Computed errors for simuation %3d:\n", n);
+      printf("Computed errors for domain %d:\n", n);
       printf("  L1         Error           : %1.16E\n",sim[n].solver.error[0]);
       printf("  L2         Error           : %1.16E\n",sim[n].solver.error[1]);
       printf("  Linfinity  Error           : %1.16E\n",sim[n].solver.error[2]);
       printf("Conservation Errors:\n");
       for (d=0; d<sim[n].solver.nvars; d++) printf("\t%1.16E\n",sim[n].solver.ConservationError[d]);
-      printf("Solver runtime (in seconds): %1.16E\n",solver_runtime);
-      printf("Total  runtime (in seconds): %1.16E\n",main_runtime);
+      printf("\n");
 
     }
+
+    printf("Solver runtime (in seconds): %1.16E\n",solver_runtime);
+    printf("Total  runtime (in seconds): %1.16E\n",main_runtime);
+    if (nsims > 1) printf("\n");
+
   }
 
   return;

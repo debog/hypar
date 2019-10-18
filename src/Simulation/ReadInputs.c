@@ -94,8 +94,8 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
   int n, ferr    = 0;
 
   if (sim == NULL) {
-    fprintf(stderr,"Error: simulation object array is NULL!\n");
-    fprintf(stderr,"Please consider killing this run.\n");
+    printf("Error: simulation object array is NULL!\n");
+    printf("Please consider killing this run.\n");
     return(1);
   }
 
@@ -184,8 +184,13 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
               return(1);
             } else {
               int i;
-              for (i=0; i<sim[n].solver.ndims; i++) ferr = fscanf(in,"%d",&(sim[n].solver.dim_global[i]));
-              if (ferr != 1) return(1);
+              for (i=0; i<sim[n].solver.ndims; i++) {
+                ferr = fscanf(in,"%d",&(sim[n].solver.dim_global[i]));
+                if (ferr != 1) {
+                  fprintf(stderr,"Error in ReadInputs() while reading grid sizes for domain %d.\n", n);
+                  return(1);
+                }
+              }
             }
           }
 
@@ -199,8 +204,13 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
               return(1);
             } else {
               int i;
-              for (i=0; i<sim[n].solver.ndims; i++) ferr = fscanf(in,"%d",&(sim[n].mpi.iproc[i]));
-              if (ferr != 1) return(1);
+              for (i=0; i<sim[n].solver.ndims; i++) {
+                ferr = fscanf(in,"%d",&(sim[n].mpi.iproc[i]));
+                if (ferr != 1) {
+                  fprintf(stderr,"Error in ReadInputs() while reading iproc for domain %d.\n", n);
+                  return(1);
+                }
+              }
             }
           }
 
@@ -290,7 +300,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
 
         }	else if (!strcmp(word, "screen_op_iter")) { 
 
-          ferr = fscanf(in,"%d",&(sim[n].solver.screen_op_iter));
+          ferr = fscanf(in,"%d",&(sim[0].solver.screen_op_iter));
 
           int n;
           for (n = 1; n < nsims; n++) sim[n].solver.screen_op_iter = sim[0].solver.screen_op_iter;
@@ -413,13 +423,15 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
         for (i=0; i<sim[n].solver.ndims; i++) printf ("%d ",sim[n].solver.dim_global[i]);
         printf("\n");
       }
-	    printf("\tProcesses along each dimension             : ");
+#ifndef serial
+	    printf("\tProcesses along each dimension:\n");
       for (int n = 0; n < nsims; n++) {
         printf("\t\tdomain %3d - ", n);
         int i;
         for (i=0; i<sim[n].solver.ndims; i++) printf ("%d ",sim[n].mpi.iproc[i]);
         printf("\n");
       }
+#endif
     } else {
 	    printf("\tDomain size                                : ");
       int i;

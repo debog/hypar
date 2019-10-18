@@ -119,7 +119,10 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     IERR OutputSolution(sim, nsims); CHECKERR(ierr); 
   }
 
-  if (!rank) printf("Completed time integration (Final time: %f).\n",TS.waqt);
+  if (!rank) {
+    printf("Completed time integration (Final time: %f).\n",TS.waqt);
+    if (nsims > 1) printf("\n");
+  }
 
   /* calculate error if exact solution has been provided */
   for (ns = 0; ns < nsims; ns++) {

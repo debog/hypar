@@ -14,14 +14,26 @@
 
 /*! Read in the exact solution, if available. */
 int ExactSolution(
-                    void    *s,     /*!< Solver object of type #HyPar */
-                    void    *m,     /*!< MPI object of type #MPIVariables */
-                    double  *uex,   /*!< Array to hold the exact solution, if available */
-                    int     *flag   /*!< Flag to indicate if exact solution was available */
+                    void   *s,     /*!< Solver object of type #HyPar */
+                    void   *m,     /*!< MPI object of type #MPIVariables */
+                    double *uex,   /*!< Array to hold the exact solution, if available */
+                    char   *fname, /*!< Filename root from which to read exact solution */
+                    int    *flag   /*!< Flag to indicate if exact solution was available */
                  )
 {
   HyPar  *solver = (HyPar*) s;
-  ReadArray(solver->ndims,solver->nvars,solver->dim_global,solver->dim_local,
-            solver->ghosts,solver,m,NULL,uex,"exact",flag);
+
+  ReadArray(  solver->ndims,
+              solver->nvars,
+              solver->dim_global,
+              solver->dim_local,
+              solver->ghosts,
+              solver,
+              m,
+              NULL,
+              uex,
+              fname,
+              flag);
+
   return(0);
 }

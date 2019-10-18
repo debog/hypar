@@ -8,12 +8,13 @@
 #include <string.h>
 #include <math.h>
 #include <basic.h>
+#include <common.h>
 #include <arrayfunctions.h>
 #include <timeintegration.h>
 #include <mpivars.h>
 #include <hypar.h>
 
-int ExactSolution(void*,void*,double*,int*);
+int ExactSolution(void*,void*,double*,char*,int*);
 
 /*! Calculates the error in the solution if the exact solution is 
     available. If the exact solution is not available, the errors
@@ -38,8 +39,20 @@ int CalculateError(
     size *= (solver->dim_local[i]+2*solver->ghosts);
   uex = (double*) calloc (size, sizeof(double));
 
+  char fname_root[_MAX_STRING_SIZE_] = "exact";
+  if (solver->nsims > 1) {
+    char index[_MAX_STRING_SIZE_];
+    GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
+    strcat(fname_root, "_");
+    strcat(fname_root, index);
+  }
+
   static const double tolerance = 1e-15;
-  IERR ExactSolution(solver,mpi,uex,&exact_flag); CHECKERR(ierr);
+  IERR ExactSolution( solver,
+                      mpi,
+                      uex,
+                      fname_root,
+                      &exact_flag ); CHECKERR(ierr);
 
   if (!exact_flag) {
 

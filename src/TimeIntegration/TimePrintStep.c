@@ -20,11 +20,18 @@ int TimePrintStep(void *ts /*!< Object of type #TimeIntegration */)
   int ns, nsims = TS->nsims;
 
   if ((!TS->rank) && ((TS->iter+1)%sim[0].solver.screen_op_iter == 0)) {
-    printf("Iteration: %7d  "       ,TS->iter+1  );
-    printf("Time: %1.3E  "          ,TS->waqt    );
-    printf("Max CFL: %1.3E  "       ,TS->max_cfl );
-    printf("Max Diff. No.: %1.3E  " ,TS->max_diff);
-    printf("Norm: %1.4E  "          ,TS->norm    );
+    if (nsims > 1) {
+      printf("--\n");
+      printf("Iteration: %7d,  Time: %1.3e\n", TS->iter+1, TS->waqt);
+      printf("  Max CFL: %1.3E,  Max Diff. No.: %1.3E,  ", TS->max_cfl, TS->max_diff);
+      printf("  Norm: %1.4E\n", TS->norm    );
+    } else {
+      printf("Iteration: %7d  "       ,TS->iter+1  );
+      printf("Time: %1.3E  "          ,TS->waqt    );
+      printf("Max CFL: %1.3E  "       ,TS->max_cfl );
+      printf("Max Diff. No.: %1.3E  " ,TS->max_diff);
+      printf("Norm: %1.4E  "          ,TS->norm    );
+    }
 
     /* calculate and print conservation error */
     if (!strcmp(sim[0].solver.ConservationCheck,"yes")) {
@@ -37,19 +44,22 @@ int TimePrintStep(void *ts /*!< Object of type #TimeIntegration */)
         }
       }
       error = sqrt(error);
-      printf("Conservation loss: %1.4E",error);
+      printf("  Conservation loss: %1.4E\n", error);
 
     }
-    printf("\n");
 
     /* print physics-specific info, if available */
     for (ns = 0; ns < nsims; ns++) {
-      if (nsims > 1) printf("Domain %d:\n", ns);
+      if (nsims > 1) printf("Physics-specific output for domain %d:\n", ns);
       if (sim[ns].solver.PrintStep) {
         sim[ns].solver.PrintStep( &(sim[ns].solver),
                                   &(sim[ns].mpi),
                                   TS->waqt );
       }
+    }
+    if (nsims > 1) {
+      printf("--\n");
+      printf("\n");
     }
   }
 

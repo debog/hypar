@@ -47,6 +47,7 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
     if (!mpi->rank) {
 
       char filename[_MAX_STRING_SIZE_] = "boundary";
+      char filename_backup[_MAX_STRING_SIZE_] = "boundary";
       if (nsims > 1) {
         char index[_MAX_STRING_SIZE_];
         GetStringFromInteger(ns, index, (int)log10(nsims)+1);
@@ -54,13 +55,23 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
         strcat(filename, index);
       }
       strcat(filename, ".inp");
+      strcat(filename_backup, ".inp");
 
-      printf("Reading boundary conditions from %s.\n", filename);
       FILE *in;
       in = fopen(filename,"r");
       if (!in) {
-        fprintf(stderr,"Error: boundary condition file %s not found.\n", filename);
-        return(1);
+        in = fopen(filename_backup, "r");
+        if (!in) {
+          fprintf(stderr,"Error: boundary condition file %s or %s not found.\n",
+                  filename, filename_backup );
+          return(1);
+        } else {
+          if (nsims > 1) printf("Domain %d: ", ns);
+          printf("Reading boundary conditions from %s.\n", filename_backup);
+        }
+      } else {
+        if (nsims > 1) printf("Domain %d: ", ns);
+        printf("Reading boundary conditions from %s.\n", filename);
       }
 
       /* read number of boundary conditions and allocate */
@@ -195,7 +206,7 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
       }
   
       fclose(in);
-      printf("%d boundary condition(s) read from %s.\n",solver->nBoundaryZones, filename);
+      printf("%d boundary condition(s) read.\n",solver->nBoundaryZones);
     }
 
     /* tell other processes how many BCs are there and let them allocate */

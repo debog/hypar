@@ -3,6 +3,8 @@
     @author Debojyoti Ghosh
 */
 
+#include <stdio.h>
+#include <basic.h>
 #include <common.h>
 
 
@@ -16,12 +18,16 @@ void GetStringFromInteger(
                             int   width /*!< desired width of the string */
                          )
 {
+  if (width > _MAX_STRING_SIZE_-1) {
+    fprintf(stderr,"Error in GetStringFromInteger(): requested width is larger than _MAX_STRING_SIZE_.\n");
+  }
   int i;
   for (i=0; i<width; i++) {
     char digit = (char) (a%10 + '0'); 
     a /= 10;
     A[width-1-i] = digit;
   }
+  A[width] = 0;
   return;
 }
 

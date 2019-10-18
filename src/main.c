@@ -138,7 +138,7 @@ int InitializeSimulation( SimulationObject**  sim,    /*!< Array of simulation o
   if (!rank) {
 
     FILE *in;
-    in = fopen("simulations.inp","r");
+    in = fopen("simulation.inp","r");
     if (in) {
       int ferr;
       char word[_MAX_STRING_SIZE_];
