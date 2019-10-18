@@ -8,8 +8,7 @@
 #include <string.h>
 #include <basic.h>
 #include <arrayfunctions.h>
-#include <mpivars.h>
-#include <hypar.h>
+#include <simulation.h>
 #include <timeintegration.h>
 
 int TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
@@ -22,73 +21,115 @@ int TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
     by specific time integration methods.
   + It calls the method-specific initialization functions.
 */
-int TimeInitialize(
-                    void *s,  /*!< Solver object of type #HyPar */
-                    void *m,  /*!< MPI object of type #MPIVariables */
-                    void *ts  /*!< Time integration object of type #TimeIntegration */
+int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #SimulationObject */
+                    int   nsims,  /*!< number of simulation objects */
+                    int   rank,   /*!< MPI rank of this process */
+                    int   nproc,  /*!< number of MPI processes */
+                    void  *ts     /*!< Time integration object of type #TimeIntegration */
                   )
 {
-  TimeIntegration *TS     = (TimeIntegration*) ts;
-  HyPar           *solver = (HyPar*)           s;
-  MPIVariables    *mpi    = (MPIVariables*)    m;
-  int             d, i;
-  if (!solver) return(1);
+  TimeIntegration*  TS  = (TimeIntegration*) ts;
+  SimulationObject* sim = (SimulationObject*) s;
+  int ns, d, i;
 
-  TS->solver        = solver;
-  TS->mpi           = mpi;
-  TS->n_iter        = solver->n_iter;
-  TS->restart_iter  = solver->restart_iter;
-  TS->dt            = solver->dt;
+  if (!sim) return(1);
+
+  TS->simulation    = sim;
+  TS->nsims         = nsims;
+
+  TS->rank          = rank;
+  TS->nproc         = nproc;
+
+  TS->n_iter        = sim[0].solver.n_iter;
+  TS->restart_iter  = sim[0].solver.restart_iter;
+  TS->dt            = sim[0].solver.dt;
+
   TS->waqt          = (double) TS->restart_iter * TS->dt;
   TS->max_cfl       = 0.0;
   TS->norm          = 0.0;
-  TS->TimeIntegrate = solver->TimeIntegrate;
+  TS->TimeIntegrate = sim[0].solver.TimeIntegrate;
 
-  int size = solver->nvars;
-  for (d=0; d<solver->ndims; d++) size *= (solver->dim_local[d] + 2*solver->ghosts);
-  TS->u   = (double*) calloc (size,sizeof(double));
-  TS->rhs = (double*) calloc (size,sizeof(double));
-  _ArraySetValue_(TS->u  ,size,0.0);
-  _ArraySetValue_(TS->rhs,size,0.0);
+  TS->u_offsets = (long*) calloc (nsims, sizeof(long));
+  TS->u_sizes = (long*) calloc (nsims, sizeof(long));
+
+  TS->u_size_total = 0;
+  for (ns = 0; ns < nsims; ns++) {
+    TS->u_offsets[ns] = TS->u_size_total;
+    TS->u_sizes[ns] = sim[ns].solver.npoints_local_wghosts * sim[ns].solver.nvars ;
+    TS->u_size_total += TS->u_sizes[ns];
+  }
+
+  TS->u   = (double*) calloc (TS->u_size_total,sizeof(double));
+  TS->rhs = (double*) calloc (TS->u_size_total,sizeof(double));
+  _ArraySetValue_(TS->u  ,TS->u_size_total,0.0);
+  _ArraySetValue_(TS->rhs,TS->u_size_total,0.0);
 
   /* initialize arrays to NULL, then allocate as necessary */
   TS->U             = NULL;
   TS->Udot          = NULL;
   TS->BoundaryFlux  = NULL;
   
-  if (!strcmp(solver->time_scheme,_RK_)) {
+  if (!strcmp(sim[0].solver.time_scheme,_RK_)) {
 
     /* explicit Runge-Kutta methods */
-    ExplicitRKParameters  *params = (ExplicitRKParameters*)  solver->msti;
+    ExplicitRKParameters  *params = (ExplicitRKParameters*)  sim[0].solver.msti;
     int nstages = params->nstages;
     TS->U     = (double**) calloc (nstages,sizeof(double*));
     TS->Udot  = (double**) calloc (nstages,sizeof(double*));
     for (i = 0; i < nstages; i++) {
-      TS->U[i]    = (double*) calloc (size,sizeof(double));
-      TS->Udot[i] = (double*) calloc (size,sizeof(double));
+      TS->U[i]    = (double*) calloc (TS->u_size_total,sizeof(double));
+      TS->Udot[i] = (double*) calloc (TS->u_size_total,sizeof(double));
+    }
+
+    TS->bf_size_total = 0;
+    TS->bf_offsets = (int*) calloc (nsims, sizeof(int));
+    TS->bf_sizes = (int*) calloc (nsims, sizeof(int));
+    for (ns = 0; ns < nsims; ns++) {
+      TS->bf_offsets[ns] = TS->bf_size_total;
+      TS->bf_sizes[ns] =  2 * sim[ns].solver.ndims * sim[ns].solver.nvars;
+      TS->bf_size_total += TS->bf_sizes[ns];
     }
     TS->BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
-    for (i=0; i<nstages; i++) 
-      TS->BoundaryFlux[i] = (double*) calloc (2*solver->ndims*solver->nvars,sizeof(double));
+    for (i=0; i<nstages; i++) {
+      TS->BoundaryFlux[i] = (double*) calloc (TS->bf_size_total,sizeof(double));
+    }
   
-  } else if (!strcmp(solver->time_scheme,_GLM_GEE_)) {
+  } else if (!strcmp(sim[0].solver.time_scheme,_GLM_GEE_)) {
     
     /* General Linear Methods with Global Error Estimate */
-    GLMGEEParameters *params = (GLMGEEParameters*) solver->msti;
+    GLMGEEParameters *params = (GLMGEEParameters*) sim[0].solver.msti;
     int nstages = params->nstages;
     int r       = params->r;
     TS->U     = (double**) calloc (2*r-1  ,sizeof(double*));
     TS->Udot  = (double**) calloc (nstages,sizeof(double*));
-    for (i=0; i<2*r-1; i++)   TS->U[i]    = (double*) calloc (size,sizeof(double));
-    for (i=0; i<nstages; i++) TS->Udot[i] = (double*) calloc (size,sizeof(double));
+    for (i=0; i<2*r-1; i++)   TS->U[i]    = (double*) calloc (TS->u_size_total,sizeof(double));
+    for (i=0; i<nstages; i++) TS->Udot[i] = (double*) calloc (TS->u_size_total,sizeof(double));
+
+    TS->bf_size_total = 0;
+    TS->bf_offsets = (int*) calloc (nsims, sizeof(int));
+    for (ns = 0; ns < nsims; ns++) {
+      TS->bf_offsets[ns] = TS->bf_size_total;
+      TS->bf_sizes[ns] =  2 * sim[ns].solver.ndims * sim[ns].solver.nvars;
+      TS->bf_size_total += TS->bf_sizes[ns];
+    }
     TS->BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
-    for (i=0; i<nstages; i++) 
-      TS->BoundaryFlux[i] = (double*) calloc (2*solver->ndims*solver->nvars,sizeof(double));
+    for (i=0; i<nstages; i++) {
+      TS->BoundaryFlux[i] = (double*) calloc (TS->bf_size_total,sizeof(double));
+    }
+  
     
     if (!strcmp(params->ee_mode,_GLM_GEE_YYT_)) {
-      for (i=0; i<r-1; i++) _ArrayCopy1D_(solver->u,TS->U[r+i],size);
+      for (ns = 0; ns < nsims; ns++) {
+        for (i=0; i<r-1; i++) {
+          _ArrayCopy1D_(  (sim[ns].solver.u),
+                          (TS->U[r+i] + TS->u_offsets[ns]),
+                          (TS->u_sizes[ns])  );
+        }
+      }
     } else {
-      for (i=0; i<r-1; i++) _ArraySetValue_(TS->U[r+i],size,0.0);
+      for (i=0; i<r-1; i++) {
+        _ArraySetValue_(TS->U[r+i],TS->u_size_total,0.0);
+      }
     }
   }
 
@@ -96,12 +137,15 @@ int TimeInitialize(
   TS->RHSFunction = TimeRHSFunctionExplicit;
 
   /* open files for writing */
-  if (!mpi->rank) {
-    if (solver->write_residual) TS->ResidualFile = (void*) fopen("residual.out","w");
-    else                        TS->ResidualFile = NULL;
-  } else                        TS->ResidualFile = NULL;
+  if (!rank) {
+    if (sim[0].solver.write_residual) TS->ResidualFile = (void*) fopen("residual.out","w");
+    else                              TS->ResidualFile = NULL;
+  } else                              TS->ResidualFile = NULL;
 
-  solver->time_integrator = TS;
+  for (ns = 0; ns < nsims; ns++) {
+    sim[ns].solver.time_integrator = TS;
+  }
+
   return(0);
 }
 

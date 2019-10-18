@@ -8,6 +8,7 @@
 #include <string.h>
 #include <math.h>
 #include <basic.h>
+#include <common.h>
 #include <arrayfunctions.h>
 #include <mathfunctions.h>
 #include <immersedboundaries.h>
@@ -292,7 +293,15 @@ int NavierStokes3DIBForces(
   }
 
   char surface_filename[_MAX_STRING_SIZE_] = "surface";
-  if (!strcmp(solver->op_overwrite,"no")) strcat(surface_filename,solver->filename_index);
+  if (solver->nsims == 1) {
+    if (!strcmp(solver->op_overwrite,"no")) strcat(surface_filename,solver->filename_index);
+  } else {
+    char index[_MAX_STRING_SIZE_];
+    GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
+    strcat(surface_filename, "_");
+    strcat(surface_filename, index);
+    strcat(surface_filename, "_");
+  }
   strcat(surface_filename,".dat");
 
   if (!mpi->rank) {

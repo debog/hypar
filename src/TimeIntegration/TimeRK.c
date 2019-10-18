@@ -5,8 +5,7 @@
 
 #include <basic.h>
 #include <arrayfunctions.h>
-#include <mpivars.h>
-#include <hypar.h>
+#include <simulation.h>
 #include <timeintegration.h>
 
 /*!
@@ -29,39 +28,85 @@
 */
 int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
 {
-  TimeIntegration       *TS     = (TimeIntegration*) ts;
-  HyPar                 *solver = (HyPar*)           TS->solver;
-  MPIVariables          *mpi    = (MPIVariables*)    TS->mpi;
-  ExplicitRKParameters  *params = (ExplicitRKParameters*)  solver->msti;
-  int                   d, stage, i;
+  TimeIntegration* TS = (TimeIntegration*) ts;
+  SimulationObject* sim = (SimulationObject*) TS->simulation;
+  ExplicitRKParameters *params = (ExplicitRKParameters*) sim[0].solver.msti;
+  int ns, stage, i, nsims = TS->nsims;
   _DECLARE_IERR_;
-
-  int size = 1;
-  for (d=0; d<solver->ndims; d++) size *= (solver->dim_local[d]+2*solver->ghosts);
 
   /* Calculate stage values */
   for (stage = 0; stage < params->nstages; stage++) {
-    double stagetime = TS->waqt + params->c[stage]*TS->dt;
-    _ArrayCopy1D_(solver->u,TS->U[stage],size*solver->nvars);
-    for (i = 0; i < stage; i++) {
-      _ArrayAXPY_(TS->Udot[i],solver->dt*params->A[stage*params->nstages+i],
-                  TS->U[stage],size*solver->nvars); 
-    }
-    if (solver->PreStage)
-      { IERR solver->PreStage(stage,TS->U ,solver,mpi,stagetime); CHECKERR(ierr); }
-    IERR TS->RHSFunction(TS->Udot[stage],TS->U[stage],solver,mpi,stagetime);
-    if (solver->PostStage) 
-      { IERR solver->PostStage(TS->U[stage],solver,mpi,stagetime); CHECKERR(ierr); }
 
-    _ArraySetValue_(TS->BoundaryFlux[stage],2*solver->ndims*solver->nvars,0.0);
-    _ArrayCopy1D_(solver->StageBoundaryIntegral,TS->BoundaryFlux[stage],2*solver->ndims*solver->nvars);
+    double stagetime = TS->waqt + params->c[stage]*TS->dt;
+
+    for (ns = 0; ns < nsims; ns++) {
+      _ArrayCopy1D_(  sim[ns].solver.u,
+                      (TS->U[stage] + TS->u_offsets[ns]),
+                      (TS->u_sizes[ns]) );
+    }
+
+    for (i = 0; i < stage; i++) {
+      _ArrayAXPY_(  TS->Udot[i],
+                    (TS->dt * params->A[stage*params->nstages+i]),
+                    TS->U[stage],
+                    TS->u_size_total ); 
+    }
+
+    for (ns = 0; ns < nsims; ns++) {
+      if (sim[ns].solver.PreStage) { 
+        fprintf(stderr,"Call to solver->PreStage() commented out in TimeRK()!\n");
+        return 1;
+//        IERR sim[ns].solver.PreStage( stage,
+//                                      (TS->U),
+//                                      &(sim[ns].solver),
+//                                      &(sim[ns].mpi),
+//                                      stagetime ); CHECKERR(ierr); 
+      }
+    }
+
+    for (ns = 0; ns < nsims; ns++) {
+      IERR TS->RHSFunction( (TS->Udot[stage] + TS->u_offsets[ns]),
+                            (TS->U[stage] + TS->u_offsets[ns]),
+                            &(sim[ns].solver),
+                            &(sim[ns].mpi),
+                            stagetime);
+    }
+
+    for (ns = 0; ns < nsims; ns++) {
+      if (sim[ns].solver.PostStage) { 
+        IERR sim[ns].solver.PostStage(  (TS->U[stage] + TS->u_offsets[ns]),
+                                        &(sim[ns].solver),
+                                        &(sim[ns].mpi),
+                                        stagetime); CHECKERR(ierr); 
+      }
+    }
+
+    _ArraySetValue_(TS->BoundaryFlux[stage], TS->bf_size_total, 0.0);
+    for (ns = 0; ns < nsims; ns++) {
+      _ArrayCopy1D_(  sim[ns].solver.StageBoundaryIntegral,
+                      (TS->BoundaryFlux[stage] + TS->bf_offsets[ns]),
+                      TS->bf_sizes[ns] );
+    }
+
   }
 
   /* Step completion */
   for (stage = 0; stage < params->nstages; stage++) {
-    _ArrayAXPY_(TS->Udot[stage],solver->dt*params->b[stage],solver->u,size*solver->nvars);
-    _ArrayAXPY_(TS->BoundaryFlux[stage],solver->dt*params->b[stage],solver->StepBoundaryIntegral,
-                2*solver->ndims*solver->nvars);
+
+    for (ns = 0; ns < nsims; ns++) {
+
+      _ArrayAXPY_(  (TS->Udot[stage] + TS->u_offsets[ns]),
+                    (TS->dt * params->b[stage]),
+                    (sim[ns].solver.u),
+                    (TS->u_sizes[ns]) );
+  
+      _ArrayAXPY_(  (TS->BoundaryFlux[stage] + TS->bf_offsets[ns]),
+                    (TS->dt * params->b[stage]),
+                    (sim[ns].solver.StepBoundaryIntegral),
+                    (TS->bf_sizes[ns]) );
+
+    }
+
   }
 
   return(0);

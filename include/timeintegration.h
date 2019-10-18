@@ -40,20 +40,46 @@ typedef struct time_integration_variables {
   /*! Maximum diffusion number at a time step */
   double  max_diff;     
 
-  /*! Solver object of type #HyPar */
-  void    *solver;      
-  /*! MPI object of type #MPIVariables */
-  void    *mpi;         
+  /*! Array of simulation objects of type #SimulationObject */
+  void    *simulation;
+  /*! Number of simulation objects */
+  int     nsims;
+
+  /*! Offsets (positions) for the solution of each simulation domain in
+   *  the big array containing all the solutions */
+  long    *u_offsets;
+
+  /*! Local size of the solution of each simulation domain */
+  long    *u_sizes;
+
+  /*! Offsets (positions) for the boundary flux of each simulation domain in
+   *  the big array containing all the boundary fluxes */
+  int     *bf_offsets;
+
+  /*! Size of  the boundary flux of each simulation domain */
+  int     *bf_sizes;
+
   /*! Array to store the current solution */
   double  *u;           
 
   /*! Array to store the right-hand side */ 
   double  *rhs;         
 
+  /*! Local size of the solution vector */
+  long    u_size_total;
+
+  /*! Local size of the boundary flux vector */
+  long    bf_size_total;
+
   /*! Arrays to store stage values for a multi-stage time-integration method */
   double  **U; 
   /*! Arrays to store stage right-hand-sides for a multi-stage time-integration method */
   double  **Udot;
+
+  /*! MPI rank of this process */
+  int     rank;
+  /*! Number of MPI processes */
+  int     nproc;
 
   /*! Array to store the flux integral at the physical boundary at each stage of 
       a multi-stage time-integration method (to compute conservation errors) */
@@ -246,7 +272,7 @@ int TimeGLMGEEInitialize(char*,char*,void*,void*);
 int TimeGLMGEECleanup   (void*);
 
 /*! Initialize the time integration */
-int TimeInitialize      (void*,void*,void*);
+int TimeInitialize      (void*,int, int, int, void*);
 /*! Clean up variables related to time integration */
 int TimeCleanup         (void*);
 /*! Function called at the beginning of a time step */
@@ -260,7 +286,7 @@ int TimePrintStep       (void*);
 /*! Compute/estimate error in solution */
 int TimeError           (void*,void*,double*);
 /*! Function to get auxiliary solutions if available (for example, in GLM-GEE methods) */
-int TimeGetAuxSolutions (int*,double**,void*,int);
+int TimeGetAuxSolutions (int*,double**,void*,int,int);
 
 /*! Take a step in time using the Forward Euler method */
 int TimeForwardEuler  (void*);

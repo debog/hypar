@@ -96,7 +96,7 @@ PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
     if (solver->PhysicsOutput) {
       IERR solver->PhysicsOutput(solver,mpi); CHECKERR(ierr);
     }
-    ierr = OutputSolution(solver,mpi); CHECKERR(ierr); context->tic=0; 
+    //ierr = OutputSolution(solver,mpi); CHECKERR(ierr); context->tic=0; 
   }
 
   PetscFunctionReturn(0);

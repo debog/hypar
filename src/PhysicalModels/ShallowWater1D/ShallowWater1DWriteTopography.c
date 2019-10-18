@@ -3,7 +3,9 @@
     @brief Function to write out the topography
 */
 #include <stdlib.h>
+#include <string.h>
 #include <basic.h>
+#include <common.h>
 #include <arrayfunctions.h>
 #include <io.h>
 #include <mpivars.h>
@@ -22,9 +24,28 @@ int ShallowWater1DWriteTopography(
   _DECLARE_IERR_;
 
   if (params->topo_flag) {
-    IERR WriteArray(solver->ndims,1,solver->dim_global,solver->dim_local,
-                    solver->ghosts,solver->x,params->b,solver,mpi,
-                    "topography"); CHECKERR(ierr);
+
+    char fname_root[_MAX_STRING_SIZE_] = "topography";
+    if (solver->nsims == 1) {
+      if (!strcmp(solver->op_overwrite,"no")) strcat(fname_root,solver->filename_index);
+    } else {
+      char index[_MAX_STRING_SIZE_];
+      GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
+      strcat(fname_root, "_");
+      strcat(fname_root, index);
+      strcat(fname_root, "_");
+    }
+
+    IERR WriteArray(  solver->ndims,
+                      1,
+                      solver->dim_global,
+                      solver->dim_local,
+                      solver->ghosts,
+                      solver->x,
+                      params->b,
+                      solver,mpi,
+                      fname_root ); CHECKERR(ierr);
+
   }
 
   return(0);

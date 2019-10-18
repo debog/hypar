@@ -79,7 +79,7 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
     if (solver->PhysicsOutput) {
       IERR solver->PhysicsOutput(solver,mpi); CHECKERR(ierr);
     }
-    ierr = OutputSolution(solver,mpi); CHECKERR(ierr); 
+    //ierr = OutputSolution(solver,mpi); CHECKERR(ierr); 
   }
 
   IERR TransferVecToPETSc(solver->u,Y,context);

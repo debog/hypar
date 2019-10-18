@@ -46,6 +46,12 @@ typedef struct main_parameters {
   /*! If restart run, time step iteration at which to restart. 0 -> not a restart run (input - \b solver.inp ) */
   int     restart_iter;
 
+  /*! for multi-domain simulations, index of this solver object */
+  int     my_idx;
+
+  /*! for multi-domain simulations, total number of solver objects */
+  int     nsims;
+
   /*! time step size (input - \b solver.inp ) */
   double  dt;
 
@@ -389,21 +395,7 @@ typedef struct main_parameters {
 
 } HyPar;
 
-/* The following functions are called by main() */
-int CalculateError                (void*,void*);/*!< Calculate the error in the final solution */
-int Cleanup                       (void*,void*);/*!< Clean up: deallocate all arrays and objects */
-int Initialize                    (void*,void*);/*!< Initialize the solver */
-int InitializeBoundaries          (void*,void*);/*!< Initialize the boundary conditions */
-int InitializeImmersedBoundaries  (void*,void*);/*!< Initialize the immersed boundary conditions */
-int InitializePhysics             (void*,void*);/*!< Initialize the physics */
-int InitializeSolvers             (void*,void*);/*!< Initialize the solvers */
-int InitialSolution               (void*,void*);/*!< Read the initial solution */
-int OutputSolution                (void*,void*);/*!< Write solution to file */
-int ReadInputs                    (void*,void*);/*!< Read the input parameters */
-int Solve                         (void*,void*);/*!< Solve the PDE - time-integration */
-#ifdef with_petsc
-int SolvePETSc                    (void*,void*);  /*!< Solve the PDE using PETSc TS */
-#endif
+int CalculateError (void*,void*);/*!< Calculate the error in the final solution */
 
 /* Some definitions - types of discretizations available 
    for the parabolic (2nd derivative) term  */

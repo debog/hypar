@@ -1,7 +1,8 @@
 SUBDIRS = \
   ArrayFunctions \
   BandedMatrix \
-  BoundaryConditions\
+  BoundaryConditions \
+  CommonFunctions \
   FirstDerivative \
   HyParFunctions \
   ImmersedBoundaries \
@@ -13,12 +14,14 @@ SUBDIRS = \
   MathFunctions \
   MPIFunctions \
   SecondDerivative \
+  Simulation \
   TimeIntegration \
   TridiagLU
 
 bin_PROGRAMS = HyPar
 HyPar_SOURCES = main.c
 HyPar_LDADD = \
+  Simulation/libSimulation.a \
   HyParFunctions/libHyParFunctions.a \
   TimeIntegration/libTimeIntegration.a \
   PETScFunctions/libPETScFunctions.a \
@@ -46,4 +49,5 @@ HyPar_LDADD = \
   MPIFunctions/libMPIFunctions.a \
   BandedMatrix/libBandedMatrix.a \
   ArrayFunctions/libArrayFunctions.a \
-  MathFunctions/libMathFunctions.a
+  MathFunctions/libMathFunctions.a \
+  CommonFunctions/libCommonFunctions.a

@@ -131,6 +131,7 @@ AC_CONFIG_FILES([
  src/ArrayFunctions/Makefile
  src/BandedMatrix/Makefile
  src/BoundaryConditions/Makefile
+ src/CommonFunctions/Makefile
  src/FirstDerivative/Makefile
  src/HyParFunctions/Makefile
  src/ImmersedBoundaries/Makefile
@@ -155,6 +156,7 @@ AC_CONFIG_FILES([
    src/PhysicalModels/ShallowWater1D/Makefile
    src/PhysicalModels/ShallowWater2D/Makefile
  src/SecondDerivative/Makefile
+ src/Simulation/Makefile
  src/TimeIntegration/Makefile
  src/TridiagLU/Makefile
 ])

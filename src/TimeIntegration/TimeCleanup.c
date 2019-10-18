@@ -6,8 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mpivars.h>
-#include <hypar.h>
+#include <simulation.h>
 #include <timeintegration.h>
 
 /*!
@@ -15,30 +14,36 @@
 */
 int TimeCleanup(void *ts /*!< Object of type #TimeIntegration*/)
 {
-  TimeIntegration *TS     = (TimeIntegration*) ts;
-  HyPar           *solver = (HyPar*)           TS->solver;
-  MPIVariables    *mpi    = (MPIVariables*)    TS->mpi;
+  TimeIntegration* TS = (TimeIntegration*) ts;
+  SimulationObject* sim = (SimulationObject*) TS->simulation;
+  int ns, nsims = TS->nsims;
 
   /* close files opened for writing */
-  if (!mpi->rank) if (solver->write_residual) fclose((FILE*)TS->ResidualFile);
+  if (!TS->rank) if (sim[0].solver.write_residual) fclose((FILE*)TS->ResidualFile);
 
-  if (!strcmp(solver->time_scheme,_RK_)) {
+  if (!strcmp(sim[0].solver.time_scheme,_RK_)) {
     int i;
-    ExplicitRKParameters  *params = (ExplicitRKParameters*)  solver->msti;
+    ExplicitRKParameters  *params = (ExplicitRKParameters*)  sim[0].solver.msti;
     for (i=0; i<params->nstages; i++) free(TS->U[i]);            free(TS->U);
     for (i=0; i<params->nstages; i++) free(TS->Udot[i]);         free(TS->Udot);
     for (i=0; i<params->nstages; i++) free(TS->BoundaryFlux[i]); free(TS->BoundaryFlux);
-  } else if (!strcmp(solver->time_scheme,_GLM_GEE_)) {
+  } else if (!strcmp(sim[0].solver.time_scheme,_GLM_GEE_)) {
     int i;
-    GLMGEEParameters  *params = (GLMGEEParameters*)  solver->msti;
+    GLMGEEParameters  *params = (GLMGEEParameters*)  sim[0].solver.msti;
     for (i=0; i<2*params->r-1  ; i++) free(TS->U[i]);            free(TS->U);
     for (i=0; i<params->nstages; i++) free(TS->Udot[i]);         free(TS->Udot);
     for (i=0; i<params->nstages; i++) free(TS->BoundaryFlux[i]); free(TS->BoundaryFlux);
   }
 
   /* deallocate arrays */
+  free(TS->u_offsets);
+  free(TS->u_sizes);
+  free(TS->bf_offsets);
+  free(TS->bf_sizes);
   free(TS->u  );
   free(TS->rhs);
-  solver->time_integrator = NULL;
+  for (ns = 0; ns < nsims; ns++) {
+    sim[ns].solver.time_integrator = NULL;
+  }
   return(0);
 }

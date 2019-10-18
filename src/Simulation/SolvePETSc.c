@@ -14,11 +14,10 @@
 #include <string.h>
 #include <basic.h>
 #include <arrayfunctions.h>
-#include <mpivars.h>
 #include <io.h>
 #include <boundaryconditions.h>
-#include <hypar.h>
 #include <petscinterface.h>
+#include <simulation.h>
 
 #undef __FUNCT__
 #define __FUNCT__ "SolvePETSc"
@@ -39,11 +38,22 @@
     on PETSc's website).
 */
 
-int SolvePETSc(void *s, /*!< Solver object of type #HyPar */
-               void *m  /*!< MPI object of type #MPIVariables */)
+int SolvePETSc( void *s, /*!< Array of simulation objects of type #SimulationObjects */
+                int   nsims,  /*!< number of simulation objects */
+                int   rank,   /*!< MPI rank of this process */
+                int   nproc   /*!< Number of MPI processes */
+               )
 {
-  HyPar           *solver = (HyPar*)        s;
-  MPIVariables    *mpi    = (MPIVariables*) m;
+  SimulationObject* sim = (SimulationObject*) s;
+
+  if (nsims > 1) {
+    fprintf(stderr,"Error in SolvePETSc: Ensemble simulations with nsims > 1 not yet supported!\n");
+    return 1;
+  }
+
+  HyPar           *solver = &(sim[0].solver);
+  MPIVariables    *mpi    = &(sim[0].mpi);
+
   PetscErrorCode  ierr    = 0, d;
   TS              ts;     /* time integration object               */
   Vec             Y,Z;    /* PETSc solution vectors                */
@@ -378,7 +388,7 @@ int SolvePETSc(void *s, /*!< Solver object of type #HyPar */
     if (solver->PhysicsOutput) {
       IERR solver->PhysicsOutput(solver,mpi); CHECKERR(ierr);
     }
-    IERR OutputSolution(solver,mpi); CHECKERR(ierr); 
+    IERR OutputSolution(sim, nsims); CHECKERR(ierr); 
   }
   /* calculate error if exact solution has been provided */
   IERR CalculateError(solver,mpi); CHECKERR(ierr);

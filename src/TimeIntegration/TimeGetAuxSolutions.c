@@ -30,16 +30,17 @@ int TimeGetAuxSolutions(
                           int     *N,      /*!< Number of auxiliary solutions */
                           double  **uaux,  /*!< Pointer to the array holding the auxiliary solution */
                           void    *s,      /*!< Solver object of type #HyPar */
-                          int     n        /*!< Index of the auxiliary solution to return */
+                          int     nu,      /*!< Index of the auxiliary solution to return */
+                          int     ns       /*!< Index of the simulation domain of which the auxiliary solution to return */
                        )
 {
   HyPar           *solver = (HyPar*) s;
   TimeIntegration *TS     = (TimeIntegration*) solver->time_integrator;
 
-  if (n >= 0) {
+  if (nu >= 0) {
     if (!strcmp(solver->time_scheme,_GLM_GEE_)) {
       GLMGEEParameters *params = (GLMGEEParameters*) solver->msti;
-      *uaux = TS->U[params->r+n];
+      *uaux = (TS->U[params->r+nu] + TS->u_offsets[ns]);
     }
   } else {
     if (!TS) *N = 0;
