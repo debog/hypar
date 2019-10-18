@@ -120,7 +120,7 @@ style = [ ...
             '-kd';
             '-mv';
         ];
-if (size(style,2) < size(schemes,2))
+if (size(style,1) < size(schemes,2))
     printf('Error: not enough plotting styles specified.\n');
     return;
 end
