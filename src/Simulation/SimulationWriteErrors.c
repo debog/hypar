@@ -45,7 +45,7 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
         strcat(fc_fname,"_");
 
         char index[_MAX_STRING_SIZE_];
-        GetStringFromInteger(n, index,4);
+        GetStringFromInteger(n, index, (int)log10(nsims)+1);
 
         strcat(err_fname,index);
         strcat(cons_fname,index);
