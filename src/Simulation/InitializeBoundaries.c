@@ -28,7 +28,7 @@ static int CalculateLocalExtent(void*,void*);
     Note that boundary conditions are implemented as boundary objects of the
     type #DomainBoundary.
 */
-int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #SimulationObjects */
+int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #SimulationObject */
                           int   nsims /*!< number of simulation objects */
                         )
 {

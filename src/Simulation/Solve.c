@@ -21,7 +21,7 @@ int ComputeRHSOperators(void*,void*,double);
     time steps, and calculates the errors. After the specified number of iterations, 
     it writes out some information to the screen and the solution to a file.
 */
-int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationObjects */
+int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationObject */
             int   nsims,  /*!< number of simulation objects */
             int   rank,   /*!< MPI rank of this process */
             int   nproc   /*!< Number of MPI processes */

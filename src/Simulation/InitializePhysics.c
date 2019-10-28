@@ -32,7 +32,7 @@
     setting all the physics-specific functions that are required
     by the model.
 */
-int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #SimulationObjects */
+int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #SimulationObject */
                         int   nsims /*!< number of simulation objects */
                      )
 {

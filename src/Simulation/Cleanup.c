@@ -30,7 +30,7 @@
 #include <physicalmodels/shallowwater2d.h>
 
 /*! Cleans up and frees the memory after the completion of the simulation. */
-int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationObjects */
+int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationObject */
               int   nsims /*!< number of simulation objects */
            )
 {

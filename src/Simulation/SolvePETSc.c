@@ -38,7 +38,7 @@
     on PETSc's website).
 */
 
-int SolvePETSc( void *s, /*!< Array of simulation objects of type #SimulationObjects */
+int SolvePETSc( void *s, /*!< Array of simulation objects of type #SimulationObject */
                 int   nsims,  /*!< number of simulation objects */
                 int   rank,   /*!< MPI rank of this process */
                 int   nproc   /*!< Number of MPI processes */

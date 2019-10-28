@@ -37,7 +37,7 @@ int  NonLinearInterpolation      (double*,void*,void*,double,
     depending on user input. The specific functions used for spatial
     discretization, time integration, and solution output are set here.
 */
-int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #SimulationObjects */
+int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #SimulationObject */
                         int   nsims /*!< number of simulation objects */
                      )
 {
