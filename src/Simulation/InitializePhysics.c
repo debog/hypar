@@ -13,6 +13,7 @@
 
 /* include header files for each physical model */
 #include <physicalmodels/linearadr.h>
+#include <physicalmodels/burgers.h>
 #include <physicalmodels/fpdoublewell.h>
 #include <physicalmodels/fppowersystem.h>
 #include <physicalmodels/fppowersystem1bus.h>
@@ -79,7 +80,12 @@ int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #Si
   
       solver->physics = (LinearADR*) calloc (1,sizeof(LinearADR));
       IERR LinearADRInitialize(solver,mpi); CHECKERR(ierr);
-  
+
+    } else if (!strcmp(solver->model,_BURGERS_)) {
+
+    solver->physics = (Burgers*) calloc (1,sizeof(Burgers));
+    IERR BurgersInitialize(solver,mpi); CHECKERR(ierr);
+
     } else if (!strcmp(solver->model,_FP_DOUBLE_WELL_)) {
   
       solver->physics = (FPDoubleWell*) calloc (1,sizeof(FPDoubleWell));

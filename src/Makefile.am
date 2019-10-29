@@ -28,6 +28,7 @@ HyPar_LDADD = \
   ImmersedBoundaries/libImmersedBoundaries.a \
   BoundaryConditions/libBoundaryConditions.a \
   PhysicalModels/LinearADR/libLinearADR.a \
+  PhysicalModels/Burgers/libBurgers.a \
   PhysicalModels/FPDoubleWell/libFPDoubleWell.a \
   PhysicalModels/FPPowerSystem/libFPPowerSystem.a \
   PhysicalModels/FPPowerSystem1Bus/libFPPowerSystem1Bus.a \

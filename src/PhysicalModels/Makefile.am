@@ -1,5 +1,6 @@
 SUBDIRS = \
   LinearADR \
+  Burgers \
   FPDoubleWell \
   FPPowerSystem \
   FPPowerSystem1Bus \
