@@ -56,7 +56,6 @@ int BurgersUpwind(  double* fI,   /*!< Computed upwind interface flux */
         } else if ((eigL < 0) && (eigR < 0)) {
            fI[nvars*p+v] = fR[nvars*p+v];
         } else { 
-           double ujp = u[nvars*p+v+1];
            double alpha = max(eigL, eigR);
            fI[nvars*p+v] = 0.5 * (fL[nvars*p+v] + fR[nvars*p+v] - alpha * (uR[nvars*p+v] - uL[nvars*p+v]));
         }
