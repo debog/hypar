@@ -1,19 +1,19 @@
 begin
 	ndims              2
 	nvars              1
-	size               20 20 
-	iproc              1 1 
+	size               64 64
+	iproc              2 2 
 	ghost              3
-	n_iter             500
+	n_iter             40
 	restart_iter       0 
 	time_scheme        rk
-	time_scheme_type   ssprk3
+	time_scheme_type   44
 	hyp_space_scheme   crweno5
-	dt                 0.00025
+	dt                 0.1
 	conservation_check yes
-	screen_op_iter     10
-	file_op_iter       40
-	op_file_format     text
+	screen_op_iter     1
+	file_op_iter       4
+	op_file_format     tecplot2d
 	ip_file_type       ascii
 	input_mode         serial
 	output_mode        serial

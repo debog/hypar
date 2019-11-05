@@ -4,28 +4,36 @@
 #include <string.h>
 
 
-int main(){
+int main()
+{
   double pi = 4.0*atan(1.0);
-	int NI,ndims;
+
+	int NI, ndims;
+
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");
+
   FILE *in;
   printf("Reading file \"solver.inp\"...\n");
   in = fopen("solver.inp","r");
-  if (!in) printf("Error: Input file \"solver.inp\" not found. Default values will be used.\n");
-  else {
+  if (!in) {
+    printf("Error: Input file \"solver.inp\" not found. Default values will be used.\n");
+  } else {
     char word[500];
     fscanf(in,"%s",word);
-    if (!strcmp(word, "begin")){
-      while (strcmp(word, "end")){
+    if (!strcmp(word, "begin")) {
+      while (strcmp(word, "end")) {
         fscanf(in,"%s",word);
         if (!strcmp(word, "ndims"))             fscanf(in,"%d",&ndims);
         else if (!strcmp(word, "size"))         fscanf(in,"%d",&NI);
         else if (!strcmp(word, "ip_file_type")) fscanf(in,"%s",ip_file_type);
       }
-    } else printf("Error: Illegal format in solver.inp. Crash and burn!\n");
+    } else {
+      printf("Error: Illegal format in solver.inp. Crash and burn!\n");
+    }
   }
   fclose(in);
+
   if (ndims != 1) {
     printf("ndims is not 1 in solver.inp. this code is to generate 1D initial conditions\n");
     return(0);
@@ -41,7 +49,7 @@ int main(){
 
 	for (i = 0; i < NI; i++){
 		x[i] = i*dx;
-		u[i] = sin(2*pi*x[i]) + 1.0;
+		u[i] = sin(2*pi*x[i]) / (4*pi);
 	}
 
   FILE *out;

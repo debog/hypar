@@ -1,10 +1,25 @@
+/*! @file BurgersAdvection.c
+    @author John Loffeld
+    @brief Contains the function to compute the hyperbolic flux for the Burgers equations over the domain.
+*/
+
 #include <stdlib.h>
 #include <basic.h>
 #include <arrayfunctions.h>
 #include <physicalmodels/burgers.h>
 #include <hypar.h>
 
-int BurgersAdvection(double *f,double *u,int dir,void *s,double t)
+/*! Compute the hyperbolic flux over the local domain.\n
+    \f{equation}{
+      {\bf F}\left({\bf u}\right) = 0.5 {\bf u}^2
+    \f}
+*/
+int BurgersAdvection( double  *f,   /*!< Array to hold the computed flux (same size and layout as u) */
+                      double  *u,   /*!< Array containing the conserved solution */
+                      int     dir,  /*!< Spatial dimension */
+                      void    *s,   /*!< Solver object of type #HyPar */
+                      double  t     /*!< Current time */
+                    )
 {
   HyPar     *solver = (HyPar*)   s;
   Burgers   *param  = (Burgers*) solver->physics;
