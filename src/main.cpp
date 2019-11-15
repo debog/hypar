@@ -109,6 +109,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+
+#include <string>
+
 #ifdef with_petsc
 #include <petscinterface.h>
 #endif
@@ -123,7 +126,7 @@ static const char help[] = "HyPar - A finite-difference algorithm for solving hy
 */
 int InitializeSimulation( SimulationObject**  sim,    /*!< Array of simulation objects of type 
                                                            #SimulationObject, must be NULL. */
-                          int*                nsims,  /*!< Number of simulation objects */
+                          int&                nsims,  /*!< Number of simulation objects */
                           int                 rank,   /*!< MPI rank of this process */
                           int                 nproc   /*!< Number of MPI processes  */
                         )
@@ -134,51 +137,68 @@ int InitializeSimulation( SimulationObject**  sim,    /*!< Array of simulation o
   }
 
   /* default value */
-  *nsims = 1;
+  nsims = 1;
 
   if (!rank) {
 
     FILE *in;
     in = fopen("simulation.inp","r");
+
     if (in) {
+
       int ferr;
-      char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-      if (!strcmp(word, "begin")){
-        while (strcmp(word, "end")) {
-  	      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-          if (!strcmp(word, "nsims")) {
-            ferr = fscanf(in,"%d",nsims); if (ferr != 1) return(1);
-          } else if (strcmp(word, "end")) {
-            char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless);
+      std::string word;
+      ferr = fscanf(in,"%s",word.c_str()); if (ferr != 1) return(1);
+
+      if (word == "begin") {
+
+        while (word != "end") {
+
+  	      ferr = fscanf(in,"%s",word.c_str()); if (ferr != 1) return(1);
+
+          if (word == "nsims") {
+
+            ferr = fscanf(in,"%d",&nsims); if (ferr != 1) return(1);
+
+          } else if (word != "end") {
+
+            std::string useless;
+            ferr = fscanf(in,"%s",useless.c_str());
             printf("Warning: keyword %s in file \"simulation.inp\" with value %s not recognized or extraneous. Ignoring.\n",
-                    word,useless);
+                    word.c_str(), useless.c_str() );
+
           }
+
           if (ferr != 1) return(1);
         }
       } else {
+
    		  fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
         return 1;
+
       }
+
       fclose(in);
+
     }
-    if (*nsims < 1) {
+
+    if (nsims < 1) {
       fprintf(stderr,"Error in InitializeSimulation(): invalid value for nsims (%d)!\n", nsims);
       return 1;
     }
-    printf("Number of simulation domains: %d\n", *nsims);
+
+    printf("Number of simulation domains: %d\n", nsims);
   }
 
 #ifndef serial
-  MPI_Bcast(nsims,1,MPI_INT,0,MPI_COMM_WORLD);
+  MPI_Bcast(&nsims,1,MPI_INT,0,MPI_COMM_WORLD);
 #endif
 
   int ns;
-  SimulationObject* sim_array = (SimulationObject*) calloc( *nsims, sizeof(SimulationObject));
-  for (ns = 0; ns < *nsims; ns++) {
+  SimulationObject* sim_array = (SimulationObject*) calloc( nsims, sizeof(SimulationObject));
+  for (ns = 0; ns < nsims; ns++) {
     sim_array[ns].solver.my_idx = ns;
-    sim_array[ns].solver.nsims = *nsims;
+    sim_array[ns].solver.nsims = nsims;
     sim_array[ns].mpi.rank = rank;
     sim_array[ns].mpi.nproc = nproc;
   }
@@ -197,7 +217,7 @@ int InitializeSimulation( SimulationObject**  sim,    /*!< Array of simulation o
  *
  * The main driver function that calls the initialization, solving, and cleaning up functions.
 */
-int main(int argc,char **argv)
+int main(int argc, char **argv)
 {
   SimulationObject  *sim;
   int               ierr = 0, d, n;
@@ -232,7 +252,7 @@ int main(int argc,char **argv)
   /* Allocate simulation objects */
   int nsims;
   sim = NULL;
-  ierr = InitializeSimulation(&sim, &nsims, rank, nproc);
+  ierr = InitializeSimulation(&sim, nsims, rank, nproc);
   if (sim == NULL) {
     printf("Error: InitializeSimulation() failed to allocate simulation objects on rank %d\n",
            rank);
