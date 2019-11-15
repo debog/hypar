@@ -24,7 +24,7 @@
   + Solves <B>hyperbolic-parabolic PDEs with source terms</B>.
   + Allows arbitrary number of <B>spatial dimensions</B> and <B>vector components per grid point</B>.
   + Solves the PDEs over <B>Cartesian</B> grids.
-  + Written entirely in C and uses the MPICH library. It also uses OpenMP threads 
+  + Written entirely in C/C++ and uses the MPICH library. It also uses OpenMP threads 
     but this is a work-in-progress.
   + Can be <B>compiled with PETSc</B> (http://www.mcs.anl.gov/petsc/), if available, where 
     it can use PETSc's time integration module TS (http://www.mcs.anl.gov/petsc/petsc-current/src/ts/).
@@ -58,11 +58,11 @@
   To compile HyPar, follow these steps in the root directory:
   
         autoreconf -i
-        [CFLAGS="..."] ./configure [options]
+        [CFLAGS="..."] [CXXFLAGS="..."] ./configure [options]
         make
         make install
 
-  CFLAGS should include all the compiler flags.
+  CFLAGS and CXXFLAGS should include all the compiler flags.
 
   \b Note: Default installation target is its own directory, and thus "make install" should not require
            administrative privileges. The binary will be placed in \a bin/ subdirectory.
@@ -85,7 +85,7 @@
 
   Notes
   -----
-  + This package has been tested using the GNU and IBM C compilers. The configuration script is designed to look for these 
+  + This package has been tested using the GNU C and C++ compilers. The configuration script is designed to look for these 
     compilers only.
   + Feel free to contact me about anything regarding this (doubts/difficulties/suggestions).
   + Feel free to use and modify the code in any way.
