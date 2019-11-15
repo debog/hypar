@@ -3,6 +3,7 @@ SUBDIRS = \
   BandedMatrix \
   BoundaryConditions \
   CommonFunctions \
+  EnsembleSimulations \
   FirstDerivative \
   HyParFunctions \
   ImmersedBoundaries \
@@ -21,6 +22,7 @@ SUBDIRS = \
 bin_PROGRAMS = HyPar
 HyPar_SOURCES = main.cpp
 HyPar_LDADD = \
+  EnsembleSimulations/libEnsembleSimulations.a \
   Simulation/libSimulation.a \
   HyParFunctions/libHyParFunctions.a \
   TimeIntegration/libTimeIntegration.a \

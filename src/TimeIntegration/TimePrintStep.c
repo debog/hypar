@@ -46,6 +46,10 @@ int TimePrintStep(void *ts /*!< Object of type #TimeIntegration */)
       error = sqrt(error);
       printf("  Conservation loss: %1.4E\n", error);
 
+    } else {
+
+      if (nsims == 1) printf("\n");
+
     }
 
     /* print physics-specific info, if available */

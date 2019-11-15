@@ -107,110 +107,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/time.h>
-
-#include <string>
 
 #ifdef with_petsc
 #include <petscinterface.h>
 #endif
 #include <mpivars.H>
-#include <simulation.H>
+#include <SimulationLibrary.H>
 
 static const char help[] = "HyPar - A finite-difference algorithm for solving hyperbolic-parabolic PDEs";
-
-/*! \brief Initialize simulation objects
- *
- * Read in the number of simulations and allocate array of these objects.
-*/
-int InitializeSimulation( SimulationObject**  sim,    /*!< Array of simulation objects of type 
-                                                           #SimulationObject, must be NULL. */
-                          int&                nsims,  /*!< Number of simulation objects */
-                          int                 rank,   /*!< MPI rank of this process */
-                          int                 nproc   /*!< Number of MPI processes  */
-                        )
-{
-  if (*sim != NULL) {
-    fprintf(stderr,"Errror: sim is not NULL on rank %d.\n",rank);
-    return 1;
-  }
-
-  /* default value */
-  nsims = 1;
-
-  if (!rank) {
-
-    FILE *in;
-    in = fopen("simulation.inp","r");
-
-    if (in) {
-
-      int ferr;
-      std::string word;
-      ferr = fscanf(in,"%s",word.c_str()); if (ferr != 1) return(1);
-
-      if (word == "begin") {
-
-        while (word != "end") {
-
-  	      ferr = fscanf(in,"%s",word.c_str()); if (ferr != 1) return(1);
-
-          if (word == "nsims") {
-
-            ferr = fscanf(in,"%d",&nsims); if (ferr != 1) return(1);
-
-          } else if (word != "end") {
-
-            std::string useless;
-            ferr = fscanf(in,"%s",useless.c_str());
-            printf("Warning: keyword %s in file \"simulation.inp\" with value %s not recognized or extraneous. Ignoring.\n",
-                    word.c_str(), useless.c_str() );
-
-          }
-
-          if (ferr != 1) return(1);
-        }
-      } else {
-
-   		  fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
-        return 1;
-
-      }
-
-      fclose(in);
-
-    }
-
-    if (nsims < 1) {
-      fprintf(stderr,"Error in InitializeSimulation(): invalid value for nsims (%d)!\n", nsims);
-      return 1;
-    }
-
-    printf("Number of simulation domains: %d\n", nsims);
-  }
-
-#ifndef serial
-  MPI_Bcast(&nsims,1,MPI_INT,0,MPI_COMM_WORLD);
-#endif
-
-  int ns;
-  SimulationObject* sim_array = (SimulationObject*) calloc( nsims, sizeof(SimulationObject));
-  for (ns = 0; ns < nsims; ns++) {
-    sim_array[ns].solver.my_idx = ns;
-    sim_array[ns].solver.nsims = nsims;
-    sim_array[ns].mpi.rank = rank;
-    sim_array[ns].mpi.nproc = nproc;
-  }
-
-  *sim = sim_array;
-
-  if (!rank) {
-    printf("Allocated simulation object(s).\n");
-  }
-
-  return 0;
-}
 
 /*!
  * \brief Main driver
@@ -219,7 +124,9 @@ int InitializeSimulation( SimulationObject**  sim,    /*!< Array of simulation o
 */
 int main(int argc, char **argv)
 {
-  SimulationObject  *sim;
+  Simulation *sim;
+  sim = new EnsembleSimulation;
+
   int               ierr = 0, d, n;
   struct timeval    main_start, solve_start;
   struct timeval    main_end  , solve_end  ;
@@ -250,25 +157,22 @@ int main(int argc, char **argv)
   gettimeofday(&main_start,NULL);
 
   /* Allocate simulation objects */
-  int nsims;
-  sim = NULL;
-  ierr = InitializeSimulation(&sim, nsims, rank, nproc);
-  if (sim == NULL) {
-    printf("Error: InitializeSimulation() failed to allocate simulation objects on rank %d\n",
+  ierr = sim->define(rank, nproc);
+  if (!sim->isDefined()) {
+    printf("Error: Simulation::define() failed on rank %d\n",
            rank);
     return 1;
   }
   if (ierr) {
-    printf("Error: InitializeSimulation() returned with status %d on process %d.\n",
-            ierr,rank);
+    printf("Error: Simulation::define() returned with status %d on process %d.\n",
+            ierr, rank);
     return(ierr);
   }
 
 #ifndef serial
-  for (n = 0; n < nsims; n++) {
-    MPI_Comm_dup(MPI_COMM_WORLD, &(sim[n].mpi.world));
-  }
+  ierr = sim->mpiCommDup();
 #endif
+
 #ifdef with_petsc
   use_petscts = PETSC_FALSE; /* default value */
   ierr = PetscOptionsGetBool( PETSC_NULL,PETSC_NULL,
@@ -276,57 +180,55 @@ int main(int argc, char **argv)
                               &use_petscts,
                               PETSC_NULL); CHKERRQ(ierr);
   if (use_petscts == PETSC_TRUE) use_petsc = 1;
-  for (n = 0; n < nsims; n++) {
-    sim[n].solver.use_petscTS  = use_petscts;
-  }
+  sim->usePetscTS(use_petscts);
 #endif
 
   /* Read Inputs */
-  ierr = ReadInputs(sim, nsims, rank);
+  ierr = sim->ReadInputs();
   if (ierr) {
-    printf("Error: ReadInputs() returned with status %d on process %d.\n",ierr,rank);
+    printf("Error: Simulation::ReadInputs() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
   
   /* Initialize and allocate arrays */
-  ierr = Initialize(sim, nsims);
+  ierr = sim->Initialize();
   if (ierr) {
-    printf("Error: Initialize() returned with status %d on process %d.\n",ierr,rank);
+    printf("Error: Simulation::Initialize() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
   
   /* read and set grid & initial solution */
-  ierr = InitialSolution(sim, nsims);
+  ierr = sim->InitialSolution();
   if (ierr) {
-    printf("Error: InitialSolution() returned with status %d on process %d.\n",ierr,rank);
+    printf("Error: Simulation::InitialSolution() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
   
   /* Initialize domain boundaries */
-  ierr = InitializeBoundaries(sim, nsims);
+  ierr = sim->InitializeBoundaries();
   if (ierr) {
-    printf("Error: InitializeBoundaries() returned with status %d on process %d.\n",ierr,rank);
+    printf("Error: Simulation::InitializeBoundaries() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
   
   /* Initialize immersed boundaries */
-  ierr = InitializeImmersedBoundaries(sim, nsims);
+  ierr = sim->InitializeImmersedBoundaries();
   if (ierr) {
-    printf("Error: InitializeImmersedBoundaries() returned with status %d on process %d.\n",ierr,rank);
+    printf("Error: Simulation::InitializeImmersedBoundaries() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
   
   /* Initialize solvers */
-  ierr = InitializeSolvers(sim, nsims);
+  ierr = sim->InitializeSolvers();
   if (ierr) {
-    printf("Error: InitializeSolvers() returned with status %d on process %d.\n",ierr,rank);
+    printf("Error: Simulation::InitializeSolvers() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
   
   /* Initialize physics */
-  ierr = InitializePhysics(sim, nsims);
+  ierr = sim->InitializePhysics();
   if (ierr) {
-    printf("Error: InitializePhysics() returned with status %d on process %d.\n",ierr,rank);
+    printf("Error: Simulation::InitializePhysics() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
   
@@ -340,24 +242,24 @@ int main(int argc, char **argv)
 #ifdef with_petsc
   if (use_petsc == 1) {
     /* Use PETSc time-integration */
-    ierr = SolvePETSc(sim, nsims, rank, nproc);
+    ierr = sim->SolvePETSc();
     if (ierr) {
-      printf("Error: SolvePETSc() returned with status %d on process %d.\n",ierr,rank);
+      printf("Error: Simulation::SolvePETSc() returned with status %d on process %d.\n",ierr,rank);
       return(ierr);
     }
   } else {
     /* Use native time-integration */
-    ierr = Solve(sim, nsims, rank, nproc);
+    ierr = sim->Solve();
     if (ierr) {
-      printf("Error: Solve() returned with status %d on process %d.\n",ierr,rank);
+      printf("Error: Simulation::Solve() returned with status %d on process %d.\n",ierr,rank);
       return(ierr);
     }
   }
 #else 
   /* Use native time-integration */
-  ierr = Solve(sim, nsims, rank, nproc);
+  ierr = sim->Solve();
   if (ierr) {
-    printf("Error: Solve() returned with status %d on process %d.\n",ierr,rank);
+    printf("Error: Simulation::Solve() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
 #endif
@@ -379,15 +281,10 @@ int main(int argc, char **argv)
   ierr = MPIMax_double(&solver_runtime,&solver_runtime,1,&world); if(ierr) return(ierr);
 
   /* Write errors and other data */
-  SimWriteErrors(sim, nsims, rank, solver_runtime, main_runtime);
+  sim->WriteErrors(solver_runtime, main_runtime);
 
   /* Cleaning up */
-  ierr = Cleanup(sim, nsims);
-  if (ierr) {
-    printf("Error: CleanUp() returned with status %d on process %d.\n",ierr,rank);
-    return(ierr);
-  }
-  free(sim);
+  delete sim;
   if (!rank) printf("Finished.\n");
 
 #ifdef with_petsc
@@ -398,5 +295,6 @@ int main(int argc, char **argv)
   MPI_Comm_free(&world);
   MPI_Finalize();
 #endif
+
   return(0);
 }

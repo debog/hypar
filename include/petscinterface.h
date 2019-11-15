@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
  */
 
+#ifndef _PETSC_INTERFACE_H_
+#define _PETSC_INTERFACE_H_
+
 /* include PETSc header files */
 #include <petscsys.h>
 #include <petscvec.h>
@@ -118,4 +121,6 @@ PetscErrorCode PetscPostTimeStep    (TS);
 
 /*! Function to compute any error estimates, if available */
 PetscErrorCode PetscTimeError       (TS);
+
+#endif
 

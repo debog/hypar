@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
 */
 
+#ifndef _simulation_struct_h_
+#define _simulation_struct_h_
+
 #include <mpivars.h>
 #include <hypar.h>
 
@@ -23,3 +26,5 @@ typedef struct simulation_object {
   HyPar         solver;       /*!< Solver-related variables */
 
 } SimulationObject;
+
+#endif
