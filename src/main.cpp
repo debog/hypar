@@ -112,7 +112,8 @@
 #ifdef with_petsc
 #include <petscinterface.h>
 #endif
-#include <simulation.h>
+#include <mpivars.H>
+#include <simulation.H>
 
 static const char help[] = "HyPar - A finite-difference algorithm for solving hyperbolic-parabolic PDEs";
 

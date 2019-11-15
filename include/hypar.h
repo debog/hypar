@@ -396,6 +396,7 @@ typedef struct main_parameters {
 } HyPar;
 
 int CalculateError (void*,void*);/*!< Calculate the error in the final solution */
+int OutputSolution (void*,int);/*!< Write solutions to file */
 
 /* Some definitions - types of discretizations available 
    for the parabolic (2nd derivative) term  */

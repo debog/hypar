@@ -19,7 +19,7 @@ SUBDIRS = \
   TridiagLU
 
 bin_PROGRAMS = HyPar
-HyPar_SOURCES = main.c
+HyPar_SOURCES = main.cpp
 HyPar_LDADD = \
   Simulation/libSimulation.a \
   HyParFunctions/libHyParFunctions.a \

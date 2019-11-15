@@ -16,24 +16,23 @@ AC_ARG_WITH([lapack_dir],AC_HELP_STRING([--with-lapack-dir],[Specify path where 
 AC_ARG_WITH([scalapack_dir],AC_HELP_STRING([--with-scalapack-dir],[Specify path where ScaLAPACK libraries are installed.]))
 
 AC_PROG_CC
+AC_PROG_CXX
 
 CFLAGS="$CFLAGS -I$includedir"
 if test "$GCC" = "yes" ; then
   CFLAGS="$CFLAGS -std=c99"
   LIBS="$LIBS -lm"
   MPI_CC=mpicc
-else 
-  if test "$CC" = "xlc" ; then
-    CFLAGS="$CFLAGS -qlanglvl=stdc99"
-    LIBS="$LIBS"
-    MPI_CC=mpixlc
-  else 
-    if test "$CC" = "xlc_r" ; then
-      CFLAGS="$CFLAGS -qlanglvl=stdc99"
-      LIBS="$LIBS"
-      MPI_CC=mpixlc_r
-    fi
-  fi
+else
+  AC_MSG_WARN([Compilation with non-GNU compilers not supported.])
+fi
+
+CXXFLAGS="$CXXFLAGS -I$includedir"
+if test "$GXX" = "yes" ; then
+  LIBS="$LIBS -lm"
+  MPI_CXX=mpicxx
+else
+  AC_MSG_WARN([Compilation with non-GNU compilers not supported.])
 fi
 
 if test "x$enable_omp" = "xyes" ; then
@@ -41,13 +40,13 @@ if test "x$enable_omp" = "xyes" ; then
   if test "$CC" = "gcc"  ; then
     CFLAGS="$CFLAGS -fopenmp"
     LIBS="$LIBS -lgomp"
-  else
-    if test "$CC" = "xlc" || test "$CC" = "xlc_r" ; then
-      CFLAGS="$CFLAGS -qsmp=omp"
-      LIBS="$LIBS"
-    fi
   fi
-  CFLAGS="$CFLAGS -Dwith_omp"
+  CXXFLAGS="$CXXFLAGS -Dwith_omp"
+  if test "$CXX" = "g++"  ; then
+    CXXFLAGS="$CXXFLAGS -fopenmp"
+    LIBS="$LIBS -lgomp"
+  fi
+  CXXFLAGS="$CXXFLAGS -Dwith_omp"
 fi
 
 if test "x$with_mpi_dir" != "x" ; then
@@ -55,6 +54,13 @@ if test "x$with_mpi_dir" != "x" ; then
   if test -e $with_mpi_dir/bin/${MPI_CC} ; then
     AC_MSG_RESULT([yes])
     MPICC=$with_mpi_dir/bin/${MPI_CC}
+  else
+    AC_MSG_RESULT([no])
+  fi
+  AC_MSG_CHECKING([for ${MPI_CXX} in $with_mpi_dir/bin/])
+  if test -e $with_mpi_dir/bin/${MPI_CXX} ; then
+    AC_MSG_RESULT([yes])
+    MPICXX=$with_mpi_dir/bin/${MPI_CXX}
   else
     AC_MSG_RESULT([no])
   fi
@@ -68,11 +74,21 @@ else
     else
       AC_MSG_RESULT([no])
     fi
+    AC_MSG_CHECKING([for ${MPI_CXX} in ${MPI_DIR}/bin/])
+    if test -e ${MPI_DIR}/bin/${MPI_CXX} ; then
+      AC_MSG_RESULT([yes])
+      MPICXX=${MPI_DIR}/bin/${MPI_CXX}
+    else
+      AC_MSG_RESULT([no])
+    fi
   fi
 fi
 
 if test "x$MPICC" = "x" ; then
   AC_CHECK_PROG(MPICC,${MPI_CC},${MPI_CC})
+fi
+if test "x$MPICXX" = "x" ; then
+  AC_CHECK_PROG(MPICXX,${MPI_CXX},${MPI_CXX})
 fi
 
 if test "x$MPICC" = "x" ; then
@@ -81,10 +97,17 @@ if test "x$MPICC" = "x" ; then
 else
   CC=$MPICC
 fi
+if test "x$MPICXX" = "x" ; then
+  AC_MSG_WARN([Cannot find ${MPI_CXX}. Will compile with gcc. Use --with-mpi-dir to specify the location of ${MPI_CXX}.])
+  CXXFLAGS="$CXXFLAGS -Dserial"
+else
+  CXX=$MPICXX
+fi
 
 if test "x$enable_scalapack" = "xyes" ; then
   AC_MSG_NOTICE([Compiling with ScaLAPACK support.])
   CFLAGS="$CFLAGS -Dwith_scalapack"
+  CXXFLAGS="$CXXFLAGS -Dwith_scalapack"
   if test "x$with_scalapack_dir" != "x" ; then
     LDFLAGS="$LDFLAGS -Wl,-rpath,$with_scalapack_dir/lib -L$with_scalapack_dir/lib"
   fi
@@ -117,7 +140,7 @@ MFILE
       PETSC_LIB="`make -f petscmake$$ getlinklibs`"
       rm petscmake$$
       CFLAGS="$CFLAGS -Dwith_petsc $PETSC_INC"
-      CXXFLAGS=$CFLAGS
+      CXXFLAGS="$CXXFLAGS -Dwith_petsc $PETSC_INC"
       LIBS="$LIBS $PETSC_LIB"
     fi
   fi
