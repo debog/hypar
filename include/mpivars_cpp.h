@@ -1,10 +1,10 @@
-/*! @file mpivars.H
+/*! @file mpivars_cpp.h
     @brief C++ declarations for MPI-related functions
     @author Debojyoti Ghosh
  */
 
-#ifndef _MPIVARS_H_
-#define _MPIVARS_H_
+#ifndef _MPIVARS_CPP_H_
+#define _MPIVARS_CPP_H_
 
 #include <mpivars_struct.h>
 
