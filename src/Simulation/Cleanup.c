@@ -12,7 +12,7 @@
 #include <immersedboundaries.h>
 #include <timeintegration.h>
 #include <interpolation.h>
-#include <simulation.h>
+#include <simulation_object.h>
 
 /* include header files for each physical model */
 #include <physicalmodels/linearadr.h>

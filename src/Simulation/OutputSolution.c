@@ -12,7 +12,7 @@
 #include <arrayfunctions.h>
 #include <io.h>
 #include <timeintegration.h>
-#include <simulation.h>
+#include <simulation_object.h>
 
 /* Function declarations */
 void IncrementFilenameIndex(char*,int);

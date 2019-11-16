@@ -1,4 +1,4 @@
-/*! @file ensemble_simulations.H
+/*! @file ensemble_simulations.h
     @brief Ensemble simulation class
     @author Debojyoti Ghosh
 */
@@ -7,7 +7,7 @@
 #define _ENSEMBLE_SIM_H_
 
 #include <vector>
-#include <simulation.H>
+#include <simulation.h>
 
 /*! \class EnsembleSimulation
     \brief Class describing ensemble simulations

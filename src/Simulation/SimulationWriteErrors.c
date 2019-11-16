@@ -9,7 +9,7 @@
 #include <string.h>
 #include <basic.h>
 #include <common.h>
-#include <simulation.h>
+#include <simulation_object.h>
 
 /*! Writes out the errors and other data for each simulation.
 */

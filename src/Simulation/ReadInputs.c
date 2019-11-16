@@ -8,7 +8,7 @@
 #include <string.h>
 #include <basic.h>
 #include <timeintegration.h>
-#include <simulation.h>
+#include <simulation_object.h>
 
 /*! Read the simulation inputs from the file \b solver.inp. 
     Rank 0 reads in the inputs and broadcasts them to all the

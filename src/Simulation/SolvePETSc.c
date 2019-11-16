@@ -17,7 +17,7 @@
 #include <io.h>
 #include <boundaryconditions.h>
 #include <petscinterface.h>
-#include <simulation.h>
+#include <simulation_object.h>
 
 #undef __FUNCT__
 #define __FUNCT__ "SolvePETSc"

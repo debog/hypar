@@ -12,7 +12,7 @@
 #include <interpolation.h>
 #include <firstderivative.h>
 #include <secondderivative.h>
-#include <simulation.h>
+#include <simulation_object.h>
 
 /* Function declarations */
 int  ApplyBoundaryConditions     (void*,void*,double*,double*,double);

@@ -6,7 +6,7 @@
 #include <basic.h>
 #include <arrayfunctions.h>
 #include <timeintegration.h>
-#include <simulation.h>
+#include <simulation_object.h>
 
 /*! 
   Pre-time-step function: This function is called before each time

@@ -6,7 +6,7 @@
 #include <string.h>
 #include <basic.h>
 #include <arrayfunctions.h>
-#include <simulation.h>
+#include <simulation_object.h>
 #include <timeintegration.h>
 
 /*!

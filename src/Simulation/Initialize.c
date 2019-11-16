@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <basic.h>
 #include <arrayfunctions.h>
-#include <simulation.h>
+#include <simulation_object.h>
 
 /*! Initialization function called at the beginning of a simulation. This function
     does the following:

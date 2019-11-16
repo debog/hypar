@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <simulation.h>
+#include <simulation_object.h>
 #include <timeintegration.h>
 
 /*!

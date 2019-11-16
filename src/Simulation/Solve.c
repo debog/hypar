@@ -9,7 +9,7 @@
 #include <common.h>
 #include <io.h>
 #include <timeintegration.h>
-#include <simulation.h>
+#include <simulation_object.h>
 
 #ifdef compute_rhs_operators
 int ComputeRHSOperators(void*,void*,double);

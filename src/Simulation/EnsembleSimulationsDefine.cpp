@@ -1,10 +1,10 @@
-/*! @file Define.cpp
+/*! @file EnsembleSimulationsDefine.cpp
     @brief Define an ensemble simulation object
     @author Debojyoti Ghosh
 */
 
 #include <string>
-#include <ensemble_simulations.H>
+#include <ensemble_simulations.h>
 
 /*! Define the ensemble simulation object */
 int EnsembleSimulation::define( int a_rank, /*!< MPI rank of this process */
