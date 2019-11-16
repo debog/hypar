@@ -155,7 +155,6 @@ AC_CONFIG_FILES([
  src/BandedMatrix/Makefile
  src/BoundaryConditions/Makefile
  src/CommonFunctions/Makefile
- src/EnsembleSimulations/Makefile
  src/FirstDerivative/Makefile
  src/HyParFunctions/Makefile
  src/ImmersedBoundaries/Makefile

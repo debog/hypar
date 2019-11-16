@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
  */
 
+#ifndef _MATOPS_H_
+#define _MATOPS_H_
+
 #include <stdio.h>
 
 /*! \def _MatrixZero_
@@ -120,3 +123,5 @@
     \
     /* Done - B contains A^{-1} now */ \
   }
+
+#endif

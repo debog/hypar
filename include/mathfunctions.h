@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
  */
 
+#ifndef _MATHFUNC_H_
+#define _MATHFUNC_H_
+
 /* Basic functions */
 #include <math.h>
 
@@ -196,3 +199,5 @@ void FindInterval(double,double,double*,int,int*,int*);
   }
 
 void TrilinearInterpCoeffs(double,double,double,double,double,double,double,double,double,double*);
+
+#endif

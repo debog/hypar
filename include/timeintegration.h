@@ -3,6 +3,9 @@
     @brief Contains structures and function declarations for time integration
 */
 
+#ifndef _TIME_INTEGRATION_H_
+#define _TIME_INTEGRATION_H_
+
 #include <basic.h>
 
 /* definitions */
@@ -294,3 +297,5 @@ int TimeForwardEuler  (void*);
 int TimeRK            (void*);
 /*! Take a step in time using the General Linear Methods with Global Error Estimators */
 int TimeGLMGEE        (void*);
+
+#endif

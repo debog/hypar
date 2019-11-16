@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
 */
 
+#ifndef _FIRST_DERIV_H_
+#define _FIRST_DERIV_H_
+
 /*! First order scheme */
 #define _FIRST_ORDER_           "1"
 /*! Second order central scheme */
@@ -49,3 +52,5 @@
 int FirstDerivativeFirstOrder         (double*,double*,int,int,void*,void*); /*!< First order approximation to the first derivative (**note**: not divided by grid spacing) */
 int FirstDerivativeSecondOrderCentral (double*,double*,int,int,void*,void*); /*!< Second order approximation to the first derivative (**note**: not divided by grid spacing) */
 int FirstDerivativeFourthOrderCentral (double*,double*,int,int,void*,void*); /*!< Fourth order approximation to the first derivative (**note**: not divided by grid spacing) */
+
+#endif

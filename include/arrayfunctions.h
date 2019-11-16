@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
  */
 
+#ifndef _ARRAYFUNCTIONS_H_
+#define _ARRAYFUNCTIONS_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <basic.h>
@@ -459,3 +462,5 @@ INLINE double ArraySumSquarenD(int    nvars,  /*!< number of elements at one arr
   }
   return(sum);
 }
+
+#endif

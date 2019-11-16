@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
  */
 
+#ifndef _MPIVARS_H_
+#define _MPIVARS_H_
+
 #include <mpivars_struct.h>
 
 /*! Broadcast a double to all ranks */
@@ -73,3 +76,5 @@ extern "C" int MPIRanknD               (int,int,int*,int*);
 /*! Generate a unique filename given the rank of the process to let that process
  * write to its own file */
 void MPIGetFilename         (char*,void*,char*);
+
+#endif

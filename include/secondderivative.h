@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
 */
 
+#ifndef _SECOND_DERIV_H_
+#define _SECOND_DERIV_H_
+
 /*! Second order central scheme */
 #define _SECOND_ORDER_CENTRAL_  "2"
 /*! Fourth order central scheme */
@@ -44,3 +47,5 @@
 /* Second derivative functions */
 int SecondDerivativeSecondOrderCentral (double*,double*,int,void*,void*); /*!< Second order approximation to the second derivative (**note**: not divided by square of grid spacing). */
 int SecondDerivativeFourthOrderCentral (double*,double*,int,void*,void*); /*!< Fourth order approximation to the second derivative (**note**: not divided by square of grid spacing). */
+
+#endif

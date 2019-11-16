@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
  */
 
+#ifndef _HYPAR_H_
+#define _HYPAR_H_
+
 #include <basic.h>
 
 /*! \def HyPar
@@ -410,3 +413,5 @@ int OutputSolution (void*,int);/*!< Write solutions to file */
 #define _NC_1_5STAGE_ "nonconservative-1.5stage"  
 /*! Conservative, direct evaluation of the 2nd deriv */
 #define _CONS_1STAGE_ "conservative-1stage"       
+
+#endif

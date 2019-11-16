@@ -3,7 +3,6 @@ SUBDIRS = \
   BandedMatrix \
   BoundaryConditions \
   CommonFunctions \
-  EnsembleSimulations \
   FirstDerivative \
   HyParFunctions \
   ImmersedBoundaries \
