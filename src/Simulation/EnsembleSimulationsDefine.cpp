@@ -20,14 +20,16 @@ int EnsembleSimulation::define( int a_rank, /*!< MPI rank of this process */
   m_nproc = a_nproc;
 
   /* default value */
-  m_nsims = 1;
+  m_nsims = -1;
 
   if (!m_rank) {
 
     FILE *in;
     in = fopen("simulation.inp","r");
 
-    if (in) {
+    if (!in) {
+      fprintf(stderr, "Error in EnsembleSimulations::Define() - simulation.inp file not found.\n");
+    } else {
 
       int ferr;
       char word[_MAX_STRING_SIZE_];
@@ -73,6 +75,10 @@ int EnsembleSimulation::define( int a_rank, /*!< MPI rank of this process */
 #ifndef serial
   MPI_Bcast(&m_nsims,1,MPI_INT,0,MPI_COMM_WORLD);
 #endif
+
+  if (m_nsims < 0) {
+    return 1;
+  }
 
   m_sims.resize(m_nsims);
   for (int ns = 0; ns < m_nsims; ns++) {

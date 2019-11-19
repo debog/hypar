@@ -108,6 +108,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <string>
 
 #ifdef with_petsc
 #include <petscinterface.h>
@@ -124,9 +125,6 @@ static const char help[] = "HyPar - A finite-difference algorithm for solving hy
 */
 int main(int argc, char **argv)
 {
-  Simulation *sim;
-  sim = new EnsembleSimulation;
-
   int               ierr = 0, d, n;
   struct timeval    main_start, solve_start;
   struct timeval    main_end  , solve_end  ;
@@ -155,6 +153,42 @@ int main(int argc, char **argv)
 #endif
 
   gettimeofday(&main_start,NULL);
+
+  int sim_type = -1;
+  Simulation *sim = NULL;
+
+  if (!rank) {
+
+    std::string sim_fname("simulation.inp");
+    FILE *f_sim = fopen(sim_fname.c_str(), "r");
+
+    if (f_sim) {
+      sim_type = _SIM_TYPE_ENSEMBLE_;
+      fclose(f_sim);
+    } else {
+      sim_type = _SIM_TYPE_SINGLE_;
+    }
+
+  }
+
+#ifndef serial
+  MPI_Bcast(&sim_type, 1, MPI_INT, 0, MPI_COMM_WORLD);
+#endif
+
+  if (sim_type == _SIM_TYPE_SINGLE_) {
+    sim = new SingleSimulation;
+  } else if (sim_type == _SIM_TYPE_ENSEMBLE_) {
+    sim = new EnsembleSimulation;
+  } else {
+    fprintf(stderr, "ERROR: invalid sim_type (%d) on rank %d.\n",
+            sim_type, rank);
+  }
+
+  if (sim == NULL) {
+    fprintf(stderr, "ERROR: unable to create sim on rank %d.\n",
+            rank );
+    return 1;
+  }
 
   /* Allocate simulation objects */
   ierr = sim->define(rank, nproc);
