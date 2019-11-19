@@ -1,4 +1,4 @@
-/*! @file SingleSimulationsDefine.cpp
+/*! @file SingleSimulationDefine.cpp
     @brief Define a single simulation object
     @author Debojyoti Ghosh
 */
