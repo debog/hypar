@@ -15,12 +15,14 @@ SUBDIRS = \
   MPIFunctions \
   SecondDerivative \
   Simulation \
+  SparseGrids \
   TimeIntegration \
   TridiagLU
 
 bin_PROGRAMS = HyPar
 HyPar_SOURCES = main.cpp
 HyPar_LDADD = \
+  SparseGrids/libSparseGrids.a \
   Simulation/libSimulation.a \
   HyParFunctions/libHyParFunctions.a \
   TimeIntegration/libTimeIntegration.a \

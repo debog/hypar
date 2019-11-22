@@ -12,6 +12,7 @@
 #include <arrayfunctions.h>
 #include <io.h>
 #include <timeintegration.h>
+#include <mpivars.h>
 #include <simulation_object.h>
 
 /* Function declarations */

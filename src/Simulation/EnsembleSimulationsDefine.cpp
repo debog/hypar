@@ -25,10 +25,11 @@ int EnsembleSimulation::define( int a_rank, /*!< MPI rank of this process */
   if (!m_rank) {
 
     FILE *in;
-    in = fopen("simulation.inp","r");
+    in = fopen(_ENSEMBLE_SIM_INP_FNAME_,"r");
 
     if (!in) {
-      fprintf(stderr, "Error in EnsembleSimulations::Define() - simulation.inp file not found.\n");
+      fprintf(stderr, "Error in EnsembleSimulations::Define() - %s file not found.\n",
+              _ENSEMBLE_SIM_INP_FNAME_);
     } else {
 
       int ferr;
@@ -46,16 +47,16 @@ int EnsembleSimulation::define( int a_rank, /*!< MPI rank of this process */
           } else if (std::string(word) != "end") {
             char useless[_MAX_STRING_SIZE_];
             ferr = fscanf(in,"%s",useless);
-            printf("Warning: keyword %s in file \"simulation.inp\" with value %s not recognized or extraneous. Ignoring.\n",
-                    word, useless );
+            printf("Warning: keyword %s in file \"%s\" with value %s not recognized or extraneous. Ignoring.\n",
+                    _ENSEMBLE_SIM_INP_FNAME_, word, useless );
           }
 
           if (ferr != 1) return(1);
         }
 
       } else {
-   		  fprintf(stderr,"Error: Illegal format in file \"simulation.inp\". Word read is: \n",
-                word);
+   		  fprintf(stderr,"Error: Illegal format in file \"%s\". Word read is: \n",
+                _ENSEMBLE_SIM_INP_FNAME_, word);
         return 1;
       }
 

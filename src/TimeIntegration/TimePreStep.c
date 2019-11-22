@@ -6,6 +6,7 @@
 #include <basic.h>
 #include <arrayfunctions.h>
 #include <timeintegration.h>
+#include <mpivars.h>
 #include <simulation_object.h>
 
 /*! 

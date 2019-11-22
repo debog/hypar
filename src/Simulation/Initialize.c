@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <basic.h>
 #include <arrayfunctions.h>
+#include <mpivars.h>
 #include <simulation_object.h>
 
 /*! Initialization function called at the beginning of a simulation. This function
@@ -26,6 +27,9 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
   int i,d,n;
 
   for (n = 0; n < nsims; n++) {
+
+    /* this is a full initialization, not a barebones one */
+    simobj[n].is_barebones = 0;
 
     /* allocations */
     simobj[n].mpi.ip           = (int*) calloc (simobj[n].solver.ndims,sizeof(int));

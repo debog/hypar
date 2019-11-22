@@ -8,6 +8,7 @@
 #include <string.h>
 #include <basic.h>
 #include <timeintegration.h>
+#include <mpivars.h>
 #include <simulation_object.h>
 
 /*! Read the simulation inputs from the file \b solver.inp. 
@@ -29,7 +30,6 @@
     ndims              | int          | #HyPar::ndims                 | 1
     nvars              | int          | #HyPar::nvars                 | 1
     size               | int[ndims]   | #HyPar::dim_global            | must be specified
-    iproc              | int[ndims]   | #MPIVariables::iproc          | must be specified
     ghost              | int          | #HyPar::ghosts                | 1
     n_iter             | int          | #HyPar::n_iter                | 0
     restart_iter       | int          | #HyPar::restart_iter          | 0
@@ -53,7 +53,7 @@
     immersed_body      | char[]       | #HyPar::ib_filename           | "none"
 
     \b Notes:
-    + "ndims" \b must be specified \b before "size" and "iproc".
+    + "ndims" \b must be specified \b before "size".
     + if "input_mode" or "output_mode" are set to "parallel" or "mpi-io",
       the number of I/O ranks must be specified right after as an integer.
       For example:

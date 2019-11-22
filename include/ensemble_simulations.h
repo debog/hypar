@@ -9,6 +9,8 @@
 #include <vector>
 #include <simulation.h>
 
+#define _ENSEMBLE_SIM_INP_FNAME_ "simulation.inp"
+
 /*! \class EnsembleSimulation
     \brief Class describing ensemble simulations
  *  This class contains all data and functions needed

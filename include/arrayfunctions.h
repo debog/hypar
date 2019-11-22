@@ -138,6 +138,29 @@
     else          done = 0; \
   }
 
+/*! \def _ArrayIncrementIndexWithLBound_
+ * Increments an \a N -dimensional index \a i[\a N] by one. If it reaches
+ * the provided bounds \a imax[\a N], i.e., if \a i[c] = \a imax[c]-1 for all 
+ * c = 0,...,\a N-1), then \a done = 1; else \a done = 0. This is the same
+ * as _ArrayIncrementIndex_ but with a specified lower bound \a imin instead
+ * of 0.
+*/
+#define _ArrayIncrementIndexWithLBound_(N,imax,imin,i,done) \
+  { \
+    int arraycounter = 0; \
+    while (arraycounter < (N)) { \
+      if (i[arraycounter] == imax[arraycounter]-1) { \
+        i[arraycounter] = imin[arraycounter]; \
+        arraycounter++; \
+      } else { \
+        i[arraycounter]++; \
+        break; \
+      } \
+    } \
+    if (arraycounter == (N)) done = 1; \
+    else          done = 0; \
+  }
+
 /*! \def _ArraySetValue_
  * Set all elements of a 1-dimensional array \a x (any datatype)
  * of length \a size to a scalar \a value
@@ -146,6 +169,17 @@
   {                                                                                                                 \
     int arraycounter;                                                                                               \
     for (arraycounter = 0; arraycounter < (size); arraycounter++)  x[arraycounter] = (value);                       \
+  }
+
+/*! \def _ArraySum1D_ 
+ * Compute the sum of  all elements of a 1-dimensional array \a x of length 
+ * \a size.
+*/
+#define _ArraySum1D_(x,a,size)                                                                                    \
+  {                                                                                                                 \
+    a = 0; \
+    int arraycounter;                                                                                               \
+    for (arraycounter=0; arraycounter<size; arraycounter++) a += x[arraycounter];                                   \
   }
 
 /*! \def _ArrayScale1D_ 

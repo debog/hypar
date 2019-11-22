@@ -24,6 +24,7 @@
   + Solves <B>hyperbolic-parabolic PDEs with source terms</B>.
   + Allows arbitrary number of <B>spatial dimensions</B> and <B>vector components per grid point</B>.
   + Solves the PDEs over <B>Cartesian</B> grids.
+  + Can use sparse grids for faster computations on high-dimensional problems
   + Written entirely in C/C++ and uses the MPICH library. It also uses OpenMP threads 
     but this is a work-in-progress.
   + Can be <B>compiled with PETSc</B> (http://www.mcs.anl.gov/petsc/), if available, where 
@@ -159,14 +160,34 @@ int main(int argc, char **argv)
 
   if (!rank) {
 
-    std::string sim_fname("simulation.inp");
-    FILE *f_sim = fopen(sim_fname.c_str(), "r");
+    std::string ensemble_sim_fname(_ENSEMBLE_SIM_INP_FNAME_);
+    std::string sparsegrids_sim_fname(_SPARSEGRIDS_SIM_INP_FNAME_);
 
-    if (f_sim) {
+    FILE *f_ensemble_sim = fopen(ensemble_sim_fname.c_str(), "r");
+    FILE *f_sparsegrids_sim = fopen(sparsegrids_sim_fname.c_str(), "r");
+
+    if (f_ensemble_sim && f_sparsegrids_sim) {
+
+      fprintf(stderr,"Error: Cannot have both %s and %s input files.\n",
+              _ENSEMBLE_SIM_INP_FNAME_, _SPARSEGRIDS_SIM_INP_FNAME_);
+      fprintf(stderr, "Remove one or both of them depending on the kind of simulation you want to run.\n");
+      fclose(f_ensemble_sim);
+      fclose(f_sparsegrids_sim);
+
+    } else if (f_ensemble_sim) {
+
       sim_type = _SIM_TYPE_ENSEMBLE_;
-      fclose(f_sim);
+      fclose(f_ensemble_sim);
+
+    } else if (f_sparsegrids_sim) {
+
+      sim_type = _SIM_TYPE_SPARSE_GRIDS_;
+      fclose(f_sparsegrids_sim);
+
     } else {
+
       sim_type = _SIM_TYPE_SINGLE_;
+
     }
 
   }
@@ -178,7 +199,11 @@ int main(int argc, char **argv)
   if (sim_type == _SIM_TYPE_SINGLE_) {
     sim = new SingleSimulation;
   } else if (sim_type == _SIM_TYPE_ENSEMBLE_) {
+    if (!rank) printf("-- Ensemble Simulation --\n");
     sim = new EnsembleSimulation;
+  } else if (sim_type == _SIM_TYPE_SPARSE_GRIDS_) {
+    if (!rank) printf("-- Sparse Grids Simulation --\n");
+    sim = new SparseGridsSimulation;
   } else {
     fprintf(stderr, "ERROR: invalid sim_type (%d) on rank %d.\n",
             sim_type, rank);
