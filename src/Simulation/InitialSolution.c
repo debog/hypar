@@ -11,6 +11,7 @@
 #include <common.h>
 #include <arrayfunctions.h>
 #include <io.h>
+#include <mpivars.h>
 #include <simulation_object.h>
 
 int VolumeIntegral(double*,double*,void*,void*);

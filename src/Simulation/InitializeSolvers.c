@@ -12,6 +12,7 @@
 #include <interpolation.h>
 #include <firstderivative.h>
 #include <secondderivative.h>
+#include <mpivars.h>
 #include <simulation_object.h>
 
 /* Function declarations */

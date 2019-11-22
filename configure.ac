@@ -181,6 +181,7 @@ AC_CONFIG_FILES([
    src/PhysicalModels/ShallowWater2D/Makefile
  src/SecondDerivative/Makefile
  src/Simulation/Makefile
+ src/SparseGrids/Makefile
  src/TimeIntegration/Makefile
  src/TridiagLU/Makefile
 ])

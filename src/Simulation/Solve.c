@@ -9,6 +9,7 @@
 #include <common.h>
 #include <io.h>
 #include <timeintegration.h>
+#include <mpivars.h>
 #include <simulation_object.h>
 
 #ifdef compute_rhs_operators
@@ -31,6 +32,16 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   int ns;
   int tic     = 0;
   _DECLARE_IERR_;
+
+  /* make sure none of the simulation objects sent in the array 
+   * are "barebones" type */
+  for (ns = 0; ns < nsims; ns++) {
+    if (sim[ns].is_barebones == 1) {
+      fprintf(stderr, "Error in Solve(): simulation object %d on rank %d is barebones!\n",
+              ns, rank );
+      return 1;
+    }
+  }
 
   /* write out iblank to file for visualization */
   for (ns = 0; ns < nsims; ns++) {

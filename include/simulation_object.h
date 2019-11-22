@@ -6,7 +6,7 @@
 #ifndef _simulation_struct_h_
 #define _simulation_struct_h_
 
-#include <mpivars.h>
+#include <mpivars_struct.h>
 #include <hypar.h>
 
 /*! \def SimulationObject
@@ -24,6 +24,8 @@ typedef struct simulation_object {
 
   MPIVariables  mpi;          /*!< MPI-related variables */
   HyPar         solver;       /*!< Solver-related variables */
+  int           is_barebones; /*!< Indicate whether this simulation object 
+                                   is only a barebones one */
 
 } SimulationObject;
 

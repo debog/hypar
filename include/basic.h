@@ -31,4 +31,7 @@
     coord = (x[offset+ghosts+i]); \
   }
 
+/*! Minimum number of grid points per dimension per MPI rank */
+#define _MIN_GRID_PTS_PER_PROC_ 4
+
 #endif

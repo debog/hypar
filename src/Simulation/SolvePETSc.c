@@ -17,6 +17,7 @@
 #include <io.h>
 #include <boundaryconditions.h>
 #include <petscinterface.h>
+#include <mpivars.h>
 #include <simulation_object.h>
 
 #undef __FUNCT__

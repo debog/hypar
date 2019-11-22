@@ -7,6 +7,7 @@
 #define _SIMULATION_H_
 
 #include <simulation_object.h>
+#include <mpivars_cpp.h>
 #ifdef with_petsc
 #include <petscinterface.h>
 #endif
