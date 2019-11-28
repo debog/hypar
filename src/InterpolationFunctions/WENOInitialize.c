@@ -32,6 +32,8 @@ int WENOInitialize(
   MPIVariables    *mpi    = (MPIVariables*) m;
   WENOParameters  *weno   = (WENOParameters*) solver->interp;
 
+  static int count = 0;
+
   int nvars = solver->nvars;
   int ndims = solver->ndims;
 
@@ -53,7 +55,7 @@ int WENOInitialize(
     in = fopen("weno.inp","r");
     if (!in) printf("Warning: File weno.inp not found. Using default parameters for WENO5/CRWENO5/HCWENO5 scheme.\n");
     else {
-      printf("Reading WENO parameters from weno.inp.\n");
+      if (!count) printf("Reading WENO parameters from weno.inp.\n");
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
@@ -112,7 +114,7 @@ int WENOInitialize(
   /* WENO weight calculation is hard-coded for p=2, so return error if p != 2 in
    * user input file, so that there's no confusion */
   if (weno->p != 2.0) {
-    if (!mpi->rank) printf("Warning from WENOInitialize(): \"p\" parameter is 2.0. Any other value will be ignored!\n");
+    if (!mpi->rank && !count) printf("Warning from WENOInitialize(): \"p\" parameter is 2.0. Any other value will be ignored!\n");
   }
 
   weno->offset = (int*) calloc (ndims,sizeof(int));
@@ -147,5 +149,6 @@ int WENOInitialize(
   /* initialize WENO weights to their optimal values */
   for (d=0; d<ndims; d++) WENOFifthOrderInitializeWeights(d,solver,mpi);
 
+  count++;
   return(0);
 }

@@ -39,6 +39,12 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
   int ns;
   _DECLARE_IERR_;
 
+  if (nsims == 0) return 0;
+
+  if (!sim[0].mpi.rank) {
+    printf("Deallocating arrays.\n");
+  }
+
   for (ns = 0; ns < nsims; ns++) {
 
     if (sim[ns].is_barebones == 1) {
@@ -50,12 +56,6 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
     MPIVariables* mpi = &(sim[ns].mpi);
     DomainBoundary* boundary = (DomainBoundary*) solver->boundary;
     int i;
-
-    if (nsims == 1) {
-      if (!mpi->rank) printf("Deallocating arrays.\n");
-    } else {
-      if (!mpi->rank) printf("Deallocating arrays for domain %d.\n", ns);
-    }
 
     /* Clean up boundary zones */
     for (i = 0; i < solver->nBoundaryZones; i++) {
