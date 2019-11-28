@@ -36,12 +36,13 @@ int SparseGridsSimulation::Initialize()
   ProcDistribution iproc_fg;
   ComputeProcessorDistribution(iproc_fg, dim_fg);
   for (int d=0; d<m_ndims; d++) m_sim_fg->mpi.iproc[d] = iproc_fg[d];
+  MPIBroadcast_integer(m_sim_fg->mpi.iproc,m_ndims,0,&(m_sim_fg->mpi.world)); CHECKERR(ierr);
   if (!m_rank) {
     printf("Processor distribution for full grid object: ");
     for (int d=0; d<m_ndims; d++) printf(" %3d", iproc_fg[d]);
     printf("\n");
   }
-
+ 
   if (!m_rank) printf("Initializing sparse grids...\n");
   if (!m_rank) printf("  Number of spatial dimensions: %d\n", m_ndims);
 
