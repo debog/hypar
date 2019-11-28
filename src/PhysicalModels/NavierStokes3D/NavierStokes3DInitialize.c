@@ -95,6 +95,8 @@ int NavierStokes3DInitialize(
   NavierStokes3D  *physics = (NavierStokes3D*) solver->physics;
   int             ferr     = 0;
 
+  static int count = 0;
+
   if (solver->nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in NavierStokes3DInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
     return(1);
@@ -125,7 +127,7 @@ int NavierStokes3DInitialize(
   /* reading physical model specific inputs - all processes */
   if (!mpi->rank) {
     FILE *in;
-    printf("Reading physical model inputs from file \"physics.inp\".\n");
+    if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
@@ -298,5 +300,6 @@ int NavierStokes3DInitialize(
   /* initialize the gravity fields */
   IERR NavierStokes3DGravityField(solver,mpi); CHECKERR(ierr);
 
+  count++;
   return(0);
 }

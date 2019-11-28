@@ -37,6 +37,8 @@ int LinearADRInitialize(
   LinearADR     *physics = (LinearADR*)     solver->physics;
   int           i,ferr;
 
+  static int count = 0;
+
   physics->a = (double*) calloc (solver->ndims*solver->nvars,sizeof(double));
   physics->d = (double*) calloc (solver->ndims*solver->nvars,sizeof(double));
 
@@ -47,7 +49,7 @@ int LinearADRInitialize(
   /* reading physical model specific inputs - all processes */
   if (!mpi->rank) {
     FILE *in;
-    printf("Reading physical model inputs from file \"physics.inp\".\n");
+    if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) {
       fprintf(stderr,"Error: File \"physics.inp\" not found.\n");
@@ -104,5 +106,6 @@ int LinearADRInitialize(
   solver->JFunction          = LinearADRJacobian;
   solver->Upwind             = LinearADRUpwind;
 
+  count++;
   return(0);
 }

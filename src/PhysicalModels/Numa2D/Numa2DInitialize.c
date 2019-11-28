@@ -29,6 +29,8 @@ int Numa2DInitialize(void *s,void *m)
   Numa2D          *physics = (Numa2D*)        solver->physics;
   int             ferr     = 0;
 
+  static int count = 0;
+
   if (solver->nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in Numa2DInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
     return(1);
@@ -55,7 +57,7 @@ int Numa2DInitialize(void *s,void *m)
   /* reading physical model specific inputs - rank 0 */
   if (!mpi->rank) {
     FILE *in;
-    printf("Reading physical model inputs from file \"physics.inp\".\n");
+    if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
@@ -154,5 +156,6 @@ int Numa2DInitialize(void *s,void *m)
     return(1);
   }
 
+  count++;
   return(0);
 }

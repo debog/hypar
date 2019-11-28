@@ -25,6 +25,8 @@ int Euler2DInitialize(void *s,void *m)
   Euler2D       *physics = (Euler2D*) solver->physics;
   int           ferr     = 0;
 
+  static int count = 0;
+
   if (solver->nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in Euler2DInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
     return(1);
@@ -41,7 +43,7 @@ int Euler2DInitialize(void *s,void *m)
   /* reading physical model specific inputs - all processes */
   if (!mpi->rank) {
     FILE *in;
-    printf("Reading physical model inputs from file \"physics.inp\".\n");
+    if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
@@ -103,5 +105,6 @@ int Euler2DInitialize(void *s,void *m)
   DomainBoundary  *boundary = (DomainBoundary*) solver->boundary;
   for (n = 0; n < solver->nBoundaryZones; n++)  boundary[n].gamma = physics->gamma;
 
+  count++;
   return(0);
 }

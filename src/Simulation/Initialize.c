@@ -26,6 +26,12 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
   SimulationObject* simobj = (SimulationObject*) s;
   int i,d,n;
 
+  if (nsims == 0) {
+    return 1;
+  }
+
+  if (!simobj[0].mpi.rank)  printf("Partitioning domain and allocating data arrays.\n");
+
   for (n = 0; n < nsims; n++) {
 
     /* this is a full initialization, not a barebones one */
@@ -43,10 +49,6 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
     _DECLARE_IERR_;
   
     /* Domain partitioning */
-    if (!simobj[n].mpi.rank) {
-      if (nsims == 1) printf("Partitioning domain.\n");
-      else            printf("Partitioning domain %d.\n", n);
-    }
     int total_proc = 1;
     for (i=0; i<simobj[n].solver.ndims; i++) total_proc *= simobj[n].mpi.iproc[i];
     if (simobj[n].mpi.nproc != total_proc) {
@@ -113,7 +115,6 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
     }
   
     /* Allocations */
-    if (!simobj[n].mpi.rank) printf("Allocating data arrays.\n");
     simobj[n].solver.index = (int*) calloc (simobj[n].solver.ndims,sizeof(int));
     simobj[n].solver.stride_with_ghosts = (int*) calloc (simobj[n].solver.ndims,sizeof(int));
     simobj[n].solver.stride_without_ghosts = (int*) calloc (simobj[n].solver.ndims,sizeof(int));
