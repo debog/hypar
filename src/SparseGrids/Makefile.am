@@ -4,4 +4,5 @@ libSparseGrids_a_SOURCES = \
   SparseGridsInitialize.cpp \
   SparseGridsMiscFuncs.cpp \
   SparseGridsSanityChecks.cpp \
+	SparseGridsSolve.cpp \
 	SparseGridsSetSolverParameters.cpp
