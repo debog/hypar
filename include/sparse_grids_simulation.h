@@ -122,25 +122,24 @@ class SparseGridsSimulation : public Simulation
     {
       int retval = ::InitializeSolvers( (void*) m_sims_sg.data(),
                                         m_nsims_sg );
+
+      /* disable output from individual sparse grids */
+      for (int i = 0; i < m_nsims_sg; i++) {
+        m_sims_sg[i].solver.WriteOutput = NULL;
+      }
+
       return retval;
     }
 
     /*! Run the simulation using native time integrators */
-    inline int Solve()
-    {
-      int retval = ::Solve( (void*) m_sims_sg.data(),
-                            m_nsims_sg,
-                            m_rank,
-                            m_nproc );
-      return retval;
-    }
+    int Solve();
 
     /*! Write simulation errors and wall times to file */
     inline void WriteErrors(double a_wt_solver,
                             double a_wt_total )
     {
-      ::SimWriteErrors( (void*) m_sims_sg.data(),
-                        m_nsims_sg,
+      ::SimWriteErrors( (void*) m_sim_fg,
+                        1,
                         m_rank,
                         a_wt_solver,
                         a_wt_total );
