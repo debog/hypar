@@ -23,8 +23,7 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
                     )
 {
   SimulationObject* simobj = (SimulationObject*) s;
-  int n, flag, d, i, offset;
-  _DECLARE_IERR_;
+  int n, flag, d, i, offset, ierr;
 
   for (n = 0; n < nsims; n++) {
 
@@ -38,17 +37,22 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
       strcat(fname_root, index);
     }
 
-    IERR ReadArray( simobj[n].solver.ndims,
-                    simobj[n].solver.nvars,
-                    simobj[n].solver.dim_global,
-                    simobj[n].solver.dim_local,
-                    simobj[n].solver.ghosts,
-                    &(simobj[n].solver),
-                    &(simobj[n].mpi),
-                    simobj[n].solver.x,
-                    simobj[n].solver.u,
-                    fname_root,
-                    &flag );
+    ierr = ReadArray( simobj[n].solver.ndims,
+                      simobj[n].solver.nvars,
+                      simobj[n].solver.dim_global,
+                      simobj[n].solver.dim_local,
+                      simobj[n].solver.ghosts,
+                      &(simobj[n].solver),
+                      &(simobj[n].mpi),
+                      simobj[n].solver.x,
+                      simobj[n].solver.u,
+                      fname_root,
+                      &flag );
+    if (ierr) {
+      fprintf(stderr, "Error in InitialSolution() on rank %d.\n",
+              simobj[n].mpi.rank);
+      return ierr;
+    }
     if (!flag) {
       fprintf(stderr,"Error: initial solution file not found.\n");
       return(1);
@@ -76,12 +80,17 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
     /* exchange MPI-boundary values of dxinv between processors */
     offset = 0;
     for (d = 0; d < simobj[n].solver.ndims; d++) {
-      IERR MPIExchangeBoundaries1D( &(simobj[n].mpi),
-                                    &(simobj[n].solver.dxinv[offset]),
-                                    simobj[n].solver.dim_local[d],
-                                    ghosts,
-                                    d,
-                                    simobj[n].solver.ndims ); CHECKERR(ierr);
+      ierr = MPIExchangeBoundaries1D( &(simobj[n].mpi),
+                                      &(simobj[n].solver.dxinv[offset]),
+                                      simobj[n].solver.dim_local[d],
+                                      ghosts,
+                                      d,
+                                      simobj[n].solver.ndims ); CHECKERR(ierr);
+      if (ierr) {
+        fprintf(stderr, "Error in InitialSolution() on rank %d.\n",
+                simobj[n].mpi.rank);
+        return ierr;
+      }
       offset += (simobj[n].solver.dim_local[d] + 2*ghosts);
     }
 
@@ -102,10 +111,15 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
     }
 
     /* calculate volume integral of the initial solution */
-    IERR VolumeIntegral(  simobj[n].solver.VolumeIntegralInitial,
-                          simobj[n].solver.u,
-                          &(simobj[n].solver),
-                          &(simobj[n].mpi) ); CHECKERR(ierr);
+    ierr = VolumeIntegral(  simobj[n].solver.VolumeIntegralInitial,
+                            simobj[n].solver.u,
+                            &(simobj[n].solver),
+                            &(simobj[n].mpi) ); CHECKERR(ierr);
+    if (ierr) {
+      fprintf(stderr, "Error in InitialSolution() on rank %d.\n",
+              simobj[n].mpi.rank);
+      return ierr;
+    }
     if (!simobj[n].mpi.rank) {
       if (nsims > 1) printf("Volume integral of the initial solution on domain %d:\n", n);
       else           printf("Volume integral of the initial solution:\n");
