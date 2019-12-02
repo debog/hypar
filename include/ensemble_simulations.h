@@ -60,6 +60,9 @@ class EnsembleSimulation : public Simulation
       int retval = ::ReadInputs(  (void*) m_sims.data(),
                                   m_nsims, 
                                   m_rank );
+      ::WriteInputs( (void*) m_sims.data(),
+                     m_nsims, 
+                     m_rank );
       return retval;
     }
 
