@@ -13,6 +13,7 @@
 #endif
 
 extern "C" int ReadInputs(void*,int,int);/*!< Read the input parameters */
+extern "C" int WriteInputs(void*,int,int);/*!< Write the input parameters */
 extern "C" int Initialize(void*,int);/*!< Initialize the solver */
 extern "C" int InitialSolution(void*,int);/*!< Read the initial solution */
 extern "C" int InitializeBoundaries(void*,int);/*!< Initialize the boundary conditions */

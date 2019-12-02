@@ -13,4 +13,5 @@ libSimulation_a_SOURCES = \
   SimulationWriteErrors.c \
 	SingleSimulationDefine.cpp \
   Solve.c \
-  SolvePETSc.c
+  SolvePETSc.c \
+  WriteInputs.c

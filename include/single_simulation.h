@@ -55,6 +55,9 @@ class SingleSimulation : public Simulation
       int retval = ::ReadInputs(  (void*) m_sim,
                                   _NSIMS_, 
                                   m_rank );
+      ::WriteInputs( (void*) m_sim,
+                     _NSIMS_, 
+                     m_rank );
       return retval;
     }
 
