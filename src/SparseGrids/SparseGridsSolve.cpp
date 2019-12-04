@@ -4,11 +4,11 @@
 */
 
 #include <common_cpp.h>
-#include <io.h>
+#include <io_cpp.h>
 #include <timeintegration_cpp.h>
 #include <sparse_grids_simulation.h>
 
-//extern "C" void GetStringFromInteger(int, char*, int);
+extern "C" int CalculateError (void*,void*); /*!< Calculate the error in the final solution */
 
 /*! This function integrates the semi-discrete ODE (obtained from discretizing the 
     PDE in space) using natively implemented time integration methods. It initializes 
@@ -21,28 +21,44 @@ int SparseGridsSimulation::Solve()
   int tic     = 0;
 
   /* write out iblank to file for visualization */
-  for (int ns = 0; ns < m_nsims_sg; ns++) {
-    if (m_sims_sg[ns].solver.flag_ib) {
-
-      char fname_root[_MAX_STRING_SIZE_] = "iblank";
-      if (m_nsims_sg > 1) {
-        char index[_MAX_STRING_SIZE_];
-        GetStringFromInteger(ns, index, (int)log10((m_nsims_sg)+1));
-        strcat(fname_root, "_");
-        strcat(fname_root, index);
+  if (m_write_sg_solutions == 1) {
+    for (int ns = 0; ns < m_nsims_sg; ns++) {
+      if (m_sims_sg[ns].solver.flag_ib) {
+  
+        char fname_root[_MAX_STRING_SIZE_] = "iblank_sg";
+        if (m_nsims_sg > 1) {
+          char index[_MAX_STRING_SIZE_];
+          GetStringFromInteger(ns, index, (int)log10((m_nsims_sg)+1));
+          strcat(fname_root, "_");
+          strcat(fname_root, index);
+        }
+  
+        WriteArray( m_sims_sg[ns].solver.ndims,
+                    1,
+                    m_sims_sg[ns].solver.dim_global,
+                    m_sims_sg[ns].solver.dim_local,
+                    m_sims_sg[ns].solver.ghosts,
+                    m_sims_sg[ns].solver.x,
+                    m_sims_sg[ns].solver.iblank,
+                    &(m_sims_sg[ns].solver),
+                    &(m_sims_sg[ns].mpi),
+                    fname_root );
       }
-
-//      WriteArray( m_sims_sg[ns].solver.ndims,
-//                  1,
-//                  m_sims_sg[ns].solver.dim_global,
-//                  m_sims_sg[ns].solver.dim_local,
-//                  m_sims_sg[ns].solver.ghosts,
-//                  m_sims_sg[ns].solver.x,
-//                  m_sims_sg[ns].solver.iblank,
-//                  &(m_sims_sg[ns].solver),
-//                  &(m_sims_sg[ns].mpi),
-//                  fname_root );
     }
+  }
+  if (m_sim_fg->solver.flag_ib) {
+
+    char fname_root[_MAX_STRING_SIZE_] = "iblank";
+    WriteArray( m_sim_fg->solver.ndims,
+                1,
+                m_sim_fg->solver.dim_global,
+                m_sim_fg->solver.dim_local,
+                m_sim_fg->solver.ghosts,
+                m_sim_fg->solver.x,
+                m_sim_fg->solver.iblank,
+                &(m_sim_fg->solver),
+                &(m_sim_fg->mpi),
+                fname_root );
   }
 
   /* Define and initialize the time-integration object */
@@ -90,9 +106,8 @@ int SparseGridsSimulation::Solve()
   }
 
   /* calculate error if exact solution has been provided */
-  /* XXX */
-//  CalculateError(&(m_sim_fg->solver),
-//                 &(m_sim_fg->mpi) );
+  CalculateError(&(m_sim_fg->solver),
+                 &(m_sim_fg->mpi) );
 
   TimeCleanup(&TS);
 

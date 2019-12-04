@@ -6,6 +6,7 @@
 #ifndef _IO_CPP_H_
 #define _IO_CPP_H_
 
+extern "C" int WriteArray    (int,int,int*,int*,int,double*,double*,void*,void*,char*);
 extern "C" int WriteBinary   (int,int,int*,double*,double*,char*,int*);
 extern "C" int WriteText     (int,int,int*,double*,double*,char*,int*);
 extern "C" int WriteTecplot2D(int,int,int*,double*,double*,char*,int*);
