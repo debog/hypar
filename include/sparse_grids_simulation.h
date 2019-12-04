@@ -139,11 +139,11 @@ class SparseGridsSimulation : public Simulation
     inline void WriteErrors(double a_wt_solver,
                             double a_wt_total )
     {
-//      ::SimWriteErrors( (void*) m_sim_fg,
-//                        1,
-//                        m_rank,
-//                        a_wt_solver,
-//                        a_wt_total );
+      ::SimWriteErrors( (void*) m_sim_fg,
+                        1,
+                        m_rank,
+                        a_wt_solver,
+                        a_wt_total );
       return;
     }
 
