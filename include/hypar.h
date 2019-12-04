@@ -181,6 +181,11 @@ typedef struct main_parameters {
   /*! solution filename extension */
   char solnfilename_extn[_MAX_STRING_SIZE_];
 
+  /*! output filename root */
+  char op_fname_root[_MAX_STRING_SIZE_];
+  /*! auxiliary output filename root */
+  char aux_op_fname_root[_MAX_STRING_SIZE_];
+
   /*! Pointer to the function to write the solution to file, assigned in InitializeSolvers() */
   int (*WriteOutput)              (int,int,int*,double*,double*,char*,int*);  
 
@@ -397,9 +402,6 @@ typedef struct main_parameters {
   int (*IBFunction) (void*,void*,double*,double);
 
 } HyPar;
-
-int CalculateError (void*,void*);/*!< Calculate the error in the final solution */
-int OutputSolution (void*,int);/*!< Write solutions to file */
 
 /* Some definitions - types of discretizations available 
    for the parabolic (2nd derivative) term  */

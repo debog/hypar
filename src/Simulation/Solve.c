@@ -16,6 +16,9 @@
 int ComputeRHSOperators(void*,void*,double);
 #endif
 
+int CalculateError (void*,void*); /*!< Calculate the error in the final solution */
+int OutputSolution (void*,int);   /*!< Write solutions to file */
+
 /*! This function integrates the semi-discrete ODE (obtained from discretizing the 
     PDE in space) using natively implemented time integration methods. It initializes 
     the time integration object, iterates the simulation for the required number of 

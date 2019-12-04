@@ -41,8 +41,10 @@ int OutputSolution( void  *s,   /*!< Array of simulation objects of type #Simula
     if (NSolutions > 10) NSolutions = 10;
   
     int  nu;
-    char fname_root[_MAX_STRING_SIZE_]     = "op";
-    char aux_fname_root[_MAX_STRING_SIZE_] = "ts0";
+    char fname_root[_MAX_STRING_SIZE_];
+    char aux_fname_root[_MAX_STRING_SIZE_];
+    strcpy(fname_root, solver->op_fname_root);
+    strcpy(aux_fname_root, solver->aux_op_fname_root);
 
     if (nsims > 1) {
       char index[_MAX_STRING_SIZE_];

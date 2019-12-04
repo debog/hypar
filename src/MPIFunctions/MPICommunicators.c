@@ -83,6 +83,7 @@ int MPIFreeCommunicators(
   for (n=0; n<ndims; n++) MPI_Comm_free(&mpi->comm[n]);
   free(mpi->comm);
   if (mpi->IOParticipant) MPI_Comm_free(&mpi->IOWorld);
+  MPI_Comm_free(&mpi->world);
 #endif
   return(0);
 }

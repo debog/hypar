@@ -3,10 +3,12 @@
     @author Debojyoti Ghosh, John Loffeld, Lee Ricketson
 */
 
-#include <common.h>
+#include <common_cpp.h>
 #include <io.h>
-#include <timeintegration.h>
+#include <timeintegration_cpp.h>
 #include <sparse_grids_simulation.h>
+
+//extern "C" void GetStringFromInteger(int, char*, int);
 
 /*! This function integrates the semi-discrete ODE (obtained from discretizing the 
     PDE in space) using natively implemented time integration methods. It initializes 
@@ -25,7 +27,7 @@ int SparseGridsSimulation::Solve()
       char fname_root[_MAX_STRING_SIZE_] = "iblank";
       if (m_nsims_sg > 1) {
         char index[_MAX_STRING_SIZE_];
-//        GetStringFromInteger(ns, index, (int)log10((m_nsims_sg)+1));
+        GetStringFromInteger(ns, index, (int)log10((m_nsims_sg)+1));
         strcat(fname_root, "_");
         strcat(fname_root, index);
       }
@@ -46,39 +48,41 @@ int SparseGridsSimulation::Solve()
   /* Define and initialize the time-integration object */
   TimeIntegration TS;
   if (!m_rank) printf("Setting up time integration.\n");
-//  TimeInitialize((void*)m_sims_sg.data(), m_nsims_sg, m_rank, m_nproc, &TS);
+  TimeInitialize((void*)m_sims_sg.data(), m_nsims_sg, m_rank, m_nproc, &TS);
 
-  if (!m_rank) printf("Solving in time (from %d to %d iterations)\n",TS.restart_iter,TS.n_iter);
+  if (!m_rank) {
+    printf( "Solving in time (from %d to %d iterations)\n",
+            TS.restart_iter,TS.n_iter);
+  }
+
   for (TS.iter = TS.restart_iter; TS.iter < TS.n_iter; TS.iter++) {
 
     /* Write initial solution to file if this is the first iteration */
-    /* XXX */
+    if (!TS.iter) OutputSolution();
 
     /* Call pre-step function */
-//    TimePreStep  (&TS);
+    TimePreStep  (&TS);
 
     /* Step in time */
-//    TimeStep     (&TS);
+    TimeStep     (&TS);
 
     /* Call post-step function */
-//    TimePostStep (&TS);
+    TimePostStep (&TS);
 
     /* Print information to screen */
-//    TimePrintStep(&TS);
+    TimePrintStep(&TS);
     tic++;
 
     /* Write intermediate solution to file */
     if ((TS.iter+1)%m_sims_sg[0].solver.file_op_iter == 0) { 
-      /* XXX */
+      OutputSolution();
       tic = 0; 
     }
 
   }
 
   /* write a final solution file, if last iteration did not write one */
-  if (tic || (!TS.n_iter)) { 
-    /* XXX */
-  }
+  if (tic || (!TS.n_iter)) OutputSolution();
 
   if (!m_rank) {
     printf("Completed time integration (Final time: %f).\n",TS.waqt);
@@ -90,7 +94,7 @@ int SparseGridsSimulation::Solve()
 //  CalculateError(&(m_sim_fg->solver),
 //                 &(m_sim_fg->mpi) );
 
-//  TimeCleanup(&TS);
+  TimeCleanup(&TS);
 
   return(0);
 }

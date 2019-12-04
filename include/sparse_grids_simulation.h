@@ -7,7 +7,9 @@
 #define _SPARSE_GRIDS_SIM_H_
 
 #include <vector>
+#include <string>
 #include <utility>
+#include <std_vec_ops.h>
 #include <simulation.h>
 
 #define _SPARSEGRIDS_SIM_INP_FNAME_ "sparse_grids.inp"
@@ -83,17 +85,13 @@ class SparseGridsSimulation : public Simulation
       return retval;
     }
 
-    /*! Initialize the simulations */
+    /*! Initialize the simulation */
     int Initialize();
 
-    /*! Read initial solution for each simulation */
-    inline int InitialSolution()
-    {
-      int retval = ::InitialSolution( (void*) m_sim_fg, 1 );
-      return retval;
-    }
+    /*! Read initial solution */
+    int InitialSolution();
 
-    /*! Initialize the boundary conditions of the simulations */
+    /*! Initialize the boundary conditions of the simulation */
     inline int InitializeBoundaries()
     {
       int retval = ::InitializeBoundaries(  (void*) m_sims_sg.data(),
@@ -101,7 +99,7 @@ class SparseGridsSimulation : public Simulation
       return retval;
     }
 
-    /*! Initialize the immersed boundary conditions of the simulations */
+    /*! Initialize the immersed boundary conditions of the simulation */
     inline int InitializeImmersedBoundaries()
     {
       int retval = ::InitializeImmersedBoundaries(  (void*) m_sims_sg.data(),
@@ -122,12 +120,15 @@ class SparseGridsSimulation : public Simulation
     {
       int retval = ::InitializeSolvers( (void*) m_sims_sg.data(),
                                         m_nsims_sg );
+      InitializeSolversBarebones(m_sim_fg);
 
-      /* disable output from individual sparse grids */
-      for (int i = 0; i < m_nsims_sg; i++) {
-        m_sims_sg[i].solver.WriteOutput = NULL;
+      /* some modifications to output filename roots */
+      for (int i=0; i<m_nsims_sg; i++) {
+        strcpy(m_sims_sg[i].solver.op_fname_root, "op_sg");
+        strcpy(m_sims_sg[i].solver.aux_op_fname_root, "ts0_sg");
       }
-
+      strcpy(m_sim_fg->solver.op_fname_root, "op_fg");
+      strcpy(m_sim_fg->solver.aux_op_fname_root, "ts0_fg");
       return retval;
     }
 
@@ -138,11 +139,11 @@ class SparseGridsSimulation : public Simulation
     inline void WriteErrors(double a_wt_solver,
                             double a_wt_total )
     {
-      ::SimWriteErrors( (void*) m_sim_fg,
-                        1,
-                        m_rank,
-                        a_wt_solver,
-                        a_wt_total );
+//      ::SimWriteErrors( (void*) m_sim_fg,
+//                        1,
+//                        m_rank,
+//                        a_wt_solver,
+//                        a_wt_total );
       return;
     }
 
@@ -190,6 +191,9 @@ class SparseGridsSimulation : public Simulation
     int   m_rank,         /*!< MPI rank of this process */
           m_nproc;        /*!< Total number of MPI ranks */
 
+    /*! Write out the sparse grid solutions to file? */
+    int m_write_sg_solutions; 
+
     SimulationObject* m_sim_fg;               /*!< full grid simulation object */
     std::vector<SimulationObject> m_sims_sg;  /*!< vector of sparse grids simulation objects */
 
@@ -217,6 +221,9 @@ class SparseGridsSimulation : public Simulation
     /*! Initialize a "barebones" simulation object */
     int InitializeBarebones(SimulationObject*);
 
+    /*! Initialize some function pointers for a "barebones" simulation object */
+    int InitializeSolversBarebones(SimulationObject*);
+
     /*! Cleanup (deallocate) a "barebones" simulation object */
     int CleanupBarebones(SimulationObject*);
 
@@ -227,6 +234,53 @@ class SparseGridsSimulation : public Simulation
                               const SimulationObject&,
                               const int,
                               const int );
+
+    /*! Output solutions to file */
+    void OutputSolution();
+
+    /*! Combination technique */
+    void CombinationTechnique(SimulationObject* const);
+
+    /*! Interpolate data from one simulation object to another */
+    void interpolate( SimulationObject* const, 
+                      const SimulationObject* const);
+
+    /*! Interpolate data to a desired resolution */
+    void interpolate( const GridDimensions&,
+                      double** const, 
+                      const SimulationObject* const);
+
+    /*! Coarsen along a given dimension */
+    void coarsen1D( const GridDimensions&,
+                    const GridDimensions&,
+                    const double* const, 
+                    double* const,
+                    int, int );
+
+    /*! Refine along a given dimension */
+    void refine1D( const GridDimensions&,
+                   const GridDimensions&,
+                   const double* const, 
+                   double* const,
+                   int, int );
+
+    /*! Interpolate data from one simulation object to another */
+    void interpolateGrid( SimulationObject* const, 
+                          const SimulationObject* const);
+
+    /*! Coarsen along a given dimension */
+    void coarsenGrid1D( const GridDimensions&,
+                        const GridDimensions&,
+                        const double* const, 
+                        double* const,
+                        int );
+
+    /*! Refine along a given dimension */
+    void refineGrid1D( const GridDimensions&,
+                       const GridDimensions&,
+                       const double* const, 
+                       double* const,
+                       int );
 
     /*! Checks if an integer is a power of 2 */
     inline bool isPowerOfTwo(int x) 
@@ -252,6 +306,27 @@ class SparseGridsSimulation : public Simulation
       int retval = 1.0;
       for (int i=1; i<=a; i++) retval *= a;
       return retval;
+    }
+
+    /*! Allocate grid array given grid dimension */
+    inline void allocateGridArrays( const GridDimensions& a_dim,
+                                    double** const        a_x )
+    {
+      long size_x = StdVecOps::sum(a_dim);
+      (*a_x) = new double[size_x];
+      for (int i=0; i<size_x; i++) (*a_x)[i] = 0.0;
+      return;
+    }
+
+    /*! Allocate data arrays given grid dimension */
+    inline void allocateDataArrays( const GridDimensions& a_dim,
+                                    const int             a_nvars,
+                                    double** const        a_u )
+    {
+      long size_u = a_nvars*StdVecOps::product(a_dim);
+      (*a_u) = new double[size_u];
+      for (int i=0; i<size_u; i++) (*a_u)[i] = 0.0;
+      return;
     }
 
   private:
