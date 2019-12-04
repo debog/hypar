@@ -118,6 +118,44 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
     delete[] xg_dst;
   }
 
+  /* exchange MPI-boundary values of x between processors */
+  {
+    int offset = 0;
+    for (int d = 0; d < m_ndims; d++) {
+      MPIExchangeBoundaries1D(  (void*) &(a_dst->mpi),
+                                &(a_dst->solver.x[offset]),
+                                a_dst->solver.dim_local[d],
+                                a_dst->solver.ghosts,
+                                d,
+                                m_ndims);
+      offset += (a_dst->solver.dim_local[d] + 2*a_dst->solver.ghosts);
+    }
+  }
+  /* fill in ghost values of x at physical boundaries by extrapolation */
+  {
+    int offset = 0;
+    for (int d = 0; d < m_ndims; d++) {
+      double* X       = &(a_dst->solver.x[offset]);
+      int*    dim     = a_dst->solver.dim_local;
+      int     ghosts  = a_dst->solver.ghosts;
+      if (a_dst->mpi.ip[d] == 0) {
+        /* fill left boundary along this dimension */
+        for (int i = 0; i < ghosts; i++) {
+          int delta = ghosts - i;
+          X[i] = X[ghosts] + ((double) delta) * (X[ghosts]-X[ghosts+1]);
+        }
+      }
+      if (a_dst->mpi.ip[d] == a_dst->mpi.iproc[d]-1) {
+        /* fill right boundary along this dimension */
+        for (int i = dim[d]+ghosts; i < dim[d]+2*ghosts; i++) {
+          int delta = i - (dim[d]+ghosts-1);
+          X[i] =  X[dim[d]+ghosts-1] 
+                  + ((double) delta) * (X[dim[d]+ghosts-1]-X[dim[d]+ghosts-2]);
+        }
+      }
+      offset  += (dim[d] + 2*ghosts);
+    }
+  }
   return;
 }
 
