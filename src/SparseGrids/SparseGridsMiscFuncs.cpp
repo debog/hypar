@@ -9,7 +9,10 @@
 #include <sparse_grids_simulation.h>
 #include <arrayfunctions.h>
 #include <mathfunctions.h>
+#include <io_cpp.h>
 #include <std_vec_ops.h>
+
+extern "C" void IncrementFilenameIndex(char*,int);
 
 /*! Compute the number, coefficients, and dimensions of all the sparse
  * grids that go into the combination technique.
@@ -302,6 +305,87 @@ int SparseGridsSimulation::InitializeBarebones( SimulationObject *simobj /*!< si
   solver->VolumeIntegralInitial = (double*) calloc (solver->nvars,sizeof(double));
   solver->TotalBoundaryIntegral = (double*) calloc (solver->nvars,sizeof(double));
   solver->ConservationError     = (double*) calloc (solver->nvars,sizeof(double));
+
+  return(0);
+}
+
+/*! This function initializes all some function pointers needed by a 
+ *  barebones simulation object.
+*/
+int SparseGridsSimulation::InitializeSolversBarebones( SimulationObject *sim /*!< simulation objects of type #SimulationObject*/)
+{
+  if (sim->is_barebones != 1) {
+    fprintf(stderr, "Error in SparseGridsSimulation::InitializeSolversBarebones() - \n");
+    fprintf(stderr, "  simulation object is not barebones type.\n");
+  }
+
+  int ns;
+
+  HyPar        *solver   = &(sim->solver);
+  MPIVariables *mpi      = &(sim->mpi);
+
+  solver->ParabolicFunction         = NULL;
+  solver->SecondDerivativePar       = NULL;
+  solver->FirstDerivativePar        = NULL;
+  solver->InterpolateInterfacesPar  = NULL;
+
+  solver->interp                = NULL;
+  solver->compact               = NULL;
+  solver->lusolver              = NULL;
+  solver->SetInterpLimiterVar   = NULL;
+  solver->flag_nonlinearinterp  = 0;
+  solver->time_integrator = NULL;
+  solver->msti = NULL;
+  
+  /* Solution output function */
+  solver->WriteOutput    = NULL; /* default - no output */
+  solver->filename_index = NULL;
+  if (!strcmp(solver->output_mode,"serial")) {
+    solver->index_length = 5;
+    solver->filename_index = (char*) calloc (solver->index_length+1,sizeof(char));
+    int i; for (i=0; i<solver->index_length; i++) solver->filename_index[i] = '0';
+    solver->filename_index[solver->index_length] = (char) 0;
+    if (!strcmp(solver->op_file_format,"text")) {
+      solver->WriteOutput = WriteText;
+      strcpy(solver->solnfilename_extn,".dat");
+    } else if (!strcmp(solver->op_file_format,"tecplot2d")) {
+      solver->WriteOutput = WriteTecplot2D;
+      strcpy(solver->solnfilename_extn,".dat");
+    } else if (!strcmp(solver->op_file_format,"tecplot3d")) {
+      solver->WriteOutput = WriteTecplot3D;
+      strcpy(solver->solnfilename_extn,".dat");
+    } else if ((!strcmp(solver->op_file_format,"binary")) || (!strcmp(solver->op_file_format,"bin"))) {
+      solver->WriteOutput = WriteBinary;
+      strcpy(solver->solnfilename_extn,".bin");
+    } else if (!strcmp(solver->op_file_format,"none")) {
+      solver->WriteOutput = NULL;
+    } else {
+      fprintf(stderr,"Error (domain %d): %s is not a supported file format.\n",
+              ns, solver->op_file_format);
+      return(1);
+    }
+    if ((!strcmp(solver->op_overwrite,"no")) && solver->restart_iter) {
+      /* if it's a restart run, fast-forward the filename */
+      int t;
+      for (t=0; t<solver->restart_iter; t++) 
+        if ((t+1)%solver->file_op_iter == 0) IncrementFilenameIndex(solver->filename_index,solver->index_length);
+    }
+  } else if (!strcmp(solver->output_mode,"parallel")) {
+    if (!strcmp(solver->op_file_format,"none")) solver->WriteOutput = NULL;
+    else {
+      /* only binary file writing supported in parallel mode */
+      /* use post-processing scripts to convert              */
+      solver->WriteOutput = WriteBinary;
+      strcpy(solver->solnfilename_extn,".bin");
+    }
+  } else {
+
+    fprintf(stderr,"Error (domain %d): %s is not a supported output mode.\n",
+            ns, solver->output_mode);
+    fprintf(stderr,"Should be \"serial\" or \"parallel\".    \n");
+    return(1);
+
+  }
 
   return(0);
 }

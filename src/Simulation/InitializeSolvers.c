@@ -308,6 +308,8 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
     /* Solution output function */
     solver->WriteOutput    = NULL; /* default - no output */
     solver->filename_index = NULL;
+    strcpy(solver->op_fname_root, "op");
+    strcpy(solver->aux_op_fname_root, "ts0");
     if (!strcmp(solver->output_mode,"serial")) {
       solver->index_length = 5;
       solver->filename_index = (char*) calloc (solver->index_length+1,sizeof(char));

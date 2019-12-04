@@ -23,6 +23,9 @@
 #undef __FUNCT__
 #define __FUNCT__ "SolvePETSc"
 
+int CalculateError (void*,void*); /*!< Calculate the error in the final solution */
+int OutputSolution (void*,int);   /*!< Write solutions to file */
+
 /*! \brief Integrate in time with PETSc
 
     This function integrates the semi-discrete ODE (obtained from discretizing
