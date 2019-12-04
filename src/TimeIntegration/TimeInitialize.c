@@ -69,6 +69,15 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
   TS->Udot          = NULL;
   TS->BoundaryFlux  = NULL;
   
+  TS->bf_offsets = (int*) calloc (nsims, sizeof(int));
+  TS->bf_sizes = (int*) calloc (nsims, sizeof(int));
+  TS->bf_size_total = 0;
+  for (ns = 0; ns < nsims; ns++) {
+    TS->bf_offsets[ns] = TS->bf_size_total;
+    TS->bf_sizes[ns] =  2 * sim[ns].solver.ndims * sim[ns].solver.nvars;
+    TS->bf_size_total += TS->bf_sizes[ns];
+  }
+
   if (!strcmp(sim[0].solver.time_scheme,_RK_)) {
 
     /* explicit Runge-Kutta methods */
@@ -81,19 +90,19 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
       TS->Udot[i] = (double*) calloc (TS->u_size_total,sizeof(double));
     }
 
-    TS->bf_size_total = 0;
-    TS->bf_offsets = (int*) calloc (nsims, sizeof(int));
-    TS->bf_sizes = (int*) calloc (nsims, sizeof(int));
-    for (ns = 0; ns < nsims; ns++) {
-      TS->bf_offsets[ns] = TS->bf_size_total;
-      TS->bf_sizes[ns] =  2 * sim[ns].solver.ndims * sim[ns].solver.nvars;
-      TS->bf_size_total += TS->bf_sizes[ns];
-    }
     TS->BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
     for (i=0; i<nstages; i++) {
       TS->BoundaryFlux[i] = (double*) calloc (TS->bf_size_total,sizeof(double));
     }
   
+  } else if (!strcmp(sim[0].solver.time_scheme,_FORWARD_EULER_)) {
+
+    int nstages = 1;
+    TS->BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
+    for (i=0; i<nstages; i++) {
+      TS->BoundaryFlux[i] = (double*) calloc (TS->bf_size_total,sizeof(double));
+    }
+
   } else if (!strcmp(sim[0].solver.time_scheme,_GLM_GEE_)) {
     
     /* General Linear Methods with Global Error Estimate */
@@ -105,13 +114,6 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
     for (i=0; i<2*r-1; i++)   TS->U[i]    = (double*) calloc (TS->u_size_total,sizeof(double));
     for (i=0; i<nstages; i++) TS->Udot[i] = (double*) calloc (TS->u_size_total,sizeof(double));
 
-    TS->bf_size_total = 0;
-    TS->bf_offsets = (int*) calloc (nsims, sizeof(int));
-    for (ns = 0; ns < nsims; ns++) {
-      TS->bf_offsets[ns] = TS->bf_size_total;
-      TS->bf_sizes[ns] =  2 * sim[ns].solver.ndims * sim[ns].solver.nvars;
-      TS->bf_size_total += TS->bf_sizes[ns];
-    }
     TS->BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
     for (i=0; i<nstages; i++) {
       TS->BoundaryFlux[i] = (double*) calloc (TS->bf_size_total,sizeof(double));

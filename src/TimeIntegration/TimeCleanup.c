@@ -27,6 +27,9 @@ int TimeCleanup(void *ts /*!< Object of type #TimeIntegration*/)
     for (i=0; i<params->nstages; i++) free(TS->U[i]);            free(TS->U);
     for (i=0; i<params->nstages; i++) free(TS->Udot[i]);         free(TS->Udot);
     for (i=0; i<params->nstages; i++) free(TS->BoundaryFlux[i]); free(TS->BoundaryFlux);
+  } else if (!strcmp(sim[0].solver.time_scheme,_FORWARD_EULER_)) {
+    int nstages = 1, i;
+    for (i=0; i<nstages; i++) free(TS->BoundaryFlux[i]); free(TS->BoundaryFlux);
   } else if (!strcmp(sim[0].solver.time_scheme,_GLM_GEE_)) {
     int i;
     GLMGEEParameters  *params = (GLMGEEParameters*)  sim[0].solver.msti;
