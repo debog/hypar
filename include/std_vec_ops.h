@@ -43,6 +43,15 @@ namespace StdVecOps {
     return;
   }
 
+  /*! Add constant to all elements of a vector */
+  inline
+  void add( std::vector<int>& a_iv, /*!< C++ vector of ints */
+            const int         a_a   /*!< constant to add */ )
+  {
+    for (int i=0; i<a_iv.size(); i++) a_iv[i] += a_a;
+    return;
+  }
+
   /*! Copy from a C-array */
   inline
   void copyFrom(  std::vector<double>& a_iv,       /*!< C++ vector of doubles */

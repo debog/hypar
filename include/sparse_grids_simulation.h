@@ -255,14 +255,14 @@ class SparseGridsSimulation : public Simulation
                     const GridDimensions&,
                     const double* const, 
                     double* const,
-                    int, int );
+                    int, int, int );
 
     /*! Refine along a given dimension */
     void refine1D( const GridDimensions&,
                    const GridDimensions&,
                    const double* const, 
                    double* const,
-                   int, int );
+                   int, int, int );
 
     /*! Interpolate data from one simulation object to another */
     void interpolateGrid( SimulationObject* const, 
@@ -310,9 +310,14 @@ class SparseGridsSimulation : public Simulation
 
     /*! Allocate grid array given grid dimension */
     inline void allocateGridArrays( const GridDimensions& a_dim,
-                                    double** const        a_x )
+                                    double** const        a_x,
+                                    const int             a_ngpt = 0)
     {
-      long size_x = StdVecOps::sum(a_dim);
+      GridDimensions dim_wghosts = a_dim;
+      for (int i=0; i<dim_wghosts.size(); i++) {
+        dim_wghosts[i] += (2*a_ngpt);
+      }
+      long size_x = StdVecOps::sum(dim_wghosts);
       (*a_x) = new double[size_x];
       for (int i=0; i<size_x; i++) (*a_x)[i] = 0.0;
       return;
@@ -321,9 +326,14 @@ class SparseGridsSimulation : public Simulation
     /*! Allocate data arrays given grid dimension */
     inline void allocateDataArrays( const GridDimensions& a_dim,
                                     const int             a_nvars,
-                                    double** const        a_u )
+                                    double** const        a_u,
+                                    const int             a_ngpt = 0)
     {
-      long size_u = a_nvars*StdVecOps::product(a_dim);
+      GridDimensions dim_wghosts = a_dim;
+      for (int i=0; i<dim_wghosts.size(); i++) {
+        dim_wghosts[i] += (2*a_ngpt);
+      }
+      long size_u = a_nvars*StdVecOps::product(dim_wghosts);
       (*a_u) = new double[size_u];
       for (int i=0; i<size_u; i++) (*a_u)[i] = 0.0;
       return;
