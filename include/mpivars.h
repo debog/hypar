@@ -36,13 +36,17 @@ int MPIExchangeBoundaries1D (void*,double*,int,int,int,int);
 int MPIExchangeBoundariesnD (int,int,int*,int,void*,double*);
 
 /*! Gather local arrays into a global array for an essentially 1D array */
-int MPIGatherArray1D        (void*,double*,double*,int,int,int,int); 
+int MPIGatherArray1D            (void*,double*,double*,int,int,int,int); 
 /*! Gather local arrays into a global array for an n-dimensional array */
-int MPIGatherArraynD        (int,void*,double*,double*,int*,int*,int,int);
+int MPIGatherArraynD            (int,void*,double*,double*,int*,int*,int,int);
+/*! Gather local arrays into a global array for an n-dimensional array (with ghosts) */
+int MPIGatherArraynDwGhosts     (int,void*,double*,double*,int*,int*,int,int);
 /*! Partition a global array into local arrays for an n-dimensional array */
-int MPIPartitionArraynD     (int,void*,double*,double*,int*,int*,int,int); 
+int MPIPartitionArraynD         (int,void*,double*,double*,int*,int*,int,int); 
+/*! Partition a global array into local arrays for an n-dimensional array */
+int MPIPartitionArraynDwGhosts  (int,void*,double*,double*,int*,int*,int,int); 
 /*! Partition a global array into local arrays for an essentially 1D array */
-int MPIPartitionArray1D     (void*,double*,double*,int,int,int,int); 
+int MPIPartitionArray1D         (void*,double*,double*,int,int,int,int); 
 
 /*! fetch data from an n-dimensional local array on another rank */
 int MPIGetArrayDatanD       (double*,double*,int*,int*,int*,int*,int,int,int,void*);
