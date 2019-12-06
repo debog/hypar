@@ -304,7 +304,7 @@ class SparseGridsSimulation : public Simulation
     inline int factorial(int a)
     {
       int retval = 1.0;
-      for (int i=1; i<=a; i++) retval *= a;
+      for (int i=1; i<=a; i++) retval *= i;
       return retval;
     }
 
