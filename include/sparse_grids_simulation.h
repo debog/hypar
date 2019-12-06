@@ -136,16 +136,7 @@ class SparseGridsSimulation : public Simulation
     int Solve();
 
     /*! Write simulation errors and wall times to file */
-    inline void WriteErrors(double a_wt_solver,
-                            double a_wt_total )
-    {
-      ::SimWriteErrors( (void*) m_sim_fg,
-                        1,
-                        m_rank,
-                        a_wt_solver,
-                        a_wt_total );
-      return;
-    }
+    void WriteErrors(double, double);
 
     /*! Return whether object is defined or not */
     inline bool isDefined() const { return m_is_defined; }
@@ -193,6 +184,9 @@ class SparseGridsSimulation : public Simulation
 
     /*! Write out the sparse grid solutions to file? */
     int m_write_sg_solutions; 
+
+    /*! Print and write out the sparse grid errors? */
+    int m_print_sg_errors; 
 
     SimulationObject* m_sim_fg;               /*!< full grid simulation object */
     std::vector<SimulationObject> m_sims_sg;  /*!< vector of sparse grids simulation objects */
@@ -245,10 +239,18 @@ class SparseGridsSimulation : public Simulation
     void interpolate( SimulationObject* const, 
                       const SimulationObject* const);
 
-    /*! Interpolate data to a desired resolution */
+    /*! Interpolate data from a simulation to a global C-array */
     void interpolate( const GridDimensions&,
                       double** const, 
                       const SimulationObject* const);
+
+    /*! Interpolate data from one global C-array to another */
+    void interpolate( const GridDimensions&,
+                      double** const,
+                      const GridDimensions&,
+                      double* const,
+                      const int,
+                      const int );
 
     /*! Coarsen along a given dimension */
     void coarsen1D( const GridDimensions&,
@@ -281,6 +283,12 @@ class SparseGridsSimulation : public Simulation
                        const double* const, 
                        double* const,
                        int );
+
+    /*! Calculate errors */
+    void CalculateError();
+
+    /*! Compute error for a simulation object */
+    void computeError( SimulationObject&, double* const);
 
     /*! Checks if an integer is a power of 2 */
     inline bool isPowerOfTwo(int x) 

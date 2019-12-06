@@ -42,6 +42,7 @@ void SparseGridsSimulation::CombinationTechnique(SimulationObject* const a_sim /
     if (!m_rank) {
       double coeff = m_combination[n]._coeff_;
       _ArrayAXPY_(u_sg_interpolated, coeff, ug_combined, size_wg);
+      delete[] u_sg_interpolated;
     }
   }
 

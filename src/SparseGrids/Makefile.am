@@ -1,5 +1,6 @@
 noinst_LIBRARIES = libSparseGrids.a
 libSparseGrids_a_SOURCES = \
+	SparseGridsCalculateError.cpp \
 	SparseGridsCombinationTechnique.cpp \
 	SparseGridsDefine.cpp \
   SparseGridsInitialize.cpp \
@@ -10,4 +11,5 @@ libSparseGrids_a_SOURCES = \
   SparseGridsOutputSolution.cpp \
   SparseGridsSanityChecks.cpp \
 	SparseGridsSolve.cpp \
-	SparseGridsSetSolverParameters.cpp
+	SparseGridsSetSolverParameters.cpp \
+	SparseGridsWriteErrors.cpp
