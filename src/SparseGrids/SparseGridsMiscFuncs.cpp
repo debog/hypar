@@ -306,6 +306,8 @@ int SparseGridsSimulation::InitializeBarebones( SimulationObject *simobj /*!< si
   solver->TotalBoundaryIntegral = (double*) calloc (solver->nvars,sizeof(double));
   solver->ConservationError     = (double*) calloc (solver->nvars,sizeof(double));
 
+  for (int i=0; i<solver->nvars; i++) solver->ConservationError[i] = -1;
+
   return(0);
 }
 

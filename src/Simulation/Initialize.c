@@ -184,6 +184,7 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
     simobj[n].solver.StepBoundaryIntegral  = (double*) calloc (2*simobj[n].solver.ndims*simobj[n].solver.nvars,sizeof(double));
     simobj[n].solver.TotalBoundaryIntegral = (double*) calloc (simobj[n].solver.nvars,sizeof(double));
     simobj[n].solver.ConservationError     = (double*) calloc (simobj[n].solver.nvars,sizeof(double));
+    for (i=0; i<simobj[n].solver.nvars; i++) simobj[n].solver.ConservationError[i] = -1;
 
     /* initialize function call counts to zero */
     simobj[n].solver.count_hyp 
