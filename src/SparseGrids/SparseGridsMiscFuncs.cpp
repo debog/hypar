@@ -29,7 +29,7 @@ int SparseGridsSimulation::ComputeSGDimsAndCoeffs()
     double coeff = c1 * cfunc(d-1,s-1);
 
     std::vector<GridDimensions> dims(0);
-    GetCTGridSizes(m_n_fg+d-s, dims);
+    GetCTGridSizes((m_n_fg+(m_ndims-1)*(m_imin-1))+d-s, dims);
     if (dims.size() == 0) {
       fprintf(stderr, "Error in SparseGridsSimulation::ComputeSGDimsAndCoeffs()\n");
       fprintf(stderr, "  GetCTGridSize() returned empty vector!\n");
@@ -57,7 +57,7 @@ void SparseGridsSimulation::GetCTGridSizes(const int a_N, /*!< Desired sum of th
 
   int index[m_ndims], ubounds[m_ndims], lbounds[m_ndims];
   _ArraySetValue_(index,  m_ndims, m_imin);
-  _ArraySetValue_(ubounds, m_ndims, a_N-m_imin+1);
+  _ArraySetValue_(ubounds, m_ndims, a_N);
   _ArraySetValue_(lbounds, m_ndims, m_imin);
 
   int done = 0;
