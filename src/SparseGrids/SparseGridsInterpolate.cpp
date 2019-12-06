@@ -280,10 +280,59 @@ void SparseGridsSimulation::refine1D( const GridDimensions& a_dim_src,  /*!< Gri
     exit(1);
   }
 
-  fprintf(stderr, "Error in SparseGridsSimulation::refine1D() -\n");
-  fprintf(stderr, "  NOT YET IMPLEMENTED\n");
-  exit(1);
-  
+  /* compute dimensions with ghosts */
+  GridDimensions dim_src_wg = a_dim_src;
+  StdVecOps::add(dim_src_wg, 2*a_ngpt);
+  GridDimensions dim_dst_wg = a_dim_dst;
+  StdVecOps::add(dim_dst_wg, 2*a_ngpt);
+
+  /* create bounds for the transverse loop, i.e., to loop over 
+   * all 1D lines along dimension "a_dir" */
+  int bounds_transverse[m_ndims];
+  _ArrayCopy1D_(a_dim_src, bounds_transverse, m_ndims); 
+  for (int d = 0; d < m_ndims; d++) bounds_transverse[d] += (2*a_ngpt);
+  bounds_transverse[a_dir] =  1;
+
+  int n_transverse; 
+  _ArrayProduct1D_(bounds_transverse, m_ndims, n_transverse);
+
+  for (int ti = 0; ti < n_transverse; ti++) {
+
+    int index_transverse[m_ndims];
+    _ArrayIndexnD_(m_ndims, ti, bounds_transverse, index_transverse, 0);
+
+    int index_dst[m_ndims], index_srcL[m_ndims], index_srcR[m_ndims];
+    _ArrayCopy1D_(index_transverse, index_dst, m_ndims);
+    _ArrayCopy1D_(index_transverse, index_srcL, m_ndims);
+    _ArrayCopy1D_(index_transverse, index_srcR, m_ndims);
+
+    for (int i_dst = 0; i_dst < n_dst; i_dst++) {
+
+      double xi_dst = ((double) i_dst + 0.5) / ((double) stride) - 0.5;
+      int i_src_left = std::floor(xi_dst),
+          i_src_right = std::ceil(xi_dst);
+      double alpha = ((double)i_src_right - xi_dst) / ((double)i_src_right - (double)i_src_left);
+
+      for (int v = 0; v < a_nvars; v++) {
+
+        index_dst[a_dir] = i_dst+a_ngpt;
+        int p; _ArrayIndex1D_(m_ndims, dim_dst_wg, index_dst, 0, p);
+
+        index_srcL[a_dir] = i_src_left+a_ngpt;
+        int qL; _ArrayIndex1D_(m_ndims, dim_src_wg, index_srcL, 0, qL);
+
+        index_srcR[a_dir] = i_src_right+a_ngpt;
+        int qR; _ArrayIndex1D_(m_ndims, dim_src_wg, index_srcR, 0, qR);
+
+        a_u_dst[p*a_nvars+v] =    alpha       * a_u_src[qL*a_nvars+v]
+                                + (1.0-alpha) * a_u_src[qR*a_nvars+v];
+
+      }
+
+    }
+
+  }
+
   return;
 }
 

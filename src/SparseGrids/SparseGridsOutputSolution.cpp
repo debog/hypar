@@ -22,7 +22,7 @@ void SparseGridsSimulation::OutputSolution()
   }
 
   /* Combine the sparse grids solutions to full grid */
-  //CombinationTechnique(m_sim_fg);
+  CombinationTechnique(m_sim_fg);
 
   /* Write the full grid solution */
   ::OutputSolution((void*)m_sim_fg, 1);
