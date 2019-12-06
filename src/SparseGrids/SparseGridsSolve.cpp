@@ -8,8 +8,6 @@
 #include <timeintegration_cpp.h>
 #include <sparse_grids_simulation.h>
 
-extern "C" int CalculateError (void*,void*); /*!< Calculate the error in the final solution */
-
 /*! This function integrates the semi-discrete ODE (obtained from discretizing the 
     PDE in space) using natively implemented time integration methods. It initializes 
     the time integration object, iterates the simulation for the required number of 
@@ -106,8 +104,7 @@ int SparseGridsSimulation::Solve()
   }
 
   /* calculate error if exact solution has been provided */
-  CalculateError(&(m_sim_fg->solver),
-                 &(m_sim_fg->mpi) );
+  CalculateError();
 
   TimeCleanup(&TS);
 

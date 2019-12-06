@@ -24,6 +24,7 @@ int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
   /* default values */
   m_imin = 2;
   m_write_sg_solutions = 0;
+  m_print_sg_errors = 0;
 
   if (!m_rank) {
 
@@ -58,6 +59,12 @@ int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
             ferr = fscanf(in,"%s",answer); if (ferr != 1) return(1);
             m_write_sg_solutions = (strcmp(answer,"yes") ? 0 : 1);
 
+          } else if (std::string(word) == "write_sg_errors") {
+
+            char answer[_MAX_STRING_SIZE_];
+            ferr = fscanf(in,"%s",answer); if (ferr != 1) return(1);
+            m_print_sg_errors = (strcmp(answer,"yes") ? 0 : 1);
+
           } else if (std::string(word) != "end") {
 
             char useless[_MAX_STRING_SIZE_];
@@ -90,6 +97,7 @@ int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
 #ifndef serial
   MPI_Bcast(&m_imin,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(&m_write_sg_solutions,1,MPI_INT,0,MPI_COMM_WORLD);
+  MPI_Bcast(&m_print_sg_errors,1,MPI_INT,0,MPI_COMM_WORLD);
 #endif
 
   m_sim_fg = new SimulationObject;

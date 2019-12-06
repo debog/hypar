@@ -90,8 +90,49 @@ void SparseGridsSimulation::interpolate(const GridDimensions& a_dim_dst, /*!< gr
                            ghosts,
                            nvars );
 
+  interpolate(  a_dim_dst,
+                a_u_dst,
+                dim_src,
+                ug_src,
+                nvars,
+                ghosts );
+  return;
+}
+
+/*! Interpolate data from one grid to another of a desired resolution. 
+    Note that along each dimension, the ratio of the number of grid points 
+    in the source grid and that in the destination grid must be an integer 
+    power of 2 (negative or positive).
+
+    The source data *must* be global. It will get deallocated at the end
+    of this function.
+
+    The incoming pointer must be NULL. After this function is executed, it
+    will point to a chunk of memory with the interpolated solution. This is
+    the *global* solution.
+*/
+void SparseGridsSimulation::interpolate(const GridDimensions& a_dim_dst, /*!< grid dimensions to interpolate to */
+                                        double** const a_u_dst, /*!< pointer to array containing interpolated data */
+                                        const GridDimensions& a_dim_src, /*!< grid dimensions to interpolate from */
+                                        double* const a_u_src, /*!< pointer to array containing data to interpolate from */
+                                        const int a_nvars, /*!< Number of vector components of the solution */
+                                        const int a_ghosts /*!< Number of ghost points */
+                                       )
+{
+  if ((*a_u_dst) != NULL) {
+    fprintf(stderr, "Error in SparseGridsSimulation::interpolate() - \n");
+    fprintf(stderr, "  a_u_dst is not NULL!\n");
+    exit(1);
+  }
+
   /* now do the interpolation, dimension-by-dimension */
   if (!m_rank) {
+
+    if (a_u_src == NULL) {
+      fprintf(stderr, "Error in SparseGridsSimulation::interpolate() - \n");
+      fprintf(stderr, "  a_u_src is NULL!\n");
+      exit(1);
+    }
 
     GridDimensions dim_to(m_ndims,0);
     GridDimensions dim_from(m_ndims,0);
@@ -99,8 +140,8 @@ void SparseGridsSimulation::interpolate(const GridDimensions& a_dim_dst, /*!< gr
     double *u_from;
     double *u_to;
 
-    dim_to = dim_src;
-    u_to = ug_src;
+    dim_to = a_dim_src;
+    u_to = a_u_src;
     u_from = NULL;
 
     for (int dir = 0; dir < m_ndims; dir++) {
@@ -123,11 +164,11 @@ void SparseGridsSimulation::interpolate(const GridDimensions& a_dim_dst, /*!< gr
 
       u_from = u_to;
 
-      allocateDataArrays(dim_to, nvars, &u_to, ghosts);
+      allocateDataArrays(dim_to, a_nvars, &u_to, a_ghosts);
       if (dim_to[dir] < dim_from[dir]) {
-        coarsen1D(dim_from, dim_to, u_from, u_to, dir, nvars, ghosts);
+        coarsen1D(dim_from, dim_to, u_from, u_to, dir, a_nvars, a_ghosts);
       } else {
-        refine1D(dim_from, dim_to, u_from, u_to, dir, nvars, ghosts);
+        refine1D(dim_from, dim_to, u_from, u_to, dir, a_nvars, a_ghosts);
       }
   
     }
