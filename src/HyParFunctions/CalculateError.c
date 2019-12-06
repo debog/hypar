@@ -58,7 +58,7 @@ int CalculateError(
 
     /* No exact solution */
     IERR TimeError(solver,mpi,NULL); CHECKERR(ierr);
-    solver->error[0] = solver->error[1] = solver->error[2] = 0.0;
+    solver->error[0] = solver->error[1] = solver->error[2] = -1;
 
   } else {
 
