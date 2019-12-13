@@ -7,6 +7,7 @@
 #define _SPARSE_GRIDS_SIM_H_
 
 #include <vector>
+#include <string.h>
 #include <string>
 #include <utility>
 #include <std_vec_ops.h>
