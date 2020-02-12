@@ -6,6 +6,7 @@
 #ifndef _SPARSE_GRIDS_SIM_H_
 #define _SPARSE_GRIDS_SIM_H_
 
+#include <cstdlib>
 #include <vector>
 #include <string.h>
 #include <string>

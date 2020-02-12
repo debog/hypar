@@ -3,6 +3,7 @@
     @author Debojyoti Ghosh, John Loffeld, Lee Ricketson
 */
 
+#include <cmath>
 #include <arrayfunctions.h>
 #include <std_vec_ops.h>
 #include <sparse_grids_simulation.h>
