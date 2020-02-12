@@ -3,6 +3,7 @@
     @author Debojyoti Ghosh, John Loffeld, Lee Ricketson
 */
 
+#include <cmath>
 #include <basic.h>
 #include <arrayfunctions.h>
 #include <std_vec_ops.h>
