@@ -24,7 +24,6 @@ root_dir=$PWD
 hypar_dir="/home/ghosh5/Codes/hypar"
 # other HyPar-related stuff
 hypar_exec="HyPar"
-hypar_compile_log_file="compile_hypar.log"
 
 #export env vars for other scripts to run HyPar
 export HYPAR_EXEC_W_PATH="${hypar_dir}/bin/${hypar_exec}"
