@@ -144,7 +144,7 @@ while [ $REF_LEVEL -lt $num_refinements ]; do
   echo "    writing input files"
   write_solver_inp.sh
   write_boundary_inp.sh
-  write_physics_inp_linadv1d.sh
+  write_physics_inp_linadv.sh
 
   # compile the code to generate initial solution and run it
   echo "    compiling and running code to generate initial solution"
