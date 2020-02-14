@@ -2,7 +2,7 @@
 
 #################################################################
 # 
-# Bash script to run a spatial convergence test on a smooth 1D linear 
+# Bash script to run a spatial convergence test on a smooth 2D linear 
 # advection problem - periodic advection of a sine wave.
 #
 # ** Please copy this script to a new location before using it! **
@@ -148,7 +148,7 @@ DIRINDEXLEN=${#MAX_NUM_PTS}
 
 echo "--"
 echo "Spatial convergence test on a smooth solution to the linear "
-echo "advection equation (1D):"
+echo "advection equation (2D):"
 echo "Grid sizes varying from ${num_pts_coarsest}^${p_ndims} to ${MAX_NUM_PTS}^${p_ndims}:"
 echo "Spatial discretization (hyperbolic): ${p_hyp_scheme}"
 echo "Spatial discretization (parabolic): ${p_par_scheme}"
