@@ -2,8 +2,8 @@
 
 #################################################################
 # 
-# Bash script to run a spatial convergence test on a smooth 1D linear 
-# advection problem - periodic advection of a sine wave.
+# Bash script to run a spatial convergence test on a smooth 1D Euler 
+# equations problem - periodic advection of a density sine wave.
 #
 # ** Please copy this script to a new location before using it! **
 # It will create test directories at the location it is run from.
@@ -15,7 +15,7 @@ clear
 # Please adjust the variables below as needed.
 
 # HyPar location 
-hypar_dir="/g/g92/ghosh5/Codes/hypar"
+hypar_dir="/home/ghosh5/Codes/hypar"
 # HyPar binary name
 hypar_exec="HyPar"
 # therefore, HyPar binary with path
@@ -47,12 +47,10 @@ fi
 echo ""
 
 # command to launch MPI jobs (mpiexec, srun, etc.)
-#mpicmd="mpiexec"
-mpicmd="srun"
+mpicmd="mpiexec"
 # other necessary args for launching MPI jobs, 
 # eg., queue/allocation specifications
-#mpiargs=""
-mpiargs="-p pdebug"
+mpiargs=""
 
 # Convergence test parameters
 num_pts_coarsest=16
