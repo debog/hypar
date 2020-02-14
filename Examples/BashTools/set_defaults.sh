@@ -70,4 +70,10 @@ export p_atol="1e-12"
 export p_rtol="1e-10"
 export p_verbose=0
 
+# linear advection
+export p_adv_speed="1.0"
 
+# Euler/Navier-Stokes equations
+export p_gamma="1.4"
+export p_gravity="0.0"
+export p_upwinding="roe"
