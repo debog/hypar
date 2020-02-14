@@ -76,4 +76,11 @@ export p_adv_speed="1.0"
 # Euler/Navier-Stokes equations
 export p_gamma="1.4"
 export p_gravity="0.0"
+export p_pr="0.72"
+export p_re="-1"
+export p_minf="1.0"
+export p_rho_ref="1.0"
+export p_p_ref="1.0"
+export p_HB=0
+export p_R="1.0"
 export p_upwinding="roe"
