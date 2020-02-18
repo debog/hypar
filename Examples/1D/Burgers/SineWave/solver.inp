@@ -4,7 +4,7 @@ begin
   size                80
   iproc               1
   ghost               3
-  n_iter              30
+  n_iter              15
   time_scheme         rk
   time_scheme_type    ssprk3
   hyp_space_scheme    crweno5
