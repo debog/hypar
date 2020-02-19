@@ -1,0 +1,28 @@
+2D BURGERS EQUATION
+
+  du     d[0.5 u^2]    d[0.5 u^2]
+  --  +  ---------- +  ----------  = 0
+  dt         dx            dy
+
+  0 <= x,y <= 1; Periodic
+
+Initial Solution:
+  u(x,y,0) = u0(x) = sin(2*pi*x) / 2*ts*pi
+  ts = 2.0
+
+Exact Solution (final time < ts):
+  u(x,y,t) = sin( 2*pi * (x-u(x,y,t)*t) ) / 2*ts*pi
+  Needs to be computed iteratively using
+  the fixed point method.
+
+The following input files are required:
++ solver.inp    -   General solver parameters
++ boundary.inp  -   Boundary conditions
++ physics.inp   -   Physical parameters 
++ initial.inp   -   Initial solution
+
+** See hypar/README for other (optional) input files
+
+Notes:-
+The code aux/init.c is an example to generate the initial
+solution file(s) in the correct format required by the solver.  

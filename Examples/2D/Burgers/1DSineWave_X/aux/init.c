@@ -1,6 +1,6 @@
 /*
   Code to generate the initial for:
-  Case: Sine Wave
+  Case: 1D Sine Wave
   Model: Burger2D
 
   Needs: solver.inp
@@ -103,7 +103,7 @@ int main()
   	  	x[i] = i*dx;
   	  	y[j] = j*dy;
         int p = NJ*i + j;
-  		  u[p] = sin(2*pi*y[j]) * sin(2*pi*x[i]) / (2*ts*pi);
+  		  u[p] = sin(2*pi*x[i]) / (2*ts*pi);
   	  }
   	}
   
@@ -163,7 +163,7 @@ int main()
   	  	x[i] = i*dx;
   	  	y[j] = j*dy;
         int p = NJ*i + j;
-  		  u[p] = sin(2*pi*y[j]) * sin(2*pi*x[i]) / (2*ts*pi);
+  		  u[p] = sin(2*pi*x[i]) / (2*ts*pi);
   	  }
   	}
   
@@ -174,7 +174,7 @@ int main()
 	    for (i = 0; i < NI; i++){
     	  for (j = 0; j < NJ; j++){
           int p = NJ*i + j;
-          double new_u =  sin(2.0*pi*(y[j]-u[p]*tf)) * sin(2.0*pi*(x[i]-u[p]*tf)) / (ts*2.0*pi);
+          double new_u =  sin(2.0*pi*(x[i]-u[p]*tf)) / (ts*2.0*pi);
           double res = sqrt((new_u-u[p])*(new_u-u[p]));
           if (res > maxres) maxres = res;
           u[p] = new_u;

@@ -125,7 +125,6 @@ int main()
       if (maxres < tolerance) break;
     }
 
-
     FILE *out;
     if (!strcmp(ip_file_type,"ascii")) {
       printf("Writing ASCII initial solution file exact.inp\n");
