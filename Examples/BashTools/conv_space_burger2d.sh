@@ -47,12 +47,10 @@ fi
 echo ""
 
 # command to launch MPI jobs (mpiexec, srun, etc.)
-#mpicmd="mpiexec"
-mpicmd="srun"
+mpicmd="mpiexec"
 # other necessary args for launching MPI jobs, 
 # eg., queue/allocation specifications
-#mpiargs=""
-mpiargs="-p pdebug"
+mpiargs=""
 
 # Convergence test parameters
 num_pts_coarsest=32
