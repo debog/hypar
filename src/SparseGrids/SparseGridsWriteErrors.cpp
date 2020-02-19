@@ -98,7 +98,7 @@ void SparseGridsSimulation::WriteErrors(double solver_runtime,  /*!< Measured ru
     /* First write stuff for the full grid solution */
     {
       char  err_fname[_MAX_STRING_SIZE_];
-      strcpy(err_fname,"errors_fg_");
+      strcpy(err_fname,"errors_fg");
       strcat(err_fname,".dat");
 
       FILE *out; 
