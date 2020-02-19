@@ -1,5 +1,10 @@
 # Defaut values of all the input parameters for HyPar
 
+# sparse_grids.inp
+export p_imin=3
+export p_write_sg_solutions="no"
+export p_write_sg_errors="yes"
+
 # solver.inp
 export p_ndims=1
 export p_nvars=1
