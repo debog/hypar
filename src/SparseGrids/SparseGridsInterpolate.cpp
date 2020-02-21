@@ -256,25 +256,37 @@ void SparseGridsSimulation::coarsen1D(  const GridDimensions& a_dim_src,  /*!< G
 
     for (int i_dst = 0; i_dst < n_dst; i_dst++) {
 
+      int i_m1 = i_dst*stride + (stride/2-1);
+      int i_m2 = i_m1 - 1;
+      int i_p1 = i_m1 + 1;
+      int i_p2 = i_p1 + 1;
+
+      int p;
+      index_dst[a_dir] = i_dst+a_ngpt;
+      _ArrayIndex1D_(m_ndims, dim_dst_wg, index_dst, 0, p);
+
+      int p_m2;
+      index_src[a_dir] = i_m2+a_ngpt;
+      _ArrayIndex1D_(m_ndims, dim_src_wg, index_src, 0, p_m2);
+
+      int p_m1;
+      index_src[a_dir] = i_m1+a_ngpt;
+      _ArrayIndex1D_(m_ndims, dim_src_wg, index_src, 0, p_m1);
+
+      int p_p1;
+      index_src[a_dir] = i_p1+a_ngpt;
+      _ArrayIndex1D_(m_ndims, dim_src_wg, index_src, 0, p_p1);
+
+      int p_p2;
+      index_src[a_dir] = i_p2+a_ngpt;
+      _ArrayIndex1D_(m_ndims, dim_src_wg, index_src, 0, p_p2);
+
       for (int v = 0; v < a_nvars; v++) {
-
-        double avg = 0;
-        for ( int i_src = i_dst*stride; i_src < (i_dst+1)*stride; i_src++ ) {
-          int p;
-          index_src[a_dir] = i_src+a_ngpt;
-          _ArrayIndex1D_(m_ndims, dim_src_wg, index_src, 0, p);
-          avg += a_u_src[p*a_nvars+v];
-        }
-        avg /= (double) stride;
-
-        {
-          int p;
-          index_dst[a_dir] = i_dst+a_ngpt;
-          _ArrayIndex1D_(m_ndims, dim_dst_wg, index_dst, 0, p);
-          a_u_dst[p*a_nvars+v] = avg;
-        }
-
-
+        double val =  - ( 1.0/16.0) * a_u_src[p_m2*a_nvars+v]
+                      + ( 9.0/16.0) * a_u_src[p_m1*a_nvars+v] 
+                      + ( 9.0/16.0) * a_u_src[p_p1*a_nvars+v] 
+                      - ( 1.0/16.0) * a_u_src[p_p2*a_nvars+v];
+        a_u_dst[p*a_nvars+v] = val;
       }
 
     }

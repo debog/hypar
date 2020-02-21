@@ -12,8 +12,8 @@ begin
 	hyp_interp_type    components
 	dt                 0.001
 	conservation_check yes
-	screen_op_iter     20
-	file_op_iter       10
+	screen_op_iter     50
+	file_op_iter       100
 	op_file_format     tecplot2d
 	ip_file_type       ascii
 	input_mode         serial
