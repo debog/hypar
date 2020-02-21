@@ -355,31 +355,54 @@ void SparseGridsSimulation::refine1D( const GridDimensions& a_dim_src,  /*!< Gri
     int index_transverse[m_ndims];
     _ArrayIndexnD_(m_ndims, ti, bounds_transverse, index_transverse, 0);
 
-    int index_dst[m_ndims], index_srcL[m_ndims], index_srcR[m_ndims];
-    _ArrayCopy1D_(index_transverse, index_dst, m_ndims);
-    _ArrayCopy1D_(index_transverse, index_srcL, m_ndims);
-    _ArrayCopy1D_(index_transverse, index_srcR, m_ndims);
+    int index_dst [m_ndims], 
+        index_src0[m_ndims], 
+        index_src1[m_ndims], 
+        index_src2[m_ndims],
+        index_src3[m_ndims];
+    _ArrayCopy1D_(index_transverse, index_dst  , m_ndims);
+    _ArrayCopy1D_(index_transverse, index_src0, m_ndims);
+    _ArrayCopy1D_(index_transverse, index_src1 , m_ndims);
+    _ArrayCopy1D_(index_transverse, index_src2 , m_ndims);
+    _ArrayCopy1D_(index_transverse, index_src3, m_ndims);
 
     for (int i_dst = 0; i_dst < n_dst; i_dst++) {
 
       double xi_dst = ((double) i_dst + 0.5) / ((double) stride) - 0.5;
-      int i_src_left = std::floor(xi_dst),
-          i_src_right = std::ceil(xi_dst);
-      double alpha = ((double)i_src_right - xi_dst) / ((double)i_src_right - (double)i_src_left);
+
+      int i_src_1  = std::floor(xi_dst);
+      int i_src_2  = std::ceil(xi_dst);
+      int i_src_0 = i_src_1 - 1;
+      int i_src_3 = i_src_2 + 1;
+
+      double alpha = ((double)i_src_2 - xi_dst) / ((double)i_src_2 - (double)i_src_1);
+
+      index_dst[a_dir] = i_dst + a_ngpt;
+      int p; _ArrayIndex1D_(m_ndims, dim_dst_wg, index_dst, 0, p);
+
+      index_src0[a_dir] = i_src_0 + a_ngpt;
+      int q0; _ArrayIndex1D_(m_ndims, dim_src_wg, index_src0, 0, q0);
+
+      index_src1[a_dir] = i_src_1 + a_ngpt;
+      int q1; _ArrayIndex1D_(m_ndims, dim_src_wg, index_src1, 0, q1);
+
+      index_src2[a_dir] = i_src_2 + a_ngpt;
+      int q2; _ArrayIndex1D_(m_ndims, dim_src_wg, index_src2, 0, q2);
+
+      index_src3[a_dir] = i_src_3 + a_ngpt;
+      int q3; _ArrayIndex1D_(m_ndims, dim_src_wg, index_src3, 0, q3);
+
+      double c0 = -((-2.0 + alpha)*(-1.0 + alpha)*alpha)/6.0;
+      double c1 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
+      double c2 = (alpha*(2.0 + alpha - alpha*alpha))/2.0;
+      double c3 = (alpha*(-1.0 + alpha*alpha))/6.0;
 
       for (int v = 0; v < a_nvars; v++) {
 
-        index_dst[a_dir] = i_dst+a_ngpt;
-        int p; _ArrayIndex1D_(m_ndims, dim_dst_wg, index_dst, 0, p);
-
-        index_srcL[a_dir] = i_src_left+a_ngpt;
-        int qL; _ArrayIndex1D_(m_ndims, dim_src_wg, index_srcL, 0, qL);
-
-        index_srcR[a_dir] = i_src_right+a_ngpt;
-        int qR; _ArrayIndex1D_(m_ndims, dim_src_wg, index_srcR, 0, qR);
-
-        a_u_dst[p*a_nvars+v] =    alpha       * a_u_src[qL*a_nvars+v]
-                                + (1.0-alpha) * a_u_src[qR*a_nvars+v];
+        a_u_dst[p*a_nvars+v] =    c0 * a_u_src[q0*a_nvars+v]
+                                + c1 * a_u_src[q1*a_nvars+v]
+                                + c2 * a_u_src[q2*a_nvars+v]
+                                + c3 * a_u_src[q3*a_nvars+v];
 
       }
 
