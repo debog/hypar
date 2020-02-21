@@ -1,0 +1,5 @@
+begin
+  log2_imin           3
+  write_sg_solutions  yes
+  write_sg_errors     yes
+end
