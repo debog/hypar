@@ -16,7 +16,7 @@ void SparseGridsSimulation::interpolate(  SimulationObject* const       a_dst,  
                                           const SimulationObject* const a_src   /*!< Source object */
                                       )
 {
-  /* get the source and destination grid dimensions */
+  /* get the destination grid dimensions */
   GridDimensions dim_dst;
   StdVecOps::copyFrom(dim_dst, a_dst->solver.dim_global, m_ndims);
 

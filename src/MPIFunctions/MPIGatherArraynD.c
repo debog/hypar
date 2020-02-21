@@ -145,7 +145,7 @@ int MPIGatherArraynDwGhosts(
     return(1);
   }
 
-  /* calculate total size of local domain (w/o ghosts) */
+  /* calculate total size of local domain (w/ ghosts) */
   size = 1;
   for (d = 0; d < ndims; d++) size *= (dim_local[d]+2*ghosts);
 
@@ -156,23 +156,26 @@ int MPIGatherArraynDwGhosts(
   if (!mpi->rank) {
     int proc;
     for (proc = 0; proc < mpi->nproc; proc++) {
-      int d,done,size;
+      int d,done;
       /* Find out the domain limits for each process */
       IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie); CHECKERR(ierr);
-      size = 1;
       for (d=0; d<ndims; d++) {
-        size *= (ie[d]-is[d]+2*ghosts);
-        bounds[d] = ie[d] - is[d] + 2*ghosts;
+        bounds[d] = ie[d] - is[d];
       }
       if (proc) {
 #ifndef serial
+        int size = 1;
+        for (d=0; d<ndims; d++) {
+          size *= (ie[d]-is[d]+2*ghosts);
+          bounds[d] = ie[d] - is[d];
+        }
         MPI_Status status;
         double *recvbuf = (double*) calloc (size*nvars, sizeof(double));
         MPI_Recv(recvbuf,size*nvars,MPI_DOUBLE,proc,1902,mpi->world,&status);
         int done = 0; _ArraySetValue_(index,ndims,0);
         while (!done) {
-          int p1; _ArrayIndex1D_(ndims,bounds,index,0,p1);
-          int p2; _ArrayIndex1DWO_(ndims,dim_global_wghosts,index,is,0,p2);
+          int p1; _ArrayIndex1D_(ndims,bounds,index,ghosts,p1);
+          int p2; _ArrayIndex1DWO_(ndims,dim_global,index,is,ghosts,p2);
           _ArrayCopy1D_((recvbuf+nvars*p1),(xg+nvars*p2),nvars);
           _ArrayIncrementIndex_(ndims,bounds,index,done);
         }
@@ -181,8 +184,8 @@ int MPIGatherArraynDwGhosts(
       } else {
         done = 0; _ArraySetValue_(index,ndims,0);
         while (!done) {
-          int p1; _ArrayIndex1D_(ndims,bounds,index,0,p1);
-          int p2; _ArrayIndex1DWO_(ndims,dim_global_wghosts,index,is,0,p2);
+          int p1; _ArrayIndex1D_(ndims,bounds,index,ghosts,p1);
+          int p2; _ArrayIndex1DWO_(ndims,dim_global,index,is,ghosts,p2);
           _ArrayCopy1D_((buffer+nvars*p1),(xg+nvars*p2),nvars);
           _ArrayIncrementIndex_(ndims,bounds,index,done);
         }
