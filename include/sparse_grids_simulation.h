@@ -54,6 +54,7 @@ class SparseGridsSimulation : public Simulation
       m_n_fg = -1;
       m_imin = -1;
 
+      m_is_periodic.clear();
       m_combination.clear();
     }
 
@@ -98,6 +99,12 @@ class SparseGridsSimulation : public Simulation
     {
       int retval = ::InitializeBoundaries(  (void*) m_sims_sg.data(),
                                             m_nsims_sg );
+      if (m_nsims_sg > 0) {
+        m_is_periodic.resize(m_ndims);
+        for (int d=0; d<m_ndims; d++) {
+          m_is_periodic[d] = ( m_sims_sg[0].solver.isPeriodic[d] == 1 ? true : false);
+        }
+      }
       return retval;
     }
 
@@ -133,6 +140,9 @@ class SparseGridsSimulation : public Simulation
       strcpy(m_sim_fg->solver.aux_op_fname_root, "ts0_fg");
       return retval;
     }
+
+    /*! Wrap up initializations */
+    int InitializationWrapup();
 
     /*! Run the simulation using native time integrators */
     int Solve();
@@ -183,6 +193,8 @@ class SparseGridsSimulation : public Simulation
     int   m_ndims;        /*!< Number of spatial dimensions */
     int   m_rank,         /*!< MPI rank of this process */
           m_nproc;        /*!< Total number of MPI ranks */
+
+    std::vector<bool> m_is_periodic; /*! Periodicity along each dimension */
 
     /*! Write out the sparse grid solutions to file? */
     int m_write_sg_solutions; 
@@ -285,6 +297,12 @@ class SparseGridsSimulation : public Simulation
                        const double* const, 
                        double* const,
                        int );
+
+    /*! Fill ghost cells for interpolation */
+    void fillGhostCells(  const GridDimensions&,
+                          const int,
+                          double* const,
+                          const int );
 
     /*! Calculate errors */
     void CalculateError();

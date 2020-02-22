@@ -71,6 +71,12 @@ class Simulation
     /*! Initialize the numerical solvers of the simulations */
     virtual int InitializeSolvers() = 0;
 
+    /*! Wrap up initializations */
+    virtual int InitializationWrapup()
+    {
+      return 0;
+    }
+
     /*! Run the simulation using native time integrators */
     virtual int Solve() = 0;
 

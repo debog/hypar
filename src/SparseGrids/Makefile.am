@@ -3,6 +3,8 @@ libSparseGrids_a_SOURCES = \
 	SparseGridsCalculateError.cpp \
 	SparseGridsCombinationTechnique.cpp \
 	SparseGridsDefine.cpp \
+	SparseGridsFillGhostCells.cpp \
+  SparseGridsInitializationWrapup.cpp \
   SparseGridsInitialize.cpp \
   SparseGridsInitialSolution.cpp \
   SparseGridsInterpolate.cpp \

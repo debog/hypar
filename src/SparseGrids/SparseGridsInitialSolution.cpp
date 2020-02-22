@@ -9,8 +9,10 @@
 extern "C" int VolumeIntegral (double*,double*,void*,void*);
 
 /*! Reads in the initial solution for the full grid, saves it in the full
-    grid object, and then interpolates (coarsens) it to all the sparge grid
-    objects.
+    grid object.  Then interpolates (coarsens) the grid coordinates to all 
+    the sparge grids. The solution is not yet interpolated because boundary
+    information is not yet available. It is done in 
+    SparseGridsSimulation::InitializationWrapup().
 */
 int SparseGridsSimulation::InitialSolution()
 {
@@ -24,9 +26,8 @@ int SparseGridsSimulation::InitialSolution()
   for (int n = 0; n < m_nsims_sg; n++) {
 
     if (!m_rank) {
-      printf("  Interpolating initial solution to sparse grids domain %d.\n", n);
+      printf("Interpolating grid coordinates to sparse grids domain %d.\n", n);
     }
-    interpolate( &m_sims_sg[n], m_sim_fg );
     interpolateGrid( &m_sims_sg[n], m_sim_fg );
 
     HyPar* solver = &(m_sims_sg[n].solver);
@@ -35,14 +36,6 @@ int SparseGridsSimulation::InitialSolution()
     int nvars = solver->nvars;
     int ghosts = solver->ghosts;
     int *dim_local = solver->dim_local;
-
-    /* exchange MPI-boundary values of u between processors */
-    MPIExchangeBoundariesnD(  m_ndims,
-                              nvars,
-                              dim_local,
-                              ghosts,
-                              mpi,
-                              solver->u  );
 
     /* calculate dxinv */
     {
@@ -91,23 +84,6 @@ int SparseGridsSimulation::InitialSolution()
         offset  += (dim[d] + 2*ghosts);
       }
     }
-
-    /* calculate volume integral of the initial solution */
-    ierr = ::VolumeIntegral(solver->VolumeIntegralInitial,
-                            solver->u,
-                            solver,
-                            mpi );
-    if (ierr) return ierr;
-
-    if (!mpi->rank) {
-      printf("  Volume integral of the initial solution on sparse grids domain %d:\n", n);
-      for (int d=0; d<nvars; d++) {
-        printf("    %2d:  %1.16E\n",d,solver->VolumeIntegralInitial[d]);
-      }
-    }
-
-    /* Set initial total boundary flux integral to zero */
-    _ArraySetValue_( solver->TotalBoundaryIntegral, nvars, 0 );
 
   }
 

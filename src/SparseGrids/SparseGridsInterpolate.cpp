@@ -166,6 +166,8 @@ void SparseGridsSimulation::interpolate(const GridDimensions& a_dim_dst, /*!< gr
       u_from = u_to;
 
       allocateDataArrays(dim_to, a_nvars, &u_to, a_ghosts);
+
+      fillGhostCells(dim_from, a_ghosts, u_from, a_nvars);
       if (dim_to[dir] < dim_from[dir]) {
         coarsen1D(dim_from, dim_to, u_from, u_to, dir, a_nvars, a_ghosts);
       } else {

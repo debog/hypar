@@ -290,6 +290,13 @@ int main(int argc, char **argv)
     printf("Error: Simulation::InitializePhysics() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
+
+  /* Wrap up initializations */
+  ierr = sim->InitializationWrapup();
+  if (ierr) {
+    printf("Error: Simulation::InitializationWrapup() returned with status %d on process %d.\n",ierr,rank);
+    return(ierr);
+  }
   
   /* Initializations complete */
   
