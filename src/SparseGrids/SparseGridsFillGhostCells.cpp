@@ -29,16 +29,16 @@ void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< gr
 
   for (int d = 0; d < m_ndims; d++) {
 
+    int bounds[m_ndims];
+    _ArrayCopy1D_(a_dim, bounds, m_ndims);
+    bounds[d] = a_ngpt;
+
+    int index[m_ndims];
+    _ArraySetValue_(index, m_ndims, 0);
+
     if (m_is_periodic[d]) {
       
       /* periodic case */
-
-      int bounds[m_ndims];
-      _ArrayCopy1D_(a_dim, bounds, m_ndims);
-      bounds[d] = a_ngpt;
-
-      int index[m_ndims];
-      _ArraySetValue_(index, m_ndims, 0);
 
       int done = 0;
       while (!done) {
@@ -49,16 +49,15 @@ void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< gr
           int p_gpt = 0, 
               p_int = 0;
 
-          int offset_gpt[m_ndims];
-          _ArraySetValue_(offset_gpt, m_ndims, 0);
-          offset_gpt[d] = -a_ngpt;
+          int index_gpt[m_ndims];
+          _ArrayCopy1D_(index, index_gpt, m_ndims);
+          index_gpt[d] -= a_ngpt;
+          _ArrayIndex1D_(m_ndims, a_dim, index_gpt, a_ngpt, p_gpt);
 
-          int offset_int[m_ndims];
-          _ArraySetValue_(offset_int, m_ndims, 0);
-          offset_int[d] = a_dim[d] - a_ngpt;
-
-          _ArrayIndex1DWO_(m_ndims, a_dim, index, offset_gpt, a_ngpt, p_gpt);
-          _ArrayIndex1DWO_(m_ndims, a_dim, index, offset_int, a_ngpt, p_int);
+          int index_int[m_ndims];
+          _ArrayCopy1D_(index, index_int, m_ndims);
+          index_int[d] += (a_dim[d]-a_ngpt);
+          _ArrayIndex1D_(m_ndims, a_dim, index_int, a_ngpt, p_int);
 
           _ArrayCopy1D_((a_u+a_nvars*p_int), (a_u+a_nvars*p_gpt), a_nvars);
         }
@@ -69,12 +68,14 @@ void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< gr
           int p_gpt = 0, 
               p_int = 0;
 
-          int offset_gpt[m_ndims];
-          _ArraySetValue_(offset_gpt, m_ndims, 0);
-          offset_gpt[d] = a_dim[d];
+          int index_gpt[m_ndims];
+          _ArrayCopy1D_(index, index_gpt, m_ndims);
+          index_gpt[d] += a_dim[d];
+          _ArrayIndex1D_(m_ndims, a_dim, index_gpt, a_ngpt, p_gpt);
 
-          _ArrayIndex1DWO_(m_ndims, a_dim, index, offset_gpt, a_ngpt, p_gpt);
-          _ArrayIndex1D_(m_ndims, a_dim, index, a_ngpt, p_int);
+          int index_int[m_ndims];
+          _ArrayCopy1D_(index, index_int, m_ndims);
+          _ArrayIndex1D_(m_ndims, a_dim, index_int, a_ngpt, p_int);
 
           _ArrayCopy1D_((a_u+a_nvars*p_int), (a_u+a_nvars*p_gpt), a_nvars);
         }
@@ -86,6 +87,99 @@ void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< gr
     } else {
 
       /* not periodic - extrapolate */
+
+      int done = 0;
+      while (!done) {
+
+        {
+          /* low end - face = 1 */
+
+          int p_gpt = 0, 
+              p_int_0 = 0,
+              p_int_1 = 0,
+              p_int_2 = 0,
+              p_int_3 = 0;
+
+          int index_gpt[m_ndims];
+          _ArrayCopy1D_(index, index_gpt, m_ndims);
+          index_gpt[d] -= a_ngpt;
+          _ArrayIndex1D_(m_ndims, a_dim, index_gpt, a_ngpt, p_gpt);
+
+          int index_int[m_ndims];
+          _ArrayCopy1D_(index, index_int, m_ndims);
+
+          index_int[d] = 0;
+          _ArrayIndex1D_(m_ndims, a_dim, index_int, a_ngpt, p_int_0);
+          index_int[d]++;
+          _ArrayIndex1D_(m_ndims, a_dim, index_int, a_ngpt, p_int_1);
+          index_int[d]++;
+          _ArrayIndex1D_(m_ndims, a_dim, index_int, a_ngpt, p_int_2);
+          index_int[d]++;
+          _ArrayIndex1D_(m_ndims, a_dim, index_int, a_ngpt, p_int_3);
+
+          double alpha = - (double) (a_ngpt - index[d]);
+          double c0 = -((-2.0 + alpha)*(-1.0 + alpha)*alpha)/6.0;
+          double c1 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
+          double c2 = (alpha*(2.0 + alpha - alpha*alpha))/2.0;
+          double c3 = (alpha*(-1.0 + alpha*alpha))/6.0;
+
+          for (int v = 0; v < a_nvars; v++) {
+    
+            a_u[p_gpt*a_nvars+v] =    c0 * a_u[p_int_0*a_nvars+v]
+                                    + c1 * a_u[p_int_1*a_nvars+v]
+                                    + c2 * a_u[p_int_2*a_nvars+v]
+                                    + c3 * a_u[p_int_3*a_nvars+v];
+    
+          }
+
+        }
+
+        {
+          /* high end - face = -1 */
+
+          int p_gpt = 0, 
+              p_int_0 = 0,
+              p_int_1 = 0,
+              p_int_2 = 0,
+              p_int_3 = 0;
+
+          int index_gpt[m_ndims];
+          _ArrayCopy1D_(index, index_gpt, m_ndims);
+          index_gpt[d] += a_dim[d];
+          _ArrayIndex1D_(m_ndims, a_dim, index_gpt, a_ngpt, p_gpt);
+
+          int index_int[m_ndims];
+          _ArrayCopy1D_(index, index_int, m_ndims);
+
+          index_int[d] = a_dim[d]-1;
+          _ArrayIndex1D_(m_ndims, a_dim, index, a_ngpt, p_int_0);
+          index_int[d]--;
+          _ArrayIndex1D_(m_ndims, a_dim, index, a_ngpt, p_int_1);
+          index_int[d]--;
+          _ArrayIndex1D_(m_ndims, a_dim, index, a_ngpt, p_int_2);
+          index_int[d]--;
+          _ArrayIndex1D_(m_ndims, a_dim, index, a_ngpt, p_int_3);
+
+          double alpha = - (double) (index[d]+1);
+          double c0 = -((-2.0 + alpha)*(-1.0 + alpha)*alpha)/6.0;
+          double c1 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
+          double c2 = (alpha*(2.0 + alpha - alpha*alpha))/2.0;
+          double c3 = (alpha*(-1.0 + alpha*alpha))/6.0;
+
+          for (int v = 0; v < a_nvars; v++) {
+    
+            a_u[p_gpt*a_nvars+v] =    c0 * a_u[p_int_0*a_nvars+v]
+                                    + c1 * a_u[p_int_1*a_nvars+v]
+                                    + c2 * a_u[p_int_2*a_nvars+v]
+                                    + c3 * a_u[p_int_3*a_nvars+v];
+    
+          }
+
+        }
+
+        _ArrayIncrementIndex_(m_ndims, bounds, index, done);
+
+      }
 
     }
 
