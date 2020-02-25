@@ -231,26 +231,15 @@ void SparseGridsSimulation::coarsen1D(  const GridDimensions& a_dim_src,  /*!< G
     exit(1);
   }
 
-  /* compute dimensions with ghosts */
-  GridDimensions dim_src_wg = a_dim_src;
-  StdVecOps::add(dim_src_wg, 2*a_ngpt);
-  GridDimensions dim_dst_wg = a_dim_dst;
-  StdVecOps::add(dim_dst_wg, 2*a_ngpt);
-
   /* create bounds for the transverse loop, i.e., to loop over 
    * all 1D lines along dimension "a_dir" */
   int bounds_transverse[m_ndims];
   _ArrayCopy1D_(a_dim_src, bounds_transverse, m_ndims); 
-  for (int d = 0; d < m_ndims; d++) bounds_transverse[d] += (2*a_ngpt);
   bounds_transverse[a_dir] =  1;
 
-  int n_transverse; 
-  _ArrayProduct1D_(bounds_transverse, m_ndims, n_transverse);
-
-  for (int ti = 0; ti < n_transverse; ti++) {
-
-    int index_transverse[m_ndims];
-    _ArrayIndexnD_(m_ndims, ti, bounds_transverse, index_transverse, 0);
+  int index_transverse[m_ndims], done = 0;
+  _ArraySetValue_(index_transverse, m_ndims, 0);
+  while (!done) {
 
     int index_dst[m_ndims], index_src[m_ndims];
     _ArrayCopy1D_(index_transverse, index_dst, m_ndims);
@@ -264,24 +253,24 @@ void SparseGridsSimulation::coarsen1D(  const GridDimensions& a_dim_src,  /*!< G
       int i_p2 = i_p1 + 1;
 
       int p;
-      index_dst[a_dir] = i_dst+a_ngpt;
-      _ArrayIndex1D_(m_ndims, dim_dst_wg, index_dst, 0, p);
+      index_dst[a_dir] = i_dst;
+      _ArrayIndex1D_(m_ndims, a_dim_dst, index_dst, a_ngpt, p);
 
       int p_m2;
-      index_src[a_dir] = i_m2+a_ngpt;
-      _ArrayIndex1D_(m_ndims, dim_src_wg, index_src, 0, p_m2);
+      index_src[a_dir] = i_m2;
+      _ArrayIndex1D_(m_ndims, a_dim_src, index_src, a_ngpt, p_m2);
 
       int p_m1;
-      index_src[a_dir] = i_m1+a_ngpt;
-      _ArrayIndex1D_(m_ndims, dim_src_wg, index_src, 0, p_m1);
+      index_src[a_dir] = i_m1;
+      _ArrayIndex1D_(m_ndims, a_dim_src, index_src, a_ngpt, p_m1);
 
       int p_p1;
-      index_src[a_dir] = i_p1+a_ngpt;
-      _ArrayIndex1D_(m_ndims, dim_src_wg, index_src, 0, p_p1);
+      index_src[a_dir] = i_p1;
+      _ArrayIndex1D_(m_ndims, a_dim_src, index_src, a_ngpt, p_p1);
 
       int p_p2;
-      index_src[a_dir] = i_p2+a_ngpt;
-      _ArrayIndex1D_(m_ndims, dim_src_wg, index_src, 0, p_p2);
+      index_src[a_dir] = i_p2;
+      _ArrayIndex1D_(m_ndims, a_dim_src, index_src, a_ngpt, p_p2);
 
       for (int v = 0; v < a_nvars; v++) {
         double val =  - ( 1.0/16.0) * a_u_src[p_m2*a_nvars+v]
@@ -293,6 +282,8 @@ void SparseGridsSimulation::coarsen1D(  const GridDimensions& a_dim_src,  /*!< G
 
     }
 
+    _ArrayIncrementIndex_(m_ndims, bounds_transverse, index_transverse, done);
+  
   }
 
   return;
@@ -336,26 +327,15 @@ void SparseGridsSimulation::refine1D( const GridDimensions& a_dim_src,  /*!< Gri
     exit(1);
   }
 
-  /* compute dimensions with ghosts */
-  GridDimensions dim_src_wg = a_dim_src;
-  StdVecOps::add(dim_src_wg, 2*a_ngpt);
-  GridDimensions dim_dst_wg = a_dim_dst;
-  StdVecOps::add(dim_dst_wg, 2*a_ngpt);
-
   /* create bounds for the transverse loop, i.e., to loop over 
    * all 1D lines along dimension "a_dir" */
   int bounds_transverse[m_ndims];
   _ArrayCopy1D_(a_dim_src, bounds_transverse, m_ndims); 
-  for (int d = 0; d < m_ndims; d++) bounds_transverse[d] += (2*a_ngpt);
   bounds_transverse[a_dir] =  1;
 
-  int n_transverse; 
-  _ArrayProduct1D_(bounds_transverse, m_ndims, n_transverse);
-
-  for (int ti = 0; ti < n_transverse; ti++) {
-
-    int index_transverse[m_ndims];
-    _ArrayIndexnD_(m_ndims, ti, bounds_transverse, index_transverse, 0);
+  int index_transverse[m_ndims], done = 0;
+  _ArraySetValue_(index_transverse, m_ndims, 0);
+  while (!done) {
 
     int index_dst [m_ndims], 
         index_src0[m_ndims], 
@@ -377,22 +357,22 @@ void SparseGridsSimulation::refine1D( const GridDimensions& a_dim_src,  /*!< Gri
       int i_src_0 = i_src_1 - 1;
       int i_src_3 = i_src_2 + 1;
 
-      double alpha = ((double)i_src_2 - xi_dst) / ((double)i_src_2 - (double)i_src_1);
+      double alpha = (xi_dst - (double)i_src_1) / ((double)i_src_2 - (double)i_src_1);
 
-      index_dst[a_dir] = i_dst + a_ngpt;
-      int p; _ArrayIndex1D_(m_ndims, dim_dst_wg, index_dst, 0, p);
+      index_dst[a_dir] = i_dst;
+      int p; _ArrayIndex1D_(m_ndims, a_dim_dst, index_dst, a_ngpt, p);
 
-      index_src0[a_dir] = i_src_0 + a_ngpt;
-      int q0; _ArrayIndex1D_(m_ndims, dim_src_wg, index_src0, 0, q0);
+      index_src0[a_dir] = i_src_0;
+      int q0; _ArrayIndex1D_(m_ndims, a_dim_src, index_src0, a_ngpt, q0);
 
-      index_src1[a_dir] = i_src_1 + a_ngpt;
-      int q1; _ArrayIndex1D_(m_ndims, dim_src_wg, index_src1, 0, q1);
+      index_src1[a_dir] = i_src_1;
+      int q1; _ArrayIndex1D_(m_ndims, a_dim_src, index_src1, a_ngpt, q1);
 
-      index_src2[a_dir] = i_src_2 + a_ngpt;
-      int q2; _ArrayIndex1D_(m_ndims, dim_src_wg, index_src2, 0, q2);
+      index_src2[a_dir] = i_src_2;
+      int q2; _ArrayIndex1D_(m_ndims, a_dim_src, index_src2, a_ngpt, q2);
 
-      index_src3[a_dir] = i_src_3 + a_ngpt;
-      int q3; _ArrayIndex1D_(m_ndims, dim_src_wg, index_src3, 0, q3);
+      index_src3[a_dir] = i_src_3;
+      int q3; _ArrayIndex1D_(m_ndims, a_dim_src, index_src3, a_ngpt, q3);
 
       double c0 = -((-2.0 + alpha)*(-1.0 + alpha)*alpha)/6.0;
       double c1 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
@@ -410,6 +390,8 @@ void SparseGridsSimulation::refine1D( const GridDimensions& a_dim_src,  /*!< Gri
 
     }
 
+    _ArrayIncrementIndex_(m_ndims, bounds_transverse, index_transverse, done);
+  
   }
 
   return;
