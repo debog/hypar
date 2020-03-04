@@ -196,21 +196,22 @@ class SparseGridsSimulation : public Simulation
     int   m_rank,         /*!< MPI rank of this process */
           m_nproc;        /*!< Total number of MPI ranks */
 
-    int   m_interp_order; /*!< Order of interpolation between grids */
+    /*! Order of interpolation between grids (input - \b sparse_grids.inp ) */
+    int   m_interp_order; 
 
-    std::vector<bool> m_is_periodic; /*! Periodicity along each dimension */
+    std::vector<bool> m_is_periodic; /*!< Periodicity along each dimension */
 
-    /*! Write out the sparse grid solutions to file? */
+    /*! Write out the sparse grid solutions to file? (input - \b sparse_grids.inp ) */
     int m_write_sg_solutions; 
 
-    /*! Print and write out the sparse grid errors? */
+    /*! Print and write out the sparse grid errors? (input - \b sparse_grids.inp ) */
     int m_print_sg_errors; 
 
     SimulationObject* m_sim_fg;               /*!< full grid simulation object */
     std::vector<SimulationObject> m_sims_sg;  /*!< vector of sparse grids simulation objects */
 
     int m_n_fg; /*!< Base2 log of the number of grid points along a dimension of the full grid */
-    int m_imin; /*!< Base2 log of the minimum number of grid points along any dimension */
+    int m_imin; /*!< Base2 log of the minimum number of grid points along any dimension (input - \b sparse_grids.inp ) */
 
     std::vector<SGCTElem> m_combination;  /*!< Coefficients and grid dimensions for the combination technique */
     std::vector<ProcDistribution> m_iprocs; /*!< MPI ranks along each dimension for the grids in the combination technique */

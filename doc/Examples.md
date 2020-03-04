@@ -12,6 +12,8 @@ integration methods implemented in PETSc. To run them, HyPar needs to be compile
 
 \subpage ib_examples : Examples that use the immersed boundary method to simulate various geometries.
 
+\subpage sg_examples : Examples that use the sparse grids spatial discretization.
+
 \page basic_examples Basic Examples
 
 The following are some basic examples that are simulated using HyPar. They 
@@ -4079,3 +4081,135 @@ the Tecplot format, where the immersed body and the forces on it are represented
 
 Expected screen output:
 \include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/output.log
+
+\page sg_examples Sparse Grids Examples
+The following are some examples are simulated using the <B>sparse grids</B>
+method. Familiarity with the sparse grids approach (specifically the combination
+technique approach) is assumed.
+
+\subpage sg_linear_adv_sinewave
+
+\page sg_linear_adv_sinewave 2D Linear Advection - Sine Wave
+
+Location: \b hypar/Examples/2D/LinearAdvection/SineWave_SparseGrids
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Linear Advection Equation (linearadr.h)
+
+Domain: \f$0 \le x,y < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions on all boundaries.
+
+Initial solution: \f$u\left(x,y,0\right) = u_0\left(x,y\right)= \sin\left(2\pi x\right)\cos\left(2\pi y\right)\f$\n
+Exact solution: \f$u\left(x,y,t\right) = u_0\left(x-a_xt,y-a_yt\right)\f$.
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 2D/LinearAdvection/SineWave_SparseGrids/solver.inp
+
+\b sparse_grids.inp
+\include 2D/LinearAdvection/SineWave_SparseGrids/sparse_grids.inp
+
+\b boundary.inp
+\include 2D/LinearAdvection/SineWave_SparseGrids/boundary.inp
+
+\b physics.inp (specifies \f$a_x\f$ and \f$a_y\f$)
+\include 2D/LinearAdvection/SineWave_SparseGrids/physics.inp
+
+To generate \b initial.inp and \b exact.inp, compile and run 
+the following code in the run directory.
+\include 2D/LinearAdvection/SineWave_SparseGrids/aux/exact.c
+
+Output:
+-------
+Note that \b iproc does \b not need to be set for simulations
+using sparse grids. HyPar will automatically calculate the load
+balanced processor distribution for each sparse grid. If too
+many processors are specified, then it will return an error.
+
+After running the code, there should be the following output
+files:
+
+  + op_fg_00000.dat, ..., op_fg_00010.dat: these contain the full
+    grid solution at \f$t=0, ..., 1\f$.
+  + op_sg_<n>_00000.dat, ..., op_sg_<n>_00010.dat: these contain
+    the solution on each of the sparse grids in the combination
+    technique. These are written out because \b write_sg_solutions
+    is set to \b yes in \b sparse_grids.inp 
+    (SparseGridsSimulation::m_write_sg_solutions).
+    
+    
+Since #HyPar::op_overwrite is set to \a no in \b solver.inp, 
+separate files are written for solutions at each output time. 
+
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the final column is the 
+solution.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation was generated from the full grid solution files
+that were computed by using the combination technique on the sparse grids:
+@image html Solution_SG_full_2DLinearAdvSineWave.gif
+
+The following animations show the solution on some of the sparse grids
+in the combination technique. The simulation was actually carried out on 
+these grids. Note the different grid sizes.
+@image html Solution_SG_sg_2DLinearAdvSineWave_00.gif
+@image html Solution_SG_sg_2DLinearAdvSineWave_02.gif
+@image html Solution_SG_sg_2DLinearAdvSineWave_04.gif
+@image html Solution_SG_sg_2DLinearAdvSineWave_06.gif
+@image html Solution_SG_sg_2DLinearAdvSineWave_08.gif
+@image html Solution_SG_sg_2DLinearAdvSineWave_10.gif
+
+Since the exact solution is available at the final time, the numerical 
+errors are calculated for the recombined full grid solution and reported 
+on screen (see below) as well as \b errors_fg.dat:
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_fg.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity errors (#HyPar::error),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Since \b write_sg_errors is set to to \b yes in \b sparse_grids.inp,
+(SparseGridsSimulation::m_print_sg_errors), the errors are also
+calculated and reported (on screen and in the files \b errors_<n>.dat )
+for each of the sparse grids. Following are the errors corresponding
+to the sparse grids whose solutions are shown above.
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_00.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_02.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_04.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_06.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_08.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_10.dat
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation errors for each of the sparse grids
+and prints it to screen, as well as the files \b conservation_<n>.dat:
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_00.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_02.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_04.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_06.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_08.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_10.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt), and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 2D/LinearAdvection/SineWave_SparseGrids/output.log
+

@@ -6,7 +6,7 @@
 #include <sparse_grids_simulation.h>
 
 /*! Define the sparse grids simulation object - here, only the 
- * full grid simulation object #SparseGridsSimulation::m_sims_fg 
+ * full grid simulation object #SparseGridsSimulation::m_sim_fg 
  * is created. */
 int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
                                     int a_nproc /*!< Total number of MPI ranks */ 

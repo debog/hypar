@@ -24,7 +24,7 @@
   + Solves <B>hyperbolic-parabolic PDEs with source terms</B>.
   + Allows arbitrary number of <B>spatial dimensions</B> and <B>vector components per grid point</B>.
   + Solves the PDEs over <B>Cartesian</B> grids.
-  + Can use sparse grids for faster computations on high-dimensional problems
+  + Can use <B>sparse grids</B> for faster computations on high-dimensional problems
   + Written entirely in C/C++ and uses the MPICH library. It also uses OpenMP threads 
     but this is a work-in-progress.
   + Can be <B>compiled with PETSc</B> (http://www.mcs.anl.gov/petsc/), if available, where 
