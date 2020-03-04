@@ -54,6 +54,8 @@ class SparseGridsSimulation : public Simulation
       m_n_fg = -1;
       m_imin = -1;
 
+      m_interp_order = 6;
+
       m_is_periodic.clear();
       m_combination.clear();
     }
@@ -193,6 +195,8 @@ class SparseGridsSimulation : public Simulation
     int   m_ndims;        /*!< Number of spatial dimensions */
     int   m_rank,         /*!< MPI rank of this process */
           m_nproc;        /*!< Total number of MPI ranks */
+
+    int   m_interp_order; /*!< Order of interpolation between grids */
 
     std::vector<bool> m_is_periodic; /*! Periodicity along each dimension */
 

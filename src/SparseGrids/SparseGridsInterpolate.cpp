@@ -231,6 +231,25 @@ void SparseGridsSimulation::coarsen1D(  const GridDimensions& a_dim_src,  /*!< G
     exit(1);
   }
 
+  /* set interpolation coefficients depending on desired order */
+  double c0, c1, c2, c3, c4, c5;
+  if (m_interp_order == 2) {
+    c0 = c5 = 0.0;
+    c1 = c4 = 0.0;
+    c2 = c3 = 0.5;
+  } else if (m_interp_order == 4) {
+    c0 = c5 = 0.0;
+    c1 = c4 = -1.0/16.0;
+    c2 = c3 = 9.0/16.0;
+  } else if (m_interp_order == 6) {
+    c0 = c5 = 3.0/256.0;
+    c1 = c4 = -25.0/256.0;
+    c2 = c3 = 150.0/256.0;
+  } else {
+    fprintf(stderr,"Invalid value of interpolation order!\n");
+    exit(1);
+  }
+
   /* create bounds for the transverse loop, i.e., to loop over 
    * all 1D lines along dimension "a_dir" */
   int bounds_transverse[m_ndims];
@@ -248,13 +267,19 @@ void SparseGridsSimulation::coarsen1D(  const GridDimensions& a_dim_src,  /*!< G
     for (int i_dst = 0; i_dst < n_dst; i_dst++) {
 
       int i_m1 = i_dst*stride + (stride/2-1);
+      int i_m3 = i_m1 - 2;
       int i_m2 = i_m1 - 1;
       int i_p1 = i_m1 + 1;
-      int i_p2 = i_p1 + 1;
+      int i_p2 = i_m1 + 2;
+      int i_p3 = i_m1 + 3;
 
       int p;
       index_dst[a_dir] = i_dst;
       _ArrayIndex1D_(m_ndims, a_dim_dst, index_dst, a_ngpt, p);
+
+      int p_m3;
+      index_src[a_dir] = i_m3;
+      _ArrayIndex1D_(m_ndims, a_dim_src, index_src, a_ngpt, p_m3);
 
       int p_m2;
       index_src[a_dir] = i_m2;
@@ -272,11 +297,17 @@ void SparseGridsSimulation::coarsen1D(  const GridDimensions& a_dim_src,  /*!< G
       index_src[a_dir] = i_p2;
       _ArrayIndex1D_(m_ndims, a_dim_src, index_src, a_ngpt, p_p2);
 
+      int p_p3;
+      index_src[a_dir] = i_p3;
+      _ArrayIndex1D_(m_ndims, a_dim_src, index_src, a_ngpt, p_p3);
+
       for (int v = 0; v < a_nvars; v++) {
-        double val =  - ( 1.0/16.0) * a_u_src[p_m2*a_nvars+v]
-                      + ( 9.0/16.0) * a_u_src[p_m1*a_nvars+v] 
-                      + ( 9.0/16.0) * a_u_src[p_p1*a_nvars+v] 
-                      - ( 1.0/16.0) * a_u_src[p_p2*a_nvars+v];
+        double val =    c0 * a_u_src[p_m3*a_nvars+v]
+                      + c1 * a_u_src[p_m2*a_nvars+v] 
+                      + c2 * a_u_src[p_m1*a_nvars+v] 
+                      + c3 * a_u_src[p_p1*a_nvars+v] 
+                      + c4 * a_u_src[p_p2*a_nvars+v] 
+                      + c5 * a_u_src[p_p3*a_nvars+v];
         a_u_dst[p*a_nvars+v] = val;
       }
 
@@ -341,23 +372,29 @@ void SparseGridsSimulation::refine1D( const GridDimensions& a_dim_src,  /*!< Gri
         index_src0[m_ndims], 
         index_src1[m_ndims], 
         index_src2[m_ndims],
-        index_src3[m_ndims];
-    _ArrayCopy1D_(index_transverse, index_dst  , m_ndims);
+        index_src3[m_ndims],
+        index_src4[m_ndims],
+        index_src5[m_ndims];
+    _ArrayCopy1D_(index_transverse, index_dst , m_ndims);
     _ArrayCopy1D_(index_transverse, index_src0, m_ndims);
-    _ArrayCopy1D_(index_transverse, index_src1 , m_ndims);
-    _ArrayCopy1D_(index_transverse, index_src2 , m_ndims);
+    _ArrayCopy1D_(index_transverse, index_src1, m_ndims);
+    _ArrayCopy1D_(index_transverse, index_src2, m_ndims);
     _ArrayCopy1D_(index_transverse, index_src3, m_ndims);
+    _ArrayCopy1D_(index_transverse, index_src4, m_ndims);
+    _ArrayCopy1D_(index_transverse, index_src5, m_ndims);
 
     for (int i_dst = 0; i_dst < n_dst; i_dst++) {
 
       double xi_dst = ((double) i_dst + 0.5) / ((double) stride) - 0.5;
 
-      int i_src_1  = std::floor(xi_dst);
-      int i_src_2  = std::ceil(xi_dst);
-      int i_src_0 = i_src_1 - 1;
-      int i_src_3 = i_src_2 + 1;
+      int i_src_2  = std::floor(xi_dst);
+      int i_src_3  = std::ceil(xi_dst);
+      int i_src_0 = i_src_2 - 2;
+      int i_src_1 = i_src_2 - 1;
+      int i_src_4 = i_src_3 + 1;
+      int i_src_5 = i_src_3 + 2;
 
-      double alpha = (xi_dst - (double)i_src_1) / ((double)i_src_2 - (double)i_src_1);
+      double alpha = (xi_dst - (double)i_src_2) / ((double)i_src_3 - (double)i_src_2);
 
       index_dst[a_dir] = i_dst;
       int p; _ArrayIndex1D_(m_ndims, a_dim_dst, index_dst, a_ngpt, p);
@@ -374,17 +411,48 @@ void SparseGridsSimulation::refine1D( const GridDimensions& a_dim_src,  /*!< Gri
       index_src3[a_dir] = i_src_3;
       int q3; _ArrayIndex1D_(m_ndims, a_dim_src, index_src3, a_ngpt, q3);
 
-      double c0 = -((-2.0 + alpha)*(-1.0 + alpha)*alpha)/6.0;
-      double c1 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
-      double c2 = (alpha*(2.0 + alpha - alpha*alpha))/2.0;
-      double c3 = (alpha*(-1.0 + alpha*alpha))/6.0;
+      index_src4[a_dir] = i_src_4;
+      int q4; _ArrayIndex1D_(m_ndims, a_dim_src, index_src4, a_ngpt, q4);
+
+      index_src5[a_dir] = i_src_5;
+      int q5; _ArrayIndex1D_(m_ndims, a_dim_src, index_src5, a_ngpt, q5);
+
+      /* set interpolation coefficients depending on desired order */
+      double c0, c1, c2, c3, c4, c5;
+      if (m_interp_order == 2) {
+        c0 = 0.0;
+        c1 = 0.0;
+        c2 = (1.0-alpha);
+        c3 = alpha;
+        c4 = 0.0;
+        c5 = 0.0;
+      } else if (m_interp_order == 4) {
+        c0 = 0.0;
+        c1 = -((-2.0 + alpha)*(-1.0 + alpha)*alpha)/6.0;
+        c2 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
+        c3 = (alpha*(2.0 + alpha - alpha*alpha))/2.0;
+        c4 = (alpha*(-1.0 + alpha*alpha))/6.0;
+        c5 = 0.0;
+      } else if (m_interp_order == 6) {
+        c0 = -((-3.0 + alpha)*(-2.0 + alpha)*(-1.0 + alpha)*alpha*(1.0 + alpha))/120.0;
+        c1 = ((-3.0 + alpha)*(-2.0 + alpha)*(-1.0 + alpha)*alpha*(2.0 + alpha))/24.0;
+        c2 = -((-3.0 + alpha)*(-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha)*(2.0 + alpha))/12.0;
+        c3 = ((-3.0 + alpha)*(-2.0 + alpha)*alpha*(1.0 + alpha)*(2.0 + alpha))/12.0;
+        c4 = -((-3.0 + alpha)*(-1.0 + alpha)*alpha*(1.0 + alpha)*(2.0 + alpha))/24.0;
+        c5 = (alpha*(4.0 - 5.0*alpha*alpha + alpha*alpha*alpha*alpha))/120.0;
+      } else {
+        fprintf(stderr,"Invalid value of interpolation order!\n");
+        exit(1);
+      }
 
       for (int v = 0; v < a_nvars; v++) {
 
         a_u_dst[p*a_nvars+v] =    c0 * a_u_src[q0*a_nvars+v]
                                 + c1 * a_u_src[q1*a_nvars+v]
                                 + c2 * a_u_src[q2*a_nvars+v]
-                                + c3 * a_u_src[q3*a_nvars+v];
+                                + c3 * a_u_src[q3*a_nvars+v]
+                                + c4 * a_u_src[q4*a_nvars+v]
+                                + c5 * a_u_src[q5*a_nvars+v];
 
       }
 

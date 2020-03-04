@@ -25,6 +25,7 @@ int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
   m_imin = 2;
   m_write_sg_solutions = 0;
   m_print_sg_errors = 0;
+  m_interp_order = 6;
 
   if (!m_rank) {
 
@@ -52,6 +53,10 @@ int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
           if (std::string(word) == "log2_imin") {
 
             ferr = fscanf(in,"%d",&m_imin); if (ferr != 1) return(1);
+
+          } else if (std::string(word) == "interp_order") {
+
+            ferr = fscanf(in,"%d",&m_interp_order); if (ferr != 1) return(1);
 
           } else if (std::string(word) == "write_sg_solutions") {
 
@@ -90,12 +95,14 @@ int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
     /* print useful stuff to screen */
     printf("Sparse grids inputs:\n");
     printf("  log2 of minimum grid size:  %d\n", m_imin);
+    printf("  interpolation order:  %d\n", m_interp_order);
     printf( "  write sparse grids solutions?  %s\n",
             ( m_write_sg_solutions == 1 ? "yes" : "no" ) );
   }
 
 #ifndef serial
   MPI_Bcast(&m_imin,1,MPI_INT,0,MPI_COMM_WORLD);
+  MPI_Bcast(&m_interp_order,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(&m_write_sg_solutions,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(&m_print_sg_errors,1,MPI_INT,0,MPI_COMM_WORLD);
 #endif
