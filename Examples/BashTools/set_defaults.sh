@@ -2,6 +2,7 @@
 
 # sparse_grids.inp
 export p_imin=3
+export p_interp_order=6
 export p_write_sg_solutions="no"
 export p_write_sg_errors="yes"
 
