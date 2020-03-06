@@ -133,7 +133,7 @@ int LinearADRInitialize(
 #ifndef serial
     MPIBroadcast_double(physics->a,physics->adv_arr_size,0,&mpi->world);
 #endif
-  } else {
+  } else if (physics->constant_advection == 0) {
 #ifndef serial
     MPIBroadcast_character(physics->adv_filename, _MAX_STRING_SIZE_,0,&mpi->world);
 #endif

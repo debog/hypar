@@ -81,10 +81,13 @@ int LinearADRAdvection( double  *f, /*!< Array to hold the computed flux (same s
       _ArrayIncrementIndex_(ndims,bounds,index,done);
     }
   } else {
-    fprintf(stderr,"Error in LinearADRAdvection():\n");
-    fprintf(stderr,"Invalid value for param->constant_advection (%d).\n",
-            param->constant_advection);
-    return 1;
+    while (!done) {
+      int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
+      for (v = 0; v < nvars; v++) {
+        f[nvars*p+v] = 0.0;
+      }
+      _ArrayIncrementIndex_(ndims,bounds,index,done);
+    }
   }
 
   return(0);

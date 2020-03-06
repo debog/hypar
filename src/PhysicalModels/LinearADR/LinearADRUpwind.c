@@ -82,10 +82,17 @@ int LinearADRUpwind(  double  *fI,  /*!< Computed upwind interface flux */
 
   } else {
 
-    fprintf(stderr,"Error in LinearADRUpwind():\n");
-    fprintf(stderr,"Invalid value for param->constant_advection (%d).\n",
-            param->constant_advection);
-    return 1;
+    done = 0; _ArraySetValue_(index_outer,ndims,0);
+    while (!done) {
+      _ArrayCopy1D_(index_outer,index_inter,ndims);
+      for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+        int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
+        for (v = 0; v < nvars; v++) {
+          fI[nvars*p+v] = 0.0;
+        }
+      }
+      _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
+    }
 
   }
 

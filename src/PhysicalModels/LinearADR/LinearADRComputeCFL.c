@@ -59,13 +59,6 @@ double LinearADRComputeCFL( void    *s, /*!< Solver object of type #HyPar */
       }
     }
 
-  } else {
-
-    fprintf(stderr,"Error in LinearADRComputeCFL():\n");
-    fprintf(stderr,"Invalid value for params->constant_advection (%d).\n",
-            params->constant_advection);
-    return DBL_MAX;
-
   }
 
   return(max_cfl);
