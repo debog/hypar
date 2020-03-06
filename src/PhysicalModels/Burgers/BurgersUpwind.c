@@ -18,7 +18,7 @@ int BurgersUpwind(  double* fI,   /*!< Computed upwind interface flux */
                     double* uL,   /*!< Left-biased reconstructed interface solution */
                     double* uR,   /*!< Right-biased reconstructed interface solution */
                     double* u,    /*!< Cell-centered solution */
-                    int     dir,  /*!< Spatial dimension (unused since this is a 1D system) */
+                    int     dir,  /*!< Spatial dimension */
                     void*   s,    /*!< Solver object of type #HyPar */
                     double  t     /*!< Current solution time */
                 )

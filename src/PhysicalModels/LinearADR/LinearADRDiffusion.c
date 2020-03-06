@@ -1,3 +1,9 @@
+/*! @file LinearADRDiffusion.c
+    @author Debojyoti Ghosh
+    @brief Function to evaluate the diffusion term in the 
+           linear advection-diffusion-reaction model
+*/
+
 #include <stdlib.h>
 #include <basic.h>
 #include <arrayfunctions.h>
@@ -5,7 +11,24 @@
 #include <mpivars.h>
 #include <hypar.h>
 
-int LinearADRDiffusionG(double *f,double *u,int dir,void *s,double t)
+/*! Evaluate the diffusion term in the linear advection-diffusion-reaction model
+    for a "pure Laplacian" type operator (no cross derivatives):\n
+  
+    Compute 
+    \f{equation}
+    \nu_d u
+    \f} 
+    given \f$u\f$ and \f$d\f$ in the parabolic term
+    \f{equation}{
+    \sum_d \frac {\partial^2} {\partial x_d^2} \left( \nu_d u \right)
+    \f}
+*/
+int LinearADRDiffusionG(  double  *f, /*!< Array to hold the computed diffusion term (same size and layout as u) */
+                          double  *u, /*!< Array containing the solution */
+                          int     dir,/*!< Spatial dimension (unused since this is a 1D system) */
+                          void    *s, /*!< Solver object of type #HyPar */
+                          double  t   /*!< Current time */
+                       )
 {
   HyPar     *solver = (HyPar*)     s;
   LinearADR *param  = (LinearADR*) solver->physics;
@@ -34,7 +57,27 @@ int LinearADRDiffusionG(double *f,double *u,int dir,void *s,double t)
   return(0);
 }
 
-int LinearADRDiffusionH(double *f,double *u,int dir1,int dir2,void *s,double t)
+/*! Evaluate the diffusion term in the linear advection-diffusion-reaction model
+    for a parabolic operator with no cross derivatives:\n
+  
+    Compute 
+    \f{equation}
+    \nu_d u
+    \f} 
+    given \f$u\f$ and \f$d_1,d_2\f$ in the parabolic term
+    \f{equation}{
+    \sum_{d_1}\sum_{d_2} \frac {\partial^2} {\partial x_{d_1} \partial x_{d_2}} \left( \nu_d u \right)
+    \f}
+
+    \b Note: it's not correctly implemented. Will implement when necessary.
+*/
+int LinearADRDiffusionH(  double  *f,   /*!< Array to hold the computed diffusion term (same size and layout as u) */
+                          double  *u,   /*!< Array containing the solution */
+                          int     dir1, /*!< First spatial dimension of the double derivative \f$d_1\f$ */
+                          int     dir2, /*!< Second spatial dimension of the double derivative \f$d_2\f$ */
+                          void    *s,   /*!< Solver object of type #HyPar */ 
+                          double  t     /*!< Current time */
+                        )
 {
   HyPar     *solver = (HyPar*)     s;
   LinearADR *param  = (LinearADR*) solver->physics;

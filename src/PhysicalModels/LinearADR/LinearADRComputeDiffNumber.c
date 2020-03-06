@@ -1,9 +1,21 @@
+/*! @file LinearADRComputeDiffNumber.c
+    @author Debojyoti Ghosh
+    @brief Compute the diffusion number
+*/
+
 #include <basic.h>
 #include <physicalmodels/linearadr.h>
 #include <mpivars.h>
 #include <hypar.h>
 
-double LinearADRComputeDiffNumber(void *s,void *m,double dt,double t)
+/*! Computes the maximum diffusion number over the domain. Note that the 
+ * diffusion number is computed over the local domain on this processor only.
+*/
+double LinearADRComputeDiffNumber( void   *s, /*!< Solver object of type #HyPar */
+                                   void   *m, /*!< MPI object of type #MPIVariables */
+                                   double dt, /*!< Time step size for which to compute the CFL */
+                                   double t   /*!< Time */
+                                 )
 {
   HyPar         *solver = (HyPar*)        s;
   LinearADR     *params = (LinearADR*)    solver->physics;
