@@ -23,6 +23,7 @@ int    LinearADRReaction          ();
 int    LinearADRUpwind            (double*,double*,double*,double*,
                                    double*,double*,int,void*,double);
 int    LinearADRJacobian          (double*,double*,void*,int,int);
+int    LinearADRWriteAdvField     (void*,void*);
 
 /*! Initialize the linear advection-diffusion-reaction physics module - 
     allocate and set physics-related parameters, read physics-related inputs
@@ -137,8 +138,17 @@ int LinearADRInitialize(
 #ifndef serial
     MPIBroadcast_character(physics->adv_filename, _MAX_STRING_SIZE_,0,&mpi->world);
 #endif
+    if (!mpi->rank) {
+      printf("Reading advection field from %s.\n", physics->adv_filename);
+    }
     int retval = LinearADRAdvectionField(solver, mpi);
-    if (retval) return retval;
+    if (retval) {
+      if (!mpi->rank) {
+        fprintf(stderr, "Error in LinearADRInitialize():\n");
+        fprintf(stderr, "LinearADRAdvectionField() returned with error.\n");
+      }
+      return retval;
+    }
   }
 
 #ifndef serial
@@ -162,6 +172,10 @@ int LinearADRInitialize(
   solver->SFunction          = LinearADRReaction;
   solver->JFunction          = LinearADRJacobian;
   solver->Upwind             = LinearADRUpwind;
+
+  if (physics->constant_advection == 0) {
+    solver->PhysicsOutput = LinearADRWriteAdvField;
+  }
 
   return(0);
 }

@@ -86,9 +86,9 @@ int LinearADRAdvectionField(
   for (d = 0; d < solver->ndims; d++) {
     if (solver->isPeriodic[d] && (mpi->iproc[d] == 1)) {
       _ArrayCopy1D_(dim,bounds,solver->ndims); bounds[d] = ghosts;
-      _ArraySetValue_(offset,solver->ndims,0); offset[d] = -ghosts;
       /* left boundary */
       done = 0; _ArraySetValue_(indexb,solver->ndims,0);
+      _ArraySetValue_(offset,solver->ndims,0); offset[d] = -ghosts;
       while (!done) {
         _ArrayCopy1D_(indexb,indexi,solver->ndims); indexi[d] = indexb[d] + dim[d] - ghosts;
         int p1; _ArrayIndex1DWO_(solver->ndims,dim,indexb,offset,ghosts,p1);
@@ -98,6 +98,7 @@ int LinearADRAdvectionField(
       }
       /* right boundary */
       done = 0; _ArraySetValue_(indexb,solver->ndims,0);
+      _ArraySetValue_(offset,solver->ndims,0); offset[d] = dim[d];
       while (!done) {
         _ArrayCopy1D_(indexb,indexi,solver->ndims);
         int p1; _ArrayIndex1DWO_(solver->ndims,dim,indexb,offset,ghosts,p1);

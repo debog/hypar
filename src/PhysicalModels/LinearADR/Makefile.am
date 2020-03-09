@@ -9,4 +9,5 @@ libLinearADR_a_SOURCES = \
   LinearADRInitialize.c \
   LinearADRJacobian.c \
   LinearADRReaction.c \
-  LinearADRUpwind.c
+  LinearADRUpwind.c \
+	LinearADRWriteAdvField.c
