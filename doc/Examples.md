@@ -19,6 +19,7 @@ all use explicit time integration, and \b do \b not require HyPar to be compiled
 with PETSc.
 
 \subpage linear_adv_sine \n
+\subpage linear_adv_sine_varyingadv \n
 \subpage linear_adv_disc \n
 \subpage linear_diff_sine 
 
@@ -147,6 +148,81 @@ Expected screen output:
 \include 1D/LinearAdvection/SineWave/output.log
 
 
+\page linear_adv_sine_varyingadv 1D Linear Advection - Sine Wave with Spatially-Varying Advection Speed
+
+Location: \b Examples/1D/LinearAdvection/SineWave_NonConstantAdvection
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Linear Advection Equation (linearadr.h)
+
+Domain: \f$0 \le x < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution: \f$u\left(x,0\right) = \sin\left(2\pi x\right)\f$
+
+Advection speed: \f$a\left(x\right) = 1 + \frac{1}{2}\sin^2\left(2\pi x\right)\f$
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/solver.inp
+
+\b boundary.inp
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/boundary.inp
+
+\b physics.inp
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/physics.inp
+\b Note: Do not include the ".inp" extension in the filename above.
+
+\b weno.inp (optional)
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/weno.inp
+
+To generate \b initial.inp and \b advection.inp, compile and run the 
+following code in the run directory. 
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/aux/init.c
+
+Output:
+-------
+After running the code, there should be 101 output
+files \b op_00000.dat, \b op_00001.dat, ... \b op_00100.dat; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=2.5\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. All the files are ASCII 
+text (#HyPar::op_file_format is set to \a text in \b solver.inp).
+In these files, the first column is grid index, the second column 
+is x-coordinate, and the third column is the solution.
+
+The following animation shows the solution vs. grid point index:
+@image html Solution_1DLinearAdvSine_VaryingAdv.gif
+
+The following figure shows the advection speed vs. grid point index:
+@image html Solution_1DLinearAdvSine_VaryingAdv.png
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation.dat:
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/conservation.dat
+The numbers are: number of grid points (#HyPar::dim_global),
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/output.log
+
+\page linear_adv_disc 1D Linear Advection - Discontinuous Waves
+
+Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves
+          (This directory contains all the input files needed
+          to run this case. If there is a \a Run.m, run it in
+          MATLAB to quickly set up, run, and visualize the 
 \page linear_adv_disc 1D Linear Advection - Discontinuous Waves
 
 Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves
