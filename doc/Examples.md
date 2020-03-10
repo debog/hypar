@@ -25,6 +25,8 @@ with PETSc.
 \subpage linear_adv_disc \n
 \subpage linear_diff_sine 
 
+\subpage burger_1d_sine
+
 \subpage sod_shock_tube  \n
 \subpage lax_shock_tube \n
 \subpage shu_osher \n
@@ -379,6 +381,82 @@ and total wall time.
 
 Expected screen output:
 \include 1D/LinearDiffusion/SineWave/output.log
+
+\page burger_1d_sine 1D Inviscid Burgers Equation - Sine Wave
+
+Location: \b hypar/Examples/1D/Burgers/SineWave
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Burgers Equation (burgers.h)
+
+References:
+  + Ghosh, D., Baeder, J. D., "Compact Reconstruction Schemes with 
+    Weighted ENO Limiting for Hyperbolic Conservation Laws", 
+    SIAM Journal on Scientific Computing, 34 (3), 2012, A1678–A1706
+
+Domain: \f$0 \le x < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution: \f$u\left(x,0\right) = \frac{1}{2 \pi t_s}\sin\left(2\pi x\right)\f$,
+\f$t_s=2\f$ (time to shock formation)
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
+ + Time integration: SSPRK3 (TimeRK(), #_RK_SSP3_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 1D/Burgers/SineWave/solver.inp
+
+\b boundary.inp
+\include 1D/Burgers/SineWave/boundary.inp
+
+\b physics.inp
+\include 1D/Burgers/SineWave/physics.inp
+
+\b lusolver.inp (optional)
+\include 1D/Burgers/SineWave/lusolver.inp
+
+\b weno.inp (optional)
+\include 1D/Burgers/SineWave/weno.inp
+
+To generate \b initial.inp (initial solution) 
+and \b exact.inp (exact solution), compile and run the 
+following code in the run directory. 
+\include 1D/Burgers/SineWave/aux/init.c
+\b Note: The exact solution is available only if the
+final time is less than \f$t_s\f$ above.
+
+Output:
+-------
+After running the code, there should be 8 output
+files \b op_00000.dat, \b op_00001.dat, ... \b op_00007.dat; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=2\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. All the files are ASCII 
+text (#HyPar::op_file_format is set to \a text in \b solver.inp).
+In these files, the first column is grid index, the second column 
+is x-coordinate, and the third column is the solution.
+
+Solutions at t=0,...,2: The following figure is obtained 
+by plotting \a op_00000.dat (initial), ..., \a op_00007.dat (t=2).
+@image html Solution_1DBurgersSine.png
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation.dat:
+\include 1D/Burgers/SineWave/conservation.dat
+The numbers are: number of grid points (#HyPar::dim_global),
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 1D/Burgers/SineWave/output.log
 
 
 
