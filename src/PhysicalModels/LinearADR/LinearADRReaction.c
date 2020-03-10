@@ -9,7 +9,7 @@
 #include <hypar.h>
 
 /*! Not yet implemented */
-int LinearADRReaction(  void *s,  /*!Solver object of type #HyPar */
+int LinearADRReaction(  void *s,  /*!< Solver object of type #HyPar */
                         void *m   /*!< MPI object of type #MPIVariables */
                      )
 {
