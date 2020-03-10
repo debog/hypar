@@ -168,7 +168,7 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
       }
       if (bufdim[d] > maxbuf) maxbuf = bufdim[d];
     }
-    maxbuf *= simobj[n].solver.nvars;
+    maxbuf *= (simobj[n].solver.nvars*simobj[n].solver.ndims);
     simobj[n].mpi.maxbuf  = maxbuf;
     simobj[n].mpi.sendbuf = (double*) calloc (2*simobj[n].solver.ndims*maxbuf,sizeof(double));
     simobj[n].mpi.recvbuf = (double*) calloc (2*simobj[n].solver.ndims*maxbuf,sizeof(double));
