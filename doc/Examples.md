@@ -31,6 +31,7 @@ with PETSc.
 \subpage sw_dambreak
 
 \subpage linear_adv_gauss \n
+\subpage linear_adv_2d_sine_varyingadv \n
 \subpage linear_diff_sine2d
 
 \subpage euler2d_riemann4 \n
@@ -176,7 +177,7 @@ Input files required:
 \b boundary.inp
 \include 1D/LinearAdvection/SineWave_NonConstantAdvection/boundary.inp
 
-\b physics.inp
+\b physics.inp (specifies filename for advection field)
 \include 1D/LinearAdvection/SineWave_NonConstantAdvection/physics.inp
 \b Note: Do not include the ".inp" extension in the filename above.
 
@@ -202,6 +203,11 @@ is x-coordinate, and the third column is the solution.
 The following animation shows the solution vs. grid point index:
 @image html Solution_1DLinearAdvSine_VaryingAdv.gif
 
+In addition to the usual output files, the linear advection physics 
+module writes out the following files:
++ \b advection_00000.dat, ..., \b advection_00100.dat: These files
+  share the same format as the solution output files \b op_*.dat 
+  and contains the advection field \f$a\left(x\right)\f$.
 The following figure shows the advection speed vs. grid point index:
 @image html Solution_1DLinearAdvSine_VaryingAdv.png
 
@@ -849,6 +855,100 @@ and conservation error (#HyPar::ConservationError).
 
 Expected screen output:
 \include 2D/LinearAdvection/GaussianPulse/output.log
+
+
+\page linear_adv_2d_sine_varyingadv 2D Linear Advection - Sine Wave with Spatially-Varying Advection Speed
+
+Location: \b hypar/Examples/2D/LinearAdvection/SineWave_NonConstantAdvection
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Linear Advection Equation (linearadr.h)
+
+Domain: \f$0 \le x,y < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions on all boundaries.
+
+Initial solution: \f$u\left(x,y,0\right) = u_0\left(x,y\right)= \cos\left(4\pi y\right)\f$\n
+
+Advection speed: \f$a_x\left(x,y\right) = \sin\left(4\pi y\right)\f$, \f$a_y\left(x,y\right) = -\cos\left(4\pi x\right)\f$
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/solver.inp
+
+\b boundary.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/boundary.inp
+
+\b physics.inp (specifies filename for advection field)
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/physics.inp
+\b Note: Do not include the ".inp" extension in the filename above.
+
+\b lusolver.inp (optional)
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/lusolver.inp
+
+\b weno.inp (optional)
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/weno.inp
+
+To generate \b initial.inp and \b advection.inp, compile and run the 
+following code in the run directory. 
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 2
+processors along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be 101 output
+files \b op_00000.dat, \b op_00001.dat, ... \b op_00100.dat; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=4\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. 
+  
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the final column is the 
+solution.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation was generated from the solution files:
+@image html Solution_2DLinearAdvSine_VaryingAdv.gif
+
+In addition to the usual output files, the linear advection physics 
+module writes out the following files:
++ \b advection_00000.dat, ..., \b advection_00100.dat: These files
+  share the same format as the solution output files \b op_*.dat 
+  and contains the advection field \f$a_x\left(x,y\right), a_y\left(x,y\right)\f$.
+The following figure shows the vector plot of the velocity field:
+@image html Solution_2DLinearAdvSine_VaryingAdv.png
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation.dat:
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/conservation.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/output.log
 
 
 \page linear_diff_sine2d 2D Linear Diffusion - Sine Wave
