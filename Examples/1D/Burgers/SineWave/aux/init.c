@@ -1,5 +1,6 @@
 /*
-  Code to generate the initial for:
+  Code to generate the initial and exact 
+  solutions for:
   Case: Sine Wave
   Model: Burger1D
 
@@ -127,7 +128,7 @@ int main()
 
     FILE *out;
     if (!strcmp(ip_file_type,"ascii")) {
-      printf("Writing ASCII initial solution file exact.inp\n");
+      printf("Writing ASCII exact solution file exact.inp\n");
     	out = fopen("exact.inp","w");
       for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
       fprintf(out,"\n");
@@ -135,7 +136,7 @@ int main()
       fprintf(out,"\n");
       fclose(out);
     } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
-      printf("Writing binary initial solution file exact.inp\n");
+      printf("Writing binary exact solution file exact.inp\n");
       out = fopen("exact.inp","wb");
       fwrite(x,sizeof(double),NI,out);
       fwrite(u,sizeof(double),NI,out);
