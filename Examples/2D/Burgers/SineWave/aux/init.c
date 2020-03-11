@@ -110,6 +110,7 @@ int main()
     FILE *out;
     if (!strcmp(ip_file_type,"ascii")) {
   
+      printf("Writing ASCII initial solution file initial.inp\n");
       out = fopen("initial.inp","w");
       for (i = 0; i < NI; i++)  fprintf(out,"%1.16e ",x[i]);
       fprintf(out,"\n");
@@ -188,6 +189,7 @@ int main()
     if (!strcmp(ip_file_type,"ascii")) {
   
       out = fopen("exact.inp","w");
+      printf("Writing ASCII exact solution file exact.inp\n");
       for (i = 0; i < NI; i++)  fprintf(out,"%1.16e ",x[i]);
       fprintf(out,"\n");
       for (j = 0; j < NJ; j++)  fprintf(out,"%1.16e ",y[j]);

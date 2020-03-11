@@ -38,6 +38,8 @@ with PETSc.
 \subpage linear_adv_2d_sine_varyingadv \n
 \subpage linear_diff_sine2d
 
+\subpage burgers_2d_sine
+
 \subpage euler2d_riemann4 \n
 \subpage euler2d_riemann6 \n
 \subpage euler2d_radexp \n
@@ -400,6 +402,9 @@ Domain: \f$0 \le x < 1\f$, \a "periodic" (#_PERIODIC_)
 
 Initial solution: \f$u\left(x,0\right) = \frac{1}{2 \pi t_s}\sin\left(2\pi x\right)\f$,
 \f$t_s=2\f$ (time to shock formation)
+
+Exact solution: 
+  \f$u\left(x,y,t\right) = \frac{1}{2 \pi t_s} \sin\left(2\pi \left(x-u t\right)\right)\f$ (needs to be computed iteratively)\n
 
 Numerical Method:
  + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
@@ -1116,6 +1121,116 @@ and total wall time.
 Expected screen output:
 \include 2D/LinearDiffusion/SineWave/output.log
 
+\page burgers_2d_sine 2D Inviscid Burgers Equation - Sine Wave
+
+Location: \b hypar/Examples/2D/Burgers/SineWave
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Burgers Equation (burgers.h)
+
+Domain: \f$1 \le x,y < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions on all boundaries.
+
+Initial solution: 
+  \f$u\left(x,y,0\right) = \frac{1}{2 \pi t_s} \sin\left(2\pi x\right) \sin\left(2\pi y\right)\f$,\n
+  \f$t_s=2\f$ (time to shock formation)
+
+Exact solution: 
+  \f$u\left(x,y,t\right) = \frac{1}{2 \pi t_s} \sin\left(2\pi \left(x-u t\right)\right) \sin\left(2\pi \left(y-u t\right)\right)\f$ (needs to be computed iteratively)\n
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 2D/Burgers/SineWave/solver.inp
+
+\b boundary.inp
+\include 2D/Burgers/SineWave/boundary.inp
+
+\b physics.inp (specifies \f$a_x\f$ and \f$a_y\f$)
+\include 2D/Burgers/SineWave/physics.inp
+
+\b lusolver.inp (optional)
+\include 2D/Burgers/SineWave/lusolver.inp
+
+\b weno.inp (optional)
+\include 2D/Burgers/SineWave/weno.inp
+
+To generate \b initial.inp (initial solution) 
+and \b exact.inp (exact solution), compile and run the 
+following code in the run directory. 
+\include 2D/Burgers/SineWave/aux/init.c
+\b Note: The exact solution is available only if the
+final time is less than \f$t_s\f$ above.
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      2 2
+
+in \b solver.inp (i.e., 2 processors along \a x, and 2
+processors along \a y). Thus, this example should be run
+with 4 MPI ranks (or change \b iproc).
+
+After running the code, there should be 5 output
+files \b op_00000.dat, \b op_00001.dat, ... \b op_00004.dat; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=2\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. 
+  
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the final column is the 
+solution.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following figures show the solutions at each output time:
+  + t = 0 (initial)
+@image html Solution_2DBurgersSineWave_0.png
+  + t = 0.4)
+@image html Solution_2DBurgersSineWave_1.png
+  + t = 0.8
+@image html Solution_2DBurgersSineWave_2.png
+  + t = 1.2
+@image html Solution_2DBurgersSineWave_3.png
+  + t = 1.6 (final)
+@image html Solution_2DBurgersSineWave_4.png
+
+Since the exact solution is available at the final time 
+the errors are calculated and reported on screen (see below)
+as well as \b errors.dat:
+\include 2D/Burgers/SineWave/errors.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity errors (#HyPar::error),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation.dat:
+\include 2D/Burgers/SineWave/conservation.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 2D/Burgers/SineWave/output.log
 
 \page euler2d_riemann4 2D Euler Equations - Riemann Problem Case 4
 
