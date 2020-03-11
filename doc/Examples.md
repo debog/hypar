@@ -12,6 +12,8 @@ integration methods implemented in PETSc. To run them, HyPar needs to be compile
 
 \subpage ib_examples : Examples that use the immersed boundary method to simulate various geometries.
 
+\subpage md_examples : Examples that use the multidomain functionality.
+
 \subpage sg_examples : Examples that use the sparse grids spatial discretization.
 
 \page basic_examples Basic Examples
@@ -4450,6 +4452,113 @@ the Tecplot format, where the immersed body and the forces on it are represented
 
 Expected screen output:
 \include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/output.log
+
+\page md_examples Multidomain Examples
+HyPar has the capability to run ensemble simulations on multiple domains that 
+of varying sizes and initial solution using the same discretization methods, 
+time step sizes, final time, physics parameters, and boundary conditions. The following examples
+demonstrate this functionality; other examples can also be run with this feature
+with the appropriate modifications.
+
+\subpage md_linadv_1d_sine
+
+\page md_linadv_1d_sine 1D Linear Advection - Sine Wave - Ensemble Simulation
+
+Location: \b hypar/Examples/1D/LinearAdvection/SineWave_Ensemble
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Linear Advection Equation (linearadr.h)
+
+References:
+  + Ghosh, D., Baeder, J. D., "Compact Reconstruction Schemes with 
+    Weighted ENO Limiting for Hyperbolic Conservation Laws", 
+    SIAM Journal on Scientific Computing, 34 (3), 2012, A1678–A1706
+
+Domain: \f$0 \le x < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution: \f$u\left(x,0\right) = \sin\left(2\pi x\right)\f$
+
+Ensemble Runs: 4 simulations on grids with 40, 80, 160, and 320 points.
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b simulation.inp
+\include 1D/LinearAdvection/SineWave_Ensemble/simulation.inp
+
+\b solver.inp
+\include 1D/LinearAdvection/SineWave_Ensemble/solver.inp
+
+\b boundary.inp
+\include 1D/LinearAdvection/SineWave_Ensemble/boundary.inp
+
+\b physics.inp
+\include 1D/LinearAdvection/SineWave_Ensemble/physics.inp
+
+To generate \b initial_<n>.inp (initial solution) and
+\b exact_<n>.inp (exact solution), compile and run the 
+following code in the run directory. 
+\include 1D/LinearAdvection/SineWave_Ensemble/aux/init.c
+The index \a n is the simulation index (0, ..., 3 in 
+this case).
+
+Output:
+-------
+After running the code, there should be 24 output
+files \b op_<n>_00000.dat, ... \b op_<n>_00005.dat, with
+6 files for each of the 4 simulations in the set;
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=1\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. All the files are ASCII 
+text (#HyPar::op_file_format is set to \a text in \b solver.inp).
+In these files, the first column is grid index, the second column 
+is x-coordinate, and the third column is the solution.
+
+Solutions for each simulation: The following figure is obtained 
+by plotting \a op_<n>_00005.dat (n=0,1,2,3): 
+@image html Solution_1DLinearAdvSine_Ensemble.png
+
+Since the exact solution is available at the final time,
+the errors are calculated and reported on screen (see below)
+as well as \b errors_<n>.dat. The errors for each of the 
+simulation are as follows:
+\include 1D/LinearAdvection/SineWave_Ensemble/errors_0.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/errors_1.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/errors_2.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/errors_3.dat
+The numbers are: number of grid points (#HyPar::dim_global), 
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity errors (#HyPar::error),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+\b Note: the errors above show 5th order convergence with grid size, 
+as expected.
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation_<n>.dat:
+\include 1D/LinearAdvection/SineWave_Ensemble/conservation_0.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/conservation_1.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/conservation_2.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/conservation_3.dat
+The numbers are: number of grid points (#HyPar::dim_global),
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 1D/LinearAdvection/SineWave_Ensemble/output.log
+
 
 \page sg_examples Sparse Grids Examples
 The following are some examples are simulated using the <B>sparse grids</B>
