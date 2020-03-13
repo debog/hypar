@@ -298,6 +298,33 @@ Notes:
 + Some sample STL files are available in \b hypar/Examples/STLGeometries/
 
 
+\section simulation_inp simulation.inp
+
+Requirement: \b mandatory if running an ensemble/multidomain simulation
+
+Read by: EnsembleSimulation::define()
+
+Description: Specify the parameters related to ensemble simulations.
+
+Format: ASCII text
+
+        begin
+            <keyword>   <value>
+            <keyword>   <value>
+            <keyword>   <value>
+            ...
+            <keyword>   <value>
+        end
+
+where the list of keywords and their type are:\n
+Keyword name       | Type         | Variable                                      | Default value
+------------------ | ------------ | --------------------------------------------- | ------------------------
+nsims              | int          | #EnsembleSimulation::m_nsims                  | 1
+
+\b Notes:
++ This file \b must exist for ensemble simulations; 
+  if this file does not exist, HyPar will run a standard single simulation.
+
 \section sparse_grids_inp sparse_grids.inp
 
 Requirement: \b mandatory if running with the sparse grids method

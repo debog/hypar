@@ -1569,8 +1569,8 @@ solution components.  #HyPar::op_file_format can be set to \a text to get the so
 files in plain text format (which can be read in and visualized in
 MATLAB for example).
 
-The following plot shows the density contours at the final time t=1, 
-obtained from plotting \b op_00010.dat:
+The following animation shows the density contours as the vortex
+convects over the domain:, 
 @image html Solution_2DNavStokVortex.gif
 
 Since the exact solution is available at the final time 
@@ -4457,10 +4457,21 @@ Expected screen output:
 HyPar has the capability to run ensemble simulations on multiple domains that 
 of varying sizes and initial solution using the same discretization methods, 
 time step sizes, final time, physics parameters, and boundary conditions. The following examples
-demonstrate this functionality; other examples can also be run with this feature
-with the appropriate modifications.
+demonstrate this functionality: 
 
-\subpage md_linadv_1d_sine
+\subpage md_linadv_1d_sine\n
+\subpage md_euler2d_vortex
+
+Other examples can also be run with this feature; the modifications needed are as follows:
+  + Need to have an input file \b simulation.inp that specifies the number of
+    simulations.
+  + Modify the code to generate the intial solution (and exact solution, if available)
+    to write out initial solution files for each simulation with the filenames 
+    properly indexed, i.e., \b initial_<n>.inp, where n = 0, 1, ..., 
+    number of simulations-1.
+  + Modify \a size and \a iproc in \b solver.inp to specify the grid dimensions
+    and MPI rank distribution for each simulation.
+  + Note that multiple output files will be written, one set for each simulation.
 
 \page md_linadv_1d_sine 1D Linear Advection - Sine Wave - Ensemble Simulation
 
@@ -4559,6 +4570,131 @@ and conservation error (#HyPar::ConservationError).
 Expected screen output:
 \include 1D/LinearAdvection/SineWave_Ensemble/output.log
 
+\page md_euler2d_vortex 2D Euler Equations - Isentropic Vortex Convection - Ensemble Simulation
+
+Location: \b hypar/Examples/2D/NavierStokes2D/InviscidVortexConvection_Ensemble
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Euler Equations (navierstokes2d.h - By default,
+                     #NavierStokes2D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 2D Euler
+                     equations are solved.)
+
+Reference: C.-W. Shu, "Essentially Non-oscillatory and Weighted Essentially 
+           Non-oscillatory Schemes for Hyperbolic Conservation Laws", 
+           ICASE Report 97-65, 1997
+
+Domain: \f$0 \le x,y \le 10\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions.
+
+Initial solution: The freestream flow is given by
+\f{equation}{
+  \rho_\infty = 1,\ u_\infty = 0.1,\ v_\infty = 0,\ p_\infty = 1
+\f}
+and a vortex is introduced, specified as
+\f{align}{
+\rho &= \left[ 1 - \frac{\left(\gamma-1\right)b^2}{8\gamma\pi^2} e^{1-r^2} \right]^{\frac{1}{\gamma-1}},\ p = \rho^\gamma, \\
+u &= u_\infty - \frac{b}{2\pi} e^{\frac{1}{2}\left(1-r^2\right)} \left(y-y_c\right),\ v = v_\infty + \frac{b}{2\pi} e^{\frac{1}{2}\left(1-r^2\right)} \left(x-x_c\right),
+\f}
+where \f$b=0.5\f$ is the vortex strength and \f$r = \left[(x-x_c)^2 + (y-y_c)^2 \right]^{1/2}\f$ is the distance from the vortex center \f$\left(x_c,y_c\right) = \left(5,5\right)\f$.
+
+Ensemble Runs: 4 simulations on grids with (128,16), (64,32), (32,64), and (16,128) points.
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b simulation.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/simulation.inp
+
+\b solver.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/boundary.inp
+
+\b physics.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/physics.inp
+
+To generate \b initial_<n>.inp (initial solution) and \b exact_<n>.inp
+(exact solution), compile and run the following code in the run 
+directory.
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/aux/exact.c
+The index \a n is the simulation index (0, ..., 3 in 
+this case).
+
+Output:
+-------
+Note that \b iproc for each simulation are specified as:
+
+      8 1
+      4 2
+      2 4
+      1 8
+
+in \b solver.inp Thus, this example should be run
+with 8 MPI ranks (or change \b iproc).
+
+After running the code, there should be 44 output
+files \b op_<n>_00000.dat, \b op_<n>_00001.dat, ... \b op_<n>_00010.dat,
+with 11 files for each of the 4 simulations in the set; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=20\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. 
+  
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the remaining columns are the 
+solution components.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation shows the density contours as the vortex
+convects over the domain, for each of the 4 simulations:
+@image html Solution_md_2DNavStokVortex_0.gif
+@image html Solution_md_2DNavStokVortex_1.gif
+@image html Solution_md_2DNavStokVortex_2.gif
+@image html Solution_md_2DNavStokVortex_3.gif
+
+Since the exact solution is available at the final time, the numerical 
+errors are calculated and reported on screen (see below)
+as well as \b errors_<n>.dat:
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/errors_0.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/errors_1.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/errors_2.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/errors_3.dat
+The numbers for each simulation are: number of grid points in each dimension 
+(#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity errors (#HyPar::error),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation_<n>.dat:
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/conservation_0.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/conservation_1.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/conservation_2.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/conservation_3.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError) of each component.
+
+Expected screen output:
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/output.log
 
 \page sg_examples Sparse Grids Examples
 The following are some examples are simulated using the <B>sparse grids</B>
@@ -4566,6 +4702,16 @@ method. Familiarity with the sparse grids approach (specifically the combination
 technique approach) is assumed.
 
 \subpage sg_linear_adv_sinewave
+
+Any other simulation can also be run with the sparse grids method (as long as
+the number of spatial dimensions is greater than 1); only the following is needed: 
+the modifications needed are as follows:
+  + Input file \b sparse_grids.inp that specifies parameters related to the sparse
+    grids method.
+
+\b Note: Sparse grids work well with smooth, linear simulations. Adapting them
+for hyperbolic simulations with shocks and discontinuities is an area of active
+research.
 
 \page sg_linear_adv_sinewave 2D Linear Advection - Sine Wave
 
