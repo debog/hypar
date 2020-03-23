@@ -14,6 +14,8 @@ AC_ARG_ENABLE([scalapack],AS_HELP_STRING([--enable-scalapack],[Enable ScaLAPACK]
 AC_ARG_WITH([blas_dir],AC_HELP_STRING([--with-blas-dir],[Specify path where BLAS libraries are installed.]))
 AC_ARG_WITH([lapack_dir],AC_HELP_STRING([--with-lapack-dir],[Specify path where LAPACK libraries are installed.]))
 AC_ARG_WITH([scalapack_dir],AC_HELP_STRING([--with-scalapack-dir],[Specify path where ScaLAPACK libraries are installed.]))
+AC_ARG_ENABLE([fftw],AC_HELP_STRING([--enable-fftw],[Enable FFTW]))
+AC_ARG_WITH([fftw_dir],AC_HELP_STRING([--with-fftw-dir],[Specify path where FFTW libraries are installed.]))
 
 AC_PROG_CC
 
@@ -97,6 +99,16 @@ if test "x$enable_scalapack" = "xyes" ; then
   LIBS="$LIBS -lscalapack -lblas -llapack"
 fi
 
+if test "x$enable_fftw" = "xyes" ; then
+  AC_MSG_NOTICE([Compiling with FFTW support.])
+  CFLAGS="$CFLAGS -Dfftw"
+  if test "x$with_fftw_dir" != "x" ; then
+    CFLAGS="$CFLAGS -I$with_fftw_dir/include"
+    LDFLAGS="$LDFLAGS -Wl,-rpath,$with_scalapack_dir/lib -L$with_fftw_dir/lib"
+  fi
+  LIBS="$LIBS -lfftw3_mpi -lfftw3 -lm"
+fi
+
 if test "x$PETSC_DIR" = "x"; then
   AC_MSG_NOTICE([Environment variable PETSC_DIR not set. Compiling without PETSc interface.])
 else
@@ -143,7 +155,7 @@ AC_CONFIG_FILES([
  src/PETScFunctions/Makefile
  src/PhysicalModels/Makefile
    src/PhysicalModels/LinearADR/Makefile
-      src/PhysicalModels/Burgers/Makefile
+   src/PhysicalModels/Burgers/Makefile
    src/PhysicalModels/FPDoubleWell/Makefile
    src/PhysicalModels/FPPowerSystem/Makefile
    src/PhysicalModels/FPPowerSystem1Bus/Makefile
@@ -156,6 +168,7 @@ AC_CONFIG_FILES([
    src/PhysicalModels/Numa3D/Makefile
    src/PhysicalModels/ShallowWater1D/Makefile
    src/PhysicalModels/ShallowWater2D/Makefile
+   src/PhysicalModels/Vlasov/Makefile
  src/SecondDerivative/Makefile
  src/Simulation/Makefile
  src/TimeIntegration/Makefile

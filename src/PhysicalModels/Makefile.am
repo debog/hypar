@@ -12,4 +12,5 @@ SUBDIRS = \
   Numa2D \
   Numa3D \
   ShallowWater1D \
-  ShallowWater2D
+  ShallowWater2D \
+  Vlasov

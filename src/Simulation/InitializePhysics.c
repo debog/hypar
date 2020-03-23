@@ -26,6 +26,7 @@
 #include <physicalmodels/numa3d.h>
 #include <physicalmodels/shallowwater1d.h>
 #include <physicalmodels/shallowwater2d.h>
+#include <physicalmodels/vlasov.h>
 
 /*! Initialize the physical model for a simulation: Depending on the 
     physical model specified, this function calls the initialization
@@ -146,7 +147,12 @@ int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #Si
       solver->physics = (ShallowWater2D*) calloc (1,sizeof(ShallowWater2D));
       IERR ShallowWater2DInitialize(solver,mpi); CHECKERR(ierr);
   
-    } else {
+    } else if (!strcmp(solver->model,_VLASOV_)) {
+  
+      solver->physics = (Vlasov*) calloc (1,sizeof(Vlasov));
+      IERR VlasovInitialize(solver,mpi); CHECKERR(ierr);
+  
+    }else {
   
       fprintf(stderr,"Error (domain %d): %s is not a supported physical model.\n",
               ns, solver->model);

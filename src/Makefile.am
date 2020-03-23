@@ -41,6 +41,7 @@ HyPar_LDADD = \
   PhysicalModels/Numa3D/libNuma3D.a \
   PhysicalModels/ShallowWater1D/libShallowWater1D.a \
   PhysicalModels/ShallowWater2D/libShallowWater2D.a \
+  PhysicalModels/Vlasov/libVlasov.a \
   InterpolationFunctions/libInterpolationFunctions.a \
   LimiterFunctions/libLimiterFunctions.a \
   FirstDerivative/libFirstDerivative.a \

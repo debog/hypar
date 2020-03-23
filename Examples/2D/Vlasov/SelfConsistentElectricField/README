@@ -1,0 +1,23 @@
+1D-1V VLASOV EQUATION
+
+  df         df                     df 
+  --  +  v ------  +  (E + v x B) ------  =  0
+  dt        dx_i                   dv_i
+
+   0  <= x <= 7;   Periodic
+   0 <=  v <= 2pi; Homogenous Dirichlet
+
+Initial Solution:
+
+
+The following input files are required:
++ solver.inp    -   General solver parameters
++ boundary.inp  -   Boundary conditions
++ physics.inp   -   Physical parameters 
++ initial.inp   -   Initial solution
+
+** See hypar/README for other (optional) input files
+
+Notes:-
+The code aux/init.c is an example to generate the initial
+solution file(s) in the correct format required by the solver.  
