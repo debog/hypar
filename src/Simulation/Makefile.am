@@ -1,6 +1,7 @@
 noinst_LIBRARIES = libSimulation.a
 libSimulation_a_SOURCES = \
   Cleanup.c \
+	EnsembleSimulationsDefine.cpp \
   Initialize.c \
   InitializeBoundaries.c \
   InitializeImmersedBoundaries.c \
@@ -10,5 +11,7 @@ libSimulation_a_SOURCES = \
   OutputSolution.c \
   ReadInputs.c \
   SimulationWriteErrors.c \
+	SingleSimulationDefine.cpp \
   Solve.c \
-  SolvePETSc.c
+  SolvePETSc.c \
+  WriteInputs.c

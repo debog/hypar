@@ -12,6 +12,10 @@ integration methods implemented in PETSc. To run them, HyPar needs to be compile
 
 \subpage ib_examples : Examples that use the immersed boundary method to simulate various geometries.
 
+\subpage md_examples : Examples that use the multidomain functionality.
+
+\subpage sg_examples : Examples that use the sparse grids spatial discretization.
+
 \page basic_examples Basic Examples
 
 The following are some basic examples that are simulated using HyPar. They 
@@ -19,8 +23,11 @@ all use explicit time integration, and \b do \b not require HyPar to be compiled
 with PETSc.
 
 \subpage linear_adv_sine \n
+\subpage linear_adv_sine_varyingadv \n
 \subpage linear_adv_disc \n
 \subpage linear_diff_sine 
+
+\subpage burger_1d_sine
 
 \subpage sod_shock_tube  \n
 \subpage lax_shock_tube \n
@@ -30,7 +37,10 @@ with PETSc.
 \subpage sw_dambreak
 
 \subpage linear_adv_gauss \n
+\subpage linear_adv_2d_sine_varyingadv \n
 \subpage linear_diff_sine2d
+
+\subpage burgers_2d_sine
 
 \subpage euler2d_riemann4 \n
 \subpage euler2d_riemann6 \n
@@ -147,6 +157,86 @@ Expected screen output:
 \include 1D/LinearAdvection/SineWave/output.log
 
 
+\page linear_adv_sine_varyingadv 1D Linear Advection - Sine Wave with Spatially-Varying Advection Speed
+
+Location: \b Examples/1D/LinearAdvection/SineWave_NonConstantAdvection
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Linear Advection Equation (linearadr.h)
+
+Domain: \f$0 \le x < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution: \f$u\left(x,0\right) = \sin\left(2\pi x\right)\f$
+
+Advection speed: \f$a\left(x\right) = 1 + \frac{1}{2}\sin^2\left(2\pi x\right)\f$
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/solver.inp
+
+\b boundary.inp
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/boundary.inp
+
+\b physics.inp (specifies filename for advection field)
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/physics.inp
+\b Note: Do not include the ".inp" extension in the filename above.
+
+\b weno.inp (optional)
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/weno.inp
+
+To generate \b initial.inp and \b advection.inp, compile and run the 
+following code in the run directory. 
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/aux/init.c
+
+Output:
+-------
+After running the code, there should be 101 output
+files \b op_00000.dat, \b op_00001.dat, ... \b op_00100.dat; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=2.5\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. All the files are ASCII 
+text (#HyPar::op_file_format is set to \a text in \b solver.inp).
+In these files, the first column is grid index, the second column 
+is x-coordinate, and the third column is the solution.
+
+The following animation shows the solution vs. grid point index:
+@image html Solution_1DLinearAdvSine_VaryingAdv.gif
+
+In addition to the usual output files, the linear advection physics 
+module writes out the following files:
++ \b advection_00000.dat, ..., \b advection_00100.dat: These files
+  share the same format as the solution output files \b op_*.dat 
+  and contains the advection field \f$a\left(x\right)\f$.
+The following figure shows the advection speed vs. grid point index:
+@image html Solution_1DLinearAdvSine_VaryingAdv.png
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation.dat:
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/conservation.dat
+The numbers are: number of grid points (#HyPar::dim_global),
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 1D/LinearAdvection/SineWave_NonConstantAdvection/output.log
+
+\page linear_adv_disc 1D Linear Advection - Discontinuous Waves
+
+Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves
+          (This directory contains all the input files needed
+          to run this case. If there is a \a Run.m, run it in
+          MATLAB to quickly set up, run, and visualize the 
 \page linear_adv_disc 1D Linear Advection - Discontinuous Waves
 
 Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves
@@ -295,6 +385,85 @@ and total wall time.
 
 Expected screen output:
 \include 1D/LinearDiffusion/SineWave/output.log
+
+\page burger_1d_sine 1D Inviscid Burgers Equation - Sine Wave
+
+Location: \b hypar/Examples/1D/Burgers/SineWave
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Burgers Equation (burgers.h)
+
+References:
+  + Ghosh, D., Baeder, J. D., "Compact Reconstruction Schemes with 
+    Weighted ENO Limiting for Hyperbolic Conservation Laws", 
+    SIAM Journal on Scientific Computing, 34 (3), 2012, A1678–A1706
+
+Domain: \f$0 \le x < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution: \f$u\left(x,0\right) = \frac{1}{2 \pi t_s}\sin\left(2\pi x\right)\f$,
+\f$t_s=2\f$ (time to shock formation)
+
+Exact solution: 
+  \f$u\left(x,y,t\right) = \frac{1}{2 \pi t_s} \sin\left(2\pi \left(x-u t\right)\right)\f$ (needs to be computed iteratively)\n
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
+ + Time integration: SSPRK3 (TimeRK(), #_RK_SSP3_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 1D/Burgers/SineWave/solver.inp
+
+\b boundary.inp
+\include 1D/Burgers/SineWave/boundary.inp
+
+\b physics.inp
+\include 1D/Burgers/SineWave/physics.inp
+
+\b lusolver.inp (optional)
+\include 1D/Burgers/SineWave/lusolver.inp
+
+\b weno.inp (optional)
+\include 1D/Burgers/SineWave/weno.inp
+
+To generate \b initial.inp (initial solution) 
+and \b exact.inp (exact solution), compile and run the 
+following code in the run directory. 
+\include 1D/Burgers/SineWave/aux/init.c
+\b Note: The exact solution is available only if the
+final time is less than \f$t_s\f$ above.
+
+Output:
+-------
+After running the code, there should be 8 output
+files \b op_00000.dat, \b op_00001.dat, ... \b op_00007.dat; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=2\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. All the files are ASCII 
+text (#HyPar::op_file_format is set to \a text in \b solver.inp).
+In these files, the first column is grid index, the second column 
+is x-coordinate, and the third column is the solution.
+
+Solutions at t=0,...,2: The following figure is obtained 
+by plotting \a op_00000.dat (initial), ..., \a op_00007.dat (t=2).
+@image html Solution_1DBurgersSine.png
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation.dat:
+\include 1D/Burgers/SineWave/conservation.dat
+The numbers are: number of grid points (#HyPar::dim_global),
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 1D/Burgers/SineWave/output.log
 
 
 
@@ -775,6 +944,100 @@ Expected screen output:
 \include 2D/LinearAdvection/GaussianPulse/output.log
 
 
+\page linear_adv_2d_sine_varyingadv 2D Linear Advection - Sine Wave with Spatially-Varying Advection Speed
+
+Location: \b hypar/Examples/2D/LinearAdvection/SineWave_NonConstantAdvection
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Linear Advection Equation (linearadr.h)
+
+Domain: \f$0 \le x,y < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions on all boundaries.
+
+Initial solution: \f$u\left(x,y,0\right) = u_0\left(x,y\right)= \cos\left(4\pi y\right)\f$\n
+
+Advection speed: \f$a_x\left(x,y\right) = \sin\left(4\pi y\right)\f$, \f$a_y\left(x,y\right) = -\cos\left(4\pi x\right)\f$
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/solver.inp
+
+\b boundary.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/boundary.inp
+
+\b physics.inp (specifies filename for advection field)
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/physics.inp
+\b Note: Do not include the ".inp" extension in the filename above.
+
+\b lusolver.inp (optional)
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/lusolver.inp
+
+\b weno.inp (optional)
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/weno.inp
+
+To generate \b initial.inp and \b advection.inp, compile and run the 
+following code in the run directory. 
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 2
+processors along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be 101 output
+files \b op_00000.dat, \b op_00001.dat, ... \b op_00100.dat; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=4\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. 
+  
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the final column is the 
+solution.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation was generated from the solution files:
+@image html Solution_2DLinearAdvSine_VaryingAdv.gif
+
+In addition to the usual output files, the linear advection physics 
+module writes out the following files:
++ \b advection_00000.dat, ..., \b advection_00100.dat: These files
+  share the same format as the solution output files \b op_*.dat 
+  and contains the advection field \f$a_x\left(x,y\right), a_y\left(x,y\right)\f$.
+The following figure shows the vector plot of the velocity field:
+@image html Solution_2DLinearAdvSine_VaryingAdv.png
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation.dat:
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/conservation.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/output.log
+
+
 \page linear_diff_sine2d 2D Linear Diffusion - Sine Wave
 
 Location: \b hypar/Examples/2D/LinearDiffusion/SineWave
@@ -860,6 +1123,116 @@ and total wall time.
 Expected screen output:
 \include 2D/LinearDiffusion/SineWave/output.log
 
+\page burgers_2d_sine 2D Inviscid Burgers Equation - Sine Wave
+
+Location: \b hypar/Examples/2D/Burgers/SineWave
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Burgers Equation (burgers.h)
+
+Domain: \f$1 \le x,y < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions on all boundaries.
+
+Initial solution: 
+  \f$u\left(x,y,0\right) = \frac{1}{2 \pi t_s} \sin\left(2\pi x\right) \sin\left(2\pi y\right)\f$,\n
+  \f$t_s=2\f$ (time to shock formation)
+
+Exact solution: 
+  \f$u\left(x,y,t\right) = \frac{1}{2 \pi t_s} \sin\left(2\pi \left(x-u t\right)\right) \sin\left(2\pi \left(y-u t\right)\right)\f$ (needs to be computed iteratively)\n
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 2D/Burgers/SineWave/solver.inp
+
+\b boundary.inp
+\include 2D/Burgers/SineWave/boundary.inp
+
+\b physics.inp (specifies \f$a_x\f$ and \f$a_y\f$)
+\include 2D/Burgers/SineWave/physics.inp
+
+\b lusolver.inp (optional)
+\include 2D/Burgers/SineWave/lusolver.inp
+
+\b weno.inp (optional)
+\include 2D/Burgers/SineWave/weno.inp
+
+To generate \b initial.inp (initial solution) 
+and \b exact.inp (exact solution), compile and run the 
+following code in the run directory. 
+\include 2D/Burgers/SineWave/aux/init.c
+\b Note: The exact solution is available only if the
+final time is less than \f$t_s\f$ above.
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      2 2
+
+in \b solver.inp (i.e., 2 processors along \a x, and 2
+processors along \a y). Thus, this example should be run
+with 4 MPI ranks (or change \b iproc).
+
+After running the code, there should be 5 output
+files \b op_00000.dat, \b op_00001.dat, ... \b op_00004.dat; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=2\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. 
+  
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the final column is the 
+solution.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following figures show the solutions at each output time:
+  + t = 0 (initial)
+@image html Solution_2DBurgersSineWave_0.png
+  + t = 0.4)
+@image html Solution_2DBurgersSineWave_1.png
+  + t = 0.8
+@image html Solution_2DBurgersSineWave_2.png
+  + t = 1.2
+@image html Solution_2DBurgersSineWave_3.png
+  + t = 1.6 (final)
+@image html Solution_2DBurgersSineWave_4.png
+
+Since the exact solution is available at the final time 
+the errors are calculated and reported on screen (see below)
+as well as \b errors.dat:
+\include 2D/Burgers/SineWave/errors.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity errors (#HyPar::error),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation.dat:
+\include 2D/Burgers/SineWave/conservation.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 2D/Burgers/SineWave/output.log
 
 \page euler2d_riemann4 2D Euler Equations - Riemann Problem Case 4
 
@@ -1196,8 +1569,8 @@ solution components.  #HyPar::op_file_format can be set to \a text to get the so
 files in plain text format (which can be read in and visualized in
 MATLAB for example).
 
-The following plot shows the density contours at the final time t=1, 
-obtained from plotting \b op_00010.dat:
+The following animation shows the density contours as the vortex
+convects over the domain:, 
 @image html Solution_2DNavStokVortex.gif
 
 Since the exact solution is available at the final time 
@@ -4079,3 +4452,388 @@ the Tecplot format, where the immersed body and the forces on it are represented
 
 Expected screen output:
 \include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/output.log
+
+\page md_examples Multidomain Examples
+HyPar has the capability to run ensemble simulations on multiple domains that 
+of varying sizes and initial solution using the same discretization methods, 
+time step sizes, final time, physics parameters, and boundary conditions. The following examples
+demonstrate this functionality: 
+
+\subpage md_linadv_1d_sine\n
+\subpage md_euler2d_vortex
+
+Other examples can also be run with this feature; the modifications needed are as follows:
+  + Need to have an input file \b simulation.inp that specifies the number of
+    simulations.
+  + Modify the code to generate the intial solution (and exact solution, if available)
+    to write out initial solution files for each simulation with the filenames 
+    properly indexed, i.e., \b initial_<n>.inp, where n = 0, 1, ..., 
+    number of simulations-1.
+  + Modify \a size and \a iproc in \b solver.inp to specify the grid dimensions
+    and MPI rank distribution for each simulation.
+  + Note that multiple output files will be written, one set for each simulation.
+
+\page md_linadv_1d_sine 1D Linear Advection - Sine Wave - Ensemble Simulation
+
+Location: \b hypar/Examples/1D/LinearAdvection/SineWave_Ensemble
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Linear Advection Equation (linearadr.h)
+
+References:
+  + Ghosh, D., Baeder, J. D., "Compact Reconstruction Schemes with 
+    Weighted ENO Limiting for Hyperbolic Conservation Laws", 
+    SIAM Journal on Scientific Computing, 34 (3), 2012, A1678–A1706
+
+Domain: \f$0 \le x < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution: \f$u\left(x,0\right) = \sin\left(2\pi x\right)\f$
+
+Ensemble Runs: 4 simulations on grids with 40, 80, 160, and 320 points.
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b simulation.inp
+\include 1D/LinearAdvection/SineWave_Ensemble/simulation.inp
+
+\b solver.inp
+\include 1D/LinearAdvection/SineWave_Ensemble/solver.inp
+
+\b boundary.inp
+\include 1D/LinearAdvection/SineWave_Ensemble/boundary.inp
+
+\b physics.inp
+\include 1D/LinearAdvection/SineWave_Ensemble/physics.inp
+
+To generate \b initial_<n>.inp (initial solution) and
+\b exact_<n>.inp (exact solution), compile and run the 
+following code in the run directory. 
+\include 1D/LinearAdvection/SineWave_Ensemble/aux/init.c
+The index \a n is the simulation index (0, ..., 3 in 
+this case).
+
+Output:
+-------
+After running the code, there should be 24 output
+files \b op_<n>_00000.dat, ... \b op_<n>_00005.dat, with
+6 files for each of the 4 simulations in the set;
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=1\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. All the files are ASCII 
+text (#HyPar::op_file_format is set to \a text in \b solver.inp).
+In these files, the first column is grid index, the second column 
+is x-coordinate, and the third column is the solution.
+
+Solutions for each simulation: The following figure is obtained 
+by plotting \a op_<n>_00005.dat (n=0,1,2,3): 
+@image html Solution_1DLinearAdvSine_Ensemble.png
+
+Since the exact solution is available at the final time,
+the errors are calculated and reported on screen (see below)
+as well as \b errors_<n>.dat. The errors for each of the 
+simulation are as follows:
+\include 1D/LinearAdvection/SineWave_Ensemble/errors_0.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/errors_1.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/errors_2.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/errors_3.dat
+The numbers are: number of grid points (#HyPar::dim_global), 
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity errors (#HyPar::error),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+\b Note: the errors above show 5th order convergence with grid size, 
+as expected.
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation_<n>.dat:
+\include 1D/LinearAdvection/SineWave_Ensemble/conservation_0.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/conservation_1.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/conservation_2.dat
+\include 1D/LinearAdvection/SineWave_Ensemble/conservation_3.dat
+The numbers are: number of grid points (#HyPar::dim_global),
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 1D/LinearAdvection/SineWave_Ensemble/output.log
+
+\page md_euler2d_vortex 2D Euler Equations - Isentropic Vortex Convection - Ensemble Simulation
+
+Location: \b hypar/Examples/2D/NavierStokes2D/InviscidVortexConvection_Ensemble
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Euler Equations (navierstokes2d.h - By default,
+                     #NavierStokes2D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 2D Euler
+                     equations are solved.)
+
+Reference: C.-W. Shu, "Essentially Non-oscillatory and Weighted Essentially 
+           Non-oscillatory Schemes for Hyperbolic Conservation Laws", 
+           ICASE Report 97-65, 1997
+
+Domain: \f$0 \le x,y \le 10\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions.
+
+Initial solution: The freestream flow is given by
+\f{equation}{
+  \rho_\infty = 1,\ u_\infty = 0.1,\ v_\infty = 0,\ p_\infty = 1
+\f}
+and a vortex is introduced, specified as
+\f{align}{
+\rho &= \left[ 1 - \frac{\left(\gamma-1\right)b^2}{8\gamma\pi^2} e^{1-r^2} \right]^{\frac{1}{\gamma-1}},\ p = \rho^\gamma, \\
+u &= u_\infty - \frac{b}{2\pi} e^{\frac{1}{2}\left(1-r^2\right)} \left(y-y_c\right),\ v = v_\infty + \frac{b}{2\pi} e^{\frac{1}{2}\left(1-r^2\right)} \left(x-x_c\right),
+\f}
+where \f$b=0.5\f$ is the vortex strength and \f$r = \left[(x-x_c)^2 + (y-y_c)^2 \right]^{1/2}\f$ is the distance from the vortex center \f$\left(x_c,y_c\right) = \left(5,5\right)\f$.
+
+Ensemble Runs: 4 simulations on grids with (128,16), (64,32), (32,64), and (16,128) points.
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b simulation.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/simulation.inp
+
+\b solver.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/boundary.inp
+
+\b physics.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/physics.inp
+
+To generate \b initial_<n>.inp (initial solution) and \b exact_<n>.inp
+(exact solution), compile and run the following code in the run 
+directory.
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/aux/exact.c
+The index \a n is the simulation index (0, ..., 3 in 
+this case).
+
+Output:
+-------
+Note that \b iproc for each simulation are specified as:
+
+      8 1
+      4 2
+      2 4
+      1 8
+
+in \b solver.inp Thus, this example should be run
+with 8 MPI ranks (or change \b iproc).
+
+After running the code, there should be 44 output
+files \b op_<n>_00000.dat, \b op_<n>_00001.dat, ... \b op_<n>_00010.dat,
+with 11 files for each of the 4 simulations in the set; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=20\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. 
+  
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the remaining columns are the 
+solution components.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation shows the density contours as the vortex
+convects over the domain, for each of the 4 simulations:
+@image html Solution_md_2DNavStokVortex_0.gif
+@image html Solution_md_2DNavStokVortex_1.gif
+@image html Solution_md_2DNavStokVortex_2.gif
+@image html Solution_md_2DNavStokVortex_3.gif
+
+Since the exact solution is available at the final time, the numerical 
+errors are calculated and reported on screen (see below)
+as well as \b errors_<n>.dat:
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/errors_0.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/errors_1.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/errors_2.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/errors_3.dat
+The numbers for each simulation are: number of grid points in each dimension 
+(#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity errors (#HyPar::error),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation_<n>.dat:
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/conservation_0.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/conservation_1.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/conservation_2.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/conservation_3.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError) of each component.
+
+Expected screen output:
+\include 2D/NavierStokes2D/InviscidVortexConvection_Ensemble/output.log
+
+\page sg_examples Sparse Grids Examples
+The following are some examples are simulated using the <B>sparse grids</B>
+method. Familiarity with the sparse grids approach (specifically the combination
+technique approach) is assumed.
+
+\subpage sg_linear_adv_sinewave
+
+Any other simulation can also be run with the sparse grids method (as long as
+the number of spatial dimensions is greater than 1); only the following is needed: 
+the modifications needed are as follows:
+  + Input file \b sparse_grids.inp that specifies parameters related to the sparse
+    grids method.
+
+\b Note: Sparse grids work well with smooth, linear simulations. Adapting them
+for hyperbolic simulations with shocks and discontinuities is an area of active
+research.
+
+\page sg_linear_adv_sinewave 2D Linear Advection - Sine Wave
+
+Location: \b hypar/Examples/2D/LinearAdvection/SineWave_SparseGrids
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Linear Advection Equation (linearadr.h)
+
+Domain: \f$0 \le x,y < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions on all boundaries.
+
+Initial solution: \f$u\left(x,y,0\right) = u_0\left(x,y\right)= \sin\left(2\pi x\right)\cos\left(2\pi y\right)\f$\n
+Exact solution: \f$u\left(x,y,t\right) = u_0\left(x-a_xt,y-a_yt\right)\f$.
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 2D/LinearAdvection/SineWave_SparseGrids/solver.inp
+
+\b sparse_grids.inp
+\include 2D/LinearAdvection/SineWave_SparseGrids/sparse_grids.inp
+
+\b boundary.inp
+\include 2D/LinearAdvection/SineWave_SparseGrids/boundary.inp
+
+\b physics.inp (specifies \f$a_x\f$ and \f$a_y\f$)
+\include 2D/LinearAdvection/SineWave_SparseGrids/physics.inp
+
+To generate \b initial.inp and \b exact.inp, compile and run 
+the following code in the run directory.
+\include 2D/LinearAdvection/SineWave_SparseGrids/aux/exact.c
+
+Output:
+-------
+Note that \b iproc does \b not need to be set for simulations
+using sparse grids. HyPar will automatically calculate the load
+balanced processor distribution for each sparse grid. If too
+many processors are specified, then it will return an error.
+
+After running the code, there should be the following output
+files:
+
+  + op_fg_00000.dat, ..., op_fg_00010.dat: these contain the full
+    grid solution at \f$t=0, ..., 1\f$.
+  + op_sg_<n>_00000.dat, ..., op_sg_<n>_00010.dat: these contain
+    the solution on each of the sparse grids in the combination
+    technique. These are written out because \b write_sg_solutions
+    is set to \b yes in \b sparse_grids.inp 
+    (SparseGridsSimulation::m_write_sg_solutions).
+    
+    
+Since #HyPar::op_overwrite is set to \a no in \b solver.inp, 
+separate files are written for solutions at each output time. 
+
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the final column is the 
+solution.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation was generated from the full grid solution files
+that were computed by using the combination technique on the sparse grids:
+@image html Solution_SG_full_2DLinearAdvSineWave.gif
+
+The following animations show the solution on some of the sparse grids
+in the combination technique. The simulation was actually carried out on 
+these grids. Note the different grid sizes.
+@image html Solution_SG_sg_2DLinearAdvSineWave_00.gif
+@image html Solution_SG_sg_2DLinearAdvSineWave_02.gif
+@image html Solution_SG_sg_2DLinearAdvSineWave_04.gif
+@image html Solution_SG_sg_2DLinearAdvSineWave_06.gif
+@image html Solution_SG_sg_2DLinearAdvSineWave_08.gif
+@image html Solution_SG_sg_2DLinearAdvSineWave_10.gif
+
+Since the exact solution is available at the final time, the numerical 
+errors are calculated for the recombined full grid solution and reported 
+on screen (see below) as well as \b errors_fg.dat:
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_fg.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity errors (#HyPar::error),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Since \b write_sg_errors is set to to \b yes in \b sparse_grids.inp,
+(SparseGridsSimulation::m_print_sg_errors), the errors are also
+calculated and reported (on screen and in the files \b errors_<n>.dat )
+for each of the sparse grids. Following are the errors corresponding
+to the sparse grids whose solutions are shown above.
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_00.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_02.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_04.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_06.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_08.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/errors_10.dat
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation errors for each of the sparse grids
+and prints it to screen, as well as the files \b conservation_<n>.dat:
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_00.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_02.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_04.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_06.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_08.dat
+\include 2D/LinearAdvection/SineWave_SparseGrids/conservation_10.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt), and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 2D/LinearAdvection/SineWave_SparseGrids/output.log
+

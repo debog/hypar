@@ -296,3 +296,66 @@ Notes:
 + The normal defined in the STL file must be the <B>"outward"</B> normal, i.e., pointing outside the body.
 + The geometry must be a closed one.
 + Some sample STL files are available in \b hypar/Examples/STLGeometries/
+
+
+\section simulation_inp simulation.inp
+
+Requirement: \b mandatory if running an ensemble/multidomain simulation
+
+Read by: EnsembleSimulation::define()
+
+Description: Specify the parameters related to ensemble simulations.
+
+Format: ASCII text
+
+        begin
+            <keyword>   <value>
+            <keyword>   <value>
+            <keyword>   <value>
+            ...
+            <keyword>   <value>
+        end
+
+where the list of keywords and their type are:\n
+Keyword name       | Type         | Variable                                      | Default value
+------------------ | ------------ | --------------------------------------------- | ------------------------
+nsims              | int          | #EnsembleSimulation::m_nsims                  | 1
+
+\b Notes:
++ This file \b must exist for ensemble simulations; 
+  if this file does not exist, HyPar will run a standard single simulation.
+
+\section sparse_grids_inp sparse_grids.inp
+
+Requirement: \b mandatory if running with the sparse grids method
+
+Read by: SparseGridsSimulation::define()
+
+Description: Specify the parameters related to sparse grids method.
+
+Format: ASCII text
+
+        begin
+            <keyword>   <value>
+            <keyword>   <value>
+            <keyword>   <value>
+            ...
+            <keyword>   <value>
+        end
+
+where the list of keywords and their type are:\n
+Keyword name       | Type         | Variable                                      | Default value
+------------------ | ------------ | --------------------------------------------- | ------------------------
+log2_imin          | int          | #SparseGridsSimulation::m_imin                | 2
+interp_order       | int          | #SparseGridsSimulation::m_interp_order        | 6
+write_sg_solution  | char[]       | #SparseGridsSimulation::m_write_sg_solutions  | no
+write_sg_errors    | char[]       | #SparseGridsSimulation::m_print_sg_errors     | no
+
+\b Notes:
++ Even if you want to use the default values for all the parameters, the file
+  \b sparse_grids.inp must exist with just the text
+
+        begin
+        end
+
+  If this file does not exist, HyPar will not use the sparse grids method.

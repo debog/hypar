@@ -1,5 +1,6 @@
 HyPar - Parallel (MPI) version with 8 processes
 Compiled with PETSc time integration.
+-- Ensemble Simulation --
 Number of simulation domains: 4
 Allocated simulation object(s).
 Reading solver inputs from file "solver.inp".
@@ -34,14 +35,7 @@ Reading solver inputs from file "solver.inp".
   Solution file format                       : tecplot2d
   Overwrite solution file                    : no
   Physical model                             : navierstokes2d
-Partitioning domain 0.
-Allocating data arrays.
-Partitioning domain 1.
-Allocating data arrays.
-Partitioning domain 2.
-Allocating data arrays.
-Partitioning domain 3.
-Allocating data arrays.
+Partitioning domain and allocating data arrays.
 Reading array from binary file initial_0.inp (Serial mode).
 Volume integral of the initial solution on domain 0:
  0:  9.9980704056142386E+01
@@ -90,17 +84,8 @@ Domain 3: Reading boundary conditions from boundary.inp.
   Boundary                       periodic:  Along dimension  1 and face +1
   Boundary                       periodic:  Along dimension  1 and face -1
 4 boundary condition(s) read.
-Initializing solvers for domain 0.
-Initializing solvers for domain 1.
-Initializing solvers for domain 2.
-Initializing solvers for domain 3.
-Initializing physics for domain 0. Model = "navierstokes2d"
-Reading physical model inputs from file "physics.inp".
-Initializing physics for domain 1. Model = "navierstokes2d"
-Reading physical model inputs from file "physics.inp".
-Initializing physics for domain 2. Model = "navierstokes2d"
-Reading physical model inputs from file "physics.inp".
-Initializing physics for domain 3. Model = "navierstokes2d"
+Initializing solvers.
+Initializing physics. Model = "navierstokes2d"
 Reading physical model inputs from file "physics.inp".
 Setting up time integration.
 Solving in time (from 0 to 800 iterations)
@@ -675,11 +660,8 @@ Conservation Errors:
 	4.7403351860139664E-17
 	2.1658176009253655E-16
 
-Solver runtime (in seconds): 4.1324589999999999E+00
-Total  runtime (in seconds): 4.1992339999999997E+00
+Solver runtime (in seconds): 7.2514700000000003E+00
+Total  runtime (in seconds): 7.2883789999999999E+00
 
-Deallocating arrays for domain 0.
-Deallocating arrays for domain 1.
-Deallocating arrays for domain 2.
-Deallocating arrays for domain 3.
+Deallocating arrays.
 Finished.

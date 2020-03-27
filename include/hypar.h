@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
  */
 
+#ifndef _HYPAR_H_
+#define _HYPAR_H_
+
 #include <basic.h>
 
 /*! \def HyPar
@@ -177,6 +180,11 @@ typedef struct main_parameters {
   int  index_length;
   /*! solution filename extension */
   char solnfilename_extn[_MAX_STRING_SIZE_];
+
+  /*! output filename root */
+  char op_fname_root[_MAX_STRING_SIZE_];
+  /*! auxiliary output filename root */
+  char aux_op_fname_root[_MAX_STRING_SIZE_];
 
   /*! Pointer to the function to write the solution to file, assigned in InitializeSolvers() */
   int (*WriteOutput)              (int,int,int*,double*,double*,char*,int*);  
@@ -395,8 +403,6 @@ typedef struct main_parameters {
 
 } HyPar;
 
-int CalculateError (void*,void*);/*!< Calculate the error in the final solution */
-
 /* Some definitions - types of discretizations available 
    for the parabolic (2nd derivative) term  */
 /*! Non-conservative, direct evaluation of the 2nd deriv */
@@ -409,3 +415,5 @@ int CalculateError (void*,void*);/*!< Calculate the error in the final solution 
 #define _NC_1_5STAGE_ "nonconservative-1.5stage"  
 /*! Conservative, direct evaluation of the 2nd deriv */
 #define _CONS_1STAGE_ "conservative-1stage"       
+
+#endif

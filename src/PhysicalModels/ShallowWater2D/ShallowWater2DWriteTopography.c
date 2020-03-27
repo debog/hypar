@@ -26,9 +26,7 @@ int ShallowWater2DWriteTopography(
   if (params->topo_flag) {
 
     char fname_root[_MAX_STRING_SIZE_] = "topography";
-    if (solver->nsims == 1) {
-      if (!strcmp(solver->op_overwrite,"no")) strcat(fname_root,solver->filename_index);
-    } else {
+    if (solver->nsims > 1) {
       char index[_MAX_STRING_SIZE_];
       GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
       strcat(fname_root, "_");

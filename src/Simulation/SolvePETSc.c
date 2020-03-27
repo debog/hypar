@@ -17,10 +17,14 @@
 #include <io.h>
 #include <boundaryconditions.h>
 #include <petscinterface.h>
-#include <simulation.h>
+#include <mpivars.h>
+#include <simulation_object.h>
 
 #undef __FUNCT__
 #define __FUNCT__ "SolvePETSc"
+
+int CalculateError (void*,void*); /*!< Calculate the error in the final solution */
+int OutputSolution (void*,int);   /*!< Write solutions to file */
 
 /*! \brief Integrate in time with PETSc
 

@@ -12,7 +12,8 @@
 #include <interpolation.h>
 #include <firstderivative.h>
 #include <secondderivative.h>
-#include <simulation.h>
+#include <mpivars.h>
+#include <simulation_object.h>
 
 /* Function declarations */
 int  ApplyBoundaryConditions     (void*,void*,double*,double*,double);
@@ -45,16 +46,17 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
   int ns;
   _DECLARE_IERR_;
 
+  if (nsims == 0) return 0;
+
+  if (!sim[0].mpi.rank) {
+    printf("Initializing solvers.\n");
+  }
+
   for (ns = 0; ns < nsims; ns++) {
 
     HyPar           *solver   = &(sim[ns].solver);
     MPIVariables    *mpi      = &(sim[ns].mpi);
 
-    if (!mpi->rank) {
-      if (nsims > 1) printf("Initializing solvers for domain %d.\n", ns);
-      else           printf("Initializing solvers.\n");
-    }
-  
     solver->ApplyBoundaryConditions     = ApplyBoundaryConditions;
     solver->ApplyIBConditions           = ApplyIBConditions;
     solver->HyperbolicFunction          = HyperbolicFunction;
@@ -306,6 +308,8 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
     /* Solution output function */
     solver->WriteOutput    = NULL; /* default - no output */
     solver->filename_index = NULL;
+    strcpy(solver->op_fname_root, "op");
+    strcpy(solver->aux_op_fname_root, "ts0");
     if (!strcmp(solver->output_mode,"serial")) {
       solver->index_length = 5;
       solver->filename_index = (char*) calloc (solver->index_length+1,sizeof(char));

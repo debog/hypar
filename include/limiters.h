@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
 */
 
+#ifndef _LIMITERS_H_
+#define _LIMITERS_H_
+
 /*! Generalized MinMod Limiter: LimiterGeneralizedMinMod() */
 #define _LIM_GM_ "gmm"
 /*! MinMod Limiter: LimiterMinMod() */
@@ -21,3 +24,4 @@ double LimiterVanLeer(double);
 /*! Superbee Limiter */
 double LimiterSuperBee(double);
 
+#endif

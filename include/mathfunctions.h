@@ -3,11 +3,11 @@
     @author Debojyoti Ghosh
  */
 
+#ifndef _MATHFUNC_H_
+#define _MATHFUNC_H_
+
 /* Basic functions */
 #include <math.h>
-
-/*! Function to calculate the grid points corresponding to a given interval */
-void FindInterval(double,double,double*,int,int*,int*);
 
 /*! \def min 
  *  Minimum of two numbers 
@@ -37,10 +37,25 @@ void FindInterval(double,double,double*,int,int*,int*);
 */
 #define raiseto(x,a) (exp((a)*log(x)))
 
+/*! \def raiseto_int
+ * Raise to a power (int only): y = x^a
+*/
+#define raiseto_int(y,x,a) \
+  { \
+    int arraycounter; \
+    y = x; \
+    for (arraycounter=1; arraycounter<a; arraycounter++) { \
+      y *= x; \
+    } \
+  }
+
 /*! \def sign
  * Returns the sign of the argument
 */
 #define sign(a) ((a)<0?-1.0:1.0)
+
+/* The following macro names conflict with PETSc stuff */
+#ifndef _PETSC_INTERFACE_H_
 
 /*! \def MatMult
  * Matrix-Matrix multiplication: \a A = \a X \a Y, where \a A, \a X, \a Y 
@@ -195,4 +210,12 @@ void FindInterval(double,double,double*,int,int*,int*);
     y[4] = A[20]*x[0] +  A[21]*x[1] +  A[22]*x[2] +  A[23]*x[3] +  A[24]*x[4];\
   }
 
+#endif
+
+/*! Function to calculate the grid points corresponding to a given interval */
+void FindInterval(double,double,double*,int,int*,int*);
+
+/*! Function to compute trilinear interpolation coefficients */
 void TrilinearInterpCoeffs(double,double,double,double,double,double,double,double,double,double*);
+
+#endif

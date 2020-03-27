@@ -1,5 +1,6 @@
 HyPar - Parallel (MPI) version with 1 processes
 Compiled with PETSc time integration.
+-- Ensemble Simulation --
 Number of simulation domains: 4
 Allocated simulation object(s).
 Reading solver inputs from file "solver.inp".
@@ -34,14 +35,7 @@ Reading solver inputs from file "solver.inp".
   Solution file format                       : text
   Overwrite solution file                    : no
   Physical model                             : linear-advection-diffusion-reaction
-Partitioning domain 0.
-Allocating data arrays.
-Partitioning domain 1.
-Allocating data arrays.
-Partitioning domain 2.
-Allocating data arrays.
-Partitioning domain 3.
-Allocating data arrays.
+Partitioning domain and allocating data arrays.
 Reading array from binary file initial_0.inp (Serial mode).
 Volume integral of the initial solution on domain 0:
  0:  3.7296554733501353E-17
@@ -70,17 +64,8 @@ Domain 3: Reading boundary conditions from boundary.inp.
   Boundary                       periodic:  Along dimension  0 and face +1
   Boundary                       periodic:  Along dimension  0 and face -1
 2 boundary condition(s) read.
-Initializing solvers for domain 0.
-Initializing solvers for domain 1.
-Initializing solvers for domain 2.
-Initializing solvers for domain 3.
-Initializing physics for domain 0. Model = "linear-advection-diffusion-reaction"
-Reading physical model inputs from file "physics.inp".
-Initializing physics for domain 1. Model = "linear-advection-diffusion-reaction"
-Reading physical model inputs from file "physics.inp".
-Initializing physics for domain 2. Model = "linear-advection-diffusion-reaction"
-Reading physical model inputs from file "physics.inp".
-Initializing physics for domain 3. Model = "linear-advection-diffusion-reaction"
+Initializing solvers.
+Initializing physics. Model = "linear-advection-diffusion-reaction"
 Reading physical model inputs from file "physics.inp".
 Setting up time integration.
 Solving in time (from 0 to 1000 iterations)
@@ -743,11 +728,8 @@ Computed errors for domain 3:
 Conservation Errors:
 	9.8716607804805179E-17
 
-Solver runtime (in seconds): 7.7542299999999997E-01
-Total  runtime (in seconds): 8.0128999999999995E-01
+Solver runtime (in seconds): 5.9929299999999996E-01
+Total  runtime (in seconds): 6.1494000000000004E-01
 
-Deallocating arrays for domain 0.
-Deallocating arrays for domain 1.
-Deallocating arrays for domain 2.
-Deallocating arrays for domain 3.
+Deallocating arrays.
 Finished.

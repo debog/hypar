@@ -7,7 +7,8 @@
 #include <stdlib.h>
 #include <basic.h>
 #include <arrayfunctions.h>
-#include <simulation.h>
+#include <mpivars.h>
+#include <simulation_object.h>
 
 /*! Initialization function called at the beginning of a simulation. This function
     does the following:
@@ -25,7 +26,16 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
   SimulationObject* simobj = (SimulationObject*) s;
   int i,d,n;
 
+  if (nsims == 0) {
+    return 1;
+  }
+
+  if (!simobj[0].mpi.rank)  printf("Partitioning domain and allocating data arrays.\n");
+
   for (n = 0; n < nsims; n++) {
+
+    /* this is a full initialization, not a barebones one */
+    simobj[n].is_barebones = 0;
 
     /* allocations */
     simobj[n].mpi.ip           = (int*) calloc (simobj[n].solver.ndims,sizeof(int));
@@ -39,10 +49,6 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
     _DECLARE_IERR_;
   
     /* Domain partitioning */
-    if (!simobj[n].mpi.rank) {
-      if (nsims == 1) printf("Partitioning domain.\n");
-      else            printf("Partitioning domain %d.\n", n);
-    }
     int total_proc = 1;
     for (i=0; i<simobj[n].solver.ndims; i++) total_proc *= simobj[n].mpi.iproc[i];
     if (simobj[n].mpi.nproc != total_proc) {
@@ -109,7 +115,6 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
     }
   
     /* Allocations */
-    if (!simobj[n].mpi.rank) printf("Allocating data arrays.\n");
     simobj[n].solver.index = (int*) calloc (simobj[n].solver.ndims,sizeof(int));
     simobj[n].solver.stride_with_ghosts = (int*) calloc (simobj[n].solver.ndims,sizeof(int));
     simobj[n].solver.stride_without_ghosts = (int*) calloc (simobj[n].solver.ndims,sizeof(int));
@@ -168,7 +173,7 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
       }
       if (bufdim[d] > maxbuf) maxbuf = bufdim[d];
     }
-    maxbuf *= simobj[n].solver.nvars;
+    maxbuf *= (simobj[n].solver.nvars*simobj[n].solver.ndims);
     simobj[n].mpi.maxbuf  = maxbuf;
     simobj[n].mpi.sendbuf = (double*) calloc (2*simobj[n].solver.ndims*maxbuf,sizeof(double));
     simobj[n].mpi.recvbuf = (double*) calloc (2*simobj[n].solver.ndims*maxbuf,sizeof(double));
@@ -179,6 +184,7 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
     simobj[n].solver.StepBoundaryIntegral  = (double*) calloc (2*simobj[n].solver.ndims*simobj[n].solver.nvars,sizeof(double));
     simobj[n].solver.TotalBoundaryIntegral = (double*) calloc (simobj[n].solver.nvars,sizeof(double));
     simobj[n].solver.ConservationError     = (double*) calloc (simobj[n].solver.nvars,sizeof(double));
+    for (i=0; i<simobj[n].solver.nvars; i++) simobj[n].solver.ConservationError[i] = -1;
 
     /* initialize function call counts to zero */
     simobj[n].solver.count_hyp 

@@ -9,7 +9,8 @@
 #include <mathfunctions.h>
 #include <immersedboundaries.h>
 #include <io.h>
-#include <simulation.h>
+#include <mpivars.h>
+#include <simulation_object.h>
 
 /*! Initialize the immersed boundaries, if present.
     + Read in immersed body from STL file.

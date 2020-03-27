@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
 */
 
+#ifndef _BASIC_H_
+#define _BASIC_H_
+
 /*! Maximum size of character strings */
 #define _MAX_STRING_SIZE_ 500
 #ifdef debug
@@ -28,4 +31,7 @@
     coord = (x[offset+ghosts+i]); \
   }
 
+/*! Minimum number of grid points per dimension per MPI rank */
+#define _MIN_GRID_PTS_PER_PROC_ 4
 
+#endif

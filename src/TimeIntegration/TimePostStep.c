@@ -8,7 +8,8 @@
 #include <math.h>
 #include <basic.h>
 #include <arrayfunctions.h>
-#include <simulation.h>
+#include <mpivars.h>
+#include <simulation_object.h>
 #include <timeintegration.h>
 
 /*!

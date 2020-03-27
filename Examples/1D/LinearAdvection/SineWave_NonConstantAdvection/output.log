@@ -1,0 +1,358 @@
+HyPar - Parallel (MPI) version with 1 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 1
+  No. of variables                           : 1
+  Domain size                                : 80 
+  Processes along each dimension             : 1 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 1000
+  Restart iteration                          : 0
+  Time integration scheme                    : rk (44)
+  Spatial discretization scheme (hyperbolic) : weno5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : characteristic
+  Spatial discretization type   (parabolic ) : nonconservative-1stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 2.500000E-03
+  Check for conservation                     : yes
+  Screen output iterations                   : 10
+  File output iterations                     : 10
+  Initial solution file type                 : ascii
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : text
+  Overwrite solution file                    : no
+  Physical model                             : linear-advection-diffusion-reaction
+Partitioning domain.
+Allocating data arrays.
+Reading array from ASCII file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  4.9005938196344800E-17
+Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+2 boundary condition(s) read.
+Initializing solvers.
+Reading WENO parameters from weno.inp.
+Initializing physics. Model = "linear-advection-diffusion-reaction"
+Reading physical model inputs from file "physics.inp".
+Reading advection field from advection.
+Reading array from ASCII file advection.inp (Serial mode).
+Setting up time integration.
+Solving in time (from 0 to 1000 iterations)
+Writing solution file advection_field_00000.dat.
+Writing solution file op_00000.dat.
+Iteration:      10  Time: 2.500E-02  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5828E-02    Conservation loss: 8.4134E-17
+Writing solution file advection_field_00001.dat.
+Writing solution file op_00001.dat.
+Iteration:      20  Time: 5.000E-02  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5825E-02    Conservation loss: 4.0332E-17
+Writing solution file advection_field_00002.dat.
+Writing solution file op_00002.dat.
+Iteration:      30  Time: 7.500E-02  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5819E-02    Conservation loss: 3.1659E-17
+Writing solution file advection_field_00003.dat.
+Writing solution file op_00003.dat.
+Iteration:      40  Time: 1.000E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5811E-02    Conservation loss: 1.5179E-17
+Writing solution file advection_field_00004.dat.
+Writing solution file op_00004.dat.
+Iteration:      50  Time: 1.250E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5804E-02    Conservation loss: 5.0741E-17
+Writing solution file advection_field_00005.dat.
+Writing solution file op_00005.dat.
+Iteration:      60  Time: 1.500E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5798E-02    Conservation loss: 8.0231E-17
+Writing solution file advection_field_00006.dat.
+Writing solution file op_00006.dat.
+Iteration:      70  Time: 1.750E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5793E-02    Conservation loss: 7.3726E-18
+Writing solution file advection_field_00007.dat.
+Writing solution file op_00007.dat.
+Iteration:      80  Time: 2.000E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5791E-02    Conservation loss: 8.0231E-17
+Writing solution file advection_field_00008.dat.
+Writing solution file op_00008.dat.
+Iteration:      90  Time: 2.250E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5792E-02    Conservation loss: 2.3852E-17
+Writing solution file advection_field_00009.dat.
+Writing solution file op_00009.dat.
+Iteration:     100  Time: 2.500E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5795E-02    Conservation loss: 4.6404E-17
+Writing solution file advection_field_00010.dat.
+Writing solution file op_00010.dat.
+Iteration:     110  Time: 2.750E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5801E-02    Conservation loss: 6.9823E-17
+Writing solution file advection_field_00011.dat.
+Writing solution file op_00011.dat.
+Iteration:     120  Time: 3.000E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5808E-02    Conservation loss: 4.8139E-17
+Writing solution file advection_field_00012.dat.
+Writing solution file op_00012.dat.
+Iteration:     130  Time: 3.250E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5815E-02    Conservation loss: 1.9212E-16
+Writing solution file advection_field_00013.dat.
+Writing solution file op_00013.dat.
+Iteration:     140  Time: 3.500E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5822E-02    Conservation loss: 4.5536E-17
+Writing solution file advection_field_00014.dat.
+Writing solution file op_00014.dat.
+Iteration:     150  Time: 3.750E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5827E-02    Conservation loss: 2.6021E-17
+Writing solution file advection_field_00015.dat.
+Writing solution file op_00015.dat.
+Iteration:     160  Time: 4.000E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5829E-02    Conservation loss: 1.6209E-16
+Writing solution file advection_field_00016.dat.
+Writing solution file op_00016.dat.
+Iteration:     170  Time: 4.250E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5829E-02    Conservation loss: 1.7434E-16
+Writing solution file advection_field_00017.dat.
+Writing solution file op_00017.dat.
+Iteration:     180  Time: 4.500E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5825E-02    Conservation loss: 1.0799E-16
+Writing solution file advection_field_00018.dat.
+Writing solution file op_00018.dat.
+Iteration:     190  Time: 4.750E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5820E-02    Conservation loss: 7.5894E-17
+Writing solution file advection_field_00019.dat.
+Writing solution file op_00019.dat.
+Iteration:     200  Time: 5.000E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5813E-02    Conservation loss: 7.3292E-17
+Writing solution file advection_field_00020.dat.
+Writing solution file op_00020.dat.
+Iteration:     210  Time: 5.250E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5805E-02    Conservation loss: 4.5536E-17
+Writing solution file advection_field_00021.dat.
+Writing solution file op_00021.dat.
+Iteration:     220  Time: 5.500E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5798E-02    Conservation loss: 5.5945E-17
+Writing solution file advection_field_00022.dat.
+Writing solution file op_00022.dat.
+Iteration:     230  Time: 5.750E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5793E-02    Conservation loss: 1.0105E-16
+Writing solution file advection_field_00023.dat.
+Writing solution file op_00023.dat.
+Iteration:     240  Time: 6.000E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5790E-02    Conservation loss: 8.3700E-17
+Writing solution file advection_field_00024.dat.
+Writing solution file op_00024.dat.
+Iteration:     250  Time: 6.250E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5790E-02    Conservation loss: 1.6914E-17
+Writing solution file advection_field_00025.dat.
+Writing solution file op_00025.dat.
+Iteration:     260  Time: 6.500E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5792E-02    Conservation loss: 1.0365E-16
+Writing solution file advection_field_00026.dat.
+Writing solution file op_00026.dat.
+Iteration:     270  Time: 6.750E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5798E-02    Conservation loss: 8.8037E-17
+Writing solution file advection_field_00027.dat.
+Writing solution file op_00027.dat.
+Iteration:     280  Time: 7.000E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5804E-02    Conservation loss: 4.7705E-18
+Writing solution file advection_field_00028.dat.
+Writing solution file op_00028.dat.
+Iteration:     290  Time: 7.250E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5812E-02    Conservation loss: 3.9465E-17
+Writing solution file advection_field_00029.dat.
+Writing solution file op_00029.dat.
+Iteration:     300  Time: 7.500E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5819E-02    Conservation loss: 4.3368E-19
+Writing solution file advection_field_00030.dat.
+Writing solution file op_00030.dat.
+Iteration:     310  Time: 7.750E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5825E-02    Conservation loss: 6.2884E-17
+Writing solution file advection_field_00031.dat.
+Writing solution file op_00031.dat.
+Iteration:     320  Time: 8.000E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5828E-02    Conservation loss: 7.1015E-17
+Writing solution file advection_field_00032.dat.
+Writing solution file op_00032.dat.
+Iteration:     330  Time: 8.250E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5828E-02    Conservation loss: 1.0473E-16
+Writing solution file advection_field_00033.dat.
+Writing solution file op_00033.dat.
+Iteration:     340  Time: 8.500E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5826E-02    Conservation loss: 3.4261E-17
+Writing solution file advection_field_00034.dat.
+Writing solution file op_00034.dat.
+Iteration:     350  Time: 8.750E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5821E-02    Conservation loss: 7.5894E-17
+Writing solution file advection_field_00035.dat.
+Writing solution file op_00035.dat.
+Iteration:     360  Time: 9.000E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5815E-02    Conservation loss: 1.9516E-17
+Writing solution file advection_field_00036.dat.
+Writing solution file op_00036.dat.
+Iteration:     370  Time: 9.250E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5807E-02    Conservation loss: 8.3700E-17
+Writing solution file advection_field_00037.dat.
+Writing solution file op_00037.dat.
+Iteration:     380  Time: 9.500E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5800E-02    Conservation loss: 1.0105E-16
+Writing solution file advection_field_00038.dat.
+Writing solution file op_00038.dat.
+Iteration:     390  Time: 9.750E-01  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5794E-02    Conservation loss: 7.3292E-17
+Writing solution file advection_field_00039.dat.
+Writing solution file op_00039.dat.
+Iteration:     400  Time: 1.000E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5790E-02    Conservation loss: 7.3726E-18
+Writing solution file advection_field_00040.dat.
+Writing solution file op_00040.dat.
+Iteration:     410  Time: 1.025E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5788E-02    Conservation loss: 5.5945E-17
+Writing solution file advection_field_00041.dat.
+Writing solution file op_00041.dat.
+Iteration:     420  Time: 1.050E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5790E-02    Conservation loss: 5.2475E-17
+Writing solution file advection_field_00042.dat.
+Writing solution file op_00042.dat.
+Iteration:     430  Time: 1.075E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5795E-02    Conservation loss: 5.0741E-17
+Writing solution file advection_field_00043.dat.
+Writing solution file op_00043.dat.
+Iteration:     440  Time: 1.100E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5801E-02    Conservation loss: 2.2118E-17
+Writing solution file advection_field_00044.dat.
+Writing solution file op_00044.dat.
+Iteration:     450  Time: 1.125E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5809E-02    Conservation loss: 3.7730E-17
+Writing solution file advection_field_00045.dat.
+Writing solution file op_00045.dat.
+Iteration:     460  Time: 1.150E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5816E-02    Conservation loss: 1.1146E-16
+Writing solution file advection_field_00046.dat.
+Writing solution file op_00046.dat.
+Iteration:     470  Time: 1.175E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5822E-02    Conservation loss: 2.8666E-16
+Writing solution file advection_field_00047.dat.
+Writing solution file op_00047.dat.
+Iteration:     480  Time: 1.200E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5827E-02    Conservation loss: 1.3379E-16
+Writing solution file advection_field_00048.dat.
+Writing solution file op_00048.dat.
+Iteration:     490  Time: 1.225E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5828E-02    Conservation loss: 1.4246E-16
+Writing solution file advection_field_00049.dat.
+Writing solution file op_00049.dat.
+Iteration:     500  Time: 1.250E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5827E-02    Conservation loss: 1.1623E-16
+Writing solution file advection_field_00050.dat.
+Writing solution file op_00050.dat.
+Iteration:     510  Time: 1.275E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5822E-02    Conservation loss: 1.8258E-16
+Writing solution file advection_field_00051.dat.
+Writing solution file op_00051.dat.
+Iteration:     520  Time: 1.300E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5816E-02    Conservation loss: 2.0383E-17
+Writing solution file advection_field_00052.dat.
+Writing solution file op_00052.dat.
+Iteration:     530  Time: 1.325E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5809E-02    Conservation loss: 4.3802E-17
+Writing solution file advection_field_00053.dat.
+Writing solution file op_00053.dat.
+Iteration:     540  Time: 1.350E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5801E-02    Conservation loss: 9.9313E-17
+Writing solution file advection_field_00054.dat.
+Writing solution file op_00054.dat.
+Iteration:     550  Time: 1.375E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5794E-02    Conservation loss: 7.3292E-17
+Writing solution file advection_field_00055.dat.
+Writing solution file op_00055.dat.
+Iteration:     560  Time: 1.400E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5789E-02    Conservation loss: 2.8189E-17
+Writing solution file advection_field_00056.dat.
+Writing solution file op_00056.dat.
+Iteration:     570  Time: 1.425E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5787E-02    Conservation loss: 1.7781E-17
+Writing solution file advection_field_00057.dat.
+Writing solution file op_00057.dat.
+Iteration:     580  Time: 1.450E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5788E-02    Conservation loss: 7.3726E-18
+Writing solution file advection_field_00058.dat.
+Writing solution file op_00058.dat.
+Iteration:     590  Time: 1.475E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5792E-02    Conservation loss: 7.8496E-17
+Writing solution file advection_field_00059.dat.
+Writing solution file op_00059.dat.
+Iteration:     600  Time: 1.500E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5798E-02    Conservation loss: 1.0278E-16
+Writing solution file advection_field_00060.dat.
+Writing solution file op_00060.dat.
+Iteration:     610  Time: 1.525E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5805E-02    Conservation loss: 1.2880E-16
+Writing solution file advection_field_00061.dat.
+Writing solution file op_00061.dat.
+Iteration:     620  Time: 1.550E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5813E-02    Conservation loss: 5.4210E-17
+Writing solution file advection_field_00062.dat.
+Writing solution file op_00062.dat.
+Iteration:     630  Time: 1.575E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5820E-02    Conservation loss: 1.7217E-16
+Writing solution file advection_field_00063.dat.
+Writing solution file op_00063.dat.
+Iteration:     640  Time: 1.600E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5825E-02    Conservation loss: 3.9682E-17
+Writing solution file advection_field_00064.dat.
+Writing solution file op_00064.dat.
+Iteration:     650  Time: 1.625E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5827E-02    Conservation loss: 1.1520E-16
+Writing solution file advection_field_00065.dat.
+Writing solution file op_00065.dat.
+Iteration:     660  Time: 1.650E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5827E-02    Conservation loss: 1.3444E-17
+Writing solution file advection_field_00066.dat.
+Writing solution file op_00066.dat.
+Iteration:     670  Time: 1.675E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5824E-02    Conservation loss: 2.3202E-16
+Writing solution file advection_field_00067.dat.
+Writing solution file op_00067.dat.
+Iteration:     680  Time: 1.700E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5818E-02    Conservation loss: 1.2880E-16
+Writing solution file advection_field_00068.dat.
+Writing solution file op_00068.dat.
+Iteration:     690  Time: 1.725E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5810E-02    Conservation loss: 2.2595E-16
+Writing solution file advection_field_00069.dat.
+Writing solution file op_00069.dat.
+Iteration:     700  Time: 1.750E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5802E-02    Conservation loss: 2.1554E-16
+Writing solution file advection_field_00070.dat.
+Writing solution file op_00070.dat.
+Iteration:     710  Time: 1.775E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5795E-02    Conservation loss: 1.4268E-16
+Writing solution file advection_field_00071.dat.
+Writing solution file op_00071.dat.
+Iteration:     720  Time: 1.800E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5790E-02    Conservation loss: 2.2595E-16
+Writing solution file advection_field_00072.dat.
+Writing solution file op_00072.dat.
+Iteration:     730  Time: 1.825E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5786E-02    Conservation loss: 2.0166E-16
+Writing solution file advection_field_00073.dat.
+Writing solution file op_00073.dat.
+Iteration:     740  Time: 1.850E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5786E-02    Conservation loss: 1.7391E-16
+Writing solution file advection_field_00074.dat.
+Writing solution file op_00074.dat.
+Iteration:     750  Time: 1.875E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5789E-02    Conservation loss: 1.7564E-16
+Writing solution file advection_field_00075.dat.
+Writing solution file op_00075.dat.
+Iteration:     760  Time: 1.900E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5795E-02    Conservation loss: 7.5027E-17
+Writing solution file advection_field_00076.dat.
+Writing solution file op_00076.dat.
+Iteration:     770  Time: 1.925E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5802E-02    Conservation loss: 2.6064E-16
+Writing solution file advection_field_00077.dat.
+Writing solution file op_00077.dat.
+Iteration:     780  Time: 1.950E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5810E-02    Conservation loss: 9.2374E-17
+Writing solution file advection_field_00078.dat.
+Writing solution file op_00078.dat.
+Iteration:     790  Time: 1.975E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5817E-02    Conservation loss: 3.0748E-16
+Writing solution file advection_field_00079.dat.
+Writing solution file op_00079.dat.
+Iteration:     800  Time: 2.000E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5823E-02    Conservation loss: 2.3028E-16
+Writing solution file advection_field_00080.dat.
+Writing solution file op_00080.dat.
+Iteration:     810  Time: 2.025E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5826E-02    Conservation loss: 3.2737E-16
+Writing solution file advection_field_00081.dat.
+Writing solution file op_00081.dat.
+Iteration:     820  Time: 2.050E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5827E-02    Conservation loss: 1.3921E-16
+Writing solution file advection_field_00082.dat.
+Writing solution file op_00082.dat.
+Iteration:     830  Time: 2.075E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5824E-02    Conservation loss: 1.4311E-16
+Writing solution file advection_field_00083.dat.
+Writing solution file op_00083.dat.
+Iteration:     840  Time: 2.100E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5819E-02    Conservation loss: 2.7972E-16
+Writing solution file advection_field_00084.dat.
+Writing solution file op_00084.dat.
+Iteration:     850  Time: 2.125E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5812E-02    Conservation loss: 2.1207E-16
+Writing solution file advection_field_00085.dat.
+Writing solution file op_00085.dat.
+Iteration:     860  Time: 2.150E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5804E-02    Conservation loss: 1.3227E-16
+Writing solution file advection_field_00086.dat.
+Writing solution file op_00086.dat.
+Iteration:     870  Time: 2.175E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5796E-02    Conservation loss: 1.4789E-16
+Writing solution file advection_field_00087.dat.
+Writing solution file op_00087.dat.
+Iteration:     880  Time: 2.200E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5790E-02    Conservation loss: 1.4962E-16
+Writing solution file advection_field_00088.dat.
+Writing solution file op_00088.dat.
+Iteration:     890  Time: 2.225E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5786E-02    Conservation loss: 2.3636E-16
+Writing solution file advection_field_00089.dat.
+Writing solution file op_00089.dat.
+Iteration:     900  Time: 2.250E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5785E-02    Conservation loss: 1.2186E-16
+Writing solution file advection_field_00090.dat.
+Writing solution file op_00090.dat.
+Iteration:     910  Time: 2.275E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5787E-02    Conservation loss: 2.3289E-16
+Writing solution file advection_field_00091.dat.
+Writing solution file op_00091.dat.
+Iteration:     920  Time: 2.300E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5792E-02    Conservation loss: 2.2595E-16
+Writing solution file advection_field_00092.dat.
+Writing solution file op_00092.dat.
+Iteration:     930  Time: 2.325E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5798E-02    Conservation loss: 1.8258E-16
+Writing solution file advection_field_00093.dat.
+Writing solution file op_00093.dat.
+Iteration:     940  Time: 2.350E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5806E-02    Conservation loss: 2.1554E-16
+Writing solution file advection_field_00094.dat.
+Writing solution file op_00094.dat.
+Iteration:     950  Time: 2.375E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5814E-02    Conservation loss: 1.4875E-16
+Writing solution file advection_field_00095.dat.
+Writing solution file op_00095.dat.
+Iteration:     960  Time: 2.400E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5821E-02    Conservation loss: 3.1398E-16
+Writing solution file advection_field_00096.dat.
+Writing solution file op_00096.dat.
+Iteration:     970  Time: 2.425E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5825E-02    Conservation loss: 2.6064E-16
+Writing solution file advection_field_00097.dat.
+Writing solution file op_00097.dat.
+Iteration:     980  Time: 2.450E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5827E-02    Conservation loss: 2.1576E-16
+Writing solution file advection_field_00098.dat.
+Writing solution file op_00098.dat.
+Iteration:     990  Time: 2.475E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5825E-02    Conservation loss: 2.1250E-16
+Writing solution file advection_field_00099.dat.
+Writing solution file op_00099.dat.
+Iteration:    1000  Time: 2.500E+00  Max CFL: 3.000E-01  Max Diff. No.: 0.000E+00  Norm: 1.5820E-02    Conservation loss: 1.5049E-16
+Writing solution file advection_field_00100.dat.
+Writing solution file op_00100.dat.
+Completed time integration (Final time: 2.500000).
+Computed errors for domain 0:
+  L1         Error           : 0.0000000000000000E+00
+  L2         Error           : 0.0000000000000000E+00
+  Linfinity  Error           : 0.0000000000000000E+00
+Conservation Errors:
+	1.5048726154098802E-16
+
+Solver runtime (in seconds): 1.4122250000000001E+00
+Total  runtime (in seconds): 1.4212039999999999E+00
+Deallocating arrays.
+Finished.

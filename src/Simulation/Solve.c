@@ -9,11 +9,15 @@
 #include <common.h>
 #include <io.h>
 #include <timeintegration.h>
-#include <simulation.h>
+#include <mpivars.h>
+#include <simulation_object.h>
 
 #ifdef compute_rhs_operators
 int ComputeRHSOperators(void*,void*,double);
 #endif
+
+int CalculateError (void*,void*); /*!< Calculate the error in the final solution */
+int OutputSolution (void*,int);   /*!< Write solutions to file */
 
 /*! This function integrates the semi-discrete ODE (obtained from discretizing the 
     PDE in space) using natively implemented time integration methods. It initializes 
@@ -31,6 +35,16 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   int ns;
   int tic     = 0;
   _DECLARE_IERR_;
+
+  /* make sure none of the simulation objects sent in the array 
+   * are "barebones" type */
+  for (ns = 0; ns < nsims; ns++) {
+    if (sim[ns].is_barebones == 1) {
+      fprintf(stderr, "Error in Solve(): simulation object %d on rank %d is barebones!\n",
+              ns, rank );
+      return 1;
+    }
+  }
 
   /* write out iblank to file for visualization */
   for (ns = 0; ns < nsims; ns++) {

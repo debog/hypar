@@ -21,10 +21,9 @@ clear
 root_dir=$PWD
 
 # HyPar location 
-hypar_dir="/home/ghosh5/Codes/hypar"
+hypar_dir="/home/ghosh/Codes/hypar"
 # other HyPar-related stuff
 hypar_exec="HyPar"
-hypar_compile_log_file="compile_hypar.log"
 
 #export env vars for other scripts to run HyPar
 export HYPAR_EXEC_W_PATH="${hypar_dir}/bin/${hypar_exec}"
@@ -131,17 +130,27 @@ for f in *; do
         echo "  $F" >> $report_file
         result=$(diff $F $root_dir/$hypar_baselines_dir/$f/$F 2>&1 >> $diff_file)
         if [ -z "$result" ]; then
-          ((n_pass+=1))
-          echo "                        **passed**" 
-          echo "                        **passed**" >> $report_file
+          if [ -s "$diff_file" ]; then
+            ((n_fail+=1))
+            echo "                        **DIFFERENCES FOUND**"
+            echo "                        **DIFFERENCES FOUND**" >> $report_file
+            echo "        check"
+            echo "          $root_dir/$test_dirname/$f/$diff_file"
+            echo "        check" >> $report_file
+            echo "          $root_dir/$test_dirname/$f/$diff_file" >> $report_file
+            echo " "
+          else
+            ((n_pass+=1))
+            echo "                        **passed**" 
+            echo "                        **passed**" >> $report_file
+          fi
         else
           ((n_fail+=1))
           echo $result >> $report_file
-          echo "                        **DIFFERENCES FOUND**"
+          echo "                        **FILE COMPARISON FAILED**"
+          echo "                        **FILE COMPARISON FAILED**" >> $report_file
           echo "        check"
           echo "          $report_file"
-          echo "        or"
-          echo "          $root_dir/$test_dirname/$f/$diff_file"
           echo " "
         fi
       done <./$diff_filelistname

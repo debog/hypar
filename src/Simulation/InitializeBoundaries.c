@@ -10,7 +10,8 @@
 #include <common.h>
 #include <mathfunctions.h>
 #include <boundaryconditions.h>
-#include <simulation.h>
+#include <mpivars.h>
+#include <simulation_object.h>
 
 static int CalculateLocalExtent(void*,void*);
 

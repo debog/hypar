@@ -1,11 +1,17 @@
 -------------------------------
-    MATLAB SCRIPTS
-------------------------------
+    BASH & MATLAB SCRIPTS
+-------------------------------
 
-This folder has some MATLAB scripts which can be used to 
+This folder has some bash and MATLAB scripts which can be used to 
 quickly test convergence and errors of numerical schemes.
 
-+ Scripts named 'ConvergenceSpace_xxx.m' test the convergence
++ Bash scripts names 'convergence_space_xxx.sh' test the convergence
+  properties of the spatial discretization operator for a smooth
+  solution of the physical model 'xxx'. The first few lines of the 
+  script has several tunable parameters; please set them to 
+  appropriate values.
+
++ MATLAB scripts named 'ConvergenceSpace_xxx.m' test the convergence
   properties of the spatial discretization operator for a smooth
   solution of physical model 'xxx'.
 

@@ -8,7 +8,8 @@
 #include <string.h>
 #include <basic.h>
 #include <timeintegration.h>
-#include <simulation.h>
+#include <mpivars.h>
+#include <simulation_object.h>
 
 /*! Read the simulation inputs from the file \b solver.inp. 
     Rank 0 reads in the inputs and broadcasts them to all the
@@ -29,7 +30,7 @@
     ndims              | int          | #HyPar::ndims                 | 1
     nvars              | int          | #HyPar::nvars                 | 1
     size               | int[ndims]   | #HyPar::dim_global            | must be specified
-    iproc              | int[ndims]   | #MPIVariables::iproc          | must be specified
+    iproc              | int[ndims]   | #MPIVariables::iproc          | must be specified (see notes below)
     ghost              | int          | #HyPar::ghosts                | 1
     n_iter             | int          | #HyPar::n_iter                | 0
     restart_iter       | int          | #HyPar::restart_iter          | 0
@@ -53,7 +54,8 @@
     immersed_body      | char[]       | #HyPar::ib_filename           | "none"
 
     \b Notes:
-    + "ndims" \b must be specified \b before "size" and "iproc".
+    + "ndims" \b must be specified \b before "size".
+    + the input "iproc" is ignored when running a sparse grids simulation.
     + if "input_mode" or "output_mode" are set to "parallel" or "mpi-io",
       the number of I/O ranks must be specified right after as an integer.
       For example:
@@ -410,82 +412,6 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
         return(1);
       }
     }
-
-    /* Print to screen the inputs read */
-    printf("  No. of dimensions                          : %d\n",sim[0].solver.ndims);
-    printf("  No. of variables                           : %d\n",sim[0].solver.nvars);
-    if (nsims > 1) {
-      int n;
-      printf("  Domain sizes:\n");
-      for (int n = 0; n < nsims; n++) {
-        printf("    domain %3d - ", n);
-        int i;
-        for (i=0; i<sim[n].solver.ndims; i++) printf ("%d ",sim[n].solver.dim_global[i]);
-        printf("\n");
-      }
-#ifndef serial
-	    printf("  Processes along each dimension:\n");
-      for (int n = 0; n < nsims; n++) {
-        printf("    domain %3d - ", n);
-        int i;
-        for (i=0; i<sim[n].solver.ndims; i++) printf ("%d ",sim[n].mpi.iproc[i]);
-        printf("\n");
-      }
-#endif
-    } else {
-	    printf("  Domain size                                : ");
-      int i;
-      for (i=0; i<sim[0].solver.ndims; i++) printf ("%d ",sim[0].solver.dim_global[i]);
-      printf("\n");
-#ifndef serial
-	    printf("  Processes along each dimension             : ");
-      for (i=0; i<sim[0].solver.ndims; i++) printf ("%d ",sim[0].mpi.iproc[i]);
-      printf("\n");
-#endif
-    }
-	  printf("  No. of ghosts pts                          : %d\n"     ,sim[0].solver.ghosts              );
-	  printf("  No. of iter.                               : %d\n"     ,sim[0].solver.n_iter              );
-	  printf("  Restart iteration                          : %d\n"     ,sim[0].solver.restart_iter        );
-#ifdef with_petsc
-    if (sim[0].solver.use_petscTS)
-      printf("  Time integration scheme                    : PETSc \n"                            );
-    else {
-      printf("  Time integration scheme                    : %s ",sim[0].solver.time_scheme             );
-      if (strcmp(sim[0].solver.time_scheme,_FORWARD_EULER_)) {
-        printf("(%s)",sim[0].solver.time_scheme_type                                                    );
-      }
-      printf("\n");
-    }
-#else
-    printf("  Time integration scheme                    : %s ",sim[0].solver.time_scheme               );
-    if (strcmp(sim[0].solver.time_scheme,_FORWARD_EULER_)) {
-      printf("(%s)",sim[0].solver.time_scheme_type                                                      );
-    }
-    printf("\n");
-#endif
-    printf("  Spatial discretization scheme (hyperbolic) : %s\n"     ,sim[0].solver.spatial_scheme_hyp  );
-    printf("  Split hyperbolic flux term?                : %s\n"     ,sim[0].solver.SplitHyperbolicFlux );
-    printf("  Interpolation type for hyperbolic term     : %s\n"     ,sim[0].solver.interp_type         );
-    printf("  Spatial discretization type   (parabolic ) : %s\n"     ,sim[0].solver.spatial_type_par    );
-    printf("  Spatial discretization scheme (parabolic ) : %s\n"     ,sim[0].solver.spatial_scheme_par  );
-    printf("  Time Step                                  : %E\n"     ,sim[0].solver.dt                  );
-    printf("  Check for conservation                     : %s\n"     ,sim[0].solver.ConservationCheck   );
-    printf("  Screen output iterations                   : %d\n"     ,sim[0].solver.screen_op_iter      );
-    printf("  File output iterations                     : %d\n"     ,sim[0].solver.file_op_iter        );
-    printf("  Initial solution file type                 : %s\n"     ,sim[0].solver.ip_file_type        );
-    printf("  Initial solution read mode                 : %s"       ,sim[0].solver.input_mode          );
-    if (strcmp(sim[0].solver.input_mode,"serial"))    printf("  [%d file IO rank(s)]\n",sim[0].mpi.N_IORanks  );
-    else                                        printf("\n");
-    printf("  Solution file write mode                   : %s"       ,sim[0].solver.output_mode         );
-    if (strcmp(sim[0].solver.output_mode,"serial"))   printf("  [%d file IO rank(s)]\n",sim[0].mpi.N_IORanks  );
-    else                                        printf("\n");
-    printf("  Solution file format                       : %s\n"     ,sim[0].solver.op_file_format      );
-    printf("  Overwrite solution file                    : %s\n"     ,sim[0].solver.op_overwrite        );
-    printf("  Physical model                             : %s\n"     ,sim[0].solver.model               );
-    if (sim[0].solver.flag_ib) {
-      printf("  Immersed Body                              : %s\n"     ,sim[0].solver.ib_filename         );
-    }
-    
   }
 
 #ifndef serial

@@ -1,0 +1,77 @@
+HyPar - Parallel (MPI) version with 4 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 1
+  Domain size                                : 64 64 
+  Processes along each dimension             : 2 2 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 16
+  Restart iteration                          : 0
+  Time integration scheme                    : rk (44)
+  Spatial discretization scheme (hyperbolic) : crweno5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : characteristic
+  Spatial discretization type   (parabolic ) : nonconservative-1stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 1.000000E-01
+  Check for conservation                     : yes
+  Screen output iterations                   : 1
+  File output iterations                     : 4
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : tecplot2d
+  Overwrite solution file                    : no
+  Physical model                             : burgers
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  1.7347234759768071E-18
+Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+Reading WENO parameters from weno.inp.
+Initializing physics. Model = "burgers"
+Reading physical model inputs from file "physics.inp".
+Setting up time integration.
+Solving in time (from 0 to 16 iterations)
+Writing solution file op_00000.dat.
+Iteration:       1  Time: 1.000E-01  Max CFL: 5.093E-01  Max Diff. No.: -1.000E+00  Norm: 1.2181E-03    Conservation loss: 3.4694E-18
+Iteration:       2  Time: 2.000E-01  Max CFL: 5.081E-01  Max Diff. No.: -1.000E+00  Norm: 1.2201E-03    Conservation loss: 8.6736E-18
+Iteration:       3  Time: 3.000E-01  Max CFL: 5.093E-01  Max Diff. No.: -1.000E+00  Norm: 1.2242E-03    Conservation loss: 6.9389E-18
+Iteration:       4  Time: 4.000E-01  Max CFL: 5.082E-01  Max Diff. No.: -1.000E+00  Norm: 1.2305E-03    Conservation loss: 1.2143E-17
+Writing solution file op_00001.dat.
+Iteration:       5  Time: 5.000E-01  Max CFL: 5.093E-01  Max Diff. No.: -1.000E+00  Norm: 1.2390E-03    Conservation loss: 8.6736E-18
+Iteration:       6  Time: 6.000E-01  Max CFL: 5.083E-01  Max Diff. No.: -1.000E+00  Norm: 1.2500E-03    Conservation loss: 1.5612E-17
+Iteration:       7  Time: 7.000E-01  Max CFL: 5.093E-01  Max Diff. No.: -1.000E+00  Norm: 1.2636E-03    Conservation loss: 1.7347E-18
+Iteration:       8  Time: 8.000E-01  Max CFL: 5.083E-01  Max Diff. No.: -1.000E+00  Norm: 1.2803E-03    Conservation loss: 3.4694E-18
+Writing solution file op_00002.dat.
+Iteration:       9  Time: 9.000E-01  Max CFL: 5.093E-01  Max Diff. No.: -1.000E+00  Norm: 1.3003E-03    Conservation loss: 6.9388E-18
+Iteration:      10  Time: 1.000E+00  Max CFL: 5.084E-01  Max Diff. No.: -1.000E+00  Norm: 1.3244E-03    Conservation loss: 6.9390E-18
+Iteration:      11  Time: 1.100E+00  Max CFL: 5.093E-01  Max Diff. No.: -1.000E+00  Norm: 1.3532E-03    Conservation loss: 3.9899E-17
+Iteration:      12  Time: 1.200E+00  Max CFL: 5.085E-01  Max Diff. No.: -1.000E+00  Norm: 1.3877E-03    Conservation loss: 1.3878E-17
+Writing solution file op_00003.dat.
+Iteration:      13  Time: 1.300E+00  Max CFL: 5.092E-01  Max Diff. No.: -1.000E+00  Norm: 1.4294E-03    Conservation loss: 1.3878E-17
+Iteration:      14  Time: 1.400E+00  Max CFL: 5.086E-01  Max Diff. No.: -1.000E+00  Norm: 1.4802E-03    Conservation loss: 1.7347E-18
+Iteration:      15  Time: 1.500E+00  Max CFL: 5.092E-01  Max Diff. No.: -1.000E+00  Norm: 1.5423E-03    Conservation loss: 4.6322E-22
+Iteration:      16  Time: 1.600E+00  Max CFL: 5.086E-01  Max Diff. No.: -1.000E+00  Norm: 1.6190E-03    Conservation loss: 1.5613E-17
+Writing solution file op_00004.dat.
+Completed time integration (Final time: 1.600000).
+Reading array from binary file exact.inp (Serial mode).
+Computed errors for domain 0:
+  L1         Error           : 9.1090712454551764E-04
+  L2         Error           : 3.0493530313174199E-03
+  Linfinity  Error           : 1.6532534290490630E-02
+Conservation Errors:
+	1.5612974504934294E-17
+
+Solver runtime (in seconds): 2.2016900000000000E-01
+Total  runtime (in seconds): 2.3717800000000000E-01
+Deallocating arrays.
+Finished.

@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
 */
 
+#ifndef _BC_H_
+#define _BC_H_
+
 #include <basic.h>
 
 /*! Periodic boundary conditions \sa #BCPeriodicU */
@@ -152,3 +155,5 @@ int BCSpongeUDummy        (void*,void*,int,int,int*,int,double*,double);
 int BCReadTemperatureData(void*,void*,int,int,int*);
 /*! Function to read in unsteady boundary data for turbulent inflow */
 int BCReadTurbulentInflowData(void*,void*,int,int,int*);
+
+#endif

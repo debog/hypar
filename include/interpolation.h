@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
 */
 
+#ifndef _INTERP_H_
+#define _INTERP_H_
+
 #include "basic.h"
 
 /*! First order upwind scheme: Interp1PrimFirstOrderUpwind(), Interp1PrimFirstOrderUpwindChar() */
@@ -446,3 +449,5 @@ typedef struct compact_scheme {
 int CompactSchemeInitialize(void*,void*,char*); 
 /*! Clean up the structure containing variables and parameters for compact schemes */
 int CompactSchemeCleanup(void*);
+
+#endif

@@ -191,7 +191,13 @@ int ReadArraySerial(
         /* read grid */
         offset = 0;
         for (d = 0; d < ndims; d++) {
-          for (i = 0; i < dim_global[d]; i++) ferr = fscanf(in,"%lf",&xg[i+offset]);
+          for (i = 0; i < dim_global[d]; i++) {
+            ferr = fscanf(in,"%lf",&xg[i+offset]);
+            if (ferr != 1) {
+              printf("Error in ReadArraySerial(): unable to read data. ferr=%d\n", ferr);
+              exit(1);
+            }
+          }
           offset += dim_global[d];
         }
 
@@ -201,7 +207,10 @@ int ReadArraySerial(
           while (!done) {
             int p; _ArrayIndex1D_(ndims,dim_global,index,0,p);
             ferr = fscanf(in,"%lf",&ug[p*nvars+i]);
-            if (ferr != 1) return(1);
+            if (ferr != 1) {
+              printf("Error in ReadArraySerial(): unable to read data. ferr=%d\n", ferr);
+              exit(1);
+            }
             _ArrayIncrementIndex_(ndims,dim_global,index,done);
           }
         }

@@ -3,6 +3,9 @@
     @author Debojyoti Ghosh
 */
 
+#ifndef _TRIDIAGLU_H_
+#define _TRIDIAGLU_H_
+
 /* 
 
   Parallel direct solver for tridiagonal systems 
@@ -120,4 +123,6 @@ int blocktridiagIterJacobi (double*,double*,double*,double*,int,int,int,void*,vo
 #ifdef with_scalapack
 /* ScaLAPACK interface */
 int tridiagScaLPK     (double*,double*,double*,double*,int,int,void*,void*);
+#endif
+
 #endif

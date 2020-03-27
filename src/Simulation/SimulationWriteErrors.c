@@ -9,7 +9,8 @@
 #include <string.h>
 #include <basic.h>
 #include <common.h>
-#include <simulation.h>
+#include <mpivars.h>
+#include <simulation_object.h>
 
 /*! Writes out the errors and other data for each simulation.
 */
@@ -89,13 +90,17 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
       fclose(out);
 
       /* print solution errors, conservation errors, and wall times to screen */
-      printf("Computed errors for domain %d:\n", n);
-      printf("  L1         Error           : %1.16E\n",sim[n].solver.error[0]);
-      printf("  L2         Error           : %1.16E\n",sim[n].solver.error[1]);
-      printf("  Linfinity  Error           : %1.16E\n",sim[n].solver.error[2]);
-      printf("Conservation Errors:\n");
-      for (d=0; d<sim[n].solver.nvars; d++) printf("\t%1.16E\n",sim[n].solver.ConservationError[d]);
-      printf("\n");
+      if (sim[n].solver.error[0] >= 0) {
+        printf("Computed errors for domain %d:\n", n);
+        printf("  L1         Error           : %1.16E\n",sim[n].solver.error[0]);
+        printf("  L2         Error           : %1.16E\n",sim[n].solver.error[1]);
+        printf("  Linfinity  Error           : %1.16E\n",sim[n].solver.error[2]);
+      }
+      if (!strcmp(sim[n].solver.ConservationCheck,"yes")) {
+        printf("Conservation Errors:\n");
+        for (d=0; d<sim[n].solver.nvars; d++) printf("\t%1.16E\n",sim[n].solver.ConservationError[d]);
+        printf("\n");
+      }
 
     }
 

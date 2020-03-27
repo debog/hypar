@@ -9,7 +9,8 @@
 #include <basic.h>
 #include <bandedmatrix.h>
 #include <interpolation.h>
-#include <simulation.h>
+#include <mpivars.h>
+#include <simulation_object.h>
 
 /* include header files for each physical model */
 #include <physicalmodels/linearadr.h>
@@ -42,15 +43,16 @@ int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #Si
   int ns;
   _DECLARE_IERR_;
 
+  if (nsims == 0) return 0;
+
+  if (!sim[0].mpi.rank) {
+    printf("Initializing physics. Model = \"%s\"\n",sim[0].solver.model);
+  }
+
   for (ns = 0; ns < nsims; ns++) {
 
     HyPar        *solver   = &(sim[ns].solver);
     MPIVariables *mpi      = &(sim[ns].mpi);
-
-    if (!mpi->rank) {
-      if (nsims == 1) printf("Initializing physics. Model = \"%s\"\n",solver->model);
-      else            printf("Initializing physics for domain %d. Model = \"%s\"\n",ns,solver->model);
-    }
 
     /* Initialize physics-specific functions to NULL */
     solver->ComputeCFL            = NULL;

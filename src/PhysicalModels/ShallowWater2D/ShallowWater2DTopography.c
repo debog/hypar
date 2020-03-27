@@ -51,9 +51,9 @@ int ShallowWater2DTopography(
     for (d = 0; d < _MODEL_NDIMS_; d++) {
       if (mpi->iproc[d] == 1) {
         _ArrayCopy1D_(dim,bounds,_MODEL_NDIMS_); bounds[d] = ghosts;
-        _ArraySetValue_(offset,_MODEL_NDIMS_,0); offset[d] = -ghosts;
         /* left boundary */
         done = 0; _ArraySetValue_(indexb,_MODEL_NDIMS_,0);
+        _ArraySetValue_(offset,_MODEL_NDIMS_,0); offset[d] = -ghosts;
         while (!done) {
           _ArrayCopy1D_(indexb,indexi,_MODEL_NDIMS_); indexi[d] = indexb[d] + dim[d] - ghosts;
           int p1; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,indexb,offset,ghosts,p1);
@@ -63,6 +63,7 @@ int ShallowWater2DTopography(
         }
         /* right boundary */
         done = 0; _ArraySetValue_(indexb,_MODEL_NDIMS_,0);
+        _ArraySetValue_(offset,_MODEL_NDIMS_,0); offset[d] = dim[d];
         while (!done) {
           _ArrayCopy1D_(indexb,indexi,_MODEL_NDIMS_);
           int p1; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,indexb,offset,ghosts,p1);
