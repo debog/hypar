@@ -118,17 +118,15 @@ static int VlasovAdvectionSelfConsistent( double *f,   /*!< Array to hold the co
 {
   HyPar        *solver = (HyPar*)         s;
   Vlasov       *param  = (Vlasov*)        solver->physics;
-  MPIVariables *mpi    = (MPIVariables *) param->m;
 
 #ifndef fftw
 
-  if (!mpi->rank) {
-    fprintf(stderr, "Error in VlasovAdvectionSelfConsistent():\n");
-    fprintf(stderr, "  Using a self-consistent electric field requires FFTW.\n");
-  }
+  fprintf(stderr,"Error in VlasovAdvectionSelfConsistent():\n");
+  fprintf(stderr,"  Using a self-consistent electric field requires FFTW.\n");
   exit(1);
 
 #else
+  MPIVariables *mpi    = (MPIVariables *) param->m;
 
   int *dim    = solver->dim_local;
   int  N      = solver->dim_global[0];

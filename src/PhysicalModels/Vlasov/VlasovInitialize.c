@@ -17,10 +17,13 @@
 #include <fftw3-mpi.h>
 #endif
 
+/*! Compute the maximum CFL number */
 double VlasovComputeCFL (void*,void*,double,double);
-int    VlasovAdvection  (double*,double*,int,void*,double);
-int    VlasovUpwind     (double*,double*,double*,double*,
-                         double*,double*,int,void*,double);
+/*! Compute the advection term */
+int VlasovAdvection (double*,double*,int,void*,double);
+/*! Compute the upwind flux at interfaces */
+int VlasovUpwind (double*,double*,double*,double*,
+                  double*,double*,int,void*,double);
 
 /*! Initialize the Vlasov physics module - 
     allocate and set physics-related parameters, read physics-related inputs
@@ -93,63 +96,71 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
     return(1);
   }
 
-#ifdef fftw
-  /* If using FFTW, make sure MPI is enabled
-     Currently we only support the distrubuted memory version
-  */
-#ifdef serial
-  if (!mpi->rank) {
-    fprintf(stderr,"Error in VlasovInitialize: Using FFTW requires MPI to be enabled.\n");
-  }
-  return(1);
-#endif
-
-  /* Put the mpi object in the params for access in other functions */
-  physics->m = m;
-
-  /* Create a scratch buffer for moving between real and complex values */
-  physics->sum_buffer = (double*) calloc(dim_local[0], sizeof(double));
-
-  /* Create a buffer to hold the electric field and do halo exchange */
-  physics->field = (double*) calloc(dim_local[0] + 2*ghosts, sizeof(double));
-
-  /* Initialize FFTW and set up data buffers used for the transforms */
-  fftw_mpi_init();
-  physics->alloc_local = fftw_mpi_local_size_1d(dim[0], mpi->comm[0],
-                                                FFTW_FORWARD, 0,
-                                                &physics->local_ni,
-                                                &physics->local_i_start,
-                                                &physics->local_no,
-                                                &physics->local_o_start);
-  if (dim_local[0] != physics->local_ni) {
-    fprintf(stderr,"Error in VlasovInitialize:  The FFTW data distribution is incompatible with the HyPar one.\n");
-    fprintf(stderr,"Decompose the spatial dimension so that the degrees of freedom are evenly divided.\n");
-    return(1);
-  }
-
-  physics->phys_buffer = fftw_alloc_complex(physics->alloc_local);
-  physics->fourier_buffer = fftw_alloc_complex(physics->alloc_local);
-
-  physics->plan_forward = fftw_mpi_plan_dft_1d(dim[0],
-                                               physics->phys_buffer,
-                                               physics->fourier_buffer,
-                                               mpi->comm[0],
-                                               FFTW_FORWARD,
-                                               FFTW_ESTIMATE);
-
-  physics->plan_backward = fftw_mpi_plan_dft_1d(dim[0],
-                                                physics->fourier_buffer,
-                                                physics->phys_buffer,
-                                                mpi->comm[0],
-                                                FFTW_BACKWARD,
-                                                FFTW_ESTIMATE);
-#endif
-
 #ifndef serial
   /* Broadcast parsed problem data */
   IERR MPIBroadcast_integer((int *) &physics->self_consistent_electric_field,
                             1,0,&mpi->world); CHECKERR(ierr);
 #endif
+
+  if (physics->self_consistent_electric_field) {
+#ifdef fftw
+    /* If using FFTW, make sure MPI is enabled
+       Currently we only support the distrubuted memory version
+    */
+#ifdef serial
+    if (!mpi->rank) {
+      fprintf(stderr,"Error in VlasovInitialize: Using FFTW requires MPI to be enabled.\n");
+    }
+    return(1);
+#endif
+
+    /* Put the mpi object in the params for access in other functions */
+    physics->m = m;
+  
+    /* Create a scratch buffer for moving between real and complex values */
+    physics->sum_buffer = (double*) calloc(dim_local[0], sizeof(double));
+  
+    /* Create a buffer to hold the electric field and do halo exchange */
+    physics->field = (double*) calloc(dim_local[0] + 2*ghosts, sizeof(double));
+  
+    /* Initialize FFTW and set up data buffers used for the transforms */
+    fftw_mpi_init();
+    physics->alloc_local = fftw_mpi_local_size_1d(dim[0], mpi->comm[0],
+                                                  FFTW_FORWARD, 0,
+                                                  &physics->local_ni,
+                                                  &physics->local_i_start,
+                                                  &physics->local_no,
+                                                  &physics->local_o_start);
+    if (dim_local[0] != physics->local_ni) {
+      fprintf(stderr,"Error in VlasovInitialize:  The FFTW data distribution is incompatible with the HyPar one.\n");
+      fprintf(stderr,"Decompose the spatial dimension so that the degrees of freedom are evenly divided.\n");
+      return(1);
+    }
+  
+    physics->phys_buffer = fftw_alloc_complex(physics->alloc_local);
+    physics->fourier_buffer = fftw_alloc_complex(physics->alloc_local);
+  
+    physics->plan_forward = fftw_mpi_plan_dft_1d(dim[0],
+                                                 physics->phys_buffer,
+                                                 physics->fourier_buffer,
+                                                 mpi->comm[0],
+                                                 FFTW_FORWARD,
+                                                 FFTW_ESTIMATE);
+  
+    physics->plan_backward = fftw_mpi_plan_dft_1d(dim[0],
+                                                  physics->fourier_buffer,
+                                                  physics->phys_buffer,
+                                                  mpi->comm[0],
+                                                  FFTW_BACKWARD,
+                                                  FFTW_ESTIMATE);
+#else
+  if (!mpi->rank) {
+    fprintf(stderr,"Error in VlasovInitialize():\n");
+    fprintf(stderr,"  Self-consistent electric field requires FFTW library.\n");
+  }
+  return(1);
+#endif
+  }
 
   /* initializing physical model-specific functions */
   solver->ComputeCFL = VlasovComputeCFL;

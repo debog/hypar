@@ -55,18 +55,27 @@ typedef struct vlasov_parameters {
   /*! Use a self-consistent electric field? Requires FFTW library */
   bool self_consistent_electric_field;
 
+#ifdef fftw
   /*! Pointer to MPI object of type #MPIVariables */
   void  *m;
 
-#ifdef fftw
+  /*! Buffer sum */
   double *sum_buffer;
+  /*! */
   double *field;
+  /*! Forward FFT plan */
   fftw_plan plan_forward;
+  /*! Backward FFT plan */
   fftw_plan plan_backward;
+  /*! buffer */
   fftw_complex *phys_buffer;
+  /*! buffer */
   fftw_complex *fourier_buffer;
+  /*! */
   ptrdiff_t alloc_local;
+  /*! */
   ptrdiff_t local_ni, local_i_start;
+  /*! */
   ptrdiff_t local_no, local_o_start;
 #endif
 
