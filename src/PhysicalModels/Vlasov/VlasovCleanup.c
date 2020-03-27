@@ -1,5 +1,5 @@
 /*! @file VlasovCleanup.c
-    @author Some Dumb Guy
+    @author John Loffeld
     @brief Contains the function to clean up the Vlasov physics module
 */
 

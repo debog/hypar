@@ -28,10 +28,11 @@ Reference:
 
 
 typedef struct vlasov_parameters {
+
   bool self_consistent_electric_field;
+  void  *m;
 
 #ifdef fftw
-  void  *m;
   double *sum_buffer;
   double *field;
   fftw_plan plan_forward;

@@ -1,5 +1,5 @@
 /*! @file VlasovInitialize.c
-    @author Some Dumb Guy
+    @author John Loffeld
     @brief Initialize the Vlasov module
 */
 

@@ -1,5 +1,5 @@
 /*! @file VlasovUpwind.c
-    @author Some Dumb Guy
+    @author John Loffeld
     @brief Contains functions to compute the upwind flux at grid interfaces for the Vlasov equations.
 */
 
@@ -58,9 +58,11 @@ int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
         _GetCoordinate_(1,indexR[1],dim,ghosts,solver->x,eigR);
       } else {
         if (self_consistent_electric_field) {
+#ifdef fftw
           /* assumes field has been calculated just prior in VlasovAdvection */
           eigL = field[indexL[0]];
           eigR = field[indexR[0]];
+#endif
         } else {
           /* Prescribed electric field is the HyPar "velocity" */
           double xL, xR;

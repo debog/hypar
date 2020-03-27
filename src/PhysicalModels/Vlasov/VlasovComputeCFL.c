@@ -1,5 +1,5 @@
 /*! @file VlasovComputeCFL.c
-    @author Debojyoti Ghosh
+    @author John Loffeld
     @brief Contains the function to compute maximum CFL over the domain for the Vlasov equations.
 */
 
@@ -53,8 +53,10 @@ double VlasovComputeCFL( void    *s, /*!< Solver object of type #HyPar */
         _GetCoordinate_(1,index[1],dim,ghosts,solver->x,eig);
       } else {
         if (self_consistent_electric_field) {
+#ifdef fftw
           /* assumes field has been calculated just prior in VlasovAdvection */
           eig = field[index[0]];
+#endif
         } else {
           /* Prescribed electric field is the velocity */
           double x;

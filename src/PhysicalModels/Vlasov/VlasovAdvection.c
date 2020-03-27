@@ -1,5 +1,5 @@
 /*! @file VlasovAdvection.c
-    @author Some Dumb Guy
+    @author John Loffeld
     @brief Contains the function to compute the hyperbolic flux for the Vlasov equations over the domain.
 */
 
@@ -121,12 +121,14 @@ static int VlasovAdvectionSelfConsistent( double *f,   /*!< Array to hold the co
   MPIVariables *mpi    = (MPIVariables *) param->m;
 
 #ifndef fftw
+
   if (!mpi->rank) {
     fprintf(stderr, "Error in VlasovAdvectionSelfConsistent():\n");
     fprintf(stderr, "  Using a self-consistent electric field requires FFTW.\n");
   }
   exit(1);
-#endif
+
+#else
 
   int *dim    = solver->dim_local;
   int  N      = solver->dim_global[0];
@@ -257,6 +259,8 @@ static int VlasovAdvectionSelfConsistent( double *f,   /*!< Array to hold the co
       _ArrayIncrementIndex_(ndims,bounds,index,done);
     }
   }
+
+#endif
 
   return(0);
 }
