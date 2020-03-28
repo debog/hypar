@@ -125,8 +125,10 @@ fi
 if test "x$enable_fftw" = "xyes" ; then
   AC_MSG_NOTICE([Compiling with FFTW support.])
   CFLAGS="$CFLAGS -Dfftw"
+  CXXFLAGS="$CXXFLAGS -Dfftw"
   if test "x$with_fftw_dir" != "x" ; then
     CFLAGS="$CFLAGS -I$with_fftw_dir/include"
+    CXXFLAGS="$CXXFLAGS -I$with_fftw_dir/include"
     LDFLAGS="$LDFLAGS -Wl,-rpath,$with_scalapack_dir/lib -L$with_fftw_dir/lib"
   fi
   LIBS="$LIBS -lfftw3_mpi -lfftw3 -lm"
