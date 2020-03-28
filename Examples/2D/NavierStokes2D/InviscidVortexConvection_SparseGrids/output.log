@@ -1,0 +1,829 @@
+HyPar - Parallel (MPI) version with 32 processes
+Compiled with PETSc time integration.
+-- Sparse Grids Simulation --
+Sparse grids inputs:
+  log2 of minimum grid size:  3
+  interpolation order:  6
+  write sparse grids solutions?  yes
+Allocated full grid simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 4
+  Domain size                                : 256 256 
+  Processes along each dimension             : 8 4 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 800
+  Restart iteration                          : 0
+  Time integration scheme                    : rk (44)
+  Spatial discretization scheme (hyperbolic) : upw5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : components
+  Spatial discretization type   (parabolic ) : nonconservative-2stage
+  Spatial discretization scheme (parabolic ) : 4
+  Time Step                                  : 2.500000E-02
+  Check for conservation                     : yes
+  Screen output iterations                   : 10
+  File output iterations                     : 80
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : tecplot2d
+  Overwrite solution file                    : no
+  Physical model                             : navierstokes2d
+Processor distribution for full grid object:    8   4
+Initializing sparse grids...
+  Number of spatial dimensions: 2
+  Computing sparse grids dimensions...
+  Number of sparse grid domains in combination technique: 11
+  Computing processor decompositions...
+Sparse Grids: Combination technique grids sizes and coefficients are:-
+    0: dim = (  256     8 ),  coeff = +1.00e+00, iproc = (   32     1 )
+    1: dim = (  128    16 ),  coeff = +1.00e+00, iproc = (   16     2 )
+    2: dim = (   64    32 ),  coeff = +1.00e+00, iproc = (    8     4 )
+    3: dim = (   32    64 ),  coeff = +1.00e+00, iproc = (    4     8 )
+    4: dim = (   16   128 ),  coeff = +1.00e+00, iproc = (    2    16 )
+    5: dim = (    8   256 ),  coeff = +1.00e+00, iproc = (    1    32 )
+    6: dim = (  128     8 ),  coeff = -1.00e+00, iproc = (   32     1 )
+    7: dim = (   64    16 ),  coeff = -1.00e+00, iproc = (   16     2 )
+    8: dim = (   32    32 ),  coeff = -1.00e+00, iproc = (    8     4 )
+    9: dim = (   16    64 ),  coeff = -1.00e+00, iproc = (    2    16 )
+   10: dim = (    8   128 ),  coeff = -1.00e+00, iproc = (    1    32 )
+Allocating data arrays for full grid.
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  9.9980704056028827E+01
+ 1:  4.9990352267387813E+01
+ 2:  -2.3937350376260907E-07
+ 3:  2.6245709153809656E+02
+Interpolating grid coordinates to sparse grids domain 0.
+Interpolating grid coordinates to sparse grids domain 1.
+Interpolating grid coordinates to sparse grids domain 2.
+Interpolating grid coordinates to sparse grids domain 3.
+Interpolating grid coordinates to sparse grids domain 4.
+Interpolating grid coordinates to sparse grids domain 5.
+Interpolating grid coordinates to sparse grids domain 6.
+Interpolating grid coordinates to sparse grids domain 7.
+Interpolating grid coordinates to sparse grids domain 8.
+Interpolating grid coordinates to sparse grids domain 9.
+Interpolating grid coordinates to sparse grids domain 10.
+Domain 0: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 1: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 2: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 3: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 4: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 5: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 6: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 7: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 8: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 9: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 10: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+Initializing physics. Model = "navierstokes2d"
+Reading physical model inputs from file "physics.inp".
+Interpolating initial solution to sparse grids domain 0.
+  Volume integral of the initial solution on sparse grids domain 0:
+     0:  9.9980771982607934E+01
+     1:  4.9990391607657912E+01
+     2:  -2.3937205473334444E-07
+     3:  2.6245784617971401E+02
+Interpolating initial solution to sparse grids domain 1.
+  Volume integral of the initial solution on sparse grids domain 1:
+     0:  9.9980704055917187E+01
+     1:  4.9990352197094573E+01
+     2:  -2.3937354948211365E-07
+     3:  2.6245709149936698E+02
+Interpolating initial solution to sparse grids domain 2.
+  Volume integral of the initial solution on sparse grids domain 2:
+     0:  9.9980704056028671E+01
+     1:  4.9990352247317951E+01
+     2:  -2.3403495727448639E-07
+     3:  2.6245709152806205E+02
+Interpolating initial solution to sparse grids domain 3.
+  Volume integral of the initial solution on sparse grids domain 3:
+     0:  9.9980704056028685E+01
+     1:  4.9990352262049285E+01
+     2:  -2.1930360996768816E-07
+     3:  2.6245709153542776E+02
+Interpolating initial solution to sparse grids domain 4.
+  Volume integral of the initial solution on sparse grids domain 4:
+     0:  9.9980704055917187E+01
+     1:  4.9990352267332149E+01
+     2:  -1.6913597602997063E-07
+     3:  2.6245709153448581E+02
+Interpolating initial solution to sparse grids domain 5.
+  Volume integral of the initial solution on sparse grids domain 5:
+     0:  9.9980771982607934E+01
+     1:  4.9990386230676023E+01
+     2:  -5.6163539423498036E-06
+     3:  2.6245784349122300E+02
+Interpolating initial solution to sparse grids domain 6.
+  Volume integral of the initial solution on sparse grids domain 6:
+     0:  9.9980771982607948E+01
+     1:  4.9990391607657912E+01
+     2:  -2.3937205473334444E-07
+     3:  2.6245784617971401E+02
+Interpolating initial solution to sparse grids domain 7.
+  Volume integral of the initial solution on sparse grids domain 7:
+     0:  9.9980704055917187E+01
+     1:  4.9990352197094573E+01
+     2:  -2.3403498880525397E-07
+     3:  2.6245709149936704E+02
+Interpolating initial solution to sparse grids domain 8.
+  Volume integral of the initial solution on sparse grids domain 8:
+     0:  9.9980704056028657E+01
+     1:  4.9990352247317944E+01
+     2:  -2.1930361898095559E-07
+     3:  2.6245709152806228E+02
+Interpolating initial solution to sparse grids domain 9.
+  Volume integral of the initial solution on sparse grids domain 9:
+     0:  9.9980704055917201E+01
+     1:  4.9990352261993586E+01
+     2:  -1.6913597870430817E-07
+     3:  2.6245709153181656E+02
+Interpolating initial solution to sparse grids domain 10.
+  Volume integral of the initial solution on sparse grids domain 10:
+     0:  9.9980771982607948E+01
+     1:  4.9990386230676023E+01
+     2:  -5.6163539423644200E-06
+     3:  2.6245784349122300E+02
+Setting up time integration.
+Solving in time (from 0 to 800 iterations)
+Writing solution file op_sg_00_00000.dat.
+Writing solution file op_sg_01_00000.dat.
+Writing solution file op_sg_02_00000.dat.
+Writing solution file op_sg_03_00000.dat.
+Writing solution file op_sg_04_00000.dat.
+Writing solution file op_sg_05_00000.dat.
+Writing solution file op_sg_06_00000.dat.
+Writing solution file op_sg_07_00000.dat.
+Writing solution file op_sg_08_00000.dat.
+Writing solution file op_sg_09_00000.dat.
+Writing solution file op_sg_10_00000.dat.
+Writing solution file op_fg_00000.dat.
+--
+Iteration:      10,  Time: 2.500e-01
+  Max CFL: 4.014E-01,  Max Diff. No.: -1.000E+00,    Norm: 3.3049E-04
+  Conservation loss: 7.5746E-16
+--
+
+--
+Iteration:      20,  Time: 5.000e-01
+  Max CFL: 4.018E-01,  Max Diff. No.: -1.000E+00,    Norm: 3.1356E-04
+  Conservation loss: 6.0432E-16
+--
+
+--
+Iteration:      30,  Time: 7.500e-01
+  Max CFL: 4.018E-01,  Max Diff. No.: -1.000E+00,    Norm: 3.0382E-04
+  Conservation loss: 5.6672E-16
+--
+
+--
+Iteration:      40,  Time: 1.000e+00
+  Max CFL: 4.014E-01,  Max Diff. No.: -1.000E+00,    Norm: 3.0078E-04
+  Conservation loss: 7.5893E-16
+--
+
+--
+Iteration:      50,  Time: 1.250e+00
+  Max CFL: 4.009E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.9996E-04
+  Conservation loss: 8.2964E-16
+--
+
+--
+Iteration:      60,  Time: 1.500e+00
+  Max CFL: 4.003E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.9815E-04
+  Conservation loss: 7.0913E-16
+--
+
+--
+Iteration:      70,  Time: 1.750e+00
+  Max CFL: 3.997E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.9500E-04
+  Conservation loss: 9.0264E-16
+--
+
+--
+Iteration:      80,  Time: 2.000e+00
+  Max CFL: 3.990E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.9147E-04
+  Conservation loss: 9.8112E-16
+--
+
+Writing solution file op_sg_00_00001.dat.
+Writing solution file op_sg_01_00001.dat.
+Writing solution file op_sg_02_00001.dat.
+Writing solution file op_sg_03_00001.dat.
+Writing solution file op_sg_04_00001.dat.
+Writing solution file op_sg_05_00001.dat.
+Writing solution file op_sg_06_00001.dat.
+Writing solution file op_sg_07_00001.dat.
+Writing solution file op_sg_08_00001.dat.
+Writing solution file op_sg_09_00001.dat.
+Writing solution file op_sg_10_00001.dat.
+Writing solution file op_fg_00001.dat.
+--
+Iteration:      90,  Time: 2.250e+00
+  Max CFL: 3.982E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.8833E-04
+  Conservation loss: 9.7630E-16
+--
+
+--
+Iteration:     100,  Time: 2.500e+00
+  Max CFL: 3.972E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.8586E-04
+  Conservation loss: 1.1037E-15
+--
+
+--
+Iteration:     110,  Time: 2.750e+00
+  Max CFL: 3.960E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.8406E-04
+  Conservation loss: 1.0997E-15
+--
+
+--
+Iteration:     120,  Time: 3.000e+00
+  Max CFL: 3.947E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.8280E-04
+  Conservation loss: 1.1201E-15
+--
+
+--
+Iteration:     130,  Time: 3.250e+00
+  Max CFL: 3.947E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.8187E-04
+  Conservation loss: 9.5860E-16
+--
+
+--
+Iteration:     140,  Time: 3.500e+00
+  Max CFL: 3.957E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.8100E-04
+  Conservation loss: 9.7995E-16
+--
+
+--
+Iteration:     150,  Time: 3.750e+00
+  Max CFL: 3.965E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.8006E-04
+  Conservation loss: 1.0788E-15
+--
+
+--
+Iteration:     160,  Time: 4.000e+00
+  Max CFL: 3.969E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7914E-04
+  Conservation loss: 1.0612E-15
+--
+
+Writing solution file op_sg_00_00002.dat.
+Writing solution file op_sg_01_00002.dat.
+Writing solution file op_sg_02_00002.dat.
+Writing solution file op_sg_03_00002.dat.
+Writing solution file op_sg_04_00002.dat.
+Writing solution file op_sg_05_00002.dat.
+Writing solution file op_sg_06_00002.dat.
+Writing solution file op_sg_07_00002.dat.
+Writing solution file op_sg_08_00002.dat.
+Writing solution file op_sg_09_00002.dat.
+Writing solution file op_sg_10_00002.dat.
+Writing solution file op_fg_00002.dat.
+--
+Iteration:     170,  Time: 4.250e+00
+  Max CFL: 3.971E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7836E-04
+  Conservation loss: 1.1094E-15
+--
+
+--
+Iteration:     180,  Time: 4.500e+00
+  Max CFL: 3.970E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7767E-04
+  Conservation loss: 1.1035E-15
+--
+
+--
+Iteration:     190,  Time: 4.750e+00
+  Max CFL: 3.967E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7697E-04
+  Conservation loss: 1.0396E-15
+--
+
+--
+Iteration:     200,  Time: 5.000e+00
+  Max CFL: 3.962E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7613E-04
+  Conservation loss: 9.3420E-16
+--
+
+--
+Iteration:     210,  Time: 5.250e+00
+  Max CFL: 3.956E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7511E-04
+  Conservation loss: 1.1196E-15
+--
+
+--
+Iteration:     220,  Time: 5.500e+00
+  Max CFL: 3.947E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7413E-04
+  Conservation loss: 1.1269E-15
+--
+
+--
+Iteration:     230,  Time: 5.750e+00
+  Max CFL: 3.937E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7348E-04
+  Conservation loss: 1.1007E-15
+--
+
+--
+Iteration:     240,  Time: 6.000e+00
+  Max CFL: 3.929E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7316E-04
+  Conservation loss: 1.2379E-15
+--
+
+Writing solution file op_sg_00_00003.dat.
+Writing solution file op_sg_01_00003.dat.
+Writing solution file op_sg_02_00003.dat.
+Writing solution file op_sg_03_00003.dat.
+Writing solution file op_sg_04_00003.dat.
+Writing solution file op_sg_05_00003.dat.
+Writing solution file op_sg_06_00003.dat.
+Writing solution file op_sg_07_00003.dat.
+Writing solution file op_sg_08_00003.dat.
+Writing solution file op_sg_09_00003.dat.
+Writing solution file op_sg_10_00003.dat.
+Writing solution file op_fg_00003.dat.
+--
+Iteration:     250,  Time: 6.250e+00
+  Max CFL: 3.935E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7284E-04
+  Conservation loss: 1.2991E-15
+--
+
+--
+Iteration:     260,  Time: 6.500e+00
+  Max CFL: 3.942E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7230E-04
+  Conservation loss: 1.3243E-15
+--
+
+--
+Iteration:     270,  Time: 6.750e+00
+  Max CFL: 3.947E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7160E-04
+  Conservation loss: 1.2739E-15
+--
+
+--
+Iteration:     280,  Time: 7.000e+00
+  Max CFL: 3.949E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7091E-04
+  Conservation loss: 1.1281E-15
+--
+
+--
+Iteration:     290,  Time: 7.250e+00
+  Max CFL: 3.949E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7035E-04
+  Conservation loss: 1.1390E-15
+--
+
+--
+Iteration:     300,  Time: 7.500e+00
+  Max CFL: 3.948E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6990E-04
+  Conservation loss: 1.2292E-15
+--
+
+--
+Iteration:     310,  Time: 7.750e+00
+  Max CFL: 3.944E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6950E-04
+  Conservation loss: 1.1823E-15
+--
+
+--
+Iteration:     320,  Time: 8.000e+00
+  Max CFL: 3.939E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6913E-04
+  Conservation loss: 9.2646E-16
+--
+
+Writing solution file op_sg_00_00004.dat.
+Writing solution file op_sg_01_00004.dat.
+Writing solution file op_sg_02_00004.dat.
+Writing solution file op_sg_03_00004.dat.
+Writing solution file op_sg_04_00004.dat.
+Writing solution file op_sg_05_00004.dat.
+Writing solution file op_sg_06_00004.dat.
+Writing solution file op_sg_07_00004.dat.
+Writing solution file op_sg_08_00004.dat.
+Writing solution file op_sg_09_00004.dat.
+Writing solution file op_sg_10_00004.dat.
+Writing solution file op_fg_00004.dat.
+--
+Iteration:     330,  Time: 8.250e+00
+  Max CFL: 3.933E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6876E-04
+  Conservation loss: 9.5619E-16
+--
+
+--
+Iteration:     340,  Time: 8.500e+00
+  Max CFL: 3.925E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6836E-04
+  Conservation loss: 9.3920E-16
+--
+
+--
+Iteration:     350,  Time: 8.750e+00
+  Max CFL: 3.918E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6793E-04
+  Conservation loss: 1.0439E-15
+--
+
+--
+Iteration:     360,  Time: 9.000e+00
+  Max CFL: 3.925E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6753E-04
+  Conservation loss: 1.0907E-15
+--
+
+--
+Iteration:     370,  Time: 9.250e+00
+  Max CFL: 3.931E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6722E-04
+  Conservation loss: 1.0355E-15
+--
+
+--
+Iteration:     380,  Time: 9.500e+00
+  Max CFL: 3.935E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6695E-04
+  Conservation loss: 1.1399E-15
+--
+
+--
+Iteration:     390,  Time: 9.750e+00
+  Max CFL: 3.936E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6657E-04
+  Conservation loss: 1.0894E-15
+--
+
+--
+Iteration:     400,  Time: 1.000e+01
+  Max CFL: 3.936E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6605E-04
+  Conservation loss: 1.1089E-15
+--
+
+Writing solution file op_sg_00_00005.dat.
+Writing solution file op_sg_01_00005.dat.
+Writing solution file op_sg_02_00005.dat.
+Writing solution file op_sg_03_00005.dat.
+Writing solution file op_sg_04_00005.dat.
+Writing solution file op_sg_05_00005.dat.
+Writing solution file op_sg_06_00005.dat.
+Writing solution file op_sg_07_00005.dat.
+Writing solution file op_sg_08_00005.dat.
+Writing solution file op_sg_09_00005.dat.
+Writing solution file op_sg_10_00005.dat.
+Writing solution file op_fg_00005.dat.
+--
+Iteration:     410,  Time: 1.025e+01
+  Max CFL: 3.934E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6550E-04
+  Conservation loss: 1.1351E-15
+--
+
+--
+Iteration:     420,  Time: 1.050e+01
+  Max CFL: 3.931E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6506E-04
+  Conservation loss: 1.1216E-15
+--
+
+--
+Iteration:     430,  Time: 1.075e+01
+  Max CFL: 3.926E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6473E-04
+  Conservation loss: 1.2011E-15
+--
+
+--
+Iteration:     440,  Time: 1.100e+01
+  Max CFL: 3.921E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6440E-04
+  Conservation loss: 1.1521E-15
+--
+
+--
+Iteration:     450,  Time: 1.125e+01
+  Max CFL: 3.914E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6403E-04
+  Conservation loss: 1.3241E-15
+--
+
+--
+Iteration:     460,  Time: 1.150e+01
+  Max CFL: 3.915E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6368E-04
+  Conservation loss: 1.4016E-15
+--
+
+--
+Iteration:     470,  Time: 1.175e+01
+  Max CFL: 3.921E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6344E-04
+  Conservation loss: 1.3749E-15
+--
+
+--
+Iteration:     480,  Time: 1.200e+01
+  Max CFL: 3.925E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6330E-04
+  Conservation loss: 1.3038E-15
+--
+
+Writing solution file op_sg_00_00006.dat.
+Writing solution file op_sg_01_00006.dat.
+Writing solution file op_sg_02_00006.dat.
+Writing solution file op_sg_03_00006.dat.
+Writing solution file op_sg_04_00006.dat.
+Writing solution file op_sg_05_00006.dat.
+Writing solution file op_sg_06_00006.dat.
+Writing solution file op_sg_07_00006.dat.
+Writing solution file op_sg_08_00006.dat.
+Writing solution file op_sg_09_00006.dat.
+Writing solution file op_sg_10_00006.dat.
+Writing solution file op_fg_00006.dat.
+--
+Iteration:     490,  Time: 1.225e+01
+  Max CFL: 3.928E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6318E-04
+  Conservation loss: 1.3768E-15
+--
+
+--
+Iteration:     500,  Time: 1.250e+01
+  Max CFL: 3.929E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6299E-04
+  Conservation loss: 1.2515E-15
+--
+
+--
+Iteration:     510,  Time: 1.275e+01
+  Max CFL: 3.929E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6268E-04
+  Conservation loss: 1.2171E-15
+--
+
+--
+Iteration:     520,  Time: 1.300e+01
+  Max CFL: 3.927E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6229E-04
+  Conservation loss: 1.1241E-15
+--
+
+--
+Iteration:     530,  Time: 1.325e+01
+  Max CFL: 3.923E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6191E-04
+  Conservation loss: 1.4518E-15
+--
+
+--
+Iteration:     540,  Time: 1.350e+01
+  Max CFL: 3.919E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6157E-04
+  Conservation loss: 1.5080E-15
+--
+
+--
+Iteration:     550,  Time: 1.375e+01
+  Max CFL: 3.913E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6124E-04
+  Conservation loss: 1.3999E-15
+--
+
+--
+Iteration:     560,  Time: 1.400e+01
+  Max CFL: 3.907E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6092E-04
+  Conservation loss: 1.5722E-15
+--
+
+Writing solution file op_sg_00_00007.dat.
+Writing solution file op_sg_01_00007.dat.
+Writing solution file op_sg_02_00007.dat.
+Writing solution file op_sg_03_00007.dat.
+Writing solution file op_sg_04_00007.dat.
+Writing solution file op_sg_05_00007.dat.
+Writing solution file op_sg_06_00007.dat.
+Writing solution file op_sg_07_00007.dat.
+Writing solution file op_sg_08_00007.dat.
+Writing solution file op_sg_09_00007.dat.
+Writing solution file op_sg_10_00007.dat.
+Writing solution file op_fg_00007.dat.
+--
+Iteration:     570,  Time: 1.425e+01
+  Max CFL: 3.912E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6065E-04
+  Conservation loss: 1.5222E-15
+--
+
+--
+Iteration:     580,  Time: 1.450e+01
+  Max CFL: 3.917E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6041E-04
+  Conservation loss: 1.4880E-15
+--
+
+--
+Iteration:     590,  Time: 1.475e+01
+  Max CFL: 3.920E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6015E-04
+  Conservation loss: 1.4763E-15
+--
+
+--
+Iteration:     600,  Time: 1.500e+01
+  Max CFL: 3.922E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5989E-04
+  Conservation loss: 1.3194E-15
+--
+
+--
+Iteration:     610,  Time: 1.525e+01
+  Max CFL: 3.923E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5968E-04
+  Conservation loss: 1.2840E-15
+--
+
+--
+Iteration:     620,  Time: 1.550e+01
+  Max CFL: 3.922E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5952E-04
+  Conservation loss: 1.2997E-15
+--
+
+--
+Iteration:     630,  Time: 1.575e+01
+  Max CFL: 3.920E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5934E-04
+  Conservation loss: 1.3699E-15
+--
+
+--
+Iteration:     640,  Time: 1.600e+01
+  Max CFL: 3.917E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5913E-04
+  Conservation loss: 1.3629E-15
+--
+
+Writing solution file op_sg_00_00008.dat.
+Writing solution file op_sg_01_00008.dat.
+Writing solution file op_sg_02_00008.dat.
+Writing solution file op_sg_03_00008.dat.
+Writing solution file op_sg_04_00008.dat.
+Writing solution file op_sg_05_00008.dat.
+Writing solution file op_sg_06_00008.dat.
+Writing solution file op_sg_07_00008.dat.
+Writing solution file op_sg_08_00008.dat.
+Writing solution file op_sg_09_00008.dat.
+Writing solution file op_sg_10_00008.dat.
+Writing solution file op_fg_00008.dat.
+--
+Iteration:     650,  Time: 1.625e+01
+  Max CFL: 3.913E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5890E-04
+  Conservation loss: 1.4159E-15
+--
+
+--
+Iteration:     660,  Time: 1.650e+01
+  Max CFL: 3.908E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5869E-04
+  Conservation loss: 1.3844E-15
+--
+
+--
+Iteration:     670,  Time: 1.675e+01
+  Max CFL: 3.905E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5851E-04
+  Conservation loss: 1.4539E-15
+--
+
+--
+Iteration:     680,  Time: 1.700e+01
+  Max CFL: 3.910E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5830E-04
+  Conservation loss: 1.5666E-15
+--
+
+--
+Iteration:     690,  Time: 1.725e+01
+  Max CFL: 3.914E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5806E-04
+  Conservation loss: 1.4202E-15
+--
+
+--
+Iteration:     700,  Time: 1.750e+01
+  Max CFL: 3.916E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5780E-04
+  Conservation loss: 1.3192E-15
+--
+
+--
+Iteration:     710,  Time: 1.775e+01
+  Max CFL: 3.918E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5751E-04
+  Conservation loss: 1.2006E-15
+--
+
+--
+Iteration:     720,  Time: 1.800e+01
+  Max CFL: 3.918E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5724E-04
+  Conservation loss: 1.1660E-15
+--
+
+Writing solution file op_sg_00_00009.dat.
+Writing solution file op_sg_01_00009.dat.
+Writing solution file op_sg_02_00009.dat.
+Writing solution file op_sg_03_00009.dat.
+Writing solution file op_sg_04_00009.dat.
+Writing solution file op_sg_05_00009.dat.
+Writing solution file op_sg_06_00009.dat.
+Writing solution file op_sg_07_00009.dat.
+Writing solution file op_sg_08_00009.dat.
+Writing solution file op_sg_09_00009.dat.
+Writing solution file op_sg_10_00009.dat.
+Writing solution file op_fg_00009.dat.
+--
+Iteration:     730,  Time: 1.825e+01
+  Max CFL: 3.917E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5702E-04
+  Conservation loss: 1.1348E-15
+--
+
+--
+Iteration:     740,  Time: 1.850e+01
+  Max CFL: 3.915E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5687E-04
+  Conservation loss: 1.1627E-15
+--
+
+--
+Iteration:     750,  Time: 1.875e+01
+  Max CFL: 3.911E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5673E-04
+  Conservation loss: 1.0387E-15
+--
+
+--
+Iteration:     760,  Time: 1.900e+01
+  Max CFL: 3.907E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5657E-04
+  Conservation loss: 1.1611E-15
+--
+
+--
+Iteration:     770,  Time: 1.925e+01
+  Max CFL: 3.902E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5639E-04
+  Conservation loss: 1.1230E-15
+--
+
+--
+Iteration:     780,  Time: 1.950e+01
+  Max CFL: 3.904E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5619E-04
+  Conservation loss: 1.1702E-15
+--
+
+--
+Iteration:     790,  Time: 1.975e+01
+  Max CFL: 3.908E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5599E-04
+  Conservation loss: 1.2247E-15
+--
+
+--
+Iteration:     800,  Time: 2.000e+01
+  Max CFL: 3.911E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5581E-04
+  Conservation loss: 1.2456E-15
+--
+
+Writing solution file op_sg_00_00010.dat.
+Writing solution file op_sg_01_00010.dat.
+Writing solution file op_sg_02_00010.dat.
+Writing solution file op_sg_03_00010.dat.
+Writing solution file op_sg_04_00010.dat.
+Writing solution file op_sg_05_00010.dat.
+Writing solution file op_sg_06_00010.dat.
+Writing solution file op_sg_07_00010.dat.
+Writing solution file op_sg_08_00010.dat.
+Writing solution file op_sg_09_00010.dat.
+Writing solution file op_sg_10_00010.dat.
+Writing solution file op_fg_00010.dat.
+Completed time integration (Final time: 20.000000).
+
+Reading array from binary file exact.inp (Serial mode).
+Computed errors for full grid solution:
+  L1   Error: 2.8601039537110856E-06
+  L2   Error: 6.9470161546834434E-06
+  Linf Error: 5.2476165544926512E-05
+Solver runtime (in seconds): 1.6932818000000001E+01
+Total  runtime (in seconds): 1.7046122000000000E+01
+Deallocating arrays.
+Finished.
