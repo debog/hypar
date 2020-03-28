@@ -4710,6 +4710,11 @@ the number of spatial dimensions is greater than 1); only the following is neede
   + Input file \b sparse_grids.inp that specifies parameters related to the sparse
     grids method.
 
+As for the output, instead of \b op*.*, the full grid solution will be written
+to \b op_fg*.*, and it will be in the same format/structure as the op*.* files.
+If specified in the inputs, the sparse grid solution files will also be 
+written to \b op_sg_<n>*.*.
+
 \b Note: Sparse grids work well with smooth, linear simulations. Adapting them
 for hyperbolic simulations with shocks and discontinuities is an area of active
 research.
