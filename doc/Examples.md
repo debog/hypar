@@ -42,6 +42,8 @@ with PETSc.
 
 \subpage burgers_2d_sine
 
+\subpage vlasov_1d1v_prescribed
+
 \subpage euler2d_riemann4 \n
 \subpage euler2d_riemann6 \n
 \subpage euler2d_radexp \n
@@ -1233,6 +1235,86 @@ and conservation error (#HyPar::ConservationError).
 
 Expected screen output:
 \include 2D/Burgers/SineWave/output.log
+
+\page vlasov_1d1v_prescribed 2D (1D-1V) Vlasov Equation - Prescribed E-Field
+
+Location: \b hypar/Examples/2D/Vlasov1D1V/PrescribedElectricField
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D (1D-1V) Vlasov Equation (vlasov.h)
+
+Domain: 
+  + \f$0 \le x < 2\pi\f$, \a "periodic" (#_PERIODIC_)
+  + \f$-6 \le y < 6\f$, \a "dirichlet" (#_DIRICHLET_) (\f$f = 0\f$)
+
+
+Initial solution: \f$f\left(x,v\right) = \left[1 + \frac{1}{10} \cos\left(x\right)\right] \exp\left(- \frac{1}{2}v^2\right)\f$
+
+Prescribed electric field: \f$\frac{1}{10}\cos\left(x\right)\f$
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order compact upwind (Interp1PrimFifthOrderCompactUpwind())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 2D/Vlasov1D1V/PrescribedElectricField/solver.inp
+
+\b boundary.inp
+\include 2D/Vlasov1D1V/PrescribedElectricField/boundary.inp
+
+\b physics.inp
+\include 2D/Vlasov1D1V/PrescribedElectricField/physics.inp
+
+To generate \b initial.inp (initial solution), compile and run the 
+following code in the run directory. 
+\include 2D/Vlasov1D1V/PrescribedElectricField/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 4
+processors along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be 257 output
+files \b op_00000.dat, \b op_00001.dat, ... \b op_00257.dat; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=128\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. 
+  
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the final column is the 
+solution.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation shows the evolution of the solution:
+@image html Solution_1D1VVlasov_PrescribedE.gif
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation.dat:
+\include 2D/Vlasov1D1V/PrescribedElectricField/conservation.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 2D/Vlasov1D1V/PrescribedElectricField/output.log
 
 \page euler2d_riemann4 2D Euler Equations - Riemann Problem Case 4
 

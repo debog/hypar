@@ -1,11 +1,11 @@
 1D-1V VLASOV EQUATION
 
-  df         df                     df 
-  --  +  v ------  +  (E + v x B) ------  =  0
-  dt        dx_i                   dv_i
+  df        df          df 
+  --  +  v ----  +  E ----  =  0
+  dt        dx          dv
 
-  -6 <= x <= 6;   Periodic
-   0 <= v <= 2pi; Homogenous Dirichlet
+   0 <= x <= 2pi;   Periodic
+  -6 <= v <= 6; Homogenous Dirichlet
 
 Initial Solution:
 
