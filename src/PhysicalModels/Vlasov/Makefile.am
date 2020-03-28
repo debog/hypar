@@ -4,4 +4,5 @@ libVlasov_a_SOURCES = \
   VlasovComputeCFL.c \
   VlasovInitialize.c \
   VlasovAdvection.c \
-  VlasovUpwind.c
+  VlasovUpwind.c \
+	VlasovWriteEField.c

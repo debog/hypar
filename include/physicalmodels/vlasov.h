@@ -55,6 +55,12 @@ typedef struct vlasov_parameters {
   /*! Use a self-consistent electric field? Requires FFTW library */
   bool self_consistent_electric_field;
 
+  /*! Number of spatial dimensions */
+  int cfg_dim;
+
+  /*! Number of velocity dimensions */
+  int vel_dim;
+
 #ifdef fftw
   /*! Pointer to MPI object of type #MPIVariables */
   void  *m;

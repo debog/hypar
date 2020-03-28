@@ -24,6 +24,8 @@ int VlasovAdvection (double*,double*,int,void*,double);
 /*! Compute the upwind flux at interfaces */
 int VlasovUpwind (double*,double*,double*,double*,
                   double*,double*,int,void*,double);
+/*! Write self-consistent E-field to file */
+int VlasovWriteEField (void*, void*);
 
 /*! Initialize the Vlasov physics module - 
     allocate and set physics-related parameters, read physics-related inputs
@@ -56,6 +58,8 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
 
   /* default is prescribed electric field */
   physics->self_consistent_electric_field = false;
+  physics->cfg_dim = 1;
+  physics->vel_dim = 1;
 
   /* reading physical model specific inputs - all processes */
   if (!mpi->rank) {
@@ -88,6 +92,14 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
     fclose(in);
   }
 
+  if ((physics->cfg_dim+physics->vel_dim) != solver->ndims) {
+    if (!mpi->rank) {
+      fprintf(stderr,"Error in VlasovInitialize:\n");
+      fprintf(stderr, "  space + vel dims not equal to ndims!\n");
+    }
+    return(1);
+  }
+
   if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
     if (!mpi->rank) {
       fprintf(stderr,"Error in VlasovInitialize: This physical model does not have a splitting ");
@@ -98,8 +110,10 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
 
 #ifndef serial
   /* Broadcast parsed problem data */
-  IERR MPIBroadcast_integer((int *) &physics->self_consistent_electric_field,
-                            1,0,&mpi->world); CHECKERR(ierr);
+  MPIBroadcast_integer(&physics->cfg_dim,1,0,&mpi->world);
+  MPIBroadcast_integer(&physics->vel_dim,1,0,&mpi->world);
+  MPIBroadcast_integer((int *) &physics->self_consistent_electric_field,
+                       1,0,&mpi->world);
 #endif
 
   if (physics->self_consistent_electric_field) {
@@ -166,6 +180,10 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   solver->ComputeCFL = VlasovComputeCFL;
   solver->FFunction  = VlasovAdvection;
   solver->Upwind     = VlasovUpwind;
+
+  if (physics->self_consistent_electric_field) {
+    solver->PhysicsOutput = VlasovWriteEField;
+  }
 
   return(0);
 }
