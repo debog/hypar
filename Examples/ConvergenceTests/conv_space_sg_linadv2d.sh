@@ -2,7 +2,7 @@
 
 #################################################################
 # 
-# Bash script to run a spatial convergence test on a smooth 1D linear 
+# Bash script to run a spatial convergence test on a smooth 2D linear 
 # advection problem - periodic advection of a sine wave.
 #
 # Sparse Grids version: HyPar will run in the sparse grids mode.

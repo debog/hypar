@@ -1,0 +1,543 @@
+HyPar - Parallel (MPI) version with 32 processes
+Compiled with PETSc time integration.
+-- Sparse Grids Simulation --
+Sparse grids inputs:
+  log2 of minimum grid size:  3
+  interpolation order:  6
+  write sparse grids solutions?  no
+Allocated full grid simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 4
+  Domain size                                : 256 256 
+  Processes along each dimension             : 8 4 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 30000
+  Restart iteration                          : 0
+  Time integration scheme                    : rk (ssprk3)
+  Spatial discretization scheme (hyperbolic) : upw5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : components
+  Spatial discretization type   (parabolic ) : nonconservative-2stage
+  Spatial discretization scheme (parabolic ) : 4
+  Time Step                                  : 1.000000E-02
+  Check for conservation                     : no
+  Screen output iterations                   : 500
+  File output iterations                     : 1000
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : no
+  Physical model                             : navierstokes2d
+Processor distribution for full grid object:    8   4
+Initializing sparse grids...
+  Number of spatial dimensions: 2
+  Computing sparse grids dimensions...
+  Number of sparse grid domains in combination technique: 11
+  Computing processor decompositions...
+Sparse Grids: Combination technique grids sizes and coefficients are:-
+    0: dim = (  256     8 ),  coeff = +1.00e+00, iproc = (   32     1 )
+    1: dim = (  128    16 ),  coeff = +1.00e+00, iproc = (   16     2 )
+    2: dim = (   64    32 ),  coeff = +1.00e+00, iproc = (    8     4 )
+    3: dim = (   32    64 ),  coeff = +1.00e+00, iproc = (    4     8 )
+    4: dim = (   16   128 ),  coeff = +1.00e+00, iproc = (    2    16 )
+    5: dim = (    8   256 ),  coeff = +1.00e+00, iproc = (    1    32 )
+    6: dim = (  128     8 ),  coeff = -1.00e+00, iproc = (   32     1 )
+    7: dim = (   64    16 ),  coeff = -1.00e+00, iproc = (   16     2 )
+    8: dim = (   32    32 ),  coeff = -1.00e+00, iproc = (    8     4 )
+    9: dim = (   16    64 ),  coeff = -1.00e+00, iproc = (    2    16 )
+   10: dim = (    8   128 ),  coeff = -1.00e+00, iproc = (    1    32 )
+Allocating data arrays for full grid.
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  1.1234279568688401E+06
+ 1:  0.0000000000000000E+00
+ 2:  0.0000000000000000E+00
+ 3:  2.3801254424407306E+11
+Interpolating grid coordinates to sparse grids domain 0.
+Interpolating grid coordinates to sparse grids domain 1.
+Interpolating grid coordinates to sparse grids domain 2.
+Interpolating grid coordinates to sparse grids domain 3.
+Interpolating grid coordinates to sparse grids domain 4.
+Interpolating grid coordinates to sparse grids domain 5.
+Interpolating grid coordinates to sparse grids domain 6.
+Interpolating grid coordinates to sparse grids domain 7.
+Interpolating grid coordinates to sparse grids domain 8.
+Interpolating grid coordinates to sparse grids domain 9.
+Interpolating grid coordinates to sparse grids domain 10.
+Domain 0: Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 1: Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 2: Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 3: Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 4: Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 5: Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 6: Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 7: Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 8: Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 9: Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 10: Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+Initializing physics. Model = "navierstokes2d"
+Reading physical model inputs from file "physics.inp".
+Interpolating initial solution to sparse grids domain 0.
+  Volume integral of the initial solution on sparse grids domain 0:
+     0:  1.1234251586382261E+06
+     1:  0.0000000000000000E+00
+     2:  0.0000000000000000E+00
+     3:  2.3801105349946042E+11
+Interpolating initial solution to sparse grids domain 1.
+  Volume integral of the initial solution on sparse grids domain 1:
+     0:  1.1234271613915111E+06
+     1:  0.0000000000000000E+00
+     2:  0.0000000000000000E+00
+     3:  2.3801217265073633E+11
+Interpolating initial solution to sparse grids domain 2.
+  Volume integral of the initial solution on sparse grids domain 2:
+     0:  1.1234277731541058E+06
+     1:  0.0000000000000000E+00
+     2:  0.0000000000000000E+00
+     3:  2.3801245243865408E+11
+Interpolating initial solution to sparse grids domain 3.
+  Volume integral of the initial solution on sparse grids domain 3:
+     0:  1.1234449109078781E+06
+     1:  0.0000000000000000E+00
+     2:  0.0000000000000000E+00
+     3:  2.3801756102382306E+11
+Interpolating initial solution to sparse grids domain 4.
+  Volume integral of the initial solution on sparse grids domain 4:
+     0:  1.1233656900511470E+06
+     1:  0.0000000000000000E+00
+     2:  0.0000000000000000E+00
+     3:  2.3799406404289981E+11
+Interpolating initial solution to sparse grids domain 5.
+  Volume integral of the initial solution on sparse grids domain 5:
+     0:  1.1234285119873849E+06
+     1:  0.0000000000000000E+00
+     2:  0.0000000000000000E+00
+     3:  2.3801254424407306E+11
+Interpolating initial solution to sparse grids domain 6.
+  Volume integral of the initial solution on sparse grids domain 6:
+     0:  1.1234251586382259E+06
+     1:  0.0000000000000000E+00
+     2:  0.0000000000000000E+00
+     3:  2.3801105349946048E+11
+Interpolating initial solution to sparse grids domain 7.
+  Volume integral of the initial solution on sparse grids domain 7:
+     0:  1.1234271612869459E+06
+     1:  0.0000000000000000E+00
+     2:  0.0000000000000000E+00
+     3:  2.3801217265073633E+11
+Interpolating initial solution to sparse grids domain 8.
+  Volume integral of the initial solution on sparse grids domain 8:
+     0:  1.1234277774468665E+06
+     1:  0.0000000000000000E+00
+     2:  0.0000000000000000E+00
+     3:  2.3801245243865405E+11
+Interpolating initial solution to sparse grids domain 9.
+  Volume integral of the initial solution on sparse grids domain 9:
+     0:  1.1234449553994713E+06
+     1:  0.0000000000000000E+00
+     2:  0.0000000000000000E+00
+     3:  2.3801756102382306E+11
+Interpolating initial solution to sparse grids domain 10.
+  Volume integral of the initial solution on sparse grids domain 10:
+     0:  1.1233661938574852E+06
+     1:  0.0000000000000000E+00
+     2:  0.0000000000000000E+00
+     3:  2.3799406404289972E+11
+Setting up time integration.
+Solving in time (from 0 to 30000 iterations)
+Writing solution file op_fg_00000.bin.
+--
+Iteration:     500,  Time: 5.000e+00
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 6.5813E+00
+--
+
+--
+Iteration:    1000,  Time: 1.000e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 5.5077E+00
+--
+
+Writing solution file op_fg_00001.bin.
+--
+Iteration:    1500,  Time: 1.500e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 4.9858E+00
+--
+
+--
+Iteration:    2000,  Time: 2.000e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 4.5788E+00
+--
+
+Writing solution file op_fg_00002.bin.
+--
+Iteration:    2500,  Time: 2.500e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 4.2167E+00
+--
+
+--
+Iteration:    3000,  Time: 3.000e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 3.9285E+00
+--
+
+Writing solution file op_fg_00003.bin.
+--
+Iteration:    3500,  Time: 3.500e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 9.9974E-01
+--
+
+--
+Iteration:    4000,  Time: 4.000e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 3.6060E+00
+--
+
+Writing solution file op_fg_00004.bin.
+--
+Iteration:    4500,  Time: 4.500e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 3.5391E+00
+--
+
+--
+Iteration:    5000,  Time: 5.000e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 3.4880E+00
+--
+
+Writing solution file op_fg_00005.bin.
+--
+Iteration:    5500,  Time: 5.500e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 3.3799E+00
+--
+
+--
+Iteration:    6000,  Time: 6.000e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 3.2350E+00
+--
+
+Writing solution file op_fg_00006.bin.
+--
+Iteration:    6500,  Time: 6.500e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 3.1020E+00
+--
+
+--
+Iteration:    7000,  Time: 7.000e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 7.8745E-01
+--
+
+Writing solution file op_fg_00007.bin.
+--
+Iteration:    7500,  Time: 7.500e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.9683E+00
+--
+
+--
+Iteration:    8000,  Time: 8.000e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.9582E+00
+--
+
+Writing solution file op_fg_00008.bin.
+--
+Iteration:    8500,  Time: 8.500e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.9630E+00
+--
+
+--
+Iteration:    9000,  Time: 9.000e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.8798E+00
+--
+
+Writing solution file op_fg_00009.bin.
+--
+Iteration:    9500,  Time: 9.500e+01
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7983E+00
+--
+
+--
+Iteration:   10000,  Time: 1.000e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.7053E+00
+--
+
+Writing solution file op_fg_00010.bin.
+--
+Iteration:   10500,  Time: 1.050e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 7.4930E-01
+--
+
+--
+Iteration:   11000,  Time: 1.100e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6256E+00
+--
+
+Writing solution file op_fg_00011.bin.
+--
+Iteration:   11500,  Time: 1.150e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6302E+00
+--
+
+--
+Iteration:   12000,  Time: 1.200e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.6453E+00
+--
+
+Writing solution file op_fg_00012.bin.
+--
+Iteration:   12500,  Time: 1.250e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5970E+00
+--
+
+--
+Iteration:   13000,  Time: 1.300e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.5272E+00
+--
+
+Writing solution file op_fg_00013.bin.
+--
+Iteration:   13500,  Time: 1.350e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.4529E+00
+--
+
+--
+Iteration:   14000,  Time: 1.400e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 7.8316E-01
+--
+
+Writing solution file op_fg_00014.bin.
+--
+Iteration:   14500,  Time: 1.450e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.3973E+00
+--
+
+--
+Iteration:   15000,  Time: 1.500e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.4074E+00
+--
+
+Writing solution file op_fg_00015.bin.
+--
+Iteration:   15500,  Time: 1.550e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.4236E+00
+--
+
+--
+Iteration:   16000,  Time: 1.600e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.4106E+00
+--
+
+Writing solution file op_fg_00016.bin.
+--
+Iteration:   16500,  Time: 1.650e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.3345E+00
+--
+
+--
+Iteration:   17000,  Time: 1.700e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.2712E+00
+--
+
+Writing solution file op_fg_00017.bin.
+--
+Iteration:   17500,  Time: 1.750e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 8.4438E-01
+--
+
+--
+Iteration:   18000,  Time: 1.800e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.2288E+00
+--
+
+Writing solution file op_fg_00018.bin.
+--
+Iteration:   18500,  Time: 1.850e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.2418E+00
+--
+
+--
+Iteration:   19000,  Time: 1.900e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.2576E+00
+--
+
+Writing solution file op_fg_00019.bin.
+--
+Iteration:   19500,  Time: 1.950e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.2643E+00
+--
+
+--
+Iteration:   20000,  Time: 2.000e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.1870E+00
+--
+
+Writing solution file op_fg_00020.bin.
+--
+Iteration:   20500,  Time: 2.050e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.1311E+00
+--
+
+--
+Iteration:   21000,  Time: 2.100e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 9.1303E-01
+--
+
+Writing solution file op_fg_00021.bin.
+--
+Iteration:   21500,  Time: 2.150e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.0969E+00
+--
+
+--
+Iteration:   22000,  Time: 2.200e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.1118E+00
+--
+
+Writing solution file op_fg_00022.bin.
+--
+Iteration:   22500,  Time: 2.250e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.1269E+00
+--
+
+--
+Iteration:   23000,  Time: 2.300e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.1371E+00
+--
+
+Writing solution file op_fg_00023.bin.
+--
+Iteration:   23500,  Time: 2.350e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.0685E+00
+--
+
+--
+Iteration:   24000,  Time: 2.400e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.0180E+00
+--
+
+Writing solution file op_fg_00024.bin.
+--
+Iteration:   24500,  Time: 2.450e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 9.8161E-01
+--
+
+--
+Iteration:   25000,  Time: 2.500e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 1.9894E+00
+--
+
+Writing solution file op_fg_00025.bin.
+--
+Iteration:   25500,  Time: 2.550e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.0059E+00
+--
+
+--
+Iteration:   26000,  Time: 2.600e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.0204E+00
+--
+
+Writing solution file op_fg_00026.bin.
+--
+Iteration:   26500,  Time: 2.650e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 2.0221E+00
+--
+
+--
+Iteration:   27000,  Time: 2.700e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 1.9700E+00
+--
+
+Writing solution file op_fg_00027.bin.
+--
+Iteration:   27500,  Time: 2.750e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 1.9239E+00
+--
+
+--
+Iteration:   28000,  Time: 2.800e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 1.0484E+00
+--
+
+Writing solution file op_fg_00028.bin.
+--
+Iteration:   28500,  Time: 2.850e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 1.8991E+00
+--
+
+--
+Iteration:   29000,  Time: 2.900e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 1.9173E+00
+--
+
+Writing solution file op_fg_00029.bin.
+--
+Iteration:   29500,  Time: 2.950e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 1.9311E+00
+--
+
+--
+Iteration:   30000,  Time: 3.000e+02
+  Max CFL: 4.427E-01,  Max Diff. No.: -1.000E+00,    Norm: 1.9177E+00
+--
+
+Writing solution file op_fg_00030.bin.
+Completed time integration (Final time: 300.000000).
+
+Solver runtime (in seconds): 6.0051986999999997E+01
+Total  runtime (in seconds): 6.0287636999999997E+01
+Deallocating arrays.
+Finished.

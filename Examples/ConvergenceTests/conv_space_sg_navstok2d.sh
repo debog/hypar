@@ -5,6 +5,8 @@
 # Bash script to run a spatial convergence test on a smooth 2D 
 # Navier-Stokes problem - periodic advection of a density sine wave
 #
+# Sparse Grids version: HyPar will run in the sparse grids mode.
+#
 # ** Please copy this script to a new location before using it! **
 # It will create test directories at the location it is run from.
 #
@@ -53,31 +55,31 @@ mpicmd="mpiexec"
 mpiargs=""
 
 # Convergence test parameters
-num_pts_coarsest=16
+num_pts_coarsest=32
 num_refinements=4
-nproc_coarsest=2
+nproc_coarsest=1
 
 # set default parameters as env vars
 source set_defaults.sh
 # overwrite env vars as needed for this test case
 export p_ndims=2
 export p_nvars=4
-export p_hyp_scheme="weno5"
-export p_hyp_int_type="characteristic"
+export p_hyp_scheme="cupw5"
+export p_hyp_int_type="components"
 export p_par_type="nonconservative-2stage"
 export p_ts="rk"
 export p_tstype="44"
 export p_dt="0.0001"
 export p_niter=10000
-export p_ip_type="ascii"
+export p_ip_type="binary"
 export p_model="navierstokes2d"
 export p_gravity="0.0 0.0"
 
 # path to initial solution code for this case
 physics_name="NavierStokes2D"
-case_name="DensitySineWave"
-init_c_file="${hypar_dir}/Examples/${p_ndims}D/${physics_name}/${case_name}/aux/exact.C"
-init_compile_cmd="g++"
+case_name="DensitySineWave_SparseGrids"
+init_c_file="${hypar_dir}/Examples/${p_ndims}D/${physics_name}/${case_name}/aux/exact.c"
+init_compile_cmd="gcc -lm"
 init_exec="EXACT"
 
 # set the boundaries
@@ -122,7 +124,7 @@ done
 RUNDIRNAME_ROOT=run_grid_
 
 # file to write errors in
-ERRFILE="convergence.dat"
+ERRFILE="sg_convergence.dat"
 
 ##################################################################
 # DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU ARE DOING #
@@ -151,8 +153,8 @@ MAX_NUM_PTS=$(calc $MAX_NUM_PTS/2)
 DIRINDEXLEN=${#MAX_NUM_PTS}
 
 echo "--"
-echo "Spatial convergence test on a smooth solution to the "
-echo "Navier-Stokes equations (2D):"
+echo "Spatial convergence test on a smooth solution to the linear "
+echo "advection equation (1D): Using sparse grids"
 echo "Grid sizes varying from ${num_pts_coarsest}^${p_ndims} to ${MAX_NUM_PTS}^${p_ndims}:"
 echo "Spatial discretization (hyperbolic): ${p_hyp_scheme}"
 echo "Spatial discretization (parabolic): ${p_par_scheme}"
@@ -165,7 +167,7 @@ NUM_PTS=$num_pts_coarsest
 NPROC=$nproc_coarsest
 while [ $REF_LEVEL -lt $num_refinements ]; do
 
-  nproc_total=$(calc $NPROC*$NPROC)
+  nproc_total=$(calc $NPROC)
   echo "Running: ref_lvl=$REF_LEVEL, n=${NUM_PTS}^${p_ndims}, dt=$p_dt, maxiter=$p_niter, $nproc_total cores ..."
 
   DIRINDEX=$NUM_PTS
@@ -188,6 +190,7 @@ while [ $REF_LEVEL -lt $num_refinements ]; do
   # write input files
   echo "    writing input files"
   write_solver_inp.sh
+  write_sparse_grids_inp.sh
   write_boundary_inp.sh
   write_physics_inp_navstok.sh
 
@@ -195,7 +198,7 @@ while [ $REF_LEVEL -lt $num_refinements ]; do
   echo "    compiling and running code to generate initial solution"
   eval '${init_compile_cmd} $init_c_file -o $init_exec'
   eval './${init_exec} 2>&1 > init.log'
-  #rm -rf $init_exec
+  rm -rf $init_exec
 
   # run HyPar
   RUNCOMMAND="${mpicmd} -n ${nproc_total} ${mpiargs} ${HYPAR_EXEC_W_PATH} 2>&1 > $hypar_stdout"
@@ -212,10 +215,10 @@ while [ $REF_LEVEL -lt $num_refinements ]; do
 
   let REF_LEVEL=REF_LEVEL+1
   NUM_PTS=$(calc $NUM_PTS*2)
-  NPROC=$(calc $NPROC*2)
+  #NPROC=$(calc $NPROC*2)
 
 done
 
 # gather errors and wall times into one text file
-cat ${RUNDIRNAME_ROOT}*/errors.dat > $ERRFILE
+cat ${RUNDIRNAME_ROOT}*/errors_fg.dat > $ERRFILE
 echo ""
