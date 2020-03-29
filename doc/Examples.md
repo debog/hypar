@@ -4703,6 +4703,7 @@ technique approach) is assumed.
 
 \subpage sg_linear_adv_sinewave
 
+\subpage sg_euler2d_density_sinewave\n
 \subpage sg_euler2d_vortconv
 
 Any other simulation can also be run with the sparse grids method (as long as
@@ -4847,6 +4848,113 @@ time step size (#HyPar::dt), and conservation error (#HyPar::ConservationError).
 
 Expected screen output:
 \include 2D/LinearAdvection/SineWave_SparseGrids/output.log
+
+\page sg_euler2d_density_sinewave 2D Euler Equations - Density Sine Wave
+
+Location: \b hypar/Examples/2D/NavierStokes2D/DensitySineWave_SparseGrids
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Euler Equations (navierstokes2d.h - By default,
+                     #NavierStokes2D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 2D Euler
+                     equations are solved.)
+
+Domain: \f$0 \le x,y \le 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions.
+
+Initial solution: The freestream flow is given by
+\f{equation}{
+  \rho_\infty = 1,\ u_\infty = 1,\ v_\infty = 1,\ p_\infty = \frac{1}{\gamma}
+\f}
+and the density wave is
+\f{align}{
+\rho = \rho_\infty + \frac{1}{10} \sin\left(2\pi x\right)\cos\left(2\pi y\right)
+\f}
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order compact upwind (Interp1PrimFifthOrderCompactUpwind())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b sparse_grids.inp
+\include 2D/NavierStokes2D/DensitySineWave_SparseGrids/sparse_grids.inp
+
+\b Note: The remaining files are the same as what would be 
+required for a conventional (non-sparse-grids) simulation.
+
+\b solver.inp
+\include 2D/NavierStokes2D/DensitySineWave_SparseGrids/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/DensitySineWave_SparseGrids/boundary.inp
+
+\b physics.inp
+\include 2D/NavierStokes2D/DensitySineWave_SparseGrids/physics.inp
+
+\b lusolver.inp
+\include 2D/NavierStokes2D/DensitySineWave_SparseGrids/lusolver.inp
+
+To generate \b initial.inp (initial solution) and \b exact.inp
+(exact solution), compile and run the following code in the run 
+directory. (It is the same file as the one used in running a
+conventional non-sparse-grids simulation).
+\include 2D/NavierStokes2D/DensitySineWave_SparseGrids/aux/exact.c
+
+Output:
+-------
+Note that \b iproc does \b not need to be set for simulations
+using sparse grids. HyPar will automatically calculate the load
+balanced processor distribution for each sparse grid. If too
+many processors are specified, then it will return an error.
+
+After running the code, there should be the following output
+files:
+  + op_fg_00000.dat, ..., op_fg_00010.dat: these contain the full
+    grid solution at \f$t=0, ..., 1\f$.
+
+Since \b write_sg_solutions is set to \b no in \b sparse_grids.inp
+(SparseGridsSimulation::m_write_sg_solutions), sparse grid solution
+files are not written out.
+    
+Since #HyPar::op_overwrite is set to \a no in \b solver.inp, 
+separate files are written for solutions at each output time. 
+    
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the remaining columns are the 
+solution components.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation shows the density contours as the vortex
+convects over the domain:, 
+@image html Solution_SG_2DNavStokDensityWave.gif
+
+Since the exact solution is available at the final time, the numerical 
+errors are calculated for the recombined full grid solution and reported 
+on screen (see below) as well as \b errors_fg.dat:
+\include 2D/NavierStokes2D/DensitySineWave_SparseGrids/errors_fg.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity errors (#HyPar::error),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Since \b write_sg_errors is set to to \b no in \b sparse_grids.inp
+(SparseGridsSimulation::m_print_sg_errors),
+the errors for each of the sparse grids are not computed or reported.
+
+Expected screen output:
+\include 2D/NavierStokes2D/DensitySineWave_SparseGrids/output.log
 
 \page sg_euler2d_vortconv 2D Euler Equations - Isentropic Vortex Convection
 
