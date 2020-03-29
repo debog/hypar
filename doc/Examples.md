@@ -4704,7 +4704,8 @@ technique approach) is assumed.
 \subpage sg_linear_adv_sinewave
 
 \subpage sg_euler2d_density_sinewave\n
-\subpage sg_euler2d_vortconv
+\subpage sg_euler2d_vortconv\n
+\subpage sg_euler2d_bubble
 
 Any other simulation can also be run with the sparse grids method (as long as
 the number of spatial dimensions is greater than 1); only the following is needed: 
@@ -5087,3 +5088,100 @@ and prints it to screen, but does not write it to files because
 
 Expected screen output:
 \include 2D/NavierStokes2D/InviscidVortexConvection_SparseGrids/output.log
+
+\page sg_euler2d_bubble 2D Euler Equations (with gravitational force) - Rising Thermal Bubble
+
+Location: \b hypar/Examples/2D/NavierStokes2D/RisingThermalBubble_SparseGrids
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Euler Equations (navierstokes2d.h - By default,
+                     #NavierStokes2D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 2D Euler
+                     equations are solved.)
+
+Reference:
+  + Giraldo, F.X., Restelli, M., "A study of spectral element and
+    discontinuous Galerkin methods for the Navier–Stokes equations
+    in nonhydrostatic mesoscale atmospheric modeling: Equation sets
+    and test cases", J. Comput. Phys., 227, 2008, 3849--3877, 
+    (Section 3.2).
+
+Domain: \f$0 \le x,y \le 1000\,m\f$, 
+        "slip-wall" (#_SLIP_WALL_) boundary conditions on all sides.
+
+Initial solution: See references above.
+
+Other parameters (all dimensional quantities are in SI units):
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes2D::gamma)
+  + Universal gas constant \f$R = 287.058\f$ (#NavierStokes2D::R)
+  + Gravitational force per unit mass \f$g = 9.8\f$ along \a y-axis (#NavierStokes2D::grav_y)
+  + Reference density (at zero altitude) \f$\rho_{ref} = 1.1612055171196529\f$ (#NavierStokes2D::rho0)
+  + Reference pressure (at zero altitude) \f$P_{ref} = 100000\f$ (#NavierStokes2D::p0)
+  + Hydrostatic balance type 2 (#NavierStokes2D::HB)
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
+ + Time integration: SSPRK3 (TimeRK(), #_RK_SSP3_)
+
+Input files required:
+---------------------
+
+\b sparse_grids.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_SparseGrids/sparse_grids.inp
+
+\b Note: The remaining files are the same as what would be 
+required for a conventional (non-sparse-grids) simulation.
+
+\b solver.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_SparseGrids/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_SparseGrids/boundary.inp
+
+\b physics.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_SparseGrids/physics.inp
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory.
+\include 2D/NavierStokes2D/RisingThermalBubble_SparseGrids/aux/init.c
+
+Output:
+-------
+Note that \b iproc does \b not need to be set for simulations
+using sparse grids. HyPar will automatically calculate the load
+balanced processor distribution for each sparse grid. If too
+many processors are specified, then it will return an error.
+
+After running the code, there should be the following output
+files:
+  + op_fg_00000.dat, ..., op_fg_00030.dat: these contain the full
+    grid solution at \f$t=0, ..., 300\f$.
+
+Since \b write_sg_solutions is set to \b no in \b sparse_grids.inp
+(SparseGridsSimulation::m_write_sg_solutions), sparse grid solution
+files are not written out.
+    
+#HyPar::op_file_format is set to \a binary in \b solver.inp, and
+thus, all the files are written out in the binary format, see 
+WriteBinary(). The binary file contains the conserved variables
+\f$\left(\rho, \rho u, \rho v, e\right)\f$. The following code
+converts these variables to the primitive variables of interest
+to atmospheric flows \f$\left(\rho, u, v, p, \theta\right)\f$.
+It also writes out the hydrostatically balanced quantities 
+\f$\left(\rho_0,\pi_0, \theta_0\right)\f$ for this case that
+can be used to compute and plot the temperature and density
+perturbations. These variables are then written to either
+a tecplot2d or text file.
+(compile and run it in the run directory):
+\include 2D/NavierStokes2D/RisingThermalBubble_SparseGrids/aux/PostProcess.c
+
+The following animation shows the potential temperature perturbation. 
+It was plotted using VisIt
+(https://wci.llnl.gov/simulation/computer-codes/visit/) with 
+tecplot2d format chosen in the above postprocessing code.
+@image html Solution_SG_2DNavStokRTB.gif
+
+Expected screen output:
+\include 2D/NavierStokes2D/RisingThermalBubble_SparseGrids/output.log
+
