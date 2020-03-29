@@ -69,7 +69,6 @@ export p_ts="rk"
 export p_tstype="44"
 export p_dt="0.0001"
 export p_niter=10000
-export p_adv_speed="1.0 1.0"
 export p_ip_type="ascii"
 export p_model="navierstokes2d"
 export p_gravity="0.0 0.0"
