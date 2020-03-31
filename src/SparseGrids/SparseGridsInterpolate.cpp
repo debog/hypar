@@ -336,7 +336,7 @@ void SparseGridsSimulation::refine1D( const GridDimensions& a_dim_src,  /*!< Gri
 {
   for (int d = 0; d < m_ndims; d++) {
     if ((d != a_dir) && (a_dim_src[d] != a_dim_dst[d])) {
-      fprintf(stderr, "Error in SparseGridsSimulation::coarsen1D() -\n");
+      fprintf(stderr, "Error in SparseGridsSimulation::refine1D() -\n");
       fprintf(stderr, " a_dim_src[%d] != a_dim_dst[%d]\n", d, d);
       exit(1);
     }
