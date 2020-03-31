@@ -140,7 +140,7 @@ int ShallowWater2DInitialize(
 
   /* allocate array to hold the bottom topography field */
   physics->b = (double*) calloc (solver->npoints_local_wghosts, sizeof(double));
-  IERR ShallowWater2DTopography(solver,mpi); CHECKERR(ierr);
+//  solver->PhysicsInput = ShallowWater2DTopography;
 
   count++;
   return(0);

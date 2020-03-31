@@ -291,6 +291,13 @@ int main(int argc, char **argv)
     return(ierr);
   }
 
+  /* Initialize physics data */
+  ierr = sim->InitializePhysicsData();
+  if (ierr) {
+    printf("Error: Simulation::InitializePhysicsData() returned with status %d on process %d.\n",ierr,rank);
+    return(ierr);
+  }
+
   /* Wrap up initializations */
   ierr = sim->InitializationWrapup();
   if (ierr) {

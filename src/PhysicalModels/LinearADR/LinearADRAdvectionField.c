@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <basic.h>
+#include <common.h>
 #include <arrayfunctions.h>
 #include <io.h>
 #include <physicalmodels/linearadr.h>
@@ -15,9 +17,10 @@
 /*! Set the advection field over the domain - reads the spatially-varying 
  * advection data from a file, if available. The array to store the field
  * \b must already be allocated.*/
-int LinearADRAdvectionField(
-                            void *s, /*!< Solver object of type #HyPar */
-                            void *m  /*!< MPI object of type #MPIVariables */
+int LinearADRAdvectionField(void *s,    /*!< Solver object of type #HyPar */
+                            void *m,    /*!< MPI object of type #MPIVariables*/
+                            int  idx,   /*!< Index of this simulation */
+                            int  nsims  /*!< Total number of simulations */
                            )
 {
   HyPar         *solver = (HyPar*) s;
@@ -48,6 +51,17 @@ int LinearADRAdvectionField(
     return(1);
   }
 
+  char fname_root[_MAX_STRING_SIZE_];
+  strcpy(fname_root, param->adv_filename);
+  if (idx >= 0) {
+    if (nsims > 1) {
+      char index[_MAX_STRING_SIZE_];
+      GetStringFromInteger(idx, index, (int)log10(nsims)+1);
+      strcat(fname_root, "_");
+      strcat(fname_root, index);
+    }
+  }
+
   /* read spatially-varying advection field from provided file */
   IERR ReadArray( solver->ndims,
                   adv_nvar,
@@ -58,7 +72,7 @@ int LinearADRAdvectionField(
                   mpi,
                   NULL,
                   adv,
-                  param->adv_filename,
+                  fname_root,
                   &flag);
 
   if (!flag) {

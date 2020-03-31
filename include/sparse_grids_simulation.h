@@ -126,6 +126,22 @@ class SparseGridsSimulation : public Simulation
       return retval;
     }
 
+    /*! Initialize the physics of the simulations */
+    inline int InitializePhysicsData()
+    {
+      for (int ns = 0; ns < m_sims_sg.size(); ns++) {
+        int retval = ::InitializePhysicsData( (void*) &(m_sims_sg[ns]),
+                                              -1, m_nsims_sg );
+        if (retval) {
+          fprintf(stderr, "Error in SparseGridsSimulation::InitializePhysicsData()\n");
+          fprintf(stderr, "  InitializePhysicsData returned with error code %d on rank %d.\n",
+                  retval, m_sims_sg[ns].mpi.rank);
+          return retval;
+        }
+      }
+      return 0;
+    }
+
     /*! Initialize the numerical solvers of the simulations */
     inline int InitializeSolvers()
     {

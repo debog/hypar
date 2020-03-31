@@ -5,6 +5,9 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
+#include <basic.h>
+#include <common.h>
 #include <arrayfunctions.h>
 #include <io.h>
 #include <physicalmodels/shallowwater2d.h>
@@ -15,8 +18,10 @@
     data from a file, if available, else sets it to a constant
 */
 int ShallowWater2DTopography(
-                              void *s, /*!< Solver object of type #HyPar */
-                              void *m  /*!< MPI object of type #MPIVariables */
+                              void *s,  /*!< Solver object of type #HyPar */
+                              void *m,  /*!< MPI object of type #MPIVariables*/
+                              int  idx, /*!< Index of this simulation */
+                              int  nsims/*!< Total number of simulations */
                             )
 {
   HyPar          *solver = (HyPar*) s;
@@ -27,9 +32,29 @@ int ShallowWater2DTopography(
                  ghosts = solver->ghosts;
   _DECLARE_IERR_;
 
+  char fname_root[_MAX_STRING_SIZE_] = "topography";
+  if (idx >= 0) {
+    if (nsims > 1) {
+      char index[_MAX_STRING_SIZE_];
+      GetStringFromInteger(idx, index, (int)log10(nsims)+1);
+      strcat(fname_root, "_");
+      strcat(fname_root, index);
+    }
+  }
+
   /* read topography from provided file, if available */
-  IERR ReadArray(solver->ndims,1,solver->dim_global,solver->dim_local,solver->ghosts,
-                 solver,mpi,NULL,S,"topography",&param->topo_flag); CHECKERR(ierr);
+  IERR ReadArray( solver->ndims,
+                  1,
+                  solver->dim_global,
+                  solver->dim_local,
+                  solver->ghosts,
+                  solver,
+                  mpi,
+                  NULL,
+                  S,
+                  fname_root,
+                  &param->topo_flag); CHECKERR(ierr);
+
   if (!param->topo_flag) {
     /* if topography file not available, set it to zero */
     _ArraySetValue_(S,solver->npoints_local_wghosts,0.0);
