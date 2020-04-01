@@ -8,6 +8,7 @@
 #include <basic.h>
 #include <arrayfunctions.h>
 #include <mathfunctions.h>
+#include <matmult_native.h>
 #include <physicalmodels/shallowwater1d.h>
 #include <hypar.h>
 

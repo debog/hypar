@@ -16,11 +16,25 @@
 
 /*! Set the advection field over the domain - reads the spatially-varying 
  * advection data from a file, if available. The array to store the field
- * \b must already be allocated.*/
-int LinearADRAdvectionField(void *s,    /*!< Solver object of type #HyPar */
-                            void *m,    /*!< MPI object of type #MPIVariables*/
-                            int  idx,   /*!< Index of this simulation */
-                            int  nsims  /*!< Total number of simulations */
+ * \b must already be allocated.
+ *
+ * For a single simulation, it reads in the data from a file. The data
+ * must have the same grid dimensions as the solution.
+ *
+ * For an ensemble simulation, it reads in the advection field from the
+ * file corresponding to the \b idx (index of this simulation). The
+ * data in this file must have the same grid dimensions as the domain
+ * it is being read in for.
+ *
+ * For a sparse grids simulation, it reads in the advection field from
+ * the file with data that has the grid dimensions as the full grid. The 
+ * field on the current grid is obtained by interpolation.
+*/
+int LinearADRAdvectionField(void *s,      /*!< Solver object of type #HyPar */
+                            void *m,      /*!< MPI object of type #MPIVariables*/
+                            int  idx,     /*!< Index of this simulation */
+                            int  nsims,   /*!< Total number of simulations */
+                            int *dim_adv  /*!< Grid dimensions of the advection field stored in file */
                            )
 {
   HyPar         *solver = (HyPar*) s;
@@ -63,17 +77,42 @@ int LinearADRAdvectionField(void *s,    /*!< Solver object of type #HyPar */
   }
 
   /* read spatially-varying advection field from provided file */
-  IERR ReadArray( solver->ndims,
-                  adv_nvar,
-                  solver->dim_global,
-                  solver->dim_local,
-                  solver->ghosts,
-                  solver,
-                  mpi,
-                  NULL,
-                  adv,
-                  fname_root,
-                  &flag);
+  if (dim_adv == NULL) {
+    int ierr = ReadArray( solver->ndims,
+                          adv_nvar,
+                          solver->dim_global,
+                          solver->dim_local,
+                          solver->ghosts,
+                          solver,
+                          mpi,
+                          NULL,
+                          adv,
+                          fname_root,
+                          &flag);
+    if (ierr) {
+      fprintf(stderr,"Error in LinearADRAdvectionField()\n");
+      fprintf(stderr,"  ReadArray() returned error!\n");
+      return ierr;
+    }
+  } else {
+    int ierr = ReadArraywInterp(solver->ndims,
+                                adv_nvar,
+                                solver->dim_global,
+                                solver->dim_local,
+                                dim_adv,
+                                solver->ghosts,
+                                solver,
+                                mpi,
+                                NULL,
+                                adv,
+                                fname_root,
+                                &flag);
+    if (ierr) {
+      fprintf(stderr,"Error in LinearADRAdvectionField()\n");
+      fprintf(stderr,"  ReadArraywInterp() returned error!\n");
+      return ierr;
+    }
+  }
 
   if (!flag) {
     /* if advection file not available, set it to zero */

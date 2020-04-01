@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <basic.h>
 #include <arrayfunctions.h>
+#include <matmult_native.h>
 #include <mathfunctions.h>
 #include <interpolation.h>
 #include <mpivars.h>

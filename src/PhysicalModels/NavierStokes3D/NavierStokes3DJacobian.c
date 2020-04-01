@@ -5,6 +5,7 @@
 
 #include <arrayfunctions.h>
 #include <mathfunctions.h>
+#include <matmult_native.h>
 #include <physicalmodels/navierstokes3d.h>
 
 /*! Function to compute the flux Jacobian of the 3D Navier-Stokes equations, given the

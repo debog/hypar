@@ -105,7 +105,7 @@ class SingleSimulation : public Simulation
     inline int InitializePhysicsData()
     {
       int retval = ::InitializePhysicsData( (void*) m_sim,
-                                            0, _NSIMS_ );
+                                            0, _NSIMS_, NULL );
       return retval;
     }
 

@@ -9,9 +9,10 @@
 /*! For each simulation object, call the physics-specific function to
     read in any physics data that is not a part of the solution vector.
 */
-int InitializePhysicsData(void  *s,   /*!< Simulation object of type #SimulationObject */
-                          int   idx,  /*!< Index of this simulation object */
-                          int   nsims /*!< Total number of simuations */
+int InitializePhysicsData(void  *s,       /*!< Simulation object of type #SimulationObject */
+                          int   idx,      /*!< Index of this simulation object */
+                          int   nsims,    /*!< Total number of simuations */
+                          int   *dim_data /*!< Dimenions of physics-specific data */
                          )
 {
   SimulationObject *sim     = (SimulationObject*) s;
@@ -23,7 +24,7 @@ int InitializePhysicsData(void  *s,   /*!< Simulation object of type #Simulation
       printf("Domain %d: Initializing physics data for model %s\n",
               idx, solver->model);
     }
-    int ierr = solver->PhysicsInput(solver, mpi, idx, nsims);
+    int ierr = solver->PhysicsInput(solver, mpi, idx, nsims, dim_data);
     if (ierr) {
       fprintf(stderr, "Error in InitializePhysicsData():\n");
       fprintf(stderr, "  solver->PhysicsInput() returned error %d on rank %d\n", 

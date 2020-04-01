@@ -8,6 +8,7 @@
 #include <arrayfunctions.h>
 #include <physicalmodels/navierstokes2d.h>
 #include <mathfunctions.h>
+#include <matmult_native.h>
 #include <hypar.h>
 
 /*! Roe's upwinding scheme.

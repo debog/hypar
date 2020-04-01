@@ -18,10 +18,11 @@
     data from a file, if available, else sets it to a constant
 */
 int ShallowWater1DTopography(
-                              void *s,  /*!< Solver object of type #HyPar */
-                              void *m,  /*!< MPI object of type #MPIVariables*/
-                              int  idx, /*!< Index of this simulation */
-                              int  nsims/*!< Total number of simulations */
+                              void *s,       /*!< Solver object of type #HyPar */
+                              void *m,       /*!< MPI object of type #MPIVariables*/
+                              int  idx,      /*!< Index of this simulation */
+                              int  nsims,    /*!< Total number of simulations */
+                              int  *dim_topo /*!< Grid dimensions of the advection field stored in file */
                             )
 {
   HyPar          *solver = (HyPar*) s;
@@ -43,17 +44,42 @@ int ShallowWater1DTopography(
   }
 
   /* read topography from provided file, if available */
-  IERR ReadArray( solver->ndims,
-                  1,
-                  solver->dim_global,
-                  solver->dim_local,
-                  solver->ghosts,
-                  solver,
-                  mpi,
-                  NULL,
-                  S,
-                  fname_root,
-                  &param->topo_flag); CHECKERR(ierr);
+  if (dim_topo == NULL) {
+    int ierr = ReadArray( solver->ndims,
+                          1,
+                          solver->dim_global,
+                          solver->dim_local,
+                          solver->ghosts,
+                          solver,
+                          mpi,
+                          NULL,
+                          S,
+                          fname_root,
+                          &param->topo_flag);
+    if (ierr) {
+      fprintf(stderr,"Error in ShallowWater1DTopography()\n");
+      fprintf(stderr,"  ReadArray() returned error!\n");
+      return ierr;
+    }
+  } else {
+    int ierr = ReadArraywInterp(  solver->ndims,
+                                  1,
+                                  solver->dim_global,
+                                  solver->dim_local,
+                                  dim_topo,
+                                  solver->ghosts,
+                                  solver,
+                                  mpi,
+                                  NULL,
+                                  S,
+                                  fname_root,
+                                  &param->topo_flag);
+    if (ierr) {
+      fprintf(stderr,"Error in ShallowWater1DTopography()\n");
+      fprintf(stderr,"  ReadArraywInterp() returned error!\n");
+      return ierr;
+    }
+  }
 
   if (!param->topo_flag) {
     /* if topography file not available, set it to zero */

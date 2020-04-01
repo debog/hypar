@@ -75,7 +75,7 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
         exit(1);
       }
 
-      if (x_from != NULL) delete[] x_from;
+      if (x_from != NULL) free(x_from);
       x_from = x_to;
 
       allocateGridArrays(dim_to, &x_to);
@@ -96,7 +96,7 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
       }
     }
 
-    if (x_from != NULL) delete[] x_from;
+    if (x_from != NULL) free(x_from);
     xg_dst = x_to;
 
   }
@@ -116,7 +116,7 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
   }
 
   if (!m_rank) {
-    delete[] xg_dst;
+    free(xg_dst);
   }
 
   /* exchange MPI-boundary values of x between processors */

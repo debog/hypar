@@ -23,7 +23,7 @@ int    ShallowWater1DRoeAverage        (double*,double*,double*,void*);
 int    ShallowWater1DLeftEigenvectors  (double*,double*,void*,int);
 int    ShallowWater1DRightEigenvectors (double*,double*,void*,int);
 
-int    ShallowWater1DTopography        (void*,void*,int,int);
+int    ShallowWater1DTopography        (void*,void*,int,int, int*);
 int    ShallowWater1DSourceUpwindLLF   (double*,double*,double*,double*,int,void*,double);
 int    ShallowWater1DSourceUpwindRoe   (double*,double*,double*,double*,int,void*,double);
 

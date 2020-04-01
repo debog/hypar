@@ -111,7 +111,7 @@ class EnsembleSimulation : public Simulation
     {
       for (int ns = 0; ns < m_nsims; ns++) {
         int retval = ::InitializePhysicsData( (void*) &(m_sims[ns]),
-                                              ns, m_nsims );
+                                              ns, m_nsims, NULL );
         if (retval) {
           fprintf(stderr, "Error in EnsembleSimulations::InitializePhysicsData()\n");
           fprintf(stderr, "  InitializePhysicsData returned with error code %d on rank %d.\n",

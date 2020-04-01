@@ -4,6 +4,7 @@
 */
 
 #include <mathfunctions.h>
+#include <matmult_native.h>
 #include <physicalmodels/shallowwater1d.h>
 
 /*! Function to compute the flux Jacobian of the 1D shallow water equations, given the

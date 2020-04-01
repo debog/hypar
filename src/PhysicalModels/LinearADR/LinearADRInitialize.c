@@ -13,7 +13,7 @@
 #include <mpivars.h>
 #include <hypar.h>
 
-int    LinearADRAdvectionField    (void*,void*,int,int);
+int    LinearADRAdvectionField    (void*,void*,int,int,int*);
 double LinearADRComputeCFL        (void*,void*,double,double);
 double LinearADRComputeDiffNumber (void*,void*,double,double);
 int    LinearADRAdvection         (double*,double*,int,void*,double);

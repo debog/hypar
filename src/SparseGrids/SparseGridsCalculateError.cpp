@@ -4,6 +4,7 @@
 */
 
 #include <arrayfunctions.h>
+#include <mathfunctions_cpp.h>
 #include <std_vec_ops.h>
 #include <sparse_grids_simulation.h>
 
@@ -23,7 +24,7 @@ void SparseGridsSimulation::CalculateError()
     HyPar* solver = &(m_sim_fg->solver);
     MPIVariables* mpi = &(m_sim_fg->mpi);
     long size = solver->nvars * solver->npoints_local_wghosts;
-    uex = new double[size];
+    uex = (double*) calloc (size, sizeof(double));
   
     char fname_root[_MAX_STRING_SIZE_] = "exact";
     IERR ExactSolution( solver,
@@ -55,11 +56,17 @@ void SparseGridsSimulation::CalculateError()
 
   } else {
 
+    std::vector<int> periodic_arr(m_ndims);
+    for (int i=0; i<m_ndims; i++) {
+      periodic_arr[i] = (m_is_periodic[i] ? 1 : 0);
+    }
+
     double *uex2 = NULL;
 
     if (m_print_sg_errors == 1) {
-      long size = m_sim_fg->solver.nvars * m_sim_fg->solver.npoints_local_wghosts;
-      uex2 = new double[size];
+      long size =   m_sim_fg->solver.nvars 
+                  * m_sim_fg->solver.npoints_local_wghosts;
+      uex2 = (double*) calloc(size, sizeof(double));
       _ArrayCopy1D_(uex, uex2, size);
     }
 
@@ -93,19 +100,28 @@ void SparseGridsSimulation::CalculateError()
                                  m_sim_fg->solver.ghosts,
                                  m_sim_fg->solver.nvars );
   
-        /* interpolate to sparse grid - this will delete the full grid array */
+        /* interpolate to sparse grid - 
+         * this will delete the full grid array*/
         double *uex_global_sg = NULL;
-        interpolate( dim_sg,
-                     &uex_global_sg,
-                     dim_fg,
-                     uex_global_fg,
-                     m_sims_sg[n].solver.nvars,
-                     m_sims_sg[n].solver.ghosts );
+        if (!m_rank) {
+          int ierr = ::InterpolateGlobalnDVar(  dim_sg.data(),
+                                                &uex_global_sg,
+                                                dim_fg.data(),
+                                                uex_global_fg,
+                                                m_sims_sg[n].solver.nvars,
+                                                m_sims_sg[n].solver.ghosts,
+                                                m_ndims,
+                                                periodic_arr.data() );
+          if (ierr) {
+            fprintf(stderr,"InterpolateGlobalnDVar() returned with error!\n");
+            exit(1);
+          }
+        }
   
         /* allocate local exact solution on this sparse grid */
         long size = m_sims_sg[n].solver.nvars 
                     * m_sims_sg[n].solver.npoints_local_wghosts;
-        double* uex_sg = new double[size];
+        double* uex_sg = (double*) calloc(size, sizeof(double));
   
         /* partition the global exact solution to local on this sparse grid */
         MPIPartitionArraynDwGhosts( m_ndims,
@@ -118,19 +134,20 @@ void SparseGridsSimulation::CalculateError()
                                     m_sims_sg[n].solver.nvars );
   
         /* delete the global exact solution array */
-        if (!m_rank) delete[] uex_global_sg;
+        if (!m_rank) free(uex_global_sg);
   
         /* compute the error */
         computeError( m_sims_sg[n], uex_sg);
   
         /* delete the exact solution array */
-        delete[] uex_sg;
+        free(uex_sg);
       }
+      free(uex2);
     }
 
   }
 
-  delete[] uex;
+  free(uex);
   return;
 }
 

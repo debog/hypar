@@ -316,7 +316,7 @@ typedef struct main_parameters {
 
   /*! Pointer to the function to read (from file) physics-related data that may not
       be a part of the solution (assigned in the physical model initialization called from InitializePhysics()) */
-  int    (*PhysicsInput)       (void*, void*,int,int);
+  int    (*PhysicsInput)       (void*, void*,int,int,int*);
 
   /*! Pointer to the function to calculate the averaged solution state, given two solution states (assigned in the physical model initialization called from InitializePhysics()) */
   int   (*AveragingFunction)   (double*,double*,double*,void*);
