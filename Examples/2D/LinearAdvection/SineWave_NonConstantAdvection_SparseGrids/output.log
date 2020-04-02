@@ -1,0 +1,718 @@
+HyPar - Parallel (MPI) version with 1 processes
+Compiled with PETSc time integration.
+-- Sparse Grids Simulation --
+Sparse grids inputs:
+  log2 of minimum grid size:  3
+  interpolation order:  6
+  write sparse grids solutions?  yes
+Allocated full grid simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 1
+  Domain size                                : 128 128 
+  Processes along each dimension             : 1 1 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 1000
+  Restart iteration                          : 0
+  Time integration scheme                    : rk (44)
+  Spatial discretization scheme (hyperbolic) : upw5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : components
+  Spatial discretization type   (parabolic ) : nonconservative-1stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 4.000000E-03
+  Check for conservation                     : yes
+  Screen output iterations                   : 50
+  File output iterations                     : 50
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : tecplot2d
+  Overwrite solution file                    : no
+  Physical model                             : linear-advection-diffusion-reaction
+Processor distribution for full grid object:    1   1
+Initializing sparse grids...
+  Number of spatial dimensions: 2
+  Computing sparse grids dimensions...
+  Number of sparse grid domains in combination technique: 9
+  Computing processor decompositions...
+Sparse Grids: Combination technique grids sizes and coefficients are:-
+    0: dim = (  128     8 ),  coeff = +1.00e+00, iproc = (    1     1 )
+    1: dim = (   64    16 ),  coeff = +1.00e+00, iproc = (    1     1 )
+    2: dim = (   32    32 ),  coeff = +1.00e+00, iproc = (    1     1 )
+    3: dim = (   16    64 ),  coeff = +1.00e+00, iproc = (    1     1 )
+    4: dim = (    8   128 ),  coeff = +1.00e+00, iproc = (    1     1 )
+    5: dim = (   64     8 ),  coeff = -1.00e+00, iproc = (    1     1 )
+    6: dim = (   32    16 ),  coeff = -1.00e+00, iproc = (    1     1 )
+    7: dim = (   16    32 ),  coeff = -1.00e+00, iproc = (    1     1 )
+    8: dim = (    8    64 ),  coeff = -1.00e+00, iproc = (    1     1 )
+Allocating data arrays for full grid.
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  -1.7631837830045516E-17
+Interpolating grid coordinates to sparse grids domain 0.
+Interpolating grid coordinates to sparse grids domain 1.
+Interpolating grid coordinates to sparse grids domain 2.
+Interpolating grid coordinates to sparse grids domain 3.
+Interpolating grid coordinates to sparse grids domain 4.
+Interpolating grid coordinates to sparse grids domain 5.
+Interpolating grid coordinates to sparse grids domain 6.
+Interpolating grid coordinates to sparse grids domain 7.
+Interpolating grid coordinates to sparse grids domain 8.
+Domain 0: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 1: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 2: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 3: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 4: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 5: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 6: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 7: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 8: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+Initializing physics. Model = "linear-advection-diffusion-reaction"
+Reading physical model inputs from file "physics.inp".
+Domain -1: Initializing physics data for model linear-advection-diffusion-reaction
+Reading array from binary file advection.inp (Serial mode).
+Domain -1: Initializing physics data for model linear-advection-diffusion-reaction
+Reading array from binary file advection.inp (Serial mode).
+Domain -1: Initializing physics data for model linear-advection-diffusion-reaction
+Reading array from binary file advection.inp (Serial mode).
+Domain -1: Initializing physics data for model linear-advection-diffusion-reaction
+Reading array from binary file advection.inp (Serial mode).
+Domain -1: Initializing physics data for model linear-advection-diffusion-reaction
+Reading array from binary file advection.inp (Serial mode).
+Domain -1: Initializing physics data for model linear-advection-diffusion-reaction
+Reading array from binary file advection.inp (Serial mode).
+Domain -1: Initializing physics data for model linear-advection-diffusion-reaction
+Reading array from binary file advection.inp (Serial mode).
+Domain -1: Initializing physics data for model linear-advection-diffusion-reaction
+Reading array from binary file advection.inp (Serial mode).
+Domain -1: Initializing physics data for model linear-advection-diffusion-reaction
+Reading array from binary file advection.inp (Serial mode).
+Interpolating initial solution to sparse grids domain 0.
+  Volume integral of the initial solution on sparse grids domain 0:
+     0:  -6.7003694259604174E-17
+Interpolating initial solution to sparse grids domain 1.
+  Volume integral of the initial solution on sparse grids domain 1:
+     0:  9.3740119833096713E-16
+Interpolating initial solution to sparse grids domain 2.
+  Volume integral of the initial solution on sparse grids domain 2:
+     0:  2.0057740190981832E-16
+Interpolating initial solution to sparse grids domain 3.
+  Volume integral of the initial solution on sparse grids domain 3:
+     0:  -1.0386656812411132E-16
+Interpolating initial solution to sparse grids domain 4.
+  Volume integral of the initial solution on sparse grids domain 4:
+     0:  -7.5894152073985310E-18
+Interpolating initial solution to sparse grids domain 5.
+  Volume integral of the initial solution on sparse grids domain 5:
+     0:  1.0191500421363742E-16
+Interpolating initial solution to sparse grids domain 6.
+  Volume integral of the initial solution on sparse grids domain 6:
+     0:  -1.2359904766334751E-16
+Interpolating initial solution to sparse grids domain 7.
+  Volume integral of the initial solution on sparse grids domain 7:
+     0:  -1.3010426069826053E-18
+Interpolating initial solution to sparse grids domain 8.
+  Volume integral of the initial solution on sparse grids domain 8:
+     0:  -2.7321894746634712E-17
+Setting up time integration.
+Solving in time (from 0 to 1000 iterations)
+Writing solution file advection_field_0_00000.dat.
+Writing solution file advection_field_1_00000.dat.
+Writing solution file advection_field_2_00000.dat.
+Writing solution file advection_field_3_00000.dat.
+Writing solution file advection_field_4_00000.dat.
+Writing solution file advection_field_5_00000.dat.
+Writing solution file advection_field_6_00000.dat.
+Writing solution file advection_field_7_00000.dat.
+Writing solution file advection_field_8_00000.dat.
+Writing solution file op_sg_0_00000.dat.
+Writing solution file op_sg_1_00000.dat.
+Writing solution file op_sg_2_00000.dat.
+Writing solution file op_sg_3_00000.dat.
+Writing solution file op_sg_4_00000.dat.
+Writing solution file op_sg_5_00000.dat.
+Writing solution file op_sg_6_00000.dat.
+Writing solution file op_sg_7_00000.dat.
+Writing solution file op_sg_8_00000.dat.
+Writing solution file op_fg_00000.dat.
+--
+Iteration:      50,  Time: 2.000e-01
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 2.2241E-02
+  Conservation loss: 1.1032E-15
+--
+
+Writing solution file advection_field_0_00001.dat.
+Writing solution file advection_field_1_00001.dat.
+Writing solution file advection_field_2_00001.dat.
+Writing solution file advection_field_3_00001.dat.
+Writing solution file advection_field_4_00001.dat.
+Writing solution file advection_field_5_00001.dat.
+Writing solution file advection_field_6_00001.dat.
+Writing solution file advection_field_7_00001.dat.
+Writing solution file advection_field_8_00001.dat.
+Writing solution file op_sg_0_00001.dat.
+Writing solution file op_sg_1_00001.dat.
+Writing solution file op_sg_2_00001.dat.
+Writing solution file op_sg_3_00001.dat.
+Writing solution file op_sg_4_00001.dat.
+Writing solution file op_sg_5_00001.dat.
+Writing solution file op_sg_6_00001.dat.
+Writing solution file op_sg_7_00001.dat.
+Writing solution file op_sg_8_00001.dat.
+Writing solution file op_fg_00001.dat.
+--
+Iteration:     100,  Time: 4.000e-01
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 1.5906E-02
+  Conservation loss: 1.0999E-15
+--
+
+Writing solution file advection_field_0_00002.dat.
+Writing solution file advection_field_1_00002.dat.
+Writing solution file advection_field_2_00002.dat.
+Writing solution file advection_field_3_00002.dat.
+Writing solution file advection_field_4_00002.dat.
+Writing solution file advection_field_5_00002.dat.
+Writing solution file advection_field_6_00002.dat.
+Writing solution file advection_field_7_00002.dat.
+Writing solution file advection_field_8_00002.dat.
+Writing solution file op_sg_0_00002.dat.
+Writing solution file op_sg_1_00002.dat.
+Writing solution file op_sg_2_00002.dat.
+Writing solution file op_sg_3_00002.dat.
+Writing solution file op_sg_4_00002.dat.
+Writing solution file op_sg_5_00002.dat.
+Writing solution file op_sg_6_00002.dat.
+Writing solution file op_sg_7_00002.dat.
+Writing solution file op_sg_8_00002.dat.
+Writing solution file op_fg_00002.dat.
+--
+Iteration:     150,  Time: 6.000e-01
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 1.0442E-02
+  Conservation loss: 9.5038E-16
+--
+
+Writing solution file advection_field_0_00003.dat.
+Writing solution file advection_field_1_00003.dat.
+Writing solution file advection_field_2_00003.dat.
+Writing solution file advection_field_3_00003.dat.
+Writing solution file advection_field_4_00003.dat.
+Writing solution file advection_field_5_00003.dat.
+Writing solution file advection_field_6_00003.dat.
+Writing solution file advection_field_7_00003.dat.
+Writing solution file advection_field_8_00003.dat.
+Writing solution file op_sg_0_00003.dat.
+Writing solution file op_sg_1_00003.dat.
+Writing solution file op_sg_2_00003.dat.
+Writing solution file op_sg_3_00003.dat.
+Writing solution file op_sg_4_00003.dat.
+Writing solution file op_sg_5_00003.dat.
+Writing solution file op_sg_6_00003.dat.
+Writing solution file op_sg_7_00003.dat.
+Writing solution file op_sg_8_00003.dat.
+Writing solution file op_fg_00003.dat.
+--
+Iteration:     200,  Time: 8.000e-01
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 7.7374E-03
+  Conservation loss: 9.7977E-16
+--
+
+Writing solution file advection_field_0_00004.dat.
+Writing solution file advection_field_1_00004.dat.
+Writing solution file advection_field_2_00004.dat.
+Writing solution file advection_field_3_00004.dat.
+Writing solution file advection_field_4_00004.dat.
+Writing solution file advection_field_5_00004.dat.
+Writing solution file advection_field_6_00004.dat.
+Writing solution file advection_field_7_00004.dat.
+Writing solution file advection_field_8_00004.dat.
+Writing solution file op_sg_0_00004.dat.
+Writing solution file op_sg_1_00004.dat.
+Writing solution file op_sg_2_00004.dat.
+Writing solution file op_sg_3_00004.dat.
+Writing solution file op_sg_4_00004.dat.
+Writing solution file op_sg_5_00004.dat.
+Writing solution file op_sg_6_00004.dat.
+Writing solution file op_sg_7_00004.dat.
+Writing solution file op_sg_8_00004.dat.
+Writing solution file op_fg_00004.dat.
+--
+Iteration:     250,  Time: 1.000e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 6.3623E-03
+  Conservation loss: 1.1215E-15
+--
+
+Writing solution file advection_field_0_00005.dat.
+Writing solution file advection_field_1_00005.dat.
+Writing solution file advection_field_2_00005.dat.
+Writing solution file advection_field_3_00005.dat.
+Writing solution file advection_field_4_00005.dat.
+Writing solution file advection_field_5_00005.dat.
+Writing solution file advection_field_6_00005.dat.
+Writing solution file advection_field_7_00005.dat.
+Writing solution file advection_field_8_00005.dat.
+Writing solution file op_sg_0_00005.dat.
+Writing solution file op_sg_1_00005.dat.
+Writing solution file op_sg_2_00005.dat.
+Writing solution file op_sg_3_00005.dat.
+Writing solution file op_sg_4_00005.dat.
+Writing solution file op_sg_5_00005.dat.
+Writing solution file op_sg_6_00005.dat.
+Writing solution file op_sg_7_00005.dat.
+Writing solution file op_sg_8_00005.dat.
+Writing solution file op_fg_00005.dat.
+--
+Iteration:     300,  Time: 1.200e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 4.6742E-03
+  Conservation loss: 1.0754E-15
+--
+
+Writing solution file advection_field_0_00006.dat.
+Writing solution file advection_field_1_00006.dat.
+Writing solution file advection_field_2_00006.dat.
+Writing solution file advection_field_3_00006.dat.
+Writing solution file advection_field_4_00006.dat.
+Writing solution file advection_field_5_00006.dat.
+Writing solution file advection_field_6_00006.dat.
+Writing solution file advection_field_7_00006.dat.
+Writing solution file advection_field_8_00006.dat.
+Writing solution file op_sg_0_00006.dat.
+Writing solution file op_sg_1_00006.dat.
+Writing solution file op_sg_2_00006.dat.
+Writing solution file op_sg_3_00006.dat.
+Writing solution file op_sg_4_00006.dat.
+Writing solution file op_sg_5_00006.dat.
+Writing solution file op_sg_6_00006.dat.
+Writing solution file op_sg_7_00006.dat.
+Writing solution file op_sg_8_00006.dat.
+Writing solution file op_fg_00006.dat.
+--
+Iteration:     350,  Time: 1.400e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 3.3827E-03
+  Conservation loss: 1.0024E-15
+--
+
+Writing solution file advection_field_0_00007.dat.
+Writing solution file advection_field_1_00007.dat.
+Writing solution file advection_field_2_00007.dat.
+Writing solution file advection_field_3_00007.dat.
+Writing solution file advection_field_4_00007.dat.
+Writing solution file advection_field_5_00007.dat.
+Writing solution file advection_field_6_00007.dat.
+Writing solution file advection_field_7_00007.dat.
+Writing solution file advection_field_8_00007.dat.
+Writing solution file op_sg_0_00007.dat.
+Writing solution file op_sg_1_00007.dat.
+Writing solution file op_sg_2_00007.dat.
+Writing solution file op_sg_3_00007.dat.
+Writing solution file op_sg_4_00007.dat.
+Writing solution file op_sg_5_00007.dat.
+Writing solution file op_sg_6_00007.dat.
+Writing solution file op_sg_7_00007.dat.
+Writing solution file op_sg_8_00007.dat.
+Writing solution file op_fg_00007.dat.
+--
+Iteration:     400,  Time: 1.600e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 2.7570E-03
+  Conservation loss: 1.0048E-15
+--
+
+Writing solution file advection_field_0_00008.dat.
+Writing solution file advection_field_1_00008.dat.
+Writing solution file advection_field_2_00008.dat.
+Writing solution file advection_field_3_00008.dat.
+Writing solution file advection_field_4_00008.dat.
+Writing solution file advection_field_5_00008.dat.
+Writing solution file advection_field_6_00008.dat.
+Writing solution file advection_field_7_00008.dat.
+Writing solution file advection_field_8_00008.dat.
+Writing solution file op_sg_0_00008.dat.
+Writing solution file op_sg_1_00008.dat.
+Writing solution file op_sg_2_00008.dat.
+Writing solution file op_sg_3_00008.dat.
+Writing solution file op_sg_4_00008.dat.
+Writing solution file op_sg_5_00008.dat.
+Writing solution file op_sg_6_00008.dat.
+Writing solution file op_sg_7_00008.dat.
+Writing solution file op_sg_8_00008.dat.
+Writing solution file op_fg_00008.dat.
+--
+Iteration:     450,  Time: 1.800e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 2.1329E-03
+  Conservation loss: 9.1568E-16
+--
+
+Writing solution file advection_field_0_00009.dat.
+Writing solution file advection_field_1_00009.dat.
+Writing solution file advection_field_2_00009.dat.
+Writing solution file advection_field_3_00009.dat.
+Writing solution file advection_field_4_00009.dat.
+Writing solution file advection_field_5_00009.dat.
+Writing solution file advection_field_6_00009.dat.
+Writing solution file advection_field_7_00009.dat.
+Writing solution file advection_field_8_00009.dat.
+Writing solution file op_sg_0_00009.dat.
+Writing solution file op_sg_1_00009.dat.
+Writing solution file op_sg_2_00009.dat.
+Writing solution file op_sg_3_00009.dat.
+Writing solution file op_sg_4_00009.dat.
+Writing solution file op_sg_5_00009.dat.
+Writing solution file op_sg_6_00009.dat.
+Writing solution file op_sg_7_00009.dat.
+Writing solution file op_sg_8_00009.dat.
+Writing solution file op_fg_00009.dat.
+--
+Iteration:     500,  Time: 2.000e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 1.6837E-03
+  Conservation loss: 1.0634E-15
+--
+
+Writing solution file advection_field_0_00010.dat.
+Writing solution file advection_field_1_00010.dat.
+Writing solution file advection_field_2_00010.dat.
+Writing solution file advection_field_3_00010.dat.
+Writing solution file advection_field_4_00010.dat.
+Writing solution file advection_field_5_00010.dat.
+Writing solution file advection_field_6_00010.dat.
+Writing solution file advection_field_7_00010.dat.
+Writing solution file advection_field_8_00010.dat.
+Writing solution file op_sg_0_00010.dat.
+Writing solution file op_sg_1_00010.dat.
+Writing solution file op_sg_2_00010.dat.
+Writing solution file op_sg_3_00010.dat.
+Writing solution file op_sg_4_00010.dat.
+Writing solution file op_sg_5_00010.dat.
+Writing solution file op_sg_6_00010.dat.
+Writing solution file op_sg_7_00010.dat.
+Writing solution file op_sg_8_00010.dat.
+Writing solution file op_fg_00010.dat.
+--
+Iteration:     550,  Time: 2.200e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 1.3778E-03
+  Conservation loss: 1.0364E-15
+--
+
+Writing solution file advection_field_0_00011.dat.
+Writing solution file advection_field_1_00011.dat.
+Writing solution file advection_field_2_00011.dat.
+Writing solution file advection_field_3_00011.dat.
+Writing solution file advection_field_4_00011.dat.
+Writing solution file advection_field_5_00011.dat.
+Writing solution file advection_field_6_00011.dat.
+Writing solution file advection_field_7_00011.dat.
+Writing solution file advection_field_8_00011.dat.
+Writing solution file op_sg_0_00011.dat.
+Writing solution file op_sg_1_00011.dat.
+Writing solution file op_sg_2_00011.dat.
+Writing solution file op_sg_3_00011.dat.
+Writing solution file op_sg_4_00011.dat.
+Writing solution file op_sg_5_00011.dat.
+Writing solution file op_sg_6_00011.dat.
+Writing solution file op_sg_7_00011.dat.
+Writing solution file op_sg_8_00011.dat.
+Writing solution file op_fg_00011.dat.
+--
+Iteration:     600,  Time: 2.400e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 1.0731E-03
+  Conservation loss: 1.1319E-15
+--
+
+Writing solution file advection_field_0_00012.dat.
+Writing solution file advection_field_1_00012.dat.
+Writing solution file advection_field_2_00012.dat.
+Writing solution file advection_field_3_00012.dat.
+Writing solution file advection_field_4_00012.dat.
+Writing solution file advection_field_5_00012.dat.
+Writing solution file advection_field_6_00012.dat.
+Writing solution file advection_field_7_00012.dat.
+Writing solution file advection_field_8_00012.dat.
+Writing solution file op_sg_0_00012.dat.
+Writing solution file op_sg_1_00012.dat.
+Writing solution file op_sg_2_00012.dat.
+Writing solution file op_sg_3_00012.dat.
+Writing solution file op_sg_4_00012.dat.
+Writing solution file op_sg_5_00012.dat.
+Writing solution file op_sg_6_00012.dat.
+Writing solution file op_sg_7_00012.dat.
+Writing solution file op_sg_8_00012.dat.
+Writing solution file op_fg_00012.dat.
+--
+Iteration:     650,  Time: 2.600e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 8.2563E-04
+  Conservation loss: 9.8764E-16
+--
+
+Writing solution file advection_field_0_00013.dat.
+Writing solution file advection_field_1_00013.dat.
+Writing solution file advection_field_2_00013.dat.
+Writing solution file advection_field_3_00013.dat.
+Writing solution file advection_field_4_00013.dat.
+Writing solution file advection_field_5_00013.dat.
+Writing solution file advection_field_6_00013.dat.
+Writing solution file advection_field_7_00013.dat.
+Writing solution file advection_field_8_00013.dat.
+Writing solution file op_sg_0_00013.dat.
+Writing solution file op_sg_1_00013.dat.
+Writing solution file op_sg_2_00013.dat.
+Writing solution file op_sg_3_00013.dat.
+Writing solution file op_sg_4_00013.dat.
+Writing solution file op_sg_5_00013.dat.
+Writing solution file op_sg_6_00013.dat.
+Writing solution file op_sg_7_00013.dat.
+Writing solution file op_sg_8_00013.dat.
+Writing solution file op_fg_00013.dat.
+--
+Iteration:     700,  Time: 2.800e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 6.7015E-04
+  Conservation loss: 1.0517E-15
+--
+
+Writing solution file advection_field_0_00014.dat.
+Writing solution file advection_field_1_00014.dat.
+Writing solution file advection_field_2_00014.dat.
+Writing solution file advection_field_3_00014.dat.
+Writing solution file advection_field_4_00014.dat.
+Writing solution file advection_field_5_00014.dat.
+Writing solution file advection_field_6_00014.dat.
+Writing solution file advection_field_7_00014.dat.
+Writing solution file advection_field_8_00014.dat.
+Writing solution file op_sg_0_00014.dat.
+Writing solution file op_sg_1_00014.dat.
+Writing solution file op_sg_2_00014.dat.
+Writing solution file op_sg_3_00014.dat.
+Writing solution file op_sg_4_00014.dat.
+Writing solution file op_sg_5_00014.dat.
+Writing solution file op_sg_6_00014.dat.
+Writing solution file op_sg_7_00014.dat.
+Writing solution file op_sg_8_00014.dat.
+Writing solution file op_fg_00014.dat.
+--
+Iteration:     750,  Time: 3.000e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 5.5489E-04
+  Conservation loss: 9.8038E-16
+--
+
+Writing solution file advection_field_0_00015.dat.
+Writing solution file advection_field_1_00015.dat.
+Writing solution file advection_field_2_00015.dat.
+Writing solution file advection_field_3_00015.dat.
+Writing solution file advection_field_4_00015.dat.
+Writing solution file advection_field_5_00015.dat.
+Writing solution file advection_field_6_00015.dat.
+Writing solution file advection_field_7_00015.dat.
+Writing solution file advection_field_8_00015.dat.
+Writing solution file op_sg_0_00015.dat.
+Writing solution file op_sg_1_00015.dat.
+Writing solution file op_sg_2_00015.dat.
+Writing solution file op_sg_3_00015.dat.
+Writing solution file op_sg_4_00015.dat.
+Writing solution file op_sg_5_00015.dat.
+Writing solution file op_sg_6_00015.dat.
+Writing solution file op_sg_7_00015.dat.
+Writing solution file op_sg_8_00015.dat.
+Writing solution file op_fg_00015.dat.
+--
+Iteration:     800,  Time: 3.200e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 4.3893E-04
+  Conservation loss: 1.0627E-15
+--
+
+Writing solution file advection_field_0_00016.dat.
+Writing solution file advection_field_1_00016.dat.
+Writing solution file advection_field_2_00016.dat.
+Writing solution file advection_field_3_00016.dat.
+Writing solution file advection_field_4_00016.dat.
+Writing solution file advection_field_5_00016.dat.
+Writing solution file advection_field_6_00016.dat.
+Writing solution file advection_field_7_00016.dat.
+Writing solution file advection_field_8_00016.dat.
+Writing solution file op_sg_0_00016.dat.
+Writing solution file op_sg_1_00016.dat.
+Writing solution file op_sg_2_00016.dat.
+Writing solution file op_sg_3_00016.dat.
+Writing solution file op_sg_4_00016.dat.
+Writing solution file op_sg_5_00016.dat.
+Writing solution file op_sg_6_00016.dat.
+Writing solution file op_sg_7_00016.dat.
+Writing solution file op_sg_8_00016.dat.
+Writing solution file op_fg_00016.dat.
+--
+Iteration:     850,  Time: 3.400e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 3.5386E-04
+  Conservation loss: 9.9935E-16
+--
+
+Writing solution file advection_field_0_00017.dat.
+Writing solution file advection_field_1_00017.dat.
+Writing solution file advection_field_2_00017.dat.
+Writing solution file advection_field_3_00017.dat.
+Writing solution file advection_field_4_00017.dat.
+Writing solution file advection_field_5_00017.dat.
+Writing solution file advection_field_6_00017.dat.
+Writing solution file advection_field_7_00017.dat.
+Writing solution file advection_field_8_00017.dat.
+Writing solution file op_sg_0_00017.dat.
+Writing solution file op_sg_1_00017.dat.
+Writing solution file op_sg_2_00017.dat.
+Writing solution file op_sg_3_00017.dat.
+Writing solution file op_sg_4_00017.dat.
+Writing solution file op_sg_5_00017.dat.
+Writing solution file op_sg_6_00017.dat.
+Writing solution file op_sg_7_00017.dat.
+Writing solution file op_sg_8_00017.dat.
+Writing solution file op_fg_00017.dat.
+--
+Iteration:     900,  Time: 3.600e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 2.9575E-04
+  Conservation loss: 1.1153E-15
+--
+
+Writing solution file advection_field_0_00018.dat.
+Writing solution file advection_field_1_00018.dat.
+Writing solution file advection_field_2_00018.dat.
+Writing solution file advection_field_3_00018.dat.
+Writing solution file advection_field_4_00018.dat.
+Writing solution file advection_field_5_00018.dat.
+Writing solution file advection_field_6_00018.dat.
+Writing solution file advection_field_7_00018.dat.
+Writing solution file advection_field_8_00018.dat.
+Writing solution file op_sg_0_00018.dat.
+Writing solution file op_sg_1_00018.dat.
+Writing solution file op_sg_2_00018.dat.
+Writing solution file op_sg_3_00018.dat.
+Writing solution file op_sg_4_00018.dat.
+Writing solution file op_sg_5_00018.dat.
+Writing solution file op_sg_6_00018.dat.
+Writing solution file op_sg_7_00018.dat.
+Writing solution file op_sg_8_00018.dat.
+Writing solution file op_fg_00018.dat.
+--
+Iteration:     950,  Time: 3.800e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 2.4308E-04
+  Conservation loss: 9.8256E-16
+--
+
+Writing solution file advection_field_0_00019.dat.
+Writing solution file advection_field_1_00019.dat.
+Writing solution file advection_field_2_00019.dat.
+Writing solution file advection_field_3_00019.dat.
+Writing solution file advection_field_4_00019.dat.
+Writing solution file advection_field_5_00019.dat.
+Writing solution file advection_field_6_00019.dat.
+Writing solution file advection_field_7_00019.dat.
+Writing solution file advection_field_8_00019.dat.
+Writing solution file op_sg_0_00019.dat.
+Writing solution file op_sg_1_00019.dat.
+Writing solution file op_sg_2_00019.dat.
+Writing solution file op_sg_3_00019.dat.
+Writing solution file op_sg_4_00019.dat.
+Writing solution file op_sg_5_00019.dat.
+Writing solution file op_sg_6_00019.dat.
+Writing solution file op_sg_7_00019.dat.
+Writing solution file op_sg_8_00019.dat.
+Writing solution file op_fg_00019.dat.
+--
+Iteration:    1000,  Time: 4.000e+00
+  Max CFL: 3.196E-02,  Max Diff. No.: 0.000E+00,    Norm: 2.0336E-04
+  Conservation loss: 1.0652E-15
+--
+
+Writing solution file advection_field_0_00020.dat.
+Writing solution file advection_field_1_00020.dat.
+Writing solution file advection_field_2_00020.dat.
+Writing solution file advection_field_3_00020.dat.
+Writing solution file advection_field_4_00020.dat.
+Writing solution file advection_field_5_00020.dat.
+Writing solution file advection_field_6_00020.dat.
+Writing solution file advection_field_7_00020.dat.
+Writing solution file advection_field_8_00020.dat.
+Writing solution file op_sg_0_00020.dat.
+Writing solution file op_sg_1_00020.dat.
+Writing solution file op_sg_2_00020.dat.
+Writing solution file op_sg_3_00020.dat.
+Writing solution file op_sg_4_00020.dat.
+Writing solution file op_sg_5_00020.dat.
+Writing solution file op_sg_6_00020.dat.
+Writing solution file op_sg_7_00020.dat.
+Writing solution file op_sg_8_00020.dat.
+Writing solution file op_fg_00020.dat.
+Completed time integration (Final time: 4.000000).
+
+Conservation Errors:
+	9.5911234683498936E-17
+
+Conservation Errors:
+	9.6971042307103517E-16
+
+Conservation Errors:
+	2.7018318138338770E-16
+
+Conservation Errors:
+	5.5402731014009277E-17
+
+Conservation Errors:
+	2.6969529040576923E-17
+
+Conservation Errors:
+	2.9438799488412659E-16
+
+Conservation Errors:
+	5.3776427755281020E-17
+
+Conservation Errors:
+	1.3595895242968226E-16
+
+Conservation Errors:
+	1.8702487475374951E-17
+
+Solver runtime (in seconds): 2.6698212999999999E+01
+Total  runtime (in seconds): 2.6852226999999999E+01
+Deallocating arrays.
+Finished.

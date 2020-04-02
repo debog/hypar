@@ -4701,7 +4701,8 @@ The following are some examples are simulated using the <B>sparse grids</B>
 method. Familiarity with the sparse grids approach (specifically the combination
 technique approach) is assumed.
 
-\subpage sg_linear_adv_sinewave
+\subpage sg_linear_adv_sinewave \n
+\subpage sg_linear_adv_2d_sine_varyingadv
 
 \subpage sg_euler2d_density_sinewave\n
 \subpage sg_euler2d_vortconv\n
@@ -4849,6 +4850,120 @@ time step size (#HyPar::dt), and conservation error (#HyPar::ConservationError).
 
 Expected screen output:
 \include 2D/LinearAdvection/SineWave_SparseGrids/output.log
+
+\page sg_linear_adv_2d_sine_varyingadv 2D Linear Advection - Sine Wave with Spatially-Varying Advection Speed
+
+Location: \b hypar/Examples/2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Linear Advection Equation (linearadr.h)
+
+Domain: \f$0 \le x,y < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions on all boundaries.
+
+Initial solution: \f$u\left(x,y,0\right) = u_0\left(x,y\right)= \cos\left(4\pi y\right)\f$\n
+
+Advection speed: \f$a_x\left(x,y\right) = \sin\left(4\pi y\right)\f$, \f$a_y\left(x,y\right) = -\cos\left(4\pi x\right)\f$
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b sparse_grids.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/sparse_grids.inp
+
+\b Note: The remaining files are the same as what would be 
+required for a conventional (non-sparse-grids) simulation.
+
+\b solver.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/solver.inp
+
+\b boundary.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/boundary.inp
+
+\b physics.inp (specifies filename for advection field)
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/physics.inp
+\b Note: Do not include the ".inp" extension in the filename above.
+
+To generate \b initial.inp and \b advection.inp, compile and run the 
+following code in the run directory. 
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/aux/init.c
+
+Output:
+-------
+Note that \b iproc does \b not need to be set for simulations
+using sparse grids. HyPar will automatically calculate the load
+balanced processor distribution for each sparse grid. If too
+many processors are specified, then it will return an error.
+
+After running the code, there should be the following output
+files:
+
+  + op_fg_00000.dat, ..., op_fg_00020.dat: these contain the full
+    grid solution at \f$t=0, ..., 4\f$.
+  + op_sg_<n>_00000.dat, ..., op_sg_<n>_00020.dat: these contain
+    the solution on each of the sparse grids in the combination
+    technique. These are written out because \b write_sg_solutions
+    is set to \b yes in \b sparse_grids.inp 
+    (SparseGridsSimulation::m_write_sg_solutions).
+    
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the final column is the 
+solution.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation was generated from the full grid solution files
+that were computed by using the combination technique on the sparse grids:
+@image html Solution_SG_full_2DLinearAdvSine_VaryingAdv.gif
+
+The following animations show the solution on some of the sparse grids
+in the combination technique. The simulation was actually carried out on 
+these grids. Note the different grid sizes.
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_0.gif
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_2.gif
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_4.gif
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_6.gif
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_8.gif
+
+In addition to the usual output files, the linear advection physics 
+module writes out the following files:
++ \b advection_field_<n>_00000.dat, ..., \b advection_field_<n>_00020.dat: 
+  These files
+  share the same format as the solution output files \b op_*.dat 
+  and contains the advection field \f$a_x\left(x,y\right), a_y\left(x,y\right)\f$.
+
+The following figure shows the vector plot of the velocity field on
+some of the sparse grids:
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_0.png
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_2.png
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_4.png
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_6.png
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_8.png
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation errors for each of the sparse grids
+and prints it to screen, as well as the files \b conservation_<n>.dat:
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/conservation_0.dat
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/conservation_2.dat
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/conservation_4.dat
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/conservation_6.dat
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/conservation_8.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt), and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/output.log
 
 \page sg_euler2d_density_sinewave 2D Euler Equations - Density Sine Wave
 
