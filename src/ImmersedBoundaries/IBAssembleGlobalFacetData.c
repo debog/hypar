@@ -16,7 +16,7 @@
  *  (#ImmersedBoundary::nfacets_local X nvars).
  *
  *  The global array must be NULL at input; it will have the size
- *  (#ImmersedBoundary::nfacets_global X nvars) at output on rank 0;
+ *  (#Body3D::nfacets X nvars) at output on rank 0;
  *  it will remain NULL on other ranks.
 */
 int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of type #MPIVariables */
