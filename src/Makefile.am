@@ -27,7 +27,6 @@ HyPar_LDADD = \
   HyParFunctions/libHyParFunctions.a \
   TimeIntegration/libTimeIntegration.a \
   PETScFunctions/libPETScFunctions.a \
-  ImmersedBoundaries/libImmersedBoundaries.a \
   BoundaryConditions/libBoundaryConditions.a \
   PhysicalModels/LinearADR/libLinearADR.a \
   PhysicalModels/Burgers/libBurgers.a \
@@ -43,6 +42,7 @@ HyPar_LDADD = \
   PhysicalModels/Numa3D/libNuma3D.a \
   PhysicalModels/ShallowWater1D/libShallowWater1D.a \
   PhysicalModels/ShallowWater2D/libShallowWater2D.a \
+  ImmersedBoundaries/libImmersedBoundaries.a \
   InterpolationFunctions/libInterpolationFunctions.a \
   LimiterFunctions/libLimiterFunctions.a \
   FirstDerivative/libFirstDerivative.a \
