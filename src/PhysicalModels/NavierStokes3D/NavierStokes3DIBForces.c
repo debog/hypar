@@ -207,7 +207,7 @@ static int WriteSurfaceData(  void*               m,              /*!< MPI objec
     fprintf(out,"ZONE N = %d, E = %d, DATAPACKING = POINT, ZONETYPE = FETRIANGLE\n",3*nfacets_global,nfacets_global);
 
 		for (int n = 0; n < nfacets_global; n++) {
-      fprintf(  out, "%lf %lf %lf %lf %lf %lf %lf %lf\n",
+      fprintf(  out, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
                 facets[n].x1,
                 facets[n].y1,
                 facets[n].z1,
@@ -219,7 +219,7 @@ static int WriteSurfaceData(  void*               m,              /*!< MPI objec
                 shear_g[4*n+_YDIR_],
                 shear_g[4*n+_ZDIR_],
                 shear_g[4*n+_ZDIR_+1] );
-      fprintf(  out, "%lf %lf %lf %lf %lf %lf %lf %lf\n",
+      fprintf(  out, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
                 facets[n].x2,
                 facets[n].y2,
                 facets[n].z2,
@@ -231,7 +231,7 @@ static int WriteSurfaceData(  void*               m,              /*!< MPI objec
                 shear_g[4*n+_YDIR_],
                 shear_g[4*n+_ZDIR_],
                 shear_g[4*n+_ZDIR_+1] );
-      fprintf(  out, "%lf %lf %lf %lf %lf %lf %lf %lf\n",
+      fprintf(  out, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
                 facets[n].x3,
                 facets[n].y3,
                 facets[n].z3,
