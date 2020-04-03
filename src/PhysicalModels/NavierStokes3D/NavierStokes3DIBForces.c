@@ -36,8 +36,8 @@ int NavierStokes3DComputeTemperature(double*, const double* const, void*);
 */
 static int ComputeShear(void *s,              /*!< Solver object of type #HyPar */
                         void *m,              /*!< MPI object of type #MPIVariables */
-                        const double* const u,/*! conserved flow variables */ 
-                        double** const sf     /*! Array for (x,y,z)-components & magnitude of shear */
+                        const double* const u,/*!< Array containing the conserved flow variables */ 
+                        double** const sf     /*!< Array for (x,y,z)-components & magnitude of shear */
                        )
 {
   HyPar             *solver  = (HyPar*)          s;
