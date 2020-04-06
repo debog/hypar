@@ -3990,7 +3990,7 @@ representation of the immersed body is necessary. Note:
 
 \subpage ns3d_shock_cylinder_interaction
 
-\subpage ns3d_sphere_steady_incompressible_viscous
+\subpage ns3d_sphere_steady_incompressible_viscous_adiabatic
 
 \page ns3d_cylinder_steady_incompressible_viscous Steady, incompressible, viscous flow around a cylinder
 
@@ -4346,9 +4346,9 @@ Expected screen output:
 \include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction/output.log
 
   
-\page ns3d_sphere_steady_incompressible_viscous Steady, incompressible, viscous flow around a sphere
+\page ns3d_sphere_steady_incompressible_viscous_adiabatic Steady, incompressible, viscous flow around an adiabatic sphere
 
-Location: \b hypar/Examples/3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible
+Location: \b hypar/Examples/3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic
 
 Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
 
@@ -4370,6 +4370,8 @@ Boundary conditions:
   + xmax: Subsonic outflow #_SUBSONIC_OUTFLOW_
   + ymin and ymax: Subsonic "ambivalent" #_SUBSONIC_AMBIVALENT_
   + zmin and zmax: Subsonic "ambivalent" #_SUBSONIC_AMBIVALENT_
+  + The immersed body wall is specified as adiabatic (#_IB_ADIABATIC_);
+    (this is the default).
 
 Reference:
   + Taneda, S., “Experimental Investigation of Wake behind a Sphere at Low Reynolds Numbers,” 
@@ -4396,17 +4398,17 @@ Numerical Method:
 Input files required:
 ---------------------
 
-These files are all located in: \b hypar/Examples/3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/
+These files are all located in: \b hypar/Examples/3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/
 
 \b solver.inp
-\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/solver.inp
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/solver.inp
 
 \b boundary.inp
-\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/boundary.inp
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/boundary.inp
 
 \b physics.inp : The following file specifies a Reynolds number
 of 100. To try other Reynolds numbers, change it here.
-\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/physics.inp
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/physics.inp
 
 \b sphere.stl : the filename "sphere.stl" \b must match
 the input for \a immersed_body in \a solver.inp.\n
@@ -4414,18 +4416,18 @@ Located at \b hypar/Examples/STLGeometries/sphere.stl
 
 To generate \b initial.inp (initial solution), compile 
 and run the following code in the run directory.
-\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/aux/init.c
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/aux/init.c
 
 Output:
 -------
 
 Note that \b iproc is set to 
 
-      2 2 2
+      8 4 4
 
-in \b solver.inp (i.e., 2 processors along \a x, 2
-processors along \a y, and 2 processor along \a z). Thus, 
-this example should be run with 8 MPI ranks (or change \b iproc).
+in \b solver.inp (i.e., 8 processors along \a x, 4
+processors along \a y, and 4 processor along \a z). Thus, 
+this example should be run with 128 MPI ranks (or change \b iproc).
 
 After running the code, there should be one output file
 \b op.bin, since #HyPar::op_overwrite is set to \a yes in \b solver.inp.
@@ -4447,11 +4449,13 @@ forces on the immersed body. This file is called \a surface.dat (if #HyPar::op_o
 is "yes") or \a surface_nnnnn.dat (if #HyPar::op_overwrite is "no", "nnnnn" is a numerical
 index) (in this example, the file \b surface.dat is written out). This is an ASCII file in 
 the Tecplot format, where the immersed body and the forces on it are represented using the 
-"FETRIANGLE" type. The following image shows the surface pressure on the sphere (front-view):
-@image html IBSurface_3DNavStokSphere.png
+"FETRIANGLE" type. The following image shows the surface pressure and temperature
+on the sphere (front-view):
+@image html IBSurface_3DNavStokSphereAdiabatic_Pressure.png
+@image html IBSurface_3DNavStokSphereAdiabatic_Temperature.png
 
 Expected screen output:
-\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/output.log
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/output.log
 
 \page md_examples Multidomain Examples
 HyPar has the capability to run ensemble simulations on multiple domains that 
