@@ -30,7 +30,6 @@ int LinearADRWriteAdvField( void* s, /*!< Solver object of type #HyPar */
       GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
       strcat(fname_root, "_");
       strcat(fname_root, index);
-      strcat(fname_root, "_");
     }
 
     int adv_nvar = solver->ndims * solver->nvars;

@@ -13,7 +13,7 @@
 #include <mpivars.h>
 #include <hypar.h>
 
-int    LinearADRAdvectionField    (void*,void*);
+int    LinearADRAdvectionField    (void*,void*,int,int,int*);
 double LinearADRComputeCFL        (void*,void*,double,double);
 double LinearADRComputeDiffNumber (void*,void*,double,double);
 int    LinearADRAdvection         (double*,double*,int,void*,double);
@@ -139,17 +139,6 @@ int LinearADRInitialize(
 #ifndef serial
     MPIBroadcast_character(physics->adv_filename, _MAX_STRING_SIZE_,0,&mpi->world);
 #endif
-    if (!mpi->rank) {
-      printf("Reading advection field from %s.\n", physics->adv_filename);
-    }
-    int retval = LinearADRAdvectionField(solver, mpi);
-    if (retval) {
-      if (!mpi->rank) {
-        fprintf(stderr, "Error in LinearADRInitialize():\n");
-        fprintf(stderr, "LinearADRAdvectionField() returned with error.\n");
-      }
-      return retval;
-    }
   }
 
 #ifndef serial
@@ -175,7 +164,11 @@ int LinearADRInitialize(
   solver->Upwind             = LinearADRUpwind;
 
   if (physics->constant_advection == 0) {
+    solver->PhysicsInput = LinearADRAdvectionField;
     solver->PhysicsOutput = LinearADRWriteAdvField;
+  } else {
+    solver->PhysicsInput = NULL;
+    solver->PhysicsOutput = NULL;
   }
 
   count++;

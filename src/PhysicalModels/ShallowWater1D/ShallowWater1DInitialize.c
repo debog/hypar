@@ -23,7 +23,7 @@ int    ShallowWater1DRoeAverage        (double*,double*,double*,void*);
 int    ShallowWater1DLeftEigenvectors  (double*,double*,void*,int);
 int    ShallowWater1DRightEigenvectors (double*,double*,void*,int);
 
-int    ShallowWater1DTopography        (void*,void*);
+int    ShallowWater1DTopography        (void*,void*,int,int, int*);
 int    ShallowWater1DSourceUpwindLLF   (double*,double*,double*,double*,int,void*,double);
 int    ShallowWater1DSourceUpwindRoe   (double*,double*,double*,double*,int,void*,double);
 
@@ -125,7 +125,8 @@ int ShallowWater1DInitialize(
 
   /* allocate array to hold the bottom topography field */
   physics->b = (double*) calloc (solver->npoints_local_wghosts, sizeof(double));
-  IERR ShallowWater1DTopography(solver,mpi); CHECKERR(ierr);
+  /* set function pointer to read this topography */
+  solver->PhysicsInput = ShallowWater1DTopography;
 
   count++;
   return(0);

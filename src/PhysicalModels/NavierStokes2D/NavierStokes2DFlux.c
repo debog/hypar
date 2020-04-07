@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <arrayfunctions.h>
 #include <mathfunctions.h>
+#include <matmult_native.h>
 #include <physicalmodels/navierstokes2d.h>
 #include <hypar.h>
 

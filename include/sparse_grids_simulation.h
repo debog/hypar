@@ -126,6 +126,24 @@ class SparseGridsSimulation : public Simulation
       return retval;
     }
 
+    /*! Initialize the physics of the simulations */
+    inline int InitializePhysicsData()
+    {
+      for (int ns = 0; ns < m_sims_sg.size(); ns++) {
+        int retval = ::InitializePhysicsData( (void*) &(m_sims_sg[ns]),
+                                              -1, 
+                                              m_nsims_sg,
+                                              m_sim_fg->solver.dim_global);
+        if (retval) {
+          fprintf(stderr, "Error in SparseGridsSimulation::InitializePhysicsData()\n");
+          fprintf(stderr, "  InitializePhysicsData returned with error code %d on rank %d.\n",
+                  retval, m_sims_sg[ns].mpi.rank);
+          return retval;
+        }
+      }
+      return 0;
+    }
+
     /*! Initialize the numerical solvers of the simulations */
     inline int InitializeSolvers()
     {
@@ -263,28 +281,6 @@ class SparseGridsSimulation : public Simulation
                       double** const, 
                       const SimulationObject* const);
 
-    /*! Interpolate data from one global C-array to another */
-    void interpolate( const GridDimensions&,
-                      double** const,
-                      const GridDimensions&,
-                      double* const,
-                      const int,
-                      const int );
-
-    /*! Coarsen along a given dimension */
-    void coarsen1D( const GridDimensions&,
-                    const GridDimensions&,
-                    const double* const, 
-                    double* const,
-                    int, int, int );
-
-    /*! Refine along a given dimension */
-    void refine1D( const GridDimensions&,
-                   const GridDimensions&,
-                   const double* const, 
-                   double* const,
-                   int, int, int );
-
     /*! Interpolate data from one simulation object to another */
     void interpolateGrid( SimulationObject* const, 
                           const SimulationObject* const);
@@ -351,7 +347,7 @@ class SparseGridsSimulation : public Simulation
         dim_wghosts[i] += (2*a_ngpt);
       }
       long size_x = StdVecOps::sum(dim_wghosts);
-      (*a_x) = new double[size_x];
+      (*a_x) = (double*) calloc (size_x, sizeof(double));
       for (int i=0; i<size_x; i++) (*a_x)[i] = 0.0;
       return;
     }
@@ -367,7 +363,7 @@ class SparseGridsSimulation : public Simulation
         dim_wghosts[i] += (2*a_ngpt);
       }
       long size_u = a_nvars*StdVecOps::product(dim_wghosts);
-      (*a_u) = new double[size_u];
+      (*a_u) = (double*) calloc (size_u, sizeof(double));
       for (int i=0; i<size_u; i++) (*a_u)[i] = 0.0;
       return;
     }

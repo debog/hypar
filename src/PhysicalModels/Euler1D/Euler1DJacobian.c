@@ -4,6 +4,7 @@
 */
 
 #include <mathfunctions.h>
+#include <matmult_native.h>
 #include <physicalmodels/euler1d.h>
 
 /*! Function to compute the flux Jacobian of the 1D Euler equations, given the

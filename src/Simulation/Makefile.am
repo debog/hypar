@@ -6,6 +6,7 @@ libSimulation_a_SOURCES = \
   InitializeBoundaries.c \
   InitializeImmersedBoundaries.c \
   InitializePhysics.c \
+  InitializePhysicsData.c \
   InitializeSolvers.c \
   InitialSolution.c \
   OutputSolution.c \

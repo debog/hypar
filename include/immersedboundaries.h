@@ -178,4 +178,9 @@ int IBIdentifyMode      (double*,int*,void*);
 int IBNearestFacetNormal(void*,void*,double*,double,int*,int);
 int IBInterpCoeffs      (void*,void*,double*,int*,int,double*);
 
+int IBAssembleGlobalFacetData(void*,void*,const double* const, double** const,int);
+
+int IBComputeNormalGradient(void*,void*,const double* const, int, double** const);
+int IBComputeFacetVar(void*,void*,const double* const, int, double** const);
+
 #endif

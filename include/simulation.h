@@ -19,6 +19,7 @@ extern "C" int InitialSolution(void*,int);/*!< Read the initial solution */
 extern "C" int InitializeBoundaries(void*,int);/*!< Initialize the boundary conditions */
 extern "C" int InitializeImmersedBoundaries(void*,int);/*!< Initialize the immersed boundary conditions */
 extern "C" int InitializePhysics(void*,int);/*!< Initialize the physics */
+extern "C" int InitializePhysicsData(void*,int,int,int*);/*!< Initialize the physics data*/
 extern "C" int InitializeSolvers(void*,int);/*!< Initialize the solvers */
 extern "C" int Solve(void*,int, int, int);/*!< Solve the PDE - time-integration */
 #ifdef with_petsc
@@ -67,6 +68,9 @@ class Simulation
 
     /*! Initialize the physics of the simulations */
     virtual int InitializePhysics() = 0;
+
+    /*! Initialize the physics data of the simulations */
+    virtual int InitializePhysicsData() = 0;
 
     /*! Initialize the numerical solvers of the simulations */
     virtual int InitializeSolvers() = 0;

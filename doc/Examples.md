@@ -4072,7 +4072,8 @@ representation of the immersed body is necessary. Note:
 
 \subpage ns3d_shock_cylinder_interaction
 
-\subpage ns3d_sphere_steady_incompressible_viscous
+\subpage ns3d_sphere_steady_incompressible_viscous_adiabatic \n
+\subpage ns3d_sphere_steady_incompressible_viscous_isothermal
 
 \page ns3d_cylinder_steady_incompressible_viscous Steady, incompressible, viscous flow around a cylinder
 
@@ -4098,6 +4099,8 @@ Boundary conditions:
   + xmax: Subsonic outflow #_SUBSONIC_OUTFLOW_
   + ymin and ymax: Subsonic "ambivalent" #_SUBSONIC_AMBIVALENT_
   + zmin and zmax: Periodic #_PERIODIC_ (to simulate a 2D flow in the x-y plane)
+  + The immersed body wall is specified as adiabatic (#_IB_ADIABATIC_);
+    (this is the default).
 
 Reference:
   + Taneda, S., "Experimental Investigation of the Wakes behind Cylinders and Plates at Low 
@@ -4231,6 +4234,8 @@ Boundary conditions:
   + xmax: Subsonic outflow #_SUBSONIC_OUTFLOW_
   + ymin and ymax: Subsonic "ambivalent" #_SUBSONIC_AMBIVALENT_
   + zmin and zmax: Periodic #_PERIODIC_ (to simulate a 2D flow in the x-y plane)
+  + The immersed body wall is specified as adiabatic (#_IB_ADIABATIC_);
+    (this is the default).
 
 Reference:
   + Taneda, S., "Experimental Investigation of the Wakes behind Cylinders and Plates at Low 
@@ -4342,6 +4347,8 @@ Boundary conditions:
   + xmax: Supersonic inflow #_SUPERSONIC_OUTFLOW_ (with pre-shock flow conditions)
   + ymin and ymax: Slip walls #_SLIP_WALL_
   + zmin and zmax: Periodic #_PERIODIC_ (to simulate a 2D flow in the x-y plane)
+  + The immersed body wall is specified as adiabatic (#_IB_ADIABATIC_);
+    (this is the default).
 
 Reference:
 + O. Boiron, G. Chiavassa, R. Donat, A high-resolution penalization method for large Mach number 
@@ -4427,10 +4434,9 @@ and the following is the numerical Schlieren image (contour plot of \f$\|\nabla\
 Expected screen output:
 \include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction/output.log
 
-  
-\page ns3d_sphere_steady_incompressible_viscous Steady, incompressible, viscous flow around a sphere
+\page ns3d_sphere_steady_incompressible_viscous_adiabatic Steady, incompressible, viscous flow around an adiabatic sphere
 
-Location: \b hypar/Examples/3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible
+Location: \b hypar/Examples/3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic
 
 Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
 
@@ -4452,6 +4458,8 @@ Boundary conditions:
   + xmax: Subsonic outflow #_SUBSONIC_OUTFLOW_
   + ymin and ymax: Subsonic "ambivalent" #_SUBSONIC_AMBIVALENT_
   + zmin and zmax: Subsonic "ambivalent" #_SUBSONIC_AMBIVALENT_
+  + The immersed body wall is specified as adiabatic (#_IB_ADIABATIC_);
+    (this is the default).
 
 Reference:
   + Taneda, S., “Experimental Investigation of Wake behind a Sphere at Low Reynolds Numbers,” 
@@ -4478,17 +4486,17 @@ Numerical Method:
 Input files required:
 ---------------------
 
-These files are all located in: \b hypar/Examples/3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/
+These files are all located in: \b hypar/Examples/3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/
 
 \b solver.inp
-\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/solver.inp
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/solver.inp
 
 \b boundary.inp
-\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/boundary.inp
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/boundary.inp
 
 \b physics.inp : The following file specifies a Reynolds number
 of 100. To try other Reynolds numbers, change it here.
-\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/physics.inp
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/physics.inp
 
 \b sphere.stl : the filename "sphere.stl" \b must match
 the input for \a immersed_body in \a solver.inp.\n
@@ -4496,18 +4504,18 @@ Located at \b hypar/Examples/STLGeometries/sphere.stl
 
 To generate \b initial.inp (initial solution), compile 
 and run the following code in the run directory.
-\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/aux/init.c
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/aux/init.c
 
 Output:
 -------
 
 Note that \b iproc is set to 
 
-      2 2 2
+      8 4 4
 
-in \b solver.inp (i.e., 2 processors along \a x, 2
-processors along \a y, and 2 processor along \a z). Thus, 
-this example should be run with 8 MPI ranks (or change \b iproc).
+in \b solver.inp (i.e., 8 processors along \a x, 4
+processors along \a y, and 4 processor along \a z). Thus, 
+this example should be run with 128 MPI ranks (or change \b iproc).
 
 After running the code, there should be one output file
 \b op.bin, since #HyPar::op_overwrite is set to \a yes in \b solver.inp.
@@ -4529,11 +4537,119 @@ forces on the immersed body. This file is called \a surface.dat (if #HyPar::op_o
 is "yes") or \a surface_nnnnn.dat (if #HyPar::op_overwrite is "no", "nnnnn" is a numerical
 index) (in this example, the file \b surface.dat is written out). This is an ASCII file in 
 the Tecplot format, where the immersed body and the forces on it are represented using the 
-"FETRIANGLE" type. The following image shows the surface pressure on the sphere (front-view):
-@image html IBSurface_3DNavStokSphere.png
+"FETRIANGLE" type. The following image shows the surface pressure and temperature
+on the sphere (front-view):
+@image html IBSurface_3DNavStokSphereAdiabatic_Pressure.png
+@image html IBSurface_3DNavStokSphereAdiabatic_Temperature.png
 
 Expected screen output:
-\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible/output.log
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Adiabatic/output.log
+
+\page ns3d_sphere_steady_incompressible_viscous_isothermal Steady, incompressible, viscous flow around an isothermal sphere
+
+Location: \b hypar/Examples/3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Isothermal
+
+Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
+
+Domain: The domain consists of a fine uniform grid around the sphere defined by [-2,6] X [-2,2] X [-2,2],
+        and a stretched grid beyond this zone.
+
+Geometry: A sphere of radius 0.5 centered at (0,0)
+          (\b hypar/Examples/STLGeometries/sphere.stl)
+
+The following image shows the sphere:
+@image html Surface3D_Sphere.png
+
+The following images shows the grid and the sphere:
+@image html Domain3D_Sphere1.png
+@image html Domain3D_Sphere2.png
+
+Boundary conditions:
+  + xmin: Subsonic inflow #_SUBSONIC_INFLOW_
+  + xmax: Subsonic outflow #_SUBSONIC_OUTFLOW_
+  + ymin and ymax: Subsonic "ambivalent" #_SUBSONIC_AMBIVALENT_
+  + zmin and zmax: Subsonic "ambivalent" #_SUBSONIC_AMBIVALENT_
+  + The immersed body wall is specified as isothermal (#_IB_ISOTHERMAL_)
+    with specified wall temperature \f$T_{\rm wall} = 1\f$.
+
+Initial solution: \f$\rho=1, u=0.1, v=w=0, p=1/\gamma\f$ everywhere in the domain.
+
+Other parameters (all dimensional quantities are in SI units):
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes3D::gamma)
+  + Freestream Mach number \f$M_{\infty} = 0.1\f$ (#NavierStokes3D::Minf)
+  + Prandlt number \f$Pr = 0.72\f$ (#NavierStokes3D::Pr)
+  + Reynolds number \f$Re = \frac {\rho u L } {\mu} = 100\f$ (#NavierStokes3D::Re) 
+    (\b Note: since the diameter of the sphere is 1.0, the diameter-based Reynolds number 
+    is the same as the specified Reynolds number \f$Re_D = Re = 100\f$).
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Spatial discretization (parabolic) : 4th order (FirstDerivativeFourthOrderCentral()) 
+                                        non-conservative 2-stage (NavierStokes3DParabolicFunction())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+These files are all located in: \b hypar/Examples/3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Isothermal/
+
+\b solver.inp
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Isothermal/solver.inp
+
+\b boundary.inp
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Isothermal/boundary.inp
+
+\b physics.inp : The following file specifies a Reynolds number
+of 100. To try other Reynolds numbers, change it here. This file
+also specifies the sphere wall temperature of 1.
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Isothermal/physics.inp
+
+\b sphere.stl : the filename "sphere.stl" \b must match
+the input for \a immersed_body in \a solver.inp.\n
+Located at \b hypar/Examples/STLGeometries/sphere.stl
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory.
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Isothermal/aux/init.c
+
+Output:
+-------
+
+Note that \b iproc is set to 
+
+      8 4 4
+
+in \b solver.inp (i.e., 8 processors along \a x, 4
+processors along \a y, and 4 processor along \a z). Thus, 
+this example should be run with 128 MPI ranks (or change \b iproc).
+
+After running the code, there should be one output file
+\b op.bin, since #HyPar::op_overwrite is set to \a yes in \b solver.inp.
+#HyPar::op_file_format is set to \a binary in \b solver.inp, and
+thus, all the files are written out in the binary format, see 
+WriteBinary(). The binary file contains the conserved variables
+\f$\left(\rho, \rho u, \rho v, e\right)\f$. The following two codes
+are available to convert the binary output file:
++ \b hypar/Extras/BinaryToTecplot.c - convert binary output file to 
+  Tecplot file.
++ \b hypar/Extras/BinaryToText.c - convert binary output file to
+  an ASCII text file (to visualize in, for example, MATLAB).
+
+The following figure shows the flow (pressure and streamlines) at \f$Re_D=100\f$:
+@image html Solution_3DNavStokSphereIsothermal_ReD100.png
+
+In addition to the main solution, the code also writes out a file with the aerodynamic
+forces on the immersed body. This file is called \a surface.dat (if #HyPar::op_overwrite
+is "yes") or \a surface_nnnnn.dat (if #HyPar::op_overwrite is "no", "nnnnn" is a numerical
+index) (in this example, the file \b surface.dat is written out). This is an ASCII file in 
+the Tecplot format, where the immersed body and the forces on it are represented using the 
+"FETRIANGLE" type. The following image shows the surface pressure and temperature
+on the sphere (front-view):
+@image html IBSurface_3DNavStokSphereIsothermal_Pressure.png
+@image html IBSurface_3DNavStokSphereIsothermal_Temperature.png
+
+Expected screen output:
+\include 3D/NavierStokes3D/Sphere/Steady_Viscous_Incompressible_Isothermal/output.log
 
 \page md_examples Multidomain Examples
 HyPar has the capability to run ensemble simulations on multiple domains that 
@@ -4783,7 +4899,8 @@ The following are some examples are simulated using the <B>sparse grids</B>
 method. Familiarity with the sparse grids approach (specifically the combination
 technique approach) is assumed.
 
-\subpage sg_linear_adv_sinewave
+\subpage sg_linear_adv_sinewave \n
+\subpage sg_linear_adv_2d_sine_varyingadv
 
 \subpage sg_euler2d_density_sinewave\n
 \subpage sg_euler2d_vortconv\n
@@ -4931,6 +5048,120 @@ time step size (#HyPar::dt), and conservation error (#HyPar::ConservationError).
 
 Expected screen output:
 \include 2D/LinearAdvection/SineWave_SparseGrids/output.log
+
+\page sg_linear_adv_2d_sine_varyingadv 2D Linear Advection - Sine Wave with Spatially-Varying Advection Speed
+
+Location: \b hypar/Examples/2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Linear Advection Equation (linearadr.h)
+
+Domain: \f$0 \le x,y < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions on all boundaries.
+
+Initial solution: \f$u\left(x,y,0\right) = u_0\left(x,y\right)= \cos\left(4\pi y\right)\f$\n
+
+Advection speed: \f$a_x\left(x,y\right) = \sin\left(4\pi y\right)\f$, \f$a_y\left(x,y\right) = -\cos\left(4\pi x\right)\f$
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b sparse_grids.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/sparse_grids.inp
+
+\b Note: The remaining files are the same as what would be 
+required for a conventional (non-sparse-grids) simulation.
+
+\b solver.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/solver.inp
+
+\b boundary.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/boundary.inp
+
+\b physics.inp (specifies filename for advection field)
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/physics.inp
+\b Note: Do not include the ".inp" extension in the filename above.
+
+To generate \b initial.inp and \b advection.inp, compile and run the 
+following code in the run directory. 
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/aux/init.c
+
+Output:
+-------
+Note that \b iproc does \b not need to be set for simulations
+using sparse grids. HyPar will automatically calculate the load
+balanced processor distribution for each sparse grid. If too
+many processors are specified, then it will return an error.
+
+After running the code, there should be the following output
+files:
+
+  + op_fg_00000.dat, ..., op_fg_00020.dat: these contain the full
+    grid solution at \f$t=0, ..., 4\f$.
+  + op_sg_<n>_00000.dat, ..., op_sg_<n>_00020.dat: these contain
+    the solution on each of the sparse grids in the combination
+    technique. These are written out because \b write_sg_solutions
+    is set to \b yes in \b sparse_grids.inp 
+    (SparseGridsSimulation::m_write_sg_solutions).
+    
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the final column is the 
+solution.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation was generated from the full grid solution files
+that were computed by using the combination technique on the sparse grids:
+@image html Solution_SG_full_2DLinearAdvSine_VaryingAdv.gif
+
+The following animations show the solution on some of the sparse grids
+in the combination technique. The simulation was actually carried out on 
+these grids. Note the different grid sizes.
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_0.gif
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_2.gif
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_4.gif
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_6.gif
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_8.gif
+
+In addition to the usual output files, the linear advection physics 
+module writes out the following files:
++ \b advection_field_<n>_00000.dat, ..., \b advection_field_<n>_00020.dat: 
+  These files
+  share the same format as the solution output files \b op_*.dat 
+  and contains the advection field \f$a_x\left(x,y\right), a_y\left(x,y\right)\f$.
+
+The following figure shows the vector plot of the velocity field on
+some of the sparse grids:
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_0.png
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_2.png
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_4.png
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_6.png
+@image html Solution_SG_sg_2DLinearAdvSine_VaryingAdv_8.png
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation errors for each of the sparse grids
+and prints it to screen, as well as the files \b conservation_<n>.dat:
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/conservation_0.dat
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/conservation_2.dat
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/conservation_4.dat
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/conservation_6.dat
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/conservation_8.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt), and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection_SparseGrids/output.log
 
 \page sg_euler2d_density_sinewave 2D Euler Equations - Density Sine Wave
 

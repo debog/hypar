@@ -75,6 +75,12 @@
 /*! dimension corresponding to the \a z spatial dimension */
 #define _ZDIR_ 2
 
+/* immersed boundary wall types */
+/*! adiabatic immersed body wall */
+#define _IB_ADIABATIC_ "adiabatic"
+/*! isothermal immersed body wall */
+#define _IB_ISOTHERMAL_ "isothermal"
+
 /*! \def _NavierStokes3DGetFlowVar_
  Get the flow variables from the conserved solution vector.
  \f{equation}{
@@ -488,6 +494,11 @@ typedef struct navierstokes3d_parameters {
   double *fast_jac, /*!< "Fast" Jacobian of the flux function (comprising the acoustic modes) */
          *solution; /*!< array to store the solution at the beginning of each time step */
 
+  /*! Type of immersed boundary wall: isothermal or adiabatic */
+  char ib_wall_type[_MAX_STRING_SIZE_];
+  /*! Immersed body wall temperature, if isothermal */
+  double T_ib_wall;
+
   /* choice of hydrostatic balance                              */
   /* 1 -> isothermal                                            */
   /* 2 -> constant potential temperature                        */ 
@@ -504,4 +515,3 @@ typedef struct navierstokes3d_parameters {
 
 int    NavierStokes3DInitialize (void*,void*);
 int    NavierStokes3DCleanup    (void*);
-

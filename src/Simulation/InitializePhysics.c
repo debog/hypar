@@ -74,6 +74,7 @@ int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #Si
     solver->PostStep              = NULL;
     solver->PrintStep             = NULL;
     solver->PhysicsOutput         = NULL;
+    solver->PhysicsInput          = NULL;
     solver->AveragingFunction     = NULL;
     solver->GetLeftEigenvectors   = NULL;
     solver->GetRightEigenvectors  = NULL;

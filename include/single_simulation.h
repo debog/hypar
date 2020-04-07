@@ -101,6 +101,14 @@ class SingleSimulation : public Simulation
       return retval;
     }
 
+    /*! Initialize the physics data of the simulations */
+    inline int InitializePhysicsData()
+    {
+      int retval = ::InitializePhysicsData( (void*) m_sim,
+                                            0, _NSIMS_, NULL );
+      return retval;
+    }
+
     /*! Initialize the numerical solvers of the simulations */
     inline int InitializeSolvers()
     {

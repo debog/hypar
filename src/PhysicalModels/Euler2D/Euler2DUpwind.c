@@ -4,6 +4,7 @@
 #include <arrayfunctions.h>
 #include <physicalmodels/euler2d.h>
 #include <mathfunctions.h>
+#include <matmult_native.h>
 #include <hypar.h>
 
 int Euler2DUpwindRoe(double *fI,double *fL,double *fR,double *uL,double *uR,double *u,int dir,void *s,double t)

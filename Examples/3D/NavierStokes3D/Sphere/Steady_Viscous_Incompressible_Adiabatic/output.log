@@ -1,0 +1,1564 @@
+HyPar - Parallel (MPI) version with 128 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 3
+  No. of variables                           : 5
+  Domain size                                : 200 96 96 
+  Processes along each dimension             : 8 4 4 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 25000
+  Restart iteration                          : 0
+  Time integration scheme                    : rk (44)
+  Spatial discretization scheme (hyperbolic) : weno5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : components
+  Spatial discretization type   (parabolic ) : nonconservative-2stage
+  Spatial discretization scheme (parabolic ) : 4
+  Time Step                                  : 2.500000E-02
+  Check for conservation                     : no
+  Screen output iterations                   : 25
+  File output iterations                     : 100
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : yes
+  Physical model                             : navierstokes3d
+  Immersed Body                              : sphere.stl
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  4.6753965134569866E+04
+ 1:  4.6753965134569362E+03
+ 2:  0.0000000000000000E+00
+ 3:  0.0000000000000000E+00
+ 4:  8.3722993280261522E+04
+Reading boundary conditions from boundary.inp.
+  Boundary                subsonic-inflow:  Along dimension  0 and face +1
+  Boundary               subsonic-outflow:  Along dimension  0 and face -1
+  Boundary            subsonic-ambivalent:  Along dimension  1 and face +1
+  Boundary            subsonic-ambivalent:  Along dimension  1 and face -1
+  Boundary            subsonic-ambivalent:  Along dimension  2 and face +1
+  Boundary            subsonic-ambivalent:  Along dimension  2 and face -1
+6 boundary condition(s) read.
+Immersed body read from sphere.stl:
+    Number of facets: 12320
+    Bounding box: [-0.5,0.5] X [-0.5,0.5] X [-0.5,0.5]
+    Number of grid points inside immersed body: 3619 ( 0.2%).
+    Number of immersed boundary points        : 1988 ( 0.1%).
+    Immersed body simulation mode             : 3d.
+Initializing solvers.
+Warning: File weno.inp not found. Using default parameters for WENO5/CRWENO5/HCWENO5 scheme.
+Initializing physics. Model = "navierstokes3d"
+Reading physical model inputs from file "physics.inp".
+Writing solution file iblank.bin.
+Setting up time integration.
+Solving in time (from 0 to 25000 iterations)
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:      25  Time: 6.250E-01  Max CFL: 6.287E-01  Max Diff. No.: -1.000E+00  Norm: 5.4654E-04  
+Iteration:      50  Time: 1.250E+00  Max CFL: 6.166E-01  Max Diff. No.: -1.000E+00  Norm: 5.1634E-04  
+Iteration:      75  Time: 1.875E+00  Max CFL: 5.929E-01  Max Diff. No.: -1.000E+00  Norm: 4.7919E-04  
+Iteration:     100  Time: 2.500E+00  Max CFL: 5.793E-01  Max Diff. No.: -1.000E+00  Norm: 3.9879E-04  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:     125  Time: 3.125E+00  Max CFL: 5.720E-01  Max Diff. No.: -1.000E+00  Norm: 3.0214E-04  
+Iteration:     150  Time: 3.750E+00  Max CFL: 5.678E-01  Max Diff. No.: -1.000E+00  Norm: 2.3502E-04  
+Iteration:     175  Time: 4.375E+00  Max CFL: 5.644E-01  Max Diff. No.: -1.000E+00  Norm: 1.9337E-04  
+Iteration:     200  Time: 5.000E+00  Max CFL: 5.620E-01  Max Diff. No.: -1.000E+00  Norm: 1.6452E-04  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:     225  Time: 5.625E+00  Max CFL: 5.601E-01  Max Diff. No.: -1.000E+00  Norm: 1.2743E-04  
+Iteration:     250  Time: 6.250E+00  Max CFL: 5.586E-01  Max Diff. No.: -1.000E+00  Norm: 7.8626E-05  
+Iteration:     275  Time: 6.875E+00  Max CFL: 5.574E-01  Max Diff. No.: -1.000E+00  Norm: 4.8359E-05  
+Iteration:     300  Time: 7.500E+00  Max CFL: 5.564E-01  Max Diff. No.: -1.000E+00  Norm: 2.9567E-05  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:     325  Time: 8.125E+00  Max CFL: 5.555E-01  Max Diff. No.: -1.000E+00  Norm: 1.9032E-05  
+Iteration:     350  Time: 8.750E+00  Max CFL: 5.548E-01  Max Diff. No.: -1.000E+00  Norm: 1.3333E-05  
+Iteration:     375  Time: 9.375E+00  Max CFL: 5.541E-01  Max Diff. No.: -1.000E+00  Norm: 1.0110E-05  
+Iteration:     400  Time: 1.000E+01  Max CFL: 5.535E-01  Max Diff. No.: -1.000E+00  Norm: 8.2704E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:     425  Time: 1.063E+01  Max CFL: 5.529E-01  Max Diff. No.: -1.000E+00  Norm: 7.0010E-06  
+Iteration:     450  Time: 1.125E+01  Max CFL: 5.524E-01  Max Diff. No.: -1.000E+00  Norm: 6.0826E-06  
+Iteration:     475  Time: 1.188E+01  Max CFL: 5.519E-01  Max Diff. No.: -1.000E+00  Norm: 5.5307E-06  
+Iteration:     500  Time: 1.250E+01  Max CFL: 5.515E-01  Max Diff. No.: -1.000E+00  Norm: 5.2098E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:     525  Time: 1.313E+01  Max CFL: 5.511E-01  Max Diff. No.: -1.000E+00  Norm: 4.9910E-06  
+Iteration:     550  Time: 1.375E+01  Max CFL: 5.509E-01  Max Diff. No.: -1.000E+00  Norm: 4.8251E-06  
+Iteration:     575  Time: 1.438E+01  Max CFL: 5.506E-01  Max Diff. No.: -1.000E+00  Norm: 4.6849E-06  
+Iteration:     600  Time: 1.500E+01  Max CFL: 5.504E-01  Max Diff. No.: -1.000E+00  Norm: 4.5581E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:     625  Time: 1.563E+01  Max CFL: 5.502E-01  Max Diff. No.: -1.000E+00  Norm: 4.4428E-06  
+Iteration:     650  Time: 1.625E+01  Max CFL: 5.500E-01  Max Diff. No.: -1.000E+00  Norm: 4.3335E-06  
+Iteration:     675  Time: 1.688E+01  Max CFL: 5.499E-01  Max Diff. No.: -1.000E+00  Norm: 4.2345E-06  
+Iteration:     700  Time: 1.750E+01  Max CFL: 5.497E-01  Max Diff. No.: -1.000E+00  Norm: 4.1428E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:     725  Time: 1.813E+01  Max CFL: 5.496E-01  Max Diff. No.: -1.000E+00  Norm: 4.0558E-06  
+Iteration:     750  Time: 1.875E+01  Max CFL: 5.494E-01  Max Diff. No.: -1.000E+00  Norm: 3.9723E-06  
+Iteration:     775  Time: 1.937E+01  Max CFL: 5.493E-01  Max Diff. No.: -1.000E+00  Norm: 3.8914E-06  
+Iteration:     800  Time: 2.000E+01  Max CFL: 5.491E-01  Max Diff. No.: -1.000E+00  Norm: 3.8131E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:     825  Time: 2.062E+01  Max CFL: 5.490E-01  Max Diff. No.: -1.000E+00  Norm: 3.7388E-06  
+Iteration:     850  Time: 2.125E+01  Max CFL: 5.489E-01  Max Diff. No.: -1.000E+00  Norm: 3.6686E-06  
+Iteration:     875  Time: 2.187E+01  Max CFL: 5.487E-01  Max Diff. No.: -1.000E+00  Norm: 3.6019E-06  
+Iteration:     900  Time: 2.250E+01  Max CFL: 5.486E-01  Max Diff. No.: -1.000E+00  Norm: 3.5381E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:     925  Time: 2.312E+01  Max CFL: 5.485E-01  Max Diff. No.: -1.000E+00  Norm: 3.4766E-06  
+Iteration:     950  Time: 2.375E+01  Max CFL: 5.484E-01  Max Diff. No.: -1.000E+00  Norm: 3.4170E-06  
+Iteration:     975  Time: 2.437E+01  Max CFL: 5.483E-01  Max Diff. No.: -1.000E+00  Norm: 3.3594E-06  
+Iteration:    1000  Time: 2.500E+01  Max CFL: 5.482E-01  Max Diff. No.: -1.000E+00  Norm: 3.3036E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    1025  Time: 2.562E+01  Max CFL: 5.481E-01  Max Diff. No.: -1.000E+00  Norm: 3.2499E-06  
+Iteration:    1050  Time: 2.625E+01  Max CFL: 5.480E-01  Max Diff. No.: -1.000E+00  Norm: 3.1983E-06  
+Iteration:    1075  Time: 2.687E+01  Max CFL: 5.479E-01  Max Diff. No.: -1.000E+00  Norm: 3.1489E-06  
+Iteration:    1100  Time: 2.750E+01  Max CFL: 5.478E-01  Max Diff. No.: -1.000E+00  Norm: 3.1008E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    1125  Time: 2.812E+01  Max CFL: 5.477E-01  Max Diff. No.: -1.000E+00  Norm: 3.0532E-06  
+Iteration:    1150  Time: 2.875E+01  Max CFL: 5.477E-01  Max Diff. No.: -1.000E+00  Norm: 3.0052E-06  
+Iteration:    1175  Time: 2.937E+01  Max CFL: 5.476E-01  Max Diff. No.: -1.000E+00  Norm: 2.9575E-06  
+Iteration:    1200  Time: 3.000E+01  Max CFL: 5.475E-01  Max Diff. No.: -1.000E+00  Norm: 2.9116E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    1225  Time: 3.062E+01  Max CFL: 5.474E-01  Max Diff. No.: -1.000E+00  Norm: 2.8694E-06  
+Iteration:    1250  Time: 3.125E+01  Max CFL: 5.474E-01  Max Diff. No.: -1.000E+00  Norm: 2.8318E-06  
+Iteration:    1275  Time: 3.187E+01  Max CFL: 5.473E-01  Max Diff. No.: -1.000E+00  Norm: 2.7988E-06  
+Iteration:    1300  Time: 3.250E+01  Max CFL: 5.472E-01  Max Diff. No.: -1.000E+00  Norm: 2.7693E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    1325  Time: 3.312E+01  Max CFL: 5.472E-01  Max Diff. No.: -1.000E+00  Norm: 2.7416E-06  
+Iteration:    1350  Time: 3.375E+01  Max CFL: 5.471E-01  Max Diff. No.: -1.000E+00  Norm: 2.7143E-06  
+Iteration:    1375  Time: 3.437E+01  Max CFL: 5.470E-01  Max Diff. No.: -1.000E+00  Norm: 2.6862E-06  
+Iteration:    1400  Time: 3.500E+01  Max CFL: 5.470E-01  Max Diff. No.: -1.000E+00  Norm: 2.6567E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    1425  Time: 3.562E+01  Max CFL: 5.469E-01  Max Diff. No.: -1.000E+00  Norm: 2.6256E-06  
+Iteration:    1450  Time: 3.625E+01  Max CFL: 5.469E-01  Max Diff. No.: -1.000E+00  Norm: 2.5933E-06  
+Iteration:    1475  Time: 3.687E+01  Max CFL: 5.468E-01  Max Diff. No.: -1.000E+00  Norm: 2.5602E-06  
+Iteration:    1500  Time: 3.750E+01  Max CFL: 5.468E-01  Max Diff. No.: -1.000E+00  Norm: 2.5272E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    1525  Time: 3.812E+01  Max CFL: 5.467E-01  Max Diff. No.: -1.000E+00  Norm: 2.4949E-06  
+Iteration:    1550  Time: 3.875E+01  Max CFL: 5.467E-01  Max Diff. No.: -1.000E+00  Norm: 2.4637E-06  
+Iteration:    1575  Time: 3.937E+01  Max CFL: 5.466E-01  Max Diff. No.: -1.000E+00  Norm: 2.4333E-06  
+Iteration:    1600  Time: 4.000E+01  Max CFL: 5.466E-01  Max Diff. No.: -1.000E+00  Norm: 2.4035E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    1625  Time: 4.062E+01  Max CFL: 5.465E-01  Max Diff. No.: -1.000E+00  Norm: 2.3741E-06  
+Iteration:    1650  Time: 4.125E+01  Max CFL: 5.465E-01  Max Diff. No.: -1.000E+00  Norm: 2.3454E-06  
+Iteration:    1675  Time: 4.187E+01  Max CFL: 5.465E-01  Max Diff. No.: -1.000E+00  Norm: 2.3182E-06  
+Iteration:    1700  Time: 4.250E+01  Max CFL: 5.464E-01  Max Diff. No.: -1.000E+00  Norm: 2.2923E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    1725  Time: 4.312E+01  Max CFL: 5.464E-01  Max Diff. No.: -1.000E+00  Norm: 2.2669E-06  
+Iteration:    1750  Time: 4.375E+01  Max CFL: 5.463E-01  Max Diff. No.: -1.000E+00  Norm: 2.2413E-06  
+Iteration:    1775  Time: 4.437E+01  Max CFL: 5.463E-01  Max Diff. No.: -1.000E+00  Norm: 2.2150E-06  
+Iteration:    1800  Time: 4.500E+01  Max CFL: 5.463E-01  Max Diff. No.: -1.000E+00  Norm: 2.1887E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    1825  Time: 4.562E+01  Max CFL: 5.463E-01  Max Diff. No.: -1.000E+00  Norm: 2.1637E-06  
+Iteration:    1850  Time: 4.625E+01  Max CFL: 5.462E-01  Max Diff. No.: -1.000E+00  Norm: 2.1407E-06  
+Iteration:    1875  Time: 4.687E+01  Max CFL: 5.462E-01  Max Diff. No.: -1.000E+00  Norm: 2.1196E-06  
+Iteration:    1900  Time: 4.750E+01  Max CFL: 5.462E-01  Max Diff. No.: -1.000E+00  Norm: 2.0992E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    1925  Time: 4.812E+01  Max CFL: 5.461E-01  Max Diff. No.: -1.000E+00  Norm: 2.0782E-06  
+Iteration:    1950  Time: 4.875E+01  Max CFL: 5.461E-01  Max Diff. No.: -1.000E+00  Norm: 2.0564E-06  
+Iteration:    1975  Time: 4.937E+01  Max CFL: 5.461E-01  Max Diff. No.: -1.000E+00  Norm: 2.0346E-06  
+Iteration:    2000  Time: 5.000E+01  Max CFL: 5.461E-01  Max Diff. No.: -1.000E+00  Norm: 2.0135E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    2025  Time: 5.062E+01  Max CFL: 5.460E-01  Max Diff. No.: -1.000E+00  Norm: 1.9938E-06  
+Iteration:    2050  Time: 5.125E+01  Max CFL: 5.460E-01  Max Diff. No.: -1.000E+00  Norm: 1.9755E-06  
+Iteration:    2075  Time: 5.187E+01  Max CFL: 5.460E-01  Max Diff. No.: -1.000E+00  Norm: 1.9584E-06  
+Iteration:    2100  Time: 5.250E+01  Max CFL: 5.459E-01  Max Diff. No.: -1.000E+00  Norm: 1.9420E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    2125  Time: 5.312E+01  Max CFL: 5.459E-01  Max Diff. No.: -1.000E+00  Norm: 1.9261E-06  
+Iteration:    2150  Time: 5.375E+01  Max CFL: 5.459E-01  Max Diff. No.: -1.000E+00  Norm: 1.9103E-06  
+Iteration:    2175  Time: 5.437E+01  Max CFL: 5.459E-01  Max Diff. No.: -1.000E+00  Norm: 1.8943E-06  
+Iteration:    2200  Time: 5.500E+01  Max CFL: 5.459E-01  Max Diff. No.: -1.000E+00  Norm: 1.8779E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    2225  Time: 5.562E+01  Max CFL: 5.458E-01  Max Diff. No.: -1.000E+00  Norm: 1.8608E-06  
+Iteration:    2250  Time: 5.625E+01  Max CFL: 5.458E-01  Max Diff. No.: -1.000E+00  Norm: 1.8429E-06  
+Iteration:    2275  Time: 5.687E+01  Max CFL: 5.458E-01  Max Diff. No.: -1.000E+00  Norm: 1.8245E-06  
+Iteration:    2300  Time: 5.750E+01  Max CFL: 5.458E-01  Max Diff. No.: -1.000E+00  Norm: 1.8059E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    2325  Time: 5.812E+01  Max CFL: 5.457E-01  Max Diff. No.: -1.000E+00  Norm: 1.7872E-06  
+Iteration:    2350  Time: 5.875E+01  Max CFL: 5.457E-01  Max Diff. No.: -1.000E+00  Norm: 1.7689E-06  
+Iteration:    2375  Time: 5.937E+01  Max CFL: 5.457E-01  Max Diff. No.: -1.000E+00  Norm: 1.7509E-06  
+Iteration:    2400  Time: 6.000E+01  Max CFL: 5.457E-01  Max Diff. No.: -1.000E+00  Norm: 1.7331E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    2425  Time: 6.062E+01  Max CFL: 5.457E-01  Max Diff. No.: -1.000E+00  Norm: 1.7153E-06  
+Iteration:    2450  Time: 6.125E+01  Max CFL: 5.457E-01  Max Diff. No.: -1.000E+00  Norm: 1.6975E-06  
+Iteration:    2475  Time: 6.187E+01  Max CFL: 5.456E-01  Max Diff. No.: -1.000E+00  Norm: 1.6795E-06  
+Iteration:    2500  Time: 6.250E+01  Max CFL: 5.456E-01  Max Diff. No.: -1.000E+00  Norm: 1.6614E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    2525  Time: 6.312E+01  Max CFL: 5.456E-01  Max Diff. No.: -1.000E+00  Norm: 1.6432E-06  
+Iteration:    2550  Time: 6.375E+01  Max CFL: 5.456E-01  Max Diff. No.: -1.000E+00  Norm: 1.6247E-06  
+Iteration:    2575  Time: 6.437E+01  Max CFL: 5.456E-01  Max Diff. No.: -1.000E+00  Norm: 1.6061E-06  
+Iteration:    2600  Time: 6.500E+01  Max CFL: 5.456E-01  Max Diff. No.: -1.000E+00  Norm: 1.5873E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    2625  Time: 6.562E+01  Max CFL: 5.455E-01  Max Diff. No.: -1.000E+00  Norm: 1.5682E-06  
+Iteration:    2650  Time: 6.625E+01  Max CFL: 5.455E-01  Max Diff. No.: -1.000E+00  Norm: 1.5491E-06  
+Iteration:    2675  Time: 6.687E+01  Max CFL: 5.455E-01  Max Diff. No.: -1.000E+00  Norm: 1.5300E-06  
+Iteration:    2700  Time: 6.750E+01  Max CFL: 5.455E-01  Max Diff. No.: -1.000E+00  Norm: 1.5111E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    2725  Time: 6.812E+01  Max CFL: 5.455E-01  Max Diff. No.: -1.000E+00  Norm: 1.4925E-06  
+Iteration:    2750  Time: 6.875E+01  Max CFL: 5.455E-01  Max Diff. No.: -1.000E+00  Norm: 1.4740E-06  
+Iteration:    2775  Time: 6.937E+01  Max CFL: 5.455E-01  Max Diff. No.: -1.000E+00  Norm: 1.4557E-06  
+Iteration:    2800  Time: 7.000E+01  Max CFL: 5.454E-01  Max Diff. No.: -1.000E+00  Norm: 1.4376E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    2825  Time: 7.062E+01  Max CFL: 5.454E-01  Max Diff. No.: -1.000E+00  Norm: 1.4195E-06  
+Iteration:    2850  Time: 7.125E+01  Max CFL: 5.454E-01  Max Diff. No.: -1.000E+00  Norm: 1.4014E-06  
+Iteration:    2875  Time: 7.187E+01  Max CFL: 5.454E-01  Max Diff. No.: -1.000E+00  Norm: 1.3833E-06  
+Iteration:    2900  Time: 7.250E+01  Max CFL: 5.454E-01  Max Diff. No.: -1.000E+00  Norm: 1.3652E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    2925  Time: 7.312E+01  Max CFL: 5.454E-01  Max Diff. No.: -1.000E+00  Norm: 1.3471E-06  
+Iteration:    2950  Time: 7.375E+01  Max CFL: 5.454E-01  Max Diff. No.: -1.000E+00  Norm: 1.3290E-06  
+Iteration:    2975  Time: 7.437E+01  Max CFL: 5.454E-01  Max Diff. No.: -1.000E+00  Norm: 1.3110E-06  
+Iteration:    3000  Time: 7.500E+01  Max CFL: 5.453E-01  Max Diff. No.: -1.000E+00  Norm: 1.2931E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    3025  Time: 7.563E+01  Max CFL: 5.453E-01  Max Diff. No.: -1.000E+00  Norm: 1.2754E-06  
+Iteration:    3050  Time: 7.625E+01  Max CFL: 5.453E-01  Max Diff. No.: -1.000E+00  Norm: 1.2577E-06  
+Iteration:    3075  Time: 7.688E+01  Max CFL: 5.453E-01  Max Diff. No.: -1.000E+00  Norm: 1.2403E-06  
+Iteration:    3100  Time: 7.750E+01  Max CFL: 5.453E-01  Max Diff. No.: -1.000E+00  Norm: 1.2231E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    3125  Time: 7.813E+01  Max CFL: 5.453E-01  Max Diff. No.: -1.000E+00  Norm: 1.2061E-06  
+Iteration:    3150  Time: 7.875E+01  Max CFL: 5.453E-01  Max Diff. No.: -1.000E+00  Norm: 1.1894E-06  
+Iteration:    3175  Time: 7.938E+01  Max CFL: 5.453E-01  Max Diff. No.: -1.000E+00  Norm: 1.1728E-06  
+Iteration:    3200  Time: 8.000E+01  Max CFL: 5.453E-01  Max Diff. No.: -1.000E+00  Norm: 1.1566E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    3225  Time: 8.063E+01  Max CFL: 5.453E-01  Max Diff. No.: -1.000E+00  Norm: 1.1405E-06  
+Iteration:    3250  Time: 8.125E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 1.1247E-06  
+Iteration:    3275  Time: 8.188E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 1.1090E-06  
+Iteration:    3300  Time: 8.250E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 1.0936E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    3325  Time: 8.313E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 1.0783E-06  
+Iteration:    3350  Time: 8.375E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 1.0632E-06  
+Iteration:    3375  Time: 8.438E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 1.0482E-06  
+Iteration:    3400  Time: 8.500E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 1.0333E-06  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    3425  Time: 8.563E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 1.0187E-06  
+Iteration:    3450  Time: 8.625E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 1.0042E-06  
+Iteration:    3475  Time: 8.688E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 9.8999E-07  
+Iteration:    3500  Time: 8.750E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 9.7602E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    3525  Time: 8.813E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 9.6231E-07  
+Iteration:    3550  Time: 8.875E+01  Max CFL: 5.452E-01  Max Diff. No.: -1.000E+00  Norm: 9.4883E-07  
+Iteration:    3575  Time: 8.938E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 9.3555E-07  
+Iteration:    3600  Time: 9.000E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 9.2244E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    3625  Time: 9.063E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 9.0950E-07  
+Iteration:    3650  Time: 9.125E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 8.9672E-07  
+Iteration:    3675  Time: 9.188E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 8.8409E-07  
+Iteration:    3700  Time: 9.250E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 8.7159E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    3725  Time: 9.313E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 8.5920E-07  
+Iteration:    3750  Time: 9.375E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 8.4692E-07  
+Iteration:    3775  Time: 9.438E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 8.3469E-07  
+Iteration:    3800  Time: 9.500E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 8.2254E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    3825  Time: 9.563E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 8.1048E-07  
+Iteration:    3850  Time: 9.625E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 7.9858E-07  
+Iteration:    3875  Time: 9.688E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 7.8687E-07  
+Iteration:    3900  Time: 9.750E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 7.7539E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    3925  Time: 9.813E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 7.6417E-07  
+Iteration:    3950  Time: 9.875E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 7.5322E-07  
+Iteration:    3975  Time: 9.938E+01  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 7.4253E-07  
+Iteration:    4000  Time: 1.000E+02  Max CFL: 5.451E-01  Max Diff. No.: -1.000E+00  Norm: 7.3209E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    4025  Time: 1.006E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 7.2190E-07  
+Iteration:    4050  Time: 1.013E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 7.1194E-07  
+Iteration:    4075  Time: 1.019E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 7.0220E-07  
+Iteration:    4100  Time: 1.025E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 6.9265E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    4125  Time: 1.031E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 6.8325E-07  
+Iteration:    4150  Time: 1.038E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 6.7399E-07  
+Iteration:    4175  Time: 1.044E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 6.6483E-07  
+Iteration:    4200  Time: 1.050E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 6.5575E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    4225  Time: 1.056E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 6.4674E-07  
+Iteration:    4250  Time: 1.063E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 6.3777E-07  
+Iteration:    4275  Time: 1.069E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 6.2884E-07  
+Iteration:    4300  Time: 1.075E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 6.1994E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    4325  Time: 1.081E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 6.1109E-07  
+Iteration:    4350  Time: 1.088E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 6.0229E-07  
+Iteration:    4375  Time: 1.094E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.9356E-07  
+Iteration:    4400  Time: 1.100E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.8490E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    4425  Time: 1.106E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.7634E-07  
+Iteration:    4450  Time: 1.113E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.6790E-07  
+Iteration:    4475  Time: 1.119E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.5959E-07  
+Iteration:    4500  Time: 1.125E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.5145E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    4525  Time: 1.131E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.4351E-07  
+Iteration:    4550  Time: 1.138E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.3578E-07  
+Iteration:    4575  Time: 1.144E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.2831E-07  
+Iteration:    4600  Time: 1.150E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.2109E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    4625  Time: 1.156E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.1410E-07  
+Iteration:    4650  Time: 1.163E+02  Max CFL: 5.450E-01  Max Diff. No.: -1.000E+00  Norm: 5.0730E-07  
+Iteration:    4675  Time: 1.169E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 5.0067E-07  
+Iteration:    4700  Time: 1.175E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.9418E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    4725  Time: 1.181E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.8782E-07  
+Iteration:    4750  Time: 1.188E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.8158E-07  
+Iteration:    4775  Time: 1.194E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.7546E-07  
+Iteration:    4800  Time: 1.200E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.6943E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    4825  Time: 1.206E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.6348E-07  
+Iteration:    4850  Time: 1.213E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.5760E-07  
+Iteration:    4875  Time: 1.219E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.5181E-07  
+Iteration:    4900  Time: 1.225E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.4611E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    4925  Time: 1.231E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.4051E-07  
+Iteration:    4950  Time: 1.238E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.3500E-07  
+Iteration:    4975  Time: 1.244E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.2959E-07  
+Iteration:    5000  Time: 1.250E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.2424E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    5025  Time: 1.256E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.1893E-07  
+Iteration:    5050  Time: 1.263E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.1364E-07  
+Iteration:    5075  Time: 1.269E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.0834E-07  
+Iteration:    5100  Time: 1.275E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 4.0302E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    5125  Time: 1.281E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.9766E-07  
+Iteration:    5150  Time: 1.288E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.9231E-07  
+Iteration:    5175  Time: 1.294E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.8700E-07  
+Iteration:    5200  Time: 1.300E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.8176E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    5225  Time: 1.306E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.7665E-07  
+Iteration:    5250  Time: 1.313E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.7168E-07  
+Iteration:    5275  Time: 1.319E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.6689E-07  
+Iteration:    5300  Time: 1.325E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.6226E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    5325  Time: 1.331E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.5778E-07  
+Iteration:    5350  Time: 1.338E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.5343E-07  
+Iteration:    5375  Time: 1.344E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.4917E-07  
+Iteration:    5400  Time: 1.350E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.4496E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    5425  Time: 1.356E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.4077E-07  
+Iteration:    5450  Time: 1.363E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.3659E-07  
+Iteration:    5475  Time: 1.369E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.3241E-07  
+Iteration:    5500  Time: 1.375E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.2826E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    5525  Time: 1.381E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.2416E-07  
+Iteration:    5550  Time: 1.388E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.2015E-07  
+Iteration:    5575  Time: 1.394E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.1625E-07  
+Iteration:    5600  Time: 1.400E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.1250E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    5625  Time: 1.406E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.0891E-07  
+Iteration:    5650  Time: 1.413E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.0545E-07  
+Iteration:    5675  Time: 1.419E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 3.0211E-07  
+Iteration:    5700  Time: 1.425E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.9888E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    5725  Time: 1.431E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.9569E-07  
+Iteration:    5750  Time: 1.438E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.9249E-07  
+Iteration:    5775  Time: 1.444E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.8922E-07  
+Iteration:    5800  Time: 1.450E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.8586E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    5825  Time: 1.456E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.8240E-07  
+Iteration:    5850  Time: 1.463E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.7890E-07  
+Iteration:    5875  Time: 1.469E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.7545E-07  
+Iteration:    5900  Time: 1.475E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.7222E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    5925  Time: 1.481E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.6930E-07  
+Iteration:    5950  Time: 1.488E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.6675E-07  
+Iteration:    5975  Time: 1.494E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.6457E-07  
+Iteration:    6000  Time: 1.500E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.6266E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    6025  Time: 1.506E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.6092E-07  
+Iteration:    6050  Time: 1.513E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.5924E-07  
+Iteration:    6075  Time: 1.519E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.5754E-07  
+Iteration:    6100  Time: 1.525E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.5572E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    6125  Time: 1.531E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.5375E-07  
+Iteration:    6150  Time: 1.538E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.5158E-07  
+Iteration:    6175  Time: 1.544E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.4920E-07  
+Iteration:    6200  Time: 1.550E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.4660E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    6225  Time: 1.556E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.4380E-07  
+Iteration:    6250  Time: 1.563E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.4082E-07  
+Iteration:    6275  Time: 1.569E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.3771E-07  
+Iteration:    6300  Time: 1.575E+02  Max CFL: 5.449E-01  Max Diff. No.: -1.000E+00  Norm: 2.3454E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    6325  Time: 1.581E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.3139E-07  
+Iteration:    6350  Time: 1.588E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.2834E-07  
+Iteration:    6375  Time: 1.594E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.2543E-07  
+Iteration:    6400  Time: 1.600E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.2273E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    6425  Time: 1.606E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.2022E-07  
+Iteration:    6450  Time: 1.613E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1787E-07  
+Iteration:    6475  Time: 1.619E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1564E-07  
+Iteration:    6500  Time: 1.625E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1345E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    6525  Time: 1.631E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1126E-07  
+Iteration:    6550  Time: 1.638E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.0907E-07  
+Iteration:    6575  Time: 1.644E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.0689E-07  
+Iteration:    6600  Time: 1.650E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.0478E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    6625  Time: 1.656E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.0275E-07  
+Iteration:    6650  Time: 1.663E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.0083E-07  
+Iteration:    6675  Time: 1.669E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.9900E-07  
+Iteration:    6700  Time: 1.675E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.9724E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    6725  Time: 1.681E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.9552E-07  
+Iteration:    6750  Time: 1.688E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.9382E-07  
+Iteration:    6775  Time: 1.694E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.9214E-07  
+Iteration:    6800  Time: 1.700E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.9050E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    6825  Time: 1.706E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8895E-07  
+Iteration:    6850  Time: 1.713E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8756E-07  
+Iteration:    6875  Time: 1.719E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8638E-07  
+Iteration:    6900  Time: 1.725E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8540E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    6925  Time: 1.731E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8457E-07  
+Iteration:    6950  Time: 1.738E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8376E-07  
+Iteration:    6975  Time: 1.744E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8287E-07  
+Iteration:    7000  Time: 1.750E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8181E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    7025  Time: 1.756E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8055E-07  
+Iteration:    7050  Time: 1.763E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.7909E-07  
+Iteration:    7075  Time: 1.769E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.7750E-07  
+Iteration:    7100  Time: 1.775E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.7584E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    7125  Time: 1.781E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.7419E-07  
+Iteration:    7150  Time: 1.788E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.7260E-07  
+Iteration:    7175  Time: 1.794E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.7110E-07  
+Iteration:    7200  Time: 1.800E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.6969E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    7225  Time: 1.806E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.6837E-07  
+Iteration:    7250  Time: 1.813E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.6711E-07  
+Iteration:    7275  Time: 1.819E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.6587E-07  
+Iteration:    7300  Time: 1.825E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.6464E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    7325  Time: 1.831E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.6339E-07  
+Iteration:    7350  Time: 1.838E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.6210E-07  
+Iteration:    7375  Time: 1.844E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.6076E-07  
+Iteration:    7400  Time: 1.850E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5937E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    7425  Time: 1.856E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5795E-07  
+Iteration:    7450  Time: 1.863E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5652E-07  
+Iteration:    7475  Time: 1.869E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5509E-07  
+Iteration:    7500  Time: 1.875E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5370E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    7525  Time: 1.881E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5236E-07  
+Iteration:    7550  Time: 1.888E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5107E-07  
+Iteration:    7575  Time: 1.894E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4985E-07  
+Iteration:    7600  Time: 1.900E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4870E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    7625  Time: 1.906E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4759E-07  
+Iteration:    7650  Time: 1.913E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4651E-07  
+Iteration:    7675  Time: 1.919E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4547E-07  
+Iteration:    7700  Time: 1.925E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4445E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    7725  Time: 1.931E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4346E-07  
+Iteration:    7750  Time: 1.938E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4250E-07  
+Iteration:    7775  Time: 1.944E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4157E-07  
+Iteration:    7800  Time: 1.950E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4067E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    7825  Time: 1.956E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3980E-07  
+Iteration:    7850  Time: 1.963E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3894E-07  
+Iteration:    7875  Time: 1.969E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3808E-07  
+Iteration:    7900  Time: 1.975E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3721E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    7925  Time: 1.981E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3634E-07  
+Iteration:    7950  Time: 1.988E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3546E-07  
+Iteration:    7975  Time: 1.994E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3460E-07  
+Iteration:    8000  Time: 2.000E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3377E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    8025  Time: 2.006E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3298E-07  
+Iteration:    8050  Time: 2.013E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3223E-07  
+Iteration:    8075  Time: 2.019E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3151E-07  
+Iteration:    8100  Time: 2.025E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3081E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    8125  Time: 2.031E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3011E-07  
+Iteration:    8150  Time: 2.038E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2939E-07  
+Iteration:    8175  Time: 2.044E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2866E-07  
+Iteration:    8200  Time: 2.050E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2790E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    8225  Time: 2.056E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2714E-07  
+Iteration:    8250  Time: 2.063E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2638E-07  
+Iteration:    8275  Time: 2.069E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2564E-07  
+Iteration:    8300  Time: 2.075E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2493E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    8325  Time: 2.081E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2425E-07  
+Iteration:    8350  Time: 2.088E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2358E-07  
+Iteration:    8375  Time: 2.094E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2293E-07  
+Iteration:    8400  Time: 2.100E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2228E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    8425  Time: 2.106E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2161E-07  
+Iteration:    8450  Time: 2.113E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2093E-07  
+Iteration:    8475  Time: 2.119E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2025E-07  
+Iteration:    8500  Time: 2.125E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1957E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    8525  Time: 2.131E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1890E-07  
+Iteration:    8550  Time: 2.138E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1824E-07  
+Iteration:    8575  Time: 2.144E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1761E-07  
+Iteration:    8600  Time: 2.150E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1699E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    8625  Time: 2.156E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1639E-07  
+Iteration:    8650  Time: 2.163E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1579E-07  
+Iteration:    8675  Time: 2.169E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1519E-07  
+Iteration:    8700  Time: 2.175E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1457E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    8725  Time: 2.181E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1394E-07  
+Iteration:    8750  Time: 2.188E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1329E-07  
+Iteration:    8775  Time: 2.194E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1263E-07  
+Iteration:    8800  Time: 2.200E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1197E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    8825  Time: 2.206E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1132E-07  
+Iteration:    8850  Time: 2.213E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1070E-07  
+Iteration:    8875  Time: 2.219E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1013E-07  
+Iteration:    8900  Time: 2.225E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0961E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    8925  Time: 2.231E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0916E-07  
+Iteration:    8950  Time: 2.238E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0879E-07  
+Iteration:    8975  Time: 2.244E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0847E-07  
+Iteration:    9000  Time: 2.250E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0821E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    9025  Time: 2.256E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0799E-07  
+Iteration:    9050  Time: 2.263E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0778E-07  
+Iteration:    9075  Time: 2.269E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0756E-07  
+Iteration:    9100  Time: 2.275E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0731E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    9125  Time: 2.281E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0700E-07  
+Iteration:    9150  Time: 2.288E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0662E-07  
+Iteration:    9175  Time: 2.294E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0616E-07  
+Iteration:    9200  Time: 2.300E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0560E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    9225  Time: 2.306E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0495E-07  
+Iteration:    9250  Time: 2.313E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0421E-07  
+Iteration:    9275  Time: 2.319E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0341E-07  
+Iteration:    9300  Time: 2.325E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0257E-07  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    9325  Time: 2.331E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0173E-07  
+Iteration:    9350  Time: 2.338E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0090E-07  
+Iteration:    9375  Time: 2.344E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0013E-07  
+Iteration:    9400  Time: 2.350E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.9436E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    9425  Time: 2.356E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.8824E-08  
+Iteration:    9450  Time: 2.363E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.8296E-08  
+Iteration:    9475  Time: 2.369E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.7835E-08  
+Iteration:    9500  Time: 2.375E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.7420E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    9525  Time: 2.381E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.7024E-08  
+Iteration:    9550  Time: 2.388E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.6622E-08  
+Iteration:    9575  Time: 2.394E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.6199E-08  
+Iteration:    9600  Time: 2.400E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.5751E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    9625  Time: 2.406E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.5282E-08  
+Iteration:    9650  Time: 2.413E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.4804E-08  
+Iteration:    9675  Time: 2.419E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.4329E-08  
+Iteration:    9700  Time: 2.425E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.3865E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    9725  Time: 2.431E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.3417E-08  
+Iteration:    9750  Time: 2.438E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.2985E-08  
+Iteration:    9775  Time: 2.444E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.2567E-08  
+Iteration:    9800  Time: 2.450E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.2161E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    9825  Time: 2.456E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.1767E-08  
+Iteration:    9850  Time: 2.463E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.1389E-08  
+Iteration:    9875  Time: 2.469E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.1035E-08  
+Iteration:    9900  Time: 2.475E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.0711E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:    9925  Time: 2.481E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.0422E-08  
+Iteration:    9950  Time: 2.488E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.0168E-08  
+Iteration:    9975  Time: 2.494E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.9943E-08  
+Iteration:   10000  Time: 2.500E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.9735E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   10025  Time: 2.506E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.9529E-08  
+Iteration:   10050  Time: 2.513E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.9305E-08  
+Iteration:   10075  Time: 2.519E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.9047E-08  
+Iteration:   10100  Time: 2.525E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.8741E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   10125  Time: 2.531E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.8383E-08  
+Iteration:   10150  Time: 2.538E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.7973E-08  
+Iteration:   10175  Time: 2.544E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.7522E-08  
+Iteration:   10200  Time: 2.550E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.7046E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   10225  Time: 2.556E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.6564E-08  
+Iteration:   10250  Time: 2.563E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.6098E-08  
+Iteration:   10275  Time: 2.569E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.5666E-08  
+Iteration:   10300  Time: 2.575E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.5279E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   10325  Time: 2.581E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.4943E-08  
+Iteration:   10350  Time: 2.588E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.4655E-08  
+Iteration:   10375  Time: 2.594E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.4409E-08  
+Iteration:   10400  Time: 2.600E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.4189E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   10425  Time: 2.606E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.3980E-08  
+Iteration:   10450  Time: 2.613E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.3767E-08  
+Iteration:   10475  Time: 2.619E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.3538E-08  
+Iteration:   10500  Time: 2.625E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.3283E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   10525  Time: 2.631E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.2998E-08  
+Iteration:   10550  Time: 2.638E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.2685E-08  
+Iteration:   10575  Time: 2.644E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.2348E-08  
+Iteration:   10600  Time: 2.650E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.1995E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   10625  Time: 2.656E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.1633E-08  
+Iteration:   10650  Time: 2.663E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.1272E-08  
+Iteration:   10675  Time: 2.669E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.0916E-08  
+Iteration:   10700  Time: 2.675E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.0569E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   10725  Time: 2.681E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.0232E-08  
+Iteration:   10750  Time: 2.688E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.9903E-08  
+Iteration:   10775  Time: 2.694E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.9580E-08  
+Iteration:   10800  Time: 2.700E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.9261E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   10825  Time: 2.706E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.8942E-08  
+Iteration:   10850  Time: 2.713E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.8622E-08  
+Iteration:   10875  Time: 2.719E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.8302E-08  
+Iteration:   10900  Time: 2.725E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.7981E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   10925  Time: 2.731E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.7661E-08  
+Iteration:   10950  Time: 2.738E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.7343E-08  
+Iteration:   10975  Time: 2.744E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.7027E-08  
+Iteration:   11000  Time: 2.750E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.6712E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   11025  Time: 2.756E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.6396E-08  
+Iteration:   11050  Time: 2.763E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.6077E-08  
+Iteration:   11075  Time: 2.769E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.5753E-08  
+Iteration:   11100  Time: 2.775E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.5424E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   11125  Time: 2.781E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.5090E-08  
+Iteration:   11150  Time: 2.788E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.4755E-08  
+Iteration:   11175  Time: 2.794E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.4426E-08  
+Iteration:   11200  Time: 2.800E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.4109E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   11225  Time: 2.806E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.3811E-08  
+Iteration:   11250  Time: 2.813E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.3538E-08  
+Iteration:   11275  Time: 2.819E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.3291E-08  
+Iteration:   11300  Time: 2.825E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.3071E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   11325  Time: 2.831E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2873E-08  
+Iteration:   11350  Time: 2.838E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2692E-08  
+Iteration:   11375  Time: 2.844E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2520E-08  
+Iteration:   11400  Time: 2.850E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2349E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   11425  Time: 2.856E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2173E-08  
+Iteration:   11450  Time: 2.863E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1983E-08  
+Iteration:   11475  Time: 2.869E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1775E-08  
+Iteration:   11500  Time: 2.875E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1548E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   11525  Time: 2.881E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1301E-08  
+Iteration:   11550  Time: 2.888E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1037E-08  
+Iteration:   11575  Time: 2.894E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.0761E-08  
+Iteration:   11600  Time: 2.900E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.0480E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   11625  Time: 2.906E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.0199E-08  
+Iteration:   11650  Time: 2.913E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.9924E-08  
+Iteration:   11675  Time: 2.919E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.9658E-08  
+Iteration:   11700  Time: 2.925E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.9403E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   11725  Time: 2.931E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.9160E-08  
+Iteration:   11750  Time: 2.938E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.8927E-08  
+Iteration:   11775  Time: 2.944E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.8704E-08  
+Iteration:   11800  Time: 2.950E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.8488E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   11825  Time: 2.956E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.8279E-08  
+Iteration:   11850  Time: 2.963E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.8076E-08  
+Iteration:   11875  Time: 2.969E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.7879E-08  
+Iteration:   11900  Time: 2.975E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.7689E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   11925  Time: 2.981E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.7504E-08  
+Iteration:   11950  Time: 2.988E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.7325E-08  
+Iteration:   11975  Time: 2.994E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.7152E-08  
+Iteration:   12000  Time: 3.000E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.6983E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   12025  Time: 3.006E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.6816E-08  
+Iteration:   12050  Time: 3.012E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.6649E-08  
+Iteration:   12075  Time: 3.019E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.6478E-08  
+Iteration:   12100  Time: 3.025E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.6301E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   12125  Time: 3.031E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.6115E-08  
+Iteration:   12150  Time: 3.037E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.5919E-08  
+Iteration:   12175  Time: 3.044E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.5712E-08  
+Iteration:   12200  Time: 3.050E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.5492E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   12225  Time: 3.056E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.5261E-08  
+Iteration:   12250  Time: 3.062E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.5020E-08  
+Iteration:   12275  Time: 3.069E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.4770E-08  
+Iteration:   12300  Time: 3.075E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.4513E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   12325  Time: 3.081E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.4253E-08  
+Iteration:   12350  Time: 3.087E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.3992E-08  
+Iteration:   12375  Time: 3.094E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.3732E-08  
+Iteration:   12400  Time: 3.100E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.3476E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   12425  Time: 3.106E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.3225E-08  
+Iteration:   12450  Time: 3.112E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.2980E-08  
+Iteration:   12475  Time: 3.119E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.2743E-08  
+Iteration:   12500  Time: 3.125E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.2513E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   12525  Time: 3.131E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.2292E-08  
+Iteration:   12550  Time: 3.137E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.2078E-08  
+Iteration:   12575  Time: 3.144E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1871E-08  
+Iteration:   12600  Time: 3.150E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1670E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   12625  Time: 3.156E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1476E-08  
+Iteration:   12650  Time: 3.162E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1286E-08  
+Iteration:   12675  Time: 3.169E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1100E-08  
+Iteration:   12700  Time: 3.175E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.0917E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   12725  Time: 3.181E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.0735E-08  
+Iteration:   12750  Time: 3.187E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.0552E-08  
+Iteration:   12775  Time: 3.194E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.0368E-08  
+Iteration:   12800  Time: 3.200E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.0181E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   12825  Time: 3.206E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9989E-08  
+Iteration:   12850  Time: 3.212E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9791E-08  
+Iteration:   12875  Time: 3.219E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9586E-08  
+Iteration:   12900  Time: 3.225E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9374E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   12925  Time: 3.231E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9154E-08  
+Iteration:   12950  Time: 3.237E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.8925E-08  
+Iteration:   12975  Time: 3.244E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.8689E-08  
+Iteration:   13000  Time: 3.250E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.8446E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   13025  Time: 3.256E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.8199E-08  
+Iteration:   13050  Time: 3.262E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.7950E-08  
+Iteration:   13075  Time: 3.269E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.7704E-08  
+Iteration:   13100  Time: 3.275E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.7465E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   13125  Time: 3.281E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.7240E-08  
+Iteration:   13150  Time: 3.287E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.7033E-08  
+Iteration:   13175  Time: 3.294E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.6850E-08  
+Iteration:   13200  Time: 3.300E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.6692E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   13225  Time: 3.306E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.6559E-08  
+Iteration:   13250  Time: 3.312E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.6450E-08  
+Iteration:   13275  Time: 3.319E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.6357E-08  
+Iteration:   13300  Time: 3.325E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.6274E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   13325  Time: 3.331E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.6193E-08  
+Iteration:   13350  Time: 3.337E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.6104E-08  
+Iteration:   13375  Time: 3.344E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5998E-08  
+Iteration:   13400  Time: 3.350E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5867E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   13425  Time: 3.356E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5705E-08  
+Iteration:   13450  Time: 3.362E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5510E-08  
+Iteration:   13475  Time: 3.369E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5281E-08  
+Iteration:   13500  Time: 3.375E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5023E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   13525  Time: 3.381E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.4740E-08  
+Iteration:   13550  Time: 3.387E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.4442E-08  
+Iteration:   13575  Time: 3.394E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.4139E-08  
+Iteration:   13600  Time: 3.400E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.3841E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   13625  Time: 3.406E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.3558E-08  
+Iteration:   13650  Time: 3.412E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.3297E-08  
+Iteration:   13675  Time: 3.419E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.3063E-08  
+Iteration:   13700  Time: 3.425E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.2857E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   13725  Time: 3.431E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.2678E-08  
+Iteration:   13750  Time: 3.437E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.2522E-08  
+Iteration:   13775  Time: 3.444E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.2385E-08  
+Iteration:   13800  Time: 3.450E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.2259E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   13825  Time: 3.456E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.2137E-08  
+Iteration:   13850  Time: 3.462E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.2014E-08  
+Iteration:   13875  Time: 3.469E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.1885E-08  
+Iteration:   13900  Time: 3.475E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.1746E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   13925  Time: 3.481E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.1595E-08  
+Iteration:   13950  Time: 3.487E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.1431E-08  
+Iteration:   13975  Time: 3.494E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.1255E-08  
+Iteration:   14000  Time: 3.500E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.1067E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   14025  Time: 3.506E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.0870E-08  
+Iteration:   14050  Time: 3.512E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.0666E-08  
+Iteration:   14075  Time: 3.519E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.0457E-08  
+Iteration:   14100  Time: 3.525E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.0245E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   14125  Time: 3.531E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.0031E-08  
+Iteration:   14150  Time: 3.537E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.9816E-08  
+Iteration:   14175  Time: 3.544E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.9604E-08  
+Iteration:   14200  Time: 3.550E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.9393E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   14225  Time: 3.556E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.9188E-08  
+Iteration:   14250  Time: 3.562E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.8989E-08  
+Iteration:   14275  Time: 3.569E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.8798E-08  
+Iteration:   14300  Time: 3.575E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.8619E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   14325  Time: 3.581E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.8454E-08  
+Iteration:   14350  Time: 3.587E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.8305E-08  
+Iteration:   14375  Time: 3.594E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.8175E-08  
+Iteration:   14400  Time: 3.600E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.8064E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   14425  Time: 3.606E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7971E-08  
+Iteration:   14450  Time: 3.612E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7894E-08  
+Iteration:   14475  Time: 3.619E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7830E-08  
+Iteration:   14500  Time: 3.625E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7773E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   14525  Time: 3.631E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7717E-08  
+Iteration:   14550  Time: 3.637E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7654E-08  
+Iteration:   14575  Time: 3.644E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7578E-08  
+Iteration:   14600  Time: 3.650E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7483E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   14625  Time: 3.656E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7363E-08  
+Iteration:   14650  Time: 3.662E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7214E-08  
+Iteration:   14675  Time: 3.669E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7034E-08  
+Iteration:   14700  Time: 3.675E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.6823E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   14725  Time: 3.681E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.6581E-08  
+Iteration:   14750  Time: 3.687E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.6313E-08  
+Iteration:   14775  Time: 3.694E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.6023E-08  
+Iteration:   14800  Time: 3.700E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.5718E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   14825  Time: 3.706E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.5406E-08  
+Iteration:   14850  Time: 3.712E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.5095E-08  
+Iteration:   14875  Time: 3.719E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.4794E-08  
+Iteration:   14900  Time: 3.725E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.4509E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   14925  Time: 3.731E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.4249E-08  
+Iteration:   14950  Time: 3.737E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.4016E-08  
+Iteration:   14975  Time: 3.744E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.3813E-08  
+Iteration:   15000  Time: 3.750E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.3639E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   15025  Time: 3.756E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.3494E-08  
+Iteration:   15050  Time: 3.762E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.3371E-08  
+Iteration:   15075  Time: 3.769E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.3267E-08  
+Iteration:   15100  Time: 3.775E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.3176E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   15125  Time: 3.781E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.3092E-08  
+Iteration:   15150  Time: 3.787E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.3010E-08  
+Iteration:   15175  Time: 3.794E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.2923E-08  
+Iteration:   15200  Time: 3.800E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.2829E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   15225  Time: 3.806E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.2724E-08  
+Iteration:   15250  Time: 3.812E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.2605E-08  
+Iteration:   15275  Time: 3.819E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.2471E-08  
+Iteration:   15300  Time: 3.825E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.2322E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   15325  Time: 3.831E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.2158E-08  
+Iteration:   15350  Time: 3.837E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1981E-08  
+Iteration:   15375  Time: 3.844E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1794E-08  
+Iteration:   15400  Time: 3.850E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1597E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   15425  Time: 3.856E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1395E-08  
+Iteration:   15450  Time: 3.862E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1189E-08  
+Iteration:   15475  Time: 3.869E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.0982E-08  
+Iteration:   15500  Time: 3.875E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.0777E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   15525  Time: 3.881E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.0575E-08  
+Iteration:   15550  Time: 3.887E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.0378E-08  
+Iteration:   15575  Time: 3.894E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.0187E-08  
+Iteration:   15600  Time: 3.900E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.0004E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   15625  Time: 3.906E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.9828E-08  
+Iteration:   15650  Time: 3.912E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.9661E-08  
+Iteration:   15675  Time: 3.919E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.9501E-08  
+Iteration:   15700  Time: 3.925E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.9349E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   15725  Time: 3.931E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.9203E-08  
+Iteration:   15750  Time: 3.937E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.9063E-08  
+Iteration:   15775  Time: 3.944E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.8927E-08  
+Iteration:   15800  Time: 3.950E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.8794E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   15825  Time: 3.956E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.8660E-08  
+Iteration:   15850  Time: 3.962E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.8526E-08  
+Iteration:   15875  Time: 3.969E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.8389E-08  
+Iteration:   15900  Time: 3.975E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.8247E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   15925  Time: 3.981E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.8100E-08  
+Iteration:   15950  Time: 3.987E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.7947E-08  
+Iteration:   15975  Time: 3.994E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.7788E-08  
+Iteration:   16000  Time: 4.000E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.7623E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   16025  Time: 4.006E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.7453E-08  
+Iteration:   16050  Time: 4.012E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.7280E-08  
+Iteration:   16075  Time: 4.019E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.7104E-08  
+Iteration:   16100  Time: 4.025E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.6927E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   16125  Time: 4.031E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.6751E-08  
+Iteration:   16150  Time: 4.037E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.6578E-08  
+Iteration:   16175  Time: 4.044E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.6407E-08  
+Iteration:   16200  Time: 4.050E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.6240E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   16225  Time: 4.056E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.6077E-08  
+Iteration:   16250  Time: 4.062E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.5918E-08  
+Iteration:   16275  Time: 4.069E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.5763E-08  
+Iteration:   16300  Time: 4.075E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.5611E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   16325  Time: 4.081E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.5461E-08  
+Iteration:   16350  Time: 4.087E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.5312E-08  
+Iteration:   16375  Time: 4.094E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.5163E-08  
+Iteration:   16400  Time: 4.100E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.5012E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   16425  Time: 4.106E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.4858E-08  
+Iteration:   16450  Time: 4.112E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.4701E-08  
+Iteration:   16475  Time: 4.119E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.4540E-08  
+Iteration:   16500  Time: 4.125E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.4376E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   16525  Time: 4.131E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.4209E-08  
+Iteration:   16550  Time: 4.137E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.4042E-08  
+Iteration:   16575  Time: 4.144E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.3873E-08  
+Iteration:   16600  Time: 4.150E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.3706E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   16625  Time: 4.156E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.3542E-08  
+Iteration:   16650  Time: 4.162E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.3380E-08  
+Iteration:   16675  Time: 4.169E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.3222E-08  
+Iteration:   16700  Time: 4.175E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.3069E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   16725  Time: 4.181E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.2918E-08  
+Iteration:   16750  Time: 4.187E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.2772E-08  
+Iteration:   16775  Time: 4.194E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.2627E-08  
+Iteration:   16800  Time: 4.200E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.2484E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   16825  Time: 4.206E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.2341E-08  
+Iteration:   16850  Time: 4.212E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.2197E-08  
+Iteration:   16875  Time: 4.219E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.2051E-08  
+Iteration:   16900  Time: 4.225E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.1902E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   16925  Time: 4.231E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.1748E-08  
+Iteration:   16950  Time: 4.237E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.1589E-08  
+Iteration:   16975  Time: 4.244E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.1425E-08  
+Iteration:   17000  Time: 4.250E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.1255E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   17025  Time: 4.256E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.1079E-08  
+Iteration:   17050  Time: 4.262E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.0898E-08  
+Iteration:   17075  Time: 4.269E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.0713E-08  
+Iteration:   17100  Time: 4.275E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.0524E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   17125  Time: 4.281E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.0333E-08  
+Iteration:   17150  Time: 4.287E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.0142E-08  
+Iteration:   17175  Time: 4.294E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.9951E-08  
+Iteration:   17200  Time: 4.300E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.9764E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   17225  Time: 4.306E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.9580E-08  
+Iteration:   17250  Time: 4.312E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.9402E-08  
+Iteration:   17275  Time: 4.319E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.9231E-08  
+Iteration:   17300  Time: 4.325E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.9068E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   17325  Time: 4.331E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.8914E-08  
+Iteration:   17350  Time: 4.337E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.8768E-08  
+Iteration:   17375  Time: 4.344E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.8630E-08  
+Iteration:   17400  Time: 4.350E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.8501E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   17425  Time: 4.356E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.8378E-08  
+Iteration:   17450  Time: 4.362E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.8259E-08  
+Iteration:   17475  Time: 4.369E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.8144E-08  
+Iteration:   17500  Time: 4.375E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.8028E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   17525  Time: 4.381E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.7909E-08  
+Iteration:   17550  Time: 4.387E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.7785E-08  
+Iteration:   17575  Time: 4.394E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.7653E-08  
+Iteration:   17600  Time: 4.400E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.7512E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   17625  Time: 4.406E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.7361E-08  
+Iteration:   17650  Time: 4.412E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.7201E-08  
+Iteration:   17675  Time: 4.419E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.7032E-08  
+Iteration:   17700  Time: 4.425E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.6856E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   17725  Time: 4.431E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.6677E-08  
+Iteration:   17750  Time: 4.437E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.6496E-08  
+Iteration:   17775  Time: 4.444E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.6318E-08  
+Iteration:   17800  Time: 4.450E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.6145E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   17825  Time: 4.456E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.5980E-08  
+Iteration:   17850  Time: 4.462E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.5824E-08  
+Iteration:   17875  Time: 4.469E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.5680E-08  
+Iteration:   17900  Time: 4.475E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.5549E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   17925  Time: 4.481E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.5430E-08  
+Iteration:   17950  Time: 4.487E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.5324E-08  
+Iteration:   17975  Time: 4.494E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.5229E-08  
+Iteration:   18000  Time: 4.500E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.5142E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   18025  Time: 4.506E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.5059E-08  
+Iteration:   18050  Time: 4.512E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.4975E-08  
+Iteration:   18075  Time: 4.519E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.4887E-08  
+Iteration:   18100  Time: 4.525E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.4788E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   18125  Time: 4.531E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.4676E-08  
+Iteration:   18150  Time: 4.537E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.4546E-08  
+Iteration:   18175  Time: 4.544E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.4398E-08  
+Iteration:   18200  Time: 4.550E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.4231E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   18225  Time: 4.556E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.4047E-08  
+Iteration:   18250  Time: 4.562E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.3847E-08  
+Iteration:   18275  Time: 4.569E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.3635E-08  
+Iteration:   18300  Time: 4.575E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.3415E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   18325  Time: 4.581E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.3193E-08  
+Iteration:   18350  Time: 4.587E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.2973E-08  
+Iteration:   18375  Time: 4.594E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.2760E-08  
+Iteration:   18400  Time: 4.600E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.2560E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   18425  Time: 4.606E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.2375E-08  
+Iteration:   18450  Time: 4.612E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.2211E-08  
+Iteration:   18475  Time: 4.619E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.2068E-08  
+Iteration:   18500  Time: 4.625E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1948E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   18525  Time: 4.631E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1849E-08  
+Iteration:   18550  Time: 4.637E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1770E-08  
+Iteration:   18575  Time: 4.644E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1706E-08  
+Iteration:   18600  Time: 4.650E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1653E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   18625  Time: 4.656E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1605E-08  
+Iteration:   18650  Time: 4.662E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1559E-08  
+Iteration:   18675  Time: 4.669E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1507E-08  
+Iteration:   18700  Time: 4.675E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1446E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   18725  Time: 4.681E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1371E-08  
+Iteration:   18750  Time: 4.687E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1278E-08  
+Iteration:   18775  Time: 4.694E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1163E-08  
+Iteration:   18800  Time: 4.700E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.1026E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   18825  Time: 4.706E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.0864E-08  
+Iteration:   18850  Time: 4.712E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.0680E-08  
+Iteration:   18875  Time: 4.719E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.0474E-08  
+Iteration:   18900  Time: 4.725E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.0251E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   18925  Time: 4.731E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.0016E-08  
+Iteration:   18950  Time: 4.737E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.9774E-08  
+Iteration:   18975  Time: 4.744E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.9534E-08  
+Iteration:   19000  Time: 4.750E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.9304E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   19025  Time: 4.756E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.9090E-08  
+Iteration:   19050  Time: 4.762E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8901E-08  
+Iteration:   19075  Time: 4.769E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8741E-08  
+Iteration:   19100  Time: 4.775E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8616E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   19125  Time: 4.781E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8525E-08  
+Iteration:   19150  Time: 4.787E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8468E-08  
+Iteration:   19175  Time: 4.794E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8440E-08  
+Iteration:   19200  Time: 4.800E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8435E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   19225  Time: 4.806E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8443E-08  
+Iteration:   19250  Time: 4.812E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8456E-08  
+Iteration:   19275  Time: 4.819E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8464E-08  
+Iteration:   19300  Time: 4.825E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8458E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   19325  Time: 4.831E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8429E-08  
+Iteration:   19350  Time: 4.837E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8371E-08  
+Iteration:   19375  Time: 4.844E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8279E-08  
+Iteration:   19400  Time: 4.850E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.8150E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   19425  Time: 4.856E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.7985E-08  
+Iteration:   19450  Time: 4.862E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.7783E-08  
+Iteration:   19475  Time: 4.869E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.7550E-08  
+Iteration:   19500  Time: 4.875E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.7291E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   19525  Time: 4.881E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.7013E-08  
+Iteration:   19550  Time: 4.887E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.6727E-08  
+Iteration:   19575  Time: 4.894E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.6442E-08  
+Iteration:   19600  Time: 4.900E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.6169E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   19625  Time: 4.906E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5918E-08  
+Iteration:   19650  Time: 4.912E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5698E-08  
+Iteration:   19675  Time: 4.919E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5517E-08  
+Iteration:   19700  Time: 4.925E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5379E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   19725  Time: 4.931E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5285E-08  
+Iteration:   19750  Time: 4.937E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5234E-08  
+Iteration:   19775  Time: 4.944E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5221E-08  
+Iteration:   19800  Time: 4.950E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5238E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   19825  Time: 4.956E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5277E-08  
+Iteration:   19850  Time: 4.962E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5329E-08  
+Iteration:   19875  Time: 4.969E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5381E-08  
+Iteration:   19900  Time: 4.975E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5425E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   19925  Time: 4.981E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5451E-08  
+Iteration:   19950  Time: 4.987E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5452E-08  
+Iteration:   19975  Time: 4.994E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5421E-08  
+Iteration:   20000  Time: 5.000E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5355E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   20025  Time: 5.006E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5252E-08  
+Iteration:   20050  Time: 5.012E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.5111E-08  
+Iteration:   20075  Time: 5.019E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4934E-08  
+Iteration:   20100  Time: 5.025E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4725E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   20125  Time: 5.031E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4489E-08  
+Iteration:   20150  Time: 5.037E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.4234E-08  
+Iteration:   20175  Time: 5.044E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3968E-08  
+Iteration:   20200  Time: 5.050E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3699E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   20225  Time: 5.056E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3435E-08  
+Iteration:   20250  Time: 5.062E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.3186E-08  
+Iteration:   20275  Time: 5.069E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2958E-08  
+Iteration:   20300  Time: 5.075E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2758E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   20325  Time: 5.081E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2589E-08  
+Iteration:   20350  Time: 5.087E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2456E-08  
+Iteration:   20375  Time: 5.094E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2357E-08  
+Iteration:   20400  Time: 5.100E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2291E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   20425  Time: 5.106E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2255E-08  
+Iteration:   20450  Time: 5.112E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2242E-08  
+Iteration:   20475  Time: 5.119E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2247E-08  
+Iteration:   20500  Time: 5.125E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2262E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   20525  Time: 5.131E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2281E-08  
+Iteration:   20550  Time: 5.137E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2295E-08  
+Iteration:   20575  Time: 5.144E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2300E-08  
+Iteration:   20600  Time: 5.150E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2290E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   20625  Time: 5.156E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2261E-08  
+Iteration:   20650  Time: 5.162E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2210E-08  
+Iteration:   20675  Time: 5.169E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2137E-08  
+Iteration:   20700  Time: 5.175E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.2042E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   20725  Time: 5.181E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1926E-08  
+Iteration:   20750  Time: 5.187E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1792E-08  
+Iteration:   20775  Time: 5.194E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1643E-08  
+Iteration:   20800  Time: 5.200E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1482E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   20825  Time: 5.206E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1315E-08  
+Iteration:   20850  Time: 5.212E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.1144E-08  
+Iteration:   20875  Time: 5.219E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0973E-08  
+Iteration:   20900  Time: 5.225E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0808E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   20925  Time: 5.231E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0649E-08  
+Iteration:   20950  Time: 5.237E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0501E-08  
+Iteration:   20975  Time: 5.244E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0364E-08  
+Iteration:   21000  Time: 5.250E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0239E-08  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   21025  Time: 5.256E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0126E-08  
+Iteration:   21050  Time: 5.262E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 1.0025E-08  
+Iteration:   21075  Time: 5.269E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.9347E-09  
+Iteration:   21100  Time: 5.275E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.8533E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   21125  Time: 5.281E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.7792E-09  
+Iteration:   21150  Time: 5.287E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.7104E-09  
+Iteration:   21175  Time: 5.294E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.6452E-09  
+Iteration:   21200  Time: 5.300E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.5821E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   21225  Time: 5.306E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.5197E-09  
+Iteration:   21250  Time: 5.312E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.4571E-09  
+Iteration:   21275  Time: 5.319E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.3936E-09  
+Iteration:   21300  Time: 5.325E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.3289E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   21325  Time: 5.331E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.2628E-09  
+Iteration:   21350  Time: 5.337E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.1956E-09  
+Iteration:   21375  Time: 5.344E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.1277E-09  
+Iteration:   21400  Time: 5.350E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 9.0594E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   21425  Time: 5.356E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.9913E-09  
+Iteration:   21450  Time: 5.362E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.9237E-09  
+Iteration:   21475  Time: 5.369E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.8566E-09  
+Iteration:   21500  Time: 5.375E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.7902E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   21525  Time: 5.381E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.7242E-09  
+Iteration:   21550  Time: 5.387E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.6582E-09  
+Iteration:   21575  Time: 5.394E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.5917E-09  
+Iteration:   21600  Time: 5.400E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.5241E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   21625  Time: 5.406E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.4547E-09  
+Iteration:   21650  Time: 5.412E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.3831E-09  
+Iteration:   21675  Time: 5.419E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.3088E-09  
+Iteration:   21700  Time: 5.425E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.2315E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   21725  Time: 5.431E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.1511E-09  
+Iteration:   21750  Time: 5.437E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 8.0676E-09  
+Iteration:   21775  Time: 5.444E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.9814E-09  
+Iteration:   21800  Time: 5.450E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.8932E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   21825  Time: 5.456E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.8037E-09  
+Iteration:   21850  Time: 5.462E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.7144E-09  
+Iteration:   21875  Time: 5.469E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.6266E-09  
+Iteration:   21900  Time: 5.475E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.5423E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   21925  Time: 5.481E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.4635E-09  
+Iteration:   21950  Time: 5.487E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.3921E-09  
+Iteration:   21975  Time: 5.494E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.3301E-09  
+Iteration:   22000  Time: 5.500E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2787E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   22025  Time: 5.506E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2392E-09  
+Iteration:   22050  Time: 5.512E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2116E-09  
+Iteration:   22075  Time: 5.519E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1957E-09  
+Iteration:   22100  Time: 5.525E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1900E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   22125  Time: 5.531E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1923E-09  
+Iteration:   22150  Time: 5.537E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1997E-09  
+Iteration:   22175  Time: 5.544E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2088E-09  
+Iteration:   22200  Time: 5.550E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2159E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   22225  Time: 5.556E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2172E-09  
+Iteration:   22250  Time: 5.562E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.2092E-09  
+Iteration:   22275  Time: 5.569E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1888E-09  
+Iteration:   22300  Time: 5.575E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1535E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   22325  Time: 5.581E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.1019E-09  
+Iteration:   22350  Time: 5.587E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 7.0332E-09  
+Iteration:   22375  Time: 5.594E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.9480E-09  
+Iteration:   22400  Time: 5.600E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.8478E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   22425  Time: 5.606E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.7352E-09  
+Iteration:   22450  Time: 5.612E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.6134E-09  
+Iteration:   22475  Time: 5.619E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.4870E-09  
+Iteration:   22500  Time: 5.625E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.3610E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   22525  Time: 5.631E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.2406E-09  
+Iteration:   22550  Time: 5.637E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1314E-09  
+Iteration:   22575  Time: 5.644E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.0384E-09  
+Iteration:   22600  Time: 5.650E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9660E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   22625  Time: 5.656E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9170E-09  
+Iteration:   22650  Time: 5.662E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.8927E-09  
+Iteration:   22675  Time: 5.669E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.8923E-09  
+Iteration:   22700  Time: 5.675E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9131E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   22725  Time: 5.681E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9508E-09  
+Iteration:   22750  Time: 5.687E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9995E-09  
+Iteration:   22775  Time: 5.694E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.0527E-09  
+Iteration:   22800  Time: 5.700E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1033E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   22825  Time: 5.706E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1448E-09  
+Iteration:   22850  Time: 5.712E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1709E-09  
+Iteration:   22875  Time: 5.719E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1766E-09  
+Iteration:   22900  Time: 5.725E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1582E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   22925  Time: 5.731E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.1135E-09  
+Iteration:   22950  Time: 5.737E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 6.0423E-09  
+Iteration:   22975  Time: 5.744E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9462E-09  
+Iteration:   23000  Time: 5.750E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.8287E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   23025  Time: 5.756E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.6947E-09  
+Iteration:   23050  Time: 5.762E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5512E-09  
+Iteration:   23075  Time: 5.769E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.4058E-09  
+Iteration:   23100  Time: 5.775E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.2671E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   23125  Time: 5.781E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.1441E-09  
+Iteration:   23150  Time: 5.787E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.0452E-09  
+Iteration:   23175  Time: 5.794E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.9777E-09  
+Iteration:   23200  Time: 5.800E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.9468E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   23225  Time: 5.806E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.9550E-09  
+Iteration:   23250  Time: 5.812E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.0014E-09  
+Iteration:   23275  Time: 5.819E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.0819E-09  
+Iteration:   23300  Time: 5.825E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.1897E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   23325  Time: 5.831E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.3159E-09  
+Iteration:   23350  Time: 5.837E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.4504E-09  
+Iteration:   23375  Time: 5.844E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5831E-09  
+Iteration:   23400  Time: 5.850E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.7044E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   23425  Time: 5.856E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.8062E-09  
+Iteration:   23450  Time: 5.862E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.8811E-09  
+Iteration:   23475  Time: 5.869E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9238E-09  
+Iteration:   23500  Time: 5.875E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.9303E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   23525  Time: 5.881E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.8985E-09  
+Iteration:   23550  Time: 5.887E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.8278E-09  
+Iteration:   23575  Time: 5.894E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.7193E-09  
+Iteration:   23600  Time: 5.900E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5758E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   23625  Time: 5.906E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.4025E-09  
+Iteration:   23650  Time: 5.912E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.2059E-09  
+Iteration:   23675  Time: 5.919E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.9952E-09  
+Iteration:   23700  Time: 5.925E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7812E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   23725  Time: 5.931E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.5765E-09  
+Iteration:   23750  Time: 5.937E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.3952E-09  
+Iteration:   23775  Time: 5.944E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.2513E-09  
+Iteration:   23800  Time: 5.950E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1571E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   23825  Time: 5.956E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1211E-09  
+Iteration:   23850  Time: 5.962E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1458E-09  
+Iteration:   23875  Time: 5.969E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.2271E-09  
+Iteration:   23900  Time: 5.975E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.3558E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   23925  Time: 5.981E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.5186E-09  
+Iteration:   23950  Time: 5.987E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7010E-09  
+Iteration:   23975  Time: 5.994E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.8887E-09  
+Iteration:   24000  Time: 6.000E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.0689E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   24025  Time: 6.006E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.2305E-09  
+Iteration:   24050  Time: 6.012E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.3645E-09  
+Iteration:   24075  Time: 6.019E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.4636E-09  
+Iteration:   24100  Time: 6.025E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5229E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   24125  Time: 6.031E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5391E-09  
+Iteration:   24150  Time: 6.037E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.5108E-09  
+Iteration:   24175  Time: 6.044E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.4384E-09  
+Iteration:   24200  Time: 6.050E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.3239E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   24225  Time: 6.056E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 5.1710E-09  
+Iteration:   24250  Time: 6.062E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.9848E-09  
+Iteration:   24275  Time: 6.069E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.7720E-09  
+Iteration:   24300  Time: 6.075E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.5406E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   24325  Time: 6.081E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.3001E-09  
+Iteration:   24350  Time: 6.087E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.0609E-09  
+Iteration:   24375  Time: 6.094E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.8345E-09  
+Iteration:   24400  Time: 6.100E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.6326E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   24425  Time: 6.106E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.4668E-09  
+Iteration:   24450  Time: 6.112E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.3468E-09  
+Iteration:   24475  Time: 6.119E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.2791E-09  
+Iteration:   24500  Time: 6.125E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.2649E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   24525  Time: 6.131E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.3004E-09  
+Iteration:   24550  Time: 6.137E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.3771E-09  
+Iteration:   24575  Time: 6.144E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.4834E-09  
+Iteration:   24600  Time: 6.150E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.6070E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   24625  Time: 6.156E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.7355E-09  
+Iteration:   24650  Time: 6.162E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.8584E-09  
+Iteration:   24675  Time: 6.169E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.9665E-09  
+Iteration:   24700  Time: 6.175E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.0528E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   24725  Time: 6.181E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1122E-09  
+Iteration:   24750  Time: 6.187E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1413E-09  
+Iteration:   24775  Time: 6.194E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1381E-09  
+Iteration:   24800  Time: 6.200E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.1023E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   24825  Time: 6.206E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 4.0346E-09  
+Iteration:   24850  Time: 6.212E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.9370E-09  
+Iteration:   24875  Time: 6.219E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.8126E-09  
+Iteration:   24900  Time: 6.225E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.6655E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Iteration:   24925  Time: 6.231E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.5009E-09  
+Iteration:   24950  Time: 6.237E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.3248E-09  
+Iteration:   24975  Time: 6.244E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 3.1446E-09  
+Iteration:   25000  Time: 6.250E+02  Max CFL: 5.448E-01  Max Diff. No.: -1.000E+00  Norm: 2.9685E-09  
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+Completed time integration (Final time: 625.000000).
+Solver runtime (in seconds): 9.5406169520000003E+03
+Total  runtime (in seconds): 9.5417932239999991E+03
+Deallocating arrays.
+Finished.
