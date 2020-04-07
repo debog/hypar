@@ -42,7 +42,8 @@ with PETSc.
 
 \subpage burgers_2d_sine
 
-\subpage vlasov_1d1v_prescribed
+\subpage vlasov_1d1v_prescribed \n
+\subpage vlasov_1d1v_selfconsistent
 
 \subpage euler2d_riemann4 \n
 \subpage euler2d_riemann6 \n
@@ -1236,6 +1237,198 @@ and conservation error (#HyPar::ConservationError).
 Expected screen output:
 \include 2D/Burgers/SineWave/output.log
 
+\page vlasov_1d1v_prescribed 2D (1D-1V) Vlasov Equation - Prescribed E-Field
+
+Location: \b hypar/Examples/2D/Vlasov1D1V/PrescribedElectricField
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D (1D-1V) Vlasov Equation (vlasov.h)
+
+Domain: 
+  + \f$0 \le x < 2\pi\f$, \a "periodic" (#_PERIODIC_)
+  + \f$-6 \le y < 6\f$, \a "dirichlet" (#_DIRICHLET_) (\f$f = 0\f$)
+
+
+Initial solution: \f$f\left(x,v\right) = \left[1 + \frac{1}{10} \cos\left(x\right)\right] \exp\left(- \frac{1}{2}v^2\right)\f$
+
+Prescribed electric field: \f$\frac{1}{10}\cos\left(x\right)\f$
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order compact upwind (Interp1PrimFifthOrderCompactUpwind())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 2D/Vlasov1D1V/PrescribedElectricField/solver.inp
+
+\b boundary.inp
+\include 2D/Vlasov1D1V/PrescribedElectricField/boundary.inp
+
+\b physics.inp
+\include 2D/Vlasov1D1V/PrescribedElectricField/physics.inp
+
+To generate \b initial.inp (initial solution), compile and run the 
+following code in the run directory. 
+\include 2D/Vlasov1D1V/PrescribedElectricField/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 4
+processors along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be 257 output
+files \b op_00000.dat, \b op_00001.dat, ... \b op_00257.dat; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=128\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. 
+  
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the final column is the 
+solution.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation shows the evolution of the solution:
+@image html Solution_1D1VVlasov_PrescribedE.gif
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation.dat:
+\include 2D/Vlasov1D1V/PrescribedElectricField/conservation.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 2D/Vlasov1D1V/PrescribedElectricField/output.log
+
+\page vlasov_1d1v_selfconsistent 2D (1D-1V) Vlasov Equation - Self-Consistent E-Field
+
+Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D (1D-1V) Vlasov Equation (vlasov.h)
+
+Domain: 
+  + \f$0 \le x < 2\pi\f$, \a "periodic" (#_PERIODIC_)
+  + \f$-7 \le y < 7\f$, \a "dirichlet" (#_DIRICHLET_) (\f$f = 0\f$)
+
+
+Initial solution: 
+\f$f\left(x,v\right) = \frac{4}{\pi T}\left(1+\frac{1}{10}\cos\left(2k\pi\frac{x}{L}\right)\right)\left[\exp\left(-\frac{\left(v-2\right)^2}{2T}\right) + \exp\left(-\frac{\left(v+2\right)^2}{2T}\right)\right]\f$, \f$k=1,T=1,L=2\pi\f$.
+
+Self-consistent electric field is computed by solving the Poisson equation
+in a periodic domain using Fourier transforms. This examples *requires* HyPar
+to be compiled with FFTW (http://www.fftw.org/).
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField/solver.inp
+
+\b boundary.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField/boundary.inp
+
+\b physics.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField/physics.inp
+
+To generate \b initial.inp (initial solution), compile and run the 
+following code in the run directory. 
+\include 2D/Vlasov1D1V/SelfConsistentElectricField/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 4
+processors along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be 201 output
+files \b op_00000.dat, \b op_00001.dat, ... \b op_00201.dat; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=40\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions at each output time. 
+  
+#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
+thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
+or other visualization software supporting the Tecplot format 
+(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
+can read. In these files, the first two lines are the Tecplot headers, 
+after which the data is written out as: the first two columns are grid indices, 
+the next two columns are x and y coordinates, and the final column is the 
+solution.  #HyPar::op_file_format can be set to \a text to get the solution
+files in plain text format (which can be read in and visualized in
+MATLAB for example).
+
+The following animation shows the evolution of the solution:
+@image html Solution_1D1VVlasov_SelfConsistentE.gif
+
+HyPar will also write out 1D text files named \b efield_00000.dat, ...,
+\b efield_00200.dat that contain the electric field at each time
+instant the solution was written. In this example, the electric
+field is a 1D scalar quantity, and the columns of these files are:
+grid index, x-coordinate, electric field value.
+The following plot shows the electric field at \f$t=40\f$, obtained
+by plotting \b efield_00200.dat:
+@image html Solution_E_1D1VVlasov_SelfConsistentE.png
+
+Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
+the code checks for conservation error and prints it to screen, as well
+as the file \b conservation.dat:
+\include 2D/Vlasov1D1V/SelfConsistentElectricField/conservation.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global),
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+and conservation error (#HyPar::ConservationError).
+
+Expected screen output:
+\include 2D/Vlasov1D1V/SelfConsistentElectricField/output.log
+
+\page euler2d_riemann4 2D Euler Equations - Riemann Problem Case 4
+
+Location: \b hypar/Examples/2D/NavierStokes2D/Riemann2DCase4
+          (This directory contains all the input files needed
+          to run this case. If there is a \a Run.m, run it in
+          MATLAB to quickly set up, run, and visualize the 
+          example).
+
+Governing equations: 2D Euler Equations (navierstokes2d.h - By default,
+                     #NavierStokes2D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 2D Euler
+                     equations are solved.)
+
+Reference:
+  + P. Lax and X.-D. Liu, "Solution of two-dimensional Riemann
+    problems of gas dynamics by positive schemes," SIAM J Sci 
+    Comp 19 (1998), 319–340.
+
+Domain: \f$-0.5 \le x,y \le 0.5\f$, \a "extrapolate" (#_EXTRAPOLATE_)
+        boundary conditions.
 \page vlasov_1d1v_prescribed 2D (1D-1V) Vlasov Equation - Prescribed E-Field
 
 Location: \b hypar/Examples/2D/Vlasov1D1V/PrescribedElectricField
