@@ -88,7 +88,7 @@ int NavierStokes3DComputeTemperature( double*             T, /*!< Array to hold 
     int idx; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,idx);
     double rho, vx, vy, vz, e, pressure;
     _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*idx),rho,vx,vy,vz,e,pressure,param);
-    T[idx] = param->gamma*pressure/rho;
+    T[idx] = pressure/rho;
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
   

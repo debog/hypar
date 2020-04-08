@@ -112,14 +112,14 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
 
     double rho, uvel, vvel, wvel, energy, pressure, temperature;
     _NavierStokes3DGetFlowVar_(v,rho,uvel,vvel,wvel,energy,pressure,param);
-    temperature = param->gamma * pressure / rho;
+    temperature = pressure / rho;
 
     double rho_ib, uvel_ib, vvel_ib, wvel_ib, energy_ib, pressure_ib, temperature_ib;
     pressure_ib = pressure;
     temperature_ib = (1.0+factor)*param->T_ib_wall - factor * temperature;
     if (temperature_ib < _MACHINE_ZERO_) temperature_ib = param->T_ib_wall;
     pressure_ib = pressure;
-    rho_ib = param->gamma * pressure_ib / temperature_ib;
+    rho_ib = pressure_ib / temperature_ib;
     uvel_ib = - factor * uvel;
     vvel_ib = - factor * vvel;
     wvel_ib = - factor * wvel;
