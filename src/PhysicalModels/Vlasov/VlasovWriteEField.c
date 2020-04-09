@@ -1,6 +1,6 @@
 /*! @file VlasovWriteEField.c
     @author Debojyoti Ghosh
-    @brief Write out the self-consistent electric field to file
+    @brief Write out the electric field to file
 */
 #include <stdlib.h>
 #include <string.h>
