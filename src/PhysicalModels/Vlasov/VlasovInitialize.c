@@ -81,11 +81,11 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
             /* read whether electric field is self-consistent or prescribed */
             int ferr = fscanf(in,"%d", &physics->self_consistent_electric_field);
             if (ferr != 1) return(1);
-          } if (!strcmp(word, "x_ndims")) {
+          } else if (!strcmp(word, "x_ndims")) {
             /* read number of spatial dimensions */
             int ferr = fscanf(in,"%d", &physics->ndims_x);
             if (ferr != 1) return(1);
-          } if (!strcmp(word, "v_ndims")) {
+          } else if (!strcmp(word, "v_ndims")) {
             /* read number of velocity dimensions */
             int ferr = fscanf(in,"%d", &physics->ndims_v);
             if (ferr != 1) return(1);
