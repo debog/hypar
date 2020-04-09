@@ -16,15 +16,8 @@ double VlasovAdvectionCoeff(int*, int, void*);
     \f{equation}{
       {\bf F}\left({\bf u}(x,v)\right) = c {\bf u}(x,v),
     \f}
-    where
-     \f{equation}{
-      c = v_i,
-    \f}
-    if dir < #Vlasov::ndims_x (\f$i = {\rm dir}\f$), and
-     \f{equation}{
-      c = E_i,
-    \f}
-    the electric field if dir >= #Vlasov::ndims_x (\f$i = \f$ dir-#Vlasov::ndims_x).
+    where the advection coefficient \f$c\f$ is computed
+    by VlasovAdvectionCoeff().
 */
 int VlasovAdvection( double  *f,   /*!< Array to hold the computed flux (same size and layout as u) */
                      double  *u,   /*!< Array containing the conserved solution */

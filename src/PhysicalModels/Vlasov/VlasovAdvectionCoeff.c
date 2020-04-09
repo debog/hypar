@@ -12,9 +12,7 @@
 #include <hypar.h>
 
 /*! Returns the advection coefficient at a given grid index
-    \f{equation}{
-      c {\bf u}(x,v),
-    \f}
+    \f$c\f$,
     where
      \f{equation}{
       c = v_i,

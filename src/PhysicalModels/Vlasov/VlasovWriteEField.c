@@ -13,7 +13,7 @@
 #include <hypar.h>
 #include <physicalmodels/vlasov.h>
 
-/*! Write out the self-consistent field to file */
+/*! Write out the electric field to file */
 int VlasovWriteEField( void* s, /*!< Solver object of type #HyPar */
                        void* m  /*!< MPI object of type #MPIVariables */
                      )
