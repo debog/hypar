@@ -56,19 +56,33 @@ typedef struct vlasov_parameters {
   bool self_consistent_electric_field;
 
   /*! Number of spatial dimensions */
-  int cfg_dim;
+  int ndims_x;
 
   /*! Number of velocity dimensions */
-  int vel_dim;
+  int ndims_v;
 
-#ifdef fftw
+  /*! Number of spatial grid points (local) */
+  int npts_local_x;
+
+  /*! Number of spatial grid points (global) */
+  long npts_global_x;
+
+  /*! Number of spatial grid points with ghosts (local) */
+  int npts_local_x_wghosts;
+
+  /*! Number of spatial grid points with ghosts (global) */
+  long npts_global_x_wghosts;
+
+  /*! electric field */
+  double *e_field;
+
   /*! Pointer to MPI object of type #MPIVariables */
   void  *m;
 
+#ifdef fftw
+
   /*! Buffer sum */
   double *sum_buffer;
-  /*! */
-  double *field;
   /*! Forward FFT plan */
   fftw_plan plan_forward;
   /*! Backward FFT plan */

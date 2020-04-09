@@ -27,6 +27,11 @@ int VlasovUpwind (double*,double*,double*,double*,
 /*! Write self-consistent E-field to file */
 int VlasovWriteEField (void*, void*);
 
+int VlasovPreStep(double*,void*,void*,double);
+int VlasovPostStage(double*,void*,void*,double);
+
+int VlasovEField(double*, void*, double);
+
 /*! Initialize the Vlasov physics module - 
     allocate and set physics-related parameters, read physics-related inputs
     from file, and set the physics-related function pointers in #HyPar
@@ -38,10 +43,10 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   HyPar        *solver    = (HyPar*)        s;
   MPIVariables *mpi       = (MPIVariables*) m; 
   Vlasov       *physics   = (Vlasov*)       solver->physics;
-  int          *dim       = solver->dim_global;
-  int          *dim_local = solver->dim_local;
-  int           ghosts    = solver->ghosts;
-  int           i, ferr;
+
+  int *dim_global = solver->dim_global;
+  int *dim_local = solver->dim_local;
+  int ghosts = solver->ghosts;
 
   if (solver->nvars != _MODEL_NVARS_) {
     if (!mpi->rank) {
@@ -58,8 +63,8 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
 
   /* default is prescribed electric field */
   physics->self_consistent_electric_field = false;
-  physics->cfg_dim = 1;
-  physics->vel_dim = 1;
+  physics->ndims_x = 1;
+  physics->ndims_v = 1;
 
   /* reading physical model specific inputs - all processes */
   if (!mpi->rank) {
@@ -68,17 +73,25 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
     if (in) {
       printf("Reading physical model inputs from file \"physics.inp\".\n");
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      int ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          int ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "self_consistent_electric_field")) {
             /* read whether electric field is self-consistent or prescribed */
-            ferr = fscanf(in,"%d", &physics->self_consistent_electric_field);
+            int ferr = fscanf(in,"%d", &physics->self_consistent_electric_field);
+            if (ferr != 1) return(1);
+          } if (!strcmp(word, "x_ndims")) {
+            /* read number of spatial dimensions */
+            int ferr = fscanf(in,"%d", &physics->ndims_x);
+            if (ferr != 1) return(1);
+          } if (!strcmp(word, "v_ndims")) {
+            /* read number of velocity dimensions */
+            int ferr = fscanf(in,"%d", &physics->ndims_v);
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
+            int ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
             printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",
                    word, useless);
             printf("recognized or extraneous. Ignoring.\n");
@@ -92,7 +105,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
     fclose(in);
   }
 
-  if ((physics->cfg_dim+physics->vel_dim) != solver->ndims) {
+  if ((physics->ndims_x+physics->ndims_v) != solver->ndims) {
     if (!mpi->rank) {
       fprintf(stderr,"Error in VlasovInitialize:\n");
       fprintf(stderr, "  space + vel dims not equal to ndims!\n");
@@ -110,43 +123,63 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
 
 #ifndef serial
   /* Broadcast parsed problem data */
-  MPIBroadcast_integer(&physics->cfg_dim,1,0,&mpi->world);
-  MPIBroadcast_integer(&physics->vel_dim,1,0,&mpi->world);
+  MPIBroadcast_integer(&physics->ndims_x,1,0,&mpi->world);
+  MPIBroadcast_integer(&physics->ndims_v,1,0,&mpi->world);
   MPIBroadcast_integer((int *) &physics->self_consistent_electric_field,
                        1,0,&mpi->world);
 #endif
 
+  /* compute local number of x-space points with ghosts */
+  physics->npts_local_x_wghosts = 1;
+  physics->npts_local_x = 1;
+  physics->npts_global_x_wghosts = 1;
+  physics->npts_global_x = 1;
+  for (int d=0; d<physics->ndims_x; d++) {
+    physics->npts_local_x_wghosts *= (dim_local[d]+2*ghosts);
+    physics->npts_local_x *= dim_local[d];
+    physics->npts_global_x_wghosts *= (dim_global[d]+2*ghosts);
+    physics->npts_global_x *= dim_global[d];
+  }
+
+  /* allocate array to hold the electric field (needs to have ghosts);
+     note that number of electric field components is the number of
+     spatial dimensions */
+  physics->e_field = (double*) calloc(  physics->npts_local_x_wghosts
+                                      * physics->ndims_x, 
+                                        sizeof(double)  );
+  
+  /* Put the mpi object in the params for access in other functions */
+  physics->m = m;
+  
   if (physics->self_consistent_electric_field) {
 #ifdef fftw
     /* If using FFTW, make sure MPI is enabled
        Currently we only support the distrubuted memory version
     */
 #ifdef serial
-    if (!mpi->rank) {
-      fprintf(stderr,"Error in VlasovInitialize: Using FFTW requires MPI to be enabled.\n");
-    }
+    fprintf(stderr,"Error in VlasovInitialize(): Using FFTW requires MPI to be enabled.\n");
     return(1);
 #endif
 
-    /* Put the mpi object in the params for access in other functions */
-    physics->m = m;
-  
+    if (physics->ndims_x > 1) {
+      fprintf(stderr,"Error in VlasovInitialize():\n");
+      fprintf(stderr,"  Self-consistent electric field is implemented for only 1 space dimension.\n");
+      return 1;
+    }
+
     /* Create a scratch buffer for moving between real and complex values */
     physics->sum_buffer = (double*) calloc(dim_local[0], sizeof(double));
   
-    /* Create a buffer to hold the electric field and do halo exchange */
-    physics->field = (double*) calloc(dim_local[0] + 2*ghosts, sizeof(double));
-  
     /* Initialize FFTW and set up data buffers used for the transforms */
     fftw_mpi_init();
-    physics->alloc_local = fftw_mpi_local_size_1d(dim[0], mpi->comm[0],
+    physics->alloc_local = fftw_mpi_local_size_1d(dim_global[0], mpi->comm[0],
                                                   FFTW_FORWARD, 0,
                                                   &physics->local_ni,
                                                   &physics->local_i_start,
                                                   &physics->local_no,
                                                   &physics->local_o_start);
     if (dim_local[0] != physics->local_ni) {
-      fprintf(stderr,"Error in VlasovInitialize:  The FFTW data distribution is incompatible with the HyPar one.\n");
+      fprintf(stderr,"Error in VlasovInitialize(): The FFTW data distribution is incompatible with the HyPar one.\n");
       fprintf(stderr,"Decompose the spatial dimension so that the degrees of freedom are evenly divided.\n");
       return(1);
     }
@@ -154,36 +187,36 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
     physics->phys_buffer = fftw_alloc_complex(physics->alloc_local);
     physics->fourier_buffer = fftw_alloc_complex(physics->alloc_local);
   
-    physics->plan_forward = fftw_mpi_plan_dft_1d(dim[0],
+    physics->plan_forward = fftw_mpi_plan_dft_1d(dim_global[0],
                                                  physics->phys_buffer,
                                                  physics->fourier_buffer,
                                                  mpi->comm[0],
                                                  FFTW_FORWARD,
                                                  FFTW_ESTIMATE);
   
-    physics->plan_backward = fftw_mpi_plan_dft_1d(dim[0],
+    physics->plan_backward = fftw_mpi_plan_dft_1d(dim_global[0],
                                                   physics->fourier_buffer,
                                                   physics->phys_buffer,
                                                   mpi->comm[0],
                                                   FFTW_BACKWARD,
                                                   FFTW_ESTIMATE);
 #else
-  if (!mpi->rank) {
-    fprintf(stderr,"Error in VlasovInitialize():\n");
-    fprintf(stderr,"  Self-consistent electric field requires FFTW library.\n");
-  }
+  fprintf(stderr,"Error in VlasovInitialize():\n");
+  fprintf(stderr,"  Self-consistent electric field requires FFTW library.\n");
   return(1);
 #endif
   }
 
   /* initializing physical model-specific functions */
-  solver->ComputeCFL = VlasovComputeCFL;
-  solver->FFunction  = VlasovAdvection;
-  solver->Upwind     = VlasovUpwind;
+  solver->PreStep       = VlasovPreStep;
+  solver->ComputeCFL    = VlasovComputeCFL;
+  solver->FFunction     = VlasovAdvection;
+  solver->Upwind        = VlasovUpwind;
+  solver->PhysicsOutput = VlasovWriteEField;
+  solver->PostStage     = VlasovPostStage;
 
-  if (physics->self_consistent_electric_field) {
-    solver->PhysicsOutput = VlasovWriteEField;
-  }
+  int ierr = VlasovEField(solver->u, solver, 0.0);
+  if (ierr) return ierr;
 
-  return(0);
+  return 0;
 }

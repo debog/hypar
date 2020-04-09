@@ -11,6 +11,8 @@
 #include <physicalmodels/vlasov.h>
 #include <hypar.h>
 
+double VlasovAdvectionCoeff(int*, int, void*);
+
 /*! Upwinding scheme for the Vlasov equations */
 int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
                    double* fL,   /*!< Left-biased reconstructed interface flux */
@@ -31,13 +33,10 @@ int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
   int *dim    = solver->dim_local;
   int ghosts  = solver->ghosts;
 
-#ifdef fftw
-  double *field = param->field;
-#endif
-
-  bool self_consistent_electric_field = param->self_consistent_electric_field;
-
-  int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
+  int index_outer[ndims], 
+      index_inter[ndims], 
+      bounds_outer[ndims], 
+      bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
 
@@ -49,80 +48,28 @@ int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
       int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
-
       int idxL[ndims], idxR[ndims];
 
       int neig = 2+4*(ndims-1);
       double eig[neig];
       int count = 0;
-      if (dir == 0) {
-        _GetCoordinate_(1,indexL[1],dim,ghosts,solver->x,eig[count]); count++;
-        _GetCoordinate_(1,indexR[1],dim,ghosts,solver->x,eig[count]); count++;
-        for (int tdir = 0; tdir < ndims; tdir++ ) {
-          if (tdir != dir) {
-            _ArrayCopy1D_(indexL, idxL, ndims); idxL[tdir]--;
-            _ArrayCopy1D_(indexR, idxR, ndims); idxR[tdir]--;
-            _GetCoordinate_(1,idxL[1],dim,ghosts,solver->x,eig[count]); count++;
-            _GetCoordinate_(1,idxR[1],dim,ghosts,solver->x,eig[count]); count++;
-            _ArrayCopy1D_(indexL, idxL, ndims); idxL[tdir]++;
-            _ArrayCopy1D_(indexR, idxR, ndims); idxR[tdir]++;
-            _GetCoordinate_(1,idxL[1],dim,ghosts,solver->x,eig[count]); count++;
-            _GetCoordinate_(1,idxR[1],dim,ghosts,solver->x,eig[count]); count++;
-          }
+      eig[count] = VlasovAdvectionCoeff(indexL, dir, solver); count++;
+      eig[count] = VlasovAdvectionCoeff(indexR, dir, solver); count++;
+      for (int tdir = 0; tdir < ndims; tdir++ ) {
+        if (tdir != dir) {
+          _ArrayCopy1D_(indexL, idxL, ndims); idxL[tdir]--;
+          _ArrayCopy1D_(indexR, idxR, ndims); idxR[tdir]--;
+          eig[count] = VlasovAdvectionCoeff(idxL, dir, solver); count++;
+          eig[count] = VlasovAdvectionCoeff(idxR, dir, solver); count++;
+          _ArrayCopy1D_(indexL, idxL, ndims); idxL[tdir]++;
+          _ArrayCopy1D_(indexR, idxR, ndims); idxR[tdir]++;
+          eig[count] = VlasovAdvectionCoeff(idxL, dir, solver); count++;
+          eig[count] = VlasovAdvectionCoeff(idxR, dir, solver); count++;
         }
-        if (count != neig) {
-          fprintf(stderr, "Error in VlasovUpwind(): count != neig for dir=%d\n",dir);
-          return 1;
-        }
-      } else if (dir == 1) {
-        if (self_consistent_electric_field) {
-#ifdef fftw
-          eig[count] = field[indexL[0]]; count++;
-          eig[count] = field[indexR[0]]; count++;
-#endif
-        } else {
-          double xL, xR;
-          _GetCoordinate_(0,indexL[0],dim,ghosts,solver->x,xL);
-          _GetCoordinate_(0,indexR[0],dim,ghosts,solver->x,xR);
-          eig[count] = 0.1 * cos(xL); count++;
-          eig[count] = 0.1 * cos(xR); count++;
-        }
-        for (int tdir = 0; tdir < ndims; tdir++ ) {
-          if (tdir != dir) {
-            _ArrayCopy1D_(indexL, idxL, ndims); idxL[tdir]--;
-            _ArrayCopy1D_(indexR, idxR, ndims); idxR[tdir]--;
-            if (self_consistent_electric_field) {
-#ifdef fftw
-              eig[count] = field[idxL[0]]; count++;
-              eig[count] = field[idxR[0]]; count++;
-#endif
-            } else {
-              double xL, xR;
-              _GetCoordinate_(0,idxL[0],dim,ghosts,solver->x,xL);
-              _GetCoordinate_(0,idxR[0],dim,ghosts,solver->x,xR);
-              eig[count] = 0.1 * cos(xL); count++;
-              eig[count] = 0.1 * cos(xR); count++;
-            }
-            _ArrayCopy1D_(indexL, idxL, ndims); idxL[tdir]++;
-            _ArrayCopy1D_(indexR, idxR, ndims); idxR[tdir]++;
-            if (self_consistent_electric_field) {
-#ifdef fftw
-              eig[count] = field[idxL[0]]; count++;
-              eig[count] = field[idxR[0]]; count++;
-#endif
-            } else {
-              double xL, xR;
-              _GetCoordinate_(0,idxL[0],dim,ghosts,solver->x,xL);
-              _GetCoordinate_(0,idxR[0],dim,ghosts,solver->x,xR);
-              eig[count] = 0.1 * cos(xL); count++;
-              eig[count] = 0.1 * cos(xR); count++;
-            }
-          }
-        }
-        if (count != neig) {
-          fprintf(stderr, "Error in VlasovUpwind(): count != neig for dir=%d\n",dir);
-          return 1;
-        }
+      }
+      if (count != neig) {
+        fprintf(stderr, "Error in VlasovUpwind(): count != neig for dir=%d\n",dir);
+        return 1;
       }
 
       int all_positive = 1, all_negative = 1;
@@ -148,5 +95,5 @@ int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
 
   }
 
-  return(0);
+  return 0;
 }
