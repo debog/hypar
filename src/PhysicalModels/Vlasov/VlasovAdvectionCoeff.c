@@ -25,7 +25,7 @@
 
     \b Note: this function assumes that the electric field has already been set.
 */
-double VlasovAdvectionCoeff(int*  idx, /*! grid index */
+double VlasovAdvectionCoeff(int*  idx, /*!< grid index */
                             int   dir, /*!< Spatial dimension */
                             void* s    /*!< Solver object of type #HyPar */
                            )
