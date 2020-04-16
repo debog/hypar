@@ -6,7 +6,25 @@
 #include <string>
 #include <ensemble_simulations.h>
 
-/*! Define the ensemble simulation object */
+/*! Define the ensemble simulation object:
+    This function also reads sparse grids inputs from the file
+    \b simulation.inp. Rank 0 reads in the inputs and broadcasts
+    them to all the processors.\n\n
+    The format of \b solver.inp is as follows:\n
+
+        begin
+            <keyword>   <value>
+            <keyword>   <value>
+            ...
+            <keyword>   <value>
+        end
+
+    where the list of keywords and their type are:\n
+    Keyword name   | Type    | Variable                       | Default value
+    -------------- | ------- | ------------------------------ | ----------------
+    nsims          | int     | #EnsembleSimulation::m_nsims   | -1
+
+*/
 int EnsembleSimulation::define( int a_rank, /*!< MPI rank of this process */
                                 int a_nproc /*!< Total number of MPI ranks */ 
                               )

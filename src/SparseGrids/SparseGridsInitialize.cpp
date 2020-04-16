@@ -11,10 +11,7 @@
  * Before this function is called, the solver inputs for the full
  * grid object has already been read, and therefore, the global dimensions
  * and processor decompositions are available. This function does the following:
- *
- *  + Step 1
- *  + Step 2
- */
+*/
 int SparseGridsSimulation::Initialize()
 {
   int ierr;
