@@ -58,6 +58,14 @@ typedef struct main_parameters {
   /*! time step size (input - \b solver.inp ) */
   double  dt;
 
+  /*! Global dimensions of exact solution, if available: 
+      if an exact/reference solution is available to compute errors,
+      this array of size #HyPar::ndims contains its global grid 
+      size in each spatial/coordinate dimension. By default, it is 
+      the same as #HyPar::dim_global, unless specified otherwise in
+      \b solver.inp */
+  int     *dim_global_ex;
+  
   /*!  choice of time integration class (eg RK) (input - \b solver.inp ) */
   char    time_scheme         [_MAX_STRING_SIZE_];
 

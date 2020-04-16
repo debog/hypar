@@ -140,6 +140,7 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
   
     /* These variables are allocated in Initialize.c */
     free(solver->dim_global);
+    free(solver->dim_global_ex);
     free(solver->dim_local);
     free(solver->index);
     free(solver->u);

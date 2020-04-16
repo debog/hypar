@@ -28,33 +28,38 @@ int WriteInputs ( void  *s,     /*!< Array of simulation objects of type #Simula
     printf("  No. of dimensions                          : %d\n",sim[0].solver.ndims);
     printf("  No. of variables                           : %d\n",sim[0].solver.nvars);
     if (nsims > 1) {
-      int n;
       printf("  Domain sizes:\n");
       for (int n = 0; n < nsims; n++) {
         printf("    domain %3d - ", n);
-        int i;
-        for (i=0; i<sim[n].solver.ndims; i++) printf ("%d ",sim[n].solver.dim_global[i]);
+        for (int i=0; i<sim[n].solver.ndims; i++) printf ("%d ",sim[n].solver.dim_global[i]);
         printf("\n");
       }
 #ifndef serial
 	    printf("  Processes along each dimension:\n");
       for (int n = 0; n < nsims; n++) {
         printf("    domain %3d - ", n);
-        int i;
-        for (i=0; i<sim[n].solver.ndims; i++) printf ("%d ",sim[n].mpi.iproc[i]);
+        for (int i=0; i<sim[n].solver.ndims; i++) printf ("%d ",sim[n].mpi.iproc[i]);
         printf("\n");
       }
 #endif
+      printf("  Exact solution domain sizes:\n");
+      for (int n = 0; n < nsims; n++) {
+        printf("    domain %3d - ", n);
+        for (int i=0; i<sim[n].solver.ndims; i++) printf ("%d ",sim[n].solver.dim_global_ex[i]);
+        printf("\n");
+      }
     } else {
 	    printf("  Domain size                                : ");
-      int i;
-      for (i=0; i<sim[0].solver.ndims; i++) printf ("%d ",sim[0].solver.dim_global[i]);
+      for (int i=0; i<sim[0].solver.ndims; i++) printf ("%d ",sim[0].solver.dim_global[i]);
       printf("\n");
 #ifndef serial
 	    printf("  Processes along each dimension             : ");
-      for (i=0; i<sim[0].solver.ndims; i++) printf ("%d ",sim[0].mpi.iproc[i]);
+      for (int i=0; i<sim[0].solver.ndims; i++) printf ("%d ",sim[0].mpi.iproc[i]);
       printf("\n");
 #endif
+	    printf("  Exact solution domain size                 : ");
+      for (int i=0; i<sim[0].solver.ndims; i++) printf ("%d ",sim[0].solver.dim_global_ex[i]);
+      printf("\n");
     }
 	  printf("  No. of ghosts pts                          : %d\n"     ,sim[0].solver.ghosts              );
 	  printf("  No. of iter.                               : %d\n"     ,sim[0].solver.n_iter              );

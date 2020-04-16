@@ -52,6 +52,7 @@
     op_overwrite       | char[]       | #HyPar::op_overwrite          | no
     model              | char[]       | #HyPar::model                 | must be specified
     immersed_body      | char[]       | #HyPar::ib_filename           | "none"
+    size_exact         | int[ndims]   | #HyPar::dim_global_ex         | #HyPar::dim_global
 
     \b Notes:
     + "ndims" \b must be specified \b before "size".
@@ -110,6 +111,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
       sim[n].solver.ghosts          = 1;
       sim[n].solver.dim_global      = NULL;
       sim[n].solver.dim_local       = NULL;
+      sim[n].solver.dim_global_ex   = NULL;
       sim[n].mpi.iproc              = NULL;
       sim[n].mpi.N_IORanks          = 1;
       sim[n].solver.dt              = 0.0;
@@ -159,37 +161,54 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
         if (!strcmp(word, "ndims")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.ndims)); if (ferr != 1) return(1);
-          sim[0].solver.dim_global = (int*) calloc (sim[0].solver.ndims,sizeof(int));
-          sim[0].mpi.iproc         = (int*) calloc (sim[0].solver.ndims,sizeof(int));
+          sim[0].solver.dim_global    = (int*) calloc (sim[0].solver.ndims,sizeof(int));
+          sim[0].mpi.iproc            = (int*) calloc (sim[0].solver.ndims,sizeof(int));
+          sim[0].solver.dim_global_ex = (int*) calloc (sim[0].solver.ndims,sizeof(int));
 
           int n;
           for (n = 1; n < nsims; n++) {
             sim[n].solver.ndims = sim[0].solver.ndims;
-            sim[n].solver.dim_global = (int*) calloc (sim[n].solver.ndims,sizeof(int));
-            sim[n].mpi.iproc         = (int*) calloc (sim[n].solver.ndims,sizeof(int));
+            sim[n].solver.dim_global    = (int*) calloc (sim[n].solver.ndims,sizeof(int));
+            sim[n].mpi.iproc            = (int*) calloc (sim[n].solver.ndims,sizeof(int));
+            sim[n].solver.dim_global_ex = (int*) calloc (sim[n].solver.ndims,sizeof(int));
           }
 
         } else if (!strcmp(word, "nvars")) {
           
           ferr = fscanf(in,"%d",&(sim[0].solver.nvars));
-
-          int n;
-          for (n = 1; n < nsims; n++) sim[n].solver.nvars = sim[0].solver.nvars;
+          for (int n = 1; n < nsims; n++) sim[n].solver.nvars = sim[0].solver.nvars;
 
         } else if   (!strcmp(word, "size")) {
 
-          int n;
-          for (n = 0; n < nsims; n++) {
+          for (int n = 0; n < nsims; n++) {
             if (!sim[n].solver.dim_global) {
               fprintf(stderr,"Error in ReadInputs(): dim_global not allocated for n=%d.\n", n);
               fprintf(stderr,"Please specify ndims before dimensions.\n"         );
               return(1);
             } else {
-              int i;
-              for (i=0; i<sim[n].solver.ndims; i++) {
+              for (int i=0; i<sim[n].solver.ndims; i++) {
                 ferr = fscanf(in,"%d",&(sim[n].solver.dim_global[i]));
                 if (ferr != 1) {
                   fprintf(stderr,"Error in ReadInputs() while reading grid sizes for domain %d.\n", n);
+                  return(1);
+                }
+                sim[n].solver.dim_global_ex[i] = sim[n].solver.dim_global[i];
+              }
+            }
+          }
+
+        } else if   (!strcmp(word, "size_exact")) {
+
+          for (int n = 0; n < nsims; n++) {
+            if (!sim[n].solver.dim_global_ex) {
+              fprintf(stderr,"Error in ReadInputs(): dim_global_ex not allocated for n=%d.\n", n);
+              fprintf(stderr,"Please specify ndims before dimensions.\n"         );
+              return(1);
+            } else {
+              for (int i=0; i<sim[n].solver.ndims; i++) {
+                ferr = fscanf(in,"%d",&(sim[n].solver.dim_global_ex[i]));
+                if (ferr != 1) {
+                  fprintf(stderr,"Error in ReadInputs() while reading exact solution grid sizes for domain %d.\n", n);
                   return(1);
                 }
               }
@@ -420,11 +439,13 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
     /* Broadcast the input parameters */
     IERR MPIBroadcast_integer(&(sim[n].solver.ndims),1,0,&(sim[n].mpi.world)); CHECKERR(ierr);
     if (sim[n].mpi.rank) {
-      sim[n].solver.dim_global = (int*) calloc (sim[n].solver.ndims,sizeof(int));
-      sim[n].mpi.iproc         = (int*) calloc (sim[n].solver.ndims,sizeof(int));
+      sim[n].solver.dim_global    = (int*) calloc (sim[n].solver.ndims,sizeof(int));
+      sim[n].mpi.iproc            = (int*) calloc (sim[n].solver.ndims,sizeof(int));
+      sim[n].solver.dim_global_ex = (int*) calloc (sim[n].solver.ndims,sizeof(int));
     }
     IERR MPIBroadcast_integer(&(sim[n].solver.nvars)         ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
     IERR MPIBroadcast_integer( sim[n].solver.dim_global      ,sim[n].solver.ndims,0,&(sim[n].mpi.world)); CHECKERR(ierr);
+    IERR MPIBroadcast_integer( sim[n].solver.dim_global_ex   ,sim[n].solver.ndims,0,&(sim[n].mpi.world)); CHECKERR(ierr);
     IERR MPIBroadcast_integer( sim[n].mpi.iproc              ,sim[n].solver.ndims,0,&(sim[n].mpi.world)); CHECKERR(ierr);
     IERR MPIBroadcast_integer(&(sim[n].mpi.N_IORanks)        ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
     IERR MPIBroadcast_integer(&(sim[n].solver.ghosts)        ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
