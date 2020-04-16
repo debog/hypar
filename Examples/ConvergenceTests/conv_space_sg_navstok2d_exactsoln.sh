@@ -10,6 +10,9 @@
 # ** Please copy this script to a new location before using it! **
 # It will create test directories at the location it is run from.
 #
+# The exact solution is available in analytical form for the 
+# example being simulated.
+#
 #################################################################
 
 clear
