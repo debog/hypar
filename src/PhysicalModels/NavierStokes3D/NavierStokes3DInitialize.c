@@ -77,6 +77,9 @@ int    NavierStokes3DIBForces          (void*,void*);
     R                  | double               | #NavierStokes3D::R                                                      | 1.0
     upwinding          | char[]               | #NavierStokes3D::upw_choice                                             | "roe" (#_ROE_)
     ib_wall_type       | char[]               | #NavierStokes3D::ib_wall_type                                           | "adiabatic" (#_IB_ADIABATIC_)
+    ib_ramp_time       | double               | #NavierStokes3D::t_ib_ramp                                              | -1
+    ib_ramp_width      | double               | #NavierStokes3D::t_ib_width                                             | 0.05
+    ib_ramp_type       | char[]               | #NavierStokes3D::ib_ramp_type                                           | "linear" (#_IB_RAMP_LINEAR_)
 
     + if "ib_wall_type" (#NavierStokes3D::ib_wall_type) is specified as "isothermal", 
       it should be followed by the wall temperature (##NavierStokes3D::T_ib_wall), i.e,
@@ -134,9 +137,12 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
   physics->R         = 1.0;
   physics->N_bv      = 0.0;
   physics->T_ib_wall = -DBL_MAX;
+  physics->t_ib_ramp = -1.0;
+  physics->t_ib_width= 0.05;
   strcpy(physics->upw_choice,"roe");
   strcpy(physics->ib_write_surface_data,"yes");
   strcpy(physics->ib_wall_type,"adiabatic");
+  strcpy(physics->ib_ramp_type,"linear");
 
   /* reading physical model specific inputs - all processes */
   if (!mpi->rank) {
@@ -258,6 +264,36 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
               printf("Warning: in NavierStokes3DInitialize().\n");
               printf("Warning: no immersed body present; specification of ib_wall_type unnecessary.\n");
             }
+          } else if (!strcmp(word,"ib_ramp_time")) {
+            ferr = fscanf(in,"%lf",&physics->t_ib_ramp);
+            if (ferr != 1) {
+              fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
+              return 1;
+            }
+            if (!solver->flag_ib) {
+              printf("Warning: in NavierStokes3DInitialize().\n");
+              printf("Warning: no immersed body present; specification of ib_ramp_time unnecessary.\n");
+            }
+          } else if (!strcmp(word,"ib_ramp_width")) {
+            ferr = fscanf(in,"%lf",&physics->t_ib_width);
+            if (ferr != 1) {
+              fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
+              return 1;
+            }
+            if (!solver->flag_ib) {
+              printf("Warning: in NavierStokes3DInitialize().\n");
+              printf("Warning: no immersed body present; specification of ib_ramp_width unnecessary.\n");
+            }
+          } else if (!strcmp(word,"ib_ramp_type")) {
+            ferr = fscanf(in,"%s",physics->ib_ramp_type);
+            if (ferr != 1) {
+              fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
+              return 1;
+            }
+            if (!solver->flag_ib) {
+              printf("Warning: in NavierStokes3DInitialize().\n");
+              printf("Warning: no immersed body present; specification of ib_ramp_type unnecessary.\n");
+            }
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
             ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
@@ -276,6 +312,7 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
   IERR MPIBroadcast_character (physics->upw_choice            ,_MAX_STRING_SIZE_,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_character (physics->ib_write_surface_data ,_MAX_STRING_SIZE_,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_character (physics->ib_wall_type          ,_MAX_STRING_SIZE_,0,&mpi->world); CHECKERR(ierr);
+  IERR MPIBroadcast_character (physics->ib_ramp_type          ,_MAX_STRING_SIZE_,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_double    (&physics->gamma                ,1                ,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_double    (&physics->Pr                   ,1                ,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_double    (&physics->Re                   ,1                ,0,&mpi->world); CHECKERR(ierr);
@@ -288,6 +325,8 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
   IERR MPIBroadcast_double    (&physics->R                    ,1                ,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_double    (&physics->N_bv                 ,1                ,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_double    (&physics->T_ib_wall            ,1                ,0,&mpi->world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->t_ib_ramp            ,1                ,0,&mpi->world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->t_ib_width           ,1                ,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_integer   (&physics->HB                   ,1                ,0,&mpi->world); CHECKERR(ierr);
 
   /* if file output is disabled in HyPar, respect that */

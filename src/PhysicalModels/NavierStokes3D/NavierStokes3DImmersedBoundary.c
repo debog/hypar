@@ -3,6 +3,8 @@
     @author Debojyoti Ghosh
 */
 
+#include <math.h>
+#include <string.h>
 #include <basic.h>
 #include <arrayfunctions.h>
 #include <immersedboundaries.h>
@@ -36,6 +38,26 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
 
   double inv_gamma_m1 = 1.0 / (param->gamma - 1.0);
 
+  double ramp_fac = 1.0;
+  if (param->t_ib_ramp > 0) {
+    double x = t/param->t_ib_ramp;
+    if (!strcmp(param->ib_ramp_type,_IB_RAMP_LINEAR_)) {
+      ramp_fac = x;
+    } else if (!strcmp(param->ib_ramp_type,_IB_RAMP_SMOOTHEDSLAB_)) {
+      double a = 0.0;
+      double b = 1.0;
+      double c = 0.5;
+      double r = param->t_ib_ramp/param->t_ib_width;
+      ramp_fac = (a*exp(c*r)+b*exp(r*x))/(exp(c*r)+exp(r*x));
+    } else if (!strcmp(param->ib_ramp_type,_IB_RAMP_DISABLE_)) {
+      ramp_fac = 0.0;
+    } else {
+      fprintf(stderr,"Error in NavierStokes3DImmersedBoundary():\n");
+      fprintf(stderr,"  Ramp type %s not recognized.\n", param->ib_ramp_type);
+      return 1;
+    }
+  }
+
   for (n=0; n<nb; n++) {
 
     int     node_index = boundary[n].p;
@@ -53,13 +75,31 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
     double rho, uvel, vvel, wvel, energy, pressure;
     _NavierStokes3DGetFlowVar_(v,rho,uvel,vvel,wvel,energy,pressure,param);
 
+    double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
+    _NavierStokes3DGetFlowVar_( (u+_MODEL_NVARS_*node_index),
+                                rho_gpt,
+                                uvel_gpt,
+                                vvel_gpt,
+                                wvel_gpt,
+                                energy_gpt,
+                                pressure_gpt,
+                                param );
+
+    double rho_ib_target, uvel_ib_target, vvel_ib_target, wvel_ib_target, pressure_ib_target;
+    rho_ib_target = rho;
+    pressure_ib_target = pressure;
+    uvel_ib_target = -uvel * factor;
+    vvel_ib_target = -vvel * factor;
+    wvel_ib_target = -wvel * factor;
+
     double rho_ib, uvel_ib, vvel_ib, wvel_ib, energy_ib, pressure_ib;
-    rho_ib = rho;
-    pressure_ib = pressure;
-    uvel_ib = -uvel * factor;
-    vvel_ib = -vvel * factor;
-    wvel_ib = -wvel * factor;
-    energy_ib = inv_gamma_m1*pressure_ib + 0.5*rho_ib*(uvel_ib*uvel_ib+vvel_ib*vvel_ib+wvel_ib*wvel_ib);
+    rho_ib      = ramp_fac * rho_ib_target      + (1.0-ramp_fac) * rho_gpt;
+    pressure_ib = ramp_fac * pressure_ib_target + (1.0-ramp_fac) * pressure_gpt;
+    uvel_ib     = ramp_fac * uvel_ib_target     + (1.0-ramp_fac) * uvel_gpt;
+    vvel_ib     = ramp_fac * vvel_ib_target     + (1.0-ramp_fac) * vvel_gpt;
+    wvel_ib     = ramp_fac * wvel_ib_target     + (1.0-ramp_fac) * wvel_gpt;
+    energy_ib   = inv_gamma_m1*pressure_ib 
+                  + 0.5*rho_ib*(uvel_ib*uvel_ib+vvel_ib*vvel_ib+wvel_ib*wvel_ib);
 
     u[_MODEL_NVARS_*node_index+0] = rho_ib;
     u[_MODEL_NVARS_*node_index+1] = rho_ib * uvel_ib;
@@ -67,7 +107,8 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
     u[_MODEL_NVARS_*node_index+3] = rho_ib * wvel_ib;
     u[_MODEL_NVARS_*node_index+4] = energy_ib;
   }
-  return(0);
+
+  return 0;
 }
 
 /*! Apply no-slip isothermal wall boundary conditions on the immersed boundary

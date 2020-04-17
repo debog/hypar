@@ -81,6 +81,14 @@
 /*! isothermal immersed body wall */
 #define _IB_ISOTHERMAL_ "isothermal"
 
+/* types of immersed boundary application ramps */
+/*! linear ramping */
+#define _IB_RAMP_LINEAR_ "linear"
+/*! smoothed slab ramp (like tanh) */
+#define _IB_RAMP_SMOOTHEDSLAB_ "smoothed_slab"
+/*! disable the immersed boundaries */
+#define _IB_RAMP_DISABLE_ "no_ib"
+
 /*! \def _NavierStokes3DGetFlowVar_
  Get the flow variables from the conserved solution vector.
  \f{equation}{
@@ -510,6 +518,19 @@ typedef struct navierstokes3d_parameters {
 
   char ib_write_surface_data[_MAX_STRING_SIZE_]; /*!< Flag to indicate whether to analyze and write surface data for
                                                       immersed body, if present. Applicable only if #HyPar::flag_ib is 1 */
+
+  /*! Time scale to ramp up the application of immersed boundary conditions,
+      applicable only if #HyPar::flag_ib is 1 */
+  double t_ib_ramp;
+
+  /*! The "gentleness" with which to ramp up the application of immersed boundary conditions,
+      applicable only if #HyPar::flag_ib is 1 */
+  double t_ib_width;
+
+  /*! Type of ramp up the application of immersed boundary conditions
+      (linear, exponential, etc.),
+      applicable only if #HyPar::flag_ib is 1 */
+  char ib_ramp_type[_MAX_STRING_SIZE_];
 
 } NavierStokes3D;
 
