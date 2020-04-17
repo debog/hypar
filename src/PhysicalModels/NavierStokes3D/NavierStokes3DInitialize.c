@@ -139,6 +139,7 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
   physics->T_ib_wall = -DBL_MAX;
   physics->t_ib_ramp = -1.0;
   physics->t_ib_width= 0.05;
+  physics->ib_T_tol  = 5;
   strcpy(physics->upw_choice,"roe");
   strcpy(physics->ib_write_surface_data,"yes");
   strcpy(physics->ib_wall_type,"adiabatic");
@@ -294,6 +295,16 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
               printf("Warning: in NavierStokes3DInitialize().\n");
               printf("Warning: no immersed body present; specification of ib_ramp_type unnecessary.\n");
             }
+          } else if (!strcmp(word,"ib_T_tolerance")) {
+            ferr = fscanf(in,"%lf",&physics->ib_T_tol);
+            if (ferr != 1) {
+              fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
+              return 1;
+            }
+            if (!solver->flag_ib) {
+              printf("Warning: in NavierStokes3DInitialize().\n");
+              printf("Warning: no immersed body present; specification of ib_T_tolerance unnecessary.\n");
+            }
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
             ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
@@ -327,6 +338,7 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
   IERR MPIBroadcast_double    (&physics->T_ib_wall            ,1                ,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_double    (&physics->t_ib_ramp            ,1                ,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_double    (&physics->t_ib_width           ,1                ,0,&mpi->world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->ib_T_tol             ,1                ,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_integer   (&physics->HB                   ,1                ,0,&mpi->world); CHECKERR(ierr);
 
   /* if file output is disabled in HyPar, respect that */

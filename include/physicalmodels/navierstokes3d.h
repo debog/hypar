@@ -532,6 +532,11 @@ typedef struct navierstokes3d_parameters {
       applicable only if #HyPar::flag_ib is 1 */
   char ib_ramp_type[_MAX_STRING_SIZE_];
 
+  /*! Isothermal immersed boundary temperature tolerance: if ghost point temperature 
+      differs from wall temperature by more than this factor, set it to the wall 
+      temperature - sort of a limiting */
+  double ib_T_tol;
+
 } NavierStokes3D;
 
 int    NavierStokes3DInitialize (void*,void*);
