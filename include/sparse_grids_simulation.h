@@ -223,7 +223,7 @@ class SparseGridsSimulation : public Simulation
     int m_write_sg_solutions; 
 
     /*! Print and write out the sparse grid errors? (input - \b sparse_grids.inp ) */
-    int m_print_sg_errors; 
+    int m_print_sg_errors;
 
     SimulationObject* m_sim_fg;               /*!< full grid simulation object */
     std::vector<SimulationObject> m_sims_sg;  /*!< vector of sparse grids simulation objects */

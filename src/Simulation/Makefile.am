@@ -1,6 +1,7 @@
 noinst_LIBRARIES = libSimulation.a
 libSimulation_a_SOURCES = \
   Cleanup.c \
+	CombineSolutions.c \
 	EnsembleSimulationsDefine.cpp \
   Initialize.c \
   InitializeBoundaries.c \
