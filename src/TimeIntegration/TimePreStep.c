@@ -20,6 +20,8 @@ int TimePreStep(void *ts /*!< Object of type #TimeIntegration */ )
   TimeIntegration*  TS  = (TimeIntegration*) ts;
   _DECLARE_IERR_;
 
+  gettimeofday(&TS->iter_start_time,NULL);
+
   SimulationObject* sim = (SimulationObject*) TS->simulation;
   int ns, nsims = TS->nsims;
 

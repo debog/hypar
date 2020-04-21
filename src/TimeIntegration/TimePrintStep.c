@@ -24,13 +24,15 @@ int TimePrintStep(void *ts /*!< Object of type #TimeIntegration */)
       printf("--\n");
       printf("Iteration: %7d,  Time: %1.3e\n", TS->iter+1, TS->waqt);
       printf("  Max CFL: %1.3E,  Max Diff. No.: %1.3E,  ", TS->max_cfl, TS->max_diff);
-      printf("  Norm: %1.4E\n", TS->norm    );
+      printf("  Norm: %1.4E\n", TS->norm);
+      printf("  Wall clock time: %1.1E (s)\n",TS->iter_wctime);
     } else {
       printf("Iteration: %7d  "       ,TS->iter+1  );
       printf("Time: %1.3E  "          ,TS->waqt    );
       printf("Max CFL: %1.3E  "       ,TS->max_cfl );
       printf("Max Diff. No.: %1.3E  " ,TS->max_diff);
       printf("Norm: %1.4E  "          ,TS->norm    );
+      printf("wctime: %1.1E (s)  ",TS->iter_wctime);
     }
 
     /* calculate and print conservation error */

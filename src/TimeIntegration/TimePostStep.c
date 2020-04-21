@@ -78,6 +78,12 @@ int TimePostStep(void *ts /*!< Object of type #TimeIntegration */)
 
   }
 
+  gettimeofday(&TS->iter_end_time,NULL);
+  long long walltime;
+  walltime = (  (TS->iter_end_time.tv_sec * 1000000 + TS->iter_end_time.tv_usec)
+              - (TS->iter_start_time.tv_sec * 1000000 + TS->iter_start_time.tv_usec));
+  TS->iter_wctime = (double) walltime / 1000000.0;
+
   return(0);
 }
 
