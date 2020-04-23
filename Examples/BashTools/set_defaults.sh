@@ -10,6 +10,7 @@ export p_write_sg_errors="yes"
 export p_ndims=1
 export p_nvars=1
 export p_size=100
+export p_size_exact=
 export p_iproc=1
 export p_ghost=3
 export p_niter=200
@@ -78,6 +79,7 @@ export p_verbose=0
 
 # linear advection
 export p_adv_speed="1.0"
+export p_adv_file="none"
 
 # Euler/Navier-Stokes equations
 export p_gamma="1.4"

@@ -1,10 +1,15 @@
 FILE="solver.inp"
 
+if [ "x$p_size_exact" == "x" ]; then
+  export p_size_exact=$p_size
+fi
+
 /bin/cat <<EOM >$FILE
 begin
   ndims              $p_ndims
   nvars              $p_nvars
   size               $p_size
+  size_exact         $p_size_exact
   iproc              $p_iproc
   ghost              $p_ghost
   n_iter             $p_niter

@@ -83,7 +83,7 @@ int main()
 	a = (double*) calloc (NI, sizeof(double));
 
 	for (i = 0; i < NI; i++){
-		x[i] = i*dx;
+  	x[i] = (i+0.5)*dx;
 		u[i] = sin(2*pi*x[i]);
 		a[i] = 1.0+0.5*sin(2*pi*x[i])*sin(2*pi*x[i]);
 	}
