@@ -89,8 +89,8 @@ int main()
 
   for (i = 0; i < NI; i++) {
     for (j = 0; j < NJ; j++) {
-      x[i] = i*dx;
-      y[j] = j*dy;
+      x[i] = (i+0.5)*dx;
+      y[j] = (j+0.5)*dy;
       int p = NI*j + i;
 
       u[p] = cos(4*pi*y[j]);

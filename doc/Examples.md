@@ -949,7 +949,7 @@ Expected screen output:
 
 \page linear_adv_2d_sine_varyingadv 2D Linear Advection - Sine Wave with Spatially-Varying Advection Speed
 
-Location: \b hypar/Examples/2D/LinearAdvection/SineWave_NonConstantAdvection
+Location: \b hypar/Examples/2D/LinearAdvection/SineWave_NonConstantAdvection/case_01
           (This directory contains all the input files needed
           to run this case.)
 
@@ -970,24 +970,24 @@ Input files required:
 ---------------------
 
 \b solver.inp
-\include 2D/LinearAdvection/SineWave_NonConstantAdvection/solver.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/case_01/solver.inp
 
 \b boundary.inp
-\include 2D/LinearAdvection/SineWave_NonConstantAdvection/boundary.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/case_01/boundary.inp
 
 \b physics.inp (specifies filename for advection field)
-\include 2D/LinearAdvection/SineWave_NonConstantAdvection/physics.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/case_01/physics.inp
 \b Note: Do not include the ".inp" extension in the filename above.
 
 \b lusolver.inp (optional)
-\include 2D/LinearAdvection/SineWave_NonConstantAdvection/lusolver.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/case_01/lusolver.inp
 
 \b weno.inp (optional)
-\include 2D/LinearAdvection/SineWave_NonConstantAdvection/weno.inp
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/case_01/weno.inp
 
 To generate \b initial.inp and \b advection.inp, compile and run the 
 following code in the run directory. 
-\include 2D/LinearAdvection/SineWave_NonConstantAdvection/aux/init.c
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/case_01/aux/init.c
 
 Output:
 -------
@@ -1031,14 +1031,14 @@ The following figure shows the vector plot of the velocity field:
 Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
 the code checks for conservation error and prints it to screen, as well
 as the file \b conservation.dat:
-\include 2D/LinearAdvection/SineWave_NonConstantAdvection/conservation.dat
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/case_01/conservation.dat
 The numbers are: number of grid points in each dimension (#HyPar::dim_global),
 number of processors in each dimension (#MPIVariables::iproc),
 time step size (#HyPar::dt),
 and conservation error (#HyPar::ConservationError).
 
 Expected screen output:
-\include 2D/LinearAdvection/SineWave_NonConstantAdvection/output.log
+\include 2D/LinearAdvection/SineWave_NonConstantAdvection/case_01/output.log
 
 
 \page linear_diff_sine2d 2D Linear Diffusion - Sine Wave
