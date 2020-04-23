@@ -84,6 +84,7 @@ init_exec="INIT"
 
 # create run directories with names starting with this string
 RUNDIRNAME_ROOT=run_grid_
+REFERENCEDIR_NAME=reference
 
 # file to write errors in
 ERRFILE="convergence.dat"
@@ -109,7 +110,7 @@ calc(){ awk "BEGIN { print "$*" }"; }      #
 root_dir=$PWD
 
 # Clean up
-rm -rf $ERRFILE ${RUNDIRNAME_ROOT}*
+rm -rf $ERRFILE ${RUNDIRNAME_ROOT}* $REFERENCEDIR_NAME
 
 HERE=$PWD
 
@@ -145,7 +146,7 @@ echo ""
 echo "Generating reference solution."
 echo "Running: n=$NUM_PTS, dt=$p_dt, maxiter=$p_niter, $NPROC cores ..."
 
-DIRNAME=reference
+DIRNAME=$REFERENCEDIR_NAME
 
 echo "  creating run directory ${DIRNAME}"
 mkdir $DIRNAME
