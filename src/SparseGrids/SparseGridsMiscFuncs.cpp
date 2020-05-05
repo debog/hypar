@@ -155,8 +155,10 @@ int SparseGridsSimulation::CleanupBarebones( SimulationObject *sim /*!< simulati
 
   /* These variables are allocated in Initialize.c */
   free(solver->dim_global);
+  free(solver->dim_global_ex);
   free(solver->dim_local);
   free(solver->index);
+  free(solver->isPeriodic);
   free(solver->u);
   free(solver->x);
   free(solver->dxinv);
@@ -194,11 +196,12 @@ int SparseGridsSimulation::InitializeBarebones( SimulationObject *simobj /*!< si
   MPIVariables* mpi = &(simobj->mpi);
 
   /* allocations */
-  mpi->ip           = (int*) calloc (m_ndims,sizeof(int));
-  mpi->is           = (int*) calloc (m_ndims,sizeof(int));
-  mpi->ie           = (int*) calloc (m_ndims,sizeof(int));
-  mpi->bcperiodic   = (int*) calloc (m_ndims,sizeof(int));
-  solver->dim_local = (int*) calloc (m_ndims,sizeof(int));
+  mpi->ip             = (int*) calloc (m_ndims,sizeof(int));
+  mpi->is             = (int*) calloc (m_ndims,sizeof(int));
+  mpi->ie             = (int*) calloc (m_ndims,sizeof(int));
+  mpi->bcperiodic     = (int*) calloc (m_ndims,sizeof(int));
+  solver->dim_local   = (int*) calloc (m_ndims,sizeof(int));
+  solver->isPeriodic  = (int*) calloc (m_ndims,sizeof(int));
 
 #ifndef serial
   /* Domain partitioning */

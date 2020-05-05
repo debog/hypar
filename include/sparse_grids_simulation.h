@@ -105,6 +105,7 @@ class SparseGridsSimulation : public Simulation
         m_is_periodic.resize(m_ndims);
         for (int d=0; d<m_ndims; d++) {
           m_is_periodic[d] = ( m_sims_sg[0].solver.isPeriodic[d] == 1 ? true : false);
+          m_sim_fg->solver.isPeriodic[d] = m_sims_sg[0].solver.isPeriodic[d];
         }
       }
       return retval;
