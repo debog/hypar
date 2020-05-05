@@ -20,10 +20,6 @@ int InitializePhysicsData(void  *s,       /*!< Simulation object of type #Simula
   MPIVariables     *mpi     = &(sim->mpi);
 
   if (solver->PhysicsInput) {
-    if (!mpi->rank) {
-      printf("Domain %d: Initializing physics data for model %s\n",
-              idx, solver->model);
-    }
     int ierr = solver->PhysicsInput(solver, mpi, idx, nsims, dim_data);
     if (ierr) {
       fprintf(stderr, "Error in InitializePhysicsData():\n");
