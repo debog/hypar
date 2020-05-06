@@ -16,6 +16,8 @@
 #define _SECOND_ORDER_MUSCL_     "muscl2"
 /*! Third order MUSCL scheme with Koren's limiter: Interp1PrimThirdOrderMUSCL(), Interp1PrimThirdOrderMUSCLChar() */
 #define _THIRD_ORDER_MUSCL_     "muscl3"
+/*! Fourth order central scheme: Interp1PrimFourthOrderCentral(), Interp1PrimFourthOrderCentralChar() */
+#define _FOURTH_ORDER_CENTRAL_  "4"
 /*! Fifth order upwind scheme: Interp1PrimFifthOrderUpwind(), Interp1PrimFifthOrderUpwindChar() */
 #define _FIFTH_ORDER_UPWIND_      "upw5"
 /*! Fifth order compact upwind scheme: Interp1PrimFifthOrderCompactUpwind(), Interp1PrimFifthOrderCompactUpwindChar() */
@@ -105,6 +107,8 @@ int Interp1PrimSecondOrderCentral         (double*,double*,double*,double*,int,i
 int Interp1PrimSecondOrderMUSCL           (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Component-wise interpolation of the first primitive at the cell interfaces using the third-order MUSCL scheme */
 int Interp1PrimThirdOrderMUSCL            (double*,double*,double*,double*,int,int,void*,void*,int);
+/*! Component-wise interpolation of the first primitive at the cell interfaces using the fourth-order central scheme */
+int Interp1PrimFourthOrderCentral         (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Component-wise interpolation of the first primitive at the cell interfaces using the fifth-order upwind scheme */
 int Interp1PrimFifthOrderUpwind           (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Component-wise interpolation of the first primitive at the cell interfaces using the fifth-order compact upwind scheme */
@@ -126,6 +130,8 @@ int Interp1PrimSecondOrderCentralChar     (double*,double*,double*,double*,int,i
 int Interp1PrimSecondOrderMUSCLChar       (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Characteristic-based interpolation of the first primitive at the cell interfaces using the third-order MUSCL scheme */
 int Interp1PrimThirdOrderMUSCLChar        (double*,double*,double*,double*,int,int,void*,void*,int);
+/*! Characteristic-based interpolation of the first primitive at the cell interfaces using the fourth-order central scheme */
+int Interp1PrimFourthOrderCentralChar     (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Characteristic-based interpolation of the first primitive at the cell interfaces using the fifth-order upwind scheme */
 int Interp1PrimFifthOrderUpwindChar       (double*,double*,double*,double*,int,int,void*,void*,int);
 /*! Characteristic-based interpolation of the first primitive at the cell interfaces using the fifth-order compact upwind scheme */

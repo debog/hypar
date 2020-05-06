@@ -185,6 +185,15 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
       solver->interp = (MUSCLParameters*) calloc(1,sizeof(MUSCLParameters));
       IERR MUSCLInitialize(solver,mpi); CHECKERR(ierr);
   
+    } else if (!strcmp(solver->spatial_scheme_hyp,_FOURTH_ORDER_CENTRAL_)) {
+  
+      /* Fourth order central scheme */
+      if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
+        solver->InterpolateInterfacesHyp = Interp1PrimFourthOrderCentralChar;
+      } else {
+        solver->InterpolateInterfacesHyp = Interp1PrimFourthOrderCentral;
+      }
+  
     } else if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_UPWIND_)) {
   
       /* Fifth order upwind scheme */
