@@ -80,6 +80,7 @@ export p_verbose=0
 # linear advection
 export p_adv_speed="1.0"
 export p_adv_file="none"
+export p_linadv_centered_flux="no"
 
 # Euler/Navier-Stokes equations
 export p_gamma="1.4"

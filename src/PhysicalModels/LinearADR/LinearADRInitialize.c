@@ -22,12 +22,37 @@ int    LinearADRDiffusionH        (double*,double*,int,int,void*,double);
 int    LinearADRReaction          ();
 int    LinearADRUpwind            (double*,double*,double*,double*,
                                    double*,double*,int,void*,double);
+int    LinearADRCenteredFlux      (double*,double*,double*,double*,
+                                   double*,double*,int,void*,double);
 int    LinearADRJacobian          (double*,double*,void*,int,int);
 int    LinearADRWriteAdvField     (void*,void*);
 
 /*! Initialize the linear advection-diffusion-reaction physics module - 
     allocate and set physics-related parameters, read physics-related inputs
     from file, and set the physics-related function pointers in #HyPar
+
+    This file reads the file "physics.inp" that must have the following format:
+
+        begin
+            <keyword>   <value>
+            <keyword>   <value>
+            <keyword>   <value>
+            ...
+            <keyword>   <value>
+        end
+
+    where the list of keywords are:
+
+    Keyword name       | Type         | Variable                      | Default value
+    ------------------ | ------------ | ----------------------------- | ------------------------
+    advection_filename | char[]       | #LinearADR::adv_filename      | "none"
+    advection          | double[]     | #LinearADR::a                 | 0
+    diffusion          | double[]     | #LinearADR::d                 | 0
+    centered_flux      | char[]       | #LinearADR::centered_flux     | "no"
+
+    \b Note: 
+    + "physics.inp" is \b optional; if absent, default values will be used.
+    + Please do *not* specify both "advection" and "advection_filename"!
 */
 int LinearADRInitialize(
                         void *s, /*!< Solver object of type #HyPar */
@@ -46,6 +71,7 @@ int LinearADRInitialize(
   strcpy(physics->adv_filename,"none");
   physics->a = NULL;
   physics->adv_arr_size = -1;
+  strcpy(physics->centered_flux,"no");
 
   physics->d = (double*) calloc (solver->ndims*solver->nvars,sizeof(double));
   _ArraySetValue_(physics->d,solver->ndims*solver->nvars,0.0);
@@ -101,6 +127,9 @@ int LinearADRInitialize(
             /* read diffusion coefficients */
             for (i=0; i<solver->ndims*solver->nvars; i++) ferr = fscanf(in,"%lf",&physics->d[i]);
             if (ferr != 1) return(1);
+          } else if (!strcmp(word, "centered_flux")) {
+            ferr = fscanf(in, "%s", physics->centered_flux); 
+            if (ferr != 1) return(ferr);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
             ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
@@ -143,6 +172,7 @@ int LinearADRInitialize(
 
 #ifndef serial
   MPIBroadcast_double(physics->d,solver->ndims*solver->nvars,0,&mpi->world);
+  MPIBroadcast_character(physics->centered_flux, _MAX_STRING_SIZE_,0,&mpi->world);
 #endif
 
   if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
@@ -161,7 +191,12 @@ int LinearADRInitialize(
   solver->HFunction          = LinearADRDiffusionH;
   solver->SFunction          = LinearADRReaction;
   solver->JFunction          = LinearADRJacobian;
-  solver->Upwind             = LinearADRUpwind;
+
+  if (!strcmp(physics->centered_flux,"no")) {
+    solver->Upwind = LinearADRUpwind;
+  } else {
+    solver->Upwind = LinearADRCenteredFlux;
+  }
 
   if (physics->constant_advection == 0) {
     solver->PhysicsInput = LinearADRAdvectionField;

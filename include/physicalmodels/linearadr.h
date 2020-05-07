@@ -52,6 +52,10 @@ typedef struct linearadr_parameters {
   /*! diffusion coefficient for each variable along each dimension */
   double *d;  
 
+  /*! turn off upwinding and just take arithmetic average of left
+      and right biased fluxes? */
+  char centered_flux[_MAX_STRING_SIZE_];
+
 } LinearADR;
 
 /*! Initialize the linear advection-diffusion-reaction model */

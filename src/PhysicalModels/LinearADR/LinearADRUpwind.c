@@ -98,3 +98,42 @@ int LinearADRUpwind(  double  *fI,  /*!< Computed upwind interface flux */
 
   return(0);
 }
+
+/*! Centered scheme for linear advection */
+int LinearADRCenteredFlux(  double  *fI,  /*!< Computed upwind interface flux */
+                            double  *fL,  /*!< Left-biased reconstructed interface flux */
+                            double  *fR,  /*!< Right-biased reconstructed interface flux */
+                            double  *uL,  /*!< Left-biased reconstructed interface solution */
+                            double  *uR,  /*!< Right-biased reconstructed interface solution */
+                            double  *u,   /*!< Cell-centered solution */ 
+                            int     dir,  /*!< Spatial dimension */ 
+                            void    *s,   /*!< Solver object of type #HyPar */
+                            double  t     /*!< Current solution time */
+                         )
+{
+  HyPar     *solver = (HyPar*)      s;
+  LinearADR *param  = (LinearADR*)  solver->physics;
+
+  int ndims = solver->ndims;
+  int nvars = solver->nvars;
+  int ghosts= solver->ghosts;
+  int *dim  = solver->dim_local;
+
+  int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+    
+  int done = 0; _ArraySetValue_(index_outer,ndims,0);
+  while (!done) {
+    _ArrayCopy1D_(index_outer,index_inter,ndims);
+    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+      int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
+      for (int v = 0; v < nvars; v++) {
+        fI[nvars*p+v] = 0.5 * (fL[nvars*p+v] + fR[nvars*p+v]);
+      }
+    }
+    _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
+  }
+
+  return(0);
+}
