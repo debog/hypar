@@ -1,16 +1,31 @@
 /*
-  This code converts the binary solution files for a 2D
-  system to tecplot files
+ * This code converts binary output from HyPar to
+ * 2D/3D Tecplot format files.
+ *
+ * If the user provides an input file "bin2tec.inp"
+ * that contains the filename (without the extension
+ * ".bin") of the file they want converted, this
+ * code will convert that file.
+ *
+ * If this input file doesn't exist, then it will
+ * try to find and convert HyPar solution files.
+ * For this to happen, it needs to be run at the 
+ * same location where the input files for the 
+ * simulation exist. It needs to read in stuff from 
+ * solver.inp and check the existence of 
+ * sparse_grids.inp.
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define _ArraySetValue_(x,size,value)                                                                               \
-  {                                                                                                                 \
-    int arraycounter;                                                                                               \
-    for (arraycounter = 0; arraycounter < (size); arraycounter++)  x[arraycounter] = (value);                       \
+#define _MAX_STRING_SIZE_ 500
+
+#define _ArraySetValue_(x,size,value) \
+  { \
+    int arraycounter; \
+    for (arraycounter = 0; arraycounter < (size); arraycounter++)  x[arraycounter] = (value);\
   }
 
 #define _ArrayIndex1D_(N,imax,i,ghost,index)  \
@@ -38,34 +53,119 @@
     else          done = 0; \
   }
 
-void IncrementFilename(char *f)
+void IncrementIndex(char *f)
 {
-  if (f[7] == '9') {
-    f[7] = '0';
-    if (f[6] == '9') {
-      f[6] = '0';
-      if (f[5] == '9') {
-        f[5] = '0';
-        if (f[4] == '9') {
-          f[4] = '0';
-          if (f[3] == '9') {
-            f[3] = '0';
+  if (f[4] == '9') {
+    f[4] = '0';
+    if (f[3] == '9') {
+      f[3] = '0';
+      if (f[2] == '9') {
+        f[2] = '0';
+        if (f[1] == '9') {
+          f[1] = '0';
+          if (f[0] == '9') {
+            f[0] = '0';
             fprintf(stderr,"Warning: file increment hit max limit. Resetting to zero.\n");
           } else {
-            f[3]++;
+            f[0]++;
           }
         } else {
-          f[4]++;
+          f[1]++;
         }
       } else {
-        f[5]++;
+        f[2]++;
       }
     } else {
-      f[6]++;
+      f[3]++;
     }
   } else {
-    f[7]++;
+    f[4]++;
   }
+}
+
+int ReadBinary( const char* const a_fname,
+                int* const        a_ndims,
+                int* const        a_nvars,
+                int** const       a_dims,
+                double** const    a_x,
+                double** const    a_u )
+{
+  FILE* in = fopen(a_fname,"rb");
+  if (!in) return 1;
+
+  printf("Reading file %s.\n",a_fname);
+  size_t ferr;
+
+  /* read the file headers */
+  int ndims, nvars;
+  ferr = fread(&ndims,sizeof(int),1,in);
+  if (ferr != 1) {
+    fprintf(stderr,
+            "Error while reading %s: unable to read ndims.\n",
+            a_fname);
+    return 1;
+  }
+  ferr = fread(&nvars,sizeof(int),1,in);
+  if (ferr != 1) {
+    fprintf(stderr,
+            "Error while reading %s: unable to read nvars.\n",
+            a_fname);
+    return 1;
+  }
+  *a_ndims = ndims;
+  *a_nvars = nvars;
+  printf("  ndims: %d\n",ndims);
+  printf("  nvars: %d\n",nvars);
+
+  /* some checks */
+  if ((ndims != 2) && (ndims != 3)) {
+    printf("Error: ndims in %s not equal to 2 or 3!\n", a_fname);
+    return 1;
+  }
+
+  /* read dimensions */
+  int* dims = calloc(ndims, sizeof(int));
+  ferr = fread(dims,sizeof(int),ndims,in);
+  if (ferr != ndims) {
+    fprintf(stderr,
+            "Error while reading %s: unable to read dims.\n",
+            a_fname);
+    return 1;
+  }
+  *a_dims = dims;
+  if      (ndims == 2) printf("  dimensions: %d x %d\n",dims[0],dims[1]);
+  else if (ndims == 3) printf("  dimensions: %d x %d x %d\n",dims[0],dims[1],dims[2]);
+
+  double *U,*x;
+  /* allocate grid and solution arrays */
+  int d;
+  int sizex = 0;      for (d=0; d<ndims; d++) sizex += dims[d];
+  int sizeu = nvars;  for (d=0; d<ndims; d++) sizeu *= dims[d];
+  x = (double*) calloc (sizex,sizeof(double));
+  U = (double*) calloc (sizeu,sizeof(double));
+
+  /* read grid and solution */
+  ferr = fread(x,sizeof(double),sizex,in);
+  if (ferr != sizex) {
+    fprintf(stderr,
+            "Error while reading %s: unable to read x.\n",
+            a_fname);
+    return 1;
+  }
+  ferr = fread(U,sizeof(double),sizeu,in);
+  if (ferr != sizeu) {
+    fprintf(stderr,
+            "Error while reading %s: unable to read u.\n",
+            a_fname);
+    return 1;
+  }
+  /* done reading */
+  fclose(in);
+
+  *a_x = x;
+  *a_u = U;
+
+  return 0;
 }
 
 void WriteTecplot2D(int ndims,int nvars,int *dim,double *x,double *u,char *f,int *index)
@@ -79,7 +179,7 @@ void WriteTecplot2D(int ndims,int nvars,int *dim,double *x,double *u,char *f,int
   int imax = dim[0];
   int jmax = dim[1];
 
-  printf("\tWriting tecplot solution file %s.\n",f);
+  printf("  Writing tecplot solution file %s.\n",f);
   FILE *out;
   out = fopen(f,"w");
   if (!out) {
@@ -128,7 +228,7 @@ int WriteTecplot3D(int ndims,int nvars,int *dim,double *x,double *u,char *f,int 
   int jmax = dim[1];
   int kmax = dim[2];
 
-  printf("Writing tecplot solution file %s.\n",f);
+  printf("  Writing tecplot solution file %s.\n",f);
   FILE *out;
   out = fopen(f,"w");
   if (!out) {
@@ -165,153 +265,126 @@ int WriteTecplot3D(int ndims,int nvars,int *dim,double *x,double *u,char *f,int 
   return(0);
 }
 
+int convertFile(const char* const fname_root)
+{
+  char file_in[_MAX_STRING_SIZE_],
+       file_out[_MAX_STRING_SIZE_];
+
+  strcpy(file_in, fname_root);
+  strcat(file_in, ".");
+  strcat(file_in, "bin");
+
+  strcpy(file_out, fname_root);
+  strcat(file_out, ".");
+  strcat(file_out, "dat");
+
+  int     ndims, nvars;
+  int*    dims = NULL;
+  double* x = NULL;
+  double* U = NULL;
+
+  int ierr;
+  ierr = ReadBinary(file_in, &ndims, &nvars, &dims, &x, &U);
+
+  if (!ierr) {
+
+    /* write Tecplot file */
+    int ind[ndims];
+    if      (ndims == 2) WriteTecplot2D(2,nvars,dims,x,U,file_out,&ind[0]);
+    else if (ndims == 3) WriteTecplot3D(3,nvars,dims,x,U,file_out,&ind[0]);
+
+    /* clean up */
+    free(dims);
+    free(U);
+    free(x);
+
+  }
+
+  return ierr;
+}
+
 int main()
 {
-  FILE *out1, *out2, *in, *inputs;
-  double dt;
-  int file_op_iter;
-  char filename[50], op_file_format[50], tecfile[50], overwrite[50];
+  char fname_root[_MAX_STRING_SIZE_];
+  char overwrite[_MAX_STRING_SIZE_];
 
-  inputs = fopen("solver.inp","r");
-  if (!inputs) {
-    fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
-    return(1);
-  } else {
-	  char word[100];
-    fscanf(inputs,"%s",word);
-    if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "dt"               ))  fscanf(inputs,"%lf",&dt           );
-   			else if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
-   			else if (!strcmp(word, "file_op_iter"     ))  fscanf(inputs,"%d" ,&file_op_iter  );
-   			else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite      );
-      }
-    }
+  char input_fname_user[_MAX_STRING_SIZE_] = "bin2tec.inp";
+  char input_fname_solver[_MAX_STRING_SIZE_] = "solver.inp";
+  char input_fname_sg[_MAX_STRING_SIZE_] = "sparse_grids.inp";
+
+  FILE* inputs;
+  inputs = fopen(input_fname_user,"r");
+  if (inputs) {
+    printf("Reading filename root from %s.\n", input_fname_user);
+    fscanf(inputs, "%s", fname_root);
+    printf("  filename root is %s.\n", fname_root);
     fclose(inputs);
-  }
-  if (strcmp(op_file_format,"binary") && strcmp(op_file_format,"bin")) {
-    printf("Error: solution output needs to be in binary files.\n");
-    return(0);
+    strcpy(overwrite,"yes");
+  } else {
+    printf("Reading simulation inputs from %s.\n", input_fname_solver);
+    inputs = fopen(input_fname_solver,"r");
+    char op_file_format[_MAX_STRING_SIZE_];
+    if (!inputs) {
+      fprintf(stderr,"Error: File %s not found.\n", input_fname_solver);
+      return 1;
+    } else {
+  	  char word[100];
+      fscanf(inputs,"%s",word);
+      if (!strcmp(word, "begin")){
+  	    while (strcmp(word, "end")){
+  		    fscanf(inputs,"%s",word);
+     			if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
+     			else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite      );
+        }
+      }
+      fclose(inputs);
+    }
+    if (strcmp(op_file_format,"binary") && strcmp(op_file_format,"bin")) {
+      printf("Error: solution output needs to be in binary files.\n");
+      return 1;
+    }
+    inputs = fopen(input_fname_sg, "r");
+    if (inputs) {
+      fclose(inputs);
+      printf("  Found %s - this is a sparse grids simulation.\n", input_fname_sg);
+      strcpy(fname_root, "op_fg");
+    } else {
+      strcpy(fname_root, "op");
+    }
+    printf("  filename root is %s.\n", fname_root);
   }
 
   if (!strcmp(overwrite,"no")) {
-    strcpy(filename,"op_00000.bin");
+
+    char fname_idx[6] = "00000";
+
     while(1) {
-      in = fopen(filename,"rb");
 
-      if (!in) {
-        printf("No more files found. Exiting.\n");
+      char filename[_MAX_STRING_SIZE_];
+      strcpy(filename,fname_root);
+      strcat(filename,"_");
+      strcat(filename,fname_idx);
+
+      int ierr = convertFile(filename);
+      if (ierr) {
+        printf("No more files found (%s). Exiting.\n", filename);
         break;
-      } else {
-        printf("Reading file %s.\n",filename);
-        int ndims, nvars;
-        double *U,*x;
-
-        /* read the file headers */
-        fread(&ndims,sizeof(int),1,in);
-        fread(&nvars,sizeof(int),1,in);
-
-        /* some checks */
-        if ((ndims != 2) && (ndims != 3)) {
-          printf("Error: ndims in %s not equal to 2 or 3!\n",filename);
-          return(0);
-        }
-
-        /* read dimensions */
-        int dims[ndims];
-        fread(dims,sizeof(int),ndims,in);
-        if      (ndims == 2) printf("Dimensions: %d x %d\n",dims[0],dims[1]);
-        else if (ndims == 3) printf("Dimensions: %d x %d x %d\n",dims[0],dims[1],dims[2]);
-        printf("Nvars     : %d\n",nvars);
-
-        /* allocate grid and solution arrays */
-        int d;
-        int sizex = 0;      for (d=0; d<ndims; d++) sizex += dims[d];
-        int sizeu = nvars;  for (d=0; d<ndims; d++) sizeu *= dims[d];
-        x = (double*) calloc (sizex,sizeof(double));
-        U = (double*) calloc (sizeu,sizeof(double));
-
-        /* read grid and solution */
-        fread(x,sizeof(double),sizex,in);
-        fread(U,sizeof(double),sizeu,in);
-        /* done reading */
-        fclose(in);
-
-        /* set filename */
-        strcpy(tecfile,filename);
-        tecfile[9]  = 'd';
-        tecfile[10] = 'a';
-        tecfile[11] = 't';
-
-        /* write Tecplot file */
-        int ind[ndims];
-        if      (ndims == 2) WriteTecplot2D(2,nvars,dims,x,U,tecfile,&ind[0]);
-        else if (ndims == 3) WriteTecplot3D(3,nvars,dims,x,U,tecfile,&ind[0]);
-
-        /* clean up */
-        free(U);
-        free(x);
       }
 
-      IncrementFilename(filename);
+      IncrementIndex(fname_idx);
     }
+
   } else if (!strcmp(overwrite,"yes")) {
-    strcpy(filename,"op.bin");
-    in = fopen(filename,"rb");
-    if (!in) {
-      printf("File no found. Exiting.\n");
-    } else {
-      printf("Reading file %s.\n",filename);
-      int ndims, nvars;
-      double *U,*x;
 
-      /* read the file headers */
-      fread(&ndims,sizeof(int),1,in);
-      fread(&nvars,sizeof(int),1,in);
+    char filename[_MAX_STRING_SIZE_];
+    strcpy(filename,fname_root);
 
-      /* some checks */
-      if ((ndims != 2) && (ndims != 3)) {
-        printf("Error: ndims in %s not equal to 2 or 3!\n",filename);
-        return(0);
-      }
-
-      /* read dimensions */
-      int dims[ndims];
-      fread(dims,sizeof(int),ndims,in);
-      if      (ndims == 2) printf("Dimensions: %d x %d\n",dims[0],dims[1]);
-      else if (ndims == 3) printf("Dimensions: %d x %d x %d\n",dims[0],dims[1],dims[2]);
-      printf("Nvars     : %d\n",nvars);
-
-      /* allocate grid and solution arrays */
-      int d;
-      int sizex = 0;      for (d=0; d<ndims; d++) sizex += dims[d];
-      int sizeu = nvars;  for (d=0; d<ndims; d++) sizeu *= dims[d];
-      x = (double*) calloc (sizex,sizeof(double));
-      U = (double*) calloc (sizeu,sizeof(double));
-
-      /* read grid and solution */
-      fread(x,sizeof(double),sizex,in);
-      fread(U,sizeof(double),sizeu,in);
-      /* done reading */
-      fclose(in);
-
-      /* set filename */
-      strcpy(tecfile,filename);
-      tecfile[3] = 'd';
-      tecfile[4] = 'a';
-      tecfile[5] = 't';
-
-      /* write Tecplot file */
-      int ind[ndims];
-      if      (ndims == 2) WriteTecplot2D(2,nvars,dims,x,U,tecfile,&ind[0]);
-      else if (ndims == 3) WriteTecplot3D(3,nvars,dims,x,U,tecfile,&ind[0]);
-
-      /* clean up */
-      free(U);
-      free(x);
+    int ierr = convertFile(filename);
+    if (ierr) {
+      printf("File not found or not in correct format (%s). Exiting.\n", filename);
     }
+
   }
 
-  return(0);
+  return 0;
 }
