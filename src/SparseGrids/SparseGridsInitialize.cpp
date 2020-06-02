@@ -116,6 +116,18 @@ int SparseGridsSimulation::Initialize()
   ierr = ::Initialize( (void*) m_sims_sg.data(), m_nsims_sg);
   if (ierr) return ierr;
 
+  /* compute and report total NDOFs for sparse grids */
+  long ndof_sg = 0;
+  for (int i = 0; i < m_nsims_sg; i++) {
+    ndof_sg += m_sims_sg[i].solver.npoints_global;
+  }
+  long ndof_fg = m_sim_fg->solver.npoints_global;
+  if (!m_rank) {
+    printf("Total number of DOFs:-\n");
+    printf("  using sparse grids: %d\n", ndof_sg);
+    printf("  using conventional grid: %d\n", ndof_fg);
+  }
+
   /* done */
   return 0;
 }
