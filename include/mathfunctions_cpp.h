@@ -6,8 +6,6 @@
 #ifndef _MATHFUNC_CPP_H_
 #define _MATHFUNC_CPP_H_
 
-#include <math_ops.h>
-
 /*! Function to calculate the grid points corresponding to a given interval */
 extern "C" void FindInterval(double,double,double*,int,int*,int*);
 
