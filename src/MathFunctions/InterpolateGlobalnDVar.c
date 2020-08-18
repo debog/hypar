@@ -188,7 +188,7 @@ static int refine1D(const int* const     a_dim_src, /*!< Grid size of source dat
 
   double fac = ((double) n_dst) / ((double) n_src);
   int stride = (int) fac;
-  if (abs(((double)stride)-fac) > _MACHINE_ZERO_) {
+  if (absolute(((double)stride)-fac) > _MACHINE_ZERO_) {
     fprintf(stderr, "Error in refine1D() -\n");
     fprintf(stderr, "  non-integer refinement factor!\n");
     return 1;

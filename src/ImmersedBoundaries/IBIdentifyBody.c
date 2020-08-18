@@ -112,7 +112,7 @@ int IBIdentifyBody(
 					l3 = 1 - l1 - l2;
 					if ((l1 > -eps) && (l2 > -eps) && (l3 > -eps)){
 						xd[itr]   = l1*body->surface[n].x1 + l2*body->surface[n].x2 + l3*body->surface[n].x3;
-						dist[itr] = abs(x[imin]-xd[itr]);
+						dist[itr] = absolute(x[imin]-xd[itr]);
 						itr++;
 					}
 				}
@@ -143,7 +143,7 @@ int IBIdentifyBody(
 				}
 
 				for (ii = 1; ii < itr-1; ii++) {
-					if (abs(xd[ii]-xd[ii-1]) < eps) {
+					if (absolute(xd[ii]-xd[ii-1]) < eps) {
 						for (jj = ii+1; jj < itr; jj++) {
 							xd[jj-1]    = xd[jj];
 							dist[jj-1]  = dist[jj];

@@ -77,8 +77,8 @@ int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
       for (int n = 0; n<neig; n++) {
         if (eig[n] <= 0) all_positive = 0;
         if (eig[n] >= 0) all_negative = 0;
-        if (abs(eig[n]) > maxabs_eig) {
-          maxabs_eig = abs(eig[n]);
+        if (absolute(eig[n]) > maxabs_eig) {
+          maxabs_eig = absolute(eig[n]);
         }
       }
 

@@ -72,7 +72,7 @@ int LinearADRUpwind(  double  *fI,  /*!< Computed upwind interface flux */
           } else if ((eigL < 0) && (eigR < 0)) {
              fI[nvars*p+v] = fR[nvars*p+v];
           } else { 
-             double alpha = max(abs(eigL), abs(eigR));
+             double alpha = max(absolute(eigL), absolute(eigR));
              fI[nvars*p+v] = 0.5 * (fL[nvars*p+v] + fR[nvars*p+v] - alpha * (uR[nvars*p+v] - uL[nvars*p+v]));
           }
         }
