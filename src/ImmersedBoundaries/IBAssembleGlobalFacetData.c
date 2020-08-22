@@ -60,37 +60,23 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
 
     /* allocate arrays for whole domain */
 		*global_var = (double*) calloc (nfacets_global*nvars, sizeof(double));
+    _ArraySetValue_((*global_var), (nfacets_global*nvars), 0.0);
 
     /* check array - to avoid double counting of facets */
 		int *check = (int*) calloc (nfacets_global, sizeof(int));
-		for (int n = 0; n < nfacets_global; n++) check[n] = 0;
-		int check_total_facets = 0;
+    _ArraySetValue_(check, nfacets_global, 0);
 
     /* local data */
 		for (int n = 0; n < nfacets_local; n++) {
-
-			if (!check[fmap[n].index]) {
-
-        _ArrayCopy1D_((local_var+n), ((*global_var)+fmap[n].index), nvars);
-				check[fmap[n].index] = 1;
-
-			} else {
-
-        fprintf(stderr,"Error in IBAssembleGlobalFacetData(): ");
-        fprintf(stderr,"Facet %d has already been assigned a value. Double counting of facet!\n",fmap[n].index);
-        return 1;
-
-			}
-
+      _ArrayAXPY_((local_var+n), 1.0, ((*global_var)+fmap[n].index), nvars);
+		  check[fmap[n].index]++;
 		}
-		check_total_facets += nfacets_local;
 
 #ifndef serial
 		for (int proc = 1; proc < mpi->nproc; proc++) {
 
 			int nf_incoming;
 			MPI_Recv(&nf_incoming, 1, MPI_INT, proc, 98927, MPI_COMM_WORLD, &status);
-			check_total_facets += nf_incoming;
 
       if (nf_incoming > 0) {
 
@@ -101,15 +87,8 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
 			  MPI_Recv(var_incoming, nf_incoming*nvars, MPI_DOUBLE, proc, 98929, mpi->world, &status);
 
 			  for (int n = 0; n < nf_incoming; n++) {
-				  if (!check[indices_incoming[n]]) {
-            _ArrayCopy1D_((var_incoming+n), ((*global_var)+indices_incoming[n]), nvars);
-					  check[indices_incoming[n]] = 1;
-				  } else {
-            fprintf(stderr,"Error in IBAssembleGlobalFacetData(): ");
-            fprintf(stderr,"Facet %d has already been assigned a value. Double counting of facet!\n",
-                    indices_incoming[n]);
-            return 1;
-				  }
+          _ArrayAXPY_((var_incoming+n), 1.0, ((*global_var)+indices_incoming[n]), nvars);
+				  check[indices_incoming[n]]++;
 			  }
         
         free(indices_incoming);
@@ -118,8 +97,14 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
 		}
 #endif
 
-		if (check_total_facets != nfacets_global)	{
-      fprintf(stderr,"Error in IBAssembleGlobalFacetData(): mismatch in total facet count.\n");
+    for (int n = 0; n < nfacets_global; n++) {
+      if (check[n] == 0) {
+        fprintf(stderr, "Error in IBAssembleGlobalFacetData()\n");
+        fprintf(stderr, "  No data received for facet %d\n", n);
+        return 1;
+      } else {
+        _ArrayScale1D_(((*global_var)+n), (1.0/(double)check[n]), nvars);
+      }
     }
 
 	} else {
@@ -142,5 +127,5 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
 
 	}
 
-  return(0);
+  return 0;
 }

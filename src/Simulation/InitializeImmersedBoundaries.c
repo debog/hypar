@@ -144,16 +144,31 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
     double zlen = zmax - zmin;
     ld = max3(xlen,ylen,zlen);
     count = IBNearestFacetNormal(solver->ib,mpi,solver->x,ld,dim_local,ghosts);
-    if (count) return(count);
+    if (count) {
+      fprintf(stderr, "Error in InitializeImmersedBoundaries():\n");
+      fprintf(stderr, "  IBNearestFacetNormal() returned with error code %d on rank %d.\n",
+              count, mpi->rank);
+      return(count);
+    }
 
     /* For the immersed boundary points, find the interior points for extrapolation,
        and compute their interpolation coefficients */
     count = IBInterpCoeffs(solver->ib,mpi,solver->x,dim_local,ghosts,solver->iblank);
-    if (count) return(count);
+    if (count) {
+      fprintf(stderr, "Error in InitializeImmersedBoundaries():\n");
+      fprintf(stderr, "  IBInterpCoeffs() returned with error code %d on rank %d.\n",
+              count, mpi->rank);
+      return(count);
+    }
   
     /* Create facet mapping */;
     count = IBCreateFacetMapping(ib,mpi,solver->x,dim_local,ghosts);
-    if (count) return(count);
+    if (count) {
+      fprintf(stderr, "Error in InitializeImmersedBoundaries():\n");
+      fprintf(stderr, "  IBCreateFacetMapping() returned with error code %d on rank %d.\n",
+              count, mpi->rank);
+      return(count);
+    }
     
     /* Done */
     if (!mpi->rank) {

@@ -186,16 +186,6 @@ int IBCreateFacetMapping(
   }
 
   int nfacets_local = count;
-  int nfacets_global;
-  MPISum_integer(&nfacets_global,&nfacets_local,1,&mpi->world);
-  if (nfacets_global != nfacets) {
-    if (!mpi->rank) {
-      fprintf(stderr,"Error in IBCreateFacetMapping(): nfacets_global = %d, ", nfacets_global);
-      fprintf(stderr,"but nfacets = %d.\n", nfacets);
-    }
-    return(1);
-  }
-
   if (nfacets_local > 0) {
 
     FacetMap *fmap = (FacetMap*) calloc (nfacets_local, sizeof(FacetMap));
@@ -229,8 +219,21 @@ int IBCreateFacetMapping(
 
         int ic,jc, kc;
 
-        ierr = interpNodesCoeffs(mpi,xc,yc,zc,x,y,z,dim,ghosts,IB->mode,&ic,&jc,&kc,fmap[count].interp_nodes,fmap[count].interp_coeffs);
-        if (ierr) return(ierr);
+        ierr = interpNodesCoeffs( mpi,
+                                  xc, yc, zc,
+                                  x, y, z,
+                                  dim,
+                                  ghosts,
+                                  IB->mode,
+                                  &ic, &jc, &kc,
+                                  fmap[count].interp_nodes,
+                                  fmap[count].interp_coeffs );
+        if (ierr) {
+          fprintf(stderr, "Error in IBCreateFacetMapping(): \n");
+          fprintf(stderr, "  interpNodesCoeffs() returned with error code %d on rank %d.\n",
+                  ierr, mpi->rank );
+          return(ierr);
+        }
 
         double dx = x[ic] - x[ic-1];
         double dy = y[jc] - y[jc-1];
@@ -257,8 +260,21 @@ int IBCreateFacetMapping(
         fmap[count].dy = yns - yc;
         fmap[count].dz = zns - zc;
 
-        ierr = interpNodesCoeffs(mpi,xns,yns,zns,x,y,z,dim,ghosts,IB->mode,NULL,NULL,NULL,fmap[count].interp_nodes_ns,fmap[count].interp_coeffs_ns);
-        if (ierr) return(ierr);
+        ierr = interpNodesCoeffs( mpi,
+                                  xns, yns, zns,
+                                  x, y, z,
+                                  dim,
+                                  ghosts,
+                                  IB->mode,
+                                  NULL,NULL,NULL,
+                                  fmap[count].interp_nodes_ns,
+                                  fmap[count].interp_coeffs_ns );
+        if (ierr) {
+          fprintf(stderr, "Error in IBCreateFacetMapping(): \n");
+          fprintf(stderr, "  interpNodesCoeffs() returned with error code %d on rank %d.\n",
+                  ierr, mpi->rank );
+          return(ierr);
+        }
 
         count++;
       }
