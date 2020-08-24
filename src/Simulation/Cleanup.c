@@ -29,6 +29,7 @@
 #include <physicalmodels/numa3d.h>
 #include <physicalmodels/shallowwater1d.h>
 #include <physicalmodels/shallowwater2d.h>
+#include <physicalmodels/vlasov.h>
 
 /*! Cleans up and frees the memory after the completion of the simulation. */
 int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationObject */
@@ -96,6 +97,8 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
       IERR ShallowWater1DCleanup(solver->physics); CHECKERR(ierr);
     } else if (!strcmp(solver->model,_SHALLOW_WATER_2D_)) {
       IERR ShallowWater2DCleanup(solver->physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->model,_VLASOV_)) {
+      IERR VlasovCleanup(solver->physics); CHECKERR(ierr);
     }
     free(solver->physics);
   
