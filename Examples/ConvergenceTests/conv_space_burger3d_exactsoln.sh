@@ -2,7 +2,7 @@
 
 #################################################################
 # 
-# Bash script to run a spatial convergence test on a smooth 2D Burgers
+# Bash script to run a spatial convergence test on a smooth 3D Burgers
 # problem - evolution of a sine wave.
 #
 # ** Please copy this script to a new location before using it! **
