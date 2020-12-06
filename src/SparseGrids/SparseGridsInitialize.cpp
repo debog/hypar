@@ -102,7 +102,9 @@ int SparseGridsSimulation::Initialize()
   m_sims_sg.resize(m_nsims_sg);
   /* set the solver parameters for the sparse grids sim objects */
   for (int i = 0; i < m_nsims_sg; i++) {
+#ifndef serial
     MPI_Comm_dup(MPI_COMM_WORLD, &(m_sims_sg[i].mpi.world));
+#endif
     ierr = SetSolverParameters( m_sims_sg[i],
                                 m_combination[i]._dim_,
                                 m_iprocs[i],

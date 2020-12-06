@@ -136,13 +136,14 @@ int main(int argc, char **argv)
 #endif
   int               use_petsc = 0;
 
-  int rank, nproc;
-  MPI_Comm world;
 #ifdef serial
-  rank  = 0;
-  nproc = 1;
+  int world = 0;
+  int rank  = 0;
+  int nproc = 1;
   printf("HyPar - Serial Version\n");
 #else
+  MPI_Comm world;
+  int rank, nproc;
   MPI_Init(&argc,&argv);
   MPI_Comm_dup(MPI_COMM_WORLD, &world);
   MPI_Comm_rank(MPI_COMM_WORLD,&rank );
