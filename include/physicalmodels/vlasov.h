@@ -53,7 +53,7 @@
 typedef struct vlasov_parameters {
 
   /*! Use a self-consistent electric field? Requires FFTW library */
-  bool self_consistent_electric_field;
+  int self_consistent_electric_field;
 
   /*! Number of spatial dimensions */
   int ndims_x;

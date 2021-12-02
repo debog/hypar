@@ -105,8 +105,8 @@ int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
         }
 
       } else {
-   		  fprintf(stderr,"Error: Illegal format in file \"%s\". Word read is: \n",
-                _SPARSEGRIDS_SIM_INP_FNAME_, word);
+        fprintf( stderr, "Error: Illegal format in file \"%s\". Word read is: %s\n",
+                 _SPARSEGRIDS_SIM_INP_FNAME_, word);
         return 1;
       }
 

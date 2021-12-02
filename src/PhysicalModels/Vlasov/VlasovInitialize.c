@@ -62,7 +62,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   }
 
   /* default is prescribed electric field */
-  physics->self_consistent_electric_field = false;
+  physics->self_consistent_electric_field = 0;
   physics->ndims_x = 1;
   physics->ndims_v = 1;
 

@@ -126,8 +126,8 @@ int SparseGridsSimulation::Initialize()
   long ndof_fg = m_sim_fg->solver.npoints_global;
   if (!m_rank) {
     printf("Total number of DOFs:-\n");
-    printf("  using sparse grids: %d\n", ndof_sg);
-    printf("  using conventional grid: %d\n", ndof_fg);
+    printf("  using sparse grids: %d\n", (int)ndof_sg);
+    printf("  using conventional grid: %d\n", (int)ndof_fg);
   }
 
   /* done */

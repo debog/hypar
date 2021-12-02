@@ -39,8 +39,8 @@ int MUSCLInitialize(
       if (!strcmp(word, "begin")){
 	      while (strcmp(word, "end")){
 		      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-          if      (!strcmp(word,"epsilon")) { ferr = fscanf(in,"%lf",&muscl->eps);          if (ferr != 1) return(1); }
-          else if (!strcmp(word,"limiter")) { ferr = fscanf(in,"%s" ,&muscl->limiter_type); if (ferr != 1) return(1); }
+          if      (!strcmp(word,"epsilon")) { ferr = fscanf(in,"%lf",&muscl->eps);         if (ferr != 1) return(1); }
+          else if (!strcmp(word,"limiter")) { ferr = fscanf(in,"%s" ,muscl->limiter_type); if (ferr != 1) return(1); }
           else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
             ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);

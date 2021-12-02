@@ -73,7 +73,7 @@ int EnsembleSimulation::define( int a_rank, /*!< MPI rank of this process */
         }
 
       } else {
-   		  fprintf(stderr,"Error: Illegal format in file \"%s\". Word read is: \n",
+        fprintf(stderr,"Error: Illegal format in file \"%s\". Word read is: %s\n",
                 _ENSEMBLE_SIM_INP_FNAME_, word);
         return 1;
       }
