@@ -6,6 +6,7 @@
 #ifndef _SINGLE_SIM_H_
 #define _SINGLE_SIM_H_
 
+#include <stdio.h>
 #include <vector>
 #include <simulation.h>
 

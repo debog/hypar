@@ -8,7 +8,7 @@
 #include <mpivars.h>
 #include <boundaryconditions.h>
 
-/*! Applies periodic boundary conditions: Implemented by copying the solution 
+/*! Applies periodic boundary conditions: Implemented by copying the solution
     from the other end of the domain into the physical boundary ghost points.
     \n\n
     **Note**: This function only acts if the the number of processors is 1 along
@@ -54,5 +54,6 @@ int BCPeriodicU(
       _ArrayIncrementIndex_(ndims,bounds,index1,done);
     }
   }
+
   return(0);
 }

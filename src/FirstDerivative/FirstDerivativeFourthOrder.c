@@ -18,7 +18,7 @@ typedef HyPar         SolverContext;
 #include <omp.h>
 #endif
 
-/*! Computes the fourth-order finite-difference approximation to the first derivative 
+/*! Computes the fourth-order finite-difference approximation to the first derivative
     (\b Note: not divided by the grid spacing):
     \f{equation}{
       \left(\partial f\right)_i = \left\{ \begin{array}{ll} \frac{1}{12}\left(-25f_i+48f_{i+1}-36f_{i+2}+16f_{i+3}-3f_{i+4}\right) & i=-g \\ \frac{1}{12}\left(-3f_{i-1}-10f_i+18f_{i+1}-6f_{i+2}+f_{i+3}\right) & i = -g+1 \\ \frac{1}{2}\left( f_{i-2}-8f_{i-1}+8f_{i+1}-f_{i+2} \right) & -g+2 \leq i \leq N+g-3 \\ \frac{1}{12}\left( -f_{i-3}+6f_{i-2}-18f_{i-1}+10f_i+3f_{i+1}\right) & i = N+g-2 \\ \frac{1}{12}\left( 3f_{i-4}-16f_{i-3}+36f_{i-2}-48f_{i-1}+25f_i \right) & i = N+g-1 \end{array}\right.
@@ -35,10 +35,10 @@ typedef HyPar         SolverContext;
 */
 int FirstDerivativeFourthOrderCentral(
                                         double  *Df,  /*!< Array to hold the computed first derivative (with ghost points) */
-                                        double  *f,   /*!< Array containing the grid point function values whose first 
+                                        double  *f,   /*!< Array containing the grid point function values whose first
                                                            derivative is to be computed (with ghost points) */
                                         int     dir,  /*!< The spatial dimension along which the derivative is computed */
-                                        int     bias, /*!< Forward or backward differencing for non-central 
+                                        int     bias, /*!< Forward or backward differencing for non-central
                                                            finite-difference schemes (-1: backward, 1: forward)*/
                                         void    *s,   /*!< Solver object of type #SolverContext */
                                         void    *m    /*!< MPI object of type #MPIContext */
@@ -78,7 +78,7 @@ int FirstDerivativeFourthOrderCentral(
       indexC[dir] = i+2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp2);
       indexC[dir] = i+3; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp3);
       indexC[dir] = i+4; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp4);
-      for (v=0; v<nvars; v++)  
+      for (v=0; v<nvars; v++)
         Df[qC*nvars+v] = (-25*f[qC*nvars+v]+48*f[qp1*nvars+v]-36*f[qp2*nvars+v]+16*f[qp3*nvars+v]-3*f[qp4*nvars+v])*one_twelve;
     }
     for (i = -ghosts+1; i < -ghosts+2; i++) {
@@ -88,7 +88,7 @@ int FirstDerivativeFourthOrderCentral(
       indexC[dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp1);
       indexC[dir] = i+2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp2);
       indexC[dir] = i+3; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp3);
-      for (v=0; v<nvars; v++)  
+      for (v=0; v<nvars; v++)
         Df[qC*nvars+v] = (-3*f[qm1*nvars+v]-10*f[qC*nvars+v]+18*f[qp1*nvars+v]-6*f[qp2*nvars+v]+f[qp3*nvars+v])*one_twelve;
     }
     /* interior */
@@ -99,7 +99,7 @@ int FirstDerivativeFourthOrderCentral(
       indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
       indexC[dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp1);
       indexC[dir] = i+2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp2);
-      for (v=0; v<nvars; v++)  
+      for (v=0; v<nvars; v++)
         Df[qC*nvars+v] = (f[qm2*nvars+v]-8*f[qm1*nvars+v]+8*f[qp1*nvars+v]-f[qp2*nvars+v])*one_twelve;
     }
     /* right boundary */
@@ -110,7 +110,7 @@ int FirstDerivativeFourthOrderCentral(
       indexC[dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qm1);
       indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
       indexC[dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp1);
-      for (v=0; v<nvars; v++)  
+      for (v=0; v<nvars; v++)
         Df[qC*nvars+v] = (-f[qm3*nvars+v]+6*f[qm2*nvars+v]-18*f[qm1*nvars+v]+10*f[qC*nvars+v]+3*f[qp1*nvars+v])*one_twelve;
     }
     for (i = dim[dir]+ghosts-1; i < dim[dir]+ghosts; i++) {
@@ -120,10 +120,10 @@ int FirstDerivativeFourthOrderCentral(
       indexC[dir] = i-2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qm2);
       indexC[dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qm1);
       indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
-      for (v=0; v<nvars; v++)  
+      for (v=0; v<nvars; v++)
         Df[qC*nvars+v] = (3*f[qm4*nvars+v]-16*f[qm3*nvars+v]+36*f[qm2*nvars+v]-48*f[qm1*nvars+v]+25*f[qC*nvars+v])*one_twelve;
     }
   }
-  
+
   return(0);
 }

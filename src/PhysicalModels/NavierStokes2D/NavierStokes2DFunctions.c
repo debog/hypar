@@ -20,6 +20,6 @@ int NavierStokes2DRoeAverage(
                             )
 {
   NavierStokes2D *param  = (NavierStokes2D*) p;
-  _NavierStokes2DRoeAverage_(uavg,uL,uR,param);
+  _NavierStokes2DRoeAverage_(uavg,uL,uR,param->gamma);
   return(0);
 }

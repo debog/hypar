@@ -3,6 +3,8 @@
     @brief Functions to compute the hyperbolic flux for 2D Navier-Stokes equations
 */
 
+#include <time.h>
+
 #include <stdlib.h>
 #include <arrayfunctions.h>
 #include <mathfunctions.h>
@@ -37,14 +39,19 @@ int NavierStokes2DFlux(
   /* set offset such that index is compatible with ghost point arrangement */
   _ArraySetValue_(offset,_MODEL_NDIMS_,-ghosts);
 
+  clock_t cpu_start, cpu_end;
+
+  cpu_start = clock();
   int done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
     double rho, vx, vy, e, P;
-    _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,vx,vy,e,P,param);
+    _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,vx,vy,e,P,param->gamma);
     _NavierStokes2DSetFlux_((f+_MODEL_NVARS_*p),rho,vx,vy,e,P,dir);
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }
+  cpu_end = clock();
+  printf("NavierStokes2DFlux CPU time = %.6f\n", (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC);
 
   return(0);
 }
@@ -56,7 +63,7 @@ int NavierStokes2DFlux(
       {\bf f}\left({\bf u}\right) = A_f{\bf u}
     \f}
     where \f$A_f = A_f\left({\bf u}_{ref}\right)\f$ is the fast Jacobian (#NavierStokes2D::fast_jac)
-    evaluated for the solution at the beginning of each time step (\f${\bf u}_{ref}\f$ is 
+    evaluated for the solution at the beginning of each time step (\f${\bf u}_{ref}\f$ is
     #NavierStokes2D::solution). This is done in NavierStokes2DPreStep().\n\n
   Note: the flux function needs to be computed at the ghost points as well.
 */
@@ -84,7 +91,7 @@ int NavierStokes2DStiffFlux(
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
     double *Af = param->fast_jac+(2*p+dir)*JacSize;
-    MatVecMult4(_MODEL_NVARS_,(f+_MODEL_NVARS_*p),Af,(u+_MODEL_NVARS_*p)); 
+    MatVecMult4(_MODEL_NVARS_,(f+_MODEL_NVARS_*p),Af,(u+_MODEL_NVARS_*p));
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }
 
@@ -97,7 +104,7 @@ int NavierStokes2DStiffFlux(
     \f{equation}{
       {\bf f}\left({\bf u}\right) - A_f{\bf u}
     \f}
-    where \f${\bf f}\left({\bf u}\right)\f$ is the total flux computed in NavierStokes2DFlux(), 
+    where \f${\bf f}\left({\bf u}\right)\f$ is the total flux computed in NavierStokes2DFlux(),
     and \f$A_f{\bf u}\f$ is the linearized stiff flux computed in NavierStokes2DStiffFlux().\n\n
   Note: the flux function needs to be computed at the ghost points as well.
 */
@@ -127,11 +134,11 @@ int NavierStokes2DNonStiffFlux(
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
     /* compute total flux */
     double rho, vx, vy, e, P;
-    _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,vx,vy,e,P,param);
+    _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,vx,vy,e,P,param->gamma);
     _NavierStokes2DSetFlux_(ftot,rho,vx,vy,e,P,dir);
     /* compute stiff stuff */
     double *Af = param->fast_jac+(2*p+dir)*JacSize;
-    MatVecMult4(_MODEL_NVARS_,fstiff,Af,(u+_MODEL_NVARS_*p)); 
+    MatVecMult4(_MODEL_NVARS_,fstiff,Af,(u+_MODEL_NVARS_*p));
     /* subtract stiff flux from total flux */
     _ArraySubtract1D_((f+_MODEL_NVARS_*p),ftot,fstiff,_MODEL_NVARS_);
     /* Done */

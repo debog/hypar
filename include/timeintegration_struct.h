@@ -22,27 +22,27 @@
 */
 /*! \brief Structure of variables/parameters and function pointers for time integration
  *
- * This structure contains all the variables, parameters, and function pointers 
- * required for integrating the spatially-discretized semi-discrete ordinary 
+ * This structure contains all the variables, parameters, and function pointers
+ * required for integrating the spatially-discretized semi-discrete ordinary
  * differential equation in time
 */
 typedef struct time_integration_variables {
   /*! Current iteration number */
-  int     iter;         
+  int     iter;
   /*! Total number of iterations */
-  int     n_iter;       
+  int     n_iter;
   /*! Restart iteration number (0 for a non-restart simulation) */
-  int     restart_iter; 
+  int     restart_iter;
   /*! Current solution time */
-  double  waqt;         
+  double  waqt;
   /*! Time step size */
-  double  dt;           
+  double  dt;
   /*! Norm of the change in the solution at a time step */
-  double  norm;         
+  double  norm;
   /*! Maximum CFL at a time step */
-  double  max_cfl;      
+  double  max_cfl;
   /*! Maximum diffusion number at a time step */
-  double  max_diff;     
+  double  max_diff;
 
   /*! Array of simulation objects of type #SimulationObject */
   void    *simulation;
@@ -64,10 +64,10 @@ typedef struct time_integration_variables {
   int     *bf_sizes;
 
   /*! Array to store the current solution */
-  double  *u;           
+  double  *u;
 
-  /*! Array to store the right-hand side */ 
-  double  *rhs;         
+  /*! Array to store the right-hand side */
+  double  *rhs;
 
   /*! Local size of the solution vector */
   long    u_size_total;
@@ -76,7 +76,7 @@ typedef struct time_integration_variables {
   long    bf_size_total;
 
   /*! Arrays to store stage values for a multi-stage time-integration method */
-  double  **U; 
+  double  **U;
   /*! Arrays to store stage right-hand-sides for a multi-stage time-integration method */
   double  **Udot;
 
@@ -85,12 +85,12 @@ typedef struct time_integration_variables {
   /*! Number of MPI processes */
   int     nproc;
 
-  /*! Array to store the flux integral at the physical boundary at each stage of 
+  /*! Array to store the flux integral at the physical boundary at each stage of
       a multi-stage time-integration method (to compute conservation errors) */
   double **BoundaryFlux;
 
   /*! Pointer to file to write residual history if required */
-  void *ResidualFile; 
+  void *ResidualFile;
 
   /*! Pointer to the function that takes one time step using the desired method */
   int (*TimeIntegrate) (void*);
@@ -103,6 +103,17 @@ typedef struct time_integration_variables {
   struct timeval iter_end_time;
   /*! iteration wallclock time (in seconds) */
   double iter_wctime;
+  double iter_wctime_total;
+
+#if defined(HAVE_CUDA)
+  /*! Arrays to store stage values for a multi-stage time-integration method */
+  double *gpu_U;
+  /*! Arrays to store stage right-hand-sides for a multi-stage time-integration method */
+  double *gpu_Udot;
+  /*! Array to store the flux integral at the physical boundary at each stage of
+      a multi-stage time-integration method (to compute conservation errors) */
+  double *gpu_BoundaryFlux;
+#endif
 
 } TimeIntegration;
 
@@ -114,7 +125,7 @@ typedef struct time_integration_variables {
 
   \sa TimeExplicitRKInitialize()
 */
-#define _RK_1FE_        "1fe"     
+#define _RK_1FE_        "1fe"
 /*!
   2-stage, 2nd order Runge Kutta method, often known as "RK2a"
 
@@ -122,7 +133,7 @@ typedef struct time_integration_variables {
 
   \sa TimeExplicitRKInitialize()
 */
-#define _RK_22_         "22"      
+#define _RK_22_         "22"
 /*!
   3-stage, 3rd order Runge Kutta method
 
@@ -138,7 +149,7 @@ typedef struct time_integration_variables {
 
   \sa TimeExplicitRKInitialize()
 */
-#define _RK_44_         "44"      
+#define _RK_44_         "44"
 /*!
   Strong-Stability-Preserving (SSP) 3-stage, 3rd order Runge Kutta method
 
@@ -147,18 +158,18 @@ typedef struct time_integration_variables {
   \sa TimeExplicitRKInitialize()
 
   Reference:
-  + Gottlieb, S., Ketcheson, D. I., and Shu, C.-W., High Order Strong Stability 
+  + Gottlieb, S., Ketcheson, D. I., and Shu, C.-W., High Order Strong Stability
     Preserving Time Discretizations, J. Sci. Comput., 38 (3), 2009, pp. 251-289,
     http://dx.doi.org/10.1007/s10915-008-9239-z.
 */
-#define _RK_SSP3_       "ssprk3"  
+#define _RK_SSP3_       "ssprk3"
 #define _RK_TVD3_       "tvdrk3"  /*!< Same as #_RK_SSP3_ */
 /*! \def ExplicitRKParameters
     \brief Structure containing the parameters for an explicit Runge-Kutta method
 */
 /*! \brief Structure containing the parameters for an explicit Runge-Kutta method
 
-    Contains the parameters defining an explicit Runge Kutta time integration 
+    Contains the parameters defining an explicit Runge Kutta time integration
     method.
 
     \sa TimeRK()
@@ -172,78 +183,78 @@ typedef struct _explicit_rungekutta_time_integration_ {
 } ExplicitRKParameters;
 
 /* General Linear Methods with Global Error Estimate */
-/*! \f$y-\tilde{y}\f$ form 
+/*! \f$y-\tilde{y}\f$ form
 
     \sa TimeGLMGEEInitialize()
 
     Reference:
     + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted, 2015 (http://arxiv.org/abs/1503.05166).
 */
-#define _GLM_GEE_YYT_     "yyt" 
-/*! \f$y-\epsilon\f$ form 
+#define _GLM_GEE_YYT_     "yyt"
+/*! \f$y-\epsilon\f$ form
 
     \sa TimeGLMGEEInitialize()
 
     Reference:
     + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted, 2015 (http://arxiv.org/abs/1503.05166).
 */
-#define _GLM_GEE_YEPS_    "yeps" 
-/*! A 3-stage, 2nd order method 
+#define _GLM_GEE_YEPS_    "yeps"
+/*! A 3-stage, 2nd order method
 
     \sa TimeGLMGEEInitialize()
 
     Reference:
     + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted, 2015 (http://arxiv.org/abs/1503.05166).
 */
-#define _GLM_GEE_23_      "23"  
-/*! A 4-stage, 2nd order method 
+#define _GLM_GEE_23_      "23"
+/*! A 4-stage, 2nd order method
 
     \sa TimeGLMGEEInitialize()
 
     Reference:
     + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted, 2015 (http://arxiv.org/abs/1503.05166).
 */
-#define _GLM_GEE_24_      "24"  
-/*! A 5-stage, 2nd order method, with good imaginary stability 
+#define _GLM_GEE_24_      "24"
+/*! A 5-stage, 2nd order method, with good imaginary stability
 
     \sa TimeGLMGEEInitialize()
 
     Reference:
     + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted, 2015 (http://arxiv.org/abs/1503.05166).
 */
-#define _GLM_GEE_25I_     "25i" 
-/*! A 5-stage, 3rd order method 
+#define _GLM_GEE_25I_     "25i"
+/*! A 5-stage, 3rd order method
 
     \sa TimeGLMGEEInitialize()
 
     Reference:
     + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted, 2015 (http://arxiv.org/abs/1503.05166).
 */
-#define _GLM_GEE_35_      "35"  
-/*! RK-2a with an error estimator 
+#define _GLM_GEE_35_      "35"
+/*! RK-2a with an error estimator
 
     \sa TimeGLMGEEInitialize()
 
     Reference:
     + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted, 2015 (http://arxiv.org/abs/1503.05166).
 */
-#define _GLM_GEE_EXRK2A_  "exrk2a"  
-/*! A 3rd order method 
+#define _GLM_GEE_EXRK2A_  "exrk2a"
+/*! A 3rd order method
 
     \sa TimeGLMGEEInitialize()
 
     Reference:
     + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted, 2015 (http://arxiv.org/abs/1503.05166).
 */
-#define _GLM_GEE_RK32G1_  "rk32g1"  
-/*! A 2nd order RK method with an error estimator 
+#define _GLM_GEE_RK32G1_  "rk32g1"
+/*! A 2nd order RK method with an error estimator
 
     \sa TimeGLMGEEInitialize()
 
     Reference:
     + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted, 2015 (http://arxiv.org/abs/1503.05166).
 */
-#define _GLM_GEE_RK285EX_ "rk285ex" 
+#define _GLM_GEE_RK285EX_ "rk285ex"
 /*! \def GLMGEEParameters
     \brief Structure containing the parameters for the General Linear Methods with Global Error Estimators (GLM-GEE)
 */

@@ -132,9 +132,8 @@ int BCSubsonicAmbivalentU(
   } else if (ndims == 3) {
 
     /* create a fake physics object */
-    NavierStokes3D physics;
     double gamma;
-    gamma = physics.gamma = boundary->gamma;
+    gamma = boundary->gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
     /* boundary normal (pointing into the domain) */
@@ -181,8 +180,8 @@ int BCSubsonicAmbivalentU(
         double uvel1, uvel2, uvelb,
                vvel1, vvel2, vvelb,
                wvel1, wvel2, wvelb;
-        _NavierStokes3DGetFlowVar_((phi+nvars*p1),rho,uvel1,vvel1,wvel1,energy,pressure,(&physics));
-        _NavierStokes3DGetFlowVar_((phi+nvars*p2),rho,uvel2,vvel2,wvel2,energy,pressure,(&physics));
+        _NavierStokes3DGetFlowVar_((phi+nvars*p1),_NavierStokes3D_stride_,rho,uvel1,vvel1,wvel1,energy,pressure,gamma);
+        _NavierStokes3DGetFlowVar_((phi+nvars*p2),_NavierStokes3D_stride_,rho,uvel2,vvel2,wvel2,energy,pressure,gamma);
         uvelb = 1.5*uvel1 - 0.5*uvel2;
         vvelb = 1.5*vvel1 - 0.5*vvel2;
         wvelb = 1.5*wvel1 - 0.5*wvel2;
@@ -197,7 +196,7 @@ int BCSubsonicAmbivalentU(
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
         
         /* flow variables in the interior */
-        _NavierStokes3DGetFlowVar_((phi+nvars*p2),rho,uvel,vvel,wvel,energy,pressure,(&physics));
+        _NavierStokes3DGetFlowVar_((phi+nvars*p2),_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,gamma);
 
         /* set the ghost point values */
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;

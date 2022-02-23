@@ -35,17 +35,17 @@
 
 /*
   One-dimensional Interpolation Functions:-
-    Functions to interpolate the primitive of a function at interfaces from its 
+    Functions to interpolate the primitive of a function at interfaces from its
     cell-centered values.
 
   Arguments:-
 
-    fI        double*   array of size (N+1) in the interpolation direction; will contain 
-                        the interpolated interface function primitive 
+    fI        double*   array of size (N+1) in the interpolation direction; will contain
+                        the interpolated interface function primitive
                         (**needs to be allocated by the calling function)
                         (**does not have ghost points))
 
-    fC        double*   array of size (N+2*ghosts) in the interpolation direction of the 
+    fC        double*   array of size (N+2*ghosts) in the interpolation direction of the
                         cell centered function values
                         (**does have ghost points))
 
@@ -56,7 +56,7 @@
 
     x         double*   grid point locations along the 1D line on which the interpolation
                         is being carried out
-                        array of size (N+2*ghosts) 
+                        array of size (N+2*ghosts)
                         Used only by non-uniform-grid interpolation schemes
 
     upw       int       upwind direction for non-central schemes
@@ -73,7 +73,7 @@
                         + nvars     : number of variables per grid point
                                       (i.e. size of vector variable being interpolated)
                         + dim_local : local (of this process) dimensions of the domain
-                                      (integer array of size ndims, with the number of 
+                                      (integer array of size ndims, with the number of
                                       points in each dimension as elements)
     m         void*     object containing MPI domain decomposition related variables
                         (this information is used only by compact interpolation schemes)
@@ -92,10 +92,14 @@
 
             0   1   2   .....        ....          N-3 N-2 N-1
           | x | x | x | x | x | x | x | x | x | x | x | x | x |
-          0   1   2   ...             ...    ...     N-2 N-1  N 
+          0   1   2   ...             ...    ...     N-2 N-1  N
 
     Returns 0 on normal execution, non-zero on error.
 */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* functions to interpolate the first primitive in a component-wise way
    (for conservative discretization of the 1st derivative) on a uniform grid */
@@ -120,6 +124,11 @@ int Interp1PrimFifthOrderCRWENO           (double*,double*,double*,double*,int,i
 /*! Component-wise interpolation of the first primitive at the cell interfaces using the fifth-order hybrid-compact WENO scheme */
 int Interp1PrimFifthOrderHCWENO           (double*,double*,double*,double*,int,int,void*,void*,int);
 
+#if defined(HAVE_CUDA)
+/*! GPU implementation of component-wise interpolation of the first primitive at the cell interfaces using the fifth-order WENO scheme */
+int gpuInterp1PrimFifthOrderWENO (double*,double*,double*,double*,int,int,void*,void*,int);
+#endif
+
 /* functions to interpolate the first primitive in a characteristic-based way
    (for conservative discretization of the 1st derivative) on a uniform grid */
 /*! Characteristic-based interpolation of the first primitive at the cell interfaces using the first-order upwind scheme */
@@ -143,13 +152,17 @@ int Interp1PrimFifthOrderCRWENOChar       (double*,double*,double*,double*,int,i
 /*! Characteristic-based interpolation of the first primitive at the cell interfaces using the fifth-order hybrid-compact WENO scheme */
 int Interp1PrimFifthOrderHCWENOChar       (double*,double*,double*,double*,int,int,void*,void*,int);
 
-/* functions to interpolate the second primitive 
+/* functions to interpolate the second primitive
    (for conservative discretization of the 2nd derivative) */
 /*! Interpolation of the second primitive at the cell interfaces using the second-order central scheme */
 int Interp2PrimSecondOrder  (double*,double*,int,void*,void*);
 
 /*! Function to calculate and save the nonlinear interpolation coefficients for a non-linear (solution-dependent) interpolation scheme (eg. #_FIFTH_ORDER_WENO_, #_FIFTH_ORDER_CRWENO_, #_FIFTH_ORDER_HCWENO_, etc). */
 int InterpSetLimiterVar(double*,double*,double*,int,void*,void*);
+
+#ifdef __cplusplus
+}
+#endif
 
 /*! \def MUSCLParameters
     \brief Structure of variables/parameters needed by the MUSCL scheme
@@ -187,8 +200,8 @@ typedef struct parameters_weno {
   double	p;			      /*!< p parameter */
   double  tol;          /*!< a general tolerance parameter */
 
-  /* hybrid compact-WENO scheme related parameters 
-   * **References**: 
+  /* hybrid compact-WENO scheme related parameters
+   * **References**:
    * + http://dx.doi.org/10.1006/jcph.2002.7021
    * + http://dx.doi.org/10.1016/j.jcp.2003.07.006
   */
@@ -200,14 +213,15 @@ typedef struct parameters_weno {
          *w2, /*!< Array to save the second WENO weight */
          *w3;/*!< Array to save the third WENO weight */
   /* size and offset for the WENO weights arrays */
-  int *offset /*! Array containing the offset information for the WENO weights */, 
+  int *offset /*! Array containing the offset information for the WENO weights */,
       size /*! Size of the WENO weights array */;
 
 } WENOParameters;
+
 /*! Initialize the structure containing variables and parameters for WENO-type schemes */
-int WENOInitialize(void*,void*,char*,char*); 
+int WENOInitialize(void*,void*,char*,char*);
 /*! Clean up the structure containing variables and parameters for WENO-type schemes */
-int WENOCleanup(void*);
+int WENOCleanup(void*, int);
 
 /* define optimal weights */
 /*! Optimal value for the first fifth-order WENO weight */
@@ -228,7 +242,7 @@ int WENOCleanup(void*);
   \f{equation}{
     \omega_k = \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = \frac {c_k} {\left(\beta_k+\epsilon\right)^p},\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(f_{j-2}-2f_{j-1}+f_j\right)^2 + \frac{1}{4}\left(f_{j-2}-4f_{j-1}+3f_j\right)^2 \\
@@ -237,8 +251,8 @@ int WENOCleanup(void*);
   \f}
 
   \b Notes:
-  + This macro computes the weights for one variable along one grid line. 
-  
+  + This macro computes the weights for one variable along one grid line.
+
   \b Arguments:
   + \a w1, \a w2,\a w3 are the nonlinear WENO weights.
   + \a c1, \a c2,\a c3 are optimal coefficients.
@@ -248,7 +262,7 @@ int WENOCleanup(void*);
   \b Reference:
   + Jiang, Shu, J. Comput. Phys., 1996. http://dx.doi.org/10.1006/jcph.1996.0130
 */
-#define _WENOWeights_v_JS_(w1,w2,w3,c1,c2,c3,m3,m2,m1,p1,p2,weno,N) \
+#define _WENOWeights_v_JS_(w1,w2,w3,c1,c2,c3,m3,m2,m1,p1,p2,eps,N) \
   { \
     int idx; \
     /* calculate smoothness indicators and the WENO weights */\
@@ -256,13 +270,13 @@ int WENOCleanup(void*);
     for (idx=0; idx<N; idx++) { \
       b1 = thirteen_by_twelve*(m3[idx]-2*m2[idx]+m1[idx])*(m3[idx]-2*m2[idx]+m1[idx]) \
            + one_fourth*(m3[idx]-4*m2[idx]+3*m1[idx])*(m3[idx]-4*m2[idx]+3*m1[idx]);  \
-      a1 = c1 / ( (b1+weno->eps) * (b1+weno->eps) );  \
+      a1 = c1 / ( (b1+eps) * (b1+eps) );  \
       b2 = thirteen_by_twelve*(m2[idx]-2*m1[idx]+p1[idx])*(m2[idx]-2*m1[idx]+p1[idx]) \
            + one_fourth*(m2[idx]-p1[idx])*(m2[idx]-p1[idx]);                \
-      a2 = c2 / ( (b2+weno->eps) * (b2+weno->eps) );  \
+      a2 = c2 / ( (b2+eps) * (b2+eps) );  \
       b3 = thirteen_by_twelve*(m1[idx]-2*p1[idx]+p2[idx])*(m1[idx]-2*p1[idx]+p2[idx]) \
            + one_fourth*(3*m1[idx]-4*p1[idx]+p2[idx])*(3*m1[idx]-4*p1[idx]+p2[idx]);  \
-      a3 = c3 / ( (b3+weno->eps) * (b3+weno->eps) );  \
+      a3 = c3 / ( (b3+eps) * (b3+eps) );  \
       a_sum_inv = 1.0 / (a1 + a2 + a3); \
       w1[idx] = a1 * a_sum_inv; \
       w2[idx] = a2 * a_sum_inv; \
@@ -276,7 +290,7 @@ int WENOCleanup(void*);
     \omega_k &=& \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = \frac {\tilde{\omega}_k \left( c_k + c_k^2 - 3c_k\tilde{\omega}_k + \tilde{\omega}_k^2\right)} {c_k^2 + \tilde{\omega}_k\left(1-2c_k\right)}, \\
     \tilde{\omega}_k &=& \frac {\tilde{a}_k} {\sum_{j=1}^3 \tilde{a}_j },\ \tilde{a}_k = \frac {c_k} {\left(\beta_k+\epsilon\right)^p},\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(f_{j-2}-2f_{j-1}+f_j\right)^2 + \frac{1}{4}\left(f_{j-2}-4f_{j-1}+3f_j\right)^2 \\
@@ -285,19 +299,19 @@ int WENOCleanup(void*);
   \f}
 
   \b Notes:
-  + This macro computes the weights for one variable along one grid line. 
-  
+  + This macro computes the weights for one variable along one grid line.
+
   \b Arguments:-
   + \a w1, \a w2,\a w3 are the nonlinear WENO weights.
   + \a c1, \a c2,\a c3 are optimal coefficients.
   + \a m3, \a m2,\a m1,\a p1,\a p2 are the function values at stencil points corresponding to the interface j+1/2: j-2,j-1,j,j+1,j+2
   + \a weno is an object of type #WENOParameters containing parameters for the WENO method.
   + \a N is the number of interfaces along the grid line on which this WENO-type reconstruction is happening.
- 
+
   \b Reference:
      + Henrick, Aslam, Powers, J. Comput. Phys., 2005. http://dx.doi.org/10.1016/j.jcp.2005.01.023
  */
-#define _WENOWeights_v_M_(w1,w2,w3,c1,c2,c3,m3,m2,m1,p1,p2,weno,N) \
+#define _WENOWeights_v_M_(w1,w2,w3,c1,c2,c3,m3,m2,m1,p1,p2,eps,N) \
   { \
     int idx; \
     /* calculate smoothness indicators and the WENO weights */\
@@ -305,13 +319,13 @@ int WENOCleanup(void*);
     for (idx=0; idx<N; idx++) { \
       b1 = thirteen_by_twelve*(m3[idx]-2*m2[idx]+m1[idx])*(m3[idx]-2*m2[idx]+m1[idx]) \
            + one_fourth*(m3[idx]-4*m2[idx]+3*m1[idx])*(m3[idx]-4*m2[idx]+3*m1[idx]);  \
-      a1 = c1 / ( (b1+weno->eps) * (b1+weno->eps) );  \
+      a1 = c1 / ( (b1+eps) * (b1+eps) );  \
       b2 = thirteen_by_twelve*(m2[idx]-2*m1[idx]+p1[idx])*(m2[idx]-2*m1[idx]+p1[idx]) \
            + one_fourth*(m2[idx]-p1[idx])*(m2[idx]-p1[idx]);                \
-      a2 = c2 / ( (b2+weno->eps) * (b2+weno->eps) );  \
+      a2 = c2 / ( (b2+eps) * (b2+eps) );  \
       b3 = thirteen_by_twelve*(m1[idx]-2*p1[idx]+p2[idx])*(m1[idx]-2*p1[idx]+p2[idx]) \
            + one_fourth*(3*m1[idx]-4*p1[idx]+p2[idx])*(3*m1[idx]-4*p1[idx]+p2[idx]);  \
-      a3 = c3 / ( (b3+weno->eps) * (b3+weno->eps) );  \
+      a3 = c3 / ( (b3+eps) * (b3+eps) );  \
       a_sum_inv = 1.0 / (a1 + a2 + a3); \
       w1[idx] = a1 * a_sum_inv; \
       w2[idx] = a2 * a_sum_inv; \
@@ -326,12 +340,65 @@ int WENOCleanup(void*);
     } \
   }
 
+/*! \def _WENOWeights_v_M_Scalar_
+  Compute the WENO weights according the the Mapped-WENO formulation:
+  \f{eqnarray}{
+    \omega_k &=& \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = \frac {\tilde{\omega}_k \left( c_k + c_k^2 - 3c_k\tilde{\omega}_k + \tilde{\omega}_k^2\right)} {c_k^2 + \tilde{\omega}_k\left(1-2c_k\right)}, \\
+    \tilde{\omega}_k &=& \frac {\tilde{a}_k} {\sum_{j=1}^3 \tilde{a}_j },\ \tilde{a}_k = \frac {c_k} {\left(\beta_k+\epsilon\right)^p},\ k = 1,2,3,
+  \f}
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
+  (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
+  \f{eqnarray}{
+    \beta_1 &=& \frac{13}{12} \left(f_{j-2}-2f_{j-1}+f_j\right)^2 + \frac{1}{4}\left(f_{j-2}-4f_{j-1}+3f_j\right)^2 \\
+    \beta_2 &=& \frac{13}{12} \left(f_{j-1}-2f_j+f_{j+1}\right)^2 + \frac{1}{4}\left(f_{j-1}-f_{j+1}\right)^2 \\
+    \beta_3 &=& \frac{13}{12} \left(f_j-2f_{j+1}+f_{j+2}\right)^2 + \frac{1}{4}\left(3f_j-4f_{j+1}+f_{j+2}\right)^2
+  \f}
+
+  \b Notes:
+  + This macro computes the weights for one variable along one grid line.
+
+  \b Arguments:-
+  + \a w1, \a w2,\a w3 are the nonlinear WENO weights.
+  + \a c1, \a c2,\a c3 are optimal coefficients.
+  + \a m3, \a m2,\a m1,\a p1,\a p2 are the function values at stencil points corresponding to the interface j+1/2: j-2,j-1,j,j+1,j+2
+  + \a weno is an object of type #WENOParameters containing parameters for the WENO method.
+  + \a N is the number of interfaces along the grid line on which this WENO-type reconstruction is happening.
+
+  \b Reference:
+     + Henrick, Aslam, Powers, J. Comput. Phys., 2005. http://dx.doi.org/10.1016/j.jcp.2005.01.023
+ */
+#define _WENOWeights_v_M_Scalar_(w1,w2,w3,c1,c2,c3,m3,m2,m1,p1,p2,eps,idx) \
+  { \
+    /* calculate smoothness indicators and the WENO weights */\
+    double b1, b2, b3, a1, a2, a3, a_sum_inv; \
+    b1 = thirteen_by_twelve*(m3[idx]-2*m2[idx]+m1[idx])*(m3[idx]-2*m2[idx]+m1[idx]) \
+          + one_fourth*(m3[idx]-4*m2[idx]+3*m1[idx])*(m3[idx]-4*m2[idx]+3*m1[idx]);  \
+    a1 = c1 / ( (b1+eps) * (b1+eps) );  \
+    b2 = thirteen_by_twelve*(m2[idx]-2*m1[idx]+p1[idx])*(m2[idx]-2*m1[idx]+p1[idx]) \
+          + one_fourth*(m2[idx]-p1[idx])*(m2[idx]-p1[idx]);                \
+    a2 = c2 / ( (b2+eps) * (b2+eps) );  \
+    b3 = thirteen_by_twelve*(m1[idx]-2*p1[idx]+p2[idx])*(m1[idx]-2*p1[idx]+p2[idx]) \
+          + one_fourth*(3*m1[idx]-4*p1[idx]+p2[idx])*(3*m1[idx]-4*p1[idx]+p2[idx]);  \
+    a3 = c3 / ( (b3+eps) * (b3+eps) );  \
+    a_sum_inv = 1.0 / (a1 + a2 + a3); \
+    w1[idx] = a1 * a_sum_inv; \
+    w2[idx] = a2 * a_sum_inv; \
+    w3[idx] = a3 * a_sum_inv; \
+    a1 = w1[idx] * (c1 + c1*c1 - 3*c1*w1[idx] + w1[idx]*w1[idx]) / (c1*c1 + w1[idx]*(1.0-2.0*c1)); \
+    a2 = w2[idx] * (c2 + c2*c2 - 3*c2*w2[idx] + w2[idx]*w2[idx]) / (c2*c2 + w2[idx]*(1.0-2.0*c2)); \
+    a3 = w3[idx] * (c3 + c3*c3 - 3*c3*w3[idx] + w3[idx]*w3[idx]) / (c3*c3 + w3[idx]*(1.0-2.0*c3)); \
+    a_sum_inv = 1.0 / (a1 + a2 + a3); \
+    w1[idx] = a1 * a_sum_inv; \
+    w2[idx] = a2 * a_sum_inv; \
+    w3[idx] = a3 * a_sum_inv; \
+  }
+
 /*! \def _WENOWeights_v_Z_
   Compute the WENO weights according the the WENO-Z formulation:
   \f{equation}{
     \omega_k = \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = c_k \left( 1 + \frac{\tau_5}{\beta_k+\epsilon} \right)^p,\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(f_{j-2}-2f_{j-1}+f_j\right)^2 + \frac{1}{4}\left(f_{j-2}-4f_{j-1}+3f_j\right)^2 \\
@@ -339,10 +406,10 @@ int WENOCleanup(void*);
     \beta_3 &=& \frac{13}{12} \left(f_j-2f_{j+1}+f_{j+2}\right)^2 + \frac{1}{4}\left(3f_j-4f_{j+1}+f_{j+2}\right)^2,
   \f}
   and \f$\tau_5 = \left|\beta_1 - \beta_3 \right|\f$.
- 
+
   \b Notes:
-  + This macro computes the weights for one variable along one grid line. 
-  
+  + This macro computes the weights for one variable along one grid line.
+
   \b Arguments:
   + \a w1, \a w2,\a w3 are the nonlinear WENO weights.\n
   + \a c1, \a c2,\a c3 are optimal coefficients.
@@ -351,12 +418,12 @@ int WENOCleanup(void*);
   + \a N is the number of interfaces along the grid line on which this WENO-type reconstruction is happening.
 
  \b Reference:
-    + Borges, et. al., An improved weighted essentially non-oscillatory scheme for hyperbolic conservation laws, 
+    + Borges, et. al., An improved weighted essentially non-oscillatory scheme for hyperbolic conservation laws,
       J. Comput. Phys., 2008. http://dx.doi.org/10.1016/j.jcp.2007.11.038
-    + Castro, M., Costa, B., Don, W. S., High order weighted essentially non-oscillatory WENO-Z schemes for hyperbolic 
+    + Castro, M., Costa, B., Don, W. S., High order weighted essentially non-oscillatory WENO-Z schemes for hyperbolic
       conservation laws, J. Comput. Phys., 2011. http://dx.doi.org/10.1016/j.jcp.2010.11.028
  */
-#define _WENOWeights_v_Z_(w1,w2,w3,c1,c2,c3,m3,m2,m1,p1,p2,weno,N) \
+#define _WENOWeights_v_Z_(w1,w2,w3,c1,c2,c3,m3,m2,m1,p1,p2,eps,N) \
   { \
     int idx; \
     /* calculate smoothness indicators and the WENO weights */\
@@ -369,9 +436,9 @@ int WENOCleanup(void*);
       b3 = thirteen_by_twelve*(m1[idx]-2*p1[idx]+p2[idx])*(m1[idx]-2*p1[idx]+p2[idx]) \
            + one_fourth*(3*m1[idx]-4*p1[idx]+p2[idx])*(3*m1[idx]-4*p1[idx]+p2[idx]);  \
       tau = absolute(b3 - b1);  \
-      a1 = c1 * (1.0 + (tau/(b1+weno->eps)) * (tau/(b1+weno->eps)) );  \
-      a2 = c2 * (1.0 + (tau/(b2+weno->eps)) * (tau/(b2+weno->eps)) );  \
-      a3 = c3 * (1.0 + (tau/(b3+weno->eps)) * (tau/(b3+weno->eps)) );  \
+      a1 = c1 * (1.0 + (tau/(b1+eps)) * (tau/(b1+eps)) );  \
+      a2 = c2 * (1.0 + (tau/(b2+eps)) * (tau/(b2+eps)) );  \
+      a3 = c3 * (1.0 + (tau/(b3+eps)) * (tau/(b3+eps)) );  \
       a_sum_inv = 1.0 / (a1 + a2 + a3); \
       w1[idx] = a1 * a_sum_inv; \
       w2[idx] = a2 * a_sum_inv; \
@@ -380,13 +447,13 @@ int WENOCleanup(void*);
   }
 
 /*! \def _WENOWeights_v_YC_
-  Compute the WENO weights according the the ESWENO formulation of Yamaleev & Carpenter. 
-  Note that only the formulation for the nonlinear weights is adopted and implemented here, 
+  Compute the WENO weights according the the ESWENO formulation of Yamaleev & Carpenter.
+  Note that only the formulation for the nonlinear weights is adopted and implemented here,
   not the ESWENO scheme as a whole.
   \f{equation}{
     \omega_k = \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = c_k \left( 1 + \frac{\tau_5}{\beta_k+\epsilon} \right)^p,\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(f_{j-2}-2f_{j-1}+f_j\right)^2 + \frac{1}{4}\left(f_{j-2}-4f_{j-1}+3f_j\right)^2 \\
@@ -396,8 +463,8 @@ int WENOCleanup(void*);
   and \f$\tau_5 = \left( f_{j-2}-4f_{j-1}+6f_j-4f_{j+1}+f_{j+2} \right)^2\f$.
 
   \b Notes:
-  + This macro computes the weights for one variable along one grid line. 
-  
+  + This macro computes the weights for one variable along one grid line.
+
   \b Arguments:
   + \a w1, \a w2,\a w3 are the nonlinear WENO weights.\n
   + \a c1, \a c2,\a c3 are optimal coefficients.\n
@@ -406,10 +473,10 @@ int WENOCleanup(void*);
   + \a N is the number of interfaces along the grid line on which this WENO-type reconstruction is happening.\n
 
   \b Reference:
-     + Yamaleev, Carpenter, A systematic methodology for constructing high-order energy stable WENO schemes, 
+     + Yamaleev, Carpenter, A systematic methodology for constructing high-order energy stable WENO schemes,
        J. Comput. Phys., 2009. http://dx.doi.org/10.1016/j.jcp.2009.03.002
  */
-#define _WENOWeights_v_YC_(w1,w2,w3,c1,c2,c3,m3,m2,m1,p1,p2,weno,N) \
+#define _WENOWeights_v_YC_(w1,w2,w3,c1,c2,c3,m3,m2,m1,p1,p2,eps,N) \
   { \
     int idx; \
     /* calculate smoothness indicators and the WENO weights */\
@@ -422,14 +489,64 @@ int WENOCleanup(void*);
       b3 = thirteen_by_twelve*(m1[idx]-2*p1[idx]+p2[idx])*(m1[idx]-2*p1[idx]+p2[idx]) \
            + one_fourth*(3*m1[idx]-4*p1[idx]+p2[idx])*(3*m1[idx]-4*p1[idx]+p2[idx]);  \
       tau = (m3[idx]-4*m2[idx]+6*m1[idx]-4*p1[idx]+p2[idx])*(m3[idx]-4*m2[idx]+6*m1[idx]-4*p1[idx]+p2[idx]);  \
-      a1 = c1 * (1.0 + (tau/(b1+weno->eps)) * (tau/(b1+weno->eps)) );  \
-      a2 = c2 * (1.0 + (tau/(b2+weno->eps)) * (tau/(b2+weno->eps)) );  \
-      a3 = c3 * (1.0 + (tau/(b3+weno->eps)) * (tau/(b3+weno->eps)) );  \
+      a1 = c1 * (1.0 + (tau/(b1+eps)) * (tau/(b1+eps)) );  \
+      a2 = c2 * (1.0 + (tau/(b2+eps)) * (tau/(b2+eps)) );  \
+      a3 = c3 * (1.0 + (tau/(b3+eps)) * (tau/(b3+eps)) );  \
       a_sum_inv = 1.0 / (a1 + a2 + a3); \
       w1[idx] = a1 * a_sum_inv; \
       w2[idx] = a2 * a_sum_inv; \
       w3[idx] = a3 * a_sum_inv; \
     } \
+  }
+
+/*! \def _WENOWeights_v_YC_Scalar_
+  Compute the WENO weights according the the ESWENO formulation of Yamaleev & Carpenter.
+  Note that only the formulation for the nonlinear weights is adopted and implemented here,
+  not the ESWENO scheme as a whole.
+  \f{equation}{
+    \omega_k = \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = c_k \left( 1 + \frac{\tau_5}{\beta_k+\epsilon} \right)^p,\ k = 1,2,3,
+  \f}
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
+  (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
+  \f{eqnarray}{
+    \beta_1 &=& \frac{13}{12} \left(f_{j-2}-2f_{j-1}+f_j\right)^2 + \frac{1}{4}\left(f_{j-2}-4f_{j-1}+3f_j\right)^2 \\
+    \beta_2 &=& \frac{13}{12} \left(f_{j-1}-2f_j+f_{j+1}\right)^2 + \frac{1}{4}\left(f_{j-1}-f_{j+1}\right)^2 \\
+    \beta_3 &=& \frac{13}{12} \left(f_j-2f_{j+1}+f_{j+2}\right)^2 + \frac{1}{4}\left(3f_j-4f_{j+1}+f_{j+2}\right)^2,
+  \f}
+  and \f$\tau_5 = \left( f_{j-2}-4f_{j-1}+6f_j-4f_{j+1}+f_{j+2} \right)^2\f$.
+
+  \b Notes:
+  + This macro computes the weights for one variable along one grid line.
+
+  \b Arguments:
+  + \a w1, \a w2,\a w3 are the nonlinear WENO weights.\n
+  + \a c1, \a c2,\a c3 are optimal coefficients.\n
+  + \a m3, \a m2,\a m1,\a p1,\a p2 are the function values at stencil points corresponding to the interface j+1/2: j-2,j-1,j,j+1,j+2\n
+  + \a weno is an object of type #WENOParameters containing parameters for the WENO method.\n
+  + \a N is the number of interfaces along the grid line on which this WENO-type reconstruction is happening.\n
+
+  \b Reference:
+     + Yamaleev, Carpenter, A systematic methodology for constructing high-order energy stable WENO schemes,
+       J. Comput. Phys., 2009. http://dx.doi.org/10.1016/j.jcp.2009.03.002
+ */
+#define _WENOWeights_v_YC_Scalar_(w1,w2,w3,c1,c2,c3,m3,m2,m1,p1,p2,eps,idx) \
+  { \
+    /* calculate smoothness indicators and the WENO weights */\
+    double b1, b2, b3, a1, a2, a3, a_sum_inv, tau; \
+    b1 = thirteen_by_twelve*(m3[idx]-2*m2[idx]+m1[idx])*(m3[idx]-2*m2[idx]+m1[idx]) \
+          + one_fourth*(m3[idx]-4*m2[idx]+3*m1[idx])*(m3[idx]-4*m2[idx]+3*m1[idx]);  \
+    b2 = thirteen_by_twelve*(m2[idx]-2*m1[idx]+p1[idx])*(m2[idx]-2*m1[idx]+p1[idx]) \
+          + one_fourth*(m2[idx]-p1[idx])*(m2[idx]-p1[idx]);                \
+    b3 = thirteen_by_twelve*(m1[idx]-2*p1[idx]+p2[idx])*(m1[idx]-2*p1[idx]+p2[idx]) \
+          + one_fourth*(3*m1[idx]-4*p1[idx]+p2[idx])*(3*m1[idx]-4*p1[idx]+p2[idx]);  \
+    tau = (m3[idx]-4*m2[idx]+6*m1[idx]-4*p1[idx]+p2[idx])*(m3[idx]-4*m2[idx]+6*m1[idx]-4*p1[idx]+p2[idx]);  \
+    a1 = c1 * (1.0 + (tau/(b1+eps)) * (tau/(b1+eps)) );  \
+    a2 = c2 * (1.0 + (tau/(b2+eps)) * (tau/(b2+eps)) );  \
+    a3 = c3 * (1.0 + (tau/(b3+eps)) * (tau/(b3+eps)) );  \
+    a_sum_inv = 1.0 / (a1 + a2 + a3); \
+    w1[idx] = a1 * a_sum_inv; \
+    w2[idx] = a2 * a_sum_inv; \
+    w3[idx] = a3 * a_sum_inv; \
   }
 
 /*! \def CompactScheme
@@ -451,8 +568,9 @@ typedef struct compact_scheme {
          *recvbuf; /*!< Buffer array to receive data across processors */
 
 } CompactScheme;
+
 /*! Initialize the structure containing variables and parameters for compact schemes */
-int CompactSchemeInitialize(void*,void*,char*); 
+int CompactSchemeInitialize(void*,void*,char*);
 /*! Clean up the structure containing variables and parameters for compact schemes */
 int CompactSchemeCleanup(void*);
 

@@ -8,18 +8,20 @@
 #include <mpivars.h>
 #include <hypar.h>
 
+#include <time.h>
+
 /*!
-    This function computes the modified solution for the well-balanced treatment of the 
+    This function computes the modified solution for the well-balanced treatment of the
     gravitational source terms. The modified solution vector is given by
     \f{equation}{
       {\bf u}^* = \left[\begin{array}{c} \rho \varrho^{-1}\left(x,y\right) \\ \rho u \varrho^{-1}\left(x,y\right) \\ \rho v \varrho^{-1}\left(x,y\right) \\ e^* \end{array}\right]
     \f}
-    where 
+    where
     \f{equation}{
       e^* = \frac{p \varphi^{-1}\left(x,y\right)}{\gamma-1} + \frac{1}{2}\rho \varrho^{-1}\left(x,y\right) \left(u^2+v^2\right)
     \f}
     \f$\varrho\f$ and \f$\varphi\f$ are computed in #NavierStokes2DGravityField(). For flows without gravity, \f${\bf u}^* = {\bf u}\f$.
-    
+
     References:
     + Ghosh, D., Constantinescu, E.M., Well-Balanced Formulation of Gravitational Source
       Terms for Conservative Finite-Difference Atmospheric Flow Solvers, AIAA Paper 2015-2889,
@@ -54,15 +56,23 @@ int NavierStokes2DModifiedSolution(
 
   int done = 0; _ArraySetValue_(index,ndims,0);
   double inv_gamma_m1 = 1.0 / (param->gamma-1.0);
+
+  double cpu_time = 0.0;
+  clock_t cpu_start, cpu_end;
+  cpu_start = clock();
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double rho, uvel, vvel, E, P;
-    _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,uvel,vvel,E,P,param);
+    _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,uvel,vvel,E,P,param->gamma);
     uC[_MODEL_NVARS_*p+0] = u[_MODEL_NVARS_*p+0] * param->grav_field_f[p];
     uC[_MODEL_NVARS_*p+1] = u[_MODEL_NVARS_*p+1] * param->grav_field_f[p];
     uC[_MODEL_NVARS_*p+2] = u[_MODEL_NVARS_*p+2] * param->grav_field_f[p];
     uC[_MODEL_NVARS_*p+3] = (P*inv_gamma_m1)*(1.0/param->grav_field_g[p]) + (0.5*rho*(uvel*uvel+vvel*vvel))*param->grav_field_f[p];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
+  cpu_end = clock();
+  cpu_time += (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC;
+  printf("NavierStokes2DModifiedSolution CPU time = %8.6lf\n", cpu_time);
+
   return(0);
 }

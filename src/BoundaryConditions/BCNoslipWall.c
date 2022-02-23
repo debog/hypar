@@ -36,9 +36,8 @@ int BCNoslipWallU(
   if (ndims == 2) {
 
     /* create a fake physics object */
-    NavierStokes2D physics; 
     double gamma;
-    gamma = physics.gamma = boundary->gamma;
+    gamma = boundary->gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
     if (boundary->on_this_proc) {
@@ -59,7 +58,7 @@ int BCNoslipWallU(
         /* flow variables in the interior */
         double rho, uvel, vvel, energy, pressure;
         double rho_gpt, uvel_gpt, vvel_gpt, energy_gpt, pressure_gpt;
-        _NavierStokes2DGetFlowVar_((phi+nvars*p2),rho,uvel,vvel,energy,pressure,(&physics));
+        _NavierStokes2DGetFlowVar_((phi+nvars*p2),rho,uvel,vvel,energy,pressure,gamma);
         /* set the ghost point values */
         rho_gpt = rho;
         pressure_gpt = pressure;
@@ -79,10 +78,8 @@ int BCNoslipWallU(
 
   } else if (ndims == 3) {
 
-    /* create a fake physics object */
-    NavierStokes3D physics;
     double gamma;
-    gamma = physics.gamma = boundary->gamma;
+    gamma = boundary->gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
     if (boundary->on_this_proc) {
@@ -103,7 +100,7 @@ int BCNoslipWallU(
         /* flow variables in the interior */
         double rho, uvel, vvel, wvel, energy, pressure;
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
-        _NavierStokes3DGetFlowVar_((phi+nvars*p2),rho,uvel,vvel,wvel,energy,pressure,(&physics));
+        _NavierStokes3DGetFlowVar_((phi+nvars*p2),_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,gamma);
         /* set the ghost point values */
         rho_gpt = rho;
         pressure_gpt = pressure;

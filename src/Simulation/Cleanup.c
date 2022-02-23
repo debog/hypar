@@ -31,6 +31,10 @@
 #include <physicalmodels/shallowwater2d.h>
 #include <physicalmodels/vlasov.h>
 
+#if defined(HAVE_CUDA)
+#include <arrayfunctions_gpu.h>
+#endif
+
 /*! Cleans up and frees the memory after the completion of the simulation. */
 int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationObject */
               int   nsims /*!< number of simulation objects */
@@ -60,16 +64,20 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
 
     /* Clean up boundary zones */
     for (i = 0; i < solver->nBoundaryZones; i++) {
-      IERR BCCleanup(&boundary[i]); CHECKERR(ierr);
+#if defined(HAVE_CUDA)
+      BCCleanup(&boundary[i], solver->use_gpu);
+#else
+      BCCleanup(&boundary[i], 0);
+#endif
     }
     free(solver->boundary);
-  
+
     /* Clean up immersed boundaries */
     if (solver->flag_ib) {
       IERR IBCleanup(solver->ib);
       free(solver->ib);
     }
-  
+
     /* Clean up any allocations in physical model */
     if (!strcmp(solver->model,_LINEAR_ADVECTION_DIFFUSION_REACTION_)) {
       IERR LinearADRCleanup(solver->physics); CHECKERR(ierr);
@@ -89,6 +97,11 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
       IERR NavierStokes2DCleanup(solver->physics); CHECKERR(ierr);
     } else if (!strcmp(solver->model,_NAVIER_STOKES_3D_)) {
       IERR NavierStokes3DCleanup(solver->physics); CHECKERR(ierr);
+#if defined(HAVE_CUDA)
+      if (solver->use_gpu) {
+        IERR gpuNavierStokes3DCleanup(solver->physics); CHECKERR(ierr);
+      }
+#endif
     } else if (!strcmp(solver->model,_NUMA2D_)) {
       IERR Numa2DCleanup(solver->physics); CHECKERR(ierr);
     } else if (!strcmp(solver->model,_NUMA3D_)) {
@@ -101,7 +114,7 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
       IERR VlasovCleanup(solver->physics); CHECKERR(ierr);
     }
     free(solver->physics);
-  
+
     /* Clean up any allocations from time-integration */
 #ifdef with_petsc
     if (!solver->use_petscTS) {
@@ -122,25 +135,29 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
       free(solver->msti);
     }
 #endif
-  
+
     /* Clean up any spatial reconstruction related allocations */
-    if (   (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_WENO_  )) 
+    if (   (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_WENO_  ))
         || (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_))
         || (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_HCWENO_)) ) {
-      IERR WENOCleanup(solver->interp); CHECKERR(ierr);
+#if defined(HAVE_CUDA)
+      IERR WENOCleanup(solver->interp, solver->use_gpu); CHECKERR(ierr);
+#else
+      IERR WENOCleanup(solver->interp, 0); CHECKERR(ierr);
+#endif
     }
     if (solver->interp)   free(solver->interp);
-    if (   (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_COMPACT_UPWIND_ )) 
+    if (   (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_COMPACT_UPWIND_ ))
         || (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_         ))
         || (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_HCWENO_         )) ) {
       IERR CompactSchemeCleanup(solver->compact); CHECKERR(ierr);
     }
     if (solver->compact)  free(solver->compact);
     if (solver->lusolver) free(solver->lusolver);
-  
+
     /* Free the communicators created */
     IERR MPIFreeCommunicators(solver->ndims,mpi); CHECKERR(ierr);
-  
+
     /* These variables are allocated in Initialize.c */
     free(solver->dim_global);
     free(solver->dim_global_ex);
@@ -151,24 +168,12 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
     if (solver->u0)     free(solver->u0);
     if (solver->uref)   free(solver->uref);
     if (solver->rhsref) free(solver->rhsref);
-    if (solver->rhs)    free(solver->rhs);   
+    if (solver->rhs)    free(solver->rhs);
 #endif
 #ifdef with_librom
     free(solver->u_rom_predicted);
 #endif
     free(solver->iblank);
-    free(solver->hyp);
-    free(solver->par);
-    free(solver->source);
-    free(solver->fluxC);
-    free(solver->uC);
-    free(solver->Deriv1);
-    free(solver->Deriv2);
-    free(solver->fluxI);
-    free(solver->uL);
-    free(solver->uR);
-    free(solver->fL);
-    free(solver->fR);
     free(solver->x);
     free(solver->dxinv);
     free(solver->isPeriodic);
@@ -181,13 +186,54 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
     free(mpi->recvbuf);
     free(solver->VolumeIntegral);
     free(solver->VolumeIntegralInitial);
-    free(solver->StageBoundaryIntegral);
-    free(solver->StepBoundaryIntegral);
     free(solver->TotalBoundaryIntegral);
     free(solver->ConservationError);
     free(solver->stride_with_ghosts);
     free(solver->stride_without_ghosts);
-  
+
+#if defined(HAVE_CUDA)
+    if (solver->use_gpu) {
+      gpuFree(solver->hyp);
+      gpuFree(solver->par);
+      gpuFree(solver->source);
+      gpuFree(solver->uC);
+      gpuFree(solver->fluxC);
+      gpuFree(solver->Deriv1);
+      gpuFree(solver->Deriv2);
+      gpuFree(solver->fluxI);
+      gpuFree(solver->uL);
+      gpuFree(solver->uR);
+      gpuFree(solver->fL);
+      gpuFree(solver->fR);
+      gpuFree(solver->StageBoundaryBuffer);
+      gpuFree(solver->StageBoundaryIntegral);
+      gpuFree(solver->StepBoundaryIntegral);
+
+      gpuFree(solver->gpu_dim_local);
+      gpuFree(solver->gpu_iblank);
+      gpuFree(solver->gpu_x);
+      gpuFree(solver->gpu_dxinv);
+      gpuFree(solver->gpu_u);
+    } else {
+#endif
+      free(solver->hyp);
+      free(solver->par);
+      free(solver->source);
+      free(solver->uC);
+      free(solver->fluxC);
+      free(solver->Deriv1);
+      free(solver->Deriv2);
+      free(solver->fluxI);
+      free(solver->uL);
+      free(solver->uR);
+      free(solver->fL);
+      free(solver->fR);
+      free(solver->StageBoundaryIntegral);
+      free(solver->StepBoundaryIntegral);
+#if defined(HAVE_CUDA)
+    }
+#endif
+
     if (solver->filename_index) free(solver->filename_index);
 
   }

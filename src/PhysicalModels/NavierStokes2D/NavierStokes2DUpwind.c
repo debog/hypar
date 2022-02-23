@@ -2,6 +2,8 @@
     @author Debojyoti Ghosh
     @brief Contains functions to compute the upwind flux at grid interfaces for the 2D Navier Stokes equations.
 */
+#include <time.h>
+
 #include <stdlib.h>
 #include <math.h>
 #include <basic.h>
@@ -13,15 +15,15 @@
 
 /*! Roe's upwinding scheme.
     \f{equation}{
-      {\bf f}_{j+1/2} = \frac{1}{2}\left[ {\bf f}_{j+1/2}^L + {\bf f}_{j+1/2}^R 
+      {\bf f}_{j+1/2} = \frac{1}{2}\left[ {\bf f}_{j+1/2}^L + {\bf f}_{j+1/2}^R
                          - \left| A\left({\bf u}_{j+1/2}^L,{\bf u}_{j+1/2}^R\right) \right|
                            \left( {\bf u}_{j+1/2}^R - {\bf u}_{j+1/2}^L  \right)\right]
     \f}
     + Roe, P. L., “Approximate Riemann solvers, parameter vectors, and difference schemes,” Journal of
     Computational Physics, Vol. 43, No. 2, 1981, pp. 357–372, http://dx.doi.org/10.1016/0021-9991(81)90128-5.
-    
-    This upwinding scheme is modified for the balanced discretization of the 2D Navier Stokes equations when 
-    there is a non-zero gravitational force. See the reference below. For flows without any gravitational forces, 
+
+    This upwinding scheme is modified for the balanced discretization of the 2D Navier Stokes equations when
+    there is a non-zero gravitational force. See the reference below. For flows without any gravitational forces,
     it reduces to its original form.
     + Ghosh, D., Constantinescu, E.M., Well-Balanced Formulation of Gravitational Source
       Terms for Conservative Finite-Difference Atmospheric Flow Solvers, AIAA Paper 2015-2889,
@@ -52,8 +54,8 @@ int NavierStokes2DUpwindRoe(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
-                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
+                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_],
                 modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}; int index_inter[2];
@@ -74,10 +76,10 @@ int NavierStokes2DUpwindRoe(
       udiff[2] = 0.5 * (uR[_MODEL_NVARS_*p+2] - uL[_MODEL_NVARS_*p+2]);
       udiff[3] = 0.5 * (uR[_MODEL_NVARS_*p+3] - uL[_MODEL_NVARS_*p+3]);
 
-      _NavierStokes2DRoeAverage_        (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
-      _NavierStokes2DEigenvalues_       (uavg,D,param,dir);
-      _NavierStokes2DLeftEigenvectors_  (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_ (uavg,R,param,dir);
+      _NavierStokes2DRoeAverage_        (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param->gamma);
+      _NavierStokes2DEigenvalues_       (uavg,D,param->gamma,dir);
+      _NavierStokes2DLeftEigenvectors_  (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_ (uavg,R,param->gamma,dir);
 
        /* Harten's Entropy Fix - Page 362 of Leveque */
       int k;
@@ -91,7 +93,7 @@ int NavierStokes2DUpwindRoe(
       MatMult4(_MODEL_NVARS_,DL,D,L);
       MatMult4(_MODEL_NVARS_,modA,R,DL);
       MatVecMult4(_MODEL_NVARS_,udiss,modA,udiff);
-      
+
       fI[_MODEL_NVARS_*p+0] = 0.5 * (fL[_MODEL_NVARS_*p+0]+fR[_MODEL_NVARS_*p+0]) - udiss[0];
       fI[_MODEL_NVARS_*p+1] = 0.5 * (fL[_MODEL_NVARS_*p+1]+fR[_MODEL_NVARS_*p+1]) - udiss[1];
       fI[_MODEL_NVARS_*p+2] = 0.5 * (fL[_MODEL_NVARS_*p+2]+fR[_MODEL_NVARS_*p+2]) - udiss[2];
@@ -138,7 +140,7 @@ int NavierStokes2DUpwindRF(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}, index_inter[2];
@@ -146,16 +148,16 @@ int NavierStokes2DUpwindRF(
     index_inter[0] = index_outer[0]; index_inter[1] = index_outer[1];
     for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
       int p; _ArrayIndex1D2_(_MODEL_NDIMS_,bounds_inter,index_inter,0,p);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
 
       /* Roe-Fixed upwinding scheme */
 
-      _NavierStokes2DRoeAverage_(uavg,(uL+_MODEL_NVARS_*p),(uR+_MODEL_NVARS_*p),param);
+      _NavierStokes2DRoeAverage_(uavg,(uL+_MODEL_NVARS_*p),(uR+_MODEL_NVARS_*p),param->gamma);
 
-      _NavierStokes2DEigenvalues_(uavg,D,param,dir);
-      _NavierStokes2DLeftEigenvectors_ (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_(uavg,R,param,dir);
+      _NavierStokes2DEigenvalues_(uavg,D,param->gamma,dir);
+      _NavierStokes2DLeftEigenvectors_ (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_(uavg,R,param->gamma,dir);
 
       /* calculate characteristic fluxes and variables */
       MatVecMult4(_MODEL_NVARS_,ucL,L,(uL+_MODEL_NVARS_*p));
@@ -164,17 +166,17 @@ int NavierStokes2DUpwindRF(
       MatVecMult4(_MODEL_NVARS_,fcR,L,(fR+_MODEL_NVARS_*p));
 
       double eigL[4],eigC[4],eigR[4];
-      _NavierStokes2DEigenvalues_((uL+_MODEL_NVARS_*p),D,param,dir);
+      _NavierStokes2DEigenvalues_((uL+_MODEL_NVARS_*p),D,param->gamma,dir);
       eigL[0] = D[0];
       eigL[1] = D[5];
       eigL[2] = D[10];
       eigL[3] = D[15];
-      _NavierStokes2DEigenvalues_((uR+_MODEL_NVARS_*p),D,param,dir);
+      _NavierStokes2DEigenvalues_((uR+_MODEL_NVARS_*p),D,param->gamma,dir);
       eigR[0] = D[0];
       eigR[1] = D[5];
       eigR[2] = D[10];
       eigR[3] = D[15];
-      _NavierStokes2DEigenvalues_(uavg,D,param,dir);
+      _NavierStokes2DEigenvalues_(uavg,D,param->gamma,dir);
       eigC[0] = D[0];
       eigC[1] = D[5];
       eigC[2] = D[10];
@@ -210,8 +212,8 @@ int NavierStokes2DUpwindRF(
     where \f${\bf l}\f$, \f${\bf r}\f$, and \f$\lambda\f$ are the left-eigenvectors, right-eigenvectors and eigenvalues. The subscripts denote the grid locations.
     + C.-W. Shu, and S. Osher, "Efficient implementation of essentially non-oscillatory schemes, II", J. Comput. Phys., 83 (1989), pp. 32–78, http://dx.doi.org/10.1016/0021-9991(89)90222-2.
 
-    This upwinding scheme is modified for the balanced discretization of the 2D Navier Stokes equations when 
-    there is a non-zero gravitational force. See the reference below. For flows without any gravitational forces, 
+    This upwinding scheme is modified for the balanced discretization of the 2D Navier Stokes equations when
+    there is a non-zero gravitational force. See the reference below. For flows without any gravitational forces,
     it reduces to its original form.
     + Ghosh, D., Constantinescu, E.M., Well-Balanced Formulation of Gravitational Source
       Terms for Conservative Finite-Difference Atmospheric Flow Solvers, AIAA Paper 2015-2889,
@@ -241,7 +243,7 @@ int NavierStokes2DUpwindLLF(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}, index_inter[2];
@@ -253,16 +255,16 @@ int NavierStokes2DUpwindLLF(
       int indexR[_MODEL_NDIMS_]; _ArrayCopy1D_(index_inter,indexR,_MODEL_NDIMS_);
       int pL; _ArrayIndex1D_(_MODEL_NDIMS_,dim,indexL,solver->ghosts,pL);
       int pR; _ArrayIndex1D_(_MODEL_NDIMS_,dim,indexR,solver->ghosts,pR);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
       double kappa = max(param->grav_field_g[pL],param->grav_field_g[pR]);
 
       /* Local Lax-Friedrich upwinding scheme */
 
-      _NavierStokes2DRoeAverage_        (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
-      _NavierStokes2DEigenvalues_       (uavg,D,param,dir);
-      _NavierStokes2DLeftEigenvectors_  (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_ (uavg,R,param,dir);
+      _NavierStokes2DRoeAverage_        (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param->gamma);
+      _NavierStokes2DEigenvalues_       (uavg,D,param->gamma,dir);
+      _NavierStokes2DLeftEigenvectors_  (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_ (uavg,R,param->gamma,dir);
 
       /* calculate characteristic fluxes and variables */
       MatVecMult4(_MODEL_NVARS_,ucL,L,(uL+_MODEL_NVARS_*p));
@@ -271,17 +273,17 @@ int NavierStokes2DUpwindLLF(
       MatVecMult4(_MODEL_NVARS_,fcR,L,(fR+_MODEL_NVARS_*p));
 
       double eigL[4],eigC[4],eigR[4];
-      _NavierStokes2DEigenvalues_((u+_MODEL_NVARS_*pL),D,param,dir);
+      _NavierStokes2DEigenvalues_((u+_MODEL_NVARS_*pL),D,param->gamma,dir);
       eigL[0] = D[0];
       eigL[1] = D[5];
       eigL[2] = D[10];
       eigL[3] = D[15];
-      _NavierStokes2DEigenvalues_((u+_MODEL_NVARS_*pR),D,param,dir);
+      _NavierStokes2DEigenvalues_((u+_MODEL_NVARS_*pR),D,param->gamma,dir);
       eigR[0] = D[0];
       eigR[1] = D[5];
       eigR[2] = D[10];
       eigR[3] = D[15];
-      _NavierStokes2DEigenvalues_(uavg,D,param,dir);
+      _NavierStokes2DEigenvalues_(uavg,D,param->gamma,dir);
       eigC[0] = D[0];
       eigC[1] = D[5];
       eigC[2] = D[10];
@@ -307,7 +309,7 @@ int NavierStokes2DUpwindLLF(
 }
 
 /*! Steger-Warming Flux-Splitting scheme
-    + Steger, J.L., Warming, R.F., "Flux vector splitting of the inviscid gasdynamic equations with 
+    + Steger, J.L., Warming, R.F., "Flux vector splitting of the inviscid gasdynamic equations with
       application to finite-difference methods", J. Comput. Phys., 40(2), 1981, pp. 263-293,
       http://dx.doi.org/10.1016/0021-9991(81)90210-2.
 
@@ -346,8 +348,8 @@ int NavierStokes2DUpwindSWFS(
       double rho,vx,vy,e,P,c,gamma=param->gamma,term,Mach,lp[_MODEL_NVARS_],lm[_MODEL_NVARS_];
 
       /* Steger Warming flux splitting */
-      _NavierStokes2DRoeAverage_(uavg,(uL+_MODEL_NVARS_*p),(uR+_MODEL_NVARS_*p),param); 
-      _NavierStokes2DGetFlowVar_(uavg,rho,vx,vy,e,P,param);
+      _NavierStokes2DRoeAverage_(uavg,(uL+_MODEL_NVARS_*p),(uR+_MODEL_NVARS_*p),param->gamma);
+      _NavierStokes2DGetFlowVar_(uavg,rho,vx,vy,e,P,param->gamma);
       Mach = (dir==_XDIR_ ? vx : vy) / sqrt(gamma*P/rho);
 
       if (Mach < -1.0) {
@@ -360,7 +362,7 @@ int NavierStokes2DUpwindSWFS(
         kx = (dir==_XDIR_ ? 1.0 : 0.0);
         ky = (dir==_YDIR_ ? 1.0 : 0.0);
 
-        _NavierStokes2DGetFlowVar_((uL+_MODEL_NVARS_*p),rho,vx,vy,e,P,param);
+        _NavierStokes2DGetFlowVar_((uL+_MODEL_NVARS_*p),rho,vx,vy,e,P,param->gamma);
         c = sqrt(gamma*P/rho);
         term = rho/(2.0*gamma);
         lp[0] = lp[1] = kx*vx + ky*vy;
@@ -371,11 +373,11 @@ int NavierStokes2DUpwindSWFS(
         fp[0] = term * (2.0*(gamma-1.0)*lp[0] + lp[2] + lp[3]);
         fp[1] = term * (2.0*(gamma-1.0)*lp[0]*vx + lp[2]*(vx+c*kx) + lp[3]*(vx-c*kx));
         fp[2] = term * (2.0*(gamma-1.0)*lp[0]*vy + lp[2]*(vy+c*ky) + lp[3]*(vy-c*ky));
-        fp[3] = term * ((gamma-1.0)*lp[0]*(vx*vx+vy*vy) + 0.5*lp[2]*((vx+c*kx)*(vx+c*kx) + (vy+c*ky)*(vy+c*ky)) 
-                        + 0.5*lp[3]*((vx-c*kx)*(vx-c*kx) + (vy-c*ky)*(vy-c*ky)) 
+        fp[3] = term * ((gamma-1.0)*lp[0]*(vx*vx+vy*vy) + 0.5*lp[2]*((vx+c*kx)*(vx+c*kx) + (vy+c*ky)*(vy+c*ky))
+                        + 0.5*lp[3]*((vx-c*kx)*(vx-c*kx) + (vy-c*ky)*(vy-c*ky))
                         + ((3.0-gamma)*(lp[2]+lp[3])*c*c)/(2.0*(gamma-1.0)) );
 
-        _NavierStokes2DGetFlowVar_((uR+_MODEL_NVARS_*p),rho,vx,vy,e,P,param);
+        _NavierStokes2DGetFlowVar_((uR+_MODEL_NVARS_*p),rho,vx,vy,e,P,param->gamma);
         c = sqrt(gamma*P/rho);
         term = rho/(2.0*gamma);
         lm[0] = lm[1] = kx*vx + ky*vy;
@@ -386,8 +388,8 @@ int NavierStokes2DUpwindSWFS(
         fm[0] = term * (2.0*(gamma-1.0)*lm[0] + lm[2] + lm[3]);
         fm[1] = term * (2.0*(gamma-1.0)*lm[0]*vx + lm[2]*(vx+c*kx) + lm[3]*(vx-c*kx));
         fm[2] = term * (2.0*(gamma-1.0)*lm[0]*vy + lm[2]*(vy+c*ky) + lm[3]*(vy-c*ky));
-        fm[3] = term * ((gamma-1.0)*lm[0]*(vx*vx+vy*vy) + 0.5*lm[2]*((vx+c*kx)*(vx+c*kx) + (vy+c*ky)*(vy+c*ky)) 
-                        + 0.5*lm[3]*((vx-c*kx)*(vx-c*kx) + (vy-c*ky)*(vy-c*ky)) 
+        fm[3] = term * ((gamma-1.0)*lm[0]*(vx*vx+vy*vy) + 0.5*lm[2]*((vx+c*kx)*(vx+c*kx) + (vy+c*ky)*(vy+c*ky))
+                        + 0.5*lm[3]*((vx-c*kx)*(vx-c*kx) + (vy-c*ky)*(vy-c*ky))
                         + ((3.0-gamma)*(lm[2]+lm[3])*c*c)/(2.0*(gamma-1.0)) );
 
         _ArrayAdd1D_((fI+_MODEL_NVARS_*p),fp,fm,_MODEL_NVARS_);
@@ -407,15 +409,15 @@ int NavierStokes2DUpwindSWFS(
 
 /*! Rusanov's upwinding scheme.
     \f{equation}{
-      {\bf f}_{j+1/2} = \frac{1}{2}\left[ {\bf f}_{j+1/2}^L + {\bf f}_{j+1/2}^R 
+      {\bf f}_{j+1/2} = \frac{1}{2}\left[ {\bf f}_{j+1/2}^L + {\bf f}_{j+1/2}^R
                          - \max_{j,j+1} \nu_j \left( {\bf u}_{j+1/2}^R - {\bf u}_{j+1/2}^L  \right)\right]
     \f}
     where \f$\nu = c + \left|u\right|\f$.
-    + Rusanov, V. V., "The calculation of the interaction of non-stationary shock waves and obstacles," USSR 
+    + Rusanov, V. V., "The calculation of the interaction of non-stationary shock waves and obstacles," USSR
     Computational Mathematics and Mathematical Physics, Vol. 1, No. 2, 1962, pp. 304–320
-    
-    This upwinding scheme is modified for the balanced discretization of the 2D Navier Stokes equations when 
-    there is a non-zero gravitational force. See the reference below. For flows without any gravitational forces, 
+
+    This upwinding scheme is modified for the balanced discretization of the 2D Navier Stokes equations when
+    there is a non-zero gravitational force. See the reference below. For flows without any gravitational forces,
     it reduces to its original form.
     + Ghosh, D., Constantinescu, E.M., Well-Balanced Formulation of Gravitational Source
       Terms for Conservative Finite-Difference Atmospheric Flow Solvers, AIAA Paper 2015-2889,
@@ -446,6 +448,9 @@ int NavierStokes2DUpwindRusanov(
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
 
   done = 0; int index_outer[2] = {0,0}; int index_inter[2];
+
+  clock_t cpu_start, cpu_end;
+  cpu_start = clock();
   while (!done) {
     index_inter[0] = index_outer[0]; index_inter[1] = index_outer[1];
     for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
@@ -463,16 +468,16 @@ int NavierStokes2DUpwindRusanov(
       udiff[2] = 0.5 * (uR[_MODEL_NVARS_*p+2] - uL[_MODEL_NVARS_*p+2]);
       udiff[3] = 0.5 * (uR[_MODEL_NVARS_*p+3] - uL[_MODEL_NVARS_*p+3]);
 
-      _NavierStokes2DRoeAverage_        (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
+      _NavierStokes2DRoeAverage_ (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param->gamma);
 
       double c, vel[_MODEL_NDIMS_], rho,E,P;
-      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pL),rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pL),rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       double alphaL = c + absolute(vel[dir]), betaL = absolute(vel[dir]);
-      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pR),rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pR),rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       double alphaR = c + absolute(vel[dir]), betaR = absolute(vel[dir]);
-      _NavierStokes2DGetFlowVar_(uavg,rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_(uavg,rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       double alphaavg = c + absolute(vel[dir]), betaavg = absolute(vel[dir]);
 
@@ -486,13 +491,15 @@ int NavierStokes2DUpwindRusanov(
     }
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds_outer,index_outer,done);
   }
+  cpu_end = clock();
+  printf("NavierStokes2DUpWindRusanov CPU time = %8.6lf dir = %d\n", (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC, dir);
 
   return(0);
 }
 
 /*! Modified Rusanov's upwinding scheme: NavierStokes2DUpwindRusanov() modified as described in the
     following paper (for consistent characteristic-based splitting):
-    + Ghosh, D., Constantinescu, E. M., "Semi-Implicit Time Integration of Atmospheric Flows with 
+    + Ghosh, D., Constantinescu, E. M., "Semi-Implicit Time Integration of Atmospheric Flows with
       Characteristic-Based Flux Partitioning", Submitted (http://arxiv.org/abs/1510.05751).
 
 */
@@ -517,8 +524,8 @@ int NavierStokes2DUpwindRusanovModified(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
-                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
+                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_],
                 modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}; int index_inter[2];
@@ -539,18 +546,18 @@ int NavierStokes2DUpwindRusanovModified(
       udiff[2] = 0.5 * (uR[_MODEL_NVARS_*p+2] - uL[_MODEL_NVARS_*p+2]);
       udiff[3] = 0.5 * (uR[_MODEL_NVARS_*p+3] - uL[_MODEL_NVARS_*p+3]);
 
-      _NavierStokes2DRoeAverage_        (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
-      _NavierStokes2DLeftEigenvectors_  (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_ (uavg,R,param,dir);
+      _NavierStokes2DRoeAverage_        (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param->gamma);
+      _NavierStokes2DLeftEigenvectors_  (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_ (uavg,R,param->gamma,dir);
 
       double c, vel[_MODEL_NDIMS_], rho,E,P;
-      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pL),rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pL),rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       double alphaL = c + absolute(vel[dir]), betaL = absolute(vel[dir]);
-      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pR),rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pR),rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       double alphaR = c + absolute(vel[dir]), betaR = absolute(vel[dir]);
-      _NavierStokes2DGetFlowVar_(uavg,rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_(uavg,rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       double alphaavg = c + absolute(vel[dir]), betaavg = absolute(vel[dir]);
 
@@ -579,7 +586,7 @@ int NavierStokes2DUpwindRusanovModified(
 }
 
 /*! The Roe upwinding scheme (#NavierStokes2DUpwindRoe) for the partitioned hyperbolic flux that comprises
-    of the acoustic waves only (see #NavierStokes2DStiffFlux, #_NavierStokes2DSetStiffFlux_). Thus, only the 
+    of the acoustic waves only (see #NavierStokes2DStiffFlux, #_NavierStokes2DSetStiffFlux_). Thus, only the
     characteristic fields / eigen-modes corresponding to \f$ u\pm a\f$ are used.
     Reference:
     + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
@@ -608,8 +615,8 @@ int NavierStokes2DUpwinddFRoe(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
-                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
+                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_],
                 modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}; int index_inter[2];
@@ -630,10 +637,10 @@ int NavierStokes2DUpwinddFRoe(
       udiff[2] = 0.5 * (uR[_MODEL_NVARS_*p+2] - uL[_MODEL_NVARS_*p+2]);
       udiff[3] = 0.5 * (uR[_MODEL_NVARS_*p+3] - uL[_MODEL_NVARS_*p+3]);
 
-      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param);
-      _NavierStokes2DEigenvalues_       (uavg,D,param,dir);
-      _NavierStokes2DLeftEigenvectors_  (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_ (uavg,R,param,dir);
+      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->gamma);
+      _NavierStokes2DEigenvalues_       (uavg,D,param->gamma,dir);
+      _NavierStokes2DLeftEigenvectors_  (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_ (uavg,R,param->gamma,dir);
 
        /* Harten's Entropy Fix - Page 362 of Leveque */
       int k;
@@ -647,7 +654,7 @@ int NavierStokes2DUpwinddFRoe(
       MatMult4(_MODEL_NVARS_,DL,D,L);
       MatMult4(_MODEL_NVARS_,modA,R,DL);
       MatVecMult4(_MODEL_NVARS_,udiss,modA,udiff);
-      
+
       fI[_MODEL_NVARS_*p+0] = 0.5 * (fL[_MODEL_NVARS_*p+0]+fR[_MODEL_NVARS_*p+0]) - udiss[0];
       fI[_MODEL_NVARS_*p+1] = 0.5 * (fL[_MODEL_NVARS_*p+1]+fR[_MODEL_NVARS_*p+1]) - udiss[1];
       fI[_MODEL_NVARS_*p+2] = 0.5 * (fL[_MODEL_NVARS_*p+2]+fR[_MODEL_NVARS_*p+2]) - udiss[2];
@@ -659,8 +666,8 @@ int NavierStokes2DUpwinddFRoe(
   return(0);
 }
 
-/*! The characteristic-based Roe-fixed upwinding scheme (#NavierStokes2DUpwindRF) for the partitioned hyperbolic flux 
-    that comprises of the acoustic waves only (see #NavierStokes2DStiffFlux, #_NavierStokes2DSetStiffFlux_). Thus, only the 
+/*! The characteristic-based Roe-fixed upwinding scheme (#NavierStokes2DUpwindRF) for the partitioned hyperbolic flux
+    that comprises of the acoustic waves only (see #NavierStokes2DStiffFlux, #_NavierStokes2DSetStiffFlux_). Thus, only the
     characteristic fields / eigen-modes corresponding to \f$ u\pm a\f$ are used.
     Reference:
     + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
@@ -689,7 +696,7 @@ int NavierStokes2DUpwinddFRF(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}, index_inter[2];
@@ -701,16 +708,16 @@ int NavierStokes2DUpwinddFRF(
       int indexR[_MODEL_NDIMS_]; _ArrayCopy1D_(index_inter,indexR,_MODEL_NDIMS_);
       int pL; _ArrayIndex1D_(_MODEL_NDIMS_,dim,indexL,solver->ghosts,pL);
       int pR; _ArrayIndex1D_(_MODEL_NDIMS_,dim,indexR,solver->ghosts,pR);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
 
       /* Roe-Fixed upwinding scheme */
 
-      _NavierStokes2DRoeAverage_(uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param);
+      _NavierStokes2DRoeAverage_(uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->gamma);
 
-      _NavierStokes2DEigenvalues_      (uavg,D,param,dir);
-      _NavierStokes2DLeftEigenvectors_ (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_(uavg,R,param,dir);
+      _NavierStokes2DEigenvalues_      (uavg,D,param->gamma,dir);
+      _NavierStokes2DLeftEigenvectors_ (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_(uavg,R,param->gamma,dir);
 
       /* calculate characteristic fluxes and variables */
       MatVecMult4(_MODEL_NVARS_,ucL,L,(uL+_MODEL_NVARS_*p));
@@ -719,17 +726,17 @@ int NavierStokes2DUpwinddFRF(
       MatVecMult4(_MODEL_NVARS_,fcR,L,(fR+_MODEL_NVARS_*p));
 
       double eigL[4],eigC[4],eigR[4];
-      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pL),D,param,dir);
+      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pL),D,param->gamma,dir);
       eigL[0] = D[0];
       eigL[1] = (dir == _YDIR_ ? 0.0 : D[5]);
       eigL[2] = (dir == _XDIR_ ? 0.0 : D[10]);
       eigL[3] = 0.0;
-      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pR),D,param,dir);
+      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pR),D,param->gamma,dir);
       eigR[0] = D[0];
       eigR[1] = (dir == _YDIR_ ? 0.0 : D[5]);
       eigR[2] = (dir == _XDIR_ ? 0.0 : D[10]);
       eigR[3] = 0.0;
-      _NavierStokes2DEigenvalues_(uavg,D,param,dir);
+      _NavierStokes2DEigenvalues_(uavg,D,param->gamma,dir);
       eigC[0] = D[0];
       eigC[1] = (dir == _YDIR_ ? 0.0 : D[5]);
       eigC[2] = (dir == _XDIR_ ? 0.0 : D[10]);
@@ -753,8 +760,8 @@ int NavierStokes2DUpwinddFRF(
   return(0);
 }
 
-/*! The characteristic-based local Lax-Friedrich upwinding scheme (#NavierStokes2DUpwindLLF) for the partitioned hyperbolic 
-    flux that comprises of the acoustic waves only (see #NavierStokes2DStiffFlux, #_NavierStokes2DSetStiffFlux_). Thus, only the 
+/*! The characteristic-based local Lax-Friedrich upwinding scheme (#NavierStokes2DUpwindLLF) for the partitioned hyperbolic
+    flux that comprises of the acoustic waves only (see #NavierStokes2DStiffFlux, #_NavierStokes2DSetStiffFlux_). Thus, only the
     characteristic fields / eigen-modes corresponding to \f$ u\pm a\f$ are used.
     Reference:
     + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
@@ -783,7 +790,7 @@ int NavierStokes2DUpwinddFLLF(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}, index_inter[2];
@@ -795,16 +802,16 @@ int NavierStokes2DUpwinddFLLF(
       int indexR[_MODEL_NDIMS_]; _ArrayCopy1D_(index_inter,indexR,_MODEL_NDIMS_);
       int pL; _ArrayIndex1D_(_MODEL_NDIMS_,dim,indexL,solver->ghosts,pL);
       int pR; _ArrayIndex1D_(_MODEL_NDIMS_,dim,indexR,solver->ghosts,pR);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
       double kappa = max(param->grav_field_g[pL],param->grav_field_g[pR]);
 
       /* Local Lax-Friedrich upwinding scheme */
 
-      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param);
-      _NavierStokes2DEigenvalues_       (uavg,D,param,dir);
-      _NavierStokes2DLeftEigenvectors_  (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_ (uavg,R,param,dir);
+      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->gamma);
+      _NavierStokes2DEigenvalues_       (uavg,D,param->gamma,dir);
+      _NavierStokes2DLeftEigenvectors_  (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_ (uavg,R,param->gamma,dir);
 
       /* calculate characteristic fluxes and variables */
       MatVecMult4(_MODEL_NVARS_,ucL,L,(uL+_MODEL_NVARS_*p));
@@ -813,17 +820,17 @@ int NavierStokes2DUpwinddFLLF(
       MatVecMult4(_MODEL_NVARS_,fcR,L,(fR+_MODEL_NVARS_*p));
 
       double eigL[4],eigC[4],eigR[4];
-      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pL),D,param,dir);
+      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pL),D,param->gamma,dir);
       eigL[0] = D[0];
       eigL[1] = (dir == _YDIR_ ? 0.0 : D[5]);
       eigL[2] = (dir == _XDIR_ ? 0.0 : D[10]);
       eigL[3] = 0.0;
-      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pR),D,param,dir);
+      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pR),D,param->gamma,dir);
       eigR[0] = D[0];
       eigR[1] = (dir == _YDIR_ ? 0.0 : D[5]);
       eigR[2] = (dir == _XDIR_ ? 0.0 : D[10]);
       eigR[3] = 0.0;
-      _NavierStokes2DEigenvalues_(uavg,D,param,dir);
+      _NavierStokes2DEigenvalues_(uavg,D,param->gamma,dir);
       eigC[0] = D[0];
       eigC[1] = (dir == _YDIR_ ? 0.0 : D[5]);
       eigC[2] = (dir == _XDIR_ ? 0.0 : D[10]);
@@ -849,7 +856,7 @@ int NavierStokes2DUpwinddFLLF(
 }
 
 /*! The modified Rusanov upwinding scheme (NavierStokes2DUpwindRusanovModified()) for the partitioned hyperbolic flux that comprises
-    of the acoustic waves only (see #NavierStokes2DStiffFlux, #_NavierStokes2DSetStiffFlux_). Thus, only the 
+    of the acoustic waves only (see #NavierStokes2DStiffFlux, #_NavierStokes2DSetStiffFlux_). Thus, only the
     characteristic fields / eigen-modes corresponding to \f$ u\pm a\f$ are used.
     Reference:
     + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
@@ -878,8 +885,8 @@ int NavierStokes2DUpwinddFRusanovModified(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
-                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
+                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_],
                 modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}; int index_inter[2];
@@ -900,18 +907,18 @@ int NavierStokes2DUpwinddFRusanovModified(
       udiff[2] = 0.5 * (uR[_MODEL_NVARS_*p+2] - uL[_MODEL_NVARS_*p+2]);
       udiff[3] = 0.5 * (uR[_MODEL_NVARS_*p+3] - uL[_MODEL_NVARS_*p+3]);
 
-      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param);
-      _NavierStokes2DLeftEigenvectors_  (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_ (uavg,R,param,dir);
+      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->gamma);
+      _NavierStokes2DLeftEigenvectors_  (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_ (uavg,R,param->gamma,dir);
 
       double c, vel[_MODEL_NDIMS_], rho,E,P;
-      _NavierStokes2DGetFlowVar_((uref+_MODEL_NVARS_*pL),rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_((uref+_MODEL_NVARS_*pL),rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       double alphaL = c + absolute(vel[dir]);
-      _NavierStokes2DGetFlowVar_((uref+_MODEL_NVARS_*pR),rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_((uref+_MODEL_NVARS_*pR),rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       double alphaR = c + absolute(vel[dir]);
-      _NavierStokes2DGetFlowVar_(uavg,rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_(uavg,rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       double alphaavg = c + absolute(vel[dir]);
 
@@ -940,7 +947,7 @@ int NavierStokes2DUpwinddFRusanovModified(
 }
 
 /*! The Roe upwinding scheme (#NavierStokes2DUpwindRoe) for the partitioned hyperbolic flux that comprises
-    of the entropy waves only (see #NavierStokes2DNonStiffFlux, #_NavierStokes2DSetStiffFlux_). Thus, only the 
+    of the entropy waves only (see #NavierStokes2DNonStiffFlux, #_NavierStokes2DSetStiffFlux_). Thus, only the
     characteristic fields / eigen-modes corresponding to \f$u\f$ are used.
     Reference:
     + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
@@ -969,8 +976,8 @@ int NavierStokes2DUpwindFdFRoe(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
-                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
+                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_],
                 modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}; int index_inter[2];
@@ -996,10 +1003,10 @@ int NavierStokes2DUpwindFdFRoe(
       udiff[3] = 0.5 * (uR[_MODEL_NVARS_*p+3] - uL[_MODEL_NVARS_*p+3]);
 
       /* Compute total dissipation */
-      _NavierStokes2DRoeAverage_        (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
-      _NavierStokes2DEigenvalues_       (uavg,D,param,dir);
-      _NavierStokes2DLeftEigenvectors_  (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_ (uavg,R,param,dir);
+      _NavierStokes2DRoeAverage_        (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param->gamma);
+      _NavierStokes2DEigenvalues_       (uavg,D,param->gamma,dir);
+      _NavierStokes2DLeftEigenvectors_  (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_ (uavg,R,param->gamma,dir);
       k=0;  D[k] = kappa * (absolute(D[k]) < delta ? (D[k]*D[k]+delta2)/(2*delta) : absolute(D[k]) );
       k=5;  D[k] = kappa * (absolute(D[k]) < delta ? (D[k]*D[k]+delta2)/(2*delta) : absolute(D[k]) );
       k=10; D[k] = kappa * (absolute(D[k]) < delta ? (D[k]*D[k]+delta2)/(2*delta) : absolute(D[k]) );
@@ -1009,10 +1016,10 @@ int NavierStokes2DUpwindFdFRoe(
       MatVecMult4(_MODEL_NVARS_,udiss_total,modA,udiff);
 
       /* Compute dissipation corresponding to acoustic modes */
-      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param);
-      _NavierStokes2DEigenvalues_       (uavg,D,param,dir);
-      _NavierStokes2DLeftEigenvectors_  (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_ (uavg,R,param,dir);
+      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->gamma);
+      _NavierStokes2DEigenvalues_       (uavg,D,param->gamma,dir);
+      _NavierStokes2DLeftEigenvectors_  (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_ (uavg,R,param->gamma,dir);
       k=0;  D[k] = kappa * (absolute(D[k]) < delta ? (D[k]*D[k]+delta2)/(2*delta) : absolute(D[k]) );
       k=5;  D[k] = (dir == _YDIR_ ? 0.0 : kappa * (absolute(D[k]) < delta ? (D[k]*D[k]+delta2)/(2*delta) : absolute(D[k]) ) );
       k=10; D[k] = (dir == _XDIR_ ? 0.0 : kappa * (absolute(D[k]) < delta ? (D[k]*D[k]+delta2)/(2*delta) : absolute(D[k]) ) );
@@ -1020,7 +1027,7 @@ int NavierStokes2DUpwindFdFRoe(
       MatMult4(_MODEL_NVARS_,DL,D,L);
       MatMult4(_MODEL_NVARS_,modA,R,DL);
       MatVecMult4(_MODEL_NVARS_,udiss_stiff,modA,udiff);
-     
+
      /* Compute the dissipation term for the entropy modes */
       _ArraySubtract1D_(udiss,udiss_total,udiss_stiff,_MODEL_NVARS_);
 
@@ -1035,8 +1042,8 @@ int NavierStokes2DUpwindFdFRoe(
   return(0);
 }
 
-/*! The characteristic-based Roe-fixed upwinding scheme (#NavierStokes2DUpwindRF) for the partitioned hyperbolic flux 
-    that comprises of the entropy waves only (see #NavierStokes2DNonStiffFlux, #_NavierStokes2DSetNonStiffFlux_). Thus, only the 
+/*! The characteristic-based Roe-fixed upwinding scheme (#NavierStokes2DUpwindRF) for the partitioned hyperbolic flux
+    that comprises of the entropy waves only (see #NavierStokes2DNonStiffFlux, #_NavierStokes2DSetNonStiffFlux_). Thus, only the
     characteristic fields / eigen-modes corresponding to \f$u\f$ are used.
     Reference:
     + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
@@ -1065,7 +1072,7 @@ int NavierStokes2DUpwindFdFRF(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}, index_inter[2];
@@ -1077,16 +1084,16 @@ int NavierStokes2DUpwindFdFRF(
       int indexR[_MODEL_NDIMS_]; _ArrayCopy1D_(index_inter,indexR,_MODEL_NDIMS_);
       int pL; _ArrayIndex1D_(_MODEL_NDIMS_,dim,indexL,solver->ghosts,pL);
       int pR; _ArrayIndex1D_(_MODEL_NDIMS_,dim,indexR,solver->ghosts,pR);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
 
       /* Roe-Fixed upwinding scheme */
 
-      _NavierStokes2DRoeAverage_(uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param);
+      _NavierStokes2DRoeAverage_(uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->gamma);
 
-      _NavierStokes2DEigenvalues_      (uavg,D,param,dir);
-      _NavierStokes2DLeftEigenvectors_ (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_(uavg,R,param,dir);
+      _NavierStokes2DEigenvalues_      (uavg,D,param->gamma,dir);
+      _NavierStokes2DLeftEigenvectors_ (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_(uavg,R,param->gamma,dir);
 
       /* calculate characteristic fluxes and variables */
       MatVecMult4(_MODEL_NVARS_,ucL,L,(uL+_MODEL_NVARS_*p));
@@ -1095,18 +1102,18 @@ int NavierStokes2DUpwindFdFRF(
       MatVecMult4(_MODEL_NVARS_,fcR,L,(fR+_MODEL_NVARS_*p));
 
       double eigL[4],eigC[4],eigR[4];
-      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pL),D,param,dir);
+      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pL),D,param->gamma,dir);
       eigL[0] = 0.0;
       eigL[1] = (dir == _XDIR_ ? 0.0 : D[5]);
       eigL[2] = (dir == _YDIR_ ? 0.0 : D[10]);
       eigL[3] = D[15];
-      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pR),D,param,dir);
-      eigR[0] = 0.0; 
+      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pR),D,param->gamma,dir);
+      eigR[0] = 0.0;
       eigR[1] = (dir == _XDIR_ ? 0.0 : D[5]);
       eigR[2] = (dir == _YDIR_ ? 0.0 : D[10]);
       eigR[3] = D[15];
-      _NavierStokes2DEigenvalues_(uavg,D,param,dir);
-      eigC[0] = 0.0; 
+      _NavierStokes2DEigenvalues_(uavg,D,param->gamma,dir);
+      eigC[0] = 0.0;
       eigC[1] = (dir == _XDIR_ ? 0.0 : D[5]);
       eigC[2] = (dir == _YDIR_ ? 0.0 : D[10]);
       eigC[3] = D[15];
@@ -1129,8 +1136,8 @@ int NavierStokes2DUpwindFdFRF(
   return(0);
 }
 
-/*! The characteristic-based local Lax-Friedrich upwinding scheme (#NavierStokes2DUpwindLLF) for the partitioned hyperbolic 
-    flux that comprises of the entropy waves only (see #NavierStokes2DNonStiffFlux, #_NavierStokes2DSetNonStiffFlux_). Thus, only the 
+/*! The characteristic-based local Lax-Friedrich upwinding scheme (#NavierStokes2DUpwindLLF) for the partitioned hyperbolic
+    flux that comprises of the entropy waves only (see #NavierStokes2DNonStiffFlux, #_NavierStokes2DSetNonStiffFlux_). Thus, only the
     characteristic fields / eigen-modes corresponding to \f$u\f$ are used.
     Reference:
     + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
@@ -1159,7 +1166,7 @@ int NavierStokes2DUpwindFdFLLF(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}, index_inter[2];
@@ -1171,16 +1178,16 @@ int NavierStokes2DUpwindFdFLLF(
       int indexR[_MODEL_NDIMS_]; _ArrayCopy1D_(index_inter,indexR,_MODEL_NDIMS_);
       int pL; _ArrayIndex1D_(_MODEL_NDIMS_,dim,indexL,solver->ghosts,pL);
       int pR; _ArrayIndex1D_(_MODEL_NDIMS_,dim,indexR,solver->ghosts,pR);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
       double kappa = max(param->grav_field_g[pL],param->grav_field_g[pR]);
 
       /* Local Lax-Friedrich upwinding scheme */
 
-      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param);
-      _NavierStokes2DEigenvalues_       (uavg,D,param,dir);
-      _NavierStokes2DLeftEigenvectors_  (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_ (uavg,R,param,dir);
+      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->gamma);
+      _NavierStokes2DEigenvalues_       (uavg,D,param->gamma,dir);
+      _NavierStokes2DLeftEigenvectors_  (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_ (uavg,R,param->gamma,dir);
 
       /* calculate characteristic fluxes and variables */
       MatVecMult4(_MODEL_NVARS_,ucL,L,(uL+_MODEL_NVARS_*p));
@@ -1189,18 +1196,18 @@ int NavierStokes2DUpwindFdFLLF(
       MatVecMult4(_MODEL_NVARS_,fcR,L,(fR+_MODEL_NVARS_*p));
 
       double eigL[4],eigC[4],eigR[4];
-      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pL),D,param,dir);
+      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pL),D,param->gamma,dir);
       eigL[0] = 0.0;
       eigL[1] = (dir == _XDIR_ ? 0.0 : D[5]);
       eigL[2] = (dir == _YDIR_ ? 0.0 : D[10]);
       eigL[3] = D[15];
-      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pR),D,param,dir);
-      eigR[0] = 0.0; 
+      _NavierStokes2DEigenvalues_((uref+_MODEL_NVARS_*pR),D,param->gamma,dir);
+      eigR[0] = 0.0;
       eigR[1] = (dir == _XDIR_ ? 0.0 : D[5]);
       eigR[2] = (dir == _YDIR_ ? 0.0 : D[10]);
       eigR[3] = D[15];
-      _NavierStokes2DEigenvalues_(uavg,D,param,dir);
-      eigC[0] = 0.0; 
+      _NavierStokes2DEigenvalues_(uavg,D,param->gamma,dir);
+      eigC[0] = 0.0;
       eigC[1] = (dir == _XDIR_ ? 0.0 : D[5]);
       eigC[2] = (dir == _YDIR_ ? 0.0 : D[10]);
       eigC[3] = D[15];
@@ -1225,7 +1232,7 @@ int NavierStokes2DUpwindFdFLLF(
 }
 
 /*! The modified Rusanov upwinding scheme (NavierStokes2DUpwindRusanovModified()) for the partitioned hyperbolic flux that comprises
-    of the entropy waves only (see #NavierStokes2DNonStiffFlux, #_NavierStokes2DSetNonStiffFlux_). Thus, only the 
+    of the entropy waves only (see #NavierStokes2DNonStiffFlux, #_NavierStokes2DSetNonStiffFlux_). Thus, only the
     characteristic fields / eigen-modes corresponding to \f$u\f$ are used.
     Reference:
     + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
@@ -1254,8 +1261,8 @@ int NavierStokes2DUpwindFdFRusanovModified(
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
-                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
+                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_],
                 modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}; int index_inter[2];
@@ -1282,20 +1289,20 @@ int NavierStokes2DUpwindFdFRusanovModified(
       udiff[3] = 0.5 * (uR[_MODEL_NVARS_*p+3] - uL[_MODEL_NVARS_*p+3]);
 
       /* Compute total dissipation */
-      _NavierStokes2DRoeAverage_        (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
-      _NavierStokes2DLeftEigenvectors_  (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_ (uavg,R,param,dir);
-      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pL),rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DRoeAverage_        (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param->gamma);
+      _NavierStokes2DLeftEigenvectors_  (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_ (uavg,R,param->gamma,dir);
+      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pL),rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
-      alphaL = c + absolute(vel[dir]); 
+      alphaL = c + absolute(vel[dir]);
       betaL = absolute(vel[dir]);
-      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pR),rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*pR),rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
-      alphaR = c + absolute(vel[dir]); 
+      alphaR = c + absolute(vel[dir]);
       betaR = absolute(vel[dir]);
-      _NavierStokes2DGetFlowVar_(uavg,rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_(uavg,rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
-      alphaavg = c + absolute(vel[dir]); 
+      alphaavg = c + absolute(vel[dir]);
       betaavg = absolute(vel[dir]);
       alpha  = kappa*max3(alphaL,alphaR,alphaavg);
       beta   = kappa*max3(betaL,betaR,betaavg);
@@ -1309,16 +1316,16 @@ int NavierStokes2DUpwindFdFRusanovModified(
       MatVecMult4(_MODEL_NVARS_,udiss_total,modA,udiff);
 
       /* Compute dissipation for the linearized acoustic modes */
-      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param);
-      _NavierStokes2DLeftEigenvectors_  (uavg,L,param,dir);
-      _NavierStokes2DRightEigenvectors_ (uavg,R,param,dir);
-      _NavierStokes2DGetFlowVar_((uref+_MODEL_NVARS_*pL),rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DRoeAverage_        (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->gamma);
+      _NavierStokes2DLeftEigenvectors_  (uavg,L,param->gamma,dir);
+      _NavierStokes2DRightEigenvectors_ (uavg,R,param->gamma,dir);
+      _NavierStokes2DGetFlowVar_((uref+_MODEL_NVARS_*pL),rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       alphaL = c + absolute(vel[dir]);
-      _NavierStokes2DGetFlowVar_((uref+_MODEL_NVARS_*pR),rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_((uref+_MODEL_NVARS_*pR),rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       alphaR = c + absolute(vel[dir]);
-      _NavierStokes2DGetFlowVar_(uavg,rho,vel[0],vel[1],E,P,param);
+      _NavierStokes2DGetFlowVar_(uavg,rho,vel[0],vel[1],E,P,param->gamma);
       c = sqrt(param->gamma*P/rho);
       alphaavg = c + absolute(vel[dir]);
       kappa  = max(param->grav_field_g[pL],param->grav_field_g[pR]);

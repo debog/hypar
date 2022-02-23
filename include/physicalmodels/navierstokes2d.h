@@ -27,8 +27,8 @@
     number is based on speed of sound, instead of the freestream velocity).
 
   Reference for the well-balanced treatment of gravitational source term:
-  + Ghosh, D., Constantinescu, E.M., Well-Balanced Formulation of Gravitational Source 
-    Terms for Conservative Finite-Difference Atmospheric Flow Solvers, AIAA Paper 2015-2889, 
+  + Ghosh, D., Constantinescu, E.M., Well-Balanced Formulation of Gravitational Source
+    Terms for Conservative Finite-Difference Atmospheric Flow Solvers, AIAA Paper 2015-2889,
     7th AIAA Atmospheric and Space Environments Conference, June 22-26, 2015, Dallas, TX,
     http://dx.doi.org/10.2514/6.2015-2889
   + Ghosh, D., Constantinescu, E.M., A Well-Balanced, Conservative Finite-Difference Algorithm
@@ -36,7 +36,7 @@
 
   Reference for the partitioning of the flux into its stiff (acoustic) and non-stiff (convective)
   components:
-  + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows 
+  + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
     with Characteristic-Based Flux Partitioning, SIAM Journal on Scientific Computing,
     38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369.
 
@@ -78,12 +78,12 @@
    {\bf u} = \left[\begin{array}{c} \rho \\ \rho u \\ \rho v \\ e \end{array}\right]
  \f}
 */
-#define _NavierStokes2DGetFlowVar_(u,rho,vx,vy,e,P,p) \
+#define _NavierStokes2DGetFlowVar_(u,rho,vx,vy,e,P,gamma) \
   { \
-    double  gamma = p->gamma, vsq; \
+    double  vsq; \
     rho = u[0]; \
-    vx  = u[1] / rho; \
-    vy  = u[2] / rho; \
+    vx  = (rho==0) ? 0 : u[1] / rho; \
+    vy  = (rho==0) ? 0 : u[2] / rho; \
     e   = u[3]; \
     vsq  = (vx*vx) + (vy*vy); \
     P   = (e - 0.5*rho*vsq) * (gamma-1.0); \
@@ -168,12 +168,11 @@
 /*! \def _NavierStokes2DRoeAverage_
   Compute the Roe-average of two solutions.
 */
-#define _NavierStokes2DRoeAverage_(uavg,uL,uR,p) \
+#define _NavierStokes2DRoeAverage_(uavg,uL,uR,gamma) \
   { \
     double  rho ,vx, vy, e ,P ,H ,csq, vsq; \
     double  rhoL,vxL,vyL,eL,PL,HL,cLsq,vsqL; \
     double  rhoR,vxR,vyR,eR,PR,HR,cRsq,vsqR; \
-    double  gamma = p->gamma; \
     rhoL = uL[0]; \
     vxL  = uL[1] / rhoL; \
     vyL  = uL[2] / rhoL; \
@@ -211,9 +210,8 @@
   as a matrix D whose diagonal values are the eigenvalues. Admittedly, this is inefficient. The matrix D is stored in
   a row-major format.
 */
-#define _NavierStokes2DEigenvalues_(u,D,p,dir) \
+#define _NavierStokes2DEigenvalues_(u,D,gamma,dir) \
   { \
-    double  gamma = p->gamma; \
     double  rho,vx,vy,e,P,c,vn,vsq; \
     rho = u[0]; \
     vx  = u[1] / rho; \
@@ -246,9 +244,9 @@
   + Rohde, "Eigenvalues and eigenvectors of the Euler equations in general geometries", AIAA Paper 2001-2609,
     http://dx.doi.org/10.2514/6.2001-2609
 */
-#define _NavierStokes2DLeftEigenvectors_(u,L,p,dir) \
+#define _NavierStokes2DLeftEigenvectors_(u,L,ga,dir) \
   { \
-    double  ga = param->gamma, ga_minus_one=ga-1.0; \
+    double  ga_minus_one=ga-1.0; \
     double  rho,vx,vy,e,P,a,un,ek,vsq; \
     double  nx = 0,ny = 0; \
     rho = u[0]; \
@@ -308,9 +306,9 @@
   + Rohde, "Eigenvalues and eigenvectors of the Euler equations in general geometries", AIAA Paper 2001-2609,
     http://dx.doi.org/10.2514/6.2001-2609
 */
-#define _NavierStokes2DRightEigenvectors_(u,R,p,dir) \
+#define _NavierStokes2DRightEigenvectors_(u,R,ga,dir) \
   { \
-    double  ga   = param->gamma, ga_minus_one = ga-1.0; \
+    double  ga_minus_one = ga-1.0; \
     double  rho,vx,vy,e,P,un,ek,a,h0,vsq; \
     double  nx = 0,ny = 0; \
     rho = u[0]; \
@@ -366,11 +364,11 @@
 
 /*! \def NavierStokes2D
     \brief Structure containing variables and parameters specific to the 2D Navier Stokes equations.
- *  This structure contains the physical parameters, variables, and function pointers specific to 
+ *  This structure contains the physical parameters, variables, and function pointers specific to
  *  the 2D Navier-Stokes equations.
 */
 /*! \brief Structure containing variables and parameters specific to the 2D Navier Stokes equations.
- *  This structure contains the physical parameters, variables, and function pointers specific to 
+ *  This structure contains the physical parameters, variables, and function pointers specific to
  *  the 2D Navier-Stokes equations.
 */
 typedef struct navierstokes2d_parameters {
@@ -386,7 +384,7 @@ typedef struct navierstokes2d_parameters {
   double  C1,                             /*!< Sutherlands law constants */
           C2;                             /*!< Sutherlands law constants */
   double  R;                              /*!< universal Gas constant */
-  
+
   double  *grav_field_f, /*!< density variation function (\f$\varrho\f$) for hydrostatic equilibrium for flows with gravity */
           *grav_field_g; /*!< pressure variation function (\f$\varrho\f$) for hydrostatic equilibrium for flows with gravity */
 
@@ -395,13 +393,19 @@ typedef struct navierstokes2d_parameters {
 
   /* choice of hydrostatic balance                              */
   /* 1 -> isothermal                                            */
-  /* 2 -> constant potential temperature                        */ 
+  /* 2 -> constant potential temperature                        */
   /* 3 -> stratified atmosphere with a Brunt-Vaisala frequency  */
-  int HB /*!< Choice of hydrostatic balance for flows with gravity (1 - isothermal equilibrium, 
+  int HB /*!< Choice of hydrostatic balance for flows with gravity (1 - isothermal equilibrium,
                                                                     2 - constant potential temperature
                                                                     3 - stratified atmosphere with a Brunt-Vaisala frequency) */;
   double N_bv; /*!< the Brunt-Vaisala frequency for #NavierStokes2D::HB = 3 */
 
+#if defined(HAVE_CUDA)
+  double *gpu_grav_field_f;
+  double *gpu_grav_field_g;
+  double *gpu_fast_jac;
+  double *gpu_solution;
+#endif
 } NavierStokes2D;
 
 int    NavierStokes2DInitialize (void*,void*);

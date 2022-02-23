@@ -6,6 +6,10 @@
 #ifndef _BASIC_H_
 #define _BASIC_H_
 
+#if defined(HAVE_CONFIG_H)
+# include <config.h>
+#endif
+
 /*! Maximum size of character strings */
 #define _MAX_STRING_SIZE_ 500
 #ifdef debug

@@ -8,6 +8,9 @@ AC_MSG_NOTICE([hypar AC_PACKAGE_VERSION])
 AM_INIT_AUTOMAKE
 AC_PREFIX_DEFAULT('$(top_srcdir)')
 
+AC_ARG_ENABLE([serial],AS_HELP_STRING([--enable-serial],[Enable serial mode]))
+AC_ARG_ENABLE([cuda],AS_HELP_STRING([--enable-cuda],[Enable CUDA]))
+AC_ARG_WITH([cuda_dir],AS_HELP_STRING([--with-cuda-dir],[Specify path where CUDA is installed.]))
 AC_ARG_WITH([mpi_dir],AC_HELP_STRING([--with-mpi-dir],[Specify path where MPI is installed.]))
 AC_ARG_ENABLE([omp],AS_HELP_STRING([--enable-omp],[Enable OpenMP threads]))
 AC_ARG_ENABLE([scalapack],AS_HELP_STRING([--enable-scalapack],[Enable ScaLAPACK]))
@@ -38,6 +41,14 @@ else
   AC_MSG_WARN([Compilation with non-GNU compilers not supported.])
 fi
 
+CUDA_CFLAGS="$CUDA_CFLAGS -I$includedir"
+
+if test "x$enable_serial" = "xyes"; then
+  CFLAGS="$CFLAGS -Dserial"
+  CXXFLAGS="$CXXFLAGS -Dserial"
+  CUDA_CFLAGS="$CUDA_CFLAGS -Dserial"
+fi
+
 if test "x$enable_omp" = "xyes" ; then
   AC_MSG_NOTICE([Compiling with OpenMP support.])
   if test "$CC" = "gcc"  ; then
@@ -57,6 +68,7 @@ if test "x$with_mpi_dir" != "x" ; then
   if test -e $with_mpi_dir/bin/${MPI_CC} ; then
     AC_MSG_RESULT([yes])
     MPICC=$with_mpi_dir/bin/${MPI_CC}
+    MPI_DIR=$with_mpi_dir
   else
     AC_MSG_RESULT([no])
   fi
@@ -94,12 +106,63 @@ if test "x$MPICXX" = "x" ; then
   AC_CHECK_PROG(MPICXX,${MPI_CXX},${MPI_CXX})
 fi
 
+AM_CONDITIONAL([ENABLE_CUDA], [test "x$enable_cuda" = "xyes"])
+if test "x$enable_cuda" = "xyes"; then
+  AC_MSG_NOTICE([Compiling with CUDA support.])
+  NV_CC=nvcc
+
+  #CFLAGS="$CFLAGS -DHAVE_CUDA -malign-double"
+  #CXXFLAGS="$CXXFLAGS -DHAVE_CUDA -malign-double"
+  CFLAGS="$CFLAGS -DHAVE_CUDA"
+  CXXFLAGS="$CXXFLAGS -DHAVE_CUDA"
+
+  CUDA_CFLAGS="$CUDA_CFLAGS -DHAVE_CUDA -lineinfo -Xptxas='-dlcm=ca -v'"
+  if test "x$with_cuda_dir" != "x"; then
+    AC_MSG_CHECKING([for ${NV_CC} in $with_cuda_dir/bin/])
+    if test -e $with_cuda_dir/bin/${NV_CC}; then
+      AC_MSG_RESULT([yes])
+      NVCC=$with_cuda_dir/bin/${NV_CC}
+    else
+      AC_MSG_RESULT([no])
+    fi
+    LIBS="$LIBS -L$with_cuda_dir/lib64 -lcudart"
+  else
+    if test "x$CUDA_DIR" != "x"; then
+      AC_MSG_NOTICE([Found environment variable CUDA_DIR=${CUDA_DIR}.])
+      AC_MSG_CHECKING([for ${NV_CC} in ${CUDA_DIR}/bin/])
+      if test -e ${CUDA_DIR}/bin/${NV_CC}; then
+        AC_MSG_RESULT([yes])
+        NVCC=${CUDA_DIR}/bin/${NV_CC}
+      else
+        AC_MSG_RESULT([no])
+      fi
+      LIBS="$LIBS -L$CUDA_DIR/lib64 -lcudart"
+    else
+      CUDA_DIR=$(which ${NVCC} | sed 's/\/bin\/nvcc//g')
+      LIBS="$LIBS -L$CUDA_DIR/lib64 -lcudart"
+    fi
+  fi
+
+  if test "x$NVCC" = "x"; then
+    AC_CHECK_PROG(NVCC,${NV_CC},${NV_CC})
+  fi
+
+  if test "x$enable_serial" != "xyes"; then
+    MPI_DIR=$(which ${MPICC} | sed 's/\/bin\/mpicc//g')
+    AC_CHECK_FILE([$MPI_DIR/include/mpi.h], [], [AC_MSG_ERROR([mpi.h is not found])])
+    CUDA_CFLAGS="$CUDA_CFLAGS -I${MPI_DIR}/include -L${MPI_DIR}/lib -lmpi"
+  fi
+
+  AC_SUBST(CUDA_CFLAGS)
+fi
+
 if test "x$MPICC" = "x" ; then
   AC_MSG_WARN([Cannot find ${MPI_CC}. Will compile with gcc. Use --with-mpi-dir to specify the location of ${MPI_CC}.])
   CFLAGS="$CFLAGS -Dserial"
 else
   CC=$MPICC
 fi
+
 if test "x$MPICXX" = "x" ; then
   AC_MSG_WARN([Cannot find ${MPI_CXX}. Will compile with gcc. Use --with-mpi-dir to specify the location of ${MPI_CXX}.])
   CXXFLAGS="$CXXFLAGS -Dserial"

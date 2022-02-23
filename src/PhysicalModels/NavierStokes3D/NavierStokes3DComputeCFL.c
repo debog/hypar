@@ -34,7 +34,7 @@ double NavierStokes3DComputeCFL(
   while (!done) {
     int p; _ArrayIndex1D_(ndims,dim,index,ghosts,p);
     double rho, vx, vy, vz, e, P, c, dxinv, dyinv, dzinv, local_cfl[3];
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),rho,vx,vy,vz,e,P,param);
+    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,param->gamma);
 
     c = sqrt(param->gamma*P/rho); /* speed of sound */
     _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->dxinv,dxinv); /* 1/dx */

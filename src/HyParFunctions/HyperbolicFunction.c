@@ -3,6 +3,8 @@
     @brief Compute the hyperbolic term of the governing equations
 */
 
+#include <time.h>
+
 #include <stdlib.h>
 #include <basic.h>
 #include <arrayfunctions.h>
@@ -10,10 +12,10 @@
 #include <hypar.h>
 
 static int ReconstructHyperbolic (double*,double*,double*,double*,int,void*,void*,double,int,
-                                  int(*)(double*,double*,double*,double*,double*,double*,int,void*,double));
+                                 int(*)(double*,double*,double*,double*,double*,double*,int,void*,double));
 static int DefaultUpwinding      (double*,double*,double*,double*,double*,double*,int,void*,double);
 
-/*! This function computes the hyperbolic term of the governing equations, expressed as follows:- 
+/*! This function computes the hyperbolic term of the governing equations, expressed as follows:-
     \f{equation}{
       {\bf F} \left({\bf u}\right) = \sum_{d=0}^{D-1} \frac {\partial {\bf f}_d\left({\bf u}\right)} {\partial x_d}
     \f}
@@ -21,7 +23,7 @@ static int DefaultUpwinding      (double*,double*,double*,double*,double*,double
     \f{equation}{
       \hat{\bf F} \left({\bf u}\right) = \sum_{d=0}^{D-1} \frac {1} {\Delta x_d} \left[ \hat{\bf f}_{d,j+1/2} - \hat{\bf f}_{d,j-1/2} \right]
     \f}
-    where \f$d\f$ denotes the spatial dimension, \f$D\f$ denotes the total number of spatial dimensions, the hat denotes 
+    where \f$d\f$ denotes the spatial dimension, \f$D\f$ denotes the total number of spatial dimensions, the hat denotes
     the discretized quantity, and \f$j\f$ is the grid coordinate along dimension \f$d\f$.
     The approximation to the flux function \f${\bf f}_d\f$ at the interfaces \f$j\pm1/2\f$, denoted by \f$\hat{\bf f}_{d,j\pm 1/2}\f$,
     are computed using the function ReconstructHyperbolic().
@@ -32,13 +34,13 @@ int HyperbolicFunction(
                         void    *s,   /*!< Solver object of type #HyPar */
                         void    *m,   /*!< MPI object of type #MPIVariables */
                         double  t,    /*!< Current simulation time */
-                        int     LimFlag,  /*!< Flag to indicate if the nonlinear coefficients for solution-dependent 
+                        int     LimFlag,  /*!< Flag to indicate if the nonlinear coefficients for solution-dependent
                                                interpolation method should be recomputed (see ReconstructHyperbolic() for
                                                an explanation on why this is needed) */
                         /*! Function pointer to the flux function for the hyperbolic term */
-                        int(*FluxFunction)(double*,double*,int,void*,double), 
+                        int(*FluxFunction)(double*,double*,int,void*,double),
                         /*! Function pointer to the upwinding function for the hyperbolic term */
-                        int(*UpwindFunction)(double*,double*,double*,double*,double*,double*,int,void*,double) 
+                        int(*UpwindFunction)(double*,double*,double*,double*,double*,double*,int,void*,double)
                       )
 {
   HyPar         *solver = (HyPar*)        s;
@@ -64,6 +66,11 @@ int HyperbolicFunction(
   if (!FluxFunction) return(0); /* zero hyperbolic term */
   solver->count_hyp++;
 
+#if defined(CPU_STAT)
+  double cpu_time = 0.0;
+  clock_t cpu_start, cpu_end;
+#endif
+
   int offset = 0;
   for (d = 0; d < ndims; d++) {
     _ArrayCopy1D_(dim,dim_interface,ndims); dim_interface[d]++;
@@ -73,37 +80,52 @@ int HyperbolicFunction(
     /* evaluate cell-centered flux */
     IERR FluxFunction(FluxC,u,d,solver,t); CHECKERR(ierr);
     /* compute interface fluxes */
-    IERR ReconstructHyperbolic(FluxI,FluxC,u,x+offset,d,solver,mpi,t,LimFlag,UpwindFunction); 
+    IERR ReconstructHyperbolic(FluxI,FluxC,u,x+offset,d,solver,mpi,t,LimFlag,UpwindFunction);
     CHECKERR(ierr);
 
     /* calculate the first derivative */
     done = 0; _ArraySetValue_(index,ndims,0);
     int p, p1, p2;
+
+#if defined(CPU_STAT)
+    cpu_start = clock();
+#endif
+
     while (!done) {
       _ArrayCopy1D_(index,index1,ndims);
       _ArrayCopy1D_(index,index2,ndims); index2[d]++;
       _ArrayIndex1D_(ndims,dim          ,index ,ghosts,p);
       _ArrayIndex1D_(ndims,dim_interface,index1,0     ,p1);
       _ArrayIndex1D_(ndims,dim_interface,index2,0     ,p2);
-      for (v=0; v<nvars; v++) hyp[nvars*p+v] += dxinv[offset+ghosts+index[d]] 
+      for (v=0; v<nvars; v++) hyp[nvars*p+v] += dxinv[offset+ghosts+index[d]]
                                               * (FluxI[nvars*p2+v]-FluxI[nvars*p1+v]);
       /* boundary flux integral */
-      if (index[d] == 0) 
+      if (index[d] == 0)
         for (v=0; v<nvars; v++) solver->StageBoundaryIntegral[(2*d+0)*nvars+v] -= FluxI[nvars*p1+v];
-      if (index[d] == dim[d]-1) 
+      if (index[d] == dim[d]-1)
         for (v=0; v<nvars; v++) solver->StageBoundaryIntegral[(2*d+1)*nvars+v] += FluxI[nvars*p2+v];
 
       _ArrayIncrementIndex_(ndims,dim,index,done);
     }
 
+#if defined(CPU_STAT)
+    cpu_end = clock();
+    cpu_time += (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC;
+#endif
+
     offset += dim[d] + 2*ghosts;
   }
 
+#if defined(CPU_STAT)
+  printf("HyperbolicFunction CPU time = %8.6lf\n", cpu_time);
+#endif
+
   if (solver->flag_ib) _ArrayBlockMultiply_(hyp,solver->iblank,size,nvars);
+
   return(0);
 }
 
-/*! This function computes the numerical flux \f$\hat{\bf f}_{j+1/2}\f$ at the interface from the cell-centered 
+/*! This function computes the numerical flux \f$\hat{\bf f}_{j+1/2}\f$ at the interface from the cell-centered
     flux function \f${\bf f}_j\f$. This happens in two steps:-
 
     \b Interpolation: High-order accurate approximations to the flux at the interface \f$j+1/2\f$ are computed from
@@ -113,7 +135,7 @@ int HyperbolicFunction(
       \hat{\bf f}^L_{j+1/2} &= \mathcal{I}\left({\bf f}_j,+1\right), \\
       \hat{\bf f}^R_{j+1/2} &= \mathcal{I}\left({\bf f}_j,-1\right),
     \f}
-    where the \f$\pm 1\f$ indicates the interpolation bias, and \f$\mathcal{I}\f$ is the interpolation operator 
+    where the \f$\pm 1\f$ indicates the interpolation bias, and \f$\mathcal{I}\f$ is the interpolation operator
     pointed to by #HyPar::InterpolateInterfacesHyp (see \b src/InterpolationFunctions for all the available operators).
     The interface values of the solution are similarly computed:
     \f{align}{
@@ -130,13 +152,13 @@ int HyperbolicFunction(
     upwinding function is specified by the physical model.
 
     \b Note:
-    Solution-dependent, nonlinear interpolation methods (such as WENO, CRWENO) are implemented in a way that separates the calculation of the 
-    nonlinear interpolation weights (based on, say, the smoothness of the flux function), and the actual evaluation of the interpolant, into 
-    different functions. This allows the flexibility to choose if and when the nonlinear coefficients are evaluated (or previously computed 
+    Solution-dependent, nonlinear interpolation methods (such as WENO, CRWENO) are implemented in a way that separates the calculation of the
+    nonlinear interpolation weights (based on, say, the smoothness of the flux function), and the actual evaluation of the interpolant, into
+    different functions. This allows the flexibility to choose if and when the nonlinear coefficients are evaluated (or previously computed
     values are reused). Some possible scenarios are:
     + For explicit time integration, they are computed every time the hyperbolic flux term is being computed.
-    + For implicit time integration, consistency or linearization may require that they be computed and "frozen" 
-      at the beginning of a time step or stage. 
+    + For implicit time integration, consistency or linearization may require that they be computed and "frozen"
+      at the beginning of a time step or stage.
 
     The argument \b LimFlag controls this behavior:
     + LimFlag = 1 means recompute the nonlinear coefficients.
@@ -146,7 +168,7 @@ int ReconstructHyperbolic(
                             double  *fluxI,     /*!< Array to hold the computed interface fluxes. This array does not
                                                      have ghost points. The dimensions are the same as those of u without
                                                      ghost points in all dimensions, except along dir, where it is one more */
-                            double  *fluxC,     /*!< Array of the flux function computed at the cell centers 
+                            double  *fluxC,     /*!< Array of the flux function computed at the cell centers
                                                      (same layout as u) */
                             double  *u,         /*!< Solution array */
                             double  *x,         /*!< Array of spatial coordinates */
@@ -156,7 +178,7 @@ int ReconstructHyperbolic(
                             double  t,          /*!< Current solution time */
                             int     LimFlag,    /*!< Flag to indicate if the nonlinear coefficients for solution-dependent
                                                      interpolation method should be recomputed */
-                            /*! Function pointer to the upwinding function for the interface flux computation. If NULL, 
+                            /*! Function pointer to the upwinding function for the interface flux computation. If NULL,
                                 DefaultUpwinding() will be used. */
                             int(*UpwindFunction)(double*,double*,double*,double*,double*,double*,int,void*,double)
                           )
@@ -171,10 +193,11 @@ int ReconstructHyperbolic(
   double *fluxL  = solver->fL;
   double *fluxR  = solver->fR;
 
-  /* 
-    precalculate the non-linear interpolation coefficients if required 
+  /*
+    precalculate the non-linear interpolation coefficients if required
     else reuse the weights previously calculated
   */
+
   if (LimFlag) IERR solver->SetInterpLimiterVar(fluxC,u,x,dir,solver,mpi);
 
   /* if defined, calculate the modified u-function to be used for upwinding
@@ -198,7 +221,7 @@ int ReconstructHyperbolic(
   return(0);
 }
 
-/*! If no upwinding scheme is specified, this function defines the "upwind" flux as the 
+/*! If no upwinding scheme is specified, this function defines the "upwind" flux as the
     arithmetic mean of the left- and right-biased fluxes. */
 int DefaultUpwinding(
                       double  *fI,  /*!< Computed upwind interface flux */

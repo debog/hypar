@@ -9,15 +9,15 @@
 #include <basic.h>
 
 /*! \def HyPar
-    \brief Structure containing all solver-specific variables and functions 
- * This structure contains all the variables and function pointers for the 
+    \brief Structure containing all solver-specific variables and functions
+ * This structure contains all the variables and function pointers for the
  * main PDE solver.
  *
 */
 
-/*! \brief Structure containing all solver-specific variables and functions 
+/*! \brief Structure containing all solver-specific variables and functions
  *
- * This structure contains all the variables and function pointers for the 
+ * This structure contains all the variables and function pointers for the
  * main PDE solver.
 */
 typedef struct main_parameters {
@@ -28,19 +28,27 @@ typedef struct main_parameters {
   /*! Number of variables or DoFs at a grid point (input - \b solver.inp ) */
   int     nvars;
 
-  /*! Global dimensions: array of size #HyPar::ndims containing the global grid size in each spatial/coordinate dimension  (input - \b solver.inp )*/
+  /*! Global dimensions: array of size #HyPar::ndims containing the global grid size 
+   * in each spatial/coordinate dimension  (input - \b solver.inp )*/
   int     *dim_global;
-  
-  /*! Local dimensions: array of size #HyPar::ndims containing the local grid size in each spatial/coordinate dimension (computed, based on the number of processors) */
+
+  /*! Local dimensions: array of size #HyPar::ndims containing the local grid size 
+   * in each spatial/coordinate dimension (computed, based on the number of processors) */
   int     *dim_local;
 
   /*! Global number of grid points (product of all the elements of dim_global) */
   int     npoints_global;
 
-  int     npoints_local,          /*!< Local number of grid points (product of all the elements of dim_local) */
-          npoints_local_wghosts;  /*!< Local number of grid points with ghost points (product of the [elements of dim_local + 2*#HyPar::ghosts]) */
+  int     npoints_local, /*!< Local number of grid points (product of all the elements of dim_local) */
+          npoints_local_wghosts; /*!< Local number of grid points with ghost points 
+                                      (product of the [elements of dim_local + 2*#HyPar::ghosts]) */
 
-  /*! Number of ghost points at the boundary - it's the same along all dimensions (input - \b solver.inp ) */
+  int ndof_nodes; /*!< Total number of degrees of freedom considering cell corners (no ghosts)*/
+  int ndof_cells_wghosts; /*!< Total number of degrees of freedom considering cell centered (with ghosts)*/
+  int size_x;     /*!< the size of #HyPar::x array */
+
+  /*! Number of ghost points at the boundary - it's the same along all dimensions 
+   * (input - \b solver.inp ) */
   int     ghosts;
 
   /*! Number of time steps (input - \b solver.inp ) */
@@ -58,14 +66,14 @@ typedef struct main_parameters {
   /*! time step size (input - \b solver.inp ) */
   double  dt;
 
-  /*! Global dimensions of exact solution, if available: 
+  /*! Global dimensions of exact solution, if available:
       if an exact/reference solution is available to compute errors,
-      this array of size #HyPar::ndims contains its global grid 
-      size in each spatial/coordinate dimension. By default, it is 
+      this array of size #HyPar::ndims contains its global grid
+      size in each spatial/coordinate dimension. By default, it is
       the same as #HyPar::dim_global, unless specified otherwise in
       \b solver.inp */
   int     *dim_global_ex;
-  
+
   /*!  choice of time integration class (eg RK) (input - \b solver.inp ) */
   char    time_scheme         [_MAX_STRING_SIZE_];
 
@@ -75,7 +83,7 @@ typedef struct main_parameters {
   /*! choice of spatial discretization scheme for the hyperbolic terms (eg: weno5, crweno5, muscl3) (input - \b solver.inp ) */
   char    spatial_scheme_hyp  [_MAX_STRING_SIZE_];
 
-  /*! type of reconstruction for spatial discretization of hyperbolic term 
+  /*! type of reconstruction for spatial discretization of hyperbolic term
    * (characteristic or component-wise) (input - \b solver.inp ) */
   char    interp_type         [_MAX_STRING_SIZE_];
 
@@ -83,7 +91,7 @@ typedef struct main_parameters {
    * for any other purpose (input - \b solver.inp ) */
   char    SplitHyperbolicFlux [_MAX_STRING_SIZE_];
 
-  /*! type of spatial discretization for the parabolic term 
+  /*! type of spatial discretization for the parabolic term
    * conservative-1stage, nonconservative-1stage, or nonconservative-2stage (input - \b solver.inp )*/
   char    spatial_type_par    [_MAX_STRING_SIZE_];
 
@@ -96,14 +104,14 @@ typedef struct main_parameters {
   /*! the coordinate vector: one 1D array containing the spatial coordinates along each dimension
    * of the grid points, one dimension after the other.
    * Use #_GetCoordinate_ to access the spatial coordinate at a specific grid point */
-  double *x;                          
+  double *x;
 
   /*! array containing (1.0/dx): layout same as that of x */
   double *dxinv;
 
-  /*! Solution vector: the #HyPar::ndims-dimensional solution vector with nvars components at each 
+  /*! Solution vector: the #HyPar::ndims-dimensional solution vector with nvars components at each
    * grid point is stored as a 1D array. **Includes ghost points**
-   * Use #_ArrayIndex1D_ to calculate the index in the 1D array 
+   * Use #_ArrayIndex1D_ to calculate the index in the 1D array
    * corresponding to a #HyPar::ndims-dimensional index (i_0, i_1, i_2, ..., i_{ndims-1}) */
   double *u;
 
@@ -112,37 +120,37 @@ typedef struct main_parameters {
 
   /*! Array to hold the discretized parabolic term: Same layout as u */
   double *par;
-  
+
   /*! Array to hold the source term: Same layout as u */
   double *source;
 
   /*! Array to hold the cell-centered hyperbolic flux: Same layout as u */
   double *fluxC;
-  
+
   /*! Array to hold the cell-centered modified solution: Same layout as u */
   double *uC;
-  
+
   /*! Array to hold the interface hyperbolic flux for a conservative finite-difference method
-   * Since number of interfaces is one more than the number of cell-centers, the dimensions 
+   * Since number of interfaces is one more than the number of cell-centers, the dimensions
    * of fluxI is accordingly increased during allocation. **Does not have ghost points.** */
   double *fluxI;
-  
-  double *uL, /*!< Array to hold the left-biased reconstructed solution 
+
+  double *uL, /*!< Array to hold the left-biased reconstructed solution
                    at the interface. Same layout as fluxI. **No ghost points** */
-         *uR, /*!< Array to hold the right-biased reconstructed solution 
+         *uR, /*!< Array to hold the right-biased reconstructed solution
                    at the interface. Same layout as fluxI. **No ghost points** */
-         *fL, /*!< Array to hold the left-biased reconstructed hyperbolic flux 
+         *fL, /*!< Array to hold the left-biased reconstructed hyperbolic flux
                    at the interface. Same layout as fluxI. **No ghost points** */
-         *fR; /*!< Array to hold the right-biased reconstructed hyperbolic flux 
+         *fR; /*!< Array to hold the right-biased reconstructed hyperbolic flux
                    at the interface. Same layout as fluxI. **No ghost points** */
 
   /*! arrays to hold approximations to the first and second derivatives to a given function
    * at grid points. Layout is same as u, hyp, par, source. **Includes ghost points** */
-  double  *Deriv1, /*!< Array to hold approximations to the first derivative to 
-                        a given function at grid points. Layout is same as u, hyp, 
+  double  *Deriv1, /*!< Array to hold approximations to the first derivative to
+                        a given function at grid points. Layout is same as u, hyp,
                         par, source. **Includes ghost points** */
-          *Deriv2; /*!< Array to hold approximations to the second derivative to 
-                        a given function at grid points. Layout is same as u, hyp, 
+          *Deriv2; /*!< Array to hold approximations to the second derivative to
+                        a given function at grid points. Layout is same as u, hyp,
                         par, source. **Includes ghost points** */
 
   /*! Boundary conditions: Number of boundary zones  */
@@ -158,7 +166,7 @@ typedef struct main_parameters {
 
   /*! frequency (iterations) of writing iteration information (dt,CFL,norm,etc) to screen (input - \b solver.inp )*/
   int screen_op_iter;
-  
+
   /*! frequency (iterations) of writing solution to file (input - \b solver.inp )*/
   int file_op_iter;
 
@@ -178,7 +186,7 @@ typedef struct main_parameters {
   char op_file_format[_MAX_STRING_SIZE_];
 
   /*! overwrite solution file when writing new one? ("yes" - for steady solutions or if interested
-   * only in the final solution; "no" - to keep the solutions written at intermediate time steps). 
+   * only in the final solution; "no" - to keep the solutions written at intermediate time steps).
      (input - \b solver.inp )*/
   char op_overwrite  [_MAX_STRING_SIZE_];
 
@@ -195,7 +203,7 @@ typedef struct main_parameters {
   char aux_op_fname_root[_MAX_STRING_SIZE_];
 
   /*! Pointer to the function to write the solution to file, assigned in InitializeSolvers() */
-  int (*WriteOutput)              (int,int,int*,double*,double*,char*,int*);  
+  int (*WriteOutput)              (int,int,int*,double*,double*,char*,int*);
 
   /*! Pointer to the function to apply the physical boundary conditions to the solution, assigned in InitializeSolvers() */
   int (*ApplyBoundaryConditions)  (void*,void*,double*,double*,double);
@@ -206,17 +214,17 @@ typedef struct main_parameters {
   /*! Pointer to the function to integrate the solution in time, assigned in InitializeSolvers() */
   int (*TimeIntegrate)            (void*);
 
-  /*! Pointer to the function to interpolate a function at the grid interfaces from the cell-centered values
-   * for the hyperbolic flux, assigned in InitializeSolvers() */
+  /*! Pointer to the function to interpolate a function at the grid interfaces from 
+   * the cell-centered values for the hyperbolic flux, assigned in InitializeSolvers() */
   int (*InterpolateInterfacesHyp) (double*,double*,double*,double*,int,int,void*,void*,int);
 
-  /*! Pointer to the function to pre-calculate the nonlinear interpolation coefficients for the hyperbolic
-   * flux interpolation, assigned in InitializeSolvers() */
+  /*! Pointer to the function to pre-calculate the nonlinear interpolation coefficients for 
+   * the hyperbolic flux interpolation, assigned in InitializeSolvers() */
   int (*NonlinearInterp)    (double*,void*,void*,double,
                              int(*)(double*,double*,int,void*,double));
 
-  /*! Pointer to the function to calculate the non-linear interpolation coefficients of the given scheme, 
-      assigned by the initialization function of the non-linear interpolation method 
+  /*! Pointer to the function to calculate the non-linear interpolation coefficients of the given scheme,
+      assigned by the initialization function of the non-linear interpolation method
       (eg. WENOInitialize() )*/
   int (*SetInterpLimiterVar)      (double*,double*,double*,int,void*,void*);
 
@@ -225,8 +233,8 @@ typedef struct main_parameters {
      assigned in InitializeSolvers()*/
   int (*InterpolateInterfacesPar) (double*,double*,int,void*,void*);
 
-  /*! Pointer to the function to calculate the cell-centered first derivative of a given function, for the
-      evaluation of the parabolic term; assigned in InitializeSolvers()*/
+  /*! Pointer to the function to calculate the cell-centered first derivative of a given function, 
+   * for the evaluation of the parabolic term; assigned in InitializeSolvers()*/
   int (*FirstDerivativePar)       (double*,double*,int,int,void*,void*);
 
   /*! Pointer to the function to calculate the cell-centered second derivative of a given function, for the
@@ -245,7 +253,7 @@ typedef struct main_parameters {
   /*! Pointer to the function to calculate the source term (assigned in InitializeSolvers())*/
   int (*SourceFunction)     (double*,double*,void*,void*,double);
 
-  /*! name of physical model (defined in the header files in folder physicalmodels) 
+  /*! name of physical model (defined in the header files in folder physicalmodels)
       (input - \b solver.inp ) */
   char model[_MAX_STRING_SIZE_];
 
@@ -258,32 +266,35 @@ typedef struct main_parameters {
   /*! Pointer to the function to calculate the diffusion number (assigned in the physical model initialization called from InitializePhysics()) */
   double (*ComputeDiffNumber)  (void*,void*,double,double);
 
-  /*! Pointer to the function to calculate the hyperbolic flux function (assigned in the physical model initialization called from InitializePhysics()) */
+  /*! Pointer to the function to calculate the hyperbolic flux function 
+   * (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*FFunction)          (double*,double*,int,void*,double);
   /*! If hyperbolic flux is split as \f$f\left(u\right) = \left[f\left(u\right)-df\left(u\right)\right] + df\left(u\right)\f$
-      (see #HyPar::SplitHyperbolicFlux), 
-      function to calculate \f$df\left(u\right)\f$ (assigned in the physical model initialization called from InitializePhysics()) */ 
+      (see #HyPar::SplitHyperbolicFlux),
+      function to calculate \f$df\left(u\right)\f$ (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*dFFunction)         (double*,double*,int,void*,double);
-  /*! If hyperbolic flux is split as \f$f\left(u\right) = \left[f\left(u\right)-df\left(u\right)\right] + df\left(u\right)\f$, 
-      (see #HyPar::SplitHyperbolicFlux), 
+  /*! If hyperbolic flux is split as \f$f\left(u\right) = \left[f\left(u\right)-df\left(u\right)\right] + df\left(u\right)\f$,
+      (see #HyPar::SplitHyperbolicFlux),
       function to calculate \f$\left[f-df\right]\left(u\right)\f$(assigned in the physical model initialization called from InitializePhysics()) .\n
-   Specifying this is optional; if the physical model does not explicitly specify this, then it is computed by subtracting 
-   HyPar::dFFunction() from HyPar::FFunction(). \sa #HyPar::flag_fdf_specified */ 
+   Specifying this is optional; if the physical model does not explicitly specify this, then it is computed by subtracting
+   HyPar::dFFunction() from HyPar::FFunction(). \sa #HyPar::flag_fdf_specified */
   int    (*FdFFunction)         (double*,double*,int,void*,double);
-  /*! Flag indicating whether the physical model has explicitly specified the function to compute 
+  /*! Flag indicating whether the physical model has explicitly specified the function to compute
       \f$\left[f-df\right]\left(u\right)\f$ (HyPar::FdFFunction()) or not. Relevant if the hyperbolic flux
       is being partitioned. \sa #HyPar::SplitHyperbolicFlux, HyPar::dFFunction(), HyPar::FdFFunction() */
   int flag_fdf_specified;
 
-  /*! Pointer to the function to calculate the upwind interface flux, given the left- and right-biased fluxes (assigned in the physical model initialization called from InitializePhysics()) */
+  /*! Pointer to the function to calculate the upwind interface flux, given the left- and 
+   * right-biased fluxes (assigned in the physical model initialization called from 
+   * InitializePhysics()) */
   int    (*Upwind)             (double*,double*,double*,double*,double*,double*,int,void*,double);
-  /*! Pointer to the function to calculate the upwind interface split flux \f$df\left(u\right)\f$, given the left- and right-biased 
-      approximations (assigned in the physical model initialization called from InitializePhysics()). Relevant only if the hyperbolic flux is being partitioned as 
+  /*! Pointer to the function to calculate the upwind interface split flux \f$df\left(u\right)\f$, given the left- and right-biased
+      approximations (assigned in the physical model initialization called from InitializePhysics()). Relevant only if the hyperbolic flux is being partitioned as
       \f$f\left(u\right) = \left[f\left(u\right)-df\left(u\right)\right] + df\left(u\right)\f$
       \sa #HyPar::SplitHyperbolicFlux, HyPar::dFFunction()*/
   int    (*UpwinddF)           (double*,double*,double*,double*,double*,double*,int,void*,double);
-  /*! Pointer to the function to calculate the upwind interface split flux \f$\left[f-df\right]\left(u\right)\f$, given its left- 
-      and right-biased approximations (assigned in the physical model initialization called from InitializePhysics()). Relevant only if the hyperbolic flux is being partitioned as 
+  /*! Pointer to the function to calculate the upwind interface split flux \f$\left[f-df\right]\left(u\right)\f$, given its left-
+      and right-biased approximations (assigned in the physical model initialization called from InitializePhysics()). Relevant only if the hyperbolic flux is being partitioned as
       \f$f\left(u\right) = \left[f\left(u\right)-df\left(u\right)\right] + df\left(u\right)\f$ (see
       #HyPar::SplitHyperbolicFlux, HyPar::dFFunction()), and if the split part
       \f$\left[f-df\right]\left(u\right)\f$ is being specified explicitly (see HyPar::FdFFunction(),
@@ -296,10 +307,12 @@ typedef struct main_parameters {
   /*! Pointer to the function to calculate the parabolic function with cross-derivatives (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*HFunction)          (double*,double*,int,int,void*,double);
 
-  /*! Pointer to the function to calculate the source function (assigned in the physical model initialization called from InitializePhysics()) */
+  /*! Pointer to the function to calculate the source function 
+   * (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*SFunction)          (double*,double*,void*,void*,double);
 
-  /*! Pointer to the function to calculate the modified solution for upwinding (assigned in the physical model initialization called from InitializePhysics()) */
+  /*! Pointer to the function to calculate the modified solution for upwinding 
+   * (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*UFunction)          (double*,double*,int,void*,void*,double);
 
   /*! Pointer to the function to calculate the flux Jacobian for a given solution state (assigned in the physical model initialization called from InitializePhysics()). The
@@ -316,14 +329,15 @@ typedef struct main_parameters {
   int    (*PreStage)           (int,double**,void*,void*,double);
   /*! Pointer to the function to do some post-time-integration-stage computations, if required (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*PostStage)          (double*,void*,void*,double);
-  /*! Pointer to the function to do some pre-time-integration-step computations, if required (assigned in the physical model initialization called from InitializePhysics()) */
+  /*! Pointer to the function to do some pre-time-integration-step computations, if required 
+   * (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*PreStep)            (double*,void*,void*,double);
   /*! Pointer to the function to do some post-time-integration-step computations, if required (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*PostStep)           (double*,void*,void*,double,int);
   /*! Pointer to the function to print some physics-specific time-integration-step information,
    * if required (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*PrintStep)          (void*,void*,double);
-  /*! Pointer to the function to write (to file) physics-related data that may not be 
+  /*! Pointer to the function to write (to file) physics-related data that may not be
       a part of the solution (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*PhysicsOutput)      (void*,void*);
 
@@ -333,7 +347,7 @@ typedef struct main_parameters {
 
   /*! Pointer to the function to calculate the averaged solution state, given two solution states (assigned in the physical model initialization called from InitializePhysics()) */
   int   (*AveragingFunction)   (double*,double*,double*,void*);
-  
+
   /*! Pointer to the function to calculate the left eigenvectors of the flux Jacobian for a given solution state (assigned in the physical model initialization called from InitializePhysics()) */
   int   (*GetLeftEigenvectors) (double*,double*,void*,int);
   /*! Pointer to the function to calculate the right eigenvectors of the flux Jacobian for a given solution state (assigned in the physical model initialization called from InitializePhysics()) */
@@ -350,7 +364,7 @@ typedef struct main_parameters {
 
   /*! Errors - L1, L2 and L_inf; calculated only if an exact solution file is supplied */
   double error[3];
-  /*! Conservation error in the solution -- does not indicate anything if parabolic and source terms 
+  /*! Conservation error in the solution -- does not indicate anything if parabolic and source terms
    * are non-zero */
   double *ConservationError;
   /*! check for conservation error? */
@@ -389,7 +403,7 @@ typedef struct main_parameters {
 #endif
 
   /*! flag to globally switch on/off non-linear interpolation */
-  int flag_nonlinearinterp; 
+  int flag_nonlinearinterp;
 
   /*! strides along each dimension for an array with ghost points */
   int *stride_with_ghosts;
@@ -409,12 +423,12 @@ typedef struct main_parameters {
 #endif
 
   /*! blanking array: of same size and layout as #HyPar::u (but with 1 component
-      per grid point, it has a value 1 for all valid grid points and 0 for grid 
+      per grid point, it has a value 1 for all valid grid points and 0 for grid
       points that are blanked out. It is essentially an integer array, but the
-      declared as a \a double type to use functions defined for the \a double 
+      declared as a \a double type to use functions defined for the \a double
       data type.
-  */        
-  double *iblank;          
+  */
+  double *iblank;
 
   /*! Name of immersed body STL file (input - \b solver.inp )*/
   char ib_filename[_MAX_STRING_SIZE_];
@@ -426,19 +440,36 @@ typedef struct main_parameters {
   /*! Physics-specific immersed boundary treatment function (assigned in the physical model initialization called from InitializePhysics()) */
   int (*IBFunction) (void*,void*,double*,double);
 
+#if defined(HAVE_CUDA)
+  int use_gpu;       /*!< Indicate whether to use GPU or not */
+  int gpu_device_no; /*!< GPU device number to use, default 0 */
+
+  int gpu_npoints_boundary_offset[3]; /*!< number of boundary points offsets */
+  int gpu_npoints_boundary[3]; /*!< number of boundary points */
+
+  int *gpu_dim_local; /*!< A copy of #HyPar::dim_local on GPU */
+  double *gpu_iblank; /*!< A copy of #HyPar::iblank on GPU */
+  double *gpu_x;      /*!< A copy of #HyPar::x on GPU */
+  double *gpu_dxinv;  /*!< A copy of #HyPar::dxinv on GPU */
+  double *gpu_u;      /*!< A copy of #HyPar::u on GPU */
+
+  int StageBoundaryBuffer_size; /*!< size of #Hypar::gpu_StageBoundaryBuffer */
+  double *StageBoundaryBuffer; /*!< Array to perform reduction */
+#endif
+
 } HyPar;
 
-/* Some definitions - types of discretizations available 
+/* Some definitions - types of discretizations available
    for the parabolic (2nd derivative) term  */
 /*! Non-conservative, direct evaluation of the 2nd deriv */
-#define _NC_1STAGE_   "nonconservative-1stage"    
+#define _NC_1STAGE_   "nonconservative-1stage"
 /*! Non-conservative, two-stage evaluation of the 2nd deriv */
-#define _NC_2STAGE_   "nonconservative-2stage"    
-/*! Non-conservative, "1.5"-stage evaluation of the 2nd deriv  - 
+#define _NC_2STAGE_   "nonconservative-2stage"
+/*! Non-conservative, "1.5"-stage evaluation of the 2nd deriv  -
  * direct, 1-stage evaluation of the 2nd derivative in one variable
  * 2-stage evaluation of cross-derivatives */
-#define _NC_1_5STAGE_ "nonconservative-1.5stage"  
+#define _NC_1_5STAGE_ "nonconservative-1.5stage"
 /*! Conservative, direct evaluation of the 2nd deriv */
-#define _CONS_1STAGE_ "conservative-1stage"       
+#define _CONS_1STAGE_ "conservative-1stage"
 
 #endif

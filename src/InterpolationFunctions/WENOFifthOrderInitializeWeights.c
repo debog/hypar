@@ -30,7 +30,10 @@
   + The weights are initialized to their optimal values so that, if no limiting is specified 
     (#WENOParameters::no_limiting = 1), then no further computation of weights are required.
 */
-int WENOFifthOrderInitializeWeights(
+int WENOFifthOrderInitializeWeights(  double* const a_w1, /*!< Weight array */
+                                      double* const a_w2, /*!< Weight array */
+                                      double* const a_w3, /*!< Weight array */
+                                      const int* const a_offset, /*!< Offset array */ 
                                       int   dir,  /*!< Spatial dimension */
                                       void  *s,   /*!< Solver object of type #HyPar */
                                       void  *m    /*!< MPI object of type #MPIVariables */
@@ -48,7 +51,7 @@ int WENOFifthOrderInitializeWeights(
   int *dim   = solver->dim_local;
 
   /* calculate dimension offset */
-  int offset = weno->offset[dir];
+  int offset = a_offset[dir];
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -57,9 +60,9 @@ int WENOFifthOrderInitializeWeights(
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
 
   /* calculate weights for a left-biased interpolation */
-  ww1 = weno->w1 + offset;
-  ww2 = weno->w2 + offset;
-  ww3 = weno->w3 + offset;
+  ww1 = a_w1 + offset;
+  ww2 = a_w2 + offset;
+  ww3 = a_w3 + offset;
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,indexI,ndims);
@@ -98,9 +101,9 @@ int WENOFifthOrderInitializeWeights(
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
 
-  ww1 = weno->w1 + weno->size + offset;
-  ww2 = weno->w2 + weno->size + offset;
-  ww3 = weno->w3 + weno->size + offset;
+  ww1 = a_w1 + weno->size + offset;
+  ww2 = a_w2 + weno->size + offset;
+  ww3 = a_w3 + weno->size + offset;
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,indexI,ndims);
@@ -141,9 +144,9 @@ int WENOFifthOrderInitializeWeights(
   }
 
   /* calculate weights for a right-biased interpolation */
-  ww1 = weno->w1 + 2*weno->size + offset;
-  ww2 = weno->w2 + 2*weno->size + offset;
-  ww3 = weno->w3 + 2*weno->size + offset;
+  ww1 = a_w1 + 2*weno->size + offset;
+  ww2 = a_w2 + 2*weno->size + offset;
+  ww3 = a_w3 + 2*weno->size + offset;
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,indexI,ndims);
@@ -183,9 +186,9 @@ int WENOFifthOrderInitializeWeights(
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
 
-  ww1 = weno->w1 + 2*weno->size + weno->size + offset;
-  ww2 = weno->w2 + 2*weno->size + weno->size + offset;
-  ww3 = weno->w3 + 2*weno->size + weno->size + offset;
+  ww1 = a_w1 + 2*weno->size + weno->size + offset;
+  ww2 = a_w2 + 2*weno->size + weno->size + offset;
+  ww3 = a_w3 + 2*weno->size + weno->size + offset;
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,indexI,ndims);

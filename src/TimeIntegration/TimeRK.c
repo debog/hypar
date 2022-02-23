@@ -1,12 +1,18 @@
 /*! @file TimeRK.c
     @brief Explicit Runge-Kutta method
-    @author Debojyoti Ghosh
+    @author Debojyoti Ghosh, Youngdae Kim
 */
 
 #include <basic.h>
+#if defined (HAVE_CUDA)
+#include <arrayfunctions_gpu.h>
+#else
 #include <arrayfunctions.h>
+#endif
 #include <simulation_object.h>
 #include <timeintegration.h>
+#include <time.h>
+#include <math.h>
 
 /*!
   Advance the ODE given by
@@ -21,7 +27,7 @@
   \f}
   where the subscript represents the time level, the superscripts represent the stages, \f$\Delta t\f$ is the
   time step size #HyPar::dt, and \f${\bf F}\left({\bf u}\right)\f$ is computed by #TimeIntegration::RHSFunction.
-  The Butcher tableaux coefficients are \f$a_{ij}\f$ (#ExplicitRKParameters::A) and \f$b_i\f$ 
+  The Butcher tableaux coefficients are \f$a_{ij}\f$ (#ExplicitRKParameters::A) and \f$b_i\f$
   (#ExplicitRKParameters::b).
 
   Note: In the code #TimeIntegration::Udot is equivalent to \f${\bf F}\left({\bf u}\right)\f$.
@@ -32,83 +38,166 @@ int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
   SimulationObject* sim = (SimulationObject*) TS->simulation;
   ExplicitRKParameters *params = (ExplicitRKParameters*) sim[0].solver.msti;
   int ns, stage, i, nsims = TS->nsims;
-  _DECLARE_IERR_;
 
-  /* Calculate stage values */
-  for (stage = 0; stage < params->nstages; stage++) {
+#if defined(HAVE_CUDA)
+  if (sim[0].solver.use_gpu) {
 
-    double stagetime = TS->waqt + params->c[stage]*TS->dt;
+    /* Calculate stage values */
+    for (stage = 0; stage < params->nstages; stage++) {
 
-    for (ns = 0; ns < nsims; ns++) {
-      _ArrayCopy1D_(  sim[ns].solver.u,
-                      (TS->U[stage] + TS->u_offsets[ns]),
-                      (TS->u_sizes[ns]) );
-    }
+      double stagetime = TS->waqt + params->c[stage]*TS->dt;
 
-    for (i = 0; i < stage; i++) {
-      _ArrayAXPY_(  TS->Udot[i],
-                    (TS->dt * params->A[stage*params->nstages+i]),
-                    TS->U[stage],
-                    TS->u_size_total ); 
-    }
+      for (ns = 0; ns < nsims; ns++) {
+          gpuArrayCopy1D(  sim[ns].solver.gpu_u,
+                           (TS->gpu_U + stage*TS->u_size_total + TS->u_offsets[ns]),
+                           (TS->u_sizes[ns])  );
 
-    for (ns = 0; ns < nsims; ns++) {
-      if (sim[ns].solver.PreStage) { 
-        fprintf(stderr,"Call to solver->PreStage() commented out in TimeRK()!\n");
-        return 1;
-//        IERR sim[ns].solver.PreStage( stage,
-//                                      (TS->U),
-//                                      &(sim[ns].solver),
-//                                      &(sim[ns].mpi),
-//                                      stagetime ); CHECKERR(ierr); 
       }
-    }
 
-    for (ns = 0; ns < nsims; ns++) {
-      IERR TS->RHSFunction( (TS->Udot[stage] + TS->u_offsets[ns]),
-                            (TS->U[stage] + TS->u_offsets[ns]),
-                            &(sim[ns].solver),
-                            &(sim[ns].mpi),
-                            stagetime);
-    }
+      for (i = 0; i < stage; i++) {
+          gpuArrayAXPY(  TS->gpu_Udot + i*TS->u_size_total,
+                         (TS->dt * params->A[stage*params->nstages+i]),
+                         TS->gpu_U + stage*TS->u_size_total,
+                         TS->u_size_total  );
 
-    for (ns = 0; ns < nsims; ns++) {
-      if (sim[ns].solver.PostStage) { 
-        IERR sim[ns].solver.PostStage(  (TS->U[stage] + TS->u_offsets[ns]),
-                                        &(sim[ns].solver),
-                                        &(sim[ns].mpi),
-                                        stagetime); CHECKERR(ierr); 
       }
+
+      for (ns = 0; ns < nsims; ns++) {
+        if (sim[ns].solver.PreStage) {
+          fprintf(stderr,"Call to solver->PreStage() commented out in TimeRK()!\n");
+          return 1;
+//          sim[ns].solver.PreStage( stage,
+//                                   (TS->gpu_U),
+//                                   &(sim[ns].solver),
+//                                   &(sim[ns].mpi),
+//                                   stagetime ); CHECKERR(ierr);
+        }
+      }
+
+      for (ns = 0; ns < nsims; ns++) {
+          TS->RHSFunction( (TS->gpu_Udot + stage*TS->u_size_total + TS->u_offsets[ns]),
+                           (TS->gpu_U + stage*TS->u_size_total + TS->u_offsets[ns]),
+                           &(sim[ns].solver),
+                           &(sim[ns].mpi),
+                           stagetime  );
+      }
+
+      for (ns = 0; ns < nsims; ns++) {
+        if (sim[ns].solver.PostStage) {
+          sim[ns].solver.PostStage(  (TS->gpu_U + stage*TS->u_size_total + TS->u_offsets[ns]),
+                                     &(sim[ns].solver),
+                                     &(sim[ns].mpi),
+                                     stagetime);
+        }
+      }
+
+      gpuArraySetValue(TS->gpu_BoundaryFlux + stage*TS->bf_size_total, TS->bf_size_total, 0.0);
+
+      for (ns = 0; ns < nsims; ns++) {
+          gpuArrayCopy1D(  sim[ns].solver.StageBoundaryIntegral,
+                           (TS->gpu_BoundaryFlux + stage*TS->bf_size_total + TS->bf_offsets[ns]),
+                            TS->bf_sizes[ns]  );
+
+      }
+
     }
 
-    _ArraySetValue_(TS->BoundaryFlux[stage], TS->bf_size_total, 0.0);
-    for (ns = 0; ns < nsims; ns++) {
-      _ArrayCopy1D_(  sim[ns].solver.StageBoundaryIntegral,
-                      (TS->BoundaryFlux[stage] + TS->bf_offsets[ns]),
-                      TS->bf_sizes[ns] );
+    /* Step completion */
+    for (stage = 0; stage < params->nstages; stage++) {
+
+      for (ns = 0; ns < nsims; ns++) {
+          gpuArrayAXPY(  (TS->gpu_Udot + stage*TS->u_size_total + TS->u_offsets[ns]),
+                          (TS->dt * params->b[stage]),
+                          (sim[ns].solver.gpu_u),
+                          (TS->u_sizes[ns]) );
+          gpuArrayAXPY(  (TS->gpu_BoundaryFlux + stage*TS->bf_size_total + TS->bf_offsets[ns]),
+                          (TS->dt * params->b[stage]),
+                          (sim[ns].solver.StepBoundaryIntegral),
+                          (TS->bf_sizes[ns]) );
+
+      }
+
     }
 
-  }
+  } else {
+#endif
 
-  /* Step completion */
-  for (stage = 0; stage < params->nstages; stage++) {
-
-    for (ns = 0; ns < nsims; ns++) {
-
-      _ArrayAXPY_(  (TS->Udot[stage] + TS->u_offsets[ns]),
-                    (TS->dt * params->b[stage]),
-                    (sim[ns].solver.u),
-                    (TS->u_sizes[ns]) );
+    /* Calculate stage values */
+    for (stage = 0; stage < params->nstages; stage++) {
   
-      _ArrayAXPY_(  (TS->BoundaryFlux[stage] + TS->bf_offsets[ns]),
-                    (TS->dt * params->b[stage]),
-                    (sim[ns].solver.StepBoundaryIntegral),
-                    (TS->bf_sizes[ns]) );
-
+      double stagetime = TS->waqt + params->c[stage]*TS->dt;
+  
+      for (ns = 0; ns < nsims; ns++) {
+        _ArrayCopy1D_(  sim[ns].solver.u,
+                        (TS->U[stage] + TS->u_offsets[ns]),
+                        (TS->u_sizes[ns]) );
+      }
+  
+      for (i = 0; i < stage; i++) {
+        _ArrayAXPY_(  TS->Udot[i],
+                      (TS->dt * params->A[stage*params->nstages+i]),
+                      TS->U[stage],
+                      TS->u_size_total );
+      }
+  
+      for (ns = 0; ns < nsims; ns++) {
+        if (sim[ns].solver.PreStage) {
+          fprintf(stderr,"Call to solver->PreStage() commented out in TimeRK()!\n");
+          return 1;
+  //        sim[ns].solver.PreStage( stage,
+  //                                 (TS->U),
+  //                                 &(sim[ns].solver),
+  //                                 &(sim[ns].mpi),
+  //                                 stagetime ); CHECKERR(ierr);
+        }
+      }
+  
+      for (ns = 0; ns < nsims; ns++) {
+        TS->RHSFunction( (TS->Udot[stage] + TS->u_offsets[ns]),
+                         (TS->U[stage] + TS->u_offsets[ns]),
+                         &(sim[ns].solver),
+                         &(sim[ns].mpi),
+                         stagetime);
+      }
+  
+      for (ns = 0; ns < nsims; ns++) {
+        if (sim[ns].solver.PostStage) {
+          sim[ns].solver.PostStage(  (TS->U[stage] + TS->u_offsets[ns]),
+                                     &(sim[ns].solver),
+                                     &(sim[ns].mpi),
+                                     stagetime); CHECKERR(ierr);
+        }
+      }
+  
+      _ArraySetValue_(TS->BoundaryFlux[stage], TS->bf_size_total, 0.0);
+      for (ns = 0; ns < nsims; ns++) {
+        _ArrayCopy1D_(  sim[ns].solver.StageBoundaryIntegral,
+                        (TS->BoundaryFlux[stage] + TS->bf_offsets[ns]),
+                        TS->bf_sizes[ns] );
+      }
+  
+    }
+  
+    /* Step completion */
+    for (stage = 0; stage < params->nstages; stage++) {
+  
+      for (ns = 0; ns < nsims; ns++) {
+        _ArrayAXPY_(  (TS->Udot[stage] + TS->u_offsets[ns]),
+                      (TS->dt * params->b[stage]),
+                      (sim[ns].solver.u),
+                      (TS->u_sizes[ns]) );
+        _ArrayAXPY_(  (TS->BoundaryFlux[stage] + TS->bf_offsets[ns]),
+                      (TS->dt * params->b[stage]),
+                      (sim[ns].solver.StepBoundaryIntegral),
+                      (TS->bf_sizes[ns]) );
+      }
+  
     }
 
+#if defined(HAVE_CUDA)
   }
+#endif
 
-  return(0);
+  return 0;
 }
 

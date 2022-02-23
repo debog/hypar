@@ -28,9 +28,9 @@ int NavierStokes3DJacobian(
                 L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */
-  _NavierStokes3DEigenvalues_      (u,D,param,dir);
-  _NavierStokes3DLeftEigenvectors_ (u,L,param,dir);
-  _NavierStokes3DRightEigenvectors_(u,R,param,dir);
+  _NavierStokes3DEigenvalues_      (u,_NavierStokes3D_stride_,D,param->gamma,dir);
+  _NavierStokes3DLeftEigenvectors_ (u,_NavierStokes3D_stride_,L,param->gamma,dir);
+  _NavierStokes3DRightEigenvectors_(u,_NavierStokes3D_stride_,R,param->gamma,dir);
 
   int aupw = absolute(upw), k;
   k = 0;  D[k] = absolute( (1-aupw)*D[k] + 0.5*aupw*(1+upw)*max(0,D[k]) + 0.5*aupw*(1-upw)*min(0,D[k]) );
@@ -66,9 +66,9 @@ int NavierStokes3DStiffJacobian(
                 L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */
-  _NavierStokes3DEigenvalues_      (u,D,param,dir);
-  _NavierStokes3DLeftEigenvectors_ (u,L,param,dir);
-  _NavierStokes3DRightEigenvectors_(u,R,param,dir);
+  _NavierStokes3DEigenvalues_      (u,_NavierStokes3D_stride_,D,param->gamma,dir);
+  _NavierStokes3DLeftEigenvectors_ (u,_NavierStokes3D_stride_,L,param->gamma,dir);
+  _NavierStokes3DRightEigenvectors_(u,_NavierStokes3D_stride_,R,param->gamma,dir);
 
   int aupw = absolute(upw), k;
   if (dir == _XDIR_) {

@@ -1,12 +1,16 @@
 /*! @file SourceFunction.c
-    @author Debojyoti Ghosh
+    @author Debojyoti Ghosh, Youngdae Kim
     @brief Evaluate the source term
 */
 
 #include <stdlib.h>
 #include <string.h>
 #include <basic.h>
+#if defined(HAVE_CUDA)
+#include <arrayfunctions_gpu.h>
+#else
 #include <arrayfunctions.h>
+#endif
 #include <boundaryconditions.h>
 #include <mpivars.h>
 #include <hypar.h>
@@ -25,36 +29,53 @@ int SourceFunction(
 {
   HyPar           *solver   = (HyPar*)        s;
   MPIVariables    *mpi      = (MPIVariables*) m;
-  int             n,d;
-  _DECLARE_IERR_;
-
-  /* extract boundary information to check for and implement sponge BC */
-  DomainBoundary  *boundary = (DomainBoundary*) solver->boundary;
-  int             nb        = solver->nBoundaryZones;
-
-  int     nvars   = solver->nvars;
-  int     ghosts  = solver->ghosts;
-  int     ndims   = solver->ndims;
-  int     *dim    = solver->dim_local;
 
   /* initialize to zero */
-  int size = 1;
-  for (d=0; d<ndims; d++) size *= (dim[d] + 2*ghosts);
-  _ArraySetValue_(source,size*nvars,0.0);
+  int size = solver->ndof_cells_wghosts;
+#if defined(HAVE_CUDA)
+  if (solver->use_gpu) {
+    gpuArraySetValue(source,size, 0.0);
+  } else {
+#endif
+    _ArraySetValue_(source,size,0.0);
+#if defined(HAVE_CUDA)
+  }
+#endif
 
   /* call the source function of the physics model, if available */
   if (solver->SFunction) {
-    IERR solver->SFunction(source,u,solver,mpi,t); CHECKERR(ierr);
+    solver->SFunction(source,u,solver,mpi,t);
     solver->count_sou++;
   }
 
   /* Apart from other source terms, implement sponge BC as a source */
-  for (n = 0; n < nb; n++) {
-    if (!strcmp(boundary[n].bctype,_SPONGE_)) {
-      IERR BCSpongeSource(&boundary[n],ndims,nvars,ghosts,dim,solver->x,u,source); 
-      CHECKERR(ierr);
+  DomainBoundary* boundary = (DomainBoundary*) solver->boundary;
+  int n;
+  int nb = solver->nBoundaryZones;
+#if defined(HAVE_CUDA)
+  if (solver->use_gpu) {
+    for (n = 0; n < nb; n++) {
+      if (!strcmp(boundary[n].bctype,_SPONGE_)) {
+        fprintf(stderr,"ERROR: Sponge BC not yet implemented on GPU.\n");
+      }
     }
+  } else {
+#endif
+    for (n = 0; n < nb; n++) {
+      if (!strcmp(boundary[n].bctype,_SPONGE_)) {
+        BCSpongeSource( &boundary[n],
+                        solver->ndims,
+                        solver->nvars,
+                        solver->ghosts,
+                        solver->dim_local,
+                        solver->x,
+                        u,
+                        source  ); 
+      }
+    }
+#if defined(HAVE_CUDA)
   }
+#endif
 
 
   return(0);

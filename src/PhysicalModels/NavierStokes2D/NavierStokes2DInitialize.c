@@ -50,6 +50,16 @@ int    NavierStokes2DGravityField      (void*,void*);
 int    NavierStokes2DModifiedSolution  (double*,double*,int,void*,void*,double);
 int    NavierStokes2DPreStep           (double*,void*,void*,double);
 
+#if defined(HAVE_CUDA) && defined(CUDA_VAR_ORDERDING_AOS)
+int gpuNavierStokes2DInitialize               (void*,void*);
+int gpuNavierStokes2DFlux                     (double*,double*,int,void*,double);
+int gpuNavierStokes2DSource                   (double*,double*,void*,void*,double);
+int gpuNavierStokes2DUpwindRusanov            (double*,double*,double*,double*,
+                                               double*,double*,int,void*,double);
+int gpuNavierStokes2DModifiedSolution         (double*,double*,int,void*,void*,double);
+int gpuNavierStokes2DParabolicFunction        (double*,double*,void*,void*,double);
+#endif
+
 /*! Initialize the 2D Navier-Stokes (#NavierStokes2D) module:
     Sets the default parameters, read in and set physics-related parameters,
     and set the physics-related function pointers in #HyPar.
@@ -70,8 +80,8 @@ int    NavierStokes2DPreStep           (double*,void*,void*,double);
     ------------------ | ------------ | ----------------------------------------------- | ------------------------
     gamma              | double       | #NavierStokes2D::gamma                          | 1.4
     Pr                 | double       | #NavierStokes2D::Pr                             | 0.72
-    Re                 | double       | #NavierStokes2D::Re                             | -1  
-    Minf               | double       | #NavierStokes2D::Minf                           | 1.0 
+    Re                 | double       | #NavierStokes2D::Re                             | -1
+    Minf               | double       | #NavierStokes2D::Minf                           | 1.0
     gravity            | double,double| #NavierStokes2D::grav_x,#NavierStokes2D::grav_y | 0.0,0.0
     rho_ref            | double       | #NavierStokes2D::rho0                           | 1.0
     p_ref              | double       | #NavierStokes2D::p0                             | 1.0
@@ -79,7 +89,7 @@ int    NavierStokes2DPreStep           (double*,void*,void*,double);
     R                  | double       | #NavierStokes2D::R                              | 1.0
     upwinding          | char[]       | #NavierStokes2D::upw_choice                     | "roe" (#_ROE_)
 
-    + If "HB" (#NavierStokes2D::HB) is specified as 3, it should be followed by the the 
+    + If "HB" (#NavierStokes2D::HB) is specified as 3, it should be followed by the the
       Brunt-Vaisala frequency (#NavierStokes2D::N_bv), i.e.
 
         begin
@@ -96,7 +106,7 @@ int NavierStokes2DInitialize(
                             )
 {
   HyPar           *solver  = (HyPar*)          s;
-  MPIVariables    *mpi     = (MPIVariables*)   m; 
+  MPIVariables    *mpi     = (MPIVariables*)   m;
   NavierStokes2D  *physics = (NavierStokes2D*) solver->physics;
   int             ferr     = 0;
 
@@ -112,7 +122,7 @@ int NavierStokes2DInitialize(
   }
 
   /* default values */
-  physics->gamma  = 1.4; 
+  physics->gamma  = 1.4;
   physics->Pr     = 0.72;
   physics->Re     = -1;
   physics->Minf   = 1.0;
@@ -139,7 +149,7 @@ int NavierStokes2DInitialize(
       if (!strcmp(word, "begin")){
 	      while (strcmp(word, "end")){
 		      ferr = fscanf(in,"%s",word);                  if (ferr != 1) return(1);
-          if (!strcmp(word, "gamma")) { 
+          if (!strcmp(word, "gamma")) {
             ferr = fscanf(in,"%lf",&physics->gamma);    if (ferr != 1) return(1);
           } else if (!strcmp(word,"upwinding")) {
             ferr = fscanf(in,"%s",physics->upw_choice); if (ferr != 1) return(1);
@@ -196,8 +206,8 @@ int NavierStokes2DInitialize(
 
   /* check that a well-balanced upwinding scheme is being used for cases with gravity */
   if (   ((physics->grav_x != 0.0) || (physics->grav_y != 0.0))
-      && (strcmp(physics->upw_choice,_LLF_    )) 
-      && (strcmp(physics->upw_choice,_RUSANOV_)) 
+      && (strcmp(physics->upw_choice,_LLF_    ))
+      && (strcmp(physics->upw_choice,_RUSANOV_))
       && (strcmp(physics->upw_choice,_ROE_    ))              ) {
     if (!mpi->rank) {
       fprintf(stderr,"Error in NavierStokes2DInitialize: %s, %s or %s upwinding is needed for flows ",_LLF_,_ROE_,_RUSANOV_);
@@ -207,66 +217,100 @@ int NavierStokes2DInitialize(
   }
   /* check that solver has the correct choice of diffusion formulation */
   if (strcmp(solver->spatial_type_par,_NC_2STAGE_) && (physics->Re > 0)) {
-    if (!mpi->rank) 
+    if (!mpi->rank)
       fprintf(stderr,"Error in NavierStokes2DInitialize(): Parabolic term spatial discretization must be \"%s\"\n",_NC_2STAGE_);
     return(1);
   }
 
   /* initializing physical model-specific functions */
-  solver->PreStep               = NavierStokes2DPreStep;
-  solver->ComputeCFL            = NavierStokes2DComputeCFL;
-  solver->FFunction             = NavierStokes2DFlux;
-  solver->SFunction             = NavierStokes2DSource;
-  solver->UFunction             = NavierStokes2DModifiedSolution;
-  solver->AveragingFunction     = NavierStokes2DRoeAverage;
-  solver->GetLeftEigenvectors   = NavierStokes2DLeftEigenvectors;
-  solver->GetRightEigenvectors  = NavierStokes2DRightEigenvectors;
+#if defined(HAVE_CUDA) && defined(CUDA_VAR_ORDERDING_AOS)
+  if (solver->use_gpu) {
+    solver->FFunction  = gpuNavierStokes2DFlux;
+    solver->SFunction  = gpuNavierStokes2DSource;
+    solver->UFunction  = gpuNavierStokes2DModifiedSolution;
+  } else {
+#endif
+    solver->PreStep               = NavierStokes2DPreStep;
+    solver->ComputeCFL            = NavierStokes2DComputeCFL;
+    solver->FFunction             = NavierStokes2DFlux;
+    solver->SFunction             = NavierStokes2DSource;
+    solver->UFunction             = NavierStokes2DModifiedSolution;
+    solver->AveragingFunction     = NavierStokes2DRoeAverage;
+    solver->GetLeftEigenvectors   = NavierStokes2DLeftEigenvectors;
+    solver->GetRightEigenvectors  = NavierStokes2DRightEigenvectors;
+#if defined(HAVE_CUDA) && defined(CUDA_VAR_ORDERDING_AOS)
+  }
+#endif
 
-  if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-    solver->FdFFunction = NavierStokes2DNonStiffFlux;
-    solver->dFFunction  = NavierStokes2DStiffFlux;
-    solver->JFunction   = NavierStokes2DStiffJacobian;
-    if      (!strcmp(physics->upw_choice,_ROE_)) {
-      solver->Upwind    = NavierStokes2DUpwindRoe;
-      solver->UpwinddF  = NavierStokes2DUpwinddFRoe;
-      solver->UpwindFdF = NavierStokes2DUpwindFdFRoe;
-    } else if (!strcmp(physics->upw_choice,_RF_)) {
-      solver->Upwind    = NavierStokes2DUpwindRF;
-      solver->UpwinddF  = NavierStokes2DUpwinddFRF;
-      solver->UpwindFdF = NavierStokes2DUpwindFdFRF;
-    } else if (!strcmp(physics->upw_choice,_LLF_)) {
-      solver->Upwind    = NavierStokes2DUpwindLLF;
-      solver->UpwinddF  = NavierStokes2DUpwinddFLLF;
-      solver->UpwindFdF = NavierStokes2DUpwindFdFLLF;
-    } else if (!strcmp(physics->upw_choice,_RUSANOV_)) {
-      solver->Upwind    = NavierStokes2DUpwindRusanovModified;
-      solver->UpwinddF  = NavierStokes2DUpwinddFRusanovModified;
-      solver->UpwindFdF = NavierStokes2DUpwindFdFRusanovModified;
-    } else {
+#if defined(HAVE_CUDA) && defined(CUDA_VAR_ORDERDING_AOS)
+  if (solver->use_gpu) {
+    if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
       if (!mpi->rank) {
-        fprintf(stderr,"Error in NavierStokes2DInitialize(): %s is not a valid upwinding scheme ",
-                physics->upw_choice);
-        fprintf(stderr,"for use with split hyperbolic flux form. Use %s, %s, %s, or %s.\n",
-                _ROE_,_RF_,_LLF_,_RUSANOV_);
+        fprintf(stderr,"Error in NavierStokes2DInitialize(): Not yet implemented on GPU!");
       }
-      return(1);
+      return 1;
+    } else {
+      solver->JFunction = NavierStokes2DJacobian;
+      if (!strcmp(physics->upw_choice,_RUSANOV_)) solver->Upwind = gpuNavierStokes2DUpwindRusanov;
+      else {
+        if (!mpi->rank) {
+          fprintf(stderr,"Error in NavierStokes2DInitialize(): %s is not implemented on GPU. ",
+                  physics->upw_choice);
+          fprintf(stderr,"Only choice is %s.\n",_RUSANOV_);
+        }
+        return 1;
+      }
     }
   } else {
-    solver->JFunction      = NavierStokes2DJacobian;
-    if      (!strcmp(physics->upw_choice,_ROE_    )) solver->Upwind = NavierStokes2DUpwindRoe;
-    else if (!strcmp(physics->upw_choice,_RF_     )) solver->Upwind = NavierStokes2DUpwindRF;
-    else if (!strcmp(physics->upw_choice,_LLF_    )) solver->Upwind = NavierStokes2DUpwindLLF;
-    else if (!strcmp(physics->upw_choice,_SWFS_   )) solver->Upwind = NavierStokes2DUpwindSWFS;
-    else if (!strcmp(physics->upw_choice,_RUSANOV_)) solver->Upwind = NavierStokes2DUpwindRusanov;
-    else {
-      if (!mpi->rank) {
-        fprintf(stderr,"Error in NavierStokes2DInitialize(): %s is not a valid upwinding scheme. ",
-                physics->upw_choice);
-        fprintf(stderr,"Choices are %s, %s, %s, %s, and %s.\n",_ROE_,_RF_,_LLF_,_SWFS_,_RUSANOV_);
+#endif
+    if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
+      solver->FdFFunction = NavierStokes2DNonStiffFlux;
+      solver->dFFunction  = NavierStokes2DStiffFlux;
+      solver->JFunction = NavierStokes2DStiffJacobian;
+      if (!strcmp(physics->upw_choice,_ROE_)) {
+        solver->Upwind    = NavierStokes2DUpwindRoe;
+        solver->UpwinddF  = NavierStokes2DUpwinddFRoe;
+        solver->UpwindFdF = NavierStokes2DUpwindFdFRoe;
+      } else if (!strcmp(physics->upw_choice,_RF_)) {
+        solver->Upwind    = NavierStokes2DUpwindRF;
+        solver->UpwinddF  = NavierStokes2DUpwinddFRF;
+        solver->UpwindFdF = NavierStokes2DUpwindFdFRF;
+      } else if (!strcmp(physics->upw_choice,_LLF_)) {
+        solver->Upwind    = NavierStokes2DUpwindLLF;
+        solver->UpwinddF  = NavierStokes2DUpwinddFLLF;
+        solver->UpwindFdF = NavierStokes2DUpwindFdFLLF;
+      } else if (!strcmp(physics->upw_choice,_RUSANOV_)) {
+        solver->Upwind    = NavierStokes2DUpwindRusanovModified;
+        solver->UpwinddF  = NavierStokes2DUpwinddFRusanovModified;
+        solver->UpwindFdF = NavierStokes2DUpwindFdFRusanovModified;
+      } else {
+        if (!mpi->rank) {
+          fprintf(stderr,"Error in NavierStokes2DInitialize(): %s is not a valid upwinding scheme ",
+                  physics->upw_choice);
+          fprintf(stderr,"for use with split hyperbolic flux form. Use %s, %s, %s, or %s.\n",
+                  _ROE_,_RF_,_LLF_,_RUSANOV_);
+        }
+        return(1);
       }
-      return(1);
+    } else {
+      solver->JFunction = NavierStokes2DJacobian;
+      if      (!strcmp(physics->upw_choice,_ROE_    )) solver->Upwind = NavierStokes2DUpwindRoe;
+      else if (!strcmp(physics->upw_choice,_RF_     )) solver->Upwind = NavierStokes2DUpwindRF;
+      else if (!strcmp(physics->upw_choice,_LLF_    )) solver->Upwind = NavierStokes2DUpwindLLF;
+      else if (!strcmp(physics->upw_choice,_SWFS_   )) solver->Upwind = NavierStokes2DUpwindSWFS;
+      else if (!strcmp(physics->upw_choice,_RUSANOV_)) solver->Upwind = NavierStokes2DUpwindRusanov;
+      else {
+        if (!mpi->rank) {
+          fprintf(stderr,"Error in NavierStokes2DInitialize(): %s is not a valid upwinding scheme. ",
+                  physics->upw_choice);
+          fprintf(stderr,"Choices are %s, %s, %s, %s, and %s.\n",_ROE_,_RF_,_LLF_,_SWFS_,_RUSANOV_);
+        }
+        return(1);
+      }
     }
+#if defined(HAVE_CUDA) && defined(CUDA_VAR_ORDERDING_AOS)
   }
+#endif
 
   /* set the value of gamma in all the boundary objects */
   int n;
@@ -274,9 +318,17 @@ int NavierStokes2DInitialize(
   for (n = 0; n < solver->nBoundaryZones; n++)  boundary[n].gamma = physics->gamma;
 
   /* hijack the main solver's dissipation function pointer
-   * to this model's own function, since it's difficult to express 
+   * to this model's own function, since it's difficult to express
    * the dissipation terms in the general form                      */
-  solver->ParabolicFunction = NavierStokes2DParabolicFunction;
+#if defined(HAVE_CUDA) && defined(CUDA_VAR_ORDERDING_AOS)
+  if (solver->use_gpu) {
+    solver->ParabolicFunction = NavierStokes2DParabolicFunction;
+  } else {
+#endif
+    solver->ParabolicFunction = NavierStokes2DParabolicFunction;
+#if defined(HAVE_CUDA) && defined(CUDA_VAR_ORDERDING_AOS)
+  }
+#endif
 
   /* allocate array to hold the gravity field */
   int *dim    = solver->dim_local;
@@ -289,6 +341,10 @@ int NavierStokes2DInitialize(
   physics->solution     = (double*) calloc (size*_MODEL_NVARS_,sizeof(double));
   /* initialize the gravity fields */
   IERR NavierStokes2DGravityField(solver,mpi); CHECKERR(ierr);
+
+#if defined(HAVE_CUDA) && defined(CUDA_VAR_ORDERDING_AOS)
+  if (solver->use_gpu) gpuNavierStokes2DInitialize(s,m);
+#endif
 
   count++;
   return(0);

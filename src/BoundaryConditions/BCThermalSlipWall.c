@@ -43,9 +43,8 @@ int BCThermalSlipWallU(
   if (ndims == 3) {
 
     /* create a fake physics object */
-    NavierStokes3D physics; 
     double gamma; 
-    gamma = physics.gamma = boundary->gamma;
+    gamma = boundary->gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
     if (boundary->on_this_proc) {
@@ -82,7 +81,7 @@ int BCThermalSlipWallU(
         
         /* flow variables in the interior */
         double rho, uvel, vvel, wvel, energy, pressure;
-        _NavierStokes3DGetFlowVar_((phi+nvars*p2),rho,uvel,vvel,wvel,energy,pressure,(&physics));
+        _NavierStokes3DGetFlowVar_((phi+nvars*p2),_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,gamma);
         /* set the ghost point values */
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
         rho_gpt = rho;

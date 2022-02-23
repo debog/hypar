@@ -99,11 +99,14 @@ int WriteInputs ( void  *s,     /*!< Array of simulation objects of type #Simula
     else                                        printf("\n");
     printf("  Solution file format                       : %s\n"     ,sim[0].solver.op_file_format      );
     printf("  Overwrite solution file                    : %s\n"     ,sim[0].solver.op_overwrite        );
+#if defined(HAVE_CUDA)
+    printf("  Use GPU                                    : %s\n"     ,(sim[0].solver.use_gpu == 1)? "yes" : "no");
+    printf("  GPU device no                              : %d\n"     ,(sim[0].solver.gpu_device_no));
+#endif
     printf("  Physical model                             : %s\n"     ,sim[0].solver.model               );
     if (sim[0].solver.flag_ib) {
       printf("  Immersed Body                              : %s\n"     ,sim[0].solver.ib_filename         );
     }
-    
   }
 
   return 0;

@@ -25,7 +25,7 @@ int NavierStokes2DLeftEigenvectors(
                                   )
 {
   NavierStokes2D *param  = (NavierStokes2D*)  p;
-  _NavierStokes2DLeftEigenvectors_(u,L,param,dir);
+  _NavierStokes2DLeftEigenvectors_(u,L,param->gamma,dir);
   return(0);
 }
 
@@ -44,6 +44,6 @@ int NavierStokes2DRightEigenvectors(
                                     )
 {
   NavierStokes2D *param  = (NavierStokes2D*)  p;
-  _NavierStokes2DRightEigenvectors_(u,R,param,dir);
+  _NavierStokes2DRightEigenvectors_(u,R,param->gamma,dir);
   return(0);
 }

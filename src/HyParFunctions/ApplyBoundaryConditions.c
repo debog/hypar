@@ -6,6 +6,7 @@
  *  to each boundary zone.
 */
 
+#include <stdio.h>
 #include <basic.h>
 #include <arrayfunctions.h>
 #include <mpivars.h>
@@ -35,14 +36,23 @@ int ApplyBoundaryConditions(void    *s,     /*!< Object of type #HyPar containin
   DomainBoundary  *boundary = (DomainBoundary*) solver->boundary;
   MPIVariables    *mpi      = (MPIVariables*)   m;
   int             nb        = solver->nBoundaryZones;
-  _DECLARE_IERR_;
+
+  int* dim_local;
+#if defined(HAVE_CUDA)
+  if (solver->use_gpu) {
+    dim_local = solver->gpu_dim_local;
+  } else {
+#endif
+    dim_local = solver->dim_local;
+#if defined(HAVE_CUDA)
+  }
+#endif
 
   /* Apply domain boundary conditions to x */
   int n;
   for (n = 0; n < nb; n++) {
-    IERR boundary[n].BCFunctionU(&boundary[n],mpi,solver->ndims,solver->nvars,
-                                 solver->dim_local,solver->ghosts,x,waqt);
-    CHECKERR(ierr);
+    boundary[n].BCFunctionU(&boundary[n],mpi,solver->ndims,solver->nvars,
+                            dim_local,solver->ghosts,x,waqt);
   }
 
   return(0);

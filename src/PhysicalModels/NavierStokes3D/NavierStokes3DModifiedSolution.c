@@ -9,17 +9,17 @@
 #include <hypar.h>
 
 /*!
-    This function computes the modified solution for the well-balanced treatment of the 
+    This function computes the modified solution for the well-balanced treatment of the
     gravitational source terms. The modified solution vector is given by
     \f{equation}{
       {\bf u}^* = \left[\begin{array}{c} \rho \varrho^{-1}\left(x,y\right) \\ \rho u \varrho^{-1}\left(x,y\right) \\ \rho v \varrho^{-1}\left(x,y\right) \\ \rho w \varrho^{-1}\left(x,y\right) \\ e^* \end{array}\right]
     \f}
-    where 
+    where
     \f{equation}{
       e^* = \frac{p \varphi^{-1}\left(x,y\right)}{\gamma-1} + \frac{1}{2}\rho \varrho^{-1}\left(x,y\right) \left(u^2+v^2+w^2\right)
     \f}
     \f$\varrho\f$ and \f$\varphi\f$ are computed in #NavierStokes3DGravityField(). For flows without gravity, \f${\bf u}^* = {\bf u}\f$.
-    
+
     References:
     + Ghosh, D., Constantinescu, E.M., Well-Balanced Formulation of Gravitational Source
       Terms for Conservative Finite-Difference Atmospheric Flow Solvers, AIAA Paper 2015-2889,
@@ -57,7 +57,7 @@ int NavierStokes3DModifiedSolution(
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double rho, uvel, vvel, wvel, E, P;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),rho,uvel,vvel,wvel,E,P,param);
+    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,uvel,vvel,wvel,E,P,param->gamma);
     uC[_MODEL_NVARS_*p+0] = u[_MODEL_NVARS_*p+0] * param->grav_field_f[p];
     uC[_MODEL_NVARS_*p+1] = u[_MODEL_NVARS_*p+1] * param->grav_field_f[p];
     uC[_MODEL_NVARS_*p+2] = u[_MODEL_NVARS_*p+2] * param->grav_field_f[p];
@@ -65,5 +65,6 @@ int NavierStokes3DModifiedSolution(
     uC[_MODEL_NVARS_*p+4] = (P*inv_gamma_m1)*(1.0/param->grav_field_g[p]) + (0.5*rho*(uvel*uvel+vvel*vvel+wvel*wvel))*param->grav_field_f[p];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
+
   return(0);
 }

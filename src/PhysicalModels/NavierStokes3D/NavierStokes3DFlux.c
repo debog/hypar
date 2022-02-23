@@ -48,11 +48,11 @@ int NavierStokes3DFlux(
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double rho, vx, vy, vz, e, P;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),rho,vx,vy,vz,e,P,param);
-    _NavierStokes3DSetFlux_((f+_MODEL_NVARS_*p),rho,vx,vy,vz,e,P,dir);
+    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,param->gamma);
+    _NavierStokes3DSetFlux_((f+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,dir);
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
-  
+
   return(0);
 }
 
@@ -63,7 +63,7 @@ int NavierStokes3DFlux(
       {\bf f}\left({\bf u}\right) = A_f{\bf u}
     \f}
     where \f$A_f = A_f\left({\bf u}_{ref}\right)\f$ is the fast Jacobian (#NavierStokes3D::fast_jac)
-    evaluated for the solution at the beginning of each time step (\f${\bf u}_{ref}\f$ is 
+    evaluated for the solution at the beginning of each time step (\f${\bf u}_{ref}\f$ is
     #NavierStokes3D::solution). This is done in NavierStokes3DPreStep().\n\n
   Note: the flux function needs to be computed at the ghost points as well.
 */
@@ -91,7 +91,7 @@ int NavierStokes3DStiffFlux(
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
     double *Af = param->fast_jac+(_MODEL_NDIMS_*p+dir)*JacSize;
-    MatVecMult5(_MODEL_NVARS_,(f+_MODEL_NVARS_*p),Af,(u+_MODEL_NVARS_*p)); 
+    MatVecMult5(_MODEL_NVARS_,(f+_MODEL_NVARS_*p),Af,(u+_MODEL_NVARS_*p));
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }
 
@@ -104,7 +104,7 @@ int NavierStokes3DStiffFlux(
     \f{equation}{
       {\bf f}\left({\bf u}\right) - A_f{\bf u}
     \f}
-    where \f${\bf f}\left({\bf u}\right)\f$ is the total flux computed in NavierStokes3DFlux(), 
+    where \f${\bf f}\left({\bf u}\right)\f$ is the total flux computed in NavierStokes3DFlux(),
     and \f$A_f{\bf u}\f$ is the linearized stiff flux computed in NavierStokes3DStiffFlux().\n\n
   Note: the flux function needs to be computed at the ghost points as well.
 */
@@ -134,11 +134,11 @@ int NavierStokes3DNonStiffFlux(
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
     /* compute total flux */
     double rho, vx, vy, vz, e, P;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),rho,vx,vy,vz,e,P,param);
-    _NavierStokes3DSetFlux_(ftot,rho,vx,vy,vz,e,P,dir);
+    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,param->gamma);
+    _NavierStokes3DSetFlux_(ftot,_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,dir);
     /* compute stiff stuff */
     double *Af = param->fast_jac+(_MODEL_NDIMS_*p+dir)*JacSize;
-    MatVecMult5(_MODEL_NVARS_,fstiff,Af,(u+_MODEL_NVARS_*p)); 
+    MatVecMult5(_MODEL_NVARS_,fstiff,Af,(u+_MODEL_NVARS_*p));
     /* subtract stiff flux from total flux */
     _ArraySubtract1D_((f+_MODEL_NVARS_*p),ftot,fstiff,_MODEL_NVARS_);
     /* Done */

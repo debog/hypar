@@ -57,3 +57,15 @@ HyPar_LDADD = \
   ArrayFunctions/libArrayFunctions.a \
   MathFunctions/libMathFunctions.a \
   CommonFunctions/libCommonFunctions.a
+
+if ENABLE_CUDA
+HyPar_LDADD += HyParFunctions/libHyParFunctions_GPU.a
+HyPar_LDADD += BoundaryConditions/libBoundaryConditions_GPU.a
+HyPar_LDADD += PhysicalModels/Euler2D/libEuler2D_GPU.a
+HyPar_LDADD += PhysicalModels/NavierStokes2D/libNavierStokes2D_GPU.a
+HyPar_LDADD += PhysicalModels/NavierStokes3D/libNavierStokes3D_GPU.a
+HyPar_LDADD += InterpolationFunctions/libInterpolationFunctions_GPU.a
+HyPar_LDADD += FirstDerivative/libFirstDerivative_GPU.a
+HyPar_LDADD += MPIFunctions/libMPIFunctions_GPU.a
+HyPar_LDADD += ArrayFunctions/libArrayFunctions_GPU.a
+endif

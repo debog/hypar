@@ -1,5 +1,5 @@
 /*! @file InitialSolution.c
-    @author Debojyoti Ghosh
+    @author Debojyoti Ghosh, Youngdae Kim
     @brief Read in initial solution from file
 */
 
@@ -9,14 +9,18 @@
 #include <math.h>
 #include <basic.h>
 #include <common.h>
+#if defined(HAVE_CUDA)
+#include <arrayfunctions_gpu.h>
+#else
 #include <arrayfunctions.h>
+#endif
 #include <io.h>
 #include <mpivars.h>
 #include <simulation_object.h>
 
 int VolumeIntegral(double*,double*,void*,void*);
 
-/*! Read in initial solution from file, and compute grid spacing 
+/*! Read in initial solution from file, and compute grid spacing
     and volume integral of the initial solution */
 int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #SimulationObject */
                       int   nsims /*!< Number of simulation objects */
@@ -71,7 +75,7 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
     offset = 0;
     for (d = 0; d < simobj[n].solver.ndims; d++) {
       for (i = 0; i < simobj[n].solver.dim_local[d]; i++) {
-        simobj[n].solver.dxinv[i+offset+ghosts] 
+        simobj[n].solver.dxinv[i+offset+ghosts]
           = 2.0 / (simobj[n].solver.x[i+1+offset+ghosts]-simobj[n].solver.x[i-1+offset+ghosts]);
       }
       offset += (simobj[n].solver.dim_local[d] + 2*ghosts);
@@ -132,5 +136,34 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
 
   }
 
-  return(0); 
+#if defined(HAVE_CUDA)
+  if (simobj[0].solver.use_gpu) {
+    for (int n = 0; n < nsims; n++) {
+      double *h_u               = (double *) malloc(simobj[n].solver.ndof_cells_wghosts*sizeof(double));
+      int npoints_local_wghosts = simobj[n].solver.npoints_local_wghosts;
+      int nvars                 = simobj[n].solver.nvars;
+      int size_x                = simobj[n].solver.size_x;
+
+      for (int i=0; i<npoints_local_wghosts; i++) {
+        for (int v=0; v<nvars; v++) {
+          h_u[i+v*npoints_local_wghosts] = simobj[n].solver.u[i*nvars+v];
+        }
+      }
+
+      gpuMemcpy(simobj[n].solver.gpu_u, h_u,
+                simobj[n].solver.ndof_cells_wghosts*sizeof(double),
+                gpuMemcpyHostToDevice);
+      gpuMemcpy(simobj[n].solver.gpu_x,
+                simobj[n].solver.x, simobj[n].solver.size_x*sizeof(double),
+                gpuMemcpyHostToDevice);
+      gpuMemcpy(simobj[n].solver.gpu_dxinv, simobj[n].solver.dxinv,
+                simobj[n].solver.size_x*sizeof(double),
+                gpuMemcpyHostToDevice);
+
+      free(h_u);
+    }
+  }
+#endif
+
+  return 0;
 }

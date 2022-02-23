@@ -1,18 +1,28 @@
 /*! @file WENOInitialize.c
     @brief Initializes the WENO-type schemes
-    @author Debojyoti Ghosh
+    @author Debojyoti Ghosh, Youngdae Kim
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(HAVE_CUDA)
+#include <arrayfunctions_gpu.h>
+#else
+#include <arrayfunctions.h>
+#endif
 #include <interpolation.h>
 #include <mpivars.h>
 #include <hypar.h>
 
+int WENOFifthOrderInitializeWeights   (double* const,double* const,double* const,
+                                       const int* const, int,void*,void*);
 int WENOFifthOrderCalculateWeights    (double*,double*,double*,int,void*,void*);
 int WENOFifthOrderCalculateWeightsChar(double*,double*,double*,int,void*,void*);
-int WENOFifthOrderInitializeWeights   (int,void*,void*);
+
+#if defined(HAVE_CUDA)
+int gpuWENOFifthOrderCalculateWeights   (double*,double*,double*,int,void*,void*);
+#endif
 
 /*!
   This function initializes the WENO-type methods.
@@ -100,7 +110,7 @@ int WENOInitialize(
   }
   MPIBroadcast_integer(integer_data,4,0,&mpi->world);
   MPIBroadcast_double (real_data   ,5,0,&mpi->world);
-  
+
   weno->mapped      = integer_data[0];
   weno->borges      = integer_data[1];
   weno->yc          = integer_data[2];
@@ -117,13 +127,18 @@ int WENOInitialize(
     if (!mpi->rank && !count) printf("Warning from WENOInitialize(): \"p\" parameter is 2.0. Any other value will be ignored!\n");
   }
 
+  weno->offset = NULL;
+  weno->w1 = NULL;
+  weno->w2 = NULL;
+  weno->w3 = NULL;
+
   weno->offset = (int*) calloc (ndims,sizeof(int));
   int dir,d;
   for (dir=0; dir<ndims; dir++) {
     weno->offset[dir] = 0;
     for (d=0; d<dir; d++) {
       int size = nvars, i;
-      for (i=0; i<ndims; i++) 
+      for (i=0; i<ndims; i++)
         size *= ( i==d ? solver->dim_local[i]+1 : solver->dim_local[i] );
       weno->offset[dir] += size;
     }
@@ -132,23 +147,66 @@ int WENOInitialize(
   int total_size = 0;
   for (d=0; d<ndims; d++) {
     int size = nvars, i;
-    for (i=0; i<ndims; i++) 
+    for (i=0; i<ndims; i++)
       size *= ( i==d ? solver->dim_local[i]+1 : solver->dim_local[i] );
     total_size += size;
   }
   weno->size = total_size;
 
-  weno->w1 = (double*) calloc (4*total_size,sizeof(double));
-  weno->w2 = (double*) calloc (4*total_size,sizeof(double));
-  weno->w3 = (double*) calloc (4*total_size,sizeof(double));
-
-  if ((!strcmp(type,_CHARACTERISTIC_)) && (nvars > 1)) 
+  if ((!strcmp(type,_CHARACTERISTIC_)) && (nvars > 1))
     solver->SetInterpLimiterVar = WENOFifthOrderCalculateWeightsChar;
-  else solver->SetInterpLimiterVar = WENOFifthOrderCalculateWeights;
+  else {
+#if defined(HAVE_CUDA)
+    if (solver->use_gpu) {
+      solver->SetInterpLimiterVar = gpuWENOFifthOrderCalculateWeights;
+    } else {
+#endif
+      solver->SetInterpLimiterVar = WENOFifthOrderCalculateWeights;
+#if defined(HAVE_CUDA)
+    }
+#endif
+  }
 
   /* initialize WENO weights to their optimal values */
-  for (d=0; d<ndims; d++) WENOFifthOrderInitializeWeights(d,solver,mpi);
-
+  double* tmp_w1 = (double*) calloc (4*total_size,sizeof(double));
+  double* tmp_w2 = (double*) calloc (4*total_size,sizeof(double));
+  double* tmp_w3 = (double*) calloc (4*total_size,sizeof(double));
+  for (d=0; d<ndims; d++) WENOFifthOrderInitializeWeights(  tmp_w1, 
+                                                            tmp_w2, 
+                                                            tmp_w3, 
+                                                            weno->offset, 
+                                                            d,
+                                                            solver,
+                                                            mpi);
   count++;
-  return(0);
+
+#if defined(HAVE_CUDA)
+  if (solver->use_gpu) {
+    //gpuMalloc((void**)&weno->gpu_offset, solver->ndims*sizeof(int));
+    gpuMalloc((void**)&weno->w1, 4*total_size*sizeof(double));
+    gpuMalloc((void**)&weno->w2, 4*total_size*sizeof(double));
+    gpuMalloc((void**)&weno->w3, 4*total_size*sizeof(double));
+
+    //gpuMemcpy(weno->gpu_offset, weno->offset, solver->ndims*sizeof(int), gpuMemcpyHostToDevice);
+    gpuMemcpy(weno->w1, tmp_w1, 4*total_size*sizeof(double), gpuMemcpyHostToDevice);
+    gpuMemcpy(weno->w2, tmp_w2, 4*total_size*sizeof(double), gpuMemcpyHostToDevice);
+    gpuMemcpy(weno->w3, tmp_w3, 4*total_size*sizeof(double), gpuMemcpyHostToDevice);
+  } else {
+#endif
+    weno->w1 = (double*) calloc (4*total_size,sizeof(double));
+    weno->w2 = (double*) calloc (4*total_size,sizeof(double));
+    weno->w3 = (double*) calloc (4*total_size,sizeof(double));
+
+    _ArrayCopy1D_(tmp_w1, weno->w1, 4*total_size);
+    _ArrayCopy1D_(tmp_w2, weno->w2, 4*total_size);
+    _ArrayCopy1D_(tmp_w3, weno->w3, 4*total_size);
+#if defined(HAVE_CUDA)
+  }
+#endif
+
+  free(tmp_w1);
+  free(tmp_w2);
+  free(tmp_w3);
+
+  return 0;
 }

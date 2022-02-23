@@ -27,9 +27,9 @@ int NavierStokes2DJacobian(
                 L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */
-  _NavierStokes2DEigenvalues_      (u,D,param,dir);
-  _NavierStokes2DLeftEigenvectors_ (u,L,param,dir);
-  _NavierStokes2DRightEigenvectors_(u,R,param,dir);
+  _NavierStokes2DEigenvalues_      (u,D,param->gamma,dir);
+  _NavierStokes2DLeftEigenvectors_ (u,L,param->gamma,dir);
+  _NavierStokes2DRightEigenvectors_(u,R,param->gamma,dir);
 
   int aupw = absolute(upw), k;
   k = 0;  D[k] = absolute( (1-aupw)*D[k] + 0.5*aupw*(1+upw)*max(0,D[k]) + 0.5*aupw*(1-upw)*min(0,D[k]) );
@@ -64,9 +64,9 @@ int NavierStokes2DStiffJacobian(
                 L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */
-  _NavierStokes2DEigenvalues_      (u,D,param,dir);
-  _NavierStokes2DLeftEigenvectors_ (u,L,param,dir);
-  _NavierStokes2DRightEigenvectors_(u,R,param,dir);
+  _NavierStokes2DEigenvalues_      (u,D,param->gamma,dir);
+  _NavierStokes2DLeftEigenvectors_ (u,L,param->gamma,dir);
+  _NavierStokes2DRightEigenvectors_(u,R,param->gamma,dir);
 
   int aupw = absolute(upw), k;
   k = 0;  D[k] = absolute( (1-aupw)*D[k] + 0.5*aupw*(1+upw)*max(0,D[k]) + 0.5*aupw*(1-upw)*min(0,D[k]) );

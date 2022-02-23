@@ -28,3 +28,19 @@ libInterpolationFunctions_a_SOURCES = \
   WENOFifthOrderCalculateWeights.c \
   WENOFifthOrderInitializeWeights.c \
   WENOInitialize.c
+
+if ENABLE_CUDA
+noinst_LIBRARIES += libInterpolationFunctions_GPU.a
+libInterpolationFunctions_GPU_a_SOURCES = \
+  WENOFifthOrderCalculateWeights_GPU.cu \
+  Interp1PrimFifthOrderWENO_GPU.cu
+libInterpolationFunctions_GPU_a_LIBADD = \
+  WENOFifthOrderCalculateWeights_GPU.dlink.o \
+  Interp1PrimFifthOrderWENO_GPU.dlink.o
+libInterpolationFunctions_GPU_a_CFLAGS = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CUDA_CFLAGS)
+libInterpolationFunctions_GPU_a_AR = $(NVCC) -arch=sm_70 -lib -o
+
+.cu.o:
+	$(NVCC) $(libInterpolationFunctions_GPU_a_CFLAGS) -arch=sm_70 -dc -o $@ $<
+	$(NVCC) $(libInterpolationFunctions_GPU_a_CFLAGS) -arch=sm_70 -dlink -o $*.dlink.o $@
+endif

@@ -5,6 +5,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
 #include <basic.h>
 #include <arrayfunctions.h>
 #include <matmult_native.h>
@@ -13,9 +15,11 @@
 #include <mpivars.h>
 #include <hypar.h>
 
+#include <arrayfunctions_gpu.h>
+
 #undef  _MINIMUM_GHOSTS_
 /*! \def _MINIMUM_GHOSTS_
- * Minimum number of ghost points required for this interpolation 
+ * Minimum number of ghost points required for this interpolation
  * method.
 */
 #define _MINIMUM_GHOSTS_ 3
@@ -37,7 +41,7 @@ int WENOFifthOrderCalculateWeights(
                                     double  *fC, /*!< Array of cell-centered values of the function \f${\bf f}\left({\bf u}\right)\f$ */
                                     double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                     double  *x,  /*!< Grid coordinates */
-                                    int     dir, /*!< Spatial dimension along which to interpolation */ 
+                                    int     dir, /*!< Spatial dimension along which to interpolation */
                                     void    *s,  /*!< Object of type #HyPar containing solver-related variables */
                                     void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                   )
@@ -46,10 +50,14 @@ int WENOFifthOrderCalculateWeights(
   WENOParameters  *weno   = (WENOParameters*) solver->interp;
   MPIVariables    *mpi    = (MPIVariables*)   m;
 
-  if (weno->yc)           return(WENOFifthOrderCalculateWeightsYC (fC,uC,x,dir,solver,mpi));
-  else if (weno->borges)  return(WENOFifthOrderCalculateWeightsZ  (fC,uC,x,dir,solver,mpi));
-  else if (weno->mapped)  return(WENOFifthOrderCalculateWeightsM  (fC,uC,x,dir,solver,mpi));
-  else                    return(WENOFifthOrderCalculateWeightsJS (fC,uC,x,dir,solver,mpi));
+  int ret;
+
+  if (weno->yc)           ret = WENOFifthOrderCalculateWeightsYC (fC,uC,x,dir,solver,mpi);
+  else if (weno->borges)  ret = WENOFifthOrderCalculateWeightsZ  (fC,uC,x,dir,solver,mpi);
+  else if (weno->mapped)  ret = WENOFifthOrderCalculateWeightsM  (fC,uC,x,dir,solver,mpi);
+  else                    ret = WENOFifthOrderCalculateWeightsJS (fC,uC,x,dir,solver,mpi);
+
+  return ret;
 }
 
 /*! Compute the nonlinear weights for 5th order WENO-type schemes. This function is a wrapper that
@@ -59,7 +67,7 @@ int WENOFifthOrderCalculateWeightsChar(
                                         double  *fC, /*!< Array of cell-centered values of the function \f${\bf f}\left({\bf u}\right)\f$ */
                                         double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                         double  *x,  /*!< Grid coordinates */
-                                        int     dir, /*!< Spatial dimension along which to interpolation */ 
+                                        int     dir, /*!< Spatial dimension along which to interpolation */
                                         void    *s,  /*!< Object of type #HyPar containing solver-related variables */
                                         void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                       )
@@ -75,12 +83,12 @@ int WENOFifthOrderCalculateWeightsChar(
 }
 
 /*!
-  Computes the nonlinear weights for the 5th order component-wise WENO-type schemes using the original formulation 
+  Computes the nonlinear weights for the 5th order component-wise WENO-type schemes using the original formulation
   of Jiang & Shu:
   \f{equation}{
     \omega_k = \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = \frac {c_k} {\left(\beta_k+\epsilon\right)^p},\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(f_{j-2}-2f_{j-1}+f_j\right)^2 + \frac{1}{4}\left(f_{j-2}-4f_{j-1}+3f_j\right)^2 \\
@@ -91,10 +99,10 @@ int WENOFifthOrderCalculateWeightsChar(
   \b Notes:
   + This function computes the weights for the entire grid (for interpolation along a given spatial dimension \a dir ).
     Thus, it loops over all grid lines along \a dir.
-  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the 
+  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the
     flux function \f${\bf f}\left({\bf u}\right)\f$ and the solution \f$\bf u\f$. Thus, this approach of computing and
     storing the weights is quite memory-intensive.
-  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the 
+  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the
     current interpolation dimension (\a dir ) are stored.
 
  \b Reference:
@@ -104,7 +112,7 @@ int WENOFifthOrderCalculateWeightsJS(
                                       double  *fC, /*!< Array of cell-centered values of the function \f${\bf f}\left({\bf u}\right)\f$ */
                                       double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                       double  *x,  /*!< Grid coordinates */
-                                      int     dir, /*!< Spatial dimension along which to interpolation */ 
+                                      int     dir, /*!< Spatial dimension along which to interpolation */
                                       void    *s,  /*!< Object of type #HyPar containing solver-related variables */
                                       void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                     )
@@ -167,7 +175,7 @@ int WENOFifthOrderCalculateWeightsJS(
       qm2R = qm1R +   stride[dir];
       qp1R = qm1R -   stride[dir];
       qp2R = qm1R - 2*stride[dir];
-        
+
       /* Defining stencil points */
       double *m3LF, *m2LF, *m1LF, *p1LF, *p2LF;
       m3LF = (fC+qm3L*nvars);
@@ -217,10 +225,10 @@ int WENOFifthOrderCalculateWeightsJS(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno,nvars);
-      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno,nvars);
-      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno,nvars);
-      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno,nvars);
+      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
+      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
+      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
+      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
     }
   }
 
@@ -233,7 +241,7 @@ int WENOFifthOrderCalculateWeightsJS(
     \omega_k &=& \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = \frac {\tilde{\omega}_k \left( c_k + c_k^2 - 3c_k\tilde{\omega}_k + \tilde{\omega}_k^2\right)} {c_k^2 + \tilde{\omega}_k\left(1-2c_k\right)}, \\
     \tilde{\omega}_k &=& \frac {\tilde{a}_k} {\sum_{j=1}^3 \tilde{a}_j },\ \tilde{a}_k = \frac {c_k} {\left(\beta_k+\epsilon\right)^p},\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(f_{j-2}-2f_{j-1}+f_j\right)^2 + \frac{1}{4}\left(f_{j-2}-4f_{j-1}+3f_j\right)^2 \\
@@ -244,21 +252,21 @@ int WENOFifthOrderCalculateWeightsJS(
   \b Notes:
   + This function computes the weights for the entire grid (for interpolation along a given spatial dimension \a dir ).
     Thus, it loops over all grid lines along \a dir.
-  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the 
+  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the
     flux function \f${\bf f}\left({\bf u}\right)\f$ and the solution \f$\bf u\f$. Thus, this approach of computing and
     storing the weights is quite memory-intensive.
-  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the 
+  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the
     current interpolation dimension (\a dir ) are stored.
 
  \b Reference:
- + Henrick, Aslam, Powers, Mapped weighted essentially non-oscillatory schemes: Achieving optimal order near critical 
+ + Henrick, Aslam, Powers, Mapped weighted essentially non-oscillatory schemes: Achieving optimal order near critical
    points, J. Comput. Phys., 2005. http://dx.doi.org/10.1016/j.jcp.2005.01.023
 */
 int WENOFifthOrderCalculateWeightsM(
                                       double  *fC, /*!< Array of cell-centered values of the function \f${\bf f}\left({\bf u}\right)\f$ */
                                       double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                       double  *x,  /*!< Grid coordinates */
-                                      int     dir, /*!< Spatial dimension along which to interpolation */ 
+                                      int     dir, /*!< Spatial dimension along which to interpolation */
                                       void    *s,  /*!< Object of type #HyPar containing solver-related variables */
                                       void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                    )
@@ -302,6 +310,13 @@ int WENOFifthOrderCalculateWeightsM(
   ww1RU = weno->w1 + 2*weno->size + weno->size + offset;
   ww2RU = weno->w2 + 2*weno->size + weno->size + offset;
   ww3RU = weno->w3 + 2*weno->size + weno->size + offset;
+
+#if defined(CPU_STAT)
+  clock_t startTime, endTime;
+  double copyTime = 0.0;
+  startTime = clock();
+#endif
+
 #pragma omp parallel for schedule(auto) default(shared) private(i,index_outer,indexC,indexI)
   for (i=0; i<N_outer; i++) {
     _ArrayIndexnD_(ndims,i,bounds_outer,index_outer,0);
@@ -321,7 +336,7 @@ int WENOFifthOrderCalculateWeightsM(
       qm2R = qm1R +   stride[dir];
       qp1R = qm1R -   stride[dir];
       qp2R = qm1R - 2*stride[dir];
-        
+
       /* Defining stencil points */
       double *m3LF, *m2LF, *m1LF, *p1LF, *p2LF;
       m3LF = (fC+qm3L*nvars);
@@ -371,12 +386,18 @@ int WENOFifthOrderCalculateWeightsM(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno,nvars);
-      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno,nvars);
-      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno,nvars);
-      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno,nvars);
+      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
+      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
+      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
+      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
     }
   }
+
+#if defined(CPU_STAT)
+  endTime = clock();
+  printf("WENOFifthOrderCalculateWeightsM CPU time = %8.6f dir = %d\n",
+         (double)(endTime - startTime) / CLOCKS_PER_SEC, dir);
+#endif
 
   return(0);
 }
@@ -386,7 +407,7 @@ int WENOFifthOrderCalculateWeightsM(
   \f{equation}{
     \omega_k = \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = c_k \left( 1 + \frac{\tau_5}{\beta_k+\epsilon} \right)^p,\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(f_{j-2}-2f_{j-1}+f_j\right)^2 + \frac{1}{4}\left(f_{j-2}-4f_{j-1}+3f_j\right)^2 \\
@@ -398,23 +419,23 @@ int WENOFifthOrderCalculateWeightsM(
   \b Notes:
   + This function computes the weights for the entire grid (for interpolation along a given spatial dimension \a dir ).
     Thus, it loops over all grid lines along \a dir.
-  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the 
+  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the
     flux function \f${\bf f}\left({\bf u}\right)\f$ and the solution \f$\bf u\f$. Thus, this approach of computing and
     storing the weights is quite memory-intensive.
-  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the 
+  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the
     current interpolation dimension (\a dir ) are stored.
 
  \b Reference:
-    + Borges, et. al., An improved weighted essentially non-oscillatory scheme for hyperbolic conservation laws, 
+    + Borges, et. al., An improved weighted essentially non-oscillatory scheme for hyperbolic conservation laws,
       J. Comput. Phys., 2008. http://dx.doi.org/10.1016/j.jcp.2007.11.038
-    + Castro, M., Costa, B., Don, W. S., High order weighted essentially non-oscillatory WENO-Z schemes for hyperbolic 
+    + Castro, M., Costa, B., Don, W. S., High order weighted essentially non-oscillatory WENO-Z schemes for hyperbolic
       conservation laws, J. Comput. Phys., 2011. http://dx.doi.org/10.1016/j.jcp.2010.11.028
 */
 int WENOFifthOrderCalculateWeightsZ(
                                       double  *fC, /*!< Array of cell-centered values of the function \f${\bf f}\left({\bf u}\right)\f$ */
                                       double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                       double  *x,  /*!< Grid coordinates */
-                                      int     dir, /*!< Spatial dimension along which to interpolation */ 
+                                      int     dir, /*!< Spatial dimension along which to interpolation */
                                       void    *s,  /*!< Object of type #HyPar containing solver-related variables */
                                       void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                    )
@@ -477,7 +498,7 @@ int WENOFifthOrderCalculateWeightsZ(
       qm2R = qm1R +   stride[dir];
       qp1R = qm1R -   stride[dir];
       qp2R = qm1R - 2*stride[dir];
-        
+
       /* Defining stencil points */
       double *m3LF, *m2LF, *m1LF, *p1LF, *p2LF;
       m3LF = (fC+qm3L*nvars);
@@ -527,10 +548,10 @@ int WENOFifthOrderCalculateWeightsZ(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno,nvars);
-      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno,nvars);
-      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno,nvars);
-      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno,nvars);
+      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
+      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
+      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
+      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
     }
   }
 
@@ -538,13 +559,13 @@ int WENOFifthOrderCalculateWeightsZ(
 }
 
 /*!
-  Computes the nonlinear weights for the 5th order component-wise WENO-type schemes using the ESWENO formulation of 
+  Computes the nonlinear weights for the 5th order component-wise WENO-type schemes using the ESWENO formulation of
   Yamaleev & Carpenter. Note that only the formulation for the nonlinear weights is adopted and implemented here, not
   the ESWENO scheme as a whole.
   \f{equation}{
     \omega_k = \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = c_k \left( 1 + \frac{\tau_5}{\beta_k+\epsilon} \right)^p,\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(f_{j-2}-2f_{j-1}+f_j\right)^2 + \frac{1}{4}\left(f_{j-2}-4f_{j-1}+3f_j\right)^2 \\
@@ -556,21 +577,21 @@ int WENOFifthOrderCalculateWeightsZ(
   \b Notes:
   + This function computes the weights for the entire grid (for interpolation along a given spatial dimension \a dir ).
     Thus, it loops over all grid lines along \a dir.
-  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the 
+  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the
     flux function \f${\bf f}\left({\bf u}\right)\f$ and the solution \f$\bf u\f$. Thus, this approach of computing and
     storing the weights is quite memory-intensive.
-  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the 
+  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the
     current interpolation dimension (\a dir ) are stored.
 
   \b Reference:
-     + Yamaleev, Carpenter, A systematic methodology for constructing high-order energy stable WENO schemes, 
+     + Yamaleev, Carpenter, A systematic methodology for constructing high-order energy stable WENO schemes,
        J. Comput. Phys., 2009. http://dx.doi.org/10.1016/j.jcp.2009.03.002
 */
 int WENOFifthOrderCalculateWeightsYC(
                                       double  *fC, /*!< Array of cell-centered values of the function \f${\bf f}\left({\bf u}\right)\f$ */
                                       double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                       double  *x,  /*!< Grid coordinates */
-                                      int     dir, /*!< Spatial dimension along which to interpolation */ 
+                                      int     dir, /*!< Spatial dimension along which to interpolation */
                                       void    *s,  /*!< Object of type #HyPar containing solver-related variables */
                                       void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                     )
@@ -614,6 +635,12 @@ int WENOFifthOrderCalculateWeightsYC(
   ww1RU = weno->w1 + 2*weno->size + weno->size + offset;
   ww2RU = weno->w2 + 2*weno->size + weno->size + offset;
   ww3RU = weno->w3 + 2*weno->size + weno->size + offset;
+
+#if defined(CPU_STAT)
+  clock_t cpu_start, cpu_end;
+  cpu_start = clock();
+#endif
+
 #pragma omp parallel for schedule(auto) default(shared) private(i,index_outer,indexC,indexI)
   for (i=0; i<N_outer; i++) {
     _ArrayIndexnD_(ndims,i,bounds_outer,index_outer,0);
@@ -633,7 +660,7 @@ int WENOFifthOrderCalculateWeightsYC(
       qm2R = qm1R +   stride[dir];
       qp1R = qm1R -   stride[dir];
       qp2R = qm1R - 2*stride[dir];
-        
+
       /* Defining stencil points */
       double *m3LF, *m2LF, *m1LF, *p1LF, *p2LF;
       m3LF = (fC+qm3L*nvars);
@@ -683,23 +710,29 @@ int WENOFifthOrderCalculateWeightsYC(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno,nvars);
-      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno,nvars);
-      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno,nvars);
-      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno,nvars);
+      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
+      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
+      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
+      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
     }
   }
+
+#if defined(CPU_STAT)
+  cpu_end = clock();
+  printf("WENOFifthOrderCalculateWeightsYC:\n");
+  printf("  CPU time = %8.6lf dir = %d\n", (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC, dir);
+#endif
 
   return(0);
 }
 
 /*!
-  Computes the nonlinear weights for the 5th order characteristic-based WENO-type schemes using the original formulation 
+  Computes the nonlinear weights for the 5th order characteristic-based WENO-type schemes using the original formulation
   of Jiang & Shu:
   \f{equation}{
     \omega_k = \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = \frac {c_k} {\left(\beta_k+\epsilon\right)^p},\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(\alpha_{j-2}-2\alpha_{j-1}+\alpha_j\right)^2 + \frac{1}{4}\left(\alpha_{j-2}-4\alpha_{j-1}+3\alpha_j\right)^2 \\
@@ -711,15 +744,15 @@ int WENOFifthOrderCalculateWeightsYC(
   \b Notes:
   + This function computes the weights for the entire grid (for interpolation along a given spatial dimension \a dir ).
     Thus, it loops over all grid lines along \a dir.
-  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the 
+  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the
     flux function \f${\bf f}\left({\bf u}\right)\f$ and the solution \f$\bf u\f$. Thus, this approach of computing and
     storing the weights is quite memory-intensive.
-  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the 
+  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the
     current interpolation dimension (\a dir ) are stored.
   + This function requires functions to compute the average state and the left eigenvectors for the characteristic
     decomposition. These are provided by the physical model through
-      - #HyPar::GetLeftEigenvectors() 
-      - #HyPar::AveragingFunction() 
+      - #HyPar::GetLeftEigenvectors()
+      - #HyPar::AveragingFunction()
 
  \b Reference:
  + Jiang, Shu, Efficient Implementation of Weighted ENO Schemes, J. Comput. Phys., 1996. http://dx.doi.org/10.1006/jcph.1996.0130
@@ -728,7 +761,7 @@ int WENOFifthOrderCalculateWeightsCharJS(
                                           double  *fC, /*!< Array of cell-centered values of the function \f${\bf f}\left({\bf u}\right)\f$ */
                                           double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                           double  *x,  /*!< Grid coordinates */
-                                          int     dir, /*!< Spatial dimension along which to interpolation */ 
+                                          int     dir, /*!< Spatial dimension along which to interpolation */
                                           void    *s,  /*!< Object of type #HyPar containing solver-related variables */
                                           void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                         )
@@ -798,7 +831,7 @@ int WENOFifthOrderCalculateWeightsCharJS(
       /* find averaged state and left eigenvectors at this interface */
       IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->physics); CHECKERR(ierr);
       IERR solver->GetLeftEigenvectors(uavg,L,solver->physics,dir); CHECKERR(ierr);
-        
+
       /* Defining stencil points */
       double m3LF[nvars], m2LF[nvars], m1LF[nvars], p1LF[nvars], p2LF[nvars];
       double m3RF[nvars], m2RF[nvars], m1RF[nvars], p1RF[nvars], p2RF[nvars];
@@ -852,10 +885,10 @@ int WENOFifthOrderCalculateWeightsCharJS(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno,nvars);
-      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno,nvars);
-      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno,nvars);
-      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno,nvars);
+      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
+      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
+      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
+      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
     }
   }
 
@@ -868,7 +901,7 @@ int WENOFifthOrderCalculateWeightsCharJS(
     \omega_k &=& \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = \frac {\tilde{\omega}_k \left( c_k + c_k^2 - 3c_k\tilde{\omega}_k + \tilde{\omega}_k^2\right)} {c_k^2 + \tilde{\omega}_k\left(1-2c_k\right)}, \\
     \tilde{\omega}_k &=& \frac {\tilde{a}_k} {\sum_{j=1}^3 \tilde{a}_j },\ \tilde{a}_k = \frac {c_k} {\left(\beta_k+\epsilon\right)^p},\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(\alpha_{j-2}-2\alpha_{j-1}+\alpha_j\right)^2 + \frac{1}{4}\left(\alpha_{j-2}-4\alpha_{j-1}+3\alpha_j\right)^2 \\
@@ -880,25 +913,25 @@ int WENOFifthOrderCalculateWeightsCharJS(
   \b Notes:
   + This function computes the weights for the entire grid (for interpolation along a given spatial dimension \a dir ).
     Thus, it loops over all grid lines along \a dir.
-  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the 
+  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the
     flux function \f${\bf f}\left({\bf u}\right)\f$ and the solution \f$\bf u\f$. Thus, this approach of computing and
     storing the weights is quite memory-intensive.
-  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the 
+  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the
     current interpolation dimension (\a dir ) are stored.
   + This function requires functions to compute the average state and the left eigenvectors for the characteristic
     decomposition. These are provided by the physical model through
-      - #HyPar::GetLeftEigenvectors() 
-      - #HyPar::AveragingFunction() 
+      - #HyPar::GetLeftEigenvectors()
+      - #HyPar::AveragingFunction()
 
  \b Reference:
- + Henrick, Aslam, Powers, Mapped weighted essentially non-oscillatory schemes: Achieving optimal order near critical 
+ + Henrick, Aslam, Powers, Mapped weighted essentially non-oscillatory schemes: Achieving optimal order near critical
    points, J. Comput. Phys., 2005. http://dx.doi.org/10.1016/j.jcp.2005.01.023
 */
 int WENOFifthOrderCalculateWeightsCharM(
                                           double  *fC, /*!< Array of cell-centered values of the function \f${\bf f}\left({\bf u}\right)\f$ */
                                           double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                           double  *x,  /*!< Grid coordinates */
-                                          int     dir, /*!< Spatial dimension along which to interpolation */ 
+                                          int     dir, /*!< Spatial dimension along which to interpolation */
                                           void    *s,  /*!< Object of type #HyPar containing solver-related variables */
                                           void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                        )
@@ -968,7 +1001,7 @@ int WENOFifthOrderCalculateWeightsCharM(
       /* find averaged state and left eigenvectors at this interface */
       IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->physics); CHECKERR(ierr);
       IERR solver->GetLeftEigenvectors(uavg,L,solver->physics,dir); CHECKERR(ierr);
-        
+
       /* Defining stencil points */
       double m3LF[nvars], m2LF[nvars], m1LF[nvars], p1LF[nvars], p2LF[nvars];
       double m3RF[nvars], m2RF[nvars], m1RF[nvars], p1RF[nvars], p2RF[nvars];
@@ -1022,10 +1055,10 @@ int WENOFifthOrderCalculateWeightsCharM(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno,nvars);
-      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno,nvars);
-      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno,nvars);
-      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno,nvars);
+      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
+      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
+      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
+      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
     }
   }
 
@@ -1037,7 +1070,7 @@ int WENOFifthOrderCalculateWeightsCharM(
   \f{equation}{
     \omega_k = \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = c_k \left( 1 + \frac{\tau_5}{\beta_k+\epsilon} \right)^p,\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(\alpha_{j-2}-2\alpha_{j-1}+\alpha_j\right)^2 + \frac{1}{4}\left(\alpha_{j-2}-4\alpha_{j-1}+3\alpha_j\right)^2 \\
@@ -1049,27 +1082,27 @@ int WENOFifthOrderCalculateWeightsCharM(
   \b Notes:
   + This function computes the weights for the entire grid (for interpolation along a given spatial dimension \a dir ).
     Thus, it loops over all grid lines along \a dir.
-  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the 
+  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the
     flux function \f${\bf f}\left({\bf u}\right)\f$ and the solution \f$\bf u\f$. Thus, this approach of computing and
     storing the weights is quite memory-intensive.
-  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the 
+  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the
     current interpolation dimension (\a dir ) are stored.
   + This function requires functions to compute the average state and the left eigenvectors for the characteristic
     decomposition. These are provided by the physical model through
-      - #HyPar::GetLeftEigenvectors() 
-      - #HyPar::AveragingFunction() 
+      - #HyPar::GetLeftEigenvectors()
+      - #HyPar::AveragingFunction()
 
  \b Reference:
-    + Borges, et. al., An improved weighted essentially non-oscillatory scheme for hyperbolic conservation laws, 
+    + Borges, et. al., An improved weighted essentially non-oscillatory scheme for hyperbolic conservation laws,
       J. Comput. Phys., 2008. http://dx.doi.org/10.1016/j.jcp.2007.11.038
-    + Castro, M., Costa, B., Don, W. S., High order weighted essentially non-oscillatory WENO-Z schemes for hyperbolic 
+    + Castro, M., Costa, B., Don, W. S., High order weighted essentially non-oscillatory WENO-Z schemes for hyperbolic
       conservation laws, J. Comput. Phys., 2011. http://dx.doi.org/10.1016/j.jcp.2010.11.028
 */
 int WENOFifthOrderCalculateWeightsCharZ(
                                           double  *fC, /*!< Array of cell-centered values of the function \f${\bf f}\left({\bf u}\right)\f$ */
                                           double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                           double  *x,  /*!< Grid coordinates */
-                                          int     dir, /*!< Spatial dimension along which to interpolation */ 
+                                          int     dir, /*!< Spatial dimension along which to interpolation */
                                           void    *s,  /*!< Object of type #HyPar containing solver-related variables */
                                           void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                        )
@@ -1139,7 +1172,7 @@ int WENOFifthOrderCalculateWeightsCharZ(
       /* find averaged state and left eigenvectors at this interface */
       IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->physics); CHECKERR(ierr);
       IERR solver->GetLeftEigenvectors(uavg,L,solver->physics,dir); CHECKERR(ierr);
-        
+
       /* Defining stencil points */
       double m3LF[nvars], m2LF[nvars], m1LF[nvars], p1LF[nvars], p2LF[nvars];
       double m3RF[nvars], m2RF[nvars], m1RF[nvars], p1RF[nvars], p2RF[nvars];
@@ -1193,10 +1226,10 @@ int WENOFifthOrderCalculateWeightsCharZ(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno,nvars);
-      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno,nvars);
-      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno,nvars);
-      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno,nvars);
+      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
+      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
+      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
+      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
     }
   }
 
@@ -1204,13 +1237,13 @@ int WENOFifthOrderCalculateWeightsCharZ(
 }
 
 /*!
-  Computes the nonlinear weights for the 5th order characteristic-based WENO-type schemes using the ESWENO formulation of 
+  Computes the nonlinear weights for the 5th order characteristic-based WENO-type schemes using the ESWENO formulation of
   Yamaleev & Carpenter. Note that only the formulation for the nonlinear weights is adopted and implemented here, not
   the ESWENO scheme as a whole.
   \f{equation}{
     \omega_k = \frac {a_k} {\sum_{j=1}^3 a_j },\ a_k = c_k \left( 1 + \frac{\tau_5}{\beta_k+\epsilon} \right)^p,\ k = 1,2,3,
   \f}
-  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter 
+  where \f$c_k\f$ are the optimal weights, \f$p\f$ is hardcoded to \f$2\f$, and \f$\epsilon\f$ is an input parameter
   (#WENOParameters::eps) (typically \f$10^{-6}\f$). The smoothness indicators \f$\beta_k\f$ are given by:
   \f{eqnarray}{
     \beta_1 &=& \frac{13}{12} \left(\alpha_{j-2}-2\alpha_{j-1}+\alpha_j\right)^2 + \frac{1}{4}\left(\alpha_{j-2}-4\alpha_{j-1}+3\alpha_j\right)^2 \\
@@ -1222,25 +1255,25 @@ int WENOFifthOrderCalculateWeightsCharZ(
   \b Notes:
   + This function computes the weights for the entire grid (for interpolation along a given spatial dimension \a dir ).
     Thus, it loops over all grid lines along \a dir.
-  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the 
+  + The weights are computed for all components, for both the left- and right-biased interpolations, and for both the
     flux function \f${\bf f}\left({\bf u}\right)\f$ and the solution \f$\bf u\f$. Thus, this approach of computing and
     storing the weights is quite memory-intensive.
-  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the 
+  + The variable \a offset denotes the offset in the complete array from where the weights for interpolation along the
     current interpolation dimension (\a dir ) are stored.
   + This function requires functions to compute the average state and the left eigenvectors for the characteristic
     decomposition. These are provided by the physical model through
-      - #HyPar::GetLeftEigenvectors() 
-      - #HyPar::AveragingFunction() 
+      - #HyPar::GetLeftEigenvectors()
+      - #HyPar::AveragingFunction()
 
   \b Reference:
-     + Yamaleev, Carpenter, A systematic methodology for constructing high-order energy stable WENO schemes, 
+     + Yamaleev, Carpenter, A systematic methodology for constructing high-order energy stable WENO schemes,
        J. Comput. Phys., 2009. http://dx.doi.org/10.1016/j.jcp.2009.03.002
 */
 int WENOFifthOrderCalculateWeightsCharYC(
                                           double  *fC, /*!< Array of cell-centered values of the function \f${\bf f}\left({\bf u}\right)\f$ */
                                           double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                           double  *x,  /*!< Grid coordinates */
-                                          int     dir, /*!< Spatial dimension along which to interpolation */ 
+                                          int     dir, /*!< Spatial dimension along which to interpolation */
                                           void    *s,  /*!< Object of type #HyPar containing solver-related variables */
                                           void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                         )
@@ -1310,7 +1343,7 @@ int WENOFifthOrderCalculateWeightsCharYC(
       /* find averaged state and left eigenvectors at this interface */
       IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->physics); CHECKERR(ierr);
       IERR solver->GetLeftEigenvectors(uavg,L,solver->physics,dir); CHECKERR(ierr);
-        
+
       /* Defining stencil points */
       double m3LF[nvars], m2LF[nvars], m1LF[nvars], p1LF[nvars], p2LF[nvars];
       double m3RF[nvars], m2RF[nvars], m1RF[nvars], p1RF[nvars], p2RF[nvars];
@@ -1364,10 +1397,10 @@ int WENOFifthOrderCalculateWeightsCharYC(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno,nvars);
-      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno,nvars);
-      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno,nvars);
-      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno,nvars);
+      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
+      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
+      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
+      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
     }
   }
 

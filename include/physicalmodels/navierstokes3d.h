@@ -29,16 +29,16 @@
     number is based on speed of sound, instead of the freestream velocity).
 
   Reference for the well-balanced treatment of gravitational source term:
-  + Ghosh, D., Constantinescu, E.M., Well-Balanced Formulation of Gravitational Source 
-    Terms for Conservative Finite-Difference Atmospheric Flow Solvers, AIAA Paper 2015-2889, 
+  + Ghosh, D., Constantinescu, E.M., Well-Balanced Formulation of Gravitational Source
+    Terms for Conservative Finite-Difference Atmospheric Flow Solvers, AIAA Paper 2015-2889,
     7th AIAA Atmospheric and Space Environments Conference, June 22-26, 2015, Dallas, TX,
     http://dx.doi.org/10.2514/6.2015-2889
-  + Ghosh, D., Constantinescu, E.M., A Well-Balanced, Conservative Finite-Difference Algorithm 
+  + Ghosh, D., Constantinescu, E.M., A Well-Balanced, Conservative Finite-Difference Algorithm
     for Atmospheric Flows, AIAA Journal, 54 (4), 2016, pp. 1370-1385, http://dx.doi.org/10.2514/1.J054580.
 
   Reference for the partitioning of the flux into its stiff (acoustic) and non-stiff (convective)
   components:
-  + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows 
+  + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
     with Characteristic-Based Flux Partitioning, SIAM Journal on Scientific Computing,
     38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369.
 
@@ -95,14 +95,14 @@
    {\bf u} = \left[\begin{array}{c} \rho \\ \rho u \\ \rho v \\ \rho w \\ e \end{array}\right]
  \f}
 */
-#define _NavierStokes3DGetFlowVar_(u,rho,vx,vy,vz,e,P,p) \
+#define _NavierStokes3DGetFlowVar_(u,stride,rho,vx,vy,vz,e,P,gamma) \
   { \
-    double gamma   = p->gamma, vsq; \
+    double vsq; \
     rho = u[0]; \
-    vx  = u[1] / rho; \
-    vy  = u[2] / rho; \
-    vz  = u[3] / rho; \
-    e   = u[4]; \
+    vx  = (rho==0) ? 0 : u[stride] / rho; \
+    vy  = (rho==0) ? 0 : u[2*stride] / rho; \
+    vz  = (rho==0) ? 0 : u[3*stride] / rho; \
+    e   = u[4*stride]; \
     vsq  = vx*vx + vy*vy + vz*vz; \
     P   = (e - 0.5*rho*vsq) * (gamma-1.0); \
   }
@@ -115,27 +115,57 @@
     dir = z, & {\bf f}\left({\bf u}\right) = \left[\begin{array}{c} \rho w \\ \rho u w \\ \rho v w \\ \rho w^2 + p \\ (e+p)w \end{array}\right]
   \f}
 */
-#define _NavierStokes3DSetFlux_(f,rho,vx,vy,vz,e,P,dir) \
+#define _NavierStokes3DSetFlux_(f,stride,rho,vx,vy,vz,e,P,dir) \
   { \
     if (dir == _XDIR_) { \
       f[0] = rho * vx; \
-      f[1] = rho * vx * vx + P; \
-      f[2] = rho * vx * vy; \
-      f[3] = rho * vx * vz; \
-      f[4] = (e + P) * vx; \
+      f[stride] = rho * vx * vx + P; \
+      f[2*stride] = rho * vx * vy; \
+      f[3*stride] = rho * vx * vz; \
+      f[4*stride] = (e + P) * vx; \
     } else if (dir == _YDIR_) { \
       f[0] = rho * vy; \
-      f[1] = rho * vy * vx; \
-      f[2] = rho * vy * vy + P; \
-      f[3] = rho * vy * vz; \
-      f[4] = (e + P) * vy; \
+      f[stride] = rho * vy * vx; \
+      f[2*stride] = rho * vy * vy + P; \
+      f[3*stride] = rho * vy * vz; \
+      f[4*stride] = (e + P) * vy; \
     } else if (dir == _ZDIR_) { \
       f[0] = rho * vz; \
-      f[1] = rho * vz * vx; \
-      f[2] = rho * vz * vy; \
-      f[3] = rho * vz * vz + P; \
-      f[4] = (e + P) * vz; \
+      f[stride] = rho * vz * vx; \
+      f[2*stride] = rho * vz * vy; \
+      f[3*stride] = rho * vz * vz + P; \
+      f[4*stride] = (e + P) * vz; \
     } \
+  }
+
+/*! \def _NavierStokes3DRoeAverage_
+  Compute the Roe-average of two solutions.
+*/
+#define _NavierStokes3DRoeAverage_(uavg,stride,uL,uR,gamma) \
+  { \
+    double  rho ,vx, vy, vz, e ,P ,H; \
+    double  rhoL,vxL,vyL,vzL,eL,PL,HL,cLsq; \
+    double  rhoR,vxR,vyR,vzR,eR,PR,HR,cRsq; \
+    _NavierStokes3DGetFlowVar_(uL,stride,rhoL,vxL,vyL,vzL,eL,PL,gamma); \
+    cLsq = gamma * PL/rhoL; \
+    HL = 0.5*(vxL*vxL+vyL*vyL+vzL*vzL) + cLsq / (gamma-1.0); \
+    _NavierStokes3DGetFlowVar_(uR,stride,rhoR,vxR,vyR,vzR,eR,PR,gamma); \
+    cRsq = gamma * PR/rhoR; \
+    HR = 0.5*(vxR*vxR+vyR*vyR+vzR*vzR) + cRsq / (gamma-1.0); \
+    double tL = sqrt(rhoL); \
+    double tR = sqrt(rhoR); \
+    rho = tL * tR; \
+    vx  = (tL*vxL + tR*vxR) / (tL + tR); \
+    vy  = (tL*vyL + tR*vyR) / (tL + tR); \
+    vz  = (tL*vzL + tR*vzR) / (tL + tR); \
+    H   = (tL*HL  + tR*HR ) / (tL + tR); \
+    P = (H - 0.5* (vx*vx+vy*vy+vz*vz)) * (rho*(gamma-1.0))/gamma; \
+    e   = P/(gamma-1.0) + 0.5*rho*(vx*vx+vy*vy+vz*vz); \
+    uavg[0] = rho; \
+    uavg[1] = rho*vx; \
+    uavg[2] = rho*vy; \
+    uavg[3] = rho*vz; \
+    uavg[4] = e; \
   }
 
 /*! \def _NavierStokes3DSetStiffFlux_
@@ -150,27 +180,27 @@
     with Characteristic-Based Flux Partitioning, SIAM Journal on Scientific Computing,
     38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369.
 */
-#define _NavierStokes3DSetStiffFlux_(f,rho,vx,vy,vz,e,P,dir,gamma) \
+#define _NavierStokes3DSetStiffFlux_(f,stride,rho,vx,vy,vz,e,P,dir,gamma) \
   { \
     double gamma_inv = 1.0/gamma; \
     if (dir == _XDIR_) { \
-      f[0] = gamma_inv * rho * vx; \
-      f[1] = gamma_inv * rho * vx * vx + P; \
-      f[2] = gamma_inv * rho * vx * vy; \
-      f[3] = gamma_inv * rho * vx * vz; \
-      f[4] = (e + P) * vx - 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vx; \
+      f[0*stride] = gamma_inv * rho * vx; \
+      f[1*stride] = gamma_inv * rho * vx * vx + P; \
+      f[2*stride] = gamma_inv * rho * vx * vy; \
+      f[3*stride] = gamma_inv * rho * vx * vz; \
+      f[4*stride] = (e + P) * vx - 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vx; \
     } else if (dir == _YDIR_) { \
-      f[0] = gamma_inv * rho * vy; \
-      f[1] = gamma_inv * rho * vy * vx; \
-      f[2] = gamma_inv * rho * vy * vy + P; \
-      f[3] = gamma_inv * rho * vy * vz; \
-      f[4] = (e + P) * vy - 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vy; \
+      f[0*stride] = gamma_inv * rho * vy; \
+      f[1*stride] = gamma_inv * rho * vy * vx; \
+      f[2*stride] = gamma_inv * rho * vy * vy + P; \
+      f[3*stride] = gamma_inv * rho * vy * vz; \
+      f[4*stride] = (e + P) * vy - 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vy; \
     } else if (dir == _ZDIR_) { \
-      f[0] = gamma_inv * rho * vz; \
-      f[1] = gamma_inv * rho * vz * vx; \
-      f[2] = gamma_inv * rho * vz * vy; \
-      f[3] = gamma_inv * rho * vz * vz + P; \
-      f[4] = (e + P) * vz - 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vz; \
+      f[0*stride] = gamma_inv * rho * vz; \
+      f[1*stride] = gamma_inv * rho * vz * vx; \
+      f[2*stride] = gamma_inv * rho * vz * vy; \
+      f[3*stride] = gamma_inv * rho * vz * vz + P; \
+      f[4*stride] = (e + P) * vz - 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vz; \
     } \
   }
 
@@ -190,55 +220,24 @@
   { \
     double gamma_inv = 1.0/gamma; \
     if (dir == _XDIR_) { \
-      f[0] = (gamma-1.0) * gamma_inv * rho * vx; \
-      f[1] = (gamma-1.0) * gamma_inv * rho * vx * vx; \
-      f[2] = (gamma-1.0) * gamma_inv * rho * vx * vy; \
-      f[3] = (gamma-1.0) * gamma_inv * rho * vx * vz; \
-      f[4] = 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vx; \
+      f[0*stride] = (gamma-1.0) * gamma_inv * rho * vx; \
+      f[1*stride] = (gamma-1.0) * gamma_inv * rho * vx * vx; \
+      f[2*stride] = (gamma-1.0) * gamma_inv * rho * vx * vy; \
+      f[3*stride] = (gamma-1.0) * gamma_inv * rho * vx * vz; \
+      f[4*stride] = 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vx; \
     } else if (dir == _YDIR_) { \
-      f[0] = (gamma-1.0) * gamma_inv * rho * vy; \
-      f[1] = (gamma-1.0) * gamma_inv * rho * vy * vx; \
-      f[2] = (gamma-1.0) * gamma_inv * rho * vy * vy; \
-      f[3] = (gamma-1.0) * gamma_inv * rho * vy * vz; \
-      f[4] = 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vy; \
+      f[0*stride] = (gamma-1.0) * gamma_inv * rho * vy; \
+      f[1*stride] = (gamma-1.0) * gamma_inv * rho * vy * vx; \
+      f[2*stride] = (gamma-1.0) * gamma_inv * rho * vy * vy; \
+      f[3*stride] = (gamma-1.0) * gamma_inv * rho * vy * vz; \
+      f[4*stride] = 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vy; \
     } else if (dir == _ZDIR_) { \
-      f[0] = (gamma-1.0) * gamma_inv * rho * vz; \
-      f[1] = (gamma-1.0) * gamma_inv * rho * vz * vx; \
-      f[2] = (gamma-1.0) * gamma_inv * rho * vz * vy; \
-      f[3] = (gamma-1.0) * gamma_inv * rho * vz * vz; \
-      f[4] = 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vz; \
+      f[0*stride] = (gamma-1.0) * gamma_inv * rho * vz; \
+      f[1*stride] = (gamma-1.0) * gamma_inv * rho * vz * vx; \
+      f[2*stride] = (gamma-1.0) * gamma_inv * rho * vz * vy; \
+      f[3*stride] = (gamma-1.0) * gamma_inv * rho * vz * vz; \
+      f[4*stride] = 0.5 * gamma_inv * (gamma-1.0) * rho * (vx*vx+vy*vy+vz*vz) * vz; \
     } \
-  }
-
-/*! \def _NavierStokes3DRoeAverage_
-  Compute the Roe-average of two solutions.
-*/
-#define _NavierStokes3DRoeAverage_(uavg,uL,uR,p) \
-  { \
-    double  rho ,vx, vy, vz, e ,P ,H; \
-    double  rhoL,vxL,vyL,vzL,eL,PL,HL,cLsq; \
-    double  rhoR,vxR,vyR,vzR,eR,PR,HR,cRsq; \
-    double  gamma = p->gamma; \
-    _NavierStokes3DGetFlowVar_(uL,rhoL,vxL,vyL,vzL,eL,PL,p); \
-    cLsq = gamma * PL/rhoL; \
-    HL = 0.5*(vxL*vxL+vyL*vyL+vzL*vzL) + cLsq / (gamma-1.0); \
-    _NavierStokes3DGetFlowVar_(uR,rhoR,vxR,vyR,vzR,eR,PR,p); \
-    cRsq = gamma * PR/rhoR; \
-    HR = 0.5*(vxR*vxR+vyR*vyR+vzR*vzR) + cRsq / (gamma-1.0); \
-    double tL = sqrt(rhoL); \
-    double tR = sqrt(rhoR); \
-    rho = tL * tR; \
-    vx  = (tL*vxL + tR*vxR) / (tL + tR); \
-    vy  = (tL*vyL + tR*vyR) / (tL + tR); \
-    vz  = (tL*vzL + tR*vzR) / (tL + tR); \
-    H   = (tL*HL  + tR*HR ) / (tL + tR); \
-    P = (H - 0.5* (vx*vx+vy*vy+vz*vz)) * (rho*(gamma-1.0))/gamma; \
-    e   = P/(gamma-1.0) + 0.5*rho*(vx*vx+vy*vy+vz*vz); \
-    uavg[0] = rho; \
-    uavg[1] = rho*vx; \
-    uavg[2] = rho*vy; \
-    uavg[3] = rho*vz; \
-    uavg[4] = e; \
   }
 
 /*! \def _NavierStokes3DEigenvalues_
@@ -249,14 +248,13 @@
   The eigenvalues are \f$ {\bf v}\cdot\hat{\bf n}, {\bf v}\cdot\hat{\bf n}, {\bf v}\cdot\hat{\bf n}, {\bf v}\cdot\hat{\bf n} \pm c\f$
   where \f${\bf v} = u\hat{\bf i} + v\hat{\bf j} + w\hat{\bf k}\f$ is the velocity vector, \f$\hat{\bf n} = \hat{\bf i}, \hat{\bf j}, \hat{\bf k}\f$
   is the unit vector along the spatial dimension, and \f$c\f$ is the speed of sound.
-  \b Note that the order of the eigenvalues (and therefore, the order of the eigenvectors in #_NavierStokes3DLeftEigenvectors_ and 
+  \b Note that the order of the eigenvalues (and therefore, the order of the eigenvectors in #_NavierStokes3DLeftEigenvectors_ and
   #_NavierStokes3DRightEigenvectors_ has been chosen to avoid left eigen-matrices with zero on the diagonals.
 */
-#define _NavierStokes3DEigenvalues_(u,D,p,dir) \
+#define _NavierStokes3DEigenvalues_(u,stride,D,gamma,dir) \
   { \
-    double          gamma   = p->gamma; \
     double          rho,vx,vy,vz,e,P,c; \
-    _NavierStokes3DGetFlowVar_(u,rho,vx,vy,vz,e,P,p); \
+    _NavierStokes3DGetFlowVar_(u,stride,rho,vx,vy,vz,e,P,gamma); \
     c    = sqrt(gamma*P/rho); \
     if (dir == _XDIR_) { \
       D[0*_MODEL_NVARS_+0] = vx;     D[0*_MODEL_NVARS_+1] = 0;    D[0*_MODEL_NVARS_+2] = 0;      D[0*_MODEL_NVARS_+3] = 0;    D[0*_MODEL_NVARS_+4] = 0; \
@@ -287,11 +285,11 @@
   + Rohde, "Eigenvalues and eigenvectors of the Euler equations in general geometries", AIAA Paper 2001-2609,
     http://dx.doi.org/10.2514/6.2001-2609
 */
-#define _NavierStokes3DLeftEigenvectors_(u,L,p,dir) \
+#define _NavierStokes3DLeftEigenvectors_(u,stride,L,ga,dir) \
   { \
-    double  ga = p->gamma, ga_minus_one=ga-1.0; \
+    double  ga_minus_one=ga-1.0; \
     double  rho,vx,vy,vz,e,P,a,ek; \
-    _NavierStokes3DGetFlowVar_(u,rho,vx,vy,vz,e,P,p); \
+    _NavierStokes3DGetFlowVar_(u,stride,rho,vx,vy,vz,e,P,ga); \
   	ek = 0.5 * (vx*vx + vy*vy + vz*vz); \
 	  a = sqrt(ga * P / rho); \
     if (dir == _XDIR_) { \
@@ -383,11 +381,11 @@
   + Rohde, "Eigenvalues and eigenvectors of the Euler equations in general geometries", AIAA Paper 2001-2609,
     http://dx.doi.org/10.2514/6.2001-2609
 */
-#define _NavierStokes3DRightEigenvectors_(u,R,p,dir) \
+#define _NavierStokes3DRightEigenvectors_(u,stride,R,ga,dir) \
   { \
-    double  ga   = p->gamma, ga_minus_one = ga-1.0; \
+    double  ga_minus_one = ga-1.0; \
     double  rho,vx,vy,vz,e,P,ek,a,h0; \
-    _NavierStokes3DGetFlowVar_(u,rho,vx,vy,vz,e,P,p); \
+    _NavierStokes3DGetFlowVar_(u,stride,rho,vx,vy,vz,e,P,ga); \
   	ek   = 0.5 * (vx*vx + vy*vy + vz*vz); \
 	  a    = sqrt(ga * P / rho); \
     h0   = a*a / ga_minus_one + ek; \
@@ -474,11 +472,11 @@
 
 /*! \def NavierStokes3D
     \brief Structure containing variables and parameters specific to the 3D Navier Stokes equations.
- *  This structure contains the physical parameters, variables, and function pointers specific to 
+ *  This structure contains the physical parameters, variables, and function pointers specific to
  *  the 3D Navier-Stokes equations.
 */
 /*! \brief Structure containing variables and parameters specific to the 3D Navier Stokes equations.
- *  This structure contains the physical parameters, variables, and function pointers specific to 
+ *  This structure contains the physical parameters, variables, and function pointers specific to
  *  the 3D Navier-Stokes equations.
 */
 typedef struct navierstokes3d_parameters {
@@ -509,9 +507,9 @@ typedef struct navierstokes3d_parameters {
 
   /* choice of hydrostatic balance                              */
   /* 1 -> isothermal                                            */
-  /* 2 -> constant potential temperature                        */ 
+  /* 2 -> constant potential temperature                        */
   /* 3 -> stratified atmosphere with a Brunt-Vaisala frequency  */
-  int HB /*!< Choice of hydrostatic balance for flows with gravity (1 - isothermal equilibrium, 
+  int HB /*!< Choice of hydrostatic balance for flows with gravity (1 - isothermal equilibrium,
                                                                     2 - constant potential temperature
                                                                     3 - stratified atmosphere with a Brunt-Vaisala frequency) */;
   double N_bv; /*!< the Brunt-Vaisala frequency for #NavierStokes3D::HB = 3 */
@@ -532,12 +530,30 @@ typedef struct navierstokes3d_parameters {
       applicable only if #HyPar::flag_ib is 1 */
   char ib_ramp_type[_MAX_STRING_SIZE_];
 
-  /*! Isothermal immersed boundary temperature tolerance: if ghost point temperature 
-      differs from wall temperature by more than this factor, set it to the wall 
+  /*! Isothermal immersed boundary temperature tolerance: if ghost point temperature
+      differs from wall temperature by more than this factor, set it to the wall
       temperature - sort of a limiting */
   double ib_T_tol;
 
+#if defined(HAVE_CUDA)
+  double *gpu_Q;
+  double *gpu_QDerivX;
+  double *gpu_QDerivY;
+  double *gpu_QDerivZ;
+  double *gpu_FViscous;
+  double *gpu_FDeriv;
+  double *gpu_grav_field_f;
+  double *gpu_grav_field_g;
+  double *gpu_fast_jac;
+  double *gpu_solution;
+#endif
 } NavierStokes3D;
 
-int    NavierStokes3DInitialize (void*,void*);
-int    NavierStokes3DCleanup    (void*);
+int NavierStokes3DInitialize (void*,void*);
+int NavierStokes3DCleanup    (void*);
+
+#if defined(HAVE_CUDA)
+int gpuNavierStokes3DCleanup (void*);
+#endif
+
+static const int _NavierStokes3D_stride_ = 1;

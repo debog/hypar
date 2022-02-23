@@ -12,13 +12,13 @@
 
 /*! \def MPIVariables
  *  \brief Structure of MPI-related variables.
- * This structure contains all the variables needed for parallel computations 
+ * This structure contains all the variables needed for parallel computations
  * using the MPI library.
 */
 
 /*! \brief Structure of MPI-related variables.
  *
- * This structure contains all the variables needed for parallel computations 
+ * This structure contains all the variables needed for parallel computations
  * using the MPI library.
 */
 typedef struct mpi_variables {
@@ -52,6 +52,14 @@ typedef struct mpi_variables {
          *recvbuf; /*!< Buffer to receive data */
   int    maxbuf;   /*!< Maximum buffer size */
 
+#if defined(HAVE_CUDA)
+  int    ncalls;
+  double wctime;
+  double wctime_total;
+  int    *cpu_dim;
+  double *gpu_sendbuf,
+         *gpu_recvbuf;
+#endif
 } MPIVariables;
 
 #endif

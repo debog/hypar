@@ -15,6 +15,9 @@
 extern "C" int ReadInputs(void*,int,int);/*!< Read the input parameters */
 extern "C" int WriteInputs(void*,int,int);/*!< Write the input parameters */
 extern "C" int Initialize(void*,int);/*!< Initialize the solver */
+#if defined(HAVE_CUDA)
+  extern "C" int Initialize_GPU(void*,int);/*!< Initialize the solver */
+#endif
 extern "C" int InitialSolution(void*,int);/*!< Read the initial solution */
 extern "C" int InitializeBoundaries(void*,int);/*!< Initialize the boundary conditions */
 extern "C" int InitializeImmersedBoundaries(void*,int);/*!< Initialize the immersed boundary conditions */

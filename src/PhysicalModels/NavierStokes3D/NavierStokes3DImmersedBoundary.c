@@ -73,17 +73,18 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
     }
 
     double rho, uvel, vvel, wvel, energy, pressure;
-    _NavierStokes3DGetFlowVar_(v,rho,uvel,vvel,wvel,energy,pressure,param);
+    _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,param->gamma);
 
     double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
     _NavierStokes3DGetFlowVar_( (u+_MODEL_NVARS_*node_index),
+                                _NavierStokes3D_stride_,
                                 rho_gpt,
                                 uvel_gpt,
                                 vvel_gpt,
                                 wvel_gpt,
                                 energy_gpt,
                                 pressure_gpt,
-                                param );
+                                param->gamma );
 
     double rho_ib_target, uvel_ib_target, vvel_ib_target, wvel_ib_target, pressure_ib_target;
     rho_ib_target = rho;
@@ -172,18 +173,19 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
     }
 
     double rho, uvel, vvel, wvel, energy, pressure, temperature;
-    _NavierStokes3DGetFlowVar_(v,rho,uvel,vvel,wvel,energy,pressure,param);
+    _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,param->gamma);
     temperature = pressure / rho;
 
     double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt, temperature_gpt;
     _NavierStokes3DGetFlowVar_( (u+_MODEL_NVARS_*node_index),
+                                _NavierStokes3D_stride_,
                                 rho_gpt,
                                 uvel_gpt,
                                 vvel_gpt,
                                 wvel_gpt,
                                 energy_gpt,
                                 pressure_gpt,
-                                param );
+                                param->gamma );
     temperature_gpt = pressure_gpt / rho_gpt;
 
     double  rho_ib_target, 

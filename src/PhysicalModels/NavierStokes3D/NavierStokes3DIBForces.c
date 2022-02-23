@@ -79,7 +79,7 @@ static int ComputeShear(void *s,              /*!< Solver object of type #HyPar 
           }
         }
         double rho_c, uvel_c, vvel_c, wvel_c, energy_c, pressure_c;
-        _NavierStokes3DGetFlowVar_(v,rho_c,uvel_c,vvel_c,wvel_c,energy_c,pressure_c,physics);
+        _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho_c,uvel_c,vvel_c,wvel_c,energy_c,pressure_c,physics->gamma);
     
         alpha = &(fmap[n].interp_coeffs_ns[0]);
         nodes = &(fmap[n].interp_nodes_ns[0]);
@@ -90,7 +90,7 @@ static int ComputeShear(void *s,              /*!< Solver object of type #HyPar 
           }
         }
         double rho_ns, uvel_ns, vvel_ns, wvel_ns, energy_ns, pressure_ns;
-        _NavierStokes3DGetFlowVar_(v,rho_ns,uvel_ns,vvel_ns,wvel_ns,energy_ns,pressure_ns,physics);
+        _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho_ns,uvel_ns,vvel_ns,wvel_ns,energy_ns,pressure_ns,physics->gamma);
         
         double u_x = (uvel_ns - uvel_c) / fmap[n].dx;
         double v_x = (vvel_ns - vvel_c) / fmap[n].dx;

@@ -18,3 +18,17 @@ libMPIFunctions_a_SOURCES = \
   MPIRank1D.c \
   MPIRanknD.c \
   MPISum.c
+
+if ENABLE_CUDA
+noinst_LIBRARIES += libMPIFunctions_GPU.a
+libMPIFunctions_GPU_a_SOURCES = \
+  MPIExchangeBoundariesnD_GPU.cu
+libMPIFunctions_GPU_a_LIBADD = \
+  MPIExchangeBoundariesnD_GPU.dlink.o
+libMPIFunctions_GPU_a_CFLAGS = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CUDA_CFLAGS)
+libMPIFunctions_GPU_a_AR = $(NVCC) -arch=sm_70 -lib -o
+
+.cu.o:
+	$(NVCC) $(libMPIFunctions_GPU_a_CFLAGS) -arch=sm_70 -dc -o $@ $<
+	$(NVCC) $(libMPIFunctions_GPU_a_CFLAGS) -arch=sm_70 -dlink -o $*.dlink.o $@
+endif

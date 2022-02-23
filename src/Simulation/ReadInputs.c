@@ -11,7 +11,7 @@
 #include <mpivars.h>
 #include <simulation_object.h>
 
-/*! Read the simulation inputs from the file \b solver.inp. 
+/*! Read the simulation inputs from the file \b solver.inp.
     Rank 0 reads in the inputs and broadcasts them to all the
     processors.\n\n
     The format of \b solver.inp is as follows:\n
@@ -53,6 +53,8 @@
     model              | char[]       | #HyPar::model                 | must be specified
     immersed_body      | char[]       | #HyPar::ib_filename           | "none"
     size_exact         | int[ndims]   | #HyPar::dim_global_ex         | #HyPar::dim_global
+    use_gpu            | char[]       | #HyPar::use_gpu               | no
+    gpu_device_no      | int          | #HyPar::gpu_device_no         | -1
 
     \b Notes:
     + "ndims" \b must be specified \b before "size".
@@ -68,7 +70,7 @@
           end
 
       This means that 4 MPI ranks will participate in file I/O (assuming
-      total MPI ranks is more than 4) (see ReadArrayParallel(), 
+      total MPI ranks is more than 4) (see ReadArrayParallel(),
       WriteArrayParallel(), ReadArrayMPI_IO() ).
       - The number of I/O ranks specified for "input_mode" and "output_mode"
         \b must \b be \b same. Otherwise, the value for the one specified last
@@ -77,8 +79,8 @@
         is an integer multiple. Otherwise, the code will use only 1 I/O rank.
     + If any of the keywords are not present, the default value is used, except
       the ones whose default values say "must be specified". Thus, keywords that
-      are not required for a particular simulation may be left out of the 
-      solver.inp input file. For example, 
+      are not required for a particular simulation may be left out of the
+      solver.inp input file. For example,
       - a #Euler1D simulation does not need "par_space_type" or "par_space_scheme"
         because it does not have a parabolic term.
       - unless a conservation check is required, "conservation_check" can be left
@@ -121,6 +123,10 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
       sim[n].solver.file_op_iter    = 1000;
       sim[n].solver.write_residual  = 0;
       sim[n].solver.flag_ib         = 0;
+#if defined(HAVE_CUDA)
+      sim[n].solver.use_gpu         = 0;
+      sim[n].solver.gpu_device_no   = -1;
+#endif
       strcpy(sim[n].solver.time_scheme        ,"euler"         );
       strcpy(sim[n].solver.time_scheme_type   ," "             );
       strcpy(sim[n].solver.spatial_scheme_hyp ,"1"             );
@@ -137,7 +143,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
       strcpy(sim[n].solver.SplitHyperbolicFlux,"no"            );
       strcpy(sim[n].solver.ib_filename        ,"none"          );
     }
-    
+
     /* open the file */
     FILE *in;
     printf("Reading solver inputs from file \"solver.inp\".\n");
@@ -174,7 +180,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
           }
 
         } else if (!strcmp(word, "nvars")) {
-          
+
           ferr = fscanf(in,"%d",&(sim[0].solver.nvars));
           for (int n = 1; n < nsims; n++) sim[n].solver.nvars = sim[0].solver.nvars;
 
@@ -236,111 +242,111 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
           }
 
 			  } else if (!strcmp(word, "ghost")) {
-          
+
           ferr = fscanf(in,"%d",&(sim[0].solver.ghosts));
 
           int n;
           for (n = 1; n < nsims; n++) sim[n].solver.ghosts = sim[0].solver.ghosts;
 
-        } else if (!strcmp(word, "n_iter")) { 
+        } else if (!strcmp(word, "n_iter")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.n_iter));
 
           int n;
           for (n = 1; n < nsims; n++) sim[n].solver.n_iter = sim[0].solver.n_iter;
 
-        } else if (!strcmp(word, "restart_iter")) { 
+        } else if (!strcmp(word, "restart_iter")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.restart_iter));
 
           int n;
           for (n = 1; n < nsims; n++) sim[n].solver.restart_iter = sim[0].solver.restart_iter;
 
-        } else if (!strcmp(word, "time_scheme")) { 
+        } else if (!strcmp(word, "time_scheme")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.time_scheme);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.time_scheme, sim[0].solver.time_scheme);
 
-        }	else if (!strcmp(word, "time_scheme_type" )) { 
+        }	else if (!strcmp(word, "time_scheme_type" )) {
 
           ferr = fscanf(in,"%s",sim[0].solver.time_scheme_type);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.time_scheme_type, sim[0].solver.time_scheme_type);
 
-        }	else if (!strcmp(word, "hyp_space_scheme")) { 
+        }	else if (!strcmp(word, "hyp_space_scheme")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.spatial_scheme_hyp);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.spatial_scheme_hyp, sim[0].solver.spatial_scheme_hyp);
 
-        }	else if (!strcmp(word, "hyp_flux_split")) { 
+        }	else if (!strcmp(word, "hyp_flux_split")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.SplitHyperbolicFlux);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.SplitHyperbolicFlux, sim[0].solver.SplitHyperbolicFlux);
 
-        }	else if (!strcmp(word, "hyp_interp_type")) { 
+        }	else if (!strcmp(word, "hyp_interp_type")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.interp_type);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.interp_type, sim[0].solver.interp_type);
 
-        }	else if (!strcmp(word, "par_space_type")) { 
+        }	else if (!strcmp(word, "par_space_type")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.spatial_type_par);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.spatial_type_par, sim[0].solver.spatial_type_par);
 
-        }	else if (!strcmp(word, "par_space_scheme")) { 
+        }	else if (!strcmp(word, "par_space_scheme")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.spatial_scheme_par);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.spatial_scheme_par, sim[0].solver.spatial_scheme_par);
 
-        }	else if (!strcmp(word, "dt")) { 
+        }	else if (!strcmp(word, "dt")) {
 
           ferr = fscanf(in,"%lf",&(sim[0].solver.dt));
 
           int n;
           for (n = 1; n < nsims; n++) sim[n].solver.dt = sim[0].solver.dt;
 
-        }	else if (!strcmp(word, "conservation_check" )) { 
+        }	else if (!strcmp(word, "conservation_check" )) {
 
           ferr = fscanf(in,"%s",sim[0].solver.ConservationCheck);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.ConservationCheck, sim[0].solver.ConservationCheck);
 
-        }	else if (!strcmp(word, "screen_op_iter")) { 
+        }	else if (!strcmp(word, "screen_op_iter")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.screen_op_iter));
 
           int n;
           for (n = 1; n < nsims; n++) sim[n].solver.screen_op_iter = sim[0].solver.screen_op_iter;
 
-        }	else if (!strcmp(word, "file_op_iter")) { 
+        }	else if (!strcmp(word, "file_op_iter")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.file_op_iter));
 
           int n;
           for (n = 1; n < nsims; n++) sim[n].solver.file_op_iter = sim[0].solver.file_op_iter;
 
-        }	else if (!strcmp(word, "op_file_format")) { 
+        }	else if (!strcmp(word, "op_file_format")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.op_file_format);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.op_file_format, sim[0].solver.op_file_format);
 
-        }	else if (!strcmp(word, "ip_file_type")) { 
+        }	else if (!strcmp(word, "ip_file_type")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.ip_file_type);
 
@@ -390,7 +396,22 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.ib_filename, sim[0].solver.ib_filename);
 
-        } else if (strcmp(word, "end")) {
+        }
+#if defined(HAVE_CUDA)
+        else if (!strcmp(word, "use_gpu")) {
+          ferr = fscanf(in,"%s",word);
+          if (!strcmp(word, "yes") || !strcmp(word, "true")) sim[0].solver.use_gpu = 1;
+
+          int n;
+          for (n = 1; n < nsims; n++) sim[n].solver.use_gpu = sim[0].solver.use_gpu;
+        } else if (!strcmp(word, "gpu_device_no")) {
+          ferr = fscanf(in,"%d", &sim[0].solver.gpu_device_no);
+
+          int n;
+          for (n = 1; n < nsims; n++) sim[n].solver.gpu_device_no = sim[0].solver.gpu_device_no;
+        }
+#endif
+        else if (strcmp(word, "end")) {
 
           char useless[_MAX_STRING_SIZE_];
           ferr = fscanf(in,"%s",useless);
@@ -401,7 +422,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
         if (ferr != 1) return(1);
 
       }
-    
+
     } else {
 
  		  fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
@@ -411,7 +432,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
 
     /* close the file */
     fclose(in);
-   
+
     /* some checks */
     for (n = 0; n < nsims; n++) {
 
@@ -454,7 +475,10 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
     IERR MPIBroadcast_integer(&(sim[n].solver.screen_op_iter),1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
     IERR MPIBroadcast_integer(&(sim[n].solver.file_op_iter)  ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
     IERR MPIBroadcast_integer(&(sim[n].solver.flag_ib)       ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-  
+#if defined(HAVE_CUDA)
+    IERR MPIBroadcast_integer(&(sim[n].solver.use_gpu)       ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
+#endif
+
     IERR MPIBroadcast_character(sim[n].solver.time_scheme        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
     IERR MPIBroadcast_character(sim[n].solver.time_scheme_type   ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
     IERR MPIBroadcast_character(sim[n].solver.spatial_scheme_hyp ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
@@ -470,7 +494,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
     IERR MPIBroadcast_character(sim[n].solver.op_overwrite       ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
     IERR MPIBroadcast_character(sim[n].solver.model              ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
     IERR MPIBroadcast_character(sim[n].solver.ib_filename        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-  
+
     IERR MPIBroadcast_double(&(sim[n].solver.dt),1,0,&(sim[n].mpi.world)); CHECKERR(ierr);
 
   }

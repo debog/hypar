@@ -23,7 +23,7 @@ int NavierStokes3DRoeAverage(
                             )
 {
   NavierStokes3D *param  = (NavierStokes3D*) p;
-  _NavierStokes3DRoeAverage_(uavg,uL,uR,param);
+  _NavierStokes3DRoeAverage_(uavg,_NavierStokes3D_stride_,uL,uR,param->gamma);
   return(0);
 }
 
@@ -53,7 +53,7 @@ int NavierStokes3DComputePressure(  double*             P, /*!< Array to hold th
   while (!done) {
     int idx; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,idx);
     double rho, vx, vy, vz, e, pressure;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*idx),rho,vx,vy,vz,e,pressure,param);
+    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*idx),_NavierStokes3D_stride_,rho,vx,vy,vz,e,pressure,param->gamma);
     P[idx] = pressure;
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
@@ -87,7 +87,7 @@ int NavierStokes3DComputeTemperature( double*             T, /*!< Array to hold 
   while (!done) {
     int idx; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,idx);
     double rho, vx, vy, vz, e, pressure;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*idx),rho,vx,vy,vz,e,pressure,param);
+    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*idx),_NavierStokes3D_stride_,rho,vx,vy,vz,e,pressure,param->gamma);
     T[idx] = pressure/rho;
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }

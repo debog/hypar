@@ -15,6 +15,10 @@
 #include <mpivars.h>
 #include <simulation_object.h>
 
+#if defined(HAVE_CUDA)
+# include <arrayfunctions_gpu.h>
+#endif
+
 /* Function declarations */
 void IncrementFilenameIndex(char*,int);
 
@@ -31,15 +35,15 @@ int OutputSolution( void  *s,   /*!< Array of simulation objects of type #Simula
 
     HyPar*        solver = &(simobj[ns].solver);
     MPIVariables* mpi    = &(simobj[ns].mpi);
-    
+
     /* if WriteOutput() is NULL, then return */
     if (!solver->WriteOutput) continue;
-  
+
     /* time integration module may have auxiliary arrays to write out, so get them */
     int NSolutions = 0;
     IERR TimeGetAuxSolutions(&NSolutions,NULL,solver,-1,ns); CHECKERR(ierr);
     if (NSolutions > 10) NSolutions = 10;
-  
+
     int  nu;
     char fname_root[_MAX_STRING_SIZE_];
     char aux_fname_root[_MAX_STRING_SIZE_];
@@ -54,7 +58,7 @@ int OutputSolution( void  *s,   /*!< Array of simulation objects of type #Simula
       strcat(aux_fname_root, "_");
       strcat(aux_fname_root, index);
     }
-  
+
     for (nu=0; nu<NSolutions; nu++) {
 
       double  *uaux = NULL;
@@ -73,7 +77,23 @@ int OutputSolution( void  *s,   /*!< Array of simulation objects of type #Simula
 
       aux_fname_root[2]++;
     }
-    
+
+#if defined(HAVE_CUDA)
+    if (solver->use_gpu) {
+      /* Copy values from GPU memory to CPU memory for writing. */
+      gpuMemcpy(solver->x, solver->gpu_x, sizeof(double)*solver->size_x, gpuMemcpyDeviceToHost);
+
+      double *h_u = (double *) malloc(sizeof(double)*solver->ndof_cells_wghosts);
+      gpuMemcpy(h_u, solver->gpu_u, sizeof(double)*solver->ndof_cells_wghosts, gpuMemcpyDeviceToHost);
+      for (int i=0; i<solver->npoints_local_wghosts; i++) {
+        for (int v=0; v<solver->nvars; v++) {
+          solver->u[i*solver->nvars+v] = h_u[i+v*solver->npoints_local_wghosts];
+        }
+      }
+      free(h_u);
+    }
+#endif
+
     IERR WriteArray(  solver->ndims,
                       solver->nvars,
                       solver->dim_global,
@@ -84,13 +104,13 @@ int OutputSolution( void  *s,   /*!< Array of simulation objects of type #Simula
                       solver,
                       mpi,
                       fname_root ); CHECKERR(ierr);
-  
+
     /* increment the index string, if required */
     if ((!strcmp(solver->output_mode,"serial")) && (!strcmp(solver->op_overwrite,"no"))) {
       IncrementFilenameIndex(solver->filename_index,solver->index_length);
     }
 
   }
-  
+
   return(0);
 }

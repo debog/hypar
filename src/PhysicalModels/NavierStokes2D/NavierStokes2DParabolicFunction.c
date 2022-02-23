@@ -17,7 +17,7 @@
       \frac {\partial} {\partial x} \left[\begin{array}{c} 0 \\ \tau_{xx} \\ \tau_{yx} \\ u \tau_{xx} + v \tau_{yx} - q_x \end{array}\right]
       + \frac {\partial} {\partial y} \left[\begin{array}{c} 0 \\ \tau_{xy} \\ \tau_{yy} \\ u \tau_{xy} + v \tau_{yy} - q_y \end{array}\right]
     \f}
-    where 
+    where
     \f{align}{
       \tau_{xx} &= \frac{2}{3}\left(\frac{\mu}{Re}\right)\left(2\frac{\partial u}{\partial x} - \frac{\partial v}{\partial y}\right),\\
       \tau_{xy} &= \left(\frac{\mu}{Re}\right)\left(\frac{\partial u}{\partial y} + \frac{\partial v}{\partial x}\right),\\
@@ -57,6 +57,8 @@ int NavierStokes2DParabolicFunction(
   int ndims  = solver->ndims;
   int size   = (imax+2*ghosts)*(jmax+2*ghosts)*nvars;
 
+  printf("Parabolic Function is called: Re = %f\n", physics->Re);
+
   _ArraySetValue_(par,size,0.0);
   if (physics->Re <= 0) return(0); /* inviscid flow */
   solver->count_par++;
@@ -74,7 +76,7 @@ int NavierStokes2DParabolicFunction(
       double energy,pressure;
       _ArrayIndex1D_(ndims,dim,index,ghosts,p); p *= nvars;
       _NavierStokes2DGetFlowVar_( (u+p),Q[p+0],Q[p+1],Q[p+2],energy,
-                                  pressure,physics);
+                                  pressure,physics->gamma);
       Q[p+3] = physics->gamma*pressure/Q[p+0]; /* temperature */
     }
   }

@@ -2,6 +2,7 @@
     @author Debojyoti Ghosh
     @brief Compute the viscous terms for the 3D Navier Stokes equations
 */
+#include <string.h>
 #include <stdlib.h>
 #include <basic.h>
 #include <arrayfunctions.h>
@@ -9,6 +10,10 @@
 #include <physicalmodels/navierstokes3d.h>
 #include <mpivars.h>
 #include <hypar.h>
+
+#if defined(CPU_STAT)
+#include <time.h>
+#endif
 
 /*!
     Compute the viscous terms in the 3D Navier Stokes equations: this function computes
@@ -18,7 +23,7 @@
       + \frac {\partial} {\partial y} \left[\begin{array}{c} 0 \\ \tau_{xy} \\ \tau_{yy} \\ \tau_{zy} \\ u \tau_{xy} + v \tau_{yy} + w \tau_{zy} - q_y \end{array}\right]
       + \frac {\partial} {\partial z} \left[\begin{array}{c} 0 \\ \tau_{xz} \\ \tau_{yz} \\ \tau_{zz} \\ u \tau_{xz} + v \tau_{yz} + w \tau_{zz} - q_z \end{array}\right]
     \f}
-    where 
+    where
     \f{align}{
       \tau_{xx} &= \frac{2}{3}\left(\frac{\mu}{Re}\right)\left(2\frac{\partial u}{\partial x} - \frac{\partial v}{\partial y} - \frac{\partial w}{\partial z}\right),\\
       \tau_{xy} &= \left(\frac{\mu}{Re}\right)\left(\frac{\partial u}{\partial y} + \frac{\partial v}{\partial x}\right),\\
@@ -72,8 +77,17 @@ int NavierStokes3DParabolicFunction(
   double        inv_Re       = 1.0 / physics->Re;
   double        inv_Pr       = 1.0 / physics->Pr;
 
+#if defined(CPU_STAT)
+  clock_t startEvent, stopEvent;
+#endif
+
   double *Q; /* primitive variables */
   Q = (double*) calloc (size*_MODEL_NVARS_,sizeof(double));
+
+#if defined(CPU_STAT)
+  startEvent = clock();
+#endif
+
   for (i=-ghosts; i<(imax+ghosts); i++) {
     for (j=-ghosts; j<(jmax+ghosts); j++) {
       for (k=-ghosts; k<(kmax+ghosts); k++) {
@@ -81,17 +95,24 @@ int NavierStokes3DParabolicFunction(
         double energy,pressure;
         _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
         _NavierStokes3DGetFlowVar_( (u+p),
+                                    _NavierStokes3D_stride_,
                                     Q[p+0],
                                     Q[p+1],
                                     Q[p+2],
                                     Q[p+3],
                                     energy,
                                     pressure,
-                                    physics);
+                                    physics->gamma);
         Q[p+4] = physics->gamma*pressure/Q[p+0]; /* temperature */
       }
     }
   }
+
+#if defined(CPU_STAT)
+  stopEvent = clock();
+  printf("%-50s CPU time (secs) = %.6f\n",
+         "NaverStokes3DParabolicFunction_Q",(double)(stopEvent-startEvent)/CLOCKS_PER_SEC);
+#endif
 
   double *QDerivX = (double*) calloc (size*_MODEL_NVARS_,sizeof(double));
   double *QDerivY = (double*) calloc (size*_MODEL_NVARS_,sizeof(double));
@@ -134,7 +155,7 @@ int NavierStokes3DParabolicFunction(
         int p,index[3]; index[0]=i; index[1]=j; index[2]=k;
         _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
 
-        double uvel, vvel, wvel, T, Tx, 
+        double uvel, vvel, wvel, T, Tx,
                ux, uy, uz, vx, vy, wx, wz;
         uvel = (Q+p)[1];
         vvel = (Q+p)[2];
@@ -151,6 +172,12 @@ int NavierStokes3DParabolicFunction(
 
         /* calculate viscosity coeff based on Sutherland's law */
         double mu = raiseto(T, 0.76);
+        /*
+        if (p/_MODEL_NVARS_ == 49841) {
+          printf("[CPU] 49841 mu = %.20e T = %.20e log(0.76) = %.20e T*log(0.76) = %.20e\n",
+                 mu, T, log(0.76), T*log(0.76));
+        }
+        */
 
         double tau_xx, tau_xy, tau_xz, qx;
         tau_xx = two_third * (mu*inv_Re) * (2*ux - vy - wz);
@@ -166,6 +193,7 @@ int NavierStokes3DParabolicFunction(
       }
     }
   }
+
   IERR solver->FirstDerivativePar(FDeriv,FViscous,_XDIR_,-1,solver,mpi); CHECKERR(ierr);
   for (i=0; i<imax; i++) {
     for (j=0; j<jmax; j++) {
@@ -186,7 +214,7 @@ int NavierStokes3DParabolicFunction(
         int p,index[3]; index[0]=i; index[1]=j; index[2]=k;
         _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
 
-        double uvel, vvel, wvel, T, Ty, 
+        double uvel, vvel, wvel, T, Ty,
                ux, uy, vx, vy, vz, wy, wz;
         uvel = (Q+p)[1];
         vvel = (Q+p)[2];
@@ -218,6 +246,7 @@ int NavierStokes3DParabolicFunction(
       }
     }
   }
+
   IERR solver->FirstDerivativePar(FDeriv,FViscous,_YDIR_,-1,solver,mpi); CHECKERR(ierr);
   for (i=0; i<imax; i++) {
     for (j=0; j<jmax; j++) {
@@ -238,7 +267,7 @@ int NavierStokes3DParabolicFunction(
         int p,index[3]; index[0]=i; index[1]=j; index[2]=k;
         _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
 
-        double uvel, vvel, wvel, T, Tz, 
+        double uvel, vvel, wvel, T, Tz,
                ux, uz, vy, vz, wx, wy, wz;
         uvel = (Q+p)[1];
         vvel = (Q+p)[2];
@@ -270,6 +299,7 @@ int NavierStokes3DParabolicFunction(
       }
     }
   }
+
   IERR solver->FirstDerivativePar(FDeriv,FViscous,_ZDIR_,-1,solver,mpi); CHECKERR(ierr);
   for (i=0; i<imax; i++) {
     for (j=0; j<jmax; j++) {

@@ -4,6 +4,7 @@
 */
 
 #include <basic.h>
+#include <simulation_object.h>
 #include <timeintegration.h>
 
 /*!
@@ -12,7 +13,9 @@
 int TimeStep(void *ts /*!< Object of type #TimeIntegration */)
 {
   TimeIntegration *TS  = (TimeIntegration*) ts;
-  _DECLARE_IERR_;
-  if (TS->TimeIntegrate) { IERR TS->TimeIntegrate(TS); CHECKERR(ierr); }
+  SimulationObject* sim = (SimulationObject*) TS->simulation;
+
+  if (TS->TimeIntegrate) { TS->TimeIntegrate(TS); }
+
   return(0);
 }

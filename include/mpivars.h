@@ -8,6 +8,10 @@
 
 #include <mpivars_struct.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! Broadcast a double to all ranks */
 int MPIBroadcast_double     (double*,int,int,void*);
 /*! Broadcast an integer to all ranks */
@@ -31,22 +35,22 @@ int MPICreateIOGroups       (void*);
  * coordinates) */
 int MPIExchangeBoundaries1D (void*,double*,int,int,int,int);
 
-/*! Exchange boundary (ghost point) values for an n-dimensional array (like the 
+/*! Exchange boundary (ghost point) values for an n-dimensional array (like the
  * solution array) */
 int MPIExchangeBoundariesnD (int,int,int*,int,void*,double*);
 
 /*! Gather local arrays into a global array for an essentially 1D array */
-int MPIGatherArray1D            (void*,double*,double*,int,int,int,int); 
+int MPIGatherArray1D            (void*,double*,double*,int,int,int,int);
 /*! Gather local arrays into a global array for an n-dimensional array */
 int MPIGatherArraynD            (int,void*,double*,double*,int*,int*,int,int);
 /*! Gather local arrays into a global array for an n-dimensional array (with ghosts) */
 int MPIGatherArraynDwGhosts     (int,void*,double*,double*,int*,int*,int,int);
 /*! Partition a global array into local arrays for an n-dimensional array */
-int MPIPartitionArraynD         (int,void*,double*,double*,int*,int*,int,int); 
+int MPIPartitionArraynD         (int,void*,double*,double*,int*,int*,int,int);
 /*! Partition a global array into local arrays for an n-dimensional array */
-int MPIPartitionArraynDwGhosts  (int,void*,double*,double*,int*,int*,int,int); 
+int MPIPartitionArraynDwGhosts  (int,void*,double*,double*,int*,int*,int,int);
 /*! Partition a global array into local arrays for an essentially 1D array */
-int MPIPartitionArray1D         (void*,double*,double*,int,int,int,int); 
+int MPIPartitionArray1D         (void*,double*,double*,int,int,int,int);
 
 /*! fetch data from an n-dimensional local array on another rank */
 int MPIGetArrayDatanD       (double*,double*,int*,int*,int*,int*,int,int,int,void*);
@@ -80,5 +84,13 @@ int MPIRanknD               (int,int,int*,int*);
 /*! Generate a unique filename given the rank of the process to let that process
  * write to its own file */
 void MPIGetFilename         (char*,void*,char*);
+
+#if defined(HAVE_CUDA)
+int gpuMPIExchangeBoundariesnD (int,int,const int*,int,void*,double*);
+#endif
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
