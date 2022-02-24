@@ -64,7 +64,7 @@ if [ -z "$FFTW_DIR" ]; then
 else
   echo "FFTW found at $FFTW_DIR."
   echo "Compiling with FFTW."
-  ./configure --with-fftw-dir=${FFTW_DIR} 2>&1 >> $root_dir/$hypar_compile_log_file
+  ./configure --enable-fftw --with-fftw-dir=${FFTW_DIR} 2>&1 >> $root_dir/$hypar_compile_log_file
 fi
 make -j all 2>&1 >> $root_dir/$hypar_compile_log_file
 make install 2>&1 >> $root_dir/$hypar_compile_log_file
