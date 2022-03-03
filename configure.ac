@@ -129,7 +129,7 @@ if test "x$enable_fftw" = "xyes" ; then
   if test "x$with_fftw_dir" != "x" ; then
     CFLAGS="$CFLAGS -I$with_fftw_dir/include"
     CXXFLAGS="$CXXFLAGS -I$with_fftw_dir/include"
-    LDFLAGS="$LDFLAGS -Wl,-rpath,$with_scalapack_dir/lib -L$with_fftw_dir/lib"
+    LDFLAGS="$LDFLAGS -Wl,-rpath,$with_fftw_dir/lib -L$with_fftw_dir/lib"
   fi
   LIBS="$LIBS -lfftw3_mpi -lfftw3 -lm"
 fi
