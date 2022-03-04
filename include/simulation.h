@@ -21,7 +21,6 @@ extern "C" int InitializeImmersedBoundaries(void*,int);/*!< Initialize the immer
 extern "C" int InitializePhysics(void*,int);/*!< Initialize the physics */
 extern "C" int InitializePhysicsData(void*,int,int,int*);/*!< Initialize the physics data*/
 extern "C" int InitializeSolvers(void*,int);/*!< Initialize the solvers */
-extern "C" int Solve(void*,int, int, int);/*!< Solve the PDE - time-integration */
 #ifdef with_petsc
 extern "C" int SolvePETSc(void*,int, int, int);  /*!< Solve the PDE using PETSc TS */
 #endif
@@ -29,6 +28,8 @@ extern "C" int Cleanup(void*,int);/*!< Clean up: deallocate all arrays and objec
 
 /*! Write errors for each simulation */
 extern "C" void SimWriteErrors(void*, int, int, double, double);
+
+int Solve(void*,int, int, int);/*!< Solve the PDE - time-integration */
 
 /*! \class Simulation
     \brief Base class for a simulation
