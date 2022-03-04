@@ -19,9 +19,12 @@
 #ifdef compute_rhs_operators
 extern "C" int ComputeRHSOperators(void*,void*,double);
 #endif
-
-extern "C" int CalculateError (void*,void*); /*!< Calculate the error in the final solution */
-extern "C" int OutputSolution (void*,int);   /*!< Write solutions to file */
+extern "C" int CalculateError(void*,void*); /*!< Calculate the error in the final solution */
+extern "C" int OutputSolution(void*,int);   /*!< Write solutions to file */
+#ifdef with_librom
+extern "C" int CalculateROMDiff(void*,void*); /*!< Calculate the diff of PDE and ROM solutions */
+extern "C" int OutputROMSolution(void*,int);   /*!< Write ROM solutions to file */
+#endif
 
 /*! This function integrates the semi-discrete ODE (obtained from discretizing the 
     PDE in space) using natively implemented time integration methods. It initializes 
@@ -36,8 +39,6 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
          )
 {
   SimulationObject* sim = (SimulationObject*) s;
-  int tic = 0;
-  _DECLARE_IERR_;
 
   /* make sure none of the simulation objects sent in the array 
    * are "barebones" type */
@@ -77,11 +78,11 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   /* Define and initialize the time-integration object */
   TimeIntegration TS;
   if (!rank) printf("Setting up time integration.\n");
-  IERR TimeInitialize(sim, nsims, rank, nproc, &TS); CHECKERR(ierr);
+  TimeInitialize(sim, nsims, rank, nproc, &TS);
 
 #ifdef with_librom
   if (!rank) printf("Setting up libROM interface.\n");
-  libROMInterface rom_interface( sim, nsims, rank, nproc, TS.dt );
+  libROMInterface rom_interface( sim, nsims, rank, nproc, sim[0].solver.dt );
 #endif
 
   if (!rank) printf("Solving in time (from %d to %d iterations)\n",TS.restart_iter,TS.n_iter);
@@ -95,7 +96,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
                                         &(sim[ns].mpi) );
         }
       }
-      IERR OutputSolution(sim, nsims); CHECKERR(ierr); 
+      OutputSolution(sim, nsims); 
     }
 
 #ifdef with_librom
@@ -104,46 +105,34 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 #endif
 
     /* Call pre-step function */
-    IERR TimePreStep  (&TS); CHECKERR(ierr);
+    TimePreStep (&TS);
 #ifdef compute_rhs_operators
     /* compute and write (to file) matrix operators representing the right-hand side */
 //    if (((TS.iter+1)%solver->file_op_iter == 0) || (!TS.iter)) 
-//      { IERR ComputeRHSOperators(solver,mpi,TS.waqt); CHECKERR(ierr); }
+//      { ComputeRHSOperators(solver,mpi,TS.waqt);
 #endif
 
     /* Step in time */
-    IERR TimeStep     (&TS); CHECKERR(ierr);
+    TimeStep (&TS);
 
     /* Call post-step function */
-    IERR TimePostStep (&TS); CHECKERR(ierr);
+    TimePostStep (&TS);
 
     /* Print information to screen */
-    IERR TimePrintStep(&TS); CHECKERR(ierr);
-    tic++;
+    TimePrintStep(&TS);
 
     /* Write intermediate solution to file */
-    if ((TS.iter+1)%sim[0].solver.file_op_iter == 0) { 
+    if (      ((TS.iter+1)%sim[0].solver.file_op_iter == 0) 
+          &&  ((TS.iter+1) < TS.n_iter) ) { 
       for (int ns = 0; ns < nsims; ns++) {
         if (sim[ns].solver.PhysicsOutput) {
           sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
                                         &(sim[ns].mpi) );
         }
       }
-      IERR OutputSolution(sim, nsims); CHECKERR(ierr); 
-      tic = 0; 
+      OutputSolution(sim, nsims); 
     }
 
-  }
-
-  /* write a final solution file, if last iteration did not write one */
-  if (tic || (!TS.n_iter)) { 
-    for (int ns = 0; ns < nsims; ns++) {
-      if (sim[ns].solver.PhysicsOutput) {
-        sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
-                                      &(sim[ns].mpi) );
-      }
-    }
-    IERR OutputSolution(sim, nsims); CHECKERR(ierr); 
   }
 
   if (!rank) {
@@ -153,13 +142,13 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 #ifdef with_librom
   double t_final = TS.waqt;
 #endif
+  TimeCleanup(&TS);
 
   /* calculate error if exact solution has been provided */
   for (int ns = 0; ns < nsims; ns++) {
-    IERR CalculateError(&(sim[ns].solver),
-                        &(sim[ns].mpi) ); CHECKERR(ierr);
+    CalculateError(&(sim[ns].solver),
+                   &(sim[ns].mpi) );
   }
-  IERR TimeCleanup(&TS); CHECKERR(ierr);
 
 #ifdef with_librom
   if (!rank) printf("libROM: Training ROM.\n");
@@ -169,11 +158,23 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   rom_interface.predict(sim, t_final);
 
   /* calculate error for the ROM solution if exact solution has been provided */
+  if (!rank) printf("libROM: Calculating diff between PDE and ROM solutions.\n");
   for (int ns = 0; ns < nsims; ns++) {
-    IERR CalculateError(&(sim[ns].solver),
-                        &(sim[ns].mpi) ); CHECKERR(ierr);
+    CalculateROMDiff(  &(sim[ns].solver),
+                       &(sim[ns].mpi) );
   }
+  /* write the ROM solution to file */
+  OutputROMSolution(sim, nsims); 
 #endif
+
+  /* write a final solution file */
+  for (int ns = 0; ns < nsims; ns++) {
+    if (sim[ns].solver.PhysicsOutput) {
+      sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
+                                    &(sim[ns].mpi) );
+    }
+  }
+  OutputSolution(sim, nsims); 
 
   return 0;
 }

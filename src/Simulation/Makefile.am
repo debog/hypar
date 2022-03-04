@@ -12,6 +12,7 @@ libSimulation_a_SOURCES = \
   InitialSolution.c \
 	libROMInterface.cpp \
   OutputSolution.c \
+  OutputROMSolution.c \
   ReadInputs.c \
   SimulationWriteErrors.c \
 	SingleSimulationDefine.cpp \

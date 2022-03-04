@@ -1,9 +1,9 @@
+#ifdef with_librom
+
 /*! @file librom_interface.h
     @brief libROM interface class
     @author Debojyoti Ghosh
 */
-
-#ifdef with_librom
 
 #ifndef _LIBROM_INTERFACE_H_
 #define _LIBROM_INTERFACE_H_

@@ -153,6 +153,9 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
     if (solver->rhsref) free(solver->rhsref);
     if (solver->rhs)    free(solver->rhs);   
 #endif
+#ifdef with_librom
+    free(solver->u_rom_predicted);
+#endif
     free(solver->iblank);
     free(solver->hyp);
     free(solver->par);

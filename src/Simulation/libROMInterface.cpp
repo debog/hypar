@@ -1,9 +1,9 @@
+#ifdef with_librom
+
 /*! @file libROMInterface.cpp
  *  @brief Functions that implement interface with libROM
  *  @author Debojyoti Ghosh
 */
-
-#ifdef with_librom
 
 #include <arrayfunctions.h>
 #include <simulation_object.h>
@@ -143,7 +143,7 @@ void libROMInterface::copyToHyPar(  double* a_U,  /*!< Work vector */
 
   for (int ns = 0; ns < m_nsims; ns++) {
     double* vec = a_U + m_vec_offsets[ns];
-    double* u = sim[ns].solver.u;
+    double* u = sim[ns].solver.u_rom_predicted;
 
     std::vector<int> index(sim[ns].solver.ndims);
 

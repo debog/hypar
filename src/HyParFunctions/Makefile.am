@@ -5,6 +5,7 @@ libHyParFunctions_a_SOURCES = \
   BoundaryIntegral.c \
   CalculateError.c \
   CalculateConservationError.c \
+  CalculateROMDiff.c \
 	ComputeRHSOperators.c \
   ExactSolution.c \
   HyperbolicFunction.c \
