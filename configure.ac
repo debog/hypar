@@ -31,6 +31,7 @@ fi
 
 CXXFLAGS="$CXXFLAGS -I$includedir"
 if test "$GXX" = "yes" ; then
+  CXXFLAGS="$CXXFLAGS -std=c++11"
   LIBS="$LIBS -lm"
   MPI_CXX=mpicxx
 else
@@ -157,6 +158,20 @@ MFILE
       CXXFLAGS="$CXXFLAGS -Dwith_petsc $PETSC_INC"
       LIBS="$LIBS $PETSC_LIB"
     fi
+  fi
+fi
+
+if test "x$LIBROM_DIR" = "x"; then
+  AC_MSG_NOTICE([Environment variable LIBROM_DIR not set. Compiling without libROM interface.])
+else
+  if test [ ! -d "$LIBROM_DIR" ]; then
+    AC_MSG_NOTICE([Environment variable LIBROM_DIR set, but libROM not found there. Compiling without libROM interface.])
+  else
+    AC_MSG_NOTICE([Compiling with libROM interface.])
+    CFLAGS="$CFLAGS -Dwith_librom -I$LIBROM_DIR/lib"
+    CXXFLAGS="$CXXFLAGS -Dwith_librom -I$LIBROM_DIR/lib"
+    LDFLAGS="$LDFLAGS -Wl,-rpath,$LIBROM_DIR/build/lib -L$LIBROM_DIR/build/lib"
+    LIBS="$LIBS -lROM"
   fi
 fi
 

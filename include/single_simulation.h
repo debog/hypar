@@ -30,7 +30,7 @@ class SingleSimulation : public Simulation
     SingleSimulation()
     {
       m_is_defined = false;
-      m_sim = NULL;
+      m_sim = nullptr;
       m_nproc = -1;
       m_rank = -1;
     }
