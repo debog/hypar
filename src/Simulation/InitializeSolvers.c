@@ -318,6 +318,9 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
     solver->WriteOutput    = NULL; /* default - no output */
     solver->filename_index = NULL;
     strcpy(solver->op_fname_root, "op");
+#ifdef with_librom
+    strcpy(solver->op_rom_fname_root, "op_rom");
+#endif
     strcpy(solver->aux_op_fname_root, "ts0");
     if (!strcmp(solver->output_mode,"serial")) {
       solver->index_length = 5;

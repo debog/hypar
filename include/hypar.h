@@ -375,6 +375,14 @@ typedef struct main_parameters {
   double  *rhs;         /*!< RHS vector                  */
 #endif
 
+#ifdef with_librom
+  double* u_rom_predicted; /*!< Solution predicted using a ROM */
+  /*! L1, L2, Linf norms of the diff between PDE and ROM solutions */
+  double rom_diff_norms[3]; 
+  /*! output filename root for ROM solution file */
+  char op_rom_fname_root[_MAX_STRING_SIZE_];
+#endif
+
   /*! flag to globally switch on/off non-linear interpolation */
   int flag_nonlinearinterp; 
 

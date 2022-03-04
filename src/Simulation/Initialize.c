@@ -142,6 +142,9 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
       simobj[n].solver.rhs     = (double*) calloc (simobj[n].solver.nvars*size,sizeof(double));
     } else simobj[n].solver.u0 = simobj[n].solver.uref = simobj[n].solver.rhsref = simobj[n].solver.rhs = NULL;
 #endif
+#ifdef with_librom
+    simobj[n].solver.u_rom_predicted = (double*) calloc (simobj[n].solver.nvars*size,sizeof(double));
+#endif
     simobj[n].solver.hyp     = (double*) calloc (simobj[n].solver.nvars*size,sizeof(double));
     simobj[n].solver.par     = (double*) calloc (simobj[n].solver.nvars*size,sizeof(double));
     simobj[n].solver.source  = (double*) calloc (simobj[n].solver.nvars*size,sizeof(double));
