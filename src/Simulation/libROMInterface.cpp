@@ -26,6 +26,7 @@
     Keyword name       | Type         | Variable                                      | Default value
     ------------------ | ------------ | --------------------------------------------- | -------------------
     rdim               | int          | #libROMInterface::m_rdim                      | 10
+    sampling_frequency | int          | #libROMInterface::m_sampling_freq             | 1
    
 */
 void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of type #SimulationObject */
@@ -68,7 +69,9 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
         while (std::string(word) != "end") {
   	      ferr = fscanf(in,"%s",word); if (ferr != 1) return;
           if (std::string(word) == "rdim") {
-            ferr = fscanf(in,"%d",&m_rdim); if (ferr != 1) return;
+            ferr = fscanf(in,"%d", &m_rdim); if (ferr != 1) return;
+          } else if (std::string(word) == "sampling_frequency") {
+            ferr = fscanf(in,"%d", &m_sampling_freq); if (ferr != 1) return;
           } else if (std::string(word) != "end") {
             char useless[_MAX_STRING_SIZE_];
             ferr = fscanf(in,"%s",useless);

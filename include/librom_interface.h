@@ -41,6 +41,7 @@ class libROMInterface
       m_vec_size = -1;
       m_vec_offsets.clear();
       m_rdim = -1;
+      m_sampling_freq = 1;
       m_rom = nullptr;
       m_U = nullptr;
     }
@@ -66,6 +67,7 @@ class libROMInterface
     }
 
     inline int vectorSize() const { return m_vec_size; }
+    inline int samplingFrequency() const { return m_sampling_freq; }
 
     inline void takeSample( void*   a_s, /*!< Array of simulation objects of type #SimulationObject */
                             double  a_t /*!< Current simulation time */ )
@@ -104,6 +106,7 @@ class libROMInterface
     std::vector<int> m_vec_offsets; /*!< Offset for each simulation */
 
     int m_rdim; /*!< Reduced model dimensionality */
+    int m_sampling_freq; /*!< Frequency at which to take samples */
 
     CAROM::DMD *m_rom; /*!< ROM object */
 
