@@ -5,6 +5,7 @@
  *  @author Debojyoti Ghosh
 */
 
+#include <string.h>
 #include <arrayfunctions.h>
 #include <simulation_object.h>
 #include <librom_interface.h>
@@ -27,6 +28,7 @@
     ------------------ | ------------ | --------------------------------------------- | -------------------
     rdim               | int          | #libROMInterface::m_rdim                      | 10
     sampling_frequency | int          | #libROMInterface::m_sampling_freq             | 1
+    mode               | string       | #libROMInterface::m_mode                      | "train"
    
 */
 void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of type #SimulationObject */
@@ -48,6 +50,8 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
     m_vec_size += (sim[ns].solver.npoints_local * sim[ns].solver.nvars);
   }
 
+  char mode_c_str[_MAX_STRING_SIZE_];
+
   if (!m_rank) {
 
     FILE *in;
@@ -55,11 +59,11 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 
     if (!in) {
 
-      fprintf(stderr, "Error in libROMInterface.cpp::Define() -\n");
-      fprintf(stderr, "  %s file not found.\n", _LIBROM_INP_FNAME_);
-      exit(1);
+      strcpy( mode_c_str, "none" );
 
     } else {
+
+      strcpy( mode_c_str, "train" );
 
       int ferr;
       char word[_MAX_STRING_SIZE_];
@@ -72,6 +76,8 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
             ferr = fscanf(in,"%d", &m_rdim); if (ferr != 1) return;
           } else if (std::string(word) == "sampling_frequency") {
             ferr = fscanf(in,"%d", &m_sampling_freq); if (ferr != 1) return;
+          } else if (std::string(word) == "mode") {
+            ferr = fscanf(in,"%s", mode_c_str); if (ferr != 1) return;
           } else if (std::string(word) != "end") {
             char useless[_MAX_STRING_SIZE_];
             ferr = fscanf(in,"%s",useless);
@@ -93,15 +99,22 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
     /* print useful stuff to screen */
     printf("libROM inputs and parameters:\n");
     printf("  reduced model dimensionality:  %d\n", m_rdim);
+    printf("  sampling frequency:  %d\n", m_sampling_freq);
+    printf("  mode: %s\n", mode_c_str);
     printf("  local vector size: %d\n", m_vec_size);
   }
 
 #ifndef serial
   MPI_Bcast(&m_rdim,1,MPI_INT,0,MPI_COMM_WORLD);
+  MPI_Bcast(&m_sampling_freq,1,MPI_INT,0,MPI_COMM_WORLD);
+  MPI_Bcast(mode_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+  m_mode = std::string( mode_c_str );
 #endif
 
-  m_rom = new CAROM::DMD( m_vec_size, a_dt );
-  m_U = new double[m_vec_size];
+  if (m_mode == "train") {
+    m_rom = new CAROM::DMD( m_vec_size, a_dt );
+    m_U = new double[m_vec_size];
+  }
 
   m_is_defined = true;
   return;

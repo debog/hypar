@@ -8,6 +8,7 @@
 #ifndef _LIBROM_INTERFACE_H_
 #define _LIBROM_INTERFACE_H_
 
+#include <string>
 #include <vector>
 #include <linalg/Vector.h>
 #include <algo/DMD.h>
@@ -42,6 +43,7 @@ class libROMInterface
       m_vec_offsets.clear();
       m_rdim = -1;
       m_sampling_freq = 1;
+      m_mode = "train";
       m_rom = nullptr;
       m_U = nullptr;
     }
@@ -62,12 +64,15 @@ class libROMInterface
     /*! Destructor */
     ~libROMInterface()
     {
-      delete m_rom;
-      delete m_U;
+      if (m_mode == "train") {
+        delete m_rom;
+        delete m_U;
+      }
     }
 
     inline int vectorSize() const { return m_vec_size; }
     inline int samplingFrequency() const { return m_sampling_freq; }
+    inline const std::string& mode() const { return m_mode; }
 
     inline void takeSample( void*   a_s, /*!< Array of simulation objects of type #SimulationObject */
                             double  a_t /*!< Current simulation time */ )
@@ -107,6 +112,8 @@ class libROMInterface
 
     int m_rdim; /*!< Reduced model dimensionality */
     int m_sampling_freq; /*!< Frequency at which to take samples */
+
+    std::string m_mode; /*!< Mode: none, train */
 
     CAROM::DMD *m_rom; /*!< ROM object */
 
