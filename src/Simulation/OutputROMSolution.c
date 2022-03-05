@@ -1,3 +1,5 @@
+#ifdef with_librom
+
 /*! @file OutputROMSolution.c
     @author Debojyoti Ghosh
     @brief Write out the solution to file
@@ -52,5 +54,7 @@ int OutputROMSolution(  void  *s,   /*!< Array of simulation objects of type #Si
                 fname_root );
   }
   
-  return(0);
+  return 0;
 }
+
+#endif
