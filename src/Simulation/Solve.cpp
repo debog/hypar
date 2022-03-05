@@ -100,8 +100,10 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     }
 
 #ifdef with_librom
-    if (!rank) printf("libROM: taking sample.\n");
-    rom_interface.takeSample( sim, TS.waqt );
+    if (TS.iter%rom_interface.samplingFrequency() == 0) {
+      if (!rank) printf("libROM: taking sample.\n");
+      rom_interface.takeSample( sim, TS.waqt );
+    }
 #endif
 
     /* Call pre-step function */
