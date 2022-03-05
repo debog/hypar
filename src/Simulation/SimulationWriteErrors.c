@@ -39,7 +39,7 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
       strcpy(fc_fname,"function_counts");
 #ifdef with_librom
       char rom_diff_fname[_MAX_STRING_SIZE_]; 
-      strcpy(fc_fname,"pde_rom_diff");
+      strcpy(rom_diff_fname,"pde_rom_diff");
 #endif
 
 
