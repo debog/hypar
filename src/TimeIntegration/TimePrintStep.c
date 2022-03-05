@@ -45,7 +45,7 @@ int TimePrintStep(void *ts /*!< Object of type #TimeIntegration */)
         }
       }
       error = sqrt(error);
-      printf("  cons. err=%1.4E\n", error);
+      printf("  cons_err=%1.4E\n", error);
 
     } else {
 
