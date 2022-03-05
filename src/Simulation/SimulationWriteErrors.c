@@ -123,10 +123,12 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
         for (int d=0; d<sim[n].solver.nvars; d++) printf("\t%1.16E\n",sim[n].solver.ConservationError[d]);
       }
 #ifdef with_librom
-      printf("Norms of the diff between ROM and PDE solutions for domain %d:\n", n);
-      printf("  L1         Norm            : %1.16E\n",sim[n].solver.rom_diff_norms[0]);
-      printf("  L2         Norm            : %1.16E\n",sim[n].solver.rom_diff_norms[1]);
-      printf("  Linfinity  Norm            : %1.16E\n",sim[n].solver.rom_diff_norms[2]);
+      if (sim[n].solver.rom_diff_norms[0] >= 0) {
+        printf("Norms of the diff between ROM and PDE solutions for domain %d:\n", n);
+        printf("  L1         Norm            : %1.16E\n",sim[n].solver.rom_diff_norms[0]);
+        printf("  L2         Norm            : %1.16E\n",sim[n].solver.rom_diff_norms[1]);
+        printf("  Linfinity  Norm            : %1.16E\n",sim[n].solver.rom_diff_norms[2]);
+      }
 #endif
 
     }

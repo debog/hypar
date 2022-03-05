@@ -83,6 +83,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 #ifdef with_librom
   if (!rank) printf("Setting up libROM interface.\n");
   libROMInterface rom_interface( sim, nsims, rank, nproc, sim[0].solver.dt );
+  const std::string& rom_mode( rom_interface.mode() );
 #endif
 
   if (!rank) printf("Solving in time (from %d to %d iterations)\n",TS.restart_iter,TS.n_iter);
@@ -100,7 +101,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     }
 
 #ifdef with_librom
-    if (TS.iter%rom_interface.samplingFrequency() == 0) {
+    if ((rom_mode == "train") && (TS.iter%rom_interface.samplingFrequency() == 0)) {
       if (!rank) printf("libROM: taking sample.\n");
       rom_interface.takeSample( sim, TS.waqt );
     }
@@ -153,20 +154,30 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   }
 
 #ifdef with_librom
-  if (!rank) printf("libROM: Training ROM.\n");
-  rom_interface.train();
+  if (rom_interface.mode() == "train") {
+    if (!rank) printf("libROM: Training ROM.\n");
+    rom_interface.train();
 
-  if (!rank) printf("libROM: Predicting solution at time %1.4e using ROM.\n", t_final);
-  rom_interface.predict(sim, t_final);
+    if (!rank) printf("libROM: Predicting solution at time %1.4e using ROM.\n", t_final);
+    rom_interface.predict(sim, t_final);
 
-  /* calculate error for the ROM solution if exact solution has been provided */
-  if (!rank) printf("libROM: Calculating diff between PDE and ROM solutions.\n");
-  for (int ns = 0; ns < nsims; ns++) {
-    CalculateROMDiff(  &(sim[ns].solver),
-                       &(sim[ns].mpi) );
+    /* calculate error for the ROM solution if exact solution has been provided */
+    if (!rank) printf("libROM: Calculating diff between PDE and ROM solutions.\n");
+    for (int ns = 0; ns < nsims; ns++) {
+      CalculateROMDiff(  &(sim[ns].solver),
+                         &(sim[ns].mpi) );
+    }
+    /* write the ROM solution to file */
+    OutputROMSolution(sim, nsims); 
+  } else {
+    for (int ns = 0; ns < nsims; ns++) {
+      sim[ns].solver.rom_diff_norms[0]
+        = sim[ns].solver.rom_diff_norms[1]
+        = sim[ns].solver.rom_diff_norms[2]
+        = -1;
+    }
+
   }
-  /* write the ROM solution to file */
-  OutputROMSolution(sim, nsims); 
 #endif
 
   /* write a final solution file */
