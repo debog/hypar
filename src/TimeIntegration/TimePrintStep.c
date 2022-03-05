@@ -22,16 +22,15 @@ int TimePrintStep(void *ts /*!< Object of type #TimeIntegration */)
   if ((!TS->rank) && ((TS->iter+1)%sim[0].solver.screen_op_iter == 0)) {
     if (nsims > 1) {
       printf("--\n");
-      printf("Iteration: %7d,  Time: %1.3e\n", TS->iter+1, TS->waqt);
-      printf("  Max CFL: %1.3E,  Max Diff. No.: %1.3E,  ", TS->max_cfl, TS->max_diff);
-      printf("  Norm: %1.4E\n", TS->norm);
-      printf("  Wall clock time: %1.1E (s)\n",TS->iter_wctime);
+      printf("iter=%7d,  t=%1.3e\n", TS->iter+1, TS->waqt);
+      printf("  CFL=%1.3E, ", TS->max_cfl);
+      printf("  norm=%1.4E\n", TS->norm);
+      printf("  wctime=%1.1E (s)\n",TS->iter_wctime);
     } else {
-      printf("Iteration: %7d  "       ,TS->iter+1  );
-      printf("Time: %1.3E  "          ,TS->waqt    );
-      printf("Max CFL: %1.3E  "       ,TS->max_cfl );
-      printf("Max Diff. No.: %1.3E  " ,TS->max_diff);
-      printf("Norm: %1.4E  "          ,TS->norm    );
+      printf("iter=%7d  "       ,TS->iter+1  );
+      printf("t=%1.3E  "          ,TS->waqt    );
+      printf("CFL=%1.3E  "       ,TS->max_cfl );
+      printf("norm=%1.4E  "          ,TS->norm    );
       printf("wctime: %1.1E (s)  ",TS->iter_wctime);
     }
 
@@ -46,7 +45,7 @@ int TimePrintStep(void *ts /*!< Object of type #TimeIntegration */)
         }
       }
       error = sqrt(error);
-      printf("  Conservation loss: %1.4E\n", error);
+      printf("  cons. err=%1.4E\n", error);
 
     } else {
 
