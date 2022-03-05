@@ -10,6 +10,7 @@
 
 #include <string>
 #include <vector>
+#include <sys/time.h>
 #include <linalg/Vector.h>
 #include <algo/DMD.h>
 
@@ -46,6 +47,8 @@ class libROMInterface
       m_mode = "train";
       m_rom = nullptr;
       m_U = nullptr;
+      m_train_wctime = 0;
+      m_predict_wctime = 0;
     }
 
     /*! Constructor */
@@ -73,6 +76,8 @@ class libROMInterface
     inline int vectorSize() const { return m_vec_size; }
     inline int samplingFrequency() const { return m_sampling_freq; }
     inline const std::string& mode() const { return m_mode; }
+    inline double trainWallclockTime() const { return m_train_wctime; }
+    inline double predictWallclockTime() const { return m_predict_wctime; }
 
     inline void takeSample( void*   a_s, /*!< Array of simulation objects of type #SimulationObject */
                             double  a_t /*!< Current simulation time */ )
@@ -83,14 +88,40 @@ class libROMInterface
 
     inline void train()
     {
+#ifndef serial
+      MPI_Barrier(MPI_COMM_WORLD);
+#endif
+      gettimeofday(&m_train_start, NULL);
       m_rom->train(m_rdim);
+#ifndef serial
+      MPI_Barrier(MPI_COMM_WORLD);
+#endif
+      gettimeofday(&m_train_end, NULL);
+
+      long long walltime;
+      walltime = (  (m_train_end.tv_sec*1000000 + m_train_end.tv_usec)
+                  - (m_train_start.tv_sec*1000000 + m_train_start.tv_usec) );
+      m_train_wctime = (double) walltime / 1000000.0;
     }
 
     inline void predict(  void*  a_s, /*!< Array of simulation objects of type #SimulationObject */
                           double a_t  /*!< time at which to predict solution */)
     {
+#ifndef serial
+      MPI_Barrier(MPI_COMM_WORLD);
+#endif
+      gettimeofday(&m_predict_start, NULL);
       CAROM::Vector* u_predicted = m_rom->predict(a_t);
+#ifndef serial
+      MPI_Barrier(MPI_COMM_WORLD);
+#endif
+      gettimeofday(&m_predict_end, NULL);
       copyToHyPar( u_predicted->getData(), a_s );
+
+      long long walltime;
+      walltime = (  (m_predict_end.tv_sec*1000000 + m_predict_end.tv_usec)
+                  - (m_predict_start.tv_sec*1000000 + m_predict_start.tv_usec) );
+      m_predict_wctime = (double) walltime / 1000000.0;
     }
 
     /*! Copy HyPar solution to the work vector m_U */
@@ -118,6 +149,13 @@ class libROMInterface
     CAROM::DMD *m_rom; /*!< ROM object */
 
     double* m_U; /*!< Work vector */
+
+    struct timeval m_train_start; /*<! Training start time */
+    struct timeval m_train_end; /*<! Training end time */
+    struct timeval m_predict_start; /*<! Prediction start time */
+    struct timeval m_predict_end; /*<! Prediction end time */
+    double m_train_wctime; /*!< Wallclock time for training */
+    double m_predict_wctime; /*!< Wallclock time for prediction */
 
   private:
 

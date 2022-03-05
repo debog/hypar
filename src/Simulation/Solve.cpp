@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <sys/time.h>
 #include <common_cpp.h>
 #include <io_cpp.h>
 #include <timeintegration_cpp.h>
@@ -39,6 +40,8 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
          )
 {
   SimulationObject* sim = (SimulationObject*) s;
+
+  struct timeval ti_start, ti_end;
 
   /* make sure none of the simulation objects sent in the array 
    * are "barebones" type */
@@ -85,6 +88,11 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   libROMInterface rom_interface( sim, nsims, rank, nproc, sim[0].solver.dt );
   const std::string& rom_mode( rom_interface.mode() );
 #endif
+
+#ifndef serial
+  MPI_Barrier( MPI_COMM_WORLD );
+#endif
+  gettimeofday( &ti_start, NULL );
 
   if (!rank) printf("Solving in time (from %d to %d iterations)\n",TS.restart_iter,TS.n_iter);
   for (TS.iter = TS.restart_iter; TS.iter < TS.n_iter; TS.iter++) {
@@ -138,8 +146,19 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 
   }
 
+#ifndef serial
+  MPI_Barrier( MPI_COMM_WORLD );
+#endif
+  gettimeofday( &ti_end, NULL );
+
+  long long walltime;
+  walltime = (  (ti_end.tv_sec * 1000000   + ti_end.tv_usec  ) 
+              - (ti_start.tv_sec * 1000000 + ti_start.tv_usec));
+  double ti_runtime = (double) walltime / 1000000.0;
+
   if (!rank) {
-    printf("Completed time integration (Final time: %f).\n",TS.waqt);
+    printf( "Completed time integration (Final time: %f), total wctime: %f (seconds).\n",
+            TS.waqt, ti_runtime );
     if (nsims > 1) printf("\n");
   }
 #ifdef with_librom
@@ -157,9 +176,13 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   if (rom_interface.mode() == "train") {
     if (!rank) printf("libROM: Training ROM.\n");
     rom_interface.train();
+    if (!rank) printf("libROM: wallclock time: %f (seconds).\n", 
+                      rom_interface.trainWallclockTime() );
 
     if (!rank) printf("libROM: Predicting solution at time %1.4e using ROM.\n", t_final);
     rom_interface.predict(sim, t_final);
+    if (!rank) printf("libROM: wallclock time: %f (seconds).\n", 
+                      rom_interface.predictWallclockTime() );
 
     /* calculate error for the ROM solution if exact solution has been provided */
     if (!rank) printf("libROM: Calculating diff between PDE and ROM solutions.\n");
