@@ -82,7 +82,7 @@
     is specified).
 
   \b Compiling \b with \b PETSc:
-  Install PETSc and make sure the environment variables \b PETSC_DIR and \b PETSC_ARCH are defined. Please PETSc's
+  Install PETSc and make sure the environment variables \b PETSC_DIR and \b PETSC_ARCH are defined. Please see PETSc's
   installation instructions for this. Once these environment variables are present, HyPar will use them to compile
   itself with PETSc functionalities.
 
