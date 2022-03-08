@@ -86,6 +86,10 @@
   installation instructions for this. Once these environment variables are present, HyPar will use them to compile
   itself with PETSc functionalities.
 
+  \b Compiling \b with \b libROM:
+  Download and compile libROM and make sure the environment variable \b LIBROM_DIR is defined as the location of libROM
+  source directory. Once this environment variable is present, HyPar will use it to compile itself with libROM functionalities.
+
   Notes
   -----
   + This package has been tested using the GNU C and C++ compilers. The configuration script is designed to look for these 
