@@ -82,9 +82,13 @@
     is specified).
 
   \b Compiling \b with \b PETSc:
-  Install PETSc and make sure the environment variables \b PETSC_DIR and \b PETSC_ARCH are defined. Please PETSc's
+  Install PETSc and make sure the environment variables \b PETSC_DIR and \b PETSC_ARCH are defined. Please see PETSc's
   installation instructions for this. Once these environment variables are present, HyPar will use them to compile
   itself with PETSc functionalities.
+
+  \b Compiling \b with \b libROM:
+  Download and compile libROM and make sure the environment variable \b LIBROM_DIR is defined as the location of libROM
+  source directory. Once this environment variable is present, HyPar will use it to compile itself with libROM functionalities.
 
   Notes
   -----
