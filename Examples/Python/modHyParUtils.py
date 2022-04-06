@@ -11,17 +11,20 @@ in the file.
 '''
 def readHyParInpFile(fname):
   input_data = {}
-  
-  with open(fname,'r') as solver_file:
-    begin = False
-    for line in solver_file:
-      if line.startswith("end"):
-        break
-      elif begin:
-        fields = line.split()
-        input_data[fields[0]] = fields[1]
-      elif line.startswith("begin"):
-        begin = True
+
+  try:
+    with open(fname,'r') as solver_file:
+      begin = False
+      for line in solver_file:
+        if line.startswith("end"):
+          break
+        elif begin:
+          fields = line.split()
+          input_data[fields[0]] = fields[1]
+        elif line.startswith("begin"):
+          begin = True
+  except:
+    print('File ', fname, ' is absent.')
         
   return input_data
 
@@ -56,12 +59,19 @@ def readOpFile(fname, a_ndims, a_nvars, a_size):
 For an unsteady simulation, this function reads in the solution
 from each op_<index>.bin file and creates a 2D matrix whose rows
 are the serialized solution vector at a particular simulation time.
+
+Input arguments:
+  path: directory path where the op_* files are located
+  n_op_files: number of snapshot files to read
+  ndims: number of spatial dimensions
+  nvars: number of vector components at each grid point
+  size: integer array with grid size in each dimension
 '''
-def getSolutionSnapshots(n_op_files, ndims, nvars, size):
+def getSolutionSnapshots(path, n_op_files, ndims, nvars, size):
   ndof = nvars * np.prod(size)
   snapshots = np.empty((0,ndof),np.float64)
   for i in range(n_op_files):
-    fname = 'op_'+f'{i:05d}'+'.bin'
+    fname = path + '/op_'+f'{i:05d}'+'.bin'
     x, u = readOpFile(fname, ndims, nvars, size)
     snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
 
