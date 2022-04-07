@@ -20,13 +20,25 @@ def readHyParInpFile(fname):
           break
         elif begin:
           fields = line.split()
-          input_data[fields[0]] = fields[1]
+          input_data[fields[0]] = np.array(fields[1:])
         elif line.startswith("begin"):
           begin = True
   except:
     print('File ', fname, ' is absent.')
         
   return input_data
+
+def readHyParErrFile(path, ndims):
+
+  fname = path + '/errors.dat'
+  with open(fname,'r') as file:
+    for line in file:
+      words = line.split()
+      total_wctime = float(words[-1])
+      solver_wctime = float(words[-2])
+      errors = np.float32(np.array(words[-5:-3]))
+  return errors, solver_wctime, total_wctime
+
 
 '''
 Read in a binary solution output file
@@ -67,13 +79,17 @@ Input arguments:
   nvars: number of vector components at each grid point
   size: integer array with grid size in each dimension
 '''
-def getSolutionSnapshots(path, n_op_files, ndims, nvars, size):
+def getSolutionSnapshots(path, nsims, n_op_files, ndims, nvars, size):
   ndof = nvars * np.prod(size)
   snapshots = np.empty((0,ndof),np.float64)
-  for i in range(n_op_files):
-    fname = path + '/op_'+f'{i:05d}'+'.bin'
-    x, u = readOpFile(fname, ndims, nvars, size)
-    snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
+  for sim in range(nsims):
+    for i in range(n_op_files):
+      if nsims > 1:
+        fname = path + '/op_'+f'{sim:01d}'+'_'+f'{i:05d}'+'.bin'
+      else:
+        fname = path + '/op_'+f'{i:05d}'+'.bin'
+      x, u = readOpFile(fname, ndims, nvars, size)
+      snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
 
-  return snapshots
+  return x,snapshots
 
