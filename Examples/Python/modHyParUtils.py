@@ -84,7 +84,11 @@ def getSolutionSnapshots(path, nsims, n_op_files, ndims, nvars, size):
   snapshots = np.empty((0,ndof),np.float64)
   for sim in range(nsims):
     for i in range(n_op_files):
-      if nsims > 1:
+      if nsims >= 100:
+        fname = path + '/op_'+f'{sim:03d}'+'_'+f'{i:05d}'+'.bin'
+      elif nsims >= 10:
+        fname = path + '/op_'+f'{sim:02d}'+'_'+f'{i:05d}'+'.bin'
+      elif nsims > 1:
         fname = path + '/op_'+f'{sim:01d}'+'_'+f'{i:05d}'+'.bin'
       else:
         fname = path + '/op_'+f'{i:05d}'+'.bin'
