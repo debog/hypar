@@ -60,7 +60,9 @@ def readOpFile(fname, a_ndims, a_nvars, a_size):
     if nvars != a_nvars:
       raise Exception("nvars did not match in op file!")
     size = np.fromfile(f_op, dtype=np.int32, count=ndims)
-    if np.array_equal(size,a_size):
+    if np.any(np.not_equal(size,a_size)):
+      print('size in op file: ', size)
+      print('specified size: ', a_size)
       raise Exception("size did not match in op file!")
 
     x = np.fromfile(f_op, dtype=np.float64, count=np.sum(size))
