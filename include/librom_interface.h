@@ -17,6 +17,92 @@
 /*! Filename for libROM-related inputs */
 #define _LIBROM_INP_FNAME_ "librom.inp"
 
+/*! DMD-type ROM */
+#define _ROM_TYPE_DMD_ "DMD"
+
+/*! \class ROMObject
+ *  \brief Base class defining a ROM object.
+ *  This is the base class that defines a 
+ *  ROM object.
+*/
+/*! \brief Base class defining a ROM object.
+ *
+ *  This is the base class that defines a 
+ *  ROM object.
+*/
+class ROMObject
+{
+  public:
+
+    /*! take a sample (solution snapshot) */
+    virtual void takeSample( double*, const double ) = 0;
+    /*! train the ROM object */
+    virtual void train() = 0;
+    /*! compute prediction at given time */
+    virtual const CAROM::Vector* const predict( const double ) = 0;
+
+  protected:
+
+  private:
+
+};
+
+/*! \class DMDROMObject
+ *  \brief ROM object of type DMD (see libROM)
+ *  DMD-type ROM (see libROM for details)
+*/
+/*! \brief ROM object of type DMD (see libROM)
+ *
+ *  DMD-type ROM (see libROM for details). DMD stands
+ *  for "Dynamic Mode Decomposition".
+*/
+class DMDROMObject : public ROMObject
+{
+  public:
+
+    /*! Constructor */
+    DMDROMObject( const int     a_vec_size, /*! vector size */
+                  const double  a_dt        /*! time step size */,
+                  const int     a_rdim      /*! latent space dimension */ )
+    {
+      m_dmd = new CAROM::DMD( a_vec_size, a_dt );
+      m_rdim = a_rdim;
+    }
+
+    /*! Destructor */
+    virtual ~DMDROMObject()
+    {
+      delete m_dmd;
+    }
+
+    /*! take a sample (solution snapshot) */
+    virtual void takeSample(  double* a_U, /*! solution vector */
+                              const double a_time /*! sample time */ )
+    {
+      m_dmd->takeSample( a_U, a_time );
+    }
+
+    /*! train the DMD object */
+    virtual void train()
+    {
+      m_dmd->train(m_rdim);
+    }
+
+    /*! compute prediction at given time */
+    virtual 
+    const CAROM::Vector* const predict(const double a_t /*!< time at which to predict solution */ )
+    {
+      return m_dmd->predict(a_t);
+    }
+
+  protected:
+
+    CAROM::DMD *m_dmd;  /*! DMD object */
+    int m_rdim;         /*! Latent space dimension */
+
+  private:
+};
+
 /*! \class libROMInterface
     \brief Class implementing interface with libROM
     This class implements the interface between HyPar
@@ -25,7 +111,7 @@
 */
 
 /*! \brief Class implementing interface with libROM
- *
+ 
     This class implements the interface between HyPar
     and libROM. For details on libROM, see:
     https://github.com/LLNL/libROM.
@@ -34,6 +120,7 @@ class libROMInterface
 {
   public:
 
+    /*! Default constructor */
     libROMInterface()
     {
       m_is_defined = false;
@@ -73,12 +160,20 @@ class libROMInterface
       }
     }
 
+    /*! return vector size */
     inline int vectorSize() const { return m_vec_size; }
+    /*! return the sampling frequency */
     inline int samplingFrequency() const { return m_sampling_freq; }
+    /*! return the mode */
     inline const std::string& mode() const { return m_mode; }
+    /*! return the ROM type */
+    inline const std::string& type() const { return m_rom_type; }
+    /*! return the training wall clock time */
     inline double trainWallclockTime() const { return m_train_wctime; }
+    /*! return the prediction wall clock time */
     inline double predictWallclockTime() const { return m_predict_wctime; }
 
+    /*! Take a sample for training */
     inline void takeSample( void*   a_s, /*!< Array of simulation objects of type #SimulationObject */
                             double  a_t /*!< Current simulation time */ )
     {
@@ -86,13 +181,14 @@ class libROMInterface
       m_rom->takeSample( m_U, a_t );
     }
 
+    /*! Train the ROM object */
     inline void train()
     {
 #ifndef serial
       MPI_Barrier(MPI_COMM_WORLD);
 #endif
       gettimeofday(&m_train_start, NULL);
-      m_rom->train(m_rdim);
+      m_rom->train();
 #ifndef serial
       MPI_Barrier(MPI_COMM_WORLD);
 #endif
@@ -104,6 +200,7 @@ class libROMInterface
       m_train_wctime = (double) walltime / 1000000.0;
     }
 
+    /*! Predict the solution at a given time */
     inline void predict(  void*  a_s, /*!< Array of simulation objects of type #SimulationObject */
                           double a_t  /*!< time at which to predict solution */)
     {
@@ -111,7 +208,7 @@ class libROMInterface
       MPI_Barrier(MPI_COMM_WORLD);
 #endif
       gettimeofday(&m_predict_start, NULL);
-      CAROM::Vector* u_predicted = m_rom->predict(a_t);
+      const CAROM::Vector* const u_predicted = m_rom->predict(a_t);
 #ifndef serial
       MPI_Barrier(MPI_COMM_WORLD);
 #endif
@@ -145,9 +242,9 @@ class libROMInterface
     int m_sampling_freq; /*!< Frequency at which to take samples */
 
     std::string m_mode; /*!< Mode: none, train */
+    std::string m_rom_type; /*!< Type of ROM (eg: DMD) */
 
-    CAROM::DMD *m_rom; /*!< ROM object */
-
+    ROMObject* m_rom; /*!< ROM object */
     double* m_U; /*!< Work vector */
 
     struct timeval m_train_start; /*<! Training start time */
