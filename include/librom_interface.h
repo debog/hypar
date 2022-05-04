@@ -61,9 +61,9 @@ class DMDROMObject : public ROMObject
   public:
 
     /*! Constructor */
-    DMDROMObject( const int     a_vec_size, /*! vector size */
-                  const double  a_dt        /*! time step size */,
-                  const int     a_rdim      /*! latent space dimension */ )
+    DMDROMObject( const int     a_vec_size, /*!< vector size */
+                  const double  a_dt        /*!< time step size */,
+                  const int     a_rdim      /*!< latent space dimension */ )
     {
       m_dmd = new CAROM::DMD( a_vec_size, a_dt );
       m_rdim = a_rdim;
@@ -76,8 +76,8 @@ class DMDROMObject : public ROMObject
     }
 
     /*! take a sample (solution snapshot) */
-    virtual void takeSample(  double* a_U, /*! solution vector */
-                              const double a_time /*! sample time */ )
+    virtual void takeSample(  double* a_U, /*!< solution vector */
+                              const double a_time /*!< sample time */ )
     {
       m_dmd->takeSample( a_U, a_time );
     }
@@ -97,8 +97,8 @@ class DMDROMObject : public ROMObject
 
   protected:
 
-    CAROM::DMD *m_dmd;  /*! DMD object */
-    int m_rdim;         /*! Latent space dimension */
+    CAROM::DMD *m_dmd;  /*!< DMD object */
+    int m_rdim;         /*!< Latent space dimension */
 
   private:
 };
