@@ -7,6 +7,7 @@
 #include <math.h>
 #include <string.h>
 #include <sys/time.h>
+#include <vector>
 #include <common_cpp.h>
 #include <io_cpp.h>
 #include <timeintegration_cpp.h>
@@ -22,6 +23,7 @@ extern "C" int ComputeRHSOperators(void*,void*,double);
 #endif
 extern "C" int CalculateError(void*,void*); /*!< Calculate the error in the final solution */
 extern "C" int OutputSolution(void*,int);   /*!< Write solutions to file */
+extern "C" void ResetFilenameIndex(char*, int); /*!< Reset filename index */
 #ifdef with_librom
 extern "C" int CalculateROMDiff(void*,void*); /*!< Calculate the diff of PDE and ROM solutions */
 extern "C" int OutputROMSolution(void*,int);   /*!< Write ROM solutions to file */
@@ -94,6 +96,8 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 #endif
   gettimeofday( &ti_start, NULL );
 
+  std::vector<double> op_times_arr(0);
+
   if (!rank) printf("Solving in time (from %d to %d iterations)\n",TS.restart_iter,TS.n_iter);
   for (TS.iter = TS.restart_iter; TS.iter < TS.n_iter; TS.iter++) {
 
@@ -106,6 +110,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
         }
       }
       OutputSolution(sim, nsims); 
+      op_times_arr.push_back(TS.waqt);
     }
 
 #ifdef with_librom
@@ -141,6 +146,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
         }
       }
       OutputSolution(sim, nsims); 
+      op_times_arr.push_back(TS.waqt);
     }
 
   }
@@ -171,26 +177,59 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
                    &(sim[ns].mpi) );
   }
 
+  /* write a final solution file */
+  for (int ns = 0; ns < nsims; ns++) {
+    if (sim[ns].solver.PhysicsOutput) {
+      sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
+                                    &(sim[ns].mpi) );
+    }
+  }
+  OutputSolution(sim, nsims); 
+  op_times_arr.push_back(TS.waqt);
+
 #ifdef with_librom
+
+  for (int ns = 0; ns < nsims; ns++) {
+    ResetFilenameIndex( sim[ns].solver.filename_index, 
+                        sim[ns].solver.index_length );
+  }
+
   if (rom_interface.mode() == "train") {
+
     if (!rank) printf("libROM: Training ROM.\n");
     rom_interface.train();
     if (!rank) printf("libROM: wallclock time: %f (seconds).\n", 
                       rom_interface.trainWallclockTime() );
 
-    if (!rank) printf("libROM: Predicting solution at time %1.4e using ROM.\n", t_final);
-    rom_interface.predict(sim, t_final);
-    if (!rank) printf("libROM: wallclock time: %f (seconds).\n", 
-                      rom_interface.predictWallclockTime() );
+    double total_rom_predict_time = 0;
+    for (int iter = 0; iter < op_times_arr.size(); iter++) {
 
-    /* calculate error for the ROM solution if exact solution has been provided */
-    if (!rank) printf("libROM: Calculating diff between PDE and ROM solutions.\n");
-    for (int ns = 0; ns < nsims; ns++) {
-      CalculateROMDiff(  &(sim[ns].solver),
-                         &(sim[ns].mpi) );
+      double waqt = op_times_arr[iter];
+
+      if (!rank) printf("libROM: Predicting solution at time %1.4e using ROM.\n", waqt);
+      rom_interface.predict(sim, waqt);
+      if (!rank) printf("libROM:   wallclock time: %f (seconds).\n", 
+                        rom_interface.predictWallclockTime() );
+      total_rom_predict_time += rom_interface.predictWallclockTime();
+  
+      /* calculate error for the ROM solution if exact solution has been provided */
+      if (iter == (op_times_arr.size()-1)) {
+        if (!rank) printf("libROM:   Calculating diff between PDE and ROM solutions.\n");
+        for (int ns = 0; ns < nsims; ns++) {
+          CalculateROMDiff(  &(sim[ns].solver),
+                             &(sim[ns].mpi) );
+        }
+      }
+      /* write the ROM solution to file */
+      OutputROMSolution(sim, nsims); 
+
     }
-    /* write the ROM solution to file */
-    OutputROMSolution(sim, nsims); 
+
+    if (!rank) {
+      printf( "libROM: total prediction/query wallclock time: %f (seconds).\n",
+              total_rom_predict_time );
+    }
+
   } else {
     for (int ns = 0; ns < nsims; ns++) {
       sim[ns].solver.rom_diff_norms[0]
@@ -201,15 +240,6 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 
   }
 #endif
-
-  /* write a final solution file */
-  for (int ns = 0; ns < nsims; ns++) {
-    if (sim[ns].solver.PhysicsOutput) {
-      sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
-                                    &(sim[ns].mpi) );
-    }
-  }
-  OutputSolution(sim, nsims); 
 
   return 0;
 }

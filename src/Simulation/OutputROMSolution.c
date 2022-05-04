@@ -17,6 +17,9 @@
 #include <mpivars.h>
 #include <simulation_object.h>
 
+/* Function declarations */
+void IncrementFilenameIndex(char*,int);
+
 /*! Write out the ROM solution to file */
 int OutputROMSolution(  void  *s,   /*!< Array of simulation objects of type #SimulationObject */
                         int   nsims /*!< Number of simulation objects */ )
@@ -52,6 +55,12 @@ int OutputROMSolution(  void  *s,   /*!< Array of simulation objects of type #Si
                 solver,
                 mpi,
                 fname_root );
+
+    /* increment the index string, if required */
+    if ((!strcmp(solver->output_mode,"serial")) && (!strcmp(solver->op_overwrite,"no"))) {
+      IncrementFilenameIndex(solver->filename_index,solver->index_length);
+    }
+
   }
   
   return 0;
