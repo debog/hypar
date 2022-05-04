@@ -10,6 +10,87 @@
 #include <simulation_object.h>
 #include <librom_interface.h>
 
+/*! Constructor 
+    This function will also look into the file
+    \b librom.inp for DMD-specific options. 
+    Rank 0 reads in the inputs and broadcasts
+    them to all the processors.\n\n
+    The format of \b librom.inp is as follows:\n
+
+        begin
+            <keyword>   <value>
+            ...
+            <keyword>   <value>
+        end
+
+    where the list of keywords and their type (that this function
+    will look for) are:\n
+    Keyword name       | Type         | Variable                                      | Default value
+    ------------------ | ------------ | --------------------------------------------- | -------------------
+    dmd_num_win_samples| int          | #DMDROMObject::m_num_window_samples           | INT_MAX
+
+    Note: other keywords in this file may be read by other functions.
+   
+*/
+DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
+                            const double  a_dt,       /*!< time step size */
+                            const int     a_rdim,     /*!< latent space dimension */
+                            const int     a_rank,     /*!< MPI rank of this process */
+                            const int     a_nproc     /*!< Number of MPI processes */ )
+{
+  m_rank = a_rank;
+  m_nproc = a_nproc;
+
+  m_dmd.clear();
+  m_intervals.clear();
+  m_vec_size = a_vec_size;
+  m_dt = a_dt;
+  m_rdim = a_rdim;
+
+  m_num_window_samples = INT_MAX;
+
+  if (!m_rank) {
+
+    FILE *in;
+    in = fopen(_LIBROM_INP_FNAME_,"r");
+
+    if (in) {
+
+      int ferr;
+      char word[_MAX_STRING_SIZE_];
+      ferr = fscanf(in,"%s", word); if (ferr != 1) return;
+
+      if (std::string(word) == "begin") {
+        while (std::string(word) != "end") {
+  	      ferr = fscanf(in,"%s",word); if (ferr != 1) return;
+          if (std::string(word) == "dmd_num_win_samples") {
+            ferr = fscanf(in,"%d", &m_num_window_samples); if (ferr != 1) return;
+          }
+          if (ferr != 1) return;
+        }
+      } else {
+        fprintf( stderr, "Error: Illegal format in file \"%s\". Word read is: %s\n",
+                 _LIBROM_INP_FNAME_, word);
+        return;
+      }
+
+      fclose(in);
+
+    }
+
+    /* print useful stuff to screen */
+    printf("libROM DMD inputs:\n");
+    printf("  number of samples per window:  %d\n", m_num_window_samples);
+  }
+
+#ifndef serial
+  MPI_Bcast(&m_num_window_samples,1,MPI_INT,0,MPI_COMM_WORLD);
+#endif
+
+  m_tic = 0;
+  m_curr_win = 0;
+}
+
 /*! Define the libROM interface
   
     This function also reads libROM-related inputs from the file
@@ -23,13 +104,15 @@
             <keyword>   <value>
         end
 
-    where the list of keywords and their type are:\n
+    where the list of keywords and their type that this function will read are:\n
     Keyword name       | Type         | Variable                                      | Default value
     ------------------ | ------------ | --------------------------------------------- | -------------------
     rdim               | int          | #libROMInterface::m_rdim                      | 10
     sampling_frequency | int          | #libROMInterface::m_sampling_freq             | 1
     mode               | string       | #libROMInterface::m_mode                      | "train"
     type               | string       | #libROMInterface::m_rom_type                  | "DMD"
+
+    Note: other keywords in this file may be read by other functions.
    
 */
 void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of type #SimulationObject */
@@ -84,11 +167,6 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
             ferr = fscanf(in,"%s", mode_c_str); if (ferr != 1) return;
           } else if (std::string(word) == "type") {
             ferr = fscanf(in,"%s", type_c_str); if (ferr != 1) return;
-          } else if (std::string(word) != "end") {
-            char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless);
-            printf("Warning: keyword %s in file \"%s\" with value %s not recognized or extraneous. Ignoring.\n",
-                    _LIBROM_INP_FNAME_, word, useless );
           }
           if (ferr != 1) return;
         }
@@ -116,13 +194,14 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
   MPI_Bcast(&m_sampling_freq,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(mode_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(type_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+#endif
+
   m_mode = std::string( mode_c_str );
   m_rom_type = std::string( type_c_str );
-#endif
 
   if (m_mode == "train") {
     if (m_rom_type == _ROM_TYPE_DMD_) {
-      m_rom = new DMDROMObject( m_vec_size, a_dt, m_rdim );
+      m_rom = new DMDROMObject( m_vec_size, a_dt, m_rdim, m_rank, m_nproc );
     }
     m_U = new double[m_vec_size];
   }

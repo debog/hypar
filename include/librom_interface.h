@@ -8,8 +8,11 @@
 #ifndef _LIBROM_INTERFACE_H_
 #define _LIBROM_INTERFACE_H_
 
+#include <climits>
+#include <cfloat>
 #include <string>
 #include <vector>
+#include <utility>
 #include <sys/time.h>
 #include <linalg/Vector.h>
 #include <algo/DMD.h>
@@ -19,6 +22,9 @@
 
 /*! DMD-type ROM */
 #define _ROM_TYPE_DMD_ "DMD"
+
+/*! Interval type */
+typedef std::pair<double,double> Interval;
 
 /*! \class ROMObject
  *  \brief Base class defining a ROM object.
@@ -61,44 +67,92 @@ class DMDROMObject : public ROMObject
   public:
 
     /*! Constructor */
-    DMDROMObject( const int     a_vec_size, /*!< vector size */
-                  const double  a_dt        /*!< time step size */,
-                  const int     a_rdim      /*!< latent space dimension */ )
-    {
-      m_dmd = new CAROM::DMD( a_vec_size, a_dt );
-      m_rdim = a_rdim;
-    }
+    DMDROMObject( const int, const double, const int, const int, const int);
 
     /*! Destructor */
     virtual ~DMDROMObject()
     {
-      delete m_dmd;
+      m_dmd.clear();
+      m_intervals.clear();
     }
 
     /*! take a sample (solution snapshot) */
     virtual void takeSample(  double* a_U, /*!< solution vector */
                               const double a_time /*!< sample time */ )
     {
-      m_dmd->takeSample( a_U, a_time );
+      if (m_tic == 0) {
+
+        m_dmd.push_back( new CAROM::DMD(m_vec_size, m_dt) );
+        m_intervals.push_back( Interval(a_time, DBL_MAX) );
+        if (!m_rank) {
+          printf("DMDROMObject::takeSample() - creating new DMD object, t=%f (total: %d).\n",
+                 m_intervals[m_curr_win].first, m_dmd.size());
+        }
+        m_dmd[m_curr_win]->takeSample( a_U, a_time );
+
+      } else {
+
+        m_dmd[m_curr_win]->takeSample( a_U, a_time );
+        if (m_tic%m_num_window_samples == 0) {
+          m_intervals[m_curr_win].second = a_time;
+          m_curr_win++;
+          m_dmd.push_back( new CAROM::DMD(m_vec_size, m_dt) );
+          m_intervals.push_back( Interval(a_time, DBL_MAX) );
+          m_dmd[m_curr_win]->takeSample( a_U, a_time );
+          if (!m_rank) {
+            printf("DMDROMObject::takeSample() - creating new DMD object, t=%f (total: %d).\n",
+                   m_intervals[m_curr_win].first, m_dmd.size());
+          }
+        }
+
+      }
+
+      m_tic++;
+      return;
     }
 
     /*! train the DMD object */
     virtual void train()
     {
-      m_dmd->train(m_rdim);
+      if (m_dmd.size() > 0) {
+        for (int i = 0; i < m_dmd.size(); i++) {
+          m_dmd[i]->train(m_rdim);
+        }
+      } else {
+        printf("ERROR in DMDROMObject::train(): m_dmd is of size zero!");
+      }
+      return;
     }
 
     /*! compute prediction at given time */
     virtual 
     const CAROM::Vector* const predict(const double a_t /*!< time at which to predict solution */ )
     {
-      return m_dmd->predict(a_t);
+      for (int i = 0; i < m_dmd.size(); i++) {
+        if ((a_t >= m_intervals[i].first) && (a_t < m_intervals[i].second)) {
+          return m_dmd[i]->predict(a_t);
+        }
+      }
+      printf("ERROR in DMDROMObject::predict(): m_dmd is of size zero or interval not found!");
+      return nullptr;
     }
 
   protected:
 
-    CAROM::DMD *m_dmd;  /*!< DMD object */
-    int m_rdim;         /*!< Latent space dimension */
+    std::vector<CAROM::DMD*> m_dmd; /*!< Vector of DMD objects */
+    std::vector<Interval> m_intervals; /*!< Time intervals for each DMD object */
+
+    int m_rank;   /*!< MPI rank */
+    int m_nproc;  /*!< Number of MPI ranks */
+
+    int         m_vec_size; /*!< Local size of solution vector */
+    double      m_dt;       /*!< Time step size */
+    int         m_rdim;     /*!< Latent space dimension */
+
+    int m_num_window_samples; /*!< Number of samples per DMD for time-windowing */
+
+    int m_tic; /*! private ticker to count number of samples taken */
+    int m_curr_win; /*! private index for current window */
 
   private:
 };
