@@ -29,6 +29,7 @@
     rdim               | int          | #libROMInterface::m_rdim                      | 10
     sampling_frequency | int          | #libROMInterface::m_sampling_freq             | 1
     mode               | string       | #libROMInterface::m_mode                      | "train"
+    type               | string       | #libROMInterface::m_rom_type                  | "DMD"
    
 */
 void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of type #SimulationObject */
@@ -51,6 +52,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
   }
 
   char mode_c_str[_MAX_STRING_SIZE_];
+  char type_c_str[_MAX_STRING_SIZE_];
 
   if (!m_rank) {
 
@@ -60,10 +62,12 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
     if (!in) {
 
       strcpy( mode_c_str, "none" );
+      strcpy( type_c_str, "none" );
 
     } else {
 
       strcpy( mode_c_str, "train" );
+      strcpy( type_c_str, "DMD" );
 
       int ferr;
       char word[_MAX_STRING_SIZE_];
@@ -78,6 +82,8 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
             ferr = fscanf(in,"%d", &m_sampling_freq); if (ferr != 1) return;
           } else if (std::string(word) == "mode") {
             ferr = fscanf(in,"%s", mode_c_str); if (ferr != 1) return;
+          } else if (std::string(word) == "type") {
+            ferr = fscanf(in,"%s", type_c_str); if (ferr != 1) return;
           } else if (std::string(word) != "end") {
             char useless[_MAX_STRING_SIZE_];
             ferr = fscanf(in,"%s",useless);
@@ -101,6 +107,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
     printf("  reduced model dimensionality:  %d\n", m_rdim);
     printf("  sampling frequency:  %d\n", m_sampling_freq);
     printf("  mode: %s\n", mode_c_str);
+    printf("  type: %s\n", type_c_str);
     printf("  local vector size: %d\n", m_vec_size);
   }
 
@@ -108,11 +115,15 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
   MPI_Bcast(&m_rdim,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(&m_sampling_freq,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(mode_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+  MPI_Bcast(type_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   m_mode = std::string( mode_c_str );
+  m_rom_type = std::string( type_c_str );
 #endif
 
   if (m_mode == "train") {
-    m_rom = new CAROM::DMD( m_vec_size, a_dt );
+    if (m_rom_type == _ROM_TYPE_DMD_) {
+      m_rom = new DMDROMObject( m_vec_size, a_dt, m_rdim );
+    }
     m_U = new double[m_vec_size];
   }
 
