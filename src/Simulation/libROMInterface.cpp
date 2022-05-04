@@ -91,6 +91,43 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
   m_curr_win = 0;
 }
 
+/*! train the DMD objects */
+void DMDROMObject::train()
+{
+  /* make sure last DMD doesn't have only one column in snapshot matrix;
+   * this may happen if total number of iterations is an integer multiple
+   * of m_num_window_samples */
+  {
+    int last_win = m_dmd.size() - 1;
+    int num_columns( m_dmd[last_win]->getSnapshotMatrix()->numColumns() );
+    if (num_columns <= 1) {
+      m_dmd.pop_back();
+      m_intervals.pop_back();
+      m_intervals[m_intervals.size()-1].second = DBL_MAX;
+      if (!m_rank) {
+        printf("DMDROMObject::train() - last window DMD has %d sample(s) only; deleted it ",
+               num_columns );
+        printf("(total: %d).\n", m_dmd.size());
+      }
+    }
+  }
+
+  if (m_dmd.size() > 0) {
+    for (int i = 0; i < m_dmd.size(); i++) {
+      int ncol = m_dmd[i]->getSnapshotMatrix()->numColumns();
+      if (!m_rank) {
+        printf("DMDRomObject::train() - training DMD object %d with %d samples.\n", i, ncol );
+      }
+      m_dmd[i]->train(m_rdim);
+    }
+  } else {
+    printf("ERROR in DMDROMObject::train(): m_dmd is of size zero!");
+  }
+
+  return;
+}
+
+    /*! compute prediction at given time */
 /*! Define the libROM interface
   
     This function also reads libROM-related inputs from the file

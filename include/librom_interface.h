@@ -14,7 +14,9 @@
 #include <vector>
 #include <utility>
 #include <sys/time.h>
+
 #include <linalg/Vector.h>
+#include <linalg/Matrix.h>
 #include <algo/DMD.h>
 
 /*! Filename for libROM-related inputs */
@@ -112,17 +114,7 @@ class DMDROMObject : public ROMObject
     }
 
     /*! train the DMD object */
-    virtual void train()
-    {
-      if (m_dmd.size() > 0) {
-        for (int i = 0; i < m_dmd.size(); i++) {
-          m_dmd[i]->train(m_rdim);
-        }
-      } else {
-        printf("ERROR in DMDROMObject::train(): m_dmd is of size zero!");
-      }
-      return;
-    }
+    virtual void train();
 
     /*! compute prediction at given time */
     virtual 
