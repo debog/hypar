@@ -1,0 +1,5 @@
+begin
+  rdim                2
+  sampling_frequency  1
+  mode                train
+end

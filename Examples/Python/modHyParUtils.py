@@ -80,20 +80,40 @@ Input arguments:
   ndims: number of spatial dimensions
   nvars: number of vector components at each grid point
   size: integer array with grid size in each dimension
+(Optional)
+  op_root: filename root for output files
 '''
-def getSolutionSnapshots(path, nsims, n_op_files, ndims, nvars, size):
+def getSolutionSnapshots( path, 
+                          nsims, 
+                          n_op_files, 
+                          ndims, 
+                          nvars, 
+                          size,
+                          op_root='op'):
   ndof = nvars * np.prod(size)
   snapshots = np.empty((0,ndof),np.float64)
   for sim in range(nsims):
-    for i in range(n_op_files):
+    if n_op_files > 1:
+      for i in range(n_op_files):
+        if nsims >= 100:
+          fname = path + '/'+op_root+'_'+f'{sim:03d}'+'_'+f'{i:05d}'+'.bin'
+        elif nsims >= 10:
+          fname = path + '/'+op_root+'_'+f'{sim:02d}'+'_'+f'{i:05d}'+'.bin'
+        elif nsims > 1:
+          fname = path + '/'+op_root+'_'+f'{sim:01d}'+'_'+f'{i:05d}'+'.bin'
+        else:
+          fname = path + '/'+op_root+'_'+f'{i:05d}'+'.bin'
+        x, u = readOpFile(fname, ndims, nvars, size)
+        snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
+    else:
       if nsims >= 100:
-        fname = path + '/op_'+f'{sim:03d}'+'_'+f'{i:05d}'+'.bin'
+        fname = path + '/'+op_root+'_'+f'{sim:03d}'+'.bin'
       elif nsims >= 10:
-        fname = path + '/op_'+f'{sim:02d}'+'_'+f'{i:05d}'+'.bin'
+        fname = path + '/'+op_root+'_'+f'{sim:02d}'+'.bin'
       elif nsims > 1:
-        fname = path + '/op_'+f'{sim:01d}'+'_'+f'{i:05d}'+'.bin'
+        fname = path + '/'+op_root+'_'+f'{sim:01d}'+'.bin'
       else:
-        fname = path + '/op_'+f'{i:05d}'+'.bin'
+        fname = path + '/'+op_root+'.bin'
       x, u = readOpFile(fname, ndims, nvars, size)
       snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
 
