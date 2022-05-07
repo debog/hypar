@@ -23,3 +23,5 @@ doc/citelist*
 .deps
 stamp-h1
 *~
+__pycache__
+.ipynb_checkpoints

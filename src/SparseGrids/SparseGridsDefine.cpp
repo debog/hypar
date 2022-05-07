@@ -12,7 +12,7 @@
     This function also reads sparse grids inputs from the file
     \b sparse_grids.inp. Rank 0 reads in the inputs and broadcasts
     them to all the processors.\n\n
-    The format of \b solver.inp is as follows:\n
+    The format of \b sparse_grids.inp is as follows:\n
 
         begin
             <keyword>   <value>
