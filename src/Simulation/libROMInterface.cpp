@@ -87,6 +87,10 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
   MPI_Bcast(&m_num_window_samples,1,MPI_INT,0,MPI_COMM_WORLD);
 #endif
 
+  if (m_num_window_samples <= m_rdim) {
+    printf("ERROR:DMDROMObject::DMDROMObject() - m_num_window_samples <= m_rdim!!");
+  }
+
   m_tic = 0;
   m_curr_win = 0;
 }
@@ -127,7 +131,6 @@ void DMDROMObject::train()
   return;
 }
 
-    /*! compute prediction at given time */
 /*! Define the libROM interface
   
     This function also reads libROM-related inputs from the file
