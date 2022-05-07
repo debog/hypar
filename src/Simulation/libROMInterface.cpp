@@ -127,7 +127,6 @@ void DMDROMObject::train()
   return;
 }
 
-    /*! compute prediction at given time */
 /*! Define the libROM interface
   
     This function also reads libROM-related inputs from the file
