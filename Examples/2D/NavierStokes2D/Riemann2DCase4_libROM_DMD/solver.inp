@@ -1,0 +1,19 @@
+begin
+  ndims               2
+  nvars               4
+  size                201 201
+  iproc               4 4
+  ghost               3
+  n_iter              1000
+  time_scheme         rk
+  time_scheme_type    ssprk3
+  hyp_space_scheme    weno5
+  hyp_interp_type     characteristic
+  conservation_check  yes
+  dt                  0.00025
+  screen_op_iter      20
+  file_op_iter        100
+  op_file_format      binary
+  op_overwrite        no
+  model               navierstokes2d
+end

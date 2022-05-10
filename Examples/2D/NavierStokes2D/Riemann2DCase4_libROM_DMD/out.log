@@ -1,0 +1,251 @@
+HyPar - Parallel (MPI) version with 16 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 4
+  Domain size                                : 201 201 
+  Processes along each dimension             : 4 4 
+  Exact solution domain size                 : 201 201 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 1000
+  Restart iteration                          : 0
+  Time integration scheme                    : rk (ssprk3)
+  Spatial discretization scheme (hyperbolic) : weno5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : characteristic
+  Spatial discretization type   (parabolic ) : nonconservative-1stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 2.500000E-04
+  Check for conservation                     : yes
+  Screen output iterations                   : 20
+  File output iterations                     : 100
+  Initial solution file type                 : ascii
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : no
+  Physical model                             : navierstokes2d
+Partitioning domain and allocating data arrays.
+Reading array from ASCII file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  8.1130999999999365E-01
+ 1:  3.6014440000000125E-01
+ 2:  3.6014440000000125E-01
+ 3:  2.1526268050000308E+00
+Reading boundary conditions from boundary.inp.
+  Boundary                    extrapolate:  Along dimension  0 and face +1
+  Boundary                    extrapolate:  Along dimension  0 and face -1
+  Boundary                    extrapolate:  Along dimension  1 and face +1
+  Boundary                    extrapolate:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+Reading WENO parameters from weno.inp.
+Initializing physics. Model = "navierstokes2d"
+Reading physical model inputs from file "physics.inp".
+Setting up time integration.
+Setting up libROM interface.
+libROM inputs and parameters:
+  reduced model dimensionality:  16
+  sampling frequency:  1
+  mode: train
+  type: DMD
+  save to file: true
+  local vector size: 10000
+libROM DMD inputs:
+  number of samples per window:   50
+  directory name for DMD onjects: DMD
+Solving in time (from 0 to 1000 iterations)
+Writing solution file op_00000.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.000000 (total: 1).
+iter=     20  t=5.000E-03  CFL=1.041E-01  norm=1.2145E-02  wctime: 1.1E-01 (s)    cons_err=4.5558E-15
+iter=     40  t=1.000E-02  CFL=1.048E-01  norm=1.2094E-02  wctime: 1.1E-01 (s)    cons_err=6.3667E-15
+DMDROMObject::takeSample() - creating new DMD object, t=0.012500 (total: 2).
+iter=     60  t=1.500E-02  CFL=1.046E-01  norm=1.1487E-02  wctime: 1.1E-01 (s)    cons_err=9.0036E-15
+iter=     80  t=2.000E-02  CFL=1.044E-01  norm=1.1625E-02  wctime: 1.1E-01 (s)    cons_err=1.0664E-14
+iter=    100  t=2.500E-02  CFL=1.064E-01  norm=1.2017E-02  wctime: 1.1E-01 (s)    cons_err=1.0241E-14
+Writing solution file op_00001.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.025000 (total: 3).
+iter=    120  t=3.000E-02  CFL=1.082E-01  norm=1.1761E-02  wctime: 1.1E-01 (s)    cons_err=1.2432E-14
+iter=    140  t=3.500E-02  CFL=1.094E-01  norm=1.2143E-02  wctime: 1.1E-01 (s)    cons_err=1.2424E-14
+DMDROMObject::takeSample() - creating new DMD object, t=0.037500 (total: 4).
+iter=    160  t=4.000E-02  CFL=1.110E-01  norm=1.2351E-02  wctime: 1.1E-01 (s)    cons_err=1.4344E-14
+iter=    180  t=4.500E-02  CFL=1.119E-01  norm=1.2074E-02  wctime: 1.1E-01 (s)    cons_err=1.2662E-14
+iter=    200  t=5.000E-02  CFL=1.136E-01  norm=1.2484E-02  wctime: 1.1E-01 (s)    cons_err=1.2776E-14
+Writing solution file op_00002.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.050000 (total: 5).
+iter=    220  t=5.500E-02  CFL=1.146E-01  norm=1.2759E-02  wctime: 1.1E-01 (s)    cons_err=1.4045E-14
+iter=    240  t=6.000E-02  CFL=1.153E-01  norm=1.2462E-02  wctime: 1.1E-01 (s)    cons_err=1.3024E-14
+DMDROMObject::takeSample() - creating new DMD object, t=0.062500 (total: 6).
+iter=    260  t=6.500E-02  CFL=1.169E-01  norm=1.2843E-02  wctime: 1.1E-01 (s)    cons_err=1.0347E-14
+iter=    280  t=7.000E-02  CFL=1.185E-01  norm=1.3032E-02  wctime: 1.1E-01 (s)    cons_err=1.1335E-14
+iter=    300  t=7.500E-02  CFL=1.192E-01  norm=1.2918E-02  wctime: 1.1E-01 (s)    cons_err=1.6423E-14
+Writing solution file op_00003.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.075000 (total: 7).
+iter=    320  t=8.000E-02  CFL=1.197E-01  norm=1.3307E-02  wctime: 1.1E-01 (s)    cons_err=1.1796E-14
+iter=    340  t=8.500E-02  CFL=1.216E-01  norm=1.3303E-02  wctime: 1.1E-01 (s)    cons_err=1.4160E-14
+DMDROMObject::takeSample() - creating new DMD object, t=0.087500 (total: 8).
+iter=    360  t=9.000E-02  CFL=1.229E-01  norm=1.3197E-02  wctime: 1.2E-01 (s)    cons_err=1.3388E-14
+iter=    380  t=9.500E-02  CFL=1.231E-01  norm=1.3656E-02  wctime: 1.1E-01 (s)    cons_err=1.3445E-14
+iter=    400  t=1.000E-01  CFL=1.229E-01  norm=1.3688E-02  wctime: 1.1E-01 (s)    cons_err=1.7038E-14
+Writing solution file op_00004.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.100000 (total: 9).
+iter=    420  t=1.050E-01  CFL=1.245E-01  norm=1.3567E-02  wctime: 1.1E-01 (s)    cons_err=1.6050E-14
+iter=    440  t=1.100E-01  CFL=1.255E-01  norm=1.3981E-02  wctime: 1.1E-01 (s)    cons_err=1.1911E-14
+DMDROMObject::takeSample() - creating new DMD object, t=0.112500 (total: 10).
+iter=    460  t=1.150E-01  CFL=1.256E-01  norm=1.3918E-02  wctime: 1.1E-01 (s)    cons_err=1.4287E-14
+iter=    480  t=1.200E-01  CFL=1.269E-01  norm=1.3982E-02  wctime: 1.1E-01 (s)    cons_err=1.3570E-14
+iter=    500  t=1.250E-01  CFL=1.272E-01  norm=1.4267E-02  wctime: 1.1E-01 (s)    cons_err=1.5399E-14
+Writing solution file op_00005.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.125000 (total: 11).
+iter=    520  t=1.300E-01  CFL=1.276E-01  norm=1.4185E-02  wctime: 1.1E-01 (s)    cons_err=1.3997E-14
+iter=    540  t=1.350E-01  CFL=1.289E-01  norm=1.4258E-02  wctime: 1.1E-01 (s)    cons_err=1.4545E-14
+DMDROMObject::takeSample() - creating new DMD object, t=0.137500 (total: 12).
+iter=    560  t=1.400E-01  CFL=1.298E-01  norm=1.4746E-02  wctime: 1.1E-01 (s)    cons_err=1.3437E-14
+iter=    580  t=1.450E-01  CFL=1.299E-01  norm=1.4432E-02  wctime: 1.1E-01 (s)    cons_err=1.6812E-14
+iter=    600  t=1.500E-01  CFL=1.297E-01  norm=1.4578E-02  wctime: 1.1E-01 (s)    cons_err=1.3464E-14
+Writing solution file op_00006.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.150000 (total: 13).
+iter=    620  t=1.550E-01  CFL=1.308E-01  norm=1.4862E-02  wctime: 1.1E-01 (s)    cons_err=1.4884E-14
+iter=    640  t=1.600E-01  CFL=1.314E-01  norm=1.4870E-02  wctime: 1.1E-01 (s)    cons_err=1.8206E-14
+DMDROMObject::takeSample() - creating new DMD object, t=0.162500 (total: 14).
+iter=    660  t=1.650E-01  CFL=1.313E-01  norm=1.4850E-02  wctime: 1.1E-01 (s)    cons_err=1.9133E-14
+iter=    680  t=1.700E-01  CFL=1.315E-01  norm=1.5221E-02  wctime: 1.1E-01 (s)    cons_err=1.9239E-14
+iter=    700  t=1.750E-01  CFL=1.314E-01  norm=1.4952E-02  wctime: 1.1E-01 (s)    cons_err=1.9522E-14
+Writing solution file op_00007.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.175000 (total: 15).
+iter=    720  t=1.800E-01  CFL=1.321E-01  norm=1.5306E-02  wctime: 1.1E-01 (s)    cons_err=2.2289E-14
+iter=    740  t=1.850E-01  CFL=1.328E-01  norm=1.5367E-02  wctime: 1.1E-01 (s)    cons_err=1.9030E-14
+DMDROMObject::takeSample() - creating new DMD object, t=0.187500 (total: 16).
+iter=    760  t=1.900E-01  CFL=1.330E-01  norm=1.5257E-02  wctime: 1.1E-01 (s)    cons_err=2.1492E-14
+iter=    780  t=1.950E-01  CFL=1.328E-01  norm=1.5386E-02  wctime: 1.1E-01 (s)    cons_err=2.1584E-14
+iter=    800  t=2.000E-01  CFL=1.332E-01  norm=1.5763E-02  wctime: 1.1E-01 (s)    cons_err=2.5972E-14
+Writing solution file op_00008.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.200000 (total: 17).
+iter=    820  t=2.050E-01  CFL=1.334E-01  norm=1.5559E-02  wctime: 1.1E-01 (s)    cons_err=1.7745E-14
+iter=    840  t=2.100E-01  CFL=1.334E-01  norm=1.5729E-02  wctime: 1.1E-01 (s)    cons_err=2.1150E-14
+DMDROMObject::takeSample() - creating new DMD object, t=0.212500 (total: 18).
+iter=    860  t=2.150E-01  CFL=1.331E-01  norm=1.5928E-02  wctime: 1.1E-01 (s)    cons_err=1.6984E-14
+iter=    880  t=2.200E-01  CFL=1.332E-01  norm=1.5801E-02  wctime: 1.1E-01 (s)    cons_err=2.1588E-14
+iter=    900  t=2.250E-01  CFL=1.335E-01  norm=1.6104E-02  wctime: 1.1E-01 (s)    cons_err=1.9666E-14
+Writing solution file op_00009.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.225000 (total: 19).
+iter=    920  t=2.300E-01  CFL=1.338E-01  norm=1.6060E-02  wctime: 1.1E-01 (s)    cons_err=1.8516E-14
+iter=    940  t=2.350E-01  CFL=1.337E-01  norm=1.6161E-02  wctime: 1.1E-01 (s)    cons_err=1.5606E-14
+DMDROMObject::takeSample() - creating new DMD object, t=0.237500 (total: 20).
+iter=    960  t=2.400E-01  CFL=1.336E-01  norm=1.6273E-02  wctime: 1.1E-01 (s)    cons_err=1.6180E-14
+iter=    980  t=2.450E-01  CFL=1.338E-01  norm=1.6568E-02  wctime: 1.1E-01 (s)    cons_err=1.7095E-14
+iter=   1000  t=2.500E-01  CFL=1.338E-01  norm=1.6215E-02  wctime: 1.1E-01 (s)    cons_err=1.8917E-14
+Completed time integration (Final time: 0.250000), total wctime: 112.173584 (seconds).
+Writing solution file op_00010.bin.
+libROM: Training ROM.
+DMDROMObject::train() - training DMD object 0 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 1 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 2 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 3 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 4 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 5 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 6 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 7 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 8 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 9 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 10 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 11 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 12 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 13 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 14 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 15 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 16 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 17 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 18 with 51 samples.
+Using 16 basis vectors out of 50.
+DMDROMObject::train() - training DMD object 19 with 50 samples.
+Using 16 basis vectors out of 49.
+libROM: wallclock time: 17.724988 (seconds).
+libROM: Predicting solution at time 0.0000e+00 using ROM.
+libROM:   wallclock time: 0.131464 (seconds).
+Writing solution file op_rom_00000.bin.
+libROM: Predicting solution at time 2.5000e-02 using ROM.
+libROM:   wallclock time: 0.130257 (seconds).
+Writing solution file op_rom_00001.bin.
+libROM: Predicting solution at time 5.0000e-02 using ROM.
+libROM:   wallclock time: 0.130518 (seconds).
+Writing solution file op_rom_00002.bin.
+libROM: Predicting solution at time 7.5000e-02 using ROM.
+libROM:   wallclock time: 0.131729 (seconds).
+Writing solution file op_rom_00003.bin.
+libROM: Predicting solution at time 1.0000e-01 using ROM.
+libROM:   wallclock time: 0.130233 (seconds).
+Writing solution file op_rom_00004.bin.
+libROM: Predicting solution at time 1.2500e-01 using ROM.
+libROM:   wallclock time: 0.130290 (seconds).
+Writing solution file op_rom_00005.bin.
+libROM: Predicting solution at time 1.5000e-01 using ROM.
+libROM:   wallclock time: 0.130266 (seconds).
+Writing solution file op_rom_00006.bin.
+libROM: Predicting solution at time 1.7500e-01 using ROM.
+libROM:   wallclock time: 0.130503 (seconds).
+Writing solution file op_rom_00007.bin.
+libROM: Predicting solution at time 2.0000e-01 using ROM.
+libROM:   wallclock time: 0.130225 (seconds).
+Writing solution file op_rom_00008.bin.
+libROM: Predicting solution at time 2.2500e-01 using ROM.
+libROM:   wallclock time: 0.134812 (seconds).
+Writing solution file op_rom_00009.bin.
+libROM: Predicting solution at time 2.5000e-01 using ROM.
+libROM:   wallclock time: 0.130257 (seconds).
+libROM:   Calculating diff between PDE and ROM solutions.
+Writing solution file op_rom_00010.bin.
+libROM: total prediction/query wallclock time: 1.440554 (seconds).
+libROMInterface::saveROM() - saving ROM objects.
+  Saving DMD object with filename root DMD/dmdobj_0000.
+  Saving DMD object with filename root DMD/dmdobj_0001.
+  Saving DMD object with filename root DMD/dmdobj_0002.
+  Saving DMD object with filename root DMD/dmdobj_0003.
+  Saving DMD object with filename root DMD/dmdobj_0004.
+  Saving DMD object with filename root DMD/dmdobj_0005.
+  Saving DMD object with filename root DMD/dmdobj_0006.
+  Saving DMD object with filename root DMD/dmdobj_0007.
+  Saving DMD object with filename root DMD/dmdobj_0008.
+  Saving DMD object with filename root DMD/dmdobj_0009.
+  Saving DMD object with filename root DMD/dmdobj_0010.
+  Saving DMD object with filename root DMD/dmdobj_0011.
+  Saving DMD object with filename root DMD/dmdobj_0012.
+  Saving DMD object with filename root DMD/dmdobj_0013.
+  Saving DMD object with filename root DMD/dmdobj_0014.
+  Saving DMD object with filename root DMD/dmdobj_0015.
+  Saving DMD object with filename root DMD/dmdobj_0016.
+  Saving DMD object with filename root DMD/dmdobj_0017.
+  Saving DMD object with filename root DMD/dmdobj_0018.
+  Saving DMD object with filename root DMD/dmdobj_0019.
+Conservation Errors:
+	6.1062266354383610E-15
+	1.1657341758564144E-15
+	2.1094237467877974E-15
+	1.7741891886877642E-14
+Norms of the diff between ROM and PDE solutions for domain 0:
+  L1         Norm            : 5.6479508453806618E-05
+  L2         Norm            : 3.6234649516234460E-04
+  Linfinity  Norm            : 8.2275499561386429E-03
+Solver runtime (in seconds): 1.4052938399999999E+02
+Total  runtime (in seconds): 1.4097253200000000E+02
+Deallocating arrays.
+Finished.
