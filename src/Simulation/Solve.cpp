@@ -230,6 +230,8 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
               total_rom_predict_time );
     }
 
+    rom_interface.saveROM();
+
   } else {
     for (int ns = 0; ns < nsims; ns++) {
       sim[ns].solver.rom_diff_norms[0]

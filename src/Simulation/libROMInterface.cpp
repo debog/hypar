@@ -28,6 +28,7 @@
     Keyword name       | Type         | Variable                                      | Default value
     ------------------ | ------------ | --------------------------------------------- | -------------------
     dmd_num_win_samples| int          | #DMDROMObject::m_num_window_samples           | INT_MAX
+    dmd_dirname        | string       | #DMDROMObject::m_dirname                      | "DMD"
 
     Note: other keywords in this file may be read by other functions.
    
@@ -49,6 +50,8 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
 
   m_num_window_samples = INT_MAX;
 
+  char dirname_c_str[_MAX_STRING_SIZE_] = "DMD";
+
   if (!m_rank) {
 
     FILE *in;
@@ -65,6 +68,8 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
   	      ferr = fscanf(in,"%s",word); if (ferr != 1) return;
           if (std::string(word) == "dmd_num_win_samples") {
             ferr = fscanf(in,"%d", &m_num_window_samples); if (ferr != 1) return;
+          } else if (std::string(word) == "dmd_dirname") {
+            ferr = fscanf(in,"%s", dirname_c_str); if (ferr != 1) return;
           }
           if (ferr != 1) return;
         }
@@ -80,12 +85,16 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
 
     /* print useful stuff to screen */
     printf("libROM DMD inputs:\n");
-    printf("  number of samples per window:  %d\n", m_num_window_samples);
+    printf("  number of samples per window:   %d\n", m_num_window_samples);
+    printf("  directory name for DMD onjects: %s\n", dirname_c_str);
   }
 
 #ifndef serial
   MPI_Bcast(&m_num_window_samples,1,MPI_INT,0,MPI_COMM_WORLD);
+  MPI_Bcast(dirname_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
 #endif
+
+  m_dirname = std::string( dirname_c_str );
 
   if (m_num_window_samples <= m_rdim) {
     printf("ERROR:DMDROMObject::DMDROMObject() - m_num_window_samples <= m_rdim!!");
@@ -131,6 +140,36 @@ void DMDROMObject::train()
   return;
 }
 
+/*! Save DMD objects to file: the DMD object files will be saved in the subdirectory
+ *  with the name #DMDROMObject::m_dirname. They are in a format that libROM can read
+ *  from.
+ *
+ *  \b Note \b: If the subdirectory #DMDROMObject::m_dirname does not exist, the DMD
+ *  objects will not be written (even though the screen output will claim they were
+ *  written)!. The code will not report any error.
+*/
+void DMDROMObject::save(const std::string& a_fname_root /*!< Filename root */)
+{
+  std::string fname_root = m_dirname + "/";
+  if (a_fname_root == "") {
+    fname_root += "dmdobj_";
+  } else {
+    fname_root += a_fname_root;
+  }
+
+  for (int i = 0; i < m_dmd.size(); i++) {
+    char idx_string[_MAX_STRING_SIZE_];
+    sprintf(idx_string, "%04d", i);
+    std::string fname = fname_root + std::string(idx_string);
+    if (!m_rank) {
+      printf("  Saving DMD object with filename root %s.\n", fname.c_str());
+    }
+    m_dmd[i]->save(fname);
+  }
+
+  return;
+}
+
 /*! Define the libROM interface
   
     This function also reads libROM-related inputs from the file
@@ -151,6 +190,7 @@ void DMDROMObject::train()
     sampling_frequency | int          | #libROMInterface::m_sampling_freq             | 1
     mode               | string       | #libROMInterface::m_mode                      | "train"
     type               | string       | #libROMInterface::m_rom_type                  | "DMD"
+    save_to_file       | string       | #libROMInterface::m_save_ROM                  | "true"
 
     Note: other keywords in this file may be read by other functions.
    
@@ -176,6 +216,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 
   char mode_c_str[_MAX_STRING_SIZE_];
   char type_c_str[_MAX_STRING_SIZE_];
+  char save_c_str[_MAX_STRING_SIZE_];
 
   if (!m_rank) {
 
@@ -186,11 +227,13 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 
       strcpy( mode_c_str, "none" );
       strcpy( type_c_str, "none" );
+      strcpy( save_c_str, "false" );
 
     } else {
 
       strcpy( mode_c_str, "train" );
       strcpy( type_c_str, "DMD" );
+      strcpy( save_c_str, "true" );
 
       int ferr;
       char word[_MAX_STRING_SIZE_];
@@ -207,6 +250,8 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
             ferr = fscanf(in,"%s", mode_c_str); if (ferr != 1) return;
           } else if (std::string(word) == "type") {
             ferr = fscanf(in,"%s", type_c_str); if (ferr != 1) return;
+          } else if (std::string(word) == "save_to_file") {
+            ferr = fscanf(in,"%s", save_c_str); if (ferr != 1) return;
           }
           if (ferr != 1) return;
         }
@@ -226,6 +271,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
     printf("  sampling frequency:  %d\n", m_sampling_freq);
     printf("  mode: %s\n", mode_c_str);
     printf("  type: %s\n", type_c_str);
+    printf("  save to file: %s\n", save_c_str);
     printf("  local vector size: %d\n", m_vec_size);
   }
 
@@ -234,10 +280,13 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
   MPI_Bcast(&m_sampling_freq,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(mode_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(type_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+  MPI_Bcast(save_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
 #endif
 
   m_mode = std::string( mode_c_str );
   m_rom_type = std::string( type_c_str );
+
+  m_save_ROM = (((std::string(save_c_str) == "true")) && (m_mode == "train"));
 
   if (m_mode == "train") {
     if (m_rom_type == _ROM_TYPE_DMD_) {

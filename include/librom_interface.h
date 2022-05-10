@@ -48,6 +48,8 @@ class ROMObject
     virtual void train() = 0;
     /*! compute prediction at given time */
     virtual const CAROM::Vector* const predict( const double ) = 0;
+    /*! save ROM object to file */
+    virtual void save( const std::string& ) = 0;
 
   protected:
 
@@ -129,6 +131,9 @@ class DMDROMObject : public ROMObject
       return nullptr;
     }
 
+    /*! save DMD object to file */
+    virtual void save(const std::string& a_fname_root /*!< Filename root*/);
+
   protected:
 
     std::vector<CAROM::DMD*> m_dmd; /*!< Vector of DMD objects */
@@ -145,6 +150,8 @@ class DMDROMObject : public ROMObject
 
     int m_tic; /*! private ticker to count number of samples taken */
     int m_curr_win; /*! private index for current window */
+
+    std::string m_dirname; /*!< Subdirectory where DMD objects are written to */
 
   private:
 };
@@ -182,6 +189,7 @@ class libROMInterface
       m_U = nullptr;
       m_train_wctime = 0;
       m_predict_wctime = 0;
+      m_save_ROM = true;
     }
 
     /*! Constructor */
@@ -267,6 +275,18 @@ class libROMInterface
       m_predict_wctime = (double) walltime / 1000000.0;
     }
 
+    /*! Save ROM object to file */
+    inline void saveROM(const std::string& a_fname_root=""/*!< filename root */)
+    {
+      if (m_save_ROM) {      
+        if (!m_rank) {
+          printf("libROMInterface::saveROM() - saving ROM objects.\n");
+        }
+        m_rom->save(a_fname_root);
+      }
+      return;
+    }
+
     /*! Copy HyPar solution to the work vector m_U */
     void copyFromHyPar( double*, void* );
 
@@ -299,6 +319,8 @@ class libROMInterface
     struct timeval m_predict_end; /*<! Prediction end time */
     double m_train_wctime; /*!< Wallclock time for training */
     double m_predict_wctime; /*!< Wallclock time for prediction */
+
+    bool m_save_ROM; /*!< Save ROM objects to file (default: yes) */
 
   private:
 
