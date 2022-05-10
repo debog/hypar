@@ -102,13 +102,15 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
       fclose(out);
 #ifdef with_librom
       /* write out solution errors and wall times to file */
-      out = fopen(rom_diff_fname,"w");
-      for (int d=0; d<sim[n].solver.ndims; d++) fprintf(out,"%4d ",sim[n].solver.dim_global[d]);
-      for (int d=0; d<sim[n].solver.ndims; d++) fprintf(out,"%4d ",sim[n].mpi.iproc[d]);
-      fprintf(out,"%1.16E  ",sim[n].solver.dt);
-      fprintf(out,"%1.16E %1.16E %1.16E   ",sim[n].solver.rom_diff_norms[0],sim[n].solver.rom_diff_norms[1],sim[n].solver.rom_diff_norms[2]);
-      fprintf(out,"%1.16E %1.16E\n",solver_runtime,main_runtime);
-      fclose(out);
+      if (sim[n].solver.rom_diff_norms[0] >= 0) {
+        out = fopen(rom_diff_fname,"w");
+        for (int d=0; d<sim[n].solver.ndims; d++) fprintf(out,"%4d ",sim[n].solver.dim_global[d]);
+        for (int d=0; d<sim[n].solver.ndims; d++) fprintf(out,"%4d ",sim[n].mpi.iproc[d]);
+        fprintf(out,"%1.16E  ",sim[n].solver.dt);
+        fprintf(out,"%1.16E %1.16E %1.16E   ",sim[n].solver.rom_diff_norms[0],sim[n].solver.rom_diff_norms[1],sim[n].solver.rom_diff_norms[2]);
+        fprintf(out,"%1.16E %1.16E\n",solver_runtime,main_runtime);
+        fclose(out);
+      }
 #endif
 
       /* print solution errors, conservation errors, and wall times to screen */
