@@ -144,7 +144,7 @@ void DMDROMObject::train()
  *  with the name #DMDROMObject::m_dirname. They are in a format that libROM can read
  *  from.
  *
- *  \b Note \b: If the subdirectory #DMDROMObject::m_dirname does not exist, the DMD
+ *  \b Note: If the subdirectory #DMDROMObject::m_dirname does not exist, the DMD
  *  objects will not be written (even though the screen output will claim they were
  *  written)!. The code will not report any error.
 */
