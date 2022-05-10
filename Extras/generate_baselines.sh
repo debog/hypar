@@ -42,6 +42,7 @@ hypar_baselines_dir="baselines"
 
 # other stuff
 RUN_SCRIPT="run.sh"
+NEEDS_FFTW="dep.fftw"
 NEEDS_LIBROM="dep.libROM"
 
 # Clone HyPar
@@ -69,10 +70,12 @@ fi
 if [ -z "$FFTW_DIR" ]; then
   echo "Environment variable FFTW_DIR not found."
   echo "Compiling without FFTW; will not be able to run simulations that need FFTW."
+  opt_with_fftw=false
   ./configure 2>&1 >> $root_dir/$hypar_compile_log_file
 else
   echo "FFTW found at $FFTW_DIR."
   echo "Compiling with FFTW."
+  opt_with_fftw=true
   ./configure --enable-fftw --with-fftw-dir=${FFTW_DIR} 2>&1 >> $root_dir/$hypar_compile_log_file
 fi
 make -j all 2>&1 >> $root_dir/$hypar_compile_log_file
@@ -131,7 +134,9 @@ for f in *; do
     echo "entering $f..."
     cd $f
     if [ -f "$NEEDS_LIBROM" ] && [ "$opt_with_librom" == "false" ]; then
-      echo "Skipping; $f has unmet dependencies."
+      echo "Skipping; $f has unmet dependencies (liROM)."
+    elif [ -f "$NEEDS_FFTW" ] && [ "$opt_with_fftw" == "false" ]; then
+      echo "Skipping; $f has unmet dependencies (FFTW)."
     else
       if [ -f "$RUN_SCRIPT" ]; then
         chmod +x $RUN_SCRIPT && ./$RUN_SCRIPT
