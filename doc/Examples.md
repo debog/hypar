@@ -4,7 +4,8 @@ Examples
 \subpage basic_examples :
 Some basic examples that are simulated using HyPar. They 
 all use explicit time integration, and \b do \b not require HyPar to be compiled
-with PETSc. Most of them can be run on one or a small number of processors.
+with any external library. 
+Most of them can be run on one or a small number of processors.
 
 \subpage petsc_examples : 
 Some examples that use implicit or semi-implicit (IMEX) time
@@ -16,11 +17,13 @@ integration methods implemented in PETSc. To run them, HyPar needs to be compile
 
 \subpage sg_examples : Examples that use the sparse grids spatial discretization.
 
+\subpage librom_examples : Examples that use reduced-order modeling capabilities from libROM.
+
 \page basic_examples Basic Examples
 
 The following are some basic examples that are simulated using HyPar. They 
 all use explicit time integration, and \b do \b not require HyPar to be compiled
-with PETSc.
+with any external libraries.
 
 \subpage linear_adv_sine \n
 \subpage linear_adv_sine_varyingadv \n
@@ -6014,4 +6017,21 @@ tecplot2d format chosen in the above postprocessing code.
 
 Expected screen output:
 \include 2D/NavierStokes2D/RisingThermalBubble_SparseGrids/output.log
+
+
+\page librom_examples libROM Examples
+
+The following are some examples that use the reduced-order modeling capabilities
+implemented in the libROM library (https://www.librom.net/). To run them,
+HyPar needs to be compiled \b with \b libROM. Familiarity with using libROM is
+assumed.
+
+\b Note:
++ In general, any other example or simulation can use the capabilities of libROM
+  by providing the libROM-specific input file (librom.inp).
++ If HyPar is not compiled with libROM, these examples will run as a regular 
+  HyPar simulation.
+
+Dynamic Mode Decomposition
+--------------------------
 
