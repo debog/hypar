@@ -6016,9 +6016,9 @@ Expected screen output:
 \page librom_examples libROM Examples
 
 The following are some examples that use the reduced-order modeling capabilities
-implemented in the libROM library (https://www.librom.net/). To run them,
-HyPar needs to be compiled \b with \b libROM. Familiarity with using libROM is
-assumed.
+implemented in the \b libROM library (https://www.librom.net/). To run them,
+HyPar needs to be compiled \b with \b libROM. Familiarity with using libROM and
+the mathematical concepts implemented in it is assumed.
 
 \b Note:
 + In general, any other example or simulation can use the capabilities of libROM

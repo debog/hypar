@@ -129,7 +129,7 @@ void DMDROMObject::train()
     for (int i = 0; i < m_dmd.size(); i++) {
       int ncol = m_dmd[i]->getSnapshotMatrix()->numColumns();
       if (!m_rank) {
-        printf("DMDRomObject::train() - training DMD object %d with %d samples.\n", i, ncol );
+        printf("DMDROMObject::train() - training DMD object %d with %d samples.\n", i, ncol );
       }
       m_dmd[i]->train(m_rdim);
     }
