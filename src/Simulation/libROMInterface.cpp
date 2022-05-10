@@ -146,7 +146,8 @@ void DMDROMObject::train()
  *
  *  \b Note: If the subdirectory #DMDROMObject::m_dirname does not exist, the DMD
  *  objects will not be written (even though the screen output will claim they were
- *  written)!. The code will not report any error.
+ *  written)!. The code may not report any error, or one may see HDF5 file writing
+ *  errors.
 */
 void DMDROMObject::save(const std::string& a_fname_root /*!< Filename root */)
 {
