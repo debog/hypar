@@ -30,8 +30,9 @@ import modHyParUtils as hyparutils
 
 font = {'size':22}
 matplotlib.rc('font', **font)
+colormap='Spectral'
 
-figsize=(15,9)
+figsize=(12,10)
 plt_dir_name='plots'
 
 '''
@@ -81,29 +82,40 @@ if solver_inp_data['op_overwrite'] == 'no':
   '''
   Load simulation data (solution snapshots)
   '''
-  x,solution_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                          nsims, 
-                                                          n_snapshots, 
-                                                          ndims, 
-                                                          nvars, 
-                                                          size )
+  grid, solution_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
+                                                              nsims, 
+                                                              n_snapshots, 
+                                                              ndims, 
+                                                              nvars, 
+                                                              size )
   solution_snapshots = np.float32(solution_snapshots)
+  x = grid[:size[0]]
+  y = grid[size[0]:]
+  print('2D Domain:');
+  print(' x: ', np.min(x), np.max(x))
+  print(' x.shape: ', x.shape)
+  print(' y: ', np.min(y), np.max(y))
+  print(' y.shape: ', y.shape)
+  y2d, x2d = np.meshgrid(y, x)
   
   for var in range(nvars):
     for i in range(n_snapshots):
       fig = plt.figure(figsize=figsize)
       ax = plt.axes()
       ax.set( xlim=(np.min(x), np.max(x)), 
-              ylim=(np.min(solution_snapshots[:,var::nvars]), 
-                    np.max(solution_snapshots[:,var::nvars]) ) )
+              ylim=(np.min(y), np.max(y)) )
       for s in range(nsims):
-          solution_snapshots_sim = solution_snapshots[s*n_snapshots:(s+1)*n_snapshots]
-          ax.plot(x, solution_snapshots_sim[i, var::nvars], lw=2)
-      ax.set_title('var {:}, t={:.3}'.format(var,i*dt_snapshots))
-      plt.grid(visible=True, linestyle=':', linewidth=1)
-      plt_fname = plt_dir_name+'/fig_'+f'{var:02d}'+'_'+f'{i:05d}'+'.png'
-      print('Saving %s' % plt_fname)
-      plt.savefig(plt_fname)
+        solution_snapshots_sim = solution_snapshots[s*n_snapshots:(s+1)*n_snapshots]
+        sol2d = np.transpose(solution_snapshots_sim.reshape(n_snapshots,size[1],size[0],nvars))
+        plot = ax.pcolor(x2d, y2d, sol2d[var,:,:,i], cmap=colormap)
+        ax.set_title('var {:}, t={:.3}'.format(var,i*dt_snapshots))
+        fig.colorbar(plot, ax=ax)
+        if nsims > 1:
+          plt_fname = plt_dir_name+'/fig_'+f'{s:02d}'+'_'+f'{var:02d}'+'_'+f'{i:05d}'+'.png'
+        else:
+          plt_fname = plt_dir_name+'/fig_'+f'{var:02d}'+'_'+f'{i:05d}'+'.png'
+        print('Saving %s' % plt_fname)
+        plt.savefig(plt_fname)
 
 else:
 
@@ -123,26 +135,36 @@ else:
   '''
   Load simulation data (solution snapshots)
   '''
-  x,solution_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                          nsims, 
-                                                          n_snapshots, 
-                                                          ndims, 
-                                                          nvars, 
-                                                          size )
+  grid,solution_snapshots = hyparutils.getSolutionSnapshots(  sim_path, 
+                                                              nsims, 
+                                                              n_snapshots, 
+                                                              ndims, 
+                                                              nvars, 
+                                                              size )
   solution_snapshots = np.float32(solution_snapshots)
+  x = grid[:size[0]]
+  y = grid[size[0]:]
+  print('2D Domain:');
+  print(' x: ', np.min(x), np.max(x))
+  print(' x.shape: ', x.shape)
+  print(' y: ', np.min(y), np.max(y))
+  print(' y.shape: ', y.shape)
+  y2d, x2d = np.meshgrid(y, x)
   
   for var in range(nvars):
     fig = plt.figure(figsize=figsize)
     ax = plt.axes()
     ax.set( xlim=(np.min(x), np.max(x)), 
-            ylim=(np.min(solution_snapshots[:,var::nvars]), 
-                  np.max(solution_snapshots[:,var::nvars]) ) )
+            ylim=(np.min(y), np.max(y)) )
     for s in range(nsims):
-        solution_snapshots_sim = solution_snapshots[s*n_snapshots:(s+1)*n_snapshots]
-        ax.plot(x, solution_snapshots_sim[0, var::nvars], lw=2)
-    ax.set_title('var {:}, t={:.3}'.format(var,t_final))
-    plt.grid(visible=True, linestyle=':', linewidth=1)
-    plt_fname = plt_dir_name+'/fig_'+f'{var:02d}'+'.png'
-    print('Saving %s' % plt_fname)
-    plt.savefig(plt_fname)
-
+      solution_snapshots_sim = solution_snapshots[s*n_snapshots:(s+1)*n_snapshots]
+      sol2d = np.transpose(solution_snapshots_sim.reshape(size[1],size[0],nvars))
+      plot = ax.pcolor(x2d, y2d, sol2d[var,:,:], cmap=colormap)
+      ax.set_title('var {:}, t={:.3}'.format(var,t_final))
+      fig.colorbar(plot, ax=ax)
+      if nsims > 1:
+        plt_fname = plt_dir_name+'/fig_'+f'{s:02d}'+'_'+f'{var:02d}'+'.png'
+      else:
+          plt_fname = plt_dir_name+'/fig_'+f'{var:02d}'+'.png'
+      print('Saving %s' % plt_fname)
+      plt.savefig(plt_fname)
