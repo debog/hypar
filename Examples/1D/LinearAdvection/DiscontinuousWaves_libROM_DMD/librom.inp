@@ -1,5 +1,5 @@
 begin
-  rdim                32
+  rdim                16
   sampling_frequency  1
   mode                train
   dmd_num_win_samples 100
