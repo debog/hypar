@@ -6035,8 +6035,8 @@ Dynamic Mode Decomposition
 
 \subpage linear_adv_sine_librom_dmd \n
 \subpage linear_adv_disc_librom_dmd \n
-
-\subpage sod_shock_tube_librom_dmd
+\subpage sod_shock_tube_librom_dmd \n
+\subpage euler2d_vortex_librom_dmd \n
 
 \page linear_adv_sine_librom_dmd 1D Linear Advection - Sine Wave (Training a DMD)
 
@@ -6363,3 +6363,125 @@ is readable by libROM.
 
 Expected screen output:
 \include 1D/Euler1D/SodShockTube_libROM_DMD/out.log
+
+\page euler2d_vortex_librom_dmd 2D Euler Equations - Isentropic Vortex Convection (Training a DMD)
+
+Location: \b hypar/Examples/2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Euler Equations (navierstokes2d.h - By default,
+                     #NavierStokes2D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 2D Euler
+                     equations are solved.)
+
+Reference: C.-W. Shu, "Essentially Non-oscillatory and Weighted Essentially 
+           Non-oscillatory Schemes for Hyperbolic Conservation Laws", 
+           ICASE Report 97-65, 1997
+
+Domain: \f$0 \le x,y \le 10\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions.
+
+Initial solution: The freestream flow is given by
+\f{equation}{
+  \rho_\infty = 1,\ u_\infty = 0.1,\ v_\infty = 0,\ p_\infty = 1
+\f}
+and a vortex is introduced, specified as
+\f{align}{
+\rho &= \left[ 1 - \frac{\left(\gamma-1\right)b^2}{8\gamma\pi^2} e^{1-r^2} \right]^{\frac{1}{\gamma-1}},\ p = \rho^\gamma, \\
+u &= u_\infty - \frac{b}{2\pi} e^{\frac{1}{2}\left(1-r^2\right)} \left(y-y_c\right),\ v = v_\infty + \frac{b}{2\pi} e^{\frac{1}{2}\left(1-r^2\right)} \left(x-x_c\right),
+\f}
+where \f$b=0.5\f$ is the vortex strength and \f$r = \left[(x-x_c)^2 + (y-y_c)^2 \right]^{1/2}\f$ is the distance from the vortex center \f$\left(x_c,y_c\right) = \left(5,5\right)\f$.
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
+ + Time integration: SSPRK3 (TimeRK(), #_RK_SSP3_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/librom.inp
+
+\b solver.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/boundary.inp
+
+\b physics.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/physics.inp
+
+\b weno.inp (optional)
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/weno.inp
+
+\b lusolver.inp (optional)
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/lusolver.inp
+
+To generate \b initial.inp (initial solution) and \b exact.inp
+(exact solution), compile and run the following code in the run 
+directory.
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/aux/exact.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 4
+processors along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be the following output
+files:
+
++ 21 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00020.bin; 
+these are the \b HyPar solutions\b. 
+
++ 21 output files \b op_rom_00000.bin, \b op_rom_00001.bin, ... \b op_rom_00020.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=20\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+text (#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot2d, and Tecplot/VisIt
+or something similar can be used to plot the resulting files.
+
+The following plot shows evolution of the density - FOM (full-order model) refers to
+the HyPar solution, ROM (reduced-order model) refers to the DMD solution, and "Diff" is
+their difference.
+@image html Solution_2DNavStokVortex_libROM_DMD.gif
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error
+(or give some HDF5 file-writing error); the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/out.log
+
