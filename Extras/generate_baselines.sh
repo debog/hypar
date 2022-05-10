@@ -24,7 +24,7 @@ root_dir=$PWD
 # Details about HyPar (repo and branch that we want to
 # generate baselines from)
 hypar_repo="https://deboghosh@bitbucket.org/deboghosh/hypar.git"
-hypar_branch="master"
+hypar_branch="with_librom"
 # other HyPar-related stuff
 hypar_dir="hypar"
 hypar_exec="HyPar"
@@ -37,11 +37,12 @@ export HYPAR_EXEC_OTHER_ARGS=""
 
 # HyPar baselines repo to update
 hypar_baselines_repo="git@bitbucket.org:deboghosh/hypar_baselines.git"
-hypar_baselines_branch="master"
+hypar_baselines_branch="with_librom"
 hypar_baselines_dir="baselines"
 
 # other stuff
 RUN_SCRIPT="run.sh"
+NEEDS_LIBROM="dep.libROM"
 
 # Clone HyPar
 echo "-------------------------"
@@ -57,6 +58,14 @@ git checkout $hypar_branch
 echo "-------------------------"
 echo "compiling hypar..."
 autoreconf -i 2>&1 > $root_dir/$hypar_compile_log_file
+if [ -z "$LIBROM_DIR" ]; then
+  echo "Environment variable LIBROM_DIR not found."
+  echo "Compiling without libROM; will not be able to run simulations that need libROM."
+  opt_with_librom=false
+else
+  echo "libROM found at $LIBROM_DIR. Compiling with libROM."
+  opt_with_librom=true
+fi
 if [ -z "$FFTW_DIR" ]; then
   echo "Environment variable FFTW_DIR not found."
   echo "Compiling without FFTW; will not be able to run simulations that need FFTW."
@@ -121,10 +130,14 @@ for f in *; do
   if [ -d "$f" ]; then
     echo "entering $f..."
     cd $f
-    if [ -f "$RUN_SCRIPT" ]; then
-      chmod +x $RUN_SCRIPT && ./$RUN_SCRIPT
+    if [ -f "$NEEDS_LIBROM" ] && [ "$opt_with_librom" == "false" ]; then
+      echo "Skipping; $f has unmet dependencies."
     else
-      echo "Error: $RUN_SCRIPT not found."
+      if [ -f "$RUN_SCRIPT" ]; then
+        chmod +x $RUN_SCRIPT && ./$RUN_SCRIPT
+      else
+        echo "Error: $RUN_SCRIPT not found."
+      fi
     fi
     echo " "
     cd ../

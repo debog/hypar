@@ -233,6 +233,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     rom_interface.saveROM();
 
   } else {
+
     for (int ns = 0; ns < nsims; ns++) {
       sim[ns].solver.rom_diff_norms[0]
         = sim[ns].solver.rom_diff_norms[1]
