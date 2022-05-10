@@ -4,7 +4,8 @@ Examples
 \subpage basic_examples :
 Some basic examples that are simulated using HyPar. They 
 all use explicit time integration, and \b do \b not require HyPar to be compiled
-with PETSc. Most of them can be run on one or a small number of processors.
+with any external library. 
+Most of them can be run on one or a small number of processors.
 
 \subpage petsc_examples : 
 Some examples that use implicit or semi-implicit (IMEX) time
@@ -16,11 +17,13 @@ integration methods implemented in PETSc. To run them, HyPar needs to be compile
 
 \subpage sg_examples : Examples that use the sparse grids spatial discretization.
 
+\subpage librom_examples : Examples that use reduced-order modeling capabilities from libROM.
+
 \page basic_examples Basic Examples
 
 The following are some basic examples that are simulated using HyPar. They 
 all use explicit time integration, and \b do \b not require HyPar to be compiled
-with PETSc.
+with any external libraries.
 
 \subpage linear_adv_sine \n
 \subpage linear_adv_sine_varyingadv \n
@@ -234,12 +237,6 @@ and conservation error (#HyPar::ConservationError).
 Expected screen output:
 \include 1D/LinearAdvection/SineWave_NonConstantAdvection/output.log
 
-\page linear_adv_disc 1D Linear Advection - Discontinuous Waves
-
-Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves
-          (This directory contains all the input files needed
-          to run this case. If there is a \a Run.m, run it in
-          MATLAB to quickly set up, run, and visualize the 
 \page linear_adv_disc 1D Linear Advection - Discontinuous Waves
 
 Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves
@@ -6015,3 +6012,354 @@ tecplot2d format chosen in the above postprocessing code.
 Expected screen output:
 \include 2D/NavierStokes2D/RisingThermalBubble_SparseGrids/output.log
 
+
+\page librom_examples libROM Examples
+
+The following are some examples that use the reduced-order modeling capabilities
+implemented in the \b libROM library (https://www.librom.net/). To run them,
+HyPar needs to be compiled \b with \b libROM. Familiarity with using libROM and
+the mathematical concepts implemented in it is assumed.
+
+\b Note:
++ In general, any other example or simulation can use the capabilities of libROM
+  by providing the libROM-specific input file (librom.inp).
++ If HyPar is not compiled with libROM, these examples will run as a regular 
+  HyPar simulation.
+
+These examples may come with a Python script to plot the solutions from the binary
+solution file. This script will need the environment variable 
+\b HYPAR_DIR (/path/to/hypar) to be defined, so make sure this variable exists.
+
+Dynamic Mode Decomposition
+--------------------------
+
+\subpage linear_adv_sine_librom_dmd \n
+\subpage linear_adv_disc_librom_dmd \n
+
+\subpage sod_shock_tube_librom_dmd
+
+\page linear_adv_sine_librom_dmd 1D Linear Advection - Sine Wave (Training a DMD)
+
+Location: \b hypar/Examples/1D/LinearAdvection/SineWave_libROM_DMD
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Linear Advection Equation (linearadr.h)
+
+Reduced Order Modeling: This example trains a DMD object and then
+predicts the solution using the DMD at the same times that the
+actual HyPar solution is written at.
+
+References:
+  + Ghosh, D., Baeder, J. D., "Compact Reconstruction Schemes with 
+    Weighted ENO Limiting for Hyperbolic Conservation Laws", 
+    SIAM Journal on Scientific Computing, 34 (3), 2012, A1678–A1706
+
+Domain: \f$0 \le x < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution: \f$u\left(x,0\right) = \sin\left(2\pi x\right)\f$
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
+ + Time integration: 3rd order SSP RK3 (TimeRK(), _RK_SSP3_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 2 (DMDROMObject::m_rdim)
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD/librom.inp
+
+\b solver.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD/solver.inp
+
+\b boundary.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD/boundary.inp
+
+\b physics.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD/physics.inp
+
+\b lusolver.inp (optional)
+\include 1D/LinearAdvection/SineWave_libROM_DMD/lusolver.inp
+
+\b weno.inp (optional)
+\include 1D/LinearAdvection/SineWave_libROM_DMD/weno.inp
+
+To generate \b initial.inp, compile and run the 
+following code in the run directory. \b Note: if the
+final time is an integer multiple of the time period,
+the file \b initial.inp can also be used as the exact
+solution \b exact.inp (i.e. create a sym link called 
+\a exact.inp pointing to \a initial.inp, or just copy
+\a initial.inp to \a exact.inp).
+\include 1D/LinearAdvection/SineWave_libROM_DMD/aux/init.c
+
+Output:
+-------
+After running the code, there should be the following output
+files:
+
++ 11 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00010.bin; 
+these are the \b HyPar solutions\b. 
+
++ 11 output files \b op_rom_00000.bin, \b op_rom_00001.bin, ... \b op_rom_00010.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=1\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+text (#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b 1D/LinearAdvection/SineWave_libROM_DMD/plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the final solution - FOM (full-order model) refers to
+the HyPar solution, ROM (reduced-order model) refers to the DMD solution.
+@image html Solution_1DLinearAdvSinelibROM_DMD.png
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 1D/LinearAdvection/SineWave_libROM_DMD/pde_rom_diff.dat
+The numbers are: number of grid points (#HyPar::dim_global), 
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up), and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error; the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 1D/LinearAdvection/SineWave_libROM_DMD/out.log
+
+
+\page linear_adv_disc_librom_dmd 1D Linear Advection - Discontinuous Waves (Training a Time Windowed DMD)
+
+Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves_libROM_DMD
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Linear Advection Equation (linearadr.h)
+
+Reduced Order Modeling: This example trains time-windowed DMD objects and 
+then predicts the solution using the DMDs at the same times that the
+actual HyPar solution is written at.
+
+References:
+  + Ghosh, D., Baeder, J. D., "Compact Reconstruction Schemes with 
+    Weighted ENO Limiting for Hyperbolic Conservation Laws", 
+    SIAM Journal on Scientific Computing, 34 (3), 2012, A1678–A1706
+
+Domain: \f$-1 \le x \le 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution:
+  \f{equation}{
+    u\left(x,0\right) = \left\{\begin{array}{lc} 
+                          \exp\left(-\log\left(2\right)\frac{\left(x+7\right)^2}{0.0009}\right) & -0.8\le x \le -0.6 \\
+                          1 & -0.4\le x \le -0.2 \\
+                          1 - \left|10\left(x-0.1\right)\right| & 0\le x \le 0.2 \\
+                          \sqrt{1-100\left(x-0.5\right)^2} & 0.4\le x \le 0.6 \\
+                          0 & {\rm otherwise}
+                        \end{array}\right.
+  \f}
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
+ + Time integration: SSPRK3 (TimeRK(), #_RK_SSP3_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Number of samples per time window: 100 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/librom.inp
+
+\b solver.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/solver.inp
+
+\b boundary.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/boundary.inp
+
+\b physics.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/physics.inp
+
+\b lusolver.inp (optional)
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/lusolver.inp
+
+\b weno.inp (optional)
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/weno.inp
+
+To generate \b initial.inp, compile and run the 
+following code in the run directory. \b Note: if the
+final time is an integer multiple of the time period,
+the file \b initial.inp can also be used as the exact
+solution \b exact.inp (i.e. create a sym link called 
+\a exact.inp pointing to \a initial.inp, or just copy
+\a initial.inp to \a exact.inp).
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/aux/init.c
+
+Output:
+-------
+After running the code, there should be the following output
+files:
+
++ 51 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00050.bin; 
+these are the \b HyPar solutions\b. 
+
++ 51 output files \b op_rom_00000.bin, \b op_rom_00001.bin, ... \b op_rom_00050.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=2\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+text (#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the final solution - FOM (full-order model) refers to
+the HyPar solution, ROM (reduced-order model) refers to the DMD solution.
+@image html Solution_1DLinearAdvDisclibROM_DMD.png
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/pde_rom_diff.dat
+The numbers are: number of grid points (#HyPar::dim_global), 
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up), and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error; the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/out.log
+
+\page sod_shock_tube_librom_dmd 1D Euler Equations - Sod Shock Tube (Training a Time Windowed DMD)
+
+Description: 
+-------------------
+
+Location: \b hypar/Examples/1D/Euler1D/SodShockTube_libROM_DMD 
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Euler equations (euler1d.h)
+
+References: 
+  + G.A. Sod, "A survey of several finite difference methods 
+    for systems of nonlinear hyperbolic conservation laws," 
+    J. Comput. Phys., 27, 1 (1978).
+  + C. B. Laney, "Computational Gasdynamics", Cambridge 
+    University Press, 1998.
+
+Domain: \f$0 \le x \le 1.0\f$, \a "extrapolate" (#_EXTRAPOLATE_) 
+        boundary conditions
+
+Initial Solution:
+  + \f$ 0 \le x < 0.5\f$: \f$\rho = 1, u = 0, p = 1\f$
+  + \f$ 0.5 \le x \le 1\f$: \f$\rho = 0.125, u = 0, p = 0.1\f$
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): Characteristic-based 5th order WENO (Interp1PrimFifthOrderWENOChar())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 8 (DMDROMObject::m_rdim)
+ + Number of samples per time window: 40 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+--------------------
+
+\b librom.inp
+\include 1D/Euler1D/SodShockTube_libROM_DMD/librom.inp
+
+\b solver.inp:
+\include 1D/Euler1D/SodShockTube_libROM_DMD/solver.inp
+
+\b boundary.inp
+\include 1D/Euler1D/SodShockTube_libROM_DMD/boundary.inp
+
+\b physics.inp
+\include 1D/Euler1D/SodShockTube_libROM_DMD/physics.inp
+
+To generate \b initial.inp, compile and run the 
+following code in the run directory:
+\include 1D/Euler1D/SodShockTube_libROM_DMD/aux/init.c
+
+Output:
+-------
+After running the code, there should be the following output
+files:
+
++ 9 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00008.bin; 
+these are the \b HyPar solutions\b. 
+
++ 9 output files \b op_rom_00000.bin, \b op_rom_00001.bin, ... \b op_rom_00008.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=2\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+text (#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. It will plot the 3 conserved variables - density, momentum, and energy. 
+Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the final solution - FOM (full-order model) refers to
+the HyPar solution, ROM (reduced-order model) refers to the DMD solution.
+@image html Solution_1DSodShockTubeROM_DMD.png
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 1D/Euler1D/SodShockTube_libROM_DMD/pde_rom_diff.dat
+The numbers are: number of grid points (#HyPar::dim_global), 
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up), and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error; the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 1D/Euler1D/SodShockTube_libROM_DMD/out.log

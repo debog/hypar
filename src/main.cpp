@@ -81,6 +81,12 @@
   + --with-fortran-lib: Specify path where FORTRAN libraries are installed (for ScaLAPACK) (relevant only if --enable-scalapack 
     is specified).
 
+  Compiling with other scientific computing libraries
+  ---------------------------------------------------
+
+  HyPar can be compiled with and use the functionalities of the following libraries. It is assumed that the user
+  is familiar with them and has access to their documentation.
+
   \b Compiling \b with \b PETSc:
   Install PETSc and make sure the environment variables \b PETSC_DIR and \b PETSC_ARCH are defined. Please see PETSc's
   installation instructions for this. Once these environment variables are present, HyPar will use them to compile
