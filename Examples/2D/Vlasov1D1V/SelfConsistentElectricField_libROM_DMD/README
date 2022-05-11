@@ -1,4 +1,5 @@
 1D-1V VLASOV EQUATION
+WITH libROM DMD TRAINING
 
   df         df                     df 
   --  +  v ------  +  (E + v x B) ------  =  0
@@ -7,14 +8,26 @@
    0 <= x <= 2pi;   Periodic
   -6 <= v <= 6; Homogenous Dirichlet
 
+
 NOTE: This example requires HyPar be compiled
 with the FFTW library.
+
+In addition to the evolution of a Riemann problem, a DMD
+object is created using libROM and trained on the 
+simulation data. The solution is predicted using this
+DMD object at the same output times as the actual
+simulation.
+
+Use plotSolution.py to plot the HyPar and DMD solutions
+and compute/plot the diff between the two.
 
 The following input files are required:
 + solver.inp    -   General solver parameters
 + boundary.inp  -   Boundary conditions
 + physics.inp   -   Physical parameters 
 + initial.inp   -   Initial solution
+
++ librom.inp    -   Contains libROM-specific inputs
 
 ** See hypar/README for other (optional) input files
 

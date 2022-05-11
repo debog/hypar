@@ -1406,86 +1406,6 @@ and conservation error (#HyPar::ConservationError).
 Expected screen output:
 \include 2D/Vlasov1D1V/SelfConsistentElectricField/output.log
 
-\page vlasov_1d1v_prescribed 2D (1D-1V) Vlasov Equation - Prescribed E-Field
-
-Location: \b hypar/Examples/2D/Vlasov1D1V/PrescribedElectricField
-          (This directory contains all the input files needed
-          to run this case.)
-
-Governing equations: 2D (1D-1V) Vlasov Equation (vlasov.h)
-
-Domain: 
-  + \f$0 \le x < 2\pi\f$, \a "periodic" (#_PERIODIC_)
-  + \f$-6 \le y < 6\f$, \a "dirichlet" (#_DIRICHLET_) (\f$f = 0\f$)
-
-
-Initial solution: \f$f\left(x,v\right) = \left[1 + \frac{1}{10} \cos\left(x\right)\right] \exp\left(- \frac{1}{2}v^2\right)\f$
-
-Prescribed electric field: \f$\frac{1}{10}\cos\left(x\right)\f$
-
-Numerical Method:
- + Spatial discretization (hyperbolic): 5th order compact upwind (Interp1PrimFifthOrderCompactUpwind())
- + Time integration: RK4 (TimeRK(), #_RK_44_)
-
-Input files required:
----------------------
-
-\b solver.inp
-\include 2D/Vlasov1D1V/PrescribedElectricField/solver.inp
-
-\b boundary.inp
-\include 2D/Vlasov1D1V/PrescribedElectricField/boundary.inp
-
-\b physics.inp
-\include 2D/Vlasov1D1V/PrescribedElectricField/physics.inp
-
-To generate \b initial.inp (initial solution), compile and run the 
-following code in the run directory. 
-\include 2D/Vlasov1D1V/PrescribedElectricField/aux/init.c
-
-Output:
--------
-Note that \b iproc is set to 
-
-      4 4
-
-in \b solver.inp (i.e., 4 processors along \a x, and 4
-processors along \a y). Thus, this example should be run
-with 16 MPI ranks (or change \b iproc).
-
-After running the code, there should be 257 output
-files \b op_00000.dat, \b op_00001.dat, ... \b op_00257.dat; 
-the first one is the solution at \f$t=0\f$ and the final one
-is the solution at \f$t=128\f$. Since #HyPar::op_overwrite is
-set to \a no in \b solver.inp, separate files are written
-for solutions at each output time. 
-  
-#HyPar::op_file_format is set to \a tecplot2d in \b solver.inp, and
-thus, all the files are in a format that Tecplot (http://www.tecplot.com/)
-or other visualization software supporting the Tecplot format 
-(e.g. VisIt - https://wci.llnl.gov/simulation/computer-codes/visit/)
-can read. In these files, the first two lines are the Tecplot headers, 
-after which the data is written out as: the first two columns are grid indices, 
-the next two columns are x and y coordinates, and the final column is the 
-solution.  #HyPar::op_file_format can be set to \a text to get the solution
-files in plain text format (which can be read in and visualized in
-MATLAB for example).
-
-The following animation shows the evolution of the solution:
-@image html Solution_1D1VVlasov_PrescribedE.gif
-
-Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
-the code checks for conservation error and prints it to screen, as well
-as the file \b conservation.dat:
-\include 2D/Vlasov1D1V/PrescribedElectricField/conservation.dat
-The numbers are: number of grid points in each dimension (#HyPar::dim_global),
-number of processors in each dimension (#MPIVariables::iproc),
-time step size (#HyPar::dt),
-and conservation error (#HyPar::ConservationError).
-
-Expected screen output:
-\include 2D/Vlasov1D1V/PrescribedElectricField/output.log
-
 \page euler2d_riemann4 2D Euler Equations - Riemann Problem Case 4
 
 Location: \b hypar/Examples/2D/NavierStokes2D/Riemann2DCase4
@@ -6018,6 +5938,7 @@ Dynamic Mode Decomposition
 \subpage sod_shock_tube_librom_dmd \n
 \subpage euler2d_vortex_librom_dmd \n
 \subpage euler2d_riemann4_librom_dmd \n
+\subpage vlasov_1d1v_selfconsistent_librom_dmd \n
 
 \page linear_adv_sine_librom_dmd 1D Linear Advection - Sine Wave (Training a DMD)
 
@@ -6554,7 +6475,7 @@ or something similar can be used to plot the resulting text files.
 The following plot shows the final solution (density) - FOM (full-order model) refers to
 the HyPar solution, ROM (reduced-order model) refers to the DMD solution, and Diff
 is the difference between the two.
-@image html Solution_2DNavStokRiemann4_libROMDMD.png width=800px
+@image html Solution_2DNavStokRiemann4_libROMDMD.png
 
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
@@ -6579,3 +6500,109 @@ is readable by libROM.
 Expected screen output:
 \include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/out.log
 
+\page vlasov_1d1v_selfconsistent_librom_dmd 2D (1D-1V) Vlasov Equation - Self-Consistent E-Field
+
+Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D (1D-1V) Vlasov Equation (vlasov.h)
+
+Domain: 
+  + \f$0 \le x < 2\pi\f$, \a "periodic" (#_PERIODIC_)
+  + \f$-7 \le y < 7\f$, \a "dirichlet" (#_DIRICHLET_) (\f$f = 0\f$)
+
+
+Initial solution: 
+\f$f\left(x,v\right) = \frac{4}{\pi T}\left(1+\frac{1}{10}\cos\left(2k\pi\frac{x}{L}\right)\right)\left[\exp\left(-\frac{\left(v-2\right)^2}{2T}\right) + \exp\left(-\frac{\left(v+2\right)^2}{2T}\right)\right]\f$, \f$k=1,T=1,L=2\pi\f$.
+
+Self-consistent electric field is computed by solving the Poisson equation
+in a periodic domain using Fourier transforms. This examples *requires* HyPar
+to be compiled with FFTW (http://www.fftw.org/).
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Number of samples per time window: 200 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/librom.inp
+
+\b solver.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/solver.inp
+
+\b boundary.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/boundary.inp
+
+\b physics.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/physics.inp
+
+To generate \b initial.inp (initial solution), compile and run the 
+following code in the run directory. 
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 4
+processors along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be the following output
+files:
+
++ 26 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00025.bin; 
+these are the \b HyPar solutions\b. 
+
++ 26 output files \b op_rom_00000.bin, \b op_rom_00001.bin, ... \b op_rom_00025.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=5\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+text (#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the evolution of the distribution function - 
+FOM (full-order model) refers to the HyPar solution, 
+ROM (reduced-order model) refers to the DMD solution, and 
+Diff is the difference between the two.
+@image html Solution_1D1VVlasov_SelfConsistentE_libROM_DMD.gif
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error
+(or give some HDF5 file-writing error); the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/out.log
