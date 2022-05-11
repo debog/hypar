@@ -70,15 +70,15 @@
 
   The configure options can include options such as BLAS/LAPACK location, MPI directory, etc. Type "./configure --help"
   to see a full list. The options specific to HyPar are:
-  + --with-mpi-dir: Specify path where mpicc is installed.
-  + --enable-omp: Enable OpenMP threads.
-  + --enable-scalapack: Enable ScaLAPACK (this will make available a tridiagonal solver using ScaLAPACK).
-  + --enable-fftw: Enable FFTW (this will make available features that use the FFTW library).
-  + --with-blas-dir: Specify path where BLAS is installed (relevant only if --enable-scalapack is specified).
-  + --with-lapack-dir: Specify path where LAPACK is installed (relevant only if --enable-scalapack is specified).
-  + --with-scalapack-dir: Specify path where ScaLAPACK is installed (relevant only if --enable-scalapack is specified).
-  + --with-fftw-dir: Specify path where FFTW is installed (relevant only if --enable-fftw is specified).
-  + --with-fortran-lib: Specify path where FORTRAN libraries are installed (for ScaLAPACK) (relevant only if --enable-scalapack 
+  + \--with-mpi-dir: Specify path where mpicc is installed.
+  + \--enable-omp: Enable OpenMP threads.
+  + \--enable-scalapack: Enable ScaLAPACK (this will make available a tridiagonal solver using ScaLAPACK).
+  + \--enable-fftw: Enable FFTW (this will make available features that use the FFTW library).
+  + \--with-blas-dir: Specify path where BLAS is installed (relevant only if \--enable-scalapack is specified).
+  + \--with-lapack-dir: Specify path where LAPACK is installed (relevant only if \--enable-scalapack is specified).
+  + \--with-scalapack-dir: Specify path where ScaLAPACK is installed (relevant only if \--enable-scalapack is specified).
+  + \--with-fftw-dir: Specify path where FFTW is installed (relevant only if \--enable-fftw is specified).
+  + \--with-fortran-lib: Specify path where FORTRAN libraries are installed (for ScaLAPACK) (relevant only if \--enable-scalapack 
     is specified).
 
   Compiling with other scientific computing libraries
