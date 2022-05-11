@@ -43,8 +43,6 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 {
   SimulationObject* sim = (SimulationObject*) s;
 
-  struct timeval ti_start, ti_end;
-
   /* make sure none of the simulation objects sent in the array 
    * are "barebones" type */
   for (int ns = 0; ns < nsims; ns++) {
@@ -91,13 +89,9 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   const std::string& rom_mode( rom_interface.mode() );
 #endif
 
-#ifndef serial
-  MPI_Barrier( MPI_COMM_WORLD );
-#endif
-  gettimeofday( &ti_start, NULL );
-
   std::vector<double> op_times_arr(0);
 
+  double ti_runtime = 0.0;
   if (!rank) printf("Solving in time (from %d to %d iterations)\n",TS.restart_iter,TS.n_iter);
   for (TS.iter = TS.restart_iter; TS.iter < TS.n_iter; TS.iter++) {
 
@@ -133,6 +127,8 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     /* Call post-step function */
     TimePostStep (&TS);
 
+    ti_runtime += TS.iter_wctime;
+
     /* Print information to screen */
     TimePrintStep(&TS);
 
@@ -150,16 +146,6 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     }
 
   }
-
-#ifndef serial
-  MPI_Barrier( MPI_COMM_WORLD );
-#endif
-  gettimeofday( &ti_end, NULL );
-
-  long long walltime;
-  walltime = (  (ti_end.tv_sec * 1000000   + ti_end.tv_usec  ) 
-              - (ti_start.tv_sec * 1000000 + ti_start.tv_usec));
-  double ti_runtime = (double) walltime / 1000000.0;
 
   if (!rank) {
     printf( "Completed time integration (Final time: %f), total wctime: %f (seconds).\n",
@@ -198,7 +184,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 
     if (!rank) printf("libROM: Training ROM.\n");
     rom_interface.train();
-    if (!rank) printf("libROM: wallclock time: %f (seconds).\n", 
+    if (!rank) printf("libROM: total training wallclock time: %f (seconds).\n", 
                       rom_interface.trainWallclockTime() );
 
     double total_rom_predict_time = 0;
