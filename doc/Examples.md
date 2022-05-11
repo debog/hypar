@@ -5938,6 +5938,7 @@ Dynamic Mode Decomposition
 \subpage sod_shock_tube_librom_dmd \n
 \subpage euler2d_vortex_librom_dmd \n
 \subpage euler2d_riemann4_librom_dmd \n
+\subpage navstok2d_ldsc_librom_dmd \n
 \subpage vlasov_1d1v_selfconsistent_librom_dmd \n
 
 \page linear_adv_sine_librom_dmd 1D Linear Advection - Sine Wave (Training a DMD)
@@ -6015,9 +6016,9 @@ The first of each of these file sets is the solution at \f$t=0\f$ and
 the final one is the solution at \f$t=1\f$. Since #HyPar::op_overwrite is
 set to \a no in \b solver.inp, a separate file is written
 for solutions at each output time. All the files are binary
-text (#HyPar::op_file_format is set to \a binary in \b solver.inp).
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
 
-The provided Python script (\b 1D/LinearAdvection/SineWave_libROM_DMD/plotSolution.py)
+The provided Python script (\b plotSolution.py)
 can be used to generate plots from the binary files that compare the HyPar and DMD
 solutions. Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
 or something similar can be used to plot the resulting text files.
@@ -6134,9 +6135,9 @@ The first of each of these file sets is the solution at \f$t=0\f$ and
 the final one is the solution at \f$t=2\f$. Since #HyPar::op_overwrite is
 set to \a no in \b solver.inp, a separate file is written
 for solutions at each output time. All the files are binary
-text (#HyPar::op_file_format is set to \a binary in \b solver.inp).
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
 
-The provided Python script (\b 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/plotSolution.py)
+The provided Python script (\b plotSolution.py)
 can be used to generate plots from the binary files that compare the HyPar and DMD
 solutions. Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
 or something similar can be used to plot the resulting text files.
@@ -6235,9 +6236,9 @@ The first of each of these file sets is the solution at \f$t=0\f$ and
 the final one is the solution at \f$t=2\f$. Since #HyPar::op_overwrite is
 set to \a no in \b solver.inp, a separate file is written
 for solutions at each output time. All the files are binary
-text (#HyPar::op_file_format is set to \a binary in \b solver.inp).
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
 
-The provided Python script (\b 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/plotSolution.py)
+The provided Python script (\b plotSolution.py)
 can be used to generate plots from the binary files that compare the HyPar and DMD
 solutions. It will plot the 3 conserved variables - density, momentum, and energy. 
 Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
@@ -6355,9 +6356,9 @@ The first of each of these file sets is the solution at \f$t=0\f$ and
 the final one is the solution at \f$t=20\f$. Since #HyPar::op_overwrite is
 set to \a no in \b solver.inp, a separate file is written
 for solutions at each output time. All the files are binary
-text (#HyPar::op_file_format is set to \a binary in \b solver.inp).
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
 
-The provided Python script (\b 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/plotSolution.py)
+The provided Python script (\b plotSolution.py)
 can be used to generate plots from the binary files that compare the HyPar and DMD
 solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot2d, and Tecplot/VisIt
 or something similar can be used to plot the resulting files.
@@ -6366,6 +6367,11 @@ The following plot shows evolution of the density - FOM (full-order model) refer
 the HyPar solution, ROM (reduced-order model) refers to the DMD solution, and "Diff" is
 their difference.
 @image html Solution_2DNavStokVortex_libROM_DMD.gif
+
+\b Wall \b clock \b times:
+- PDE solution: 5.85 seconds
+- DMD training time: 5.25 seconds
+- DMD prediction/query time: 0.28 seconds
 
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
@@ -6465,9 +6471,9 @@ The first of each of these file sets is the solution at \f$t=0\f$ and
 the final one is the solution at \f$t=0.25\f$. Since #HyPar::op_overwrite is
 set to \a no in \b solver.inp, a separate file is written
 for solutions at each output time. All the files are binary
-text (#HyPar::op_file_format is set to \a binary in \b solver.inp).
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
 
-The provided Python script (\b 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/plotSolution.py)
+The provided Python script (\b plotSolution.py)
 can be used to generate plots from the binary files that compare the HyPar and DMD
 solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot2d, and Tecplot/VisIt
 or something similar can be used to plot the resulting text files.
@@ -6476,6 +6482,11 @@ The following plot shows the final solution (density) - FOM (full-order model) r
 the HyPar solution, ROM (reduced-order model) refers to the DMD solution, and Diff
 is the difference between the two.
 @image html Solution_2DNavStokRiemann4_libROMDMD.png
+
+\b Wall \b clock \b times:
+- PDE solution: 111.1 seconds
+- DMD training time: 17.6 seconds
+- DMD prediction/query time: 1.4 seconds
 
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
@@ -6571,9 +6582,9 @@ The first of each of these file sets is the solution at \f$t=0\f$ and
 the final one is the solution at \f$t=5\f$. Since #HyPar::op_overwrite is
 set to \a no in \b solver.inp, a separate file is written
 for solutions at each output time. All the files are binary
-text (#HyPar::op_file_format is set to \a binary in \b solver.inp).
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
 
-The provided Python script (\b 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/plotSolution.py)
+The provided Python script (\b plotSolution.py)
 can be used to generate plots from the binary files that compare the HyPar and DMD
 solutions. Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
 or something similar can be used to plot the resulting text files.
@@ -6583,6 +6594,11 @@ FOM (full-order model) refers to the HyPar solution,
 ROM (reduced-order model) refers to the DMD solution, and 
 Diff is the difference between the two.
 @image html Solution_1D1VVlasov_SelfConsistentE_libROM_DMD.gif
+
+\b Wall \b clock \b times:
+- PDE solution: 11.34 seconds
+- DMD training time: 2.30 seconds
+- DMD prediction/query time: 0.34 seconds
 
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
@@ -6606,3 +6622,142 @@ is readable by libROM.
 
 Expected screen output:
 \include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/out.log
+
+\page navstok2d_ldsc_librom_dmd 2D Navier-Stokes Equations -  Lid-Driven Square Cavity (Training a Time-Windowed DMD)
+
+Location: \b hypar/Examples/2D/NavierStokes2D/LidDrivenCavity_libROM_DMD
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Navier-Stokes Equations (navierstokes2d.h)
+
+Reference: 
++ Erturk, E., Corke, T.C., and Gokcol, C., "Numerical Solutions of
+  2-D Steady Incompressible Driven Cavity Flow at High Reynolds Numbers",
+  International Journal for Numerical Methods in Fluids, 48, 2005,
+  http://dx.doi.org/10.1002/fld.953.
++ Ghia, U., Ghia, K.N., Shin, C.T., "High-Re Solutions for Incompressible
+  Flow using the Navier-Stokes Equations and a Multigrid Method", Journal
+  of Computational Physics, 48, 1982, http://dx.doi.org/10.1016/0021-9991(82)90058-4.
+
+Note that this is an incompressible problem being solved here using the compressible
+Navier-Stokes equations in terms of non-dimensional flow variables. The density and 
+pressure are taken such that the speed of sound is 1.0, and the flow velocities 
+specified in the initial and boundary conditions correspond to a characteristic 
+Mach number of 0.1 (thus, they are 0.1 times the values in the above reference).
+
+Domain: \f$0 \le x, y \le 1\f$
+
+Boundary conditions:
++ No-slip wall BC on \f$x=0,1, 0 \le y \le 1\f$ (#_NOSLIP_WALL_ with 0 wall velocity).
++ No-slip wall BC on \f$y=0, 0 \le x \le 1\f$ (#_NOSLIP_WALL_ with 0 wall velocity).
++ Moving no-slip wall BC on \f$y=1, 0 \le x \le 1\f$ (#_NOSLIP_WALL_ with specified 
+  wall velocity of 0.1 in the x-direction).
+
+Initial solution: \f$\rho=1, p=1/\gamma\f$. The velocities are specified according to 
+the references above, but scaled by a factor of 0.1 to ensure that the characteristic
+Mach number is 0.1.
+
+Other parameters:
+  + \f$\gamma = 1.4\f$ (#NavierStokes2D::gamma)
+  + \f$Re = \frac {\rho u L } {\mu} = 100, 1000, 3200\f$ (Reynolds number) (#NavierStokes2D::Re), 
+    where \f$L=1\f$ is the cavity length and width.
+  + \f$Pr = 0.72\f$ (Prandtl number) (#NavierStokes2D::Pr)
+  + \f$M_\infty = 0.1\f$ (characteristic Mach number) (#NavierStokes2D::Minf)
+
+\b Note: Pressure is taken as \f$1/\gamma\f$ in the above so that the freestream 
+speed of sound is 1.
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
+ + Spatial discretization (parabolic) : 4th order (FirstDerivativeFourthOrderCentral()) 
+                                        non-conservative 2-stage (ParabolicFunctionNC2Stage())
+ + Time integration: 4th order, 4-stage Runge-Kutta (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Sampling frequency: 50 (libROMInterface::m_sampling_freq)
+ + Number of samples per time window: 200 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/librom.inp
+
+\b solver.inp
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/boundary.inp
+
+\b physics.inp (\b Note: this file specifies \f$Re = 3200\f$,
+change \a Re here for other Reynolds numbers.)
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/physics.inp
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 4
+processor along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be the following output
+files:
+
++ 1 output file \b op.bin; 
+this is the \b HyPar solutions\b. 
+
++ 1 output file \b op_rom.bin; 
+this is the \b predicted solutions from the DMD object(s)\b.
+
+All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotStreamlines.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot2d, and Tecplot/VisIt
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the final solution (velocity streamlines colored by
+the velocity magnitude) - FOM (full-order model) refers to
+the HyPar solution, ROM (reduced-order model) refers to the DMD solution, and Diff
+is the difference in the velocity magnitude between the two.
+@image html Solution_2DNavStokLDSC_Re3200_libROM_DMD.png
+
+\b Wall \b clock \b times:
+- PDE solution: 554.6 seconds
+- DMD training time: 58.6 seconds
+- DMD prediction/query time: 0.3 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error
+(or give some HDF5 file-writing error); the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/out.log
+

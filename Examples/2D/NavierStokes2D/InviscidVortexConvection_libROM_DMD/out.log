@@ -58,14 +58,14 @@ libROM DMD inputs:
 Solving in time (from 0 to 800 iterations)
 Writing solution file op_00000.bin.
 DMDROMObject::takeSample() - creating new DMD object, t=0.000000 (total: 1).
-iter=     20  t=5.000E-01  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.4E-03 (s)    cons_err=3.6443E-16
-iter=     40  t=1.000E+00  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.3E-03 (s)    cons_err=4.5731E-16
+iter=     20  t=5.000E-01  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.5E-03 (s)    cons_err=3.6443E-16
+iter=     40  t=1.000E+00  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.4E-03 (s)    cons_err=4.5731E-16
 Writing solution file op_00001.bin.
-iter=     60  t=1.500E+00  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.3E-03 (s)    cons_err=4.2677E-16
+iter=     60  t=1.500E+00  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.4E-03 (s)    cons_err=4.2677E-16
 iter=     80  t=2.000E+00  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.3E-03 (s)    cons_err=3.8260E-16
 Writing solution file op_00002.bin.
-iter=    100  t=2.500E+00  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.3E-03 (s)    cons_err=5.4237E-16
-iter=    120  t=3.000E+00  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.3E-03 (s)    cons_err=6.7929E-16
+iter=    100  t=2.500E+00  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.4E-03 (s)    cons_err=5.4237E-16
+iter=    120  t=3.000E+00  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.4E-03 (s)    cons_err=6.7929E-16
 Writing solution file op_00003.bin.
 iter=    140  t=3.500E+00  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.3E-03 (s)    cons_err=4.5072E-16
 iter=    160  t=4.000E+00  CFL=2.819E-01  norm=3.0130E-04  wctime: 7.3E-03 (s)    cons_err=4.8666E-16
@@ -104,91 +104,91 @@ iter=    580  t=1.450E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.3E-03 (s)  
 iter=    600  t=1.500E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.3E-03 (s)    cons_err=8.0060E-16
 Writing solution file op_00015.bin.
 iter=    620  t=1.550E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.3E-03 (s)    cons_err=8.1379E-16
-iter=    640  t=1.600E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.8E-03 (s)    cons_err=1.0016E-15
+iter=    640  t=1.600E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.4E-03 (s)    cons_err=1.0016E-15
 Writing solution file op_00016.bin.
 iter=    660  t=1.650E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.3E-03 (s)    cons_err=7.6872E-16
 iter=    680  t=1.700E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.3E-03 (s)    cons_err=7.8560E-16
 Writing solution file op_00017.bin.
 iter=    700  t=1.750E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.3E-03 (s)    cons_err=4.2793E-16
-iter=    720  t=1.800E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.3E-03 (s)    cons_err=6.7370E-16
+iter=    720  t=1.800E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.4E-03 (s)    cons_err=6.7370E-16
 Writing solution file op_00018.bin.
 iter=    740  t=1.850E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.3E-03 (s)    cons_err=4.6653E-16
 iter=    760  t=1.900E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.3E-03 (s)    cons_err=5.3238E-16
 Writing solution file op_00019.bin.
-iter=    780  t=1.950E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.3E-03 (s)    cons_err=8.5277E-16
+iter=    780  t=1.950E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.4E-03 (s)    cons_err=8.5277E-16
 iter=    800  t=2.000E+01  CFL=2.819E-01  norm=3.0128E-04  wctime: 7.3E-03 (s)    cons_err=1.0167E-15
-Completed time integration (Final time: 20.000000), total wctime: 7.124732 (seconds).
+Completed time integration (Final time: 20.000000), total wctime: 5.852587 (seconds).
 Reading array from binary file exact.inp (Serial mode).
 Writing solution file op_00020.bin.
 libROM: Training ROM.
 DMDROMObject::train() - training DMD object 0 with 800 samples.
 Using 16 basis vectors out of 799.
-libROM: wallclock time: 5.394844 (seconds).
+libROM: total training wallclock time: 5.253873 (seconds).
 libROM: Predicting solution at time 0.0000e+00 using ROM.
-libROM:   wallclock time: 0.013636 (seconds).
+libROM:   wallclock time: 0.013751 (seconds).
 Writing solution file op_rom_00000.bin.
 libROM: Predicting solution at time 1.0000e+00 using ROM.
-libROM:   wallclock time: 0.013938 (seconds).
+libROM:   wallclock time: 0.013635 (seconds).
 Writing solution file op_rom_00001.bin.
 libROM: Predicting solution at time 2.0000e+00 using ROM.
-libROM:   wallclock time: 0.013480 (seconds).
+libROM:   wallclock time: 0.013599 (seconds).
 Writing solution file op_rom_00002.bin.
 libROM: Predicting solution at time 3.0000e+00 using ROM.
-libROM:   wallclock time: 0.013453 (seconds).
+libROM:   wallclock time: 0.013555 (seconds).
 Writing solution file op_rom_00003.bin.
 libROM: Predicting solution at time 4.0000e+00 using ROM.
-libROM:   wallclock time: 0.013553 (seconds).
+libROM:   wallclock time: 0.013559 (seconds).
 Writing solution file op_rom_00004.bin.
 libROM: Predicting solution at time 5.0000e+00 using ROM.
-libROM:   wallclock time: 0.013552 (seconds).
+libROM:   wallclock time: 0.013557 (seconds).
 Writing solution file op_rom_00005.bin.
 libROM: Predicting solution at time 6.0000e+00 using ROM.
-libROM:   wallclock time: 0.013488 (seconds).
+libROM:   wallclock time: 0.013576 (seconds).
 Writing solution file op_rom_00006.bin.
 libROM: Predicting solution at time 7.0000e+00 using ROM.
-libROM:   wallclock time: 0.013561 (seconds).
+libROM:   wallclock time: 0.013567 (seconds).
 Writing solution file op_rom_00007.bin.
 libROM: Predicting solution at time 8.0000e+00 using ROM.
-libROM:   wallclock time: 0.013573 (seconds).
+libROM:   wallclock time: 0.013559 (seconds).
 Writing solution file op_rom_00008.bin.
 libROM: Predicting solution at time 9.0000e+00 using ROM.
-libROM:   wallclock time: 0.013641 (seconds).
+libROM:   wallclock time: 0.013639 (seconds).
 Writing solution file op_rom_00009.bin.
 libROM: Predicting solution at time 1.0000e+01 using ROM.
-libROM:   wallclock time: 0.013455 (seconds).
+libROM:   wallclock time: 0.013553 (seconds).
 Writing solution file op_rom_00010.bin.
 libROM: Predicting solution at time 1.1000e+01 using ROM.
-libROM:   wallclock time: 0.013804 (seconds).
+libROM:   wallclock time: 0.013556 (seconds).
 Writing solution file op_rom_00011.bin.
 libROM: Predicting solution at time 1.2000e+01 using ROM.
-libROM:   wallclock time: 0.013787 (seconds).
+libROM:   wallclock time: 0.013559 (seconds).
 Writing solution file op_rom_00012.bin.
 libROM: Predicting solution at time 1.3000e+01 using ROM.
-libROM:   wallclock time: 0.013803 (seconds).
+libROM:   wallclock time: 0.013558 (seconds).
 Writing solution file op_rom_00013.bin.
 libROM: Predicting solution at time 1.4000e+01 using ROM.
-libROM:   wallclock time: 0.013781 (seconds).
+libROM:   wallclock time: 0.013564 (seconds).
 Writing solution file op_rom_00014.bin.
 libROM: Predicting solution at time 1.5000e+01 using ROM.
-libROM:   wallclock time: 0.013446 (seconds).
+libROM:   wallclock time: 0.013554 (seconds).
 Writing solution file op_rom_00015.bin.
 libROM: Predicting solution at time 1.6000e+01 using ROM.
-libROM:   wallclock time: 0.013451 (seconds).
+libROM:   wallclock time: 0.013560 (seconds).
 Writing solution file op_rom_00016.bin.
 libROM: Predicting solution at time 1.7000e+01 using ROM.
-libROM:   wallclock time: 0.013450 (seconds).
+libROM:   wallclock time: 0.013558 (seconds).
 Writing solution file op_rom_00017.bin.
 libROM: Predicting solution at time 1.8000e+01 using ROM.
-libROM:   wallclock time: 0.013448 (seconds).
+libROM:   wallclock time: 0.013559 (seconds).
 Writing solution file op_rom_00018.bin.
 libROM: Predicting solution at time 1.9000e+01 using ROM.
-libROM:   wallclock time: 0.013445 (seconds).
+libROM:   wallclock time: 0.013564 (seconds).
 Writing solution file op_rom_00019.bin.
 libROM: Predicting solution at time 2.0000e+01 using ROM.
-libROM:   wallclock time: 0.013452 (seconds).
+libROM:   wallclock time: 0.013560 (seconds).
 libROM:   Calculating diff between PDE and ROM solutions.
 Writing solution file op_rom_00020.bin.
-libROM: total prediction/query wallclock time: 0.285197 (seconds).
+libROM: total prediction/query wallclock time: 0.285142 (seconds).
 libROMInterface::saveROM() - saving ROM objects.
   Saving DMD object with filename root DMD/dmdobj_0000.
 Computed errors for domain 0:
@@ -204,7 +204,7 @@ Norms of the diff between ROM and PDE solutions for domain 0:
   L1         Norm            : 1.5215990100709741E-06
   L2         Norm            : 4.0657029052378237E-06
   Linfinity  Norm            : 2.1594369212267493E-05
-Solver runtime (in seconds): 1.5002807000000001E+01
-Total  runtime (in seconds): 1.5717855999999999E+01
+Solver runtime (in seconds): 1.3170622000000000E+01
+Total  runtime (in seconds): 1.3922789000000000E+01
 Deallocating arrays.
 Finished.

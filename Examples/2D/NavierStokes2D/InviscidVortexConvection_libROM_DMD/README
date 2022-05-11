@@ -58,7 +58,7 @@ Initial Solution:
     dv  =   --- exp [ ----- ] + (x-x0)^2
             2pi         2
 
-In addition to the evolution of a Riemann problem, a DMD
+In addition to the evolution of the vortex, a DMD
 object is created using libROM and trained on the 
 simulation data. The solution is predicted using this
 DMD object at the same output times as the actual
