@@ -22,8 +22,8 @@ root_dir=$PWD
 
 # some details about HyPar (repo and branch that we want to test)
 # change these to test a particular version of HyPar
-hypar_repo="https://deboghosh@bitbucket.org/deboghosh/hypar.git"
-hypar_branch="master"
+hypar_repo="https://gitlab.com/debojyoti.ghosh/hypar.git"
+hypar_branch="with_librom"
 # other HyPar-related stuff
 hypar_dir="hypar"
 hypar_exec="HyPar"
@@ -38,7 +38,7 @@ export HYPAR_EXEC_OTHER_ARGS=""
 # (baseline solutions maintained on the public repository)
 # do not change these, unless you know what you are doing
 hypar_baselines_repo="https://deboghosh@bitbucket.org/deboghosh/hypar_baselines.git"
-hypar_baselines_branch="master"
+hypar_baselines_branch="with_librom"
 hypar_baselines_dir="baselines"
 
 # stuff about test directory
@@ -50,6 +50,8 @@ report_filename="test_report.txt"
 
 # other stuff
 RUN_SCRIPT="run.sh"
+NEEDS_FFTW="dep.fftw"
+NEEDS_LIBROM="dep.libROM"
 
 # Clone HyPar
 echo "removing any previous HyPar copy..."
@@ -64,13 +66,23 @@ git checkout $hypar_branch
 echo "-------------------------"
 echo "compiling hypar..."
 autoreconf -i 2>&1 > $root_dir/$hypar_compile_log_file
+if [ -z "$LIBROM_DIR" ]; then
+  echo "Environment variable LIBROM_DIR not found."
+  echo "Compiling without libROM; will not be able to run simulations that need libROM."
+  opt_with_librom=false
+else
+  echo "libROM found at $LIBROM_DIR. Compiling with libROM."
+  opt_with_librom=true
+fi
 if [ -z "$FFTW_DIR" ]; then
   echo "** Environment variable FFTW_DIR not found."
   echo "** Compiling without FFTW; will not be able to test cases that need FFTW."
+  opt_with_fftw=false
   ./configure 2>&1 >> $root_dir/$hypar_compile_log_file
 else
   echo "FFTW found at $FFTW_DIR."
   echo "Compiling with FFTW."
+  opt_with_fftw=true
   ./configure --enable-fftw --with-fftw-dir=${FFTW_DIR} 2>&1 >> $root_dir/$hypar_compile_log_file
 fi
 make -j all 2>&1 >> $root_dir/$hypar_compile_log_file
@@ -150,40 +162,48 @@ for f in *; do
     echo "entering $f..."
     echo "$f" >> $report_file
     cd $f
-    if [ -f "$RUN_SCRIPT" ]; then
-      chmod +x $RUN_SCRIPT && ./$RUN_SCRIPT
-      while read F  ; do
-        echo "    comparing $F ..."
-        echo "  $F" >> $report_file
-        result=$(diff $F $root_dir/$hypar_baselines_dir/$f/$F 2>&1 >> $diff_file)
-        if [ -z "$result" ]; then
-          if [ -s "$diff_file" ]; then
-            ((n_fail+=1))
-            echo "                        **DIFFERENCES FOUND**"
-            echo "                        **DIFFERENCES FOUND**" >> $report_file
-            echo "        check"
-            echo "          $root_dir/$test_dirname/$f/$diff_file"
-            echo "        check" >> $report_file
-            echo "          $root_dir/$test_dirname/$f/$diff_file" >> $report_file
-            echo " "
-          else
-            ((n_pass+=1))
-            echo "                        **passed**" 
-            echo "                        **passed**" >> $report_file
-          fi
-        else
-          ((n_fail+=1))
-          echo $result >> $report_file
-          echo "                        **FILE COMPARISON FAILED**"
-          echo "                        **FILE COMPARISON FAILED**" >> $report_file
-          echo "        check"
-          echo "          $report_file"
-          echo " "
-        fi
-      done <./$diff_filelistname
+    if [ -f "$NEEDS_LIBROM" ] && [ "$opt_with_librom" == "false" ]; then
+      echo "Skipping; $f has unmet dependencies (liROM)."
+      echo "Skipping; $f has unmet dependencies (liROM)." >> $report_file
+    elif [ -f "$NEEDS_FFTW" ] && [ "$opt_with_fftw" == "false" ]; then
+      echo "Skipping; $f has unmet dependencies (FFTW)."
+      echo "Skipping; $f has unmet dependencies (FFTW)." >> $report_file
     else
-      echo "Error: $RUN_SCRIPT not found."
-      echo "Error: $RUN_SCRIPT not found." >> $report_file
+      if [ -f "$RUN_SCRIPT" ]; then
+        chmod +x $RUN_SCRIPT && ./$RUN_SCRIPT
+        while read F  ; do
+          echo "    comparing $F ..."
+          echo "  $F" >> $report_file
+          result=$(diff $F $root_dir/$hypar_baselines_dir/$f/$F 2>&1 >> $diff_file)
+          if [ -z "$result" ]; then
+            if [ -s "$diff_file" ]; then
+              ((n_fail+=1))
+              echo "                        **DIFFERENCES FOUND**"
+              echo "                        **DIFFERENCES FOUND**" >> $report_file
+              echo "        check"
+              echo "          $root_dir/$test_dirname/$f/$diff_file"
+              echo "        check" >> $report_file
+              echo "          $root_dir/$test_dirname/$f/$diff_file" >> $report_file
+              echo " "
+            else
+              ((n_pass+=1))
+              echo "                        **passed**" 
+              echo "                        **passed**" >> $report_file
+            fi
+          else
+            ((n_fail+=1))
+            echo $result >> $report_file
+            echo "                        **FILE COMPARISON FAILED**"
+            echo "                        **FILE COMPARISON FAILED**" >> $report_file
+            echo "        check"
+            echo "          $report_file"
+            echo " "
+          fi
+        done <./$diff_filelistname
+      else
+        echo "Error: $RUN_SCRIPT not found."
+        echo "Error: $RUN_SCRIPT not found." >> $report_file
+      fi
     fi
     echo " "
     echo " " >> $report_file
