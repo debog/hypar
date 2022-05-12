@@ -31,6 +31,8 @@
     it can use PETSc's time integration module TS (http://www.mcs.anl.gov/petsc/petsc-current/src/ts/).
   + For 3-dimensional simulations, the <B>immersed boundaries</B> can be used to
     solve over non-Cartesian geometries.
+  + Can be <B>compiled with libROM</B> (https://www.librom.net/), if available, where
+    it can be used with the reduced order modeling tools implemented in libROM.
 
   HyPar has been developed to be scalable, and apart from the usual functionalities to
   solve a system of PDEs on distributed architectures, it provides scalable file I/O
