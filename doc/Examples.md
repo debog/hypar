@@ -6511,7 +6511,7 @@ is readable by libROM.
 Expected screen output:
 \include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/out.log
 
-\page vlasov_1d1v_selfconsistent_librom_dmd 2D (1D-1V) Vlasov Equation - Self-Consistent E-Field
+\page vlasov_1d1v_selfconsistent_librom_dmd 2D (1D-1V) Vlasov Equation - Self-Consistent E-Field (Training a Time-Windowed DMD)
 
 Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD
           (This directory contains all the input files needed
