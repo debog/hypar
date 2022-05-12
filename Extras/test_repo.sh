@@ -23,7 +23,7 @@ root_dir=$PWD
 # some details about HyPar (repo and branch that we want to test)
 # change these to test a particular version of HyPar
 hypar_repo="https://gitlab.com/debojyoti.ghosh/hypar.git"
-hypar_branch="with_librom"
+hypar_branch="master"
 # other HyPar-related stuff
 hypar_dir="hypar"
 hypar_exec="HyPar"
@@ -38,7 +38,7 @@ export HYPAR_EXEC_OTHER_ARGS=""
 # (baseline solutions maintained on the public repository)
 # do not change these, unless you know what you are doing
 hypar_baselines_repo="https://deboghosh@bitbucket.org/deboghosh/hypar_baselines.git"
-hypar_baselines_branch="with_librom"
+hypar_baselines_branch="master"
 hypar_baselines_dir="baselines"
 
 # stuff about test directory

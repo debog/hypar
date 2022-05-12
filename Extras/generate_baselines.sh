@@ -24,7 +24,7 @@ root_dir=$PWD
 # Details about HyPar (repo and branch that we want to
 # generate baselines from)
 hypar_repo="https://deboghosh@bitbucket.org/deboghosh/hypar.git"
-hypar_branch="with_librom"
+hypar_branch="master"
 # other HyPar-related stuff
 hypar_dir="hypar"
 hypar_exec="HyPar"
@@ -37,7 +37,7 @@ export HYPAR_EXEC_OTHER_ARGS=""
 
 # HyPar baselines repo to update
 hypar_baselines_repo="git@bitbucket.org:deboghosh/hypar_baselines.git"
-hypar_baselines_branch="with_librom"
+hypar_baselines_branch="master"
 hypar_baselines_dir="baselines"
 
 # other stuff
