@@ -128,7 +128,7 @@ if solver_inp_data['op_overwrite'] == 'no':
       sol2d_rom_u = sol2d_rom[1,:,:] / sol2d_rom[0,:,:]
       sol2d_rom_v = sol2d_rom[2,:,:] / sol2d_rom[0,:,:]
       sol2d_rom_speed = np.sqrt(np.square(sol2d_rom_u)+np.square(sol2d_rom_v))
-      diff_speed = sol2d_fom_speed = sol2d_rom_speed
+      diff_speed = sol2d_fom_speed - sol2d_rom_speed
       plot_fom = axes[0].streamplot(x2d.T, y2d.T, sol2d_fom_u.T, sol2d_fom_v.T, 
                                     color=sol2d_fom_speed.T, 
                                     linewidth=linewidth,
@@ -208,7 +208,7 @@ else:
     sol2d_rom_u = sol2d_rom[1,:,:] / sol2d_rom[0,:,:]
     sol2d_rom_v = sol2d_rom[2,:,:] / sol2d_rom[0,:,:]
     sol2d_rom_speed = np.sqrt(np.square(sol2d_rom_u)+np.square(sol2d_rom_v))
-    diff_speed = sol2d_fom_speed = sol2d_rom_speed
+    diff_speed = sol2d_fom_speed - sol2d_rom_speed
     plot_fom = axes[0].streamplot(x2d.T, y2d.T, sol2d_fom_u.T, sol2d_fom_v.T, 
                                   color=sol2d_fom_speed.T, 
                                   linewidth=linewidth,
