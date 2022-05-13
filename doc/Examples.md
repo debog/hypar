@@ -1314,7 +1314,7 @@ and conservation error (#HyPar::ConservationError).
 Expected screen output:
 \include 2D/Vlasov1D1V/PrescribedElectricField/output.log
 
-\page vlasov_1d1v_selfconsistent 2D (1D-1V) Vlasov Equation - Self-Consistent E-Field
+\page vlasov_1d1v_selfconsistent 2D (1D-1V) Vlasov Equation - Two-Stream Instability
 
 Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField
           (This directory contains all the input files needed
@@ -5936,12 +5936,18 @@ Dynamic Mode Decomposition
 \subpage linear_adv_sine_librom_dmd \n
 \subpage linear_adv_disc_librom_dmd \n
 \subpage sod_shock_tube_librom_dmd \n
+\n
 \subpage euler2d_vortex_librom_dmd \n
 \subpage euler2d_riemann4_librom_dmd \n
 \subpage navstok2d_ldsc_librom_dmd \n
 \subpage vlasov_1d1v_selfconsistent_librom_dmd \n
+\n
+\subpage ns3d_cylinder_steady_incompressible_viscous_librom_dmd \n
+
 
 \page linear_adv_sine_librom_dmd 1D Linear Advection - Sine Wave (Training a DMD)
+
+See \ref linear_adv_sine to familiarize yourself with this case.
 
 Location: \b hypar/Examples/1D/LinearAdvection/SineWave_libROM_DMD
           (This directory contains all the input files needed
@@ -6051,6 +6057,8 @@ Expected screen output:
 
 
 \page linear_adv_disc_librom_dmd 1D Linear Advection - Discontinuous Waves (Training a Time Windowed DMD)
+
+See \ref linear_adv_disc to familiarize yourself with this case.
 
 Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves_libROM_DMD
           (This directory contains all the input files needed
@@ -6170,6 +6178,8 @@ Expected screen output:
 
 \page sod_shock_tube_librom_dmd 1D Euler Equations - Sod Shock Tube (Training a Time Windowed DMD)
 
+See \ref sod_shock_tube to familiarize yourself with this case.
+
 Description: 
 -------------------
 
@@ -6271,6 +6281,8 @@ Expected screen output:
 \include 1D/Euler1D/SodShockTube_libROM_DMD/out.log
 
 \page euler2d_vortex_librom_dmd 2D Euler Equations - Isentropic Vortex Convection (Training a DMD)
+
+See \ref euler2d_vortex to familiarize yourself with this case.
 
 Location: \b hypar/Examples/2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD
           (This directory contains all the input files needed
@@ -6398,6 +6410,8 @@ Expected screen output:
 
 \page euler2d_riemann4_librom_dmd 2D Euler Equations - Riemann Problem Case 4 (Training a Time Windowed DMD)
 
+See \ref euler2d_riemann4 to familiarize yourself with this case.
+
 Location: \b hypar/Examples/2D/NavierStokes2D/Riemann2DCase4_libROM_DMD
           (This directory contains all the input files needed
           to run this case.)
@@ -6511,7 +6525,9 @@ is readable by libROM.
 Expected screen output:
 \include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/out.log
 
-\page vlasov_1d1v_selfconsistent_librom_dmd 2D (1D-1V) Vlasov Equation - Self-Consistent E-Field (Training a Time-Windowed DMD)
+\page vlasov_1d1v_selfconsistent_librom_dmd 2D (1D-1V) Vlasov Equation - Two-Stream Instability (Training a Time-Windowed DMD)
+
+See \ref vlasov_1d1v_selfconsistent to familiarize yourself with this case.
 
 Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD
           (This directory contains all the input files needed
@@ -6624,6 +6640,8 @@ Expected screen output:
 \include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/out.log
 
 \page navstok2d_ldsc_librom_dmd 2D Navier-Stokes Equations -  Lid-Driven Square Cavity (Training a Time-Windowed DMD)
+
+See \ref navstok2d_ldsc to familiarize yourself with this case.
 
 Location: \b hypar/Examples/2D/NavierStokes2D/LidDrivenCavity_libROM_DMD
           (This directory contains all the input files needed
@@ -6761,3 +6779,143 @@ is readable by libROM.
 Expected screen output:
 \include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/out.log
 
+\page ns3d_cylinder_steady_incompressible_viscous_librom_dmd 3D Navier-Stokes - Steady, incompressible, viscous flow around a cylinder (Training a Time-Windowed DMD)
+
+See \ref ns3d_cylinder_steady_incompressible_viscous to familiarize yourself with this case.
+
+Location: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD
+
+Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
+
+Domain: The domain consists of a fine uniform grid around the cylinder defined by [-2,6] X [-2,2],
+        and a stretched grid beyond this zone.
+\b Note: This is a 2D flow simulated using a 3-dimensional setup by taking the length of the
+         domain along \a z to be very small and with only 3 grid points (the domain size along \a z
+         \b must \b be smaller than the cylinder length).
+
+Geometry: A cylinder of radius 1.0 centered at (0,0)
+          (\b hypar/Examples/STLGeometries/cylinder.stl)
+
+See \ref ns3d_cylinder_steady_incompressible_viscous for pictures showing the domain and geometry.
+
+Boundary conditions:
+  + xmin: Subsonic inflow #_SUBSONIC_INFLOW_
+  + xmax: Subsonic outflow #_SUBSONIC_OUTFLOW_
+  + ymin and ymax: Subsonic "ambivalent" #_SUBSONIC_AMBIVALENT_
+  + zmin and zmax: Periodic #_PERIODIC_ (to simulate a 2D flow in the x-y plane)
+  + The immersed body wall is specified as adiabatic (#_IB_ADIABATIC_);
+    (this is the default).
+
+Reference:
+  + Taneda, S., "Experimental Investigation of the Wakes behind Cylinders and Plates at Low 
+    Reynolds Numbers," Journal of the Physical Society of Japan, Vol. 11, 302–307, 1956. 
+  + Dennis, S. C. R., Chang, G.-Z., "Numerical solutions for steady flow past a circular
+    cylinder at Reynolds numbers up to 100", Journal of Fluid Mechanics, 42 (3), 1970,
+    pp. 471-489.
+
+Initial solution: \f$\rho=1, u=0.1, v=w=0, p=1/\gamma\f$ everywhere in the domain.
+
+Other parameters (all dimensional quantities are in SI units):
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes3D::gamma)
+  + Freestream Mach number \f$M_{\infty} = 0.1\f$ (#NavierStokes3D::Minf)
+  + Prandlt number \f$Pr = 0.72\f$ (#NavierStokes3D::Pr)
+  + Reynolds number \f$Re = \frac {\rho u L } {\mu} = 10\f$ (#NavierStokes3D::Re) (\b Note: 
+    since the diameter of the cylinder is 2.0, the cylinder-diameter-based Reynolds number is 
+    \f$Re_D = 2Re = 20\f$.
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Spatial discretization (parabolic) : 4th order (FirstDerivativeFourthOrderCentral()) 
+                                        non-conservative 2-stage (NavierStokes3DParabolicFunction())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Sampling frequency: 10 (libROMInterface::m_sampling_freq)
+ + Number of samples per time window: 500 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+These files are all located in: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD
+
+\b librom.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/librom.inp
+
+\b solver.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/solver.inp
+
+\b boundary.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/boundary.inp
+
+\b physics.inp : The following file specifies a Reynolds number
+of 10 (corresponding to \f$Re_D\f$ of 20). To try other Reynolds 
+numbers, change it here.
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/physics.inp
+
+\b cylinder.stl : the filename "cylinder.stl" \b must match
+the input for \a immersed_body in \a solver.inp.\n
+Located at \b hypar/Examples/STLGeometries/cylinder.stl
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory.
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/aux/init.c
+
+Output:
+-------
+
+Note that \b iproc is set to 
+
+      8 4 1
+
+in \b solver.inp (i.e., 8 processors along \a x, 4
+processors along \a y, and 1 processor along \a z). Thus, 
+this example should be run with 32 MPI ranks (or change \b iproc).
+
+Please see the original example in the "Immersed Boundaries Examples" section
+for a full description of the output files and how to view them. The following only
+contains libROM-specific comments.
+
+After running the code, there should be the following output
+files:
+
++ 1 output file \b op.bin; 
+this is the \b HyPar solutions\b. 
+
++ 1 output file \b op_rom.bin; 
+this is the \b predicted solutions from the DMD object(s)\b.
+
+All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot2d, and Tecplot/VisIt
+or something similar can be used to plot the resulting text files.
+
+The following figure shows the flow at \f$Re_D=20\f$. The pressure is plotted in the overall
+domain, and the wake is shown by plotting the x-velocity, where it is negative.
+FOM (full-order model) refers to the HyPar solution, ROM (reduced-order model) refers to 
+the DMD solution, and Diff is the difference between the two.
+@image html Solution_3DNavStokCylinder_ReD020_libROM_DMD.png
+
+\b Wall \b clock \b times:
+- PDE solution: 3038 seconds
+- DMD training time: 249 seconds
+- DMD prediction/query time: 1.3 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Expected screen output:
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/out.log
