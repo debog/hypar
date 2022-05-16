@@ -289,7 +289,11 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 
   if (m_mode == "train") {
     if (m_rom_type == _ROM_TYPE_DMD_) {
-      m_rom = new DMDROMObject( m_vec_size, a_dt, m_rdim, m_rank, m_nproc );
+      m_rom = new DMDROMObject( m_vec_size, 
+                                m_sampling_freq*a_dt, 
+                                m_rdim, 
+                                m_rank, 
+                                m_nproc );
     }
     m_U = new double[m_vec_size];
   }
