@@ -5936,6 +5936,7 @@ Dynamic Mode Decomposition
 \subpage linear_adv_sine_librom_dmd \n
 \subpage linear_adv_disc_librom_dmd \n
 \subpage sod_shock_tube_librom_dmd \n
+\subpage shu_osher_librom_dmd \n
 \n
 \subpage euler2d_vortex_librom_dmd \n
 \subpage euler2d_riemann4_librom_dmd \n
@@ -6256,7 +6257,7 @@ solutions. It will plot the 3 conserved variables - density, momentum, and energ
 Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
 or something similar can be used to plot the resulting text files.
 
-The following plot shows the final solution - FOM (full-order model) refers to
+The following plot shows the final solution (density) - FOM (full-order model) refers to
 the HyPar solution, ROM (reduced-order model) refers to the DMD solution.
 @image html Solution_1DSodShockTubeROM_DMD.png
 
@@ -7203,4 +7204,110 @@ and total wall time.
 
 Expected screen output:
 \include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/out.log
+
+\page shu_osher_librom_dmd 1D Euler Equations - Shu-Osher Problem (Training a Time Windowed DMD)
+
+See \ref shu_osher to familiarize yourself with this case.
+
+Description: 
+------------
+
+Location: \b hypar/Examples/1D/Euler1D/ShuOsherProblem_libROM_DMD 
+          (This directory contains all the input files needed
+          to run this case. If there is a \a Run.m, run it in
+          MATLAB to quickly set up, run, and visualize the 
+          example).
+
+Governing equations: 1D Euler equations (euler1d.h)
+
+References: 
+  + C.-W. Shu and S. Osher, "Efficient implementation of
+    essentially non-oscillatory schemes ,II," J. Comput.
+    Phys., 83 (1989), pp. 32–78
+
+Domain: \f$-5 \le x \le 5\f$, \a "extrapolate" (#_EXTRAPOLATE_) 
+        boundary conditions
+
+Initial Solution:
+  + \f$ -5 \le x < -4\f$: \f$\rho = 27/7, u = 4\sqrt{35}/7, p = 31/3\f$
+  + \f$ -4 \le x \le 5\f$: \f$\rho = 1 + 0.2\sin\left(5x\right), u = 0, p = 1\f$
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): Characteristic-based 5th order WENO (Interp1PrimFifthOrderWENOChar())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Number of samples per time window: 60 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+--------------------
+\b librom.inp:
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/librom.inp
+
+\b solver.inp:
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/solver.inp
+
+\b boundary.inp
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/boundary.inp
+
+\b physics.inp
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/physics.inp
+
+\b weno.inp (optional)
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/weno.inp
+
+To generate \b initial.inp, compile and run the 
+following code in the run directory:
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/aux/init.c
+
+Output:
+-------
+After running the code, there should be the following output
+files:
+
++ 11 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00010.bin; 
+these are the \b HyPar solutions\b. 
+
++ 11 output files \b op_rom_00000.bin, \b op_rom_00001.bin, ... \b op_rom_00010.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=1.8\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. It will plot the 3 conserved variables - density, momentum, and energy. 
+Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the final solution (density) - FOM (full-order model) refers to
+the HyPar solution, ROM (reduced-order model) refers to the DMD solution.
+@image html Solution_1DShuOsherProblem_libROM_DMD.png
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/pde_rom_diff.dat
+The numbers are: number of grid points (#HyPar::dim_global), 
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up), and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error
+(or give some HDF5 file-writing error); the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/out.log
 
