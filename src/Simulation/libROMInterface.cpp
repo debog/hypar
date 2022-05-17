@@ -150,20 +150,26 @@ void DMDROMObject::train()
 void DMDROMObject::save(const std::string& a_fname_root /*!< Filename root */)
 {
   std::string fname_root = m_dirname + "/";
+  std::string summary_fname_root = m_dirname + "/";
   if (a_fname_root == "") {
     fname_root += "dmdobj_";
+    summary_fname_root += "dmd_summary_";
   } else {
-    fname_root += a_fname_root;
+    fname_root += (a_fname_root+"_dmdobj_");
+    summary_fname_root += (a_fname_root+"_dmd_summary_");
   }
 
   for (int i = 0; i < m_dmd.size(); i++) {
     char idx_string[_MAX_STRING_SIZE_];
     sprintf(idx_string, "%04d", i);
     std::string fname = fname_root + std::string(idx_string);
+    std::string summary_fname = summary_fname_root + std::string(idx_string);
     if (!m_rank) {
-      printf("  Saving DMD object with filename root %s.\n", fname.c_str());
+      printf( "  Saving DMD object and summary (filenames %s, %s).\n", 
+              fname.c_str(), summary_fname.c_str() );
     }
     m_dmd[i]->save(fname);
+    //m_dmd[i]->summary(summary_fname);
   }
 
   return;
