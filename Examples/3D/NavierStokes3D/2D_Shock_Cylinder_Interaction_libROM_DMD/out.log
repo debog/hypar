@@ -1,0 +1,194 @@
+HyPar - Parallel (MPI) version with 16 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 3
+  No. of variables                           : 5
+  Domain size                                : 256 256 3 
+  Processes along each dimension             : 4 4 1 
+  Exact solution domain size                 : 256 256 3 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 400
+  Restart iteration                          : 0
+  Time integration scheme                    : rk (44)
+  Spatial discretization scheme (hyperbolic) : weno5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : characteristic
+  Spatial discretization type   (parabolic ) : nonconservative-1stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 5.000000E-03
+  Check for conservation                     : no
+  Screen output iterations                   : 10
+  File output iterations                     : 40
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : no
+  Physical model                             : navierstokes3d
+  Immersed Body                              : cylinder.stl
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  1.3577505742780760E+01
+ 1:  6.1066251110367062E+00
+ 2:  0.0000000000000000E+00
+ 3:  0.0000000000000000E+00
+ 4:  5.1720680582882707E+01
+Reading boundary conditions from boundary.inp.
+  Boundary                subsonic-inflow:  Along dimension  0 and face +1
+  Boundary              supersonic-inflow:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+  Boundary                       periodic:  Along dimension  2 and face +1
+  Boundary                       periodic:  Along dimension  2 and face -1
+6 boundary condition(s) read.
+Immersed body read from cylinder.stl:
+    Number of facets: 628
+    Bounding box: [-1.0,1.0] X [-1.0,1.0] X [-5.0,5.0]
+    Number of grid points inside immersed body: 6408 ( 3.3%).
+    Number of immersed boundary points        : 1242 ( 0.6%).
+    Immersed body simulation mode             : 2d (xy).
+Initializing solvers.
+Reading WENO parameters from weno.inp.
+Initializing physics. Model = "navierstokes3d"
+Reading physical model inputs from file "physics.inp".
+Writing solution file iblank_00000.bin.
+Setting up time integration.
+Setting up libROM interface.
+libROM inputs and parameters:
+  reduced model dimensionality:  32
+  sampling frequency:  1
+  mode: train
+  type: DMD
+  save to file: true
+  local vector size: 61440
+libROM DMD inputs:
+  number of samples per window:   100
+  directory name for DMD onjects: DMD
+Solving in time (from 0 to 400 iterations)
+Writing immersed body surface data file surface00000.dat.
+Writing solution file op_00000.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.000000 (total: 1).
+iter=     10  t=5.000E-02  CFL=5.878E-01  norm=7.4787E-01  wctime: 1.7E+00 (s)  
+iter=     20  t=1.000E-01  CFL=5.862E-01  norm=6.8901E-01  wctime: 1.9E+00 (s)  
+iter=     30  t=1.500E-01  CFL=5.859E-01  norm=7.4701E-01  wctime: 2.1E+00 (s)  
+iter=     40  t=2.000E-01  CFL=5.857E-01  norm=6.8995E-01  wctime: 2.0E+00 (s)  
+Writing immersed body surface data file surface00001.dat.
+Writing solution file op_00001.bin.
+iter=     50  t=2.500E-01  CFL=5.856E-01  norm=7.5315E-01  wctime: 2.1E+00 (s)  
+iter=     60  t=3.000E-01  CFL=1.052E+00  norm=6.7415E-01  wctime: 2.1E+00 (s)  
+iter=     70  t=3.500E-01  CFL=9.818E-01  norm=7.0618E-01  wctime: 2.1E+00 (s)  
+iter=     80  t=4.000E-01  CFL=9.227E-01  norm=6.5493E-01  wctime: 2.1E+00 (s)  
+Writing immersed body surface data file surface00002.dat.
+Writing solution file op_00002.bin.
+iter=     90  t=4.500E-01  CFL=1.003E+00  norm=7.0464E-01  wctime: 2.1E+00 (s)  
+iter=    100  t=5.000E-01  CFL=1.150E+00  norm=6.8393E-01  wctime: 2.1E+00 (s)  
+DMDROMObject::takeSample() - creating new DMD object, t=0.500000 (total: 2).
+iter=    110  t=5.500E-01  CFL=1.235E+00  norm=7.1132E-01  wctime: 2.2E+00 (s)  
+iter=    120  t=6.000E-01  CFL=1.324E+00  norm=6.9216E-01  wctime: 2.5E+00 (s)  
+Writing immersed body surface data file surface00003.dat.
+Writing solution file op_00003.bin.
+iter=    130  t=6.500E-01  CFL=1.358E+00  norm=7.0342E-01  wctime: 2.5E+00 (s)  
+iter=    140  t=7.000E-01  CFL=1.397E+00  norm=7.0115E-01  wctime: 2.4E+00 (s)  
+iter=    150  t=7.500E-01  CFL=1.449E+00  norm=6.8685E-01  wctime: 2.1E+00 (s)  
+iter=    160  t=8.000E-01  CFL=1.460E+00  norm=7.0893E-01  wctime: 2.1E+00 (s)  
+Writing immersed body surface data file surface00004.dat.
+Writing solution file op_00004.bin.
+iter=    170  t=8.500E-01  CFL=1.463E+00  norm=6.8381E-01  wctime: 2.1E+00 (s)  
+iter=    180  t=9.000E-01  CFL=1.464E+00  norm=7.0983E-01  wctime: 2.1E+00 (s)  
+iter=    190  t=9.500E-01  CFL=1.468E+00  norm=6.7942E-01  wctime: 2.1E+00 (s)  
+iter=    200  t=1.000E+00  CFL=1.480E+00  norm=7.0922E-01  wctime: 2.2E+00 (s)  
+Writing immersed body surface data file surface00005.dat.
+Writing solution file op_00005.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=1.000000 (total: 3).
+iter=    210  t=1.050E+00  CFL=1.492E+00  norm=6.7655E-01  wctime: 2.2E+00 (s)  
+iter=    220  t=1.100E+00  CFL=1.497E+00  norm=7.0630E-01  wctime: 2.2E+00 (s)  
+iter=    230  t=1.150E+00  CFL=1.506E+00  norm=6.7587E-01  wctime: 2.2E+00 (s)  
+iter=    240  t=1.200E+00  CFL=1.510E+00  norm=7.0913E-01  wctime: 2.2E+00 (s)  
+Writing immersed body surface data file surface00006.dat.
+Writing solution file op_00006.bin.
+iter=    250  t=1.250E+00  CFL=1.513E+00  norm=6.7654E-01  wctime: 2.3E+00 (s)  
+iter=    260  t=1.300E+00  CFL=1.509E+00  norm=7.0671E-01  wctime: 2.6E+00 (s)  
+iter=    270  t=1.350E+00  CFL=1.505E+00  norm=6.8107E-01  wctime: 2.7E+00 (s)  
+iter=    280  t=1.400E+00  CFL=1.503E+00  norm=7.0402E-01  wctime: 2.7E+00 (s)  
+Writing immersed body surface data file surface00007.dat.
+Writing solution file op_00007.bin.
+iter=    290  t=1.450E+00  CFL=1.501E+00  norm=6.9051E-01  wctime: 2.2E+00 (s)  
+iter=    300  t=1.500E+00  CFL=1.496E+00  norm=7.0816E-01  wctime: 2.2E+00 (s)  
+DMDROMObject::takeSample() - creating new DMD object, t=1.500000 (total: 4).
+iter=    310  t=1.550E+00  CFL=1.492E+00  norm=6.9908E-01  wctime: 2.2E+00 (s)  
+iter=    320  t=1.600E+00  CFL=1.487E+00  norm=7.1111E-01  wctime: 2.3E+00 (s)  
+Writing immersed body surface data file surface00008.dat.
+Writing solution file op_00008.bin.
+iter=    330  t=1.650E+00  CFL=1.485E+00  norm=7.0298E-01  wctime: 2.3E+00 (s)  
+iter=    340  t=1.700E+00  CFL=1.481E+00  norm=7.0506E-01  wctime: 2.3E+00 (s)  
+iter=    350  t=1.750E+00  CFL=1.478E+00  norm=7.0788E-01  wctime: 2.3E+00 (s)  
+iter=    360  t=1.800E+00  CFL=1.476E+00  norm=7.0432E-01  wctime: 2.3E+00 (s)  
+Writing immersed body surface data file surface00009.dat.
+Writing solution file op_00009.bin.
+iter=    370  t=1.850E+00  CFL=1.472E+00  norm=7.1498E-01  wctime: 2.3E+00 (s)  
+iter=    380  t=1.900E+00  CFL=1.469E+00  norm=7.0543E-01  wctime: 2.2E+00 (s)  
+iter=    390  t=1.950E+00  CFL=1.471E+00  norm=7.2006E-01  wctime: 2.1E+00 (s)  
+iter=    400  t=2.000E+00  CFL=1.469E+00  norm=7.0183E-01  wctime: 1.8E+00 (s)  
+Completed time integration (Final time: 2.000000), total wctime: 815.048244 (seconds).
+Writing immersed body surface data file surface00010.dat.
+Writing solution file op_00010.bin.
+libROM: Training ROM.
+DMDROMObject::train() - training DMD object 0 with 101 samples.
+Using 32 basis vectors out of 100.
+DMDROMObject::train() - training DMD object 1 with 101 samples.
+Using 32 basis vectors out of 100.
+DMDROMObject::train() - training DMD object 2 with 101 samples.
+Using 32 basis vectors out of 100.
+DMDROMObject::train() - training DMD object 3 with 100 samples.
+Using 32 basis vectors out of 99.
+libROM: total training wallclock time: 155.407039 (seconds).
+libROM: Predicting solution at time 0.0000e+00 using ROM.
+libROM:   wallclock time: 2.914239 (seconds).
+Writing solution file op_rom_00000.bin.
+libROM: Predicting solution at time 2.0000e-01 using ROM.
+libROM:   wallclock time: 2.913659 (seconds).
+Writing solution file op_rom_00001.bin.
+libROM: Predicting solution at time 4.0000e-01 using ROM.
+libROM:   wallclock time: 2.914199 (seconds).
+Writing solution file op_rom_00002.bin.
+libROM: Predicting solution at time 6.0000e-01 using ROM.
+libROM:   wallclock time: 2.979725 (seconds).
+Writing solution file op_rom_00003.bin.
+libROM: Predicting solution at time 8.0000e-01 using ROM.
+libROM:   wallclock time: 3.099582 (seconds).
+Writing solution file op_rom_00004.bin.
+libROM: Predicting solution at time 1.0000e+00 using ROM.
+libROM:   wallclock time: 2.960964 (seconds).
+Writing solution file op_rom_00005.bin.
+libROM: Predicting solution at time 1.2000e+00 using ROM.
+libROM:   wallclock time: 2.940771 (seconds).
+Writing solution file op_rom_00006.bin.
+libROM: Predicting solution at time 1.4000e+00 using ROM.
+libROM:   wallclock time: 3.098174 (seconds).
+Writing solution file op_rom_00007.bin.
+libROM: Predicting solution at time 1.6000e+00 using ROM.
+libROM:   wallclock time: 2.902298 (seconds).
+Writing solution file op_rom_00008.bin.
+libROM: Predicting solution at time 1.8000e+00 using ROM.
+libROM:   wallclock time: 2.954182 (seconds).
+Writing solution file op_rom_00009.bin.
+libROM: Predicting solution at time 2.0000e+00 using ROM.
+libROM:   wallclock time: 2.914002 (seconds).
+libROM:   Calculating diff between PDE and ROM solutions.
+Writing solution file op_rom_00010.bin.
+libROM: total prediction/query wallclock time: 32.591795 (seconds).
+libROMInterface::saveROM() - saving ROM objects.
+  Saving DMD object with filename root DMD/dmdobj_0000.
+  Saving DMD object with filename root DMD/dmdobj_0001.
+  Saving DMD object with filename root DMD/dmdobj_0002.
+  Saving DMD object with filename root DMD/dmdobj_0003.
+Norms of the diff between ROM and PDE solutions for domain 0:
+  L1         Norm            : 6.4931422313752370E-03
+  L2         Norm            : 1.9356397835829150E-02
+  Linfinity  Norm            : 9.1818439088445988E-02
+Solver runtime (in seconds): 1.0099263970000000E+03
+Total  runtime (in seconds): 1.0104446960000000E+03
+Deallocating arrays.
+Finished.

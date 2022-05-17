@@ -4449,7 +4449,7 @@ Reference:
 
 Initial solution: see reference
 
-Other parameters (all dimensional quantities are in SI units):
+Other parameters:
   + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes3D::gamma)
 
 Numerical Method:
@@ -5946,7 +5946,7 @@ Dynamic Mode Decomposition
 \n
 \subpage ns3d_cylinder_steady_incompressible_viscous_librom_dmd \n
 \subpage ns3d_cylinder_unsteady_incompressible_viscous_librom_dmd \n
-
+\subpage ns3d_shock_cylinder_interaction_librom_dmd \n
 
 \page linear_adv_sine_librom_dmd 1D Linear Advection - Sine Wave (Training a DMD)
 
@@ -7311,3 +7311,129 @@ is readable by libROM.
 Expected screen output:
 \include 1D/Euler1D/ShuOsherProblem_libROM_DMD/out.log
 
+\page ns3d_shock_cylinder_interaction_librom_dmd 3D Navier-Stokes - Inviscid Shock-Cylinder Interaction (Training a Time-Windowed DMD)
+
+See \ref ns3d_shock_cylinder_interaction to familiarize yourself with this case.
+
+Location: \b hypar/Examples/3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD
+
+Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h - by default
+                     #NavierStokes3D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 3D Euler
+                     equations are solved.)
+
+Domain: \f$-2.5 \le x \le 7.5\f$, \f$-5 \le y \le 5\f$
+\b Note: This is a 2D flow simulated using a 3-dimensional setup by taking the length of the
+         domain along \a z to be very small and with only 3 grid points (the domain size along \a z
+         \b must \b be smaller than the cylinder length).
+
+Geometry: A cylinder of radius 1.0 centered at (0,0)
+          (\b hypar/Examples/STLGeometries/cylinder.stl)
+
+Boundary conditions:
+  + xmin: Subsonic inflow #_SUBSONIC_INFLOW_ (with post-shock flow conditions)
+  + xmax: Supersonic inflow #_SUPERSONIC_OUTFLOW_ (with pre-shock flow conditions)
+  + ymin and ymax: Slip walls #_SLIP_WALL_
+  + zmin and zmax: Periodic #_PERIODIC_ (to simulate a 2D flow in the x-y plane)
+  + The immersed body wall is specified as adiabatic (#_IB_ADIABATIC_);
+    (this is the default).
+
+Reference:
++ O. Boiron, G. Chiavassa, R. Donat, A high-resolution penalization method for large Mach number 
+  flows in the presence of obstacles, Computers & Fluids, 38 (2009), pp. 703-714, Section 5.1
+
+Initial solution: see reference
+
+Other parameters:
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes3D::gamma)
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 32 (DMDROMObject::m_rdim)
+ + Number of samples per time window: 100 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+These files are all located in: \b hypar/Examples/3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/
+
+\b librom.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/librom.inp
+
+\b solver.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/solver.inp
+
+\b boundary.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/boundary.inp
+
+\b physics.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/physics.inp
+
+\b cylinder.stl : the filename "cylinder.stl" \b must match
+the input for \a immersed_body in \a solver.inp.\n
+Located at \b hypar/Examples/STLGeometries/cylinder.stl
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory.
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/aux/init.c
+
+Output:
+-------
+
+Note that \b iproc is set to 
+
+      4 4 1
+
+in \b solver.inp (i.e., 4 processors along \a x, 4
+processors along \a y, and 1 processor along \a z). Thus, 
+this example should be run with 16 MPI ranks (or change \b iproc).
+
+Please see the original example in the "Immersed Boundaries Examples" section
+for a full description of the output files and how to view them. The following only
+contains libROM-specific comments.
+
+After running the code, there should be the following output
+files:
+
++ 11 output file \b op_00000.bin, ..., op_00010.bin; 
+these are the \b HyPar solutions\b. 
+
++ 11 output file \b op_rom_00000.bin, ..., op_rom_00010.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot3d, and Tecplot/VisIt
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the density contours for the final solution (t=2).
+FOM (full-order model) refers to the HyPar solution, ROM (reduced-order model) refers to 
+the DMD solution, and Diff is the difference between the two.
+@image html Solution_3DNavStokShockCyl_Density_libROM_DMD.png
+
+\b Wall \b clock \b times:
+- PDE solution: 815 seconds
+- DMD training time: 155 seconds
+- DMD prediction/query time: 33 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Expected screen output:
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/out.log
