@@ -1,0 +1,676 @@
+HyPar - Parallel (MPI) version with 36 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 4
+  Domain size                                : 201 201 
+  Processes along each dimension             : 6 6 
+  Exact solution domain size                 : 201 201 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 70000
+  Restart iteration                          : 0
+  Time integration scheme                    : rk (ssprk3)
+  Spatial discretization scheme (hyperbolic) : weno5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : components
+  Spatial discretization type   (parabolic ) : nonconservative-2stage
+  Spatial discretization scheme (parabolic ) : 4
+  Time Step                                  : 1.000000E-02
+  Check for conservation                     : no
+  Screen output iterations                   : 175
+  File output iterations                     : 1750
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : no
+  Physical model                             : navierstokes2d
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  1.1258435182264755E+06
+ 1:  0.0000000000000000E+00
+ 2:  0.0000000000000000E+00
+ 3:  2.3852437878605548E+11
+Reading boundary conditions from boundary.inp.
+  Boundary                      slip-wall:  Along dimension  0 and face +1
+  Boundary                      slip-wall:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+Reading WENO parameters from weno.inp.
+Initializing physics. Model = "navierstokes2d"
+Reading physical model inputs from file "physics.inp".
+Setting up time integration.
+Setting up libROM interface.
+libROM inputs and parameters:
+  reduced model dimensionality:  16
+  sampling frequency:  7
+  mode: train
+  type: DMD
+  save to file: true
+  local vector size: 4356
+libROM DMD inputs:
+  number of samples per window:   1000
+  directory name for DMD onjects: DMD
+Solving in time (from 0 to 70000 iterations)
+Writing solution file op_00000.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=0.000000 (total: 1).
+iter=    175  t=1.750E+00  CFL=6.945E-01  norm=1.7796E-02  wctime: 2.7E-02 (s)  
+iter=    350  t=3.500E+00  CFL=6.945E-01  norm=1.6966E-02  wctime: 2.7E-02 (s)  
+iter=    525  t=5.250E+00  CFL=6.945E-01  norm=1.2958E-02  wctime: 2.7E-02 (s)  
+iter=    700  t=7.000E+00  CFL=6.945E-01  norm=1.7251E-02  wctime: 2.7E-02 (s)  
+iter=    875  t=8.750E+00  CFL=6.945E-01  norm=1.2309E-02  wctime: 2.7E-02 (s)  
+iter=   1050  t=1.050E+01  CFL=6.945E-01  norm=1.5115E-02  wctime: 2.7E-02 (s)  
+iter=   1225  t=1.225E+01  CFL=6.945E-01  norm=1.5360E-02  wctime: 2.7E-02 (s)  
+iter=   1400  t=1.400E+01  CFL=6.945E-01  norm=1.6930E-02  wctime: 2.7E-02 (s)  
+iter=   1575  t=1.575E+01  CFL=6.945E-01  norm=1.5629E-02  wctime: 2.7E-02 (s)  
+iter=   1750  t=1.750E+01  CFL=6.945E-01  norm=8.5366E-03  wctime: 2.7E-02 (s)  
+Writing solution file op_00001.bin.
+iter=   1925  t=1.925E+01  CFL=6.945E-01  norm=1.8304E-02  wctime: 2.7E-02 (s)  
+iter=   2100  t=2.100E+01  CFL=6.945E-01  norm=1.5000E-02  wctime: 2.7E-02 (s)  
+iter=   2275  t=2.275E+01  CFL=6.945E-01  norm=1.3802E-02  wctime: 2.7E-02 (s)  
+iter=   2450  t=2.450E+01  CFL=6.945E-01  norm=1.7930E-02  wctime: 2.7E-02 (s)  
+iter=   2625  t=2.625E+01  CFL=6.945E-01  norm=1.0743E-02  wctime: 2.7E-02 (s)  
+iter=   2800  t=2.800E+01  CFL=6.945E-01  norm=1.6142E-02  wctime: 2.7E-02 (s)  
+iter=   2975  t=2.975E+01  CFL=6.945E-01  norm=1.5501E-02  wctime: 2.7E-02 (s)  
+iter=   3150  t=3.150E+01  CFL=6.945E-01  norm=1.5750E-02  wctime: 2.7E-02 (s)  
+iter=   3325  t=3.325E+01  CFL=6.945E-01  norm=1.6320E-02  wctime: 2.7E-02 (s)  
+iter=   3500  t=3.500E+01  CFL=6.945E-01  norm=9.5676E-03  wctime: 2.7E-02 (s)  
+Writing solution file op_00002.bin.
+iter=   3675  t=3.675E+01  CFL=6.945E-01  norm=1.7123E-02  wctime: 2.7E-02 (s)  
+iter=   3850  t=3.850E+01  CFL=6.946E-01  norm=1.5272E-02  wctime: 2.7E-02 (s)  
+iter=   4025  t=4.025E+01  CFL=6.946E-01  norm=1.4411E-02  wctime: 2.7E-02 (s)  
+iter=   4200  t=4.200E+01  CFL=6.946E-01  norm=1.7949E-02  wctime: 2.7E-02 (s)  
+iter=   4375  t=4.375E+01  CFL=6.946E-01  norm=1.0287E-02  wctime: 2.7E-02 (s)  
+iter=   4550  t=4.550E+01  CFL=6.946E-01  norm=1.5444E-02  wctime: 2.7E-02 (s)  
+iter=   4725  t=4.725E+01  CFL=6.946E-01  norm=1.5892E-02  wctime: 2.7E-02 (s)  
+iter=   4900  t=4.900E+01  CFL=6.946E-01  norm=1.6186E-02  wctime: 2.7E-02 (s)  
+iter=   5075  t=5.075E+01  CFL=6.946E-01  norm=1.6232E-02  wctime: 2.7E-02 (s)  
+iter=   5250  t=5.250E+01  CFL=6.946E-01  norm=9.9337E-03  wctime: 2.7E-02 (s)  
+Writing solution file op_00003.bin.
+iter=   5425  t=5.425E+01  CFL=6.946E-01  norm=1.6764E-02  wctime: 2.7E-02 (s)  
+iter=   5600  t=5.600E+01  CFL=6.946E-01  norm=1.4792E-02  wctime: 2.7E-02 (s)  
+iter=   5775  t=5.775E+01  CFL=6.946E-01  norm=1.5596E-02  wctime: 2.7E-02 (s)  
+iter=   5950  t=5.950E+01  CFL=6.946E-01  norm=1.7705E-02  wctime: 2.7E-02 (s)  
+iter=   6125  t=6.125E+01  CFL=6.946E-01  norm=9.0662E-03  wctime: 2.7E-02 (s)  
+iter=   6300  t=6.300E+01  CFL=6.946E-01  norm=1.6537E-02  wctime: 2.7E-02 (s)  
+iter=   6475  t=6.475E+01  CFL=6.946E-01  norm=1.6049E-02  wctime: 2.7E-02 (s)  
+iter=   6650  t=6.650E+01  CFL=6.946E-01  norm=1.4616E-02  wctime: 2.7E-02 (s)  
+iter=   6825  t=6.825E+01  CFL=6.946E-01  norm=1.7150E-02  wctime: 2.7E-02 (s)  
+iter=   7000  t=7.000E+01  CFL=6.946E-01  norm=1.0115E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00004.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=70.000000 (total: 2).
+iter=   7175  t=7.175E+01  CFL=6.946E-01  norm=1.6027E-02  wctime: 2.7E-02 (s)  
+iter=   7350  t=7.350E+01  CFL=6.946E-01  norm=1.6267E-02  wctime: 2.7E-02 (s)  
+iter=   7525  t=7.525E+01  CFL=6.946E-01  norm=1.4899E-02  wctime: 2.7E-02 (s)  
+iter=   7700  t=7.700E+01  CFL=6.946E-01  norm=1.6016E-02  wctime: 2.7E-02 (s)  
+iter=   7875  t=7.875E+01  CFL=6.946E-01  norm=1.2246E-02  wctime: 2.7E-02 (s)  
+iter=   8050  t=8.050E+01  CFL=6.947E-01  norm=1.6520E-02  wctime: 2.7E-02 (s)  
+iter=   8225  t=8.225E+01  CFL=6.947E-01  norm=1.4198E-02  wctime: 2.7E-02 (s)  
+iter=   8400  t=8.400E+01  CFL=6.947E-01  norm=1.6334E-02  wctime: 2.7E-02 (s)  
+iter=   8575  t=8.575E+01  CFL=6.947E-01  norm=1.6935E-02  wctime: 2.7E-02 (s)  
+iter=   8750  t=8.750E+01  CFL=6.947E-01  norm=7.8059E-03  wctime: 2.7E-02 (s)  
+Writing solution file op_00005.bin.
+iter=   8925  t=8.925E+01  CFL=6.947E-01  norm=1.7503E-02  wctime: 2.7E-02 (s)  
+iter=   9100  t=9.100E+01  CFL=6.947E-01  norm=1.5821E-02  wctime: 2.7E-02 (s)  
+iter=   9275  t=9.275E+01  CFL=6.947E-01  norm=1.3280E-02  wctime: 2.7E-02 (s)  
+iter=   9450  t=9.450E+01  CFL=6.947E-01  norm=1.8122E-02  wctime: 2.7E-02 (s)  
+iter=   9625  t=9.625E+01  CFL=6.947E-01  norm=1.2310E-02  wctime: 2.7E-02 (s)  
+iter=   9800  t=9.800E+01  CFL=6.947E-01  norm=1.4353E-02  wctime: 2.7E-02 (s)  
+iter=   9975  t=9.975E+01  CFL=6.947E-01  norm=1.5512E-02  wctime: 2.7E-02 (s)  
+iter=  10150  t=1.015E+02  CFL=6.947E-01  norm=1.7008E-02  wctime: 2.7E-02 (s)  
+iter=  10325  t=1.033E+02  CFL=6.947E-01  norm=1.5754E-02  wctime: 2.7E-02 (s)  
+iter=  10500  t=1.050E+02  CFL=6.947E-01  norm=9.9185E-03  wctime: 2.7E-02 (s)  
+Writing solution file op_00006.bin.
+iter=  10675  t=1.068E+02  CFL=6.947E-01  norm=1.7376E-02  wctime: 2.7E-02 (s)  
+iter=  10850  t=1.085E+02  CFL=6.947E-01  norm=1.4497E-02  wctime: 2.7E-02 (s)  
+iter=  11025  t=1.103E+02  CFL=6.947E-01  norm=1.4675E-02  wctime: 2.7E-02 (s)  
+iter=  11200  t=1.120E+02  CFL=6.947E-01  norm=1.8319E-02  wctime: 2.7E-02 (s)  
+iter=  11375  t=1.138E+02  CFL=6.947E-01  norm=1.0554E-02  wctime: 2.7E-02 (s)  
+iter=  11550  t=1.155E+02  CFL=6.947E-01  norm=1.4834E-02  wctime: 2.7E-02 (s)  
+iter=  11725  t=1.173E+02  CFL=6.947E-01  norm=1.6262E-02  wctime: 2.7E-02 (s)  
+iter=  11900  t=1.190E+02  CFL=6.947E-01  norm=1.6490E-02  wctime: 2.7E-02 (s)  
+iter=  12075  t=1.208E+02  CFL=6.947E-01  norm=1.5372E-02  wctime: 2.7E-02 (s)  
+iter=  12250  t=1.225E+02  CFL=6.947E-01  norm=1.0051E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00007.bin.
+iter=  12425  t=1.243E+02  CFL=6.947E-01  norm=1.7643E-02  wctime: 2.7E-02 (s)  
+iter=  12600  t=1.260E+02  CFL=6.947E-01  norm=1.4459E-02  wctime: 2.7E-02 (s)  
+iter=  12775  t=1.278E+02  CFL=6.948E-01  norm=1.4673E-02  wctime: 2.7E-02 (s)  
+iter=  12950  t=1.295E+02  CFL=6.948E-01  norm=1.8512E-02  wctime: 2.7E-02 (s)  
+iter=  13125  t=1.313E+02  CFL=6.948E-01  norm=1.0056E-02  wctime: 2.7E-02 (s)  
+iter=  13300  t=1.330E+02  CFL=6.948E-01  norm=1.4651E-02  wctime: 2.7E-02 (s)  
+iter=  13475  t=1.348E+02  CFL=6.948E-01  norm=1.7205E-02  wctime: 2.7E-02 (s)  
+iter=  13650  t=1.365E+02  CFL=6.948E-01  norm=1.5860E-02  wctime: 2.7E-02 (s)  
+iter=  13825  t=1.383E+02  CFL=6.948E-01  norm=1.4556E-02  wctime: 2.6E-02 (s)  
+iter=  14000  t=1.400E+02  CFL=6.948E-01  norm=1.2739E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00008.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=140.000000 (total: 3).
+iter=  14175  t=1.418E+02  CFL=6.948E-01  norm=1.7297E-02  wctime: 2.7E-02 (s)  
+iter=  14350  t=1.435E+02  CFL=6.948E-01  norm=1.2311E-02  wctime: 2.7E-02 (s)  
+iter=  14525  t=1.453E+02  CFL=6.948E-01  norm=1.6290E-02  wctime: 2.7E-02 (s)  
+iter=  14700  t=1.470E+02  CFL=6.948E-01  norm=1.8716E-02  wctime: 2.7E-02 (s)  
+iter=  14875  t=1.488E+02  CFL=6.948E-01  norm=7.7592E-03  wctime: 2.7E-02 (s)  
+iter=  15050  t=1.505E+02  CFL=6.948E-01  norm=1.6481E-02  wctime: 2.7E-02 (s)  
+iter=  15225  t=1.523E+02  CFL=6.948E-01  norm=1.6458E-02  wctime: 2.6E-02 (s)  
+iter=  15400  t=1.540E+02  CFL=6.948E-01  norm=1.3962E-02  wctime: 2.6E-02 (s)  
+iter=  15575  t=1.558E+02  CFL=6.948E-01  norm=1.6848E-02  wctime: 2.7E-02 (s)  
+iter=  15750  t=1.575E+02  CFL=6.948E-01  norm=1.2926E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00009.bin.
+iter=  15925  t=1.593E+02  CFL=6.948E-01  norm=1.5073E-02  wctime: 2.7E-02 (s)  
+iter=  16100  t=1.610E+02  CFL=6.948E-01  norm=1.4298E-02  wctime: 2.7E-02 (s)  
+iter=  16275  t=1.627E+02  CFL=6.948E-01  norm=1.6680E-02  wctime: 2.7E-02 (s)  
+iter=  16450  t=1.645E+02  CFL=6.948E-01  norm=1.7148E-02  wctime: 2.7E-02 (s)  
+iter=  16625  t=1.662E+02  CFL=6.948E-01  norm=9.9299E-03  wctime: 2.7E-02 (s)  
+iter=  16800  t=1.680E+02  CFL=6.948E-01  norm=1.6664E-02  wctime: 2.7E-02 (s)  
+iter=  16975  t=1.697E+02  CFL=6.948E-01  norm=1.5097E-02  wctime: 2.7E-02 (s)  
+iter=  17150  t=1.715E+02  CFL=6.948E-01  norm=1.5731E-02  wctime: 2.7E-02 (s)  
+iter=  17325  t=1.732E+02  CFL=6.948E-01  norm=1.7028E-02  wctime: 2.7E-02 (s)  
+iter=  17500  t=1.750E+02  CFL=6.948E-01  norm=1.0333E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00010.bin.
+iter=  17675  t=1.767E+02  CFL=6.948E-01  norm=1.6269E-02  wctime: 2.7E-02 (s)  
+iter=  17850  t=1.785E+02  CFL=6.948E-01  norm=1.5066E-02  wctime: 2.7E-02 (s)  
+iter=  18025  t=1.802E+02  CFL=6.948E-01  norm=1.5868E-02  wctime: 2.7E-02 (s)  
+iter=  18200  t=1.820E+02  CFL=6.948E-01  norm=1.7577E-02  wctime: 2.7E-02 (s)  
+iter=  18375  t=1.837E+02  CFL=6.948E-01  norm=1.0034E-02  wctime: 2.7E-02 (s)  
+iter=  18550  t=1.855E+02  CFL=6.948E-01  norm=1.5917E-02  wctime: 2.7E-02 (s)  
+iter=  18725  t=1.872E+02  CFL=6.948E-01  norm=1.6010E-02  wctime: 2.7E-02 (s)  
+iter=  18900  t=1.890E+02  CFL=6.948E-01  norm=1.5515E-02  wctime: 2.7E-02 (s)  
+iter=  19075  t=1.907E+02  CFL=6.948E-01  norm=1.6451E-02  wctime: 2.7E-02 (s)  
+iter=  19250  t=1.925E+02  CFL=6.948E-01  norm=1.1220E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00011.bin.
+iter=  19425  t=1.942E+02  CFL=6.948E-01  norm=1.6471E-02  wctime: 2.7E-02 (s)  
+iter=  19600  t=1.960E+02  CFL=6.948E-01  norm=1.4355E-02  wctime: 2.7E-02 (s)  
+iter=  19775  t=1.977E+02  CFL=6.948E-01  norm=1.5845E-02  wctime: 2.7E-02 (s)  
+iter=  19950  t=1.995E+02  CFL=6.948E-01  norm=1.7555E-02  wctime: 2.7E-02 (s)  
+iter=  20125  t=2.012E+02  CFL=6.948E-01  norm=1.0791E-02  wctime: 2.7E-02 (s)  
+iter=  20300  t=2.030E+02  CFL=6.948E-01  norm=1.6078E-02  wctime: 2.7E-02 (s)  
+iter=  20475  t=2.047E+02  CFL=6.948E-01  norm=1.5319E-02  wctime: 2.7E-02 (s)  
+iter=  20650  t=2.065E+02  CFL=6.948E-01  norm=1.5574E-02  wctime: 2.7E-02 (s)  
+iter=  20825  t=2.082E+02  CFL=6.948E-01  norm=1.6758E-02  wctime: 2.7E-02 (s)  
+iter=  21000  t=2.100E+02  CFL=6.948E-01  norm=1.0988E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00012.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=210.000000 (total: 4).
+iter=  21175  t=2.117E+02  CFL=6.948E-01  norm=1.6970E-02  wctime: 2.7E-02 (s)  
+iter=  21350  t=2.135E+02  CFL=6.948E-01  norm=1.3972E-02  wctime: 2.7E-02 (s)  
+iter=  21525  t=2.152E+02  CFL=6.948E-01  norm=1.5105E-02  wctime: 2.7E-02 (s)  
+iter=  21700  t=2.170E+02  CFL=6.948E-01  norm=1.9028E-02  wctime: 2.6E-02 (s)  
+iter=  21875  t=2.187E+02  CFL=6.948E-01  norm=9.9055E-03  wctime: 2.7E-02 (s)  
+iter=  22050  t=2.205E+02  CFL=6.948E-01  norm=1.4728E-02  wctime: 2.7E-02 (s)  
+iter=  22225  t=2.222E+02  CFL=6.948E-01  norm=1.6859E-02  wctime: 2.7E-02 (s)  
+iter=  22400  t=2.240E+02  CFL=6.948E-01  norm=1.5606E-02  wctime: 2.7E-02 (s)  
+iter=  22575  t=2.257E+02  CFL=6.948E-01  norm=1.5595E-02  wctime: 2.7E-02 (s)  
+iter=  22750  t=2.275E+02  CFL=6.948E-01  norm=1.3169E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00013.bin.
+iter=  22925  t=2.292E+02  CFL=6.949E-01  norm=1.6047E-02  wctime: 2.7E-02 (s)  
+iter=  23100  t=2.310E+02  CFL=6.949E-01  norm=1.2560E-02  wctime: 2.7E-02 (s)  
+iter=  23275  t=2.327E+02  CFL=6.949E-01  norm=1.7214E-02  wctime: 2.7E-02 (s)  
+iter=  23450  t=2.345E+02  CFL=6.949E-01  norm=1.8710E-02  wctime: 2.7E-02 (s)  
+iter=  23625  t=2.362E+02  CFL=6.949E-01  norm=5.8671E-03  wctime: 2.7E-02 (s)  
+iter=  23800  t=2.380E+02  CFL=6.949E-01  norm=1.6826E-02  wctime: 2.7E-02 (s)  
+iter=  23975  t=2.397E+02  CFL=6.949E-01  norm=1.6884E-02  wctime: 2.7E-02 (s)  
+iter=  24150  t=2.415E+02  CFL=6.949E-01  norm=1.3316E-02  wctime: 2.7E-02 (s)  
+iter=  24325  t=2.432E+02  CFL=6.949E-01  norm=1.7172E-02  wctime: 2.7E-02 (s)  
+iter=  24500  t=2.450E+02  CFL=6.949E-01  norm=1.3448E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00014.bin.
+iter=  24675  t=2.467E+02  CFL=6.949E-01  norm=1.4446E-02  wctime: 2.7E-02 (s)  
+iter=  24850  t=2.485E+02  CFL=6.949E-01  norm=1.4701E-02  wctime: 2.7E-02 (s)  
+iter=  25025  t=2.502E+02  CFL=6.949E-01  norm=1.7305E-02  wctime: 2.7E-02 (s)  
+iter=  25200  t=2.520E+02  CFL=6.949E-01  norm=1.6662E-02  wctime: 2.7E-02 (s)  
+iter=  25375  t=2.537E+02  CFL=6.949E-01  norm=9.4366E-03  wctime: 2.7E-02 (s)  
+iter=  25550  t=2.555E+02  CFL=6.949E-01  norm=1.7577E-02  wctime: 2.7E-02 (s)  
+iter=  25725  t=2.572E+02  CFL=6.949E-01  norm=1.5602E-02  wctime: 2.7E-02 (s)  
+iter=  25900  t=2.590E+02  CFL=6.949E-01  norm=1.3739E-02  wctime: 2.7E-02 (s)  
+iter=  26075  t=2.607E+02  CFL=6.949E-01  norm=1.7829E-02  wctime: 2.7E-02 (s)  
+iter=  26250  t=2.625E+02  CFL=6.949E-01  norm=1.2432E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00015.bin.
+iter=  26425  t=2.642E+02  CFL=6.949E-01  norm=1.4798E-02  wctime: 2.7E-02 (s)  
+iter=  26600  t=2.660E+02  CFL=6.949E-01  norm=1.4879E-02  wctime: 2.7E-02 (s)  
+iter=  26775  t=2.677E+02  CFL=6.949E-01  norm=1.6885E-02  wctime: 2.7E-02 (s)  
+iter=  26950  t=2.695E+02  CFL=6.949E-01  norm=1.7031E-02  wctime: 2.7E-02 (s)  
+iter=  27125  t=2.712E+02  CFL=6.949E-01  norm=1.0321E-02  wctime: 2.7E-02 (s)  
+iter=  27300  t=2.730E+02  CFL=6.949E-01  norm=1.6848E-02  wctime: 2.7E-02 (s)  
+iter=  27475  t=2.747E+02  CFL=6.949E-01  norm=1.5210E-02  wctime: 2.7E-02 (s)  
+iter=  27650  t=2.765E+02  CFL=6.949E-01  norm=1.3971E-02  wctime: 2.7E-02 (s)  
+iter=  27825  t=2.782E+02  CFL=6.949E-01  norm=1.8522E-02  wctime: 2.7E-02 (s)  
+iter=  28000  t=2.800E+02  CFL=6.949E-01  norm=1.2266E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00016.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=280.000000 (total: 5).
+iter=  28175  t=2.817E+02  CFL=6.949E-01  norm=1.3651E-02  wctime: 2.7E-02 (s)  
+iter=  28350  t=2.835E+02  CFL=6.949E-01  norm=1.5780E-02  wctime: 2.7E-02 (s)  
+iter=  28525  t=2.852E+02  CFL=6.948E-01  norm=1.6803E-02  wctime: 2.7E-02 (s)  
+iter=  28700  t=2.870E+02  CFL=6.949E-01  norm=1.6320E-02  wctime: 2.7E-02 (s)  
+iter=  28875  t=2.887E+02  CFL=6.949E-01  norm=1.2060E-02  wctime: 2.7E-02 (s)  
+iter=  29050  t=2.905E+02  CFL=6.948E-01  norm=1.6527E-02  wctime: 2.7E-02 (s)  
+iter=  29225  t=2.922E+02  CFL=6.948E-01  norm=1.4111E-02  wctime: 2.7E-02 (s)  
+iter=  29400  t=2.940E+02  CFL=6.948E-01  norm=1.5907E-02  wctime: 2.7E-02 (s)  
+iter=  29575  t=2.957E+02  CFL=6.948E-01  norm=1.8009E-02  wctime: 2.7E-02 (s)  
+iter=  29750  t=2.975E+02  CFL=6.948E-01  norm=1.0348E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00017.bin.
+iter=  29925  t=2.992E+02  CFL=6.948E-01  norm=1.5565E-02  wctime: 2.7E-02 (s)  
+iter=  30100  t=3.010E+02  CFL=6.948E-01  norm=1.6118E-02  wctime: 2.7E-02 (s)  
+iter=  30275  t=3.027E+02  CFL=6.948E-01  norm=1.5213E-02  wctime: 2.7E-02 (s)  
+iter=  30450  t=3.045E+02  CFL=6.948E-01  norm=1.7521E-02  wctime: 2.6E-02 (s)  
+iter=  30625  t=3.062E+02  CFL=6.948E-01  norm=1.1986E-02  wctime: 2.7E-02 (s)  
+iter=  30800  t=3.080E+02  CFL=6.948E-01  norm=1.5258E-02  wctime: 2.7E-02 (s)  
+iter=  30975  t=3.097E+02  CFL=6.948E-01  norm=1.5870E-02  wctime: 2.7E-02 (s)  
+iter=  31150  t=3.115E+02  CFL=6.948E-01  norm=1.5543E-02  wctime: 2.7E-02 (s)  
+iter=  31325  t=3.132E+02  CFL=6.948E-01  norm=1.6334E-02  wctime: 2.7E-02 (s)  
+iter=  31500  t=3.150E+02  CFL=6.948E-01  norm=1.3075E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00018.bin.
+iter=  31675  t=3.167E+02  CFL=6.948E-01  norm=1.5637E-02  wctime: 2.7E-02 (s)  
+iter=  31850  t=3.185E+02  CFL=6.948E-01  norm=1.4131E-02  wctime: 2.7E-02 (s)  
+iter=  32025  t=3.202E+02  CFL=6.948E-01  norm=1.6567E-02  wctime: 2.7E-02 (s)  
+iter=  32200  t=3.220E+02  CFL=6.948E-01  norm=1.7525E-02  wctime: 2.7E-02 (s)  
+iter=  32375  t=3.237E+02  CFL=6.948E-01  norm=1.0717E-02  wctime: 2.7E-02 (s)  
+iter=  32550  t=3.255E+02  CFL=6.948E-01  norm=1.6631E-02  wctime: 2.7E-02 (s)  
+iter=  32725  t=3.272E+02  CFL=6.948E-01  norm=1.5547E-02  wctime: 2.7E-02 (s)  
+iter=  32900  t=3.290E+02  CFL=6.948E-01  norm=1.3972E-02  wctime: 2.7E-02 (s)  
+iter=  33075  t=3.307E+02  CFL=6.948E-01  norm=1.7803E-02  wctime: 2.7E-02 (s)  
+iter=  33250  t=3.325E+02  CFL=6.948E-01  norm=1.3616E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00019.bin.
+iter=  33425  t=3.342E+02  CFL=6.948E-01  norm=1.3996E-02  wctime: 2.7E-02 (s)  
+iter=  33600  t=3.360E+02  CFL=6.948E-01  norm=1.4980E-02  wctime: 2.7E-02 (s)  
+iter=  33775  t=3.377E+02  CFL=6.948E-01  norm=1.7190E-02  wctime: 2.7E-02 (s)  
+iter=  33950  t=3.395E+02  CFL=6.948E-01  norm=1.6651E-02  wctime: 2.7E-02 (s)  
+iter=  34125  t=3.412E+02  CFL=6.948E-01  norm=1.1719E-02  wctime: 2.7E-02 (s)  
+iter=  34300  t=3.430E+02  CFL=6.948E-01  norm=1.6448E-02  wctime: 2.7E-02 (s)  
+iter=  34475  t=3.447E+02  CFL=6.948E-01  norm=1.4854E-02  wctime: 2.7E-02 (s)  
+iter=  34650  t=3.465E+02  CFL=6.948E-01  norm=1.5117E-02  wctime: 2.7E-02 (s)  
+iter=  34825  t=3.482E+02  CFL=6.948E-01  norm=1.7788E-02  wctime: 2.7E-02 (s)  
+iter=  35000  t=3.500E+02  CFL=6.948E-01  norm=1.2769E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00020.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=350.000000 (total: 6).
+iter=  35175  t=3.517E+02  CFL=6.948E-01  norm=1.3958E-02  wctime: 2.7E-02 (s)  
+iter=  35350  t=3.535E+02  CFL=6.948E-01  norm=1.5265E-02  wctime: 2.7E-02 (s)  
+iter=  35525  t=3.552E+02  CFL=6.948E-01  norm=1.7503E-02  wctime: 2.7E-02 (s)  
+iter=  35700  t=3.570E+02  CFL=6.948E-01  norm=1.6184E-02  wctime: 2.7E-02 (s)  
+iter=  35875  t=3.587E+02  CFL=6.948E-01  norm=1.1186E-02  wctime: 2.7E-02 (s)  
+iter=  36050  t=3.605E+02  CFL=6.948E-01  norm=1.7206E-02  wctime: 2.7E-02 (s)  
+iter=  36225  t=3.622E+02  CFL=6.948E-01  norm=1.4369E-02  wctime: 2.7E-02 (s)  
+iter=  36400  t=3.640E+02  CFL=6.948E-01  norm=1.4612E-02  wctime: 2.7E-02 (s)  
+iter=  36575  t=3.657E+02  CFL=6.948E-01  norm=1.8653E-02  wctime: 2.7E-02 (s)  
+iter=  36750  t=3.675E+02  CFL=6.948E-01  norm=1.2248E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00021.bin.
+iter=  36925  t=3.692E+02  CFL=6.948E-01  norm=1.3317E-02  wctime: 2.7E-02 (s)  
+iter=  37100  t=3.710E+02  CFL=6.948E-01  norm=1.6827E-02  wctime: 2.7E-02 (s)  
+iter=  37275  t=3.727E+02  CFL=6.948E-01  norm=1.6684E-02  wctime: 2.7E-02 (s)  
+iter=  37450  t=3.745E+02  CFL=6.948E-01  norm=1.4791E-02  wctime: 2.7E-02 (s)  
+iter=  37625  t=3.762E+02  CFL=6.948E-01  norm=1.4290E-02  wctime: 2.7E-02 (s)  
+iter=  37800  t=3.780E+02  CFL=6.948E-01  norm=1.7027E-02  wctime: 2.7E-02 (s)  
+iter=  37975  t=3.797E+02  CFL=6.948E-01  norm=1.1983E-02  wctime: 2.7E-02 (s)  
+iter=  38150  t=3.815E+02  CFL=6.948E-01  norm=1.6322E-02  wctime: 2.7E-02 (s)  
+iter=  38325  t=3.832E+02  CFL=6.948E-01  norm=1.8617E-02  wctime: 2.7E-02 (s)  
+iter=  38500  t=3.850E+02  CFL=6.948E-01  norm=1.0246E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00022.bin.
+iter=  38675  t=3.867E+02  CFL=6.948E-01  norm=1.5525E-02  wctime: 2.7E-02 (s)  
+iter=  38850  t=3.885E+02  CFL=6.948E-01  norm=1.6205E-02  wctime: 2.7E-02 (s)  
+iter=  39025  t=3.902E+02  CFL=6.948E-01  norm=1.4914E-02  wctime: 2.7E-02 (s)  
+iter=  39200  t=3.920E+02  CFL=6.948E-01  norm=1.6807E-02  wctime: 2.7E-02 (s)  
+iter=  39375  t=3.937E+02  CFL=6.948E-01  norm=1.4578E-02  wctime: 2.7E-02 (s)  
+iter=  39550  t=3.955E+02  CFL=6.948E-01  norm=1.4779E-02  wctime: 2.7E-02 (s)  
+iter=  39725  t=3.972E+02  CFL=6.948E-01  norm=1.3674E-02  wctime: 2.7E-02 (s)  
+iter=  39900  t=3.990E+02  CFL=6.948E-01  norm=1.7036E-02  wctime: 2.7E-02 (s)  
+iter=  40075  t=4.007E+02  CFL=6.948E-01  norm=1.7278E-02  wctime: 2.7E-02 (s)  
+iter=  40250  t=4.025E+02  CFL=6.948E-01  norm=1.1550E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00023.bin.
+iter=  40425  t=4.042E+02  CFL=6.948E-01  norm=1.5776E-02  wctime: 2.7E-02 (s)  
+iter=  40600  t=4.060E+02  CFL=6.948E-01  norm=1.4878E-02  wctime: 2.7E-02 (s)  
+iter=  40775  t=4.077E+02  CFL=6.948E-01  norm=1.6189E-02  wctime: 2.7E-02 (s)  
+iter=  40950  t=4.095E+02  CFL=6.948E-01  norm=1.7268E-02  wctime: 2.7E-02 (s)  
+iter=  41125  t=4.112E+02  CFL=6.948E-01  norm=1.2909E-02  wctime: 2.7E-02 (s)  
+iter=  41300  t=4.130E+02  CFL=6.948E-01  norm=1.5503E-02  wctime: 2.7E-02 (s)  
+iter=  41475  t=4.147E+02  CFL=6.948E-01  norm=1.4213E-02  wctime: 2.7E-02 (s)  
+iter=  41650  t=4.165E+02  CFL=6.948E-01  norm=1.6723E-02  wctime: 2.7E-02 (s)  
+iter=  41825  t=4.182E+02  CFL=6.948E-01  norm=1.7298E-02  wctime: 2.7E-02 (s)  
+iter=  42000  t=4.200E+02  CFL=6.948E-01  norm=1.1423E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00024.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=420.000000 (total: 7).
+iter=  42175  t=4.217E+02  CFL=6.948E-01  norm=1.5818E-02  wctime: 2.7E-02 (s)  
+iter=  42350  t=4.235E+02  CFL=6.948E-01  norm=1.5587E-02  wctime: 2.7E-02 (s)  
+iter=  42525  t=4.252E+02  CFL=6.948E-01  norm=1.5556E-02  wctime: 2.7E-02 (s)  
+iter=  42700  t=4.270E+02  CFL=6.948E-01  norm=1.7171E-02  wctime: 2.7E-02 (s)  
+iter=  42875  t=4.287E+02  CFL=6.947E-01  norm=1.3156E-02  wctime: 2.7E-02 (s)  
+iter=  43050  t=4.305E+02  CFL=6.947E-01  norm=1.5412E-02  wctime: 2.7E-02 (s)  
+iter=  43225  t=4.322E+02  CFL=6.947E-01  norm=1.4584E-02  wctime: 2.7E-02 (s)  
+iter=  43400  t=4.340E+02  CFL=6.947E-01  norm=1.6388E-02  wctime: 2.7E-02 (s)  
+iter=  43575  t=4.357E+02  CFL=6.947E-01  norm=1.6663E-02  wctime: 2.7E-02 (s)  
+iter=  43750  t=4.375E+02  CFL=6.947E-01  norm=1.2955E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00025.bin.
+iter=  43925  t=4.392E+02  CFL=6.947E-01  norm=1.5605E-02  wctime: 2.7E-02 (s)  
+iter=  44100  t=4.410E+02  CFL=6.947E-01  norm=1.4322E-02  wctime: 2.7E-02 (s)  
+iter=  44275  t=4.427E+02  CFL=6.947E-01  norm=1.6566E-02  wctime: 2.7E-02 (s)  
+iter=  44450  t=4.445E+02  CFL=6.947E-01  norm=1.7237E-02  wctime: 2.7E-02 (s)  
+iter=  44625  t=4.462E+02  CFL=6.947E-01  norm=1.2485E-02  wctime: 2.7E-02 (s)  
+iter=  44800  t=4.480E+02  CFL=6.947E-01  norm=1.6452E-02  wctime: 2.7E-02 (s)  
+iter=  44975  t=4.497E+02  CFL=6.947E-01  norm=1.3879E-02  wctime: 2.7E-02 (s)  
+iter=  45150  t=4.515E+02  CFL=6.947E-01  norm=1.5236E-02  wctime: 2.7E-02 (s)  
+iter=  45325  t=4.532E+02  CFL=6.947E-01  norm=1.8649E-02  wctime: 2.7E-02 (s)  
+iter=  45500  t=4.550E+02  CFL=6.947E-01  norm=1.2496E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00026.bin.
+iter=  45675  t=4.567E+02  CFL=6.947E-01  norm=1.4007E-02  wctime: 2.7E-02 (s)  
+iter=  45850  t=4.585E+02  CFL=6.947E-01  norm=1.5846E-02  wctime: 2.7E-02 (s)  
+iter=  46025  t=4.602E+02  CFL=6.947E-01  norm=1.6483E-02  wctime: 2.7E-02 (s)  
+iter=  46200  t=4.620E+02  CFL=6.947E-01  norm=1.6005E-02  wctime: 2.7E-02 (s)  
+iter=  46375  t=4.637E+02  CFL=6.947E-01  norm=1.4553E-02  wctime: 2.7E-02 (s)  
+iter=  46550  t=4.655E+02  CFL=6.947E-01  norm=1.5698E-02  wctime: 2.7E-02 (s)  
+iter=  46725  t=4.672E+02  CFL=6.947E-01  norm=1.2402E-02  wctime: 2.7E-02 (s)  
+iter=  46900  t=4.690E+02  CFL=6.947E-01  norm=1.7250E-02  wctime: 2.7E-02 (s)  
+iter=  47075  t=4.707E+02  CFL=6.947E-01  norm=1.8243E-02  wctime: 2.7E-02 (s)  
+iter=  47250  t=4.725E+02  CFL=6.947E-01  norm=9.5511E-03  wctime: 2.7E-02 (s)  
+Writing solution file op_00027.bin.
+iter=  47425  t=4.742E+02  CFL=6.947E-01  norm=1.6050E-02  wctime: 2.7E-02 (s)  
+iter=  47600  t=4.760E+02  CFL=6.947E-01  norm=1.6232E-02  wctime: 2.7E-02 (s)  
+iter=  47775  t=4.777E+02  CFL=6.947E-01  norm=1.4665E-02  wctime: 2.7E-02 (s)  
+iter=  47950  t=4.795E+02  CFL=6.947E-01  norm=1.7152E-02  wctime: 2.7E-02 (s)  
+iter=  48125  t=4.812E+02  CFL=6.947E-01  norm=1.4624E-02  wctime: 2.7E-02 (s)  
+iter=  48300  t=4.830E+02  CFL=6.947E-01  norm=1.4302E-02  wctime: 2.7E-02 (s)  
+iter=  48475  t=4.847E+02  CFL=6.947E-01  norm=1.4168E-02  wctime: 2.7E-02 (s)  
+iter=  48650  t=4.865E+02  CFL=6.947E-01  norm=1.7438E-02  wctime: 2.7E-02 (s)  
+iter=  48825  t=4.882E+02  CFL=6.947E-01  norm=1.6591E-02  wctime: 2.7E-02 (s)  
+iter=  49000  t=4.900E+02  CFL=6.947E-01  norm=1.1566E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00028.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=490.000000 (total: 8).
+iter=  49175  t=4.917E+02  CFL=6.947E-01  norm=1.6557E-02  wctime: 2.7E-02 (s)  
+iter=  49350  t=4.935E+02  CFL=6.947E-01  norm=1.5338E-02  wctime: 2.7E-02 (s)  
+iter=  49525  t=4.952E+02  CFL=6.947E-01  norm=1.4716E-02  wctime: 2.7E-02 (s)  
+iter=  49700  t=4.970E+02  CFL=6.947E-01  norm=1.7473E-02  wctime: 2.7E-02 (s)  
+iter=  49875  t=4.987E+02  CFL=6.947E-01  norm=1.4681E-02  wctime: 2.7E-02 (s)  
+iter=  50050  t=5.005E+02  CFL=6.947E-01  norm=1.4469E-02  wctime: 2.7E-02 (s)  
+iter=  50225  t=5.022E+02  CFL=6.947E-01  norm=1.3686E-02  wctime: 2.7E-02 (s)  
+iter=  50400  t=5.040E+02  CFL=6.947E-01  norm=1.7504E-02  wctime: 2.7E-02 (s)  
+iter=  50575  t=5.057E+02  CFL=6.947E-01  norm=1.6498E-02  wctime: 2.7E-02 (s)  
+iter=  50750  t=5.075E+02  CFL=6.947E-01  norm=1.1879E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00029.bin.
+iter=  50925  t=5.092E+02  CFL=6.947E-01  norm=1.6791E-02  wctime: 2.7E-02 (s)  
+iter=  51100  t=5.110E+02  CFL=6.947E-01  norm=1.4422E-02  wctime: 2.7E-02 (s)  
+iter=  51275  t=5.127E+02  CFL=6.947E-01  norm=1.4392E-02  wctime: 2.7E-02 (s)  
+iter=  51450  t=5.145E+02  CFL=6.947E-01  norm=1.8707E-02  wctime: 2.7E-02 (s)  
+iter=  51625  t=5.162E+02  CFL=6.947E-01  norm=1.4023E-02  wctime: 2.7E-02 (s)  
+iter=  51800  t=5.180E+02  CFL=6.947E-01  norm=1.2862E-02  wctime: 2.7E-02 (s)  
+iter=  51975  t=5.197E+02  CFL=6.947E-01  norm=1.5485E-02  wctime: 2.7E-02 (s)  
+iter=  52150  t=5.215E+02  CFL=6.947E-01  norm=1.7331E-02  wctime: 2.7E-02 (s)  
+iter=  52325  t=5.232E+02  CFL=6.947E-01  norm=1.5394E-02  wctime: 2.7E-02 (s)  
+iter=  52500  t=5.250E+02  CFL=6.947E-01  norm=1.3812E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00030.bin.
+iter=  52675  t=5.267E+02  CFL=6.947E-01  norm=1.6228E-02  wctime: 2.7E-02 (s)  
+iter=  52850  t=5.285E+02  CFL=6.947E-01  norm=1.2828E-02  wctime: 2.7E-02 (s)  
+iter=  53025  t=5.302E+02  CFL=6.947E-01  norm=1.6730E-02  wctime: 2.7E-02 (s)  
+iter=  53200  t=5.320E+02  CFL=6.947E-01  norm=1.8288E-02  wctime: 2.7E-02 (s)  
+iter=  53375  t=5.337E+02  CFL=6.947E-01  norm=1.2054E-02  wctime: 2.7E-02 (s)  
+iter=  53550  t=5.355E+02  CFL=6.947E-01  norm=1.4849E-02  wctime: 2.7E-02 (s)  
+iter=  53725  t=5.372E+02  CFL=6.947E-01  norm=1.5717E-02  wctime: 2.7E-02 (s)  
+iter=  53900  t=5.390E+02  CFL=6.947E-01  norm=1.5730E-02  wctime: 2.7E-02 (s)  
+iter=  54075  t=5.407E+02  CFL=6.947E-01  norm=1.6641E-02  wctime: 2.7E-02 (s)  
+iter=  54250  t=5.425E+02  CFL=6.947E-01  norm=1.3963E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00031.bin.
+iter=  54425  t=5.442E+02  CFL=6.947E-01  norm=1.5019E-02  wctime: 2.7E-02 (s)  
+iter=  54600  t=5.460E+02  CFL=6.947E-01  norm=1.4610E-02  wctime: 2.7E-02 (s)  
+iter=  54775  t=5.477E+02  CFL=6.947E-01  norm=1.6442E-02  wctime: 2.7E-02 (s)  
+iter=  54950  t=5.495E+02  CFL=6.947E-01  norm=1.6493E-02  wctime: 2.7E-02 (s)  
+iter=  55125  t=5.512E+02  CFL=6.947E-01  norm=1.4260E-02  wctime: 2.7E-02 (s)  
+iter=  55300  t=5.530E+02  CFL=6.947E-01  norm=1.5314E-02  wctime: 2.7E-02 (s)  
+iter=  55475  t=5.547E+02  CFL=6.947E-01  norm=1.3874E-02  wctime: 2.7E-02 (s)  
+iter=  55650  t=5.565E+02  CFL=6.947E-01  norm=1.6666E-02  wctime: 2.7E-02 (s)  
+iter=  55825  t=5.582E+02  CFL=6.947E-01  norm=1.6463E-02  wctime: 2.7E-02 (s)  
+iter=  56000  t=5.600E+02  CFL=6.947E-01  norm=1.3207E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00032.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=560.000000 (total: 9).
+iter=  56175  t=5.617E+02  CFL=6.947E-01  norm=1.6111E-02  wctime: 2.7E-02 (s)  
+iter=  56350  t=5.635E+02  CFL=6.947E-01  norm=1.4154E-02  wctime: 2.7E-02 (s)  
+iter=  56525  t=5.652E+02  CFL=6.947E-01  norm=1.5672E-02  wctime: 2.7E-02 (s)  
+iter=  56700  t=5.670E+02  CFL=6.947E-01  norm=1.7598E-02  wctime: 2.7E-02 (s)  
+iter=  56875  t=5.687E+02  CFL=6.947E-01  norm=1.4306E-02  wctime: 2.7E-02 (s)  
+iter=  57050  t=5.705E+02  CFL=6.947E-01  norm=1.4350E-02  wctime: 2.7E-02 (s)  
+iter=  57225  t=5.722E+02  CFL=6.947E-01  norm=1.4216E-02  wctime: 2.7E-02 (s)  
+iter=  57400  t=5.740E+02  CFL=6.947E-01  norm=1.7031E-02  wctime: 2.7E-02 (s)  
+iter=  57575  t=5.757E+02  CFL=6.947E-01  norm=1.6406E-02  wctime: 2.7E-02 (s)  
+iter=  57750  t=5.775E+02  CFL=6.947E-01  norm=1.3601E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00033.bin.
+iter=  57925  t=5.792E+02  CFL=6.947E-01  norm=1.5547E-02  wctime: 2.7E-02 (s)  
+iter=  58100  t=5.810E+02  CFL=6.947E-01  norm=1.3937E-02  wctime: 2.7E-02 (s)  
+iter=  58275  t=5.827E+02  CFL=6.947E-01  norm=1.6222E-02  wctime: 2.7E-02 (s)  
+iter=  58450  t=5.845E+02  CFL=6.947E-01  norm=1.7347E-02  wctime: 2.7E-02 (s)  
+iter=  58625  t=5.862E+02  CFL=6.947E-01  norm=1.4549E-02  wctime: 2.7E-02 (s)  
+iter=  58800  t=5.880E+02  CFL=6.947E-01  norm=1.3871E-02  wctime: 2.7E-02 (s)  
+iter=  58975  t=5.897E+02  CFL=6.947E-01  norm=1.3934E-02  wctime: 2.7E-02 (s)  
+iter=  59150  t=5.915E+02  CFL=6.947E-01  norm=1.7885E-02  wctime: 2.7E-02 (s)  
+iter=  59325  t=5.932E+02  CFL=6.947E-01  norm=1.5559E-02  wctime: 2.7E-02 (s)  
+iter=  59500  t=5.950E+02  CFL=6.947E-01  norm=1.2770E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00034.bin.
+iter=  59675  t=5.967E+02  CFL=6.947E-01  norm=1.7028E-02  wctime: 2.7E-02 (s)  
+iter=  59850  t=5.985E+02  CFL=6.947E-01  norm=1.3287E-02  wctime: 2.7E-02 (s)  
+iter=  60025  t=6.002E+02  CFL=6.947E-01  norm=1.5412E-02  wctime: 2.7E-02 (s)  
+iter=  60200  t=6.020E+02  CFL=6.947E-01  norm=1.8356E-02  wctime: 2.7E-02 (s)  
+iter=  60375  t=6.037E+02  CFL=6.947E-01  norm=1.3787E-02  wctime: 2.7E-02 (s)  
+iter=  60550  t=6.055E+02  CFL=6.947E-01  norm=1.3092E-02  wctime: 2.7E-02 (s)  
+iter=  60725  t=6.072E+02  CFL=6.947E-01  norm=1.5854E-02  wctime: 2.7E-02 (s)  
+iter=  60900  t=6.090E+02  CFL=6.946E-01  norm=1.7216E-02  wctime: 2.7E-02 (s)  
+iter=  61075  t=6.107E+02  CFL=6.946E-01  norm=1.3856E-02  wctime: 2.7E-02 (s)  
+iter=  61250  t=6.125E+02  CFL=6.947E-01  norm=1.5407E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00035.bin.
+iter=  61425  t=6.142E+02  CFL=6.946E-01  norm=1.6788E-02  wctime: 2.7E-02 (s)  
+iter=  61600  t=6.160E+02  CFL=6.946E-01  norm=1.0587E-02  wctime: 2.7E-02 (s)  
+iter=  61775  t=6.177E+02  CFL=6.946E-01  norm=1.7155E-02  wctime: 2.7E-02 (s)  
+iter=  61950  t=6.195E+02  CFL=6.946E-01  norm=1.8424E-02  wctime: 2.7E-02 (s)  
+iter=  62125  t=6.212E+02  CFL=6.946E-01  norm=1.1888E-02  wctime: 2.7E-02 (s)  
+iter=  62300  t=6.230E+02  CFL=6.946E-01  norm=1.5293E-02  wctime: 2.7E-02 (s)  
+iter=  62475  t=6.247E+02  CFL=6.946E-01  norm=1.5155E-02  wctime: 2.7E-02 (s)  
+iter=  62650  t=6.265E+02  CFL=6.946E-01  norm=1.5343E-02  wctime: 2.7E-02 (s)  
+iter=  62825  t=6.282E+02  CFL=6.946E-01  norm=1.5913E-02  wctime: 2.7E-02 (s)  
+iter=  63000  t=6.300E+02  CFL=6.946E-01  norm=1.5850E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00036.bin.
+DMDROMObject::takeSample() - creating new DMD object, t=630.000000 (total: 10).
+iter=  63175  t=6.317E+02  CFL=6.946E-01  norm=1.4914E-02  wctime: 2.7E-02 (s)  
+iter=  63350  t=6.335E+02  CFL=6.946E-01  norm=1.1839E-02  wctime: 2.7E-02 (s)  
+iter=  63525  t=6.352E+02  CFL=6.946E-01  norm=1.7563E-02  wctime: 2.7E-02 (s)  
+iter=  63700  t=6.370E+02  CFL=6.946E-01  norm=1.7309E-02  wctime: 2.7E-02 (s)  
+iter=  63875  t=6.387E+02  CFL=6.946E-01  norm=1.2744E-02  wctime: 2.7E-02 (s)  
+iter=  64050  t=6.405E+02  CFL=6.946E-01  norm=1.5444E-02  wctime: 2.7E-02 (s)  
+iter=  64225  t=6.422E+02  CFL=6.946E-01  norm=1.4349E-02  wctime: 2.7E-02 (s)  
+iter=  64400  t=6.440E+02  CFL=6.946E-01  norm=1.6178E-02  wctime: 2.7E-02 (s)  
+iter=  64575  t=6.457E+02  CFL=6.946E-01  norm=1.5941E-02  wctime: 2.7E-02 (s)  
+iter=  64750  t=6.475E+02  CFL=6.946E-01  norm=1.4847E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00037.bin.
+iter=  64925  t=6.492E+02  CFL=6.946E-01  norm=1.5246E-02  wctime: 2.7E-02 (s)  
+iter=  65100  t=6.510E+02  CFL=6.946E-01  norm=1.2186E-02  wctime: 2.7E-02 (s)  
+iter=  65275  t=6.527E+02  CFL=6.946E-01  norm=1.7972E-02  wctime: 2.7E-02 (s)  
+iter=  65450  t=6.545E+02  CFL=6.946E-01  norm=1.6938E-02  wctime: 2.7E-02 (s)  
+iter=  65625  t=6.562E+02  CFL=6.946E-01  norm=1.2089E-02  wctime: 2.7E-02 (s)  
+iter=  65800  t=6.580E+02  CFL=6.946E-01  norm=1.5943E-02  wctime: 2.7E-02 (s)  
+iter=  65975  t=6.597E+02  CFL=6.946E-01  norm=1.4416E-02  wctime: 2.7E-02 (s)  
+iter=  66150  t=6.615E+02  CFL=6.946E-01  norm=1.5515E-02  wctime: 2.7E-02 (s)  
+iter=  66325  t=6.632E+02  CFL=6.946E-01  norm=1.6629E-02  wctime: 2.7E-02 (s)  
+iter=  66500  t=6.650E+02  CFL=6.946E-01  norm=1.4613E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00038.bin.
+iter=  66675  t=6.667E+02  CFL=6.946E-01  norm=1.4660E-02  wctime: 2.7E-02 (s)  
+iter=  66850  t=6.685E+02  CFL=6.946E-01  norm=1.3105E-02  wctime: 2.7E-02 (s)  
+iter=  67025  t=6.702E+02  CFL=6.946E-01  norm=1.7467E-02  wctime: 2.7E-02 (s)  
+iter=  67200  t=6.720E+02  CFL=6.946E-01  norm=1.6018E-02  wctime: 2.7E-02 (s)  
+iter=  67375  t=6.737E+02  CFL=6.946E-01  norm=1.4048E-02  wctime: 2.7E-02 (s)  
+iter=  67550  t=6.755E+02  CFL=6.946E-01  norm=1.5859E-02  wctime: 2.7E-02 (s)  
+iter=  67725  t=6.772E+02  CFL=6.946E-01  norm=1.2581E-02  wctime: 2.7E-02 (s)  
+iter=  67900  t=6.790E+02  CFL=6.946E-01  norm=1.6482E-02  wctime: 2.7E-02 (s)  
+iter=  68075  t=6.807E+02  CFL=6.946E-01  norm=1.6525E-02  wctime: 2.7E-02 (s)  
+iter=  68250  t=6.825E+02  CFL=6.946E-01  norm=1.3833E-02  wctime: 2.7E-02 (s)  
+Writing solution file op_00039.bin.
+iter=  68425  t=6.842E+02  CFL=6.946E-01  norm=1.6070E-02  wctime: 2.7E-02 (s)  
+iter=  68600  t=6.860E+02  CFL=6.946E-01  norm=1.2545E-02  wctime: 2.7E-02 (s)  
+iter=  68775  t=6.877E+02  CFL=6.946E-01  norm=1.6129E-02  wctime: 2.7E-02 (s)  
+iter=  68950  t=6.895E+02  CFL=6.946E-01  norm=1.7858E-02  wctime: 2.7E-02 (s)  
+iter=  69125  t=6.912E+02  CFL=6.946E-01  norm=1.3676E-02  wctime: 2.7E-02 (s)  
+iter=  69300  t=6.930E+02  CFL=6.946E-01  norm=1.4308E-02  wctime: 2.7E-02 (s)  
+iter=  69475  t=6.947E+02  CFL=6.946E-01  norm=1.4283E-02  wctime: 2.7E-02 (s)  
+iter=  69650  t=6.965E+02  CFL=6.946E-01  norm=1.6583E-02  wctime: 2.7E-02 (s)  
+iter=  69825  t=6.982E+02  CFL=6.946E-01  norm=1.5248E-02  wctime: 2.7E-02 (s)  
+iter=  70000  t=7.000E+02  CFL=6.946E-01  norm=1.5461E-02  wctime: 2.7E-02 (s)  
+Completed time integration (Final time: 700.000000), total wctime: 1418.966912 (seconds).
+Writing solution file op_00040.bin.
+libROM: Training ROM.
+DMDROMObject::train() - training DMD object 0 with 1001 samples.
+Using 16 basis vectors out of 1000.
+DMDROMObject::train() - training DMD object 1 with 1001 samples.
+Using 16 basis vectors out of 1000.
+DMDROMObject::train() - training DMD object 2 with 1001 samples.
+Using 16 basis vectors out of 1000.
+DMDROMObject::train() - training DMD object 3 with 1001 samples.
+Using 16 basis vectors out of 1000.
+DMDROMObject::train() - training DMD object 4 with 1001 samples.
+Using 16 basis vectors out of 1000.
+DMDROMObject::train() - training DMD object 5 with 1001 samples.
+Using 16 basis vectors out of 1000.
+DMDROMObject::train() - training DMD object 6 with 1001 samples.
+Using 16 basis vectors out of 1000.
+DMDROMObject::train() - training DMD object 7 with 1001 samples.
+Using 16 basis vectors out of 1000.
+DMDROMObject::train() - training DMD object 8 with 1001 samples.
+Using 16 basis vectors out of 1000.
+DMDROMObject::train() - training DMD object 9 with 1000 samples.
+Using 16 basis vectors out of 999.
+libROM: total training wallclock time: 1068.407973 (seconds).
+libROM: Predicting solution at time 0.0000e+00 using ROM.
+libROM:   wallclock time: 0.066756 (seconds).
+Writing solution file op_rom_00000.bin.
+libROM: Predicting solution at time 1.7500e+01 using ROM.
+libROM:   wallclock time: 0.065916 (seconds).
+Writing solution file op_rom_00001.bin.
+libROM: Predicting solution at time 3.5000e+01 using ROM.
+libROM:   wallclock time: 0.065720 (seconds).
+Writing solution file op_rom_00002.bin.
+libROM: Predicting solution at time 5.2500e+01 using ROM.
+libROM:   wallclock time: 0.065746 (seconds).
+Writing solution file op_rom_00003.bin.
+libROM: Predicting solution at time 7.0000e+01 using ROM.
+libROM:   wallclock time: 0.066298 (seconds).
+Writing solution file op_rom_00004.bin.
+libROM: Predicting solution at time 8.7500e+01 using ROM.
+libROM:   wallclock time: 0.065845 (seconds).
+Writing solution file op_rom_00005.bin.
+libROM: Predicting solution at time 1.0500e+02 using ROM.
+libROM:   wallclock time: 0.065721 (seconds).
+Writing solution file op_rom_00006.bin.
+libROM: Predicting solution at time 1.2250e+02 using ROM.
+libROM:   wallclock time: 0.065826 (seconds).
+Writing solution file op_rom_00007.bin.
+libROM: Predicting solution at time 1.4000e+02 using ROM.
+libROM:   wallclock time: 0.066144 (seconds).
+Writing solution file op_rom_00008.bin.
+libROM: Predicting solution at time 1.5750e+02 using ROM.
+libROM:   wallclock time: 0.065728 (seconds).
+Writing solution file op_rom_00009.bin.
+libROM: Predicting solution at time 1.7500e+02 using ROM.
+libROM:   wallclock time: 0.065851 (seconds).
+Writing solution file op_rom_00010.bin.
+libROM: Predicting solution at time 1.9250e+02 using ROM.
+libROM:   wallclock time: 0.065737 (seconds).
+Writing solution file op_rom_00011.bin.
+libROM: Predicting solution at time 2.1000e+02 using ROM.
+libROM:   wallclock time: 0.066177 (seconds).
+Writing solution file op_rom_00012.bin.
+libROM: Predicting solution at time 2.2750e+02 using ROM.
+libROM:   wallclock time: 0.065745 (seconds).
+Writing solution file op_rom_00013.bin.
+libROM: Predicting solution at time 2.4500e+02 using ROM.
+libROM:   wallclock time: 0.066085 (seconds).
+Writing solution file op_rom_00014.bin.
+libROM: Predicting solution at time 2.6250e+02 using ROM.
+libROM:   wallclock time: 0.066084 (seconds).
+Writing solution file op_rom_00015.bin.
+libROM: Predicting solution at time 2.8000e+02 using ROM.
+libROM:   wallclock time: 0.066483 (seconds).
+Writing solution file op_rom_00016.bin.
+libROM: Predicting solution at time 2.9750e+02 using ROM.
+libROM:   wallclock time: 0.066035 (seconds).
+Writing solution file op_rom_00017.bin.
+libROM: Predicting solution at time 3.1500e+02 using ROM.
+libROM:   wallclock time: 0.066074 (seconds).
+Writing solution file op_rom_00018.bin.
+libROM: Predicting solution at time 3.3250e+02 using ROM.
+libROM:   wallclock time: 0.076198 (seconds).
+Writing solution file op_rom_00019.bin.
+libROM: Predicting solution at time 3.5000e+02 using ROM.
+libROM:   wallclock time: 0.076678 (seconds).
+Writing solution file op_rom_00020.bin.
+libROM: Predicting solution at time 3.6750e+02 using ROM.
+libROM:   wallclock time: 0.066058 (seconds).
+Writing solution file op_rom_00021.bin.
+libROM: Predicting solution at time 3.8500e+02 using ROM.
+libROM:   wallclock time: 0.066042 (seconds).
+Writing solution file op_rom_00022.bin.
+libROM: Predicting solution at time 4.0250e+02 using ROM.
+libROM:   wallclock time: 0.066047 (seconds).
+Writing solution file op_rom_00023.bin.
+libROM: Predicting solution at time 4.2000e+02 using ROM.
+libROM:   wallclock time: 0.066506 (seconds).
+Writing solution file op_rom_00024.bin.
+libROM: Predicting solution at time 4.3750e+02 using ROM.
+libROM:   wallclock time: 0.066080 (seconds).
+Writing solution file op_rom_00025.bin.
+libROM: Predicting solution at time 4.5500e+02 using ROM.
+libROM:   wallclock time: 0.066079 (seconds).
+Writing solution file op_rom_00026.bin.
+libROM: Predicting solution at time 4.7250e+02 using ROM.
+libROM:   wallclock time: 0.066064 (seconds).
+Writing solution file op_rom_00027.bin.
+libROM: Predicting solution at time 4.9000e+02 using ROM.
+libROM:   wallclock time: 0.066505 (seconds).
+Writing solution file op_rom_00028.bin.
+libROM: Predicting solution at time 5.0750e+02 using ROM.
+libROM:   wallclock time: 0.066045 (seconds).
+Writing solution file op_rom_00029.bin.
+libROM: Predicting solution at time 5.2500e+02 using ROM.
+libROM:   wallclock time: 0.066039 (seconds).
+Writing solution file op_rom_00030.bin.
+libROM: Predicting solution at time 5.4250e+02 using ROM.
+libROM:   wallclock time: 0.066055 (seconds).
+Writing solution file op_rom_00031.bin.
+libROM: Predicting solution at time 5.6000e+02 using ROM.
+libROM:   wallclock time: 0.066498 (seconds).
+Writing solution file op_rom_00032.bin.
+libROM: Predicting solution at time 5.7750e+02 using ROM.
+libROM:   wallclock time: 0.066045 (seconds).
+Writing solution file op_rom_00033.bin.
+libROM: Predicting solution at time 5.9500e+02 using ROM.
+libROM:   wallclock time: 0.066047 (seconds).
+Writing solution file op_rom_00034.bin.
+libROM: Predicting solution at time 6.1250e+02 using ROM.
+libROM:   wallclock time: 0.066060 (seconds).
+Writing solution file op_rom_00035.bin.
+libROM: Predicting solution at time 6.3000e+02 using ROM.
+libROM:   wallclock time: 0.066214 (seconds).
+Writing solution file op_rom_00036.bin.
+libROM: Predicting solution at time 6.4750e+02 using ROM.
+libROM:   wallclock time: 0.066066 (seconds).
+Writing solution file op_rom_00037.bin.
+libROM: Predicting solution at time 6.6500e+02 using ROM.
+libROM:   wallclock time: 0.066050 (seconds).
+Writing solution file op_rom_00038.bin.
+libROM: Predicting solution at time 6.8250e+02 using ROM.
+libROM:   wallclock time: 0.066062 (seconds).
+Writing solution file op_rom_00039.bin.
+libROM: Predicting solution at time 7.0000e+02 using ROM.
+libROM:   wallclock time: 0.066067 (seconds).
+libROM:   Calculating diff between PDE and ROM solutions.
+Writing solution file op_rom_00040.bin.
+libROM: total prediction/query wallclock time: 2.729476 (seconds).
+libROMInterface::saveROM() - saving ROM objects.
+  Saving DMD object with filename root DMD/dmdobj_0000.
+  Saving DMD object with filename root DMD/dmdobj_0001.
+  Saving DMD object with filename root DMD/dmdobj_0002.
+  Saving DMD object with filename root DMD/dmdobj_0003.
+  Saving DMD object with filename root DMD/dmdobj_0004.
+  Saving DMD object with filename root DMD/dmdobj_0005.
+  Saving DMD object with filename root DMD/dmdobj_0006.
+  Saving DMD object with filename root DMD/dmdobj_0007.
+  Saving DMD object with filename root DMD/dmdobj_0008.
+  Saving DMD object with filename root DMD/dmdobj_0009.
+Norms of the diff between ROM and PDE solutions for domain 0:
+  L1         Norm            : 1.3649835105574273E-06
+  L2         Norm            : 1.6015691358745090E-06
+  Linfinity  Norm            : 3.3001678513759942E-06
+Solver runtime (in seconds): 2.5069678070000000E+03
+Total  runtime (in seconds): 2.5070830940000001E+03
+Deallocating arrays.
+Finished.

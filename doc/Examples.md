@@ -5939,6 +5939,7 @@ Dynamic Mode Decomposition
 \n
 \subpage euler2d_vortex_librom_dmd \n
 \subpage euler2d_riemann4_librom_dmd \n
+\subpage euler2d_rtb_librom_dmd \n
 \subpage navstok2d_ldsc_librom_dmd \n
 \subpage vlasov_1d1v_selfconsistent_librom_dmd \n
 \n
@@ -7031,10 +7032,10 @@ After running the code, there should be the following output
 files:
 
 + 41 output file \b op_00000.bin, ..., op_00040.bin; 
-this is the \b HyPar solutions\b. 
+these are the \b HyPar solutions\b. 
 
 + 41 output file \b op_rom_00000.bin, ..., op_rom_00040.bin; 
-this is the \b predicted solutions from the DMD object(s)\b.
+these are the \b predicted solutions from the DMD object(s)\b.
 
 All the files are binary
 (#HyPar::op_file_format is set to \a binary in \b solver.inp).
@@ -7069,4 +7070,137 @@ and total wall time.
 
 Expected screen output:
 \include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD/out.log
+
+\page euler2d_rtb_librom_dmd 2D Euler Equations (with gravitational force) - Rising Thermal Bubble (Training a Time-Windowed DMD)
+
+See \ref euler2d_rtb to familiarize yourself with this case.
+
+Location: \b hypar/Examples/2D/NavierStokes2D/RisingThermalBubble_libROM_DMD
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Euler Equations (navierstokes2d.h - By default,
+                     #NavierStokes2D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 2D Euler
+                     equations are solved.)
+
+Reference:
+  + Giraldo, F.X., Restelli, M., "A study of spectral element and
+    discontinuous Galerkin methods for the Navier–Stokes equations
+    in nonhydrostatic mesoscale atmospheric modeling: Equation sets
+    and test cases", J. Comput. Phys., 227, 2008, 3849--3877, 
+    (Section 3.2).
+
+Domain: \f$0 \le x,y \le 1000\,m\f$, 
+        "slip-wall" (#_SLIP_WALL_) boundary conditions on all sides.
+
+Initial solution: See references above.
+
+Other parameters (all dimensional quantities are in SI units):
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes2D::gamma)
+  + Universal gas constant \f$R = 287.058\f$ (#NavierStokes2D::R)
+  + Gravitational force per unit mass \f$g = 9.8\f$ along \a y-axis (#NavierStokes2D::grav_y)
+  + Reference density (at zero altitude) \f$\rho_{ref} = 1.1612055171196529\f$ (#NavierStokes2D::rho0)
+  + Reference pressure (at zero altitude) \f$P_{ref} = 100000\f$ (#NavierStokes2D::p0)
+  + Hydrostatic balance type 2 (#NavierStokes2D::HB)
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: SSPRK3 (TimeRK(), #_RK_SSP3_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Sampling frequency: 7 (libROMInterface::m_sampling_freq)
+ + Number of samples per time window: 1000 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/librom.inp
+
+\b solver.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/boundary.inp
+
+\b physics.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/physics.inp
+
+\b weno.inp (optional)
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/weno.inp
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory.
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      6 6
+
+in \b solver.inp (i.e., 6 processors along \a x, and 6
+processor along \a y). Thus, this example should be run
+with 36 MPI ranks (or change \b iproc).
+
+After running the code, there should be the following output
+files:
+
++ 41 output file \b op_00000.bin, ..., op_00040.bin; 
+this is the \b HyPar solutions\b. 
+
++ 41 output file \b op_rom_00000.bin, ..., op_rom_00040.bin; 
+this is the \b predicted solutions from the DMD object(s)\b.
+
+All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The binary file contains the conserved variables
+\f$\left(\rho, \rho u, \rho v, e\right)\f$. The following code
+converts these variables to the primitive variables of interest
+to atmospheric flows \f$\left(\rho, u, v, p, \theta\right)\f$.
+It also writes out the hydrostatically balanced quantities 
+\f$\left(\rho_0,\pi_0, \theta_0\right)\f$ for this case that
+can be used to compute and plot the temperature and density
+perturbations. These variables are then written to either
+a tecplot2d or text file.
+(compile and run it in the run directory):
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/aux/PostProcess.cpp
+
+The following animation shows the potential temperature for the HyPar solutions.
+It was plotted using VisIt
+(https://wci.llnl.gov/simulation/computer-codes/visit/) with 
+tecplot2d format chosen in the above postprocessing code.
+@image html Solution_2DNavStokRTB_libROM_DMD_FOM.gif
+The following animation shows the same for the libROM solution predicted
+by the DMD object:
+@image html Solution_2DNavStokRTB_libROM_DMD_ROM.gif
+
+The provided Python script (\b plotDiff.py) computes and plots the diff
+of the HyPar and DMD solutions for each of the conserved variables. The
+following figure shows this diff at the final time for the density.
+@image html Solution_2DNavStokRTB_libROM_DMD_diff_density.png
+
+\b Wall \b clock \b times:
+- PDE solution: 1419 seconds
+- DMD training time: 1068 seconds
+- DMD prediction/query time: 2.73 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Expected screen output:
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/out.log
 
