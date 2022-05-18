@@ -46,6 +46,7 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
   m_intervals.clear();
   m_vec_size = a_vec_size;
   m_dt = a_dt;
+  m_t_final = -1;
   m_rdim = a_rdim;
 
   m_num_window_samples = INT_MAX;
@@ -114,7 +115,7 @@ void DMDROMObject::train()
     if (num_columns <= m_rdim) {
       m_dmd.pop_back();
       m_intervals.pop_back();
-      m_intervals[m_intervals.size()-1].second = DBL_MAX;
+      m_intervals[m_intervals.size()-1].second = m_t_final;
       if (!m_rank) {
         printf("DMDROMObject::train() - last window DMD has %d sample(s) only; deleted it ",
                num_columns );
@@ -147,16 +148,29 @@ void DMDROMObject::train()
  *  written)!. The code may not report any error, or one may see HDF5 file writing
  *  errors.
 */
-void DMDROMObject::save(const std::string& a_fname_root /*!< Filename root */)
+void DMDROMObject::save(const std::string& a_fname_root /*!< Filename root */) const
 {
   std::string fname_root = m_dirname + "/";
   std::string summary_fname_root = m_dirname + "/";
+  std::string header_fname = m_dirname + "/";
   if (a_fname_root == "") {
     fname_root += "dmdobj_";
     summary_fname_root += "dmd_summary_";
+    header_fname += "dmd_header.dat";
   } else {
     fname_root += (a_fname_root+"_dmdobj_");
     summary_fname_root += (a_fname_root+"_dmd_summary_");
+    header_fname += (a_fname_root+"_dmd_header.dat");
+  }
+
+  if (!m_rank) {
+    FILE* out;
+    out = fopen(header_fname.c_str(), "w");
+    fprintf(out, "%d\n", m_dmd.size());
+    for (int i = 0; i < m_dmd.size(); i++) {
+      fprintf(out, "%1.16e %1.16e\n", m_intervals[i].first, m_intervals[i].second);
+    }
+    fclose(out);
   }
 
   for (int i = 0; i < m_dmd.size(); i++) {
@@ -170,6 +184,65 @@ void DMDROMObject::save(const std::string& a_fname_root /*!< Filename root */)
     }
     m_dmd[i]->save(fname);
     //m_dmd[i]->summary(summary_fname);
+  }
+
+  return;
+}
+
+/*! Load DMD objects from file: the DMD object files must be in the subdirectory
+ *  with the name #DMDROMObject::m_dirname. They must be in a format that libROM can read
+ *  from. The number of objects and their parameters must correspond to the simulation
+ *  being run for which this object is defined.
+*/
+void DMDROMObject::load(const std::string& a_fname_root /*!< Filename root */)
+{
+  std::string fname_root = m_dirname + "/";
+  std::string header_fname = m_dirname + "/";
+  if (a_fname_root == "") {
+    fname_root += "dmdobj_";
+    header_fname += "dmd_header.dat";
+  } else {
+    fname_root += (a_fname_root+"_dmdobj_");
+    header_fname += (a_fname_root+"_dmd_header.dat");
+  }
+
+  int num_dmds = 0;
+  std::vector<double> intervals_start(0), intervals_end(0);
+  if (!m_rank) {
+    FILE* in;
+    in = fopen(header_fname.c_str(), "r");
+    fscanf(in, "%d\n", &num_dmds);
+    intervals_start.resize(num_dmds);
+    intervals_end.resize(num_dmds);
+    for (int i = 0; i < num_dmds; i++) {
+      fscanf(in, "%lf", &intervals_start[i]);
+      fscanf(in, "%lf", &intervals_end[i]);
+    }
+    fclose(in);
+  }
+#ifndef serial
+  MPI_Bcast(&num_dmds,1,MPI_INT,0,MPI_COMM_WORLD);
+  if (m_rank) {
+    intervals_start.resize(num_dmds);
+    intervals_end.resize(num_dmds);
+  }
+  MPI_Bcast(intervals_start.data(),num_dmds,MPI_DOUBLE,0,MPI_COMM_WORLD);
+  MPI_Bcast(intervals_end.data(),num_dmds,MPI_DOUBLE,0,MPI_COMM_WORLD);
+#endif
+
+  for (int i = 0; i < num_dmds; i++) {
+
+    m_intervals.push_back( Interval(intervals_start[i],intervals_end[i]) );
+
+    char idx_string[_MAX_STRING_SIZE_];
+    sprintf(idx_string, "%04d", i);
+    std::string fname = fname_root + std::string(idx_string);
+    if (!m_rank) {
+      printf( "  Loading DMD object (%s), time window=[%1.2e,%1.2e].\n", 
+              fname.c_str(),
+              m_intervals[i].first, m_intervals[i].second );
+    }
+    m_dmd.push_back( new CAROM::DMD(fname) );
   }
 
   return;
@@ -206,7 +279,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
                               int     a_nproc, /*!< Number of MPI processes */
                               double  a_dt     /*!< Time step size */ )
 {
-  SimulationObject* sim = (SimulationObject*) a_s;
+  const SimulationObject* sim = (const SimulationObject*) a_s;
 
   m_rank = a_rank;
   m_nproc = a_nproc;
@@ -228,14 +301,14 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 
     if (!in) {
 
-      strcpy( mode_c_str, "none" );
-      strcpy( type_c_str, "none" );
+      strcpy( mode_c_str, _ROM_MODE_NONE_ );
+      strcpy( type_c_str, _ROM_TYPE_NONE_ );
       strcpy( save_c_str, "false" );
 
     } else {
 
-      strcpy( mode_c_str, "train" );
-      strcpy( type_c_str, "DMD" );
+      strcpy( mode_c_str, _ROM_MODE_TRAIN_ );
+      strcpy( type_c_str,_ROM_TYPE_DMD_ );
       strcpy( save_c_str, "true" );
 
       int ferr;
@@ -288,23 +361,21 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
   m_mode = std::string( mode_c_str );
   m_rom_type = std::string( type_c_str );
 
-  m_save_ROM = (((std::string(save_c_str) == "true")) && (m_mode == "train"));
+  m_save_ROM = (((std::string(save_c_str) == "true")) && (m_mode == _ROM_MODE_TRAIN_));
 
   m_rom.resize( m_nsims, nullptr );
   m_U.resize( m_nsims, nullptr );
-  if (m_mode == "train") {
-    if (m_rom_type == _ROM_TYPE_DMD_) {
-      for (int ns = 0; ns < m_nsims; ns++) {
-        m_rom[ns] = new DMDROMObject( m_vec_size[ns], 
-                                      m_sampling_freq*a_dt, 
-                                      m_rdim, 
-                                      m_rank, 
-                                      m_nproc );
-      }
-    }
+  if (m_rom_type == _ROM_TYPE_DMD_) {
     for (int ns = 0; ns < m_nsims; ns++) {
-      m_U[ns] = new double[m_vec_size[ns]];
+      m_rom[ns] = new DMDROMObject( m_vec_size[ns], 
+                                    m_sampling_freq*a_dt, 
+                                    m_rdim, 
+                                    m_rank, 
+                                    m_nproc );
     }
+  }
+  for (int ns = 0; ns < m_nsims; ns++) {
+    m_U[ns] = new CAROM::Vector(m_vec_size[ns],true);
   }
 
   m_is_defined = true;
@@ -314,15 +385,15 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 /*! Copy HyPar solution to the work vectors a_U. Note that the HyPar solution has ghost
  * points but the work vectors a_U is a serialized vector of the solution without ghost
  * points */
-void libROMInterface::copyFromHyPar(  std::vector<double*>& a_U,  /*!< work vector */
-                                      void*                 a_s   /*!< Array of simulation objects of 
-                                                                       type #SimulationObject */ )
+void libROMInterface::copyFromHyPar(  std::vector<CAROM::Vector*>& a_U,  /*!< work vector */
+                                      void* a_s   /*!< Array of simulation objects of 
+                                                       type #SimulationObject */ )
 {
-  SimulationObject* sim = (SimulationObject*) a_s;
+  const SimulationObject* sim = (const SimulationObject*) a_s;
 
   for (int ns = 0; ns < m_nsims; ns++) {
-    double* vec = a_U[ns];
-    double* u = sim[ns].solver.u;
+    double* vec = a_U[ns]->getData();
+    const double* u = sim[ns].solver.u;
 
     std::vector<int> index(sim[ns].solver.ndims);
 
@@ -341,16 +412,25 @@ void libROMInterface::copyFromHyPar(  std::vector<double*>& a_U,  /*!< work vect
 
 /*! Copy the work vectors a_U to HyPar solution. Note that the HyPar solution has ghost
  * points but the work vectors a_U is a serialized vector of the solution without ghost
- * points */
-void libROMInterface::copyToHyPar(  std::vector<double*>& a_U,  /*!< Work vector */
-                                    void*                 a_s   /*!< Array of simulation objects of 
-                                                                     type #SimulationObject */ )
+ * points.
+ *
+ * \b Note: if libROMInterface::m_mode is "predict", then the vector will be copied
+ * into the main solution variable HyPar::u; otherwise it will be copied into the
+ * variable for ROM prediction HyPar::u_rom_predicted */
+void libROMInterface::copyToHyPar(  const std::vector<CAROM::Vector*>& a_U,  /*!< Work vector */
+                                    void* a_s   /*!< Array of simulation objects of 
+                                                     type #SimulationObject */ ) const
 {
   SimulationObject* sim = (SimulationObject*) a_s;
 
   for (int ns = 0; ns < m_nsims; ns++) {
-    double* vec = a_U[ns];
-    double* u = sim[ns].solver.u_rom_predicted;
+    const double* vec = a_U[ns]->getData();
+    double* u;
+    if (m_mode == _ROM_MODE_PREDICT_) {
+      u = sim[ns].solver.u;
+    } else {
+      u = sim[ns].solver.u_rom_predicted;
+    }
 
     std::vector<int> index(sim[ns].solver.ndims);
 
@@ -369,19 +449,28 @@ void libROMInterface::copyToHyPar(  std::vector<double*>& a_U,  /*!< Work vector
 
 /*! Copy a vector a_vec to HyPar solution. Note that the HyPar solution has ghost
  * points but the vector a_vec is a serialized vector of the solution without ghost
- * points */
-void libROMInterface::copyToHyPar(  double* a_vec,  /*!< Work vector */
-                                    void*   a_s,    /*!< Array of simulation objects of 
-                                                         type #SimulationObject */
-                                    int     a_idx   /*!< Simulation object index */ )
+ * points.
+ *
+ * \b Note: if libROMInterface::m_mode is "predict", then the vector will be copied
+ * into the main solution variable HyPar::u; otherwise it will be copied into the
+ * variable for ROM prediction HyPar::u_rom_predicted */
+void libROMInterface::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vector */
+                                    void* a_s, /*!< Array of simulation objects of 
+                                                    type #SimulationObject */
+                                    int a_idx /*!< Simulation object index */ ) const
 {
   SimulationObject* sim = (SimulationObject*) a_s;
 
-  double* u = sim[a_idx].solver.u_rom_predicted;
+  double* u;
+  if (m_mode == _ROM_MODE_PREDICT_) {
+    u = sim[a_idx].solver.u;
+  } else {
+    u = sim[a_idx].solver.u_rom_predicted;
+  }
   std::vector<int> index(sim[a_idx].solver.ndims);
 
   ArrayCopynD(  sim[a_idx].solver.ndims,
-                a_vec,
+                a_vec.getData(),
                 u,
                 sim[a_idx].solver.dim_local,
                 0,

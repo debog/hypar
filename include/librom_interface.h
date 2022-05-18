@@ -8,8 +8,19 @@
 #ifndef _LIBROM_INTERFACE_H_
 #define _LIBROM_INTERFACE_H_
 
+/*! Don't use any ROM */
+#define _ROM_MODE_NONE_ "none"
+/*! Training mode */
+#define _ROM_MODE_TRAIN_ "train"
+/*! Prediction mode */
+#define _ROM_MODE_PREDICT_ "predict"
+
+/*! No ROM type */
+#define _ROM_TYPE_NONE_ "none"
+/*! DMD-type ROM */
+#define _ROM_TYPE_DMD_ "DMD"
+
 #include <climits>
-#include <cfloat>
 #include <string>
 #include <vector>
 #include <utility>
@@ -21,9 +32,6 @@
 
 /*! Filename for libROM-related inputs */
 #define _LIBROM_INP_FNAME_ "librom.inp"
-
-/*! DMD-type ROM */
-#define _ROM_TYPE_DMD_ "DMD"
 
 /*! Interval type */
 typedef std::pair<double,double> Interval;
@@ -42,14 +50,18 @@ class ROMObject
 {
   public:
 
+    /*! Project initial solution for prediction */
+    virtual void projectInitialSolution( CAROM::Vector& ) = 0;
     /*! take a sample (solution snapshot) */
-    virtual void takeSample( double*, const double ) = 0;
+    virtual void takeSample( CAROM::Vector&, const double ) = 0;
     /*! train the ROM object */
     virtual void train() = 0;
     /*! compute prediction at given time */
-    virtual const CAROM::Vector* const predict( const double ) = 0;
+    virtual const CAROM::Vector* const predict( const double ) const = 0;
     /*! save ROM object to file */
-    virtual void save( const std::string& ) = 0;
+    virtual void save( const std::string& ) const = 0;
+    /*! load ROM object from file */
+    virtual void load( const std::string& ) = 0;
 
   protected:
 
@@ -80,29 +92,38 @@ class DMDROMObject : public ROMObject
       m_intervals.clear();
     }
 
+    /*! Project initial solution for prediction */
+    virtual void projectInitialSolution(  CAROM::Vector& a_U /*!< solution vector */ )
+    {
+      for (int i = 0; i < m_dmd.size(); i++) {
+        m_dmd[i]->projectInitialCondition( &a_U );
+      }
+      return;
+    }
+
     /*! take a sample (solution snapshot) */
-    virtual void takeSample(  double* a_U, /*!< solution vector */
+    virtual void takeSample(  CAROM::Vector& a_U, /*!< solution vector */
                               const double a_time /*!< sample time */ )
     {
       if (m_tic == 0) {
 
         m_dmd.push_back( new CAROM::DMD(m_vec_size, m_dt) );
-        m_intervals.push_back( Interval(a_time, DBL_MAX) );
+        m_intervals.push_back( Interval(a_time, m_t_final) );
         if (!m_rank) {
           printf("DMDROMObject::takeSample() - creating new DMD object, t=%f (total: %d).\n",
                  m_intervals[m_curr_win].first, m_dmd.size());
         }
-        m_dmd[m_curr_win]->takeSample( a_U, a_time );
+        m_dmd[m_curr_win]->takeSample( a_U.getData(), a_time );
 
       } else {
 
-        m_dmd[m_curr_win]->takeSample( a_U, a_time );
+        m_dmd[m_curr_win]->takeSample( a_U.getData(), a_time );
         if (m_tic%m_num_window_samples == 0) {
           m_intervals[m_curr_win].second = a_time;
           m_curr_win++;
           m_dmd.push_back( new CAROM::DMD(m_vec_size, m_dt) );
-          m_intervals.push_back( Interval(a_time, DBL_MAX) );
-          m_dmd[m_curr_win]->takeSample( a_U, a_time );
+          m_intervals.push_back( Interval(a_time, m_t_final) );
+          m_dmd[m_curr_win]->takeSample( a_U.getData(), a_time );
           if (!m_rank) {
             printf("DMDROMObject::takeSample() - creating new DMD object, t=%f (total: %d).\n",
                    m_intervals[m_curr_win].first, m_dmd.size());
@@ -120,10 +141,11 @@ class DMDROMObject : public ROMObject
 
     /*! compute prediction at given time */
     virtual 
-    const CAROM::Vector* const predict(const double a_t /*!< time at which to predict solution */ )
+    const CAROM::Vector* const predict(const double a_t /*!< time at which to predict solution */ ) const
     {
       for (int i = 0; i < m_dmd.size(); i++) {
-        if ((a_t >= m_intervals[i].first) && (a_t < m_intervals[i].second)) {
+        if (   (a_t >= m_intervals[i].first) 
+            && (  (a_t < m_intervals[i].second) || (m_intervals[i].second < 0)  ) ){
           return m_dmd[i]->predict(a_t);
         }
       }
@@ -132,7 +154,10 @@ class DMDROMObject : public ROMObject
     }
 
     /*! save DMD object to file */
-    virtual void save(const std::string& a_fname_root /*!< Filename root*/);
+    virtual void save(const std::string& a_fname_root /*!< Filename root*/) const;
+
+    /*! load DMD object from file */
+    virtual void load(const std::string& a_fname_root /*!< Filename root*/);
 
   protected:
 
@@ -142,16 +167,17 @@ class DMDROMObject : public ROMObject
     int m_rank;   /*!< MPI rank */
     int m_nproc;  /*!< Number of MPI ranks */
 
-    int         m_vec_size; /*!< Local size of solution vector */
-    double      m_dt;       /*!< Time step size */
-    int         m_rdim;     /*!< Latent space dimension */
+    int     m_vec_size; /*!< Local size of solution vector */
+    double  m_dt;       /*!< Time step size */
+    double  m_t_final;  /*!< Final time */
+    int     m_rdim;     /*!< Latent space dimension */
 
     int m_num_window_samples; /*!< Number of samples per DMD for time-windowing */
 
     int m_tic; /*! private ticker to count number of samples taken */
     int m_curr_win; /*! private index for current window */
 
-    std::string m_dirname; /*!< Subdirectory where DMD objects are written to */
+    std::string m_dirname; /*!< Subdirectory where DMD objects are written to or read from */
 
   private:
 };
@@ -227,12 +253,22 @@ class libROMInterface
     inline double predictWallclockTime() const { return m_predict_wctime; }
 
     /*! Take a sample for training */
-    inline void takeSample( void*   a_s, /*!< Array of simulation objects of type #SimulationObject */
-                            double  a_t /*!< Current simulation time */ )
+    inline void takeSample( void* a_s,/*!< Array of simulation objects of type #SimulationObject */
+                            const double a_t /*!< Current simulation time */ )
     {
       copyFromHyPar( m_U, a_s );
       for (int ns = 0; ns < m_nsims; ns++) {
-        m_rom[ns]->takeSample( m_U[ns], a_t );
+        m_rom[ns]->takeSample( *(m_U[ns]), a_t );
+      }
+    }
+
+    /*! Project initial solution for prediction */
+    inline void projectInitialSolution( void* a_s  /*!< Array of simulation objects of 
+                                                        type #SimulationObject */ )
+    {
+      copyFromHyPar( m_U, a_s );
+      for (int ns = 0; ns < m_nsims; ns++) {
+        m_rom[ns]->projectInitialSolution( *(m_U[ns]) );
       }
     }
 
@@ -264,7 +300,7 @@ class libROMInterface
 
     /*! Predict the solution at a given time */
     inline void predict(  void*  a_s, /*!< Array of simulation objects of type #SimulationObject */
-                          double a_t  /*!< time at which to predict solution */)
+                          const double a_t  /*!< time at which to predict solution */) const
     {
       m_predict_wctime = 0.0;
       for (int ns = 0; ns < m_nsims; ns++) {
@@ -277,7 +313,7 @@ class libROMInterface
         MPI_Barrier(MPI_COMM_WORLD);
 #endif
         gettimeofday(&m_predict_end, NULL);
-        copyToHyPar( u_predicted->getData(), a_s, ns );
+        copyToHyPar( *u_predicted, a_s, ns );
 
         long long walltime;
         walltime = (  (m_predict_end.tv_sec*1000000 + m_predict_end.tv_usec)
@@ -287,7 +323,7 @@ class libROMInterface
     }
 
     /*! Save ROM object to file */
-    inline void saveROM(const std::string& a_fname_root=""/*!< filename root */)
+    inline void saveROM(const std::string& a_fname_root=""/*!< filename root */) const
     {
       if (m_save_ROM) {      
         for (int ns = 0; ns < m_nsims; ns++) {
@@ -306,14 +342,32 @@ class libROMInterface
       return;
     }
 
+    /*! load ROM object from file */
+    inline void loadROM(const std::string& a_fname_root=""/*!< filename root */)
+    {
+      for (int ns = 0; ns < m_nsims; ns++) {
+        std::string fname_root = a_fname_root;
+        if (m_nsims > 1) {
+          char idx_string[_MAX_STRING_SIZE_];
+          sprintf(idx_string, "sim%03d", ns);
+          fname_root += std::string(idx_string);
+        }
+        if (!m_rank) {
+          printf("libROMInterface::loadROM() - loading ROM objects.\n");
+        }
+        m_rom[ns]->load(fname_root);
+      }
+      return;
+    }
+
     /*! Copy HyPar solution to the work vectors m_U */
-    void copyFromHyPar( std::vector<double*>&, void* );
+    void copyFromHyPar( std::vector<CAROM::Vector*>&, void* );
 
     /*! Copy the work vectors m_U to HyPar */
-    void copyToHyPar( std::vector<double*>&, void* );
+    void copyToHyPar( const std::vector<CAROM::Vector*>&, void* ) const;
 
     /*! Copy a vector to HyPar */
-    void copyToHyPar( double*, void*, int );
+    void copyToHyPar( const CAROM::Vector&, void*, int ) const;
 
   protected:
 
@@ -332,14 +386,14 @@ class libROMInterface
     std::string m_rom_type; /*!< Type of ROM (eg: DMD) */
 
     std::vector<ROMObject*> m_rom; /*!< ROM objects */
-    std::vector<double*> m_U; /*!< Work vectors */
+    std::vector<CAROM::Vector*> m_U; /*!< Work vectors */
 
-    struct timeval m_train_start; /*<! Training start time */
-    struct timeval m_train_end; /*<! Training end time */
-    struct timeval m_predict_start; /*<! Prediction start time */
-    struct timeval m_predict_end; /*<! Prediction end time */
-    double m_train_wctime; /*!< Wallclock time for training */
-    double m_predict_wctime; /*!< Wallclock time for prediction */
+    mutable struct timeval m_train_start; /*<! Training start time */
+    mutable struct timeval m_train_end; /*<! Training end time */
+    mutable struct timeval m_predict_start; /*<! Prediction start time */
+    mutable struct timeval m_predict_end; /*<! Prediction end time */
+    mutable double m_train_wctime; /*!< Wallclock time for training */
+    mutable double m_predict_wctime; /*!< Wallclock time for prediction */
 
     bool m_save_ROM; /*!< Save ROM objects to file (default: yes) */
 

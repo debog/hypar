@@ -398,19 +398,19 @@
 # define INLINE inline
 #endif
 
-INLINE int    ArrayCopynD            (int,double*,double*,int*,int,int,int*,int);
+INLINE int    ArrayCopynD            (int,const double*,double*,int*,int,int,int*,int);
 INLINE double ArrayMaxnD             (int,int,int*,int,int*,double*);
 INLINE double ArraySumSquarenD       (int,int,int*,int,int*,double*);
 INLINE double ArraySumAbsnD          (int,int,int*,int,int*,double*);
 
 /*! Copy one n-D array to another n-D array (both of which are stored in memory as 1D arrays) */
-INLINE int ArrayCopynD(int    ndims,  /*!< number of dimensions */
-                       double *x,     /*!< copy-from array */
-                       double *y,     /*!< copy-to   array */
-                       int    *dim,   /*!< integer array of size in each dimension */
-                       int    g1,     /*!< number of ghost points in copy-from array x */
-                       int    g2,     /*!< number of ghost points in copy-to   array y */
-                       int    *index, /*!< pre-allocated (by the calling function) integer array of size ndims */
+INLINE int ArrayCopynD(int    ndims,    /*!< number of dimensions */
+                       const double *x, /*!< copy-from array */
+                       double *y,       /*!< copy-to   array */
+                       int    *dim,     /*!< integer array of size in each dimension */
+                       int    g1,       /*!< number of ghost points in copy-from array x */
+                       int    g2,       /*!< number of ghost points in copy-to   array y */
+                       int    *index,   /*!< pre-allocated (by the calling function) integer array of size ndims */
                        int    nvars   /*!< number of elements at one array location,
                                            can be > 1 for systems of equations)*/
                       )
