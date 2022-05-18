@@ -180,13 +180,12 @@ class libROMInterface
       m_rank = -1;
       m_nproc = -1;
       m_nsims = -1;
-      m_vec_size = -1;
-      m_vec_offsets.clear();
+      m_vec_size.clear();
       m_rdim = -1;
       m_sampling_freq = 1;
       m_mode = "train";
-      m_rom = nullptr;
-      m_U = nullptr;
+      m_rom.clear();
+      m_U.clear();
       m_train_wctime = 0;
       m_predict_wctime = 0;
       m_save_ROM = true;
@@ -209,13 +208,13 @@ class libROMInterface
     ~libROMInterface()
     {
       if (m_mode == "train") {
-        delete m_rom;
-        delete m_U;
+        for (int ns = 0; ns < m_nsims; ns++) {
+          delete m_rom[ns];
+          delete m_U[ns];
+        }
       }
     }
 
-    /*! return vector size */
-    inline int vectorSize() const { return m_vec_size; }
     /*! return the sampling frequency */
     inline int samplingFrequency() const { return m_sampling_freq; }
     /*! return the mode */
@@ -232,7 +231,9 @@ class libROMInterface
                             double  a_t /*!< Current simulation time */ )
     {
       copyFromHyPar( m_U, a_s );
-      m_rom->takeSample( m_U, a_t );
+      for (int ns = 0; ns < m_nsims; ns++) {
+        m_rom[ns]->takeSample( m_U[ns], a_t );
+      }
     }
 
     /*! Train the ROM object */
@@ -242,7 +243,14 @@ class libROMInterface
       MPI_Barrier(MPI_COMM_WORLD);
 #endif
       gettimeofday(&m_train_start, NULL);
-      m_rom->train();
+      for (int ns = 0; ns < m_nsims; ns++) {
+        if (m_nsims > 1) {
+          if (!m_rank) {
+            printf("Training ROM object for domain %d.\n", ns);
+          }
+        }
+        m_rom[ns]->train();
+      }
 #ifndef serial
       MPI_Barrier(MPI_COMM_WORLD);
 #endif
@@ -258,40 +266,54 @@ class libROMInterface
     inline void predict(  void*  a_s, /*!< Array of simulation objects of type #SimulationObject */
                           double a_t  /*!< time at which to predict solution */)
     {
+      m_predict_wctime = 0.0;
+      for (int ns = 0; ns < m_nsims; ns++) {
 #ifndef serial
-      MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
 #endif
-      gettimeofday(&m_predict_start, NULL);
-      const CAROM::Vector* const u_predicted = m_rom->predict(a_t);
+        gettimeofday(&m_predict_start, NULL);
+        const CAROM::Vector* const u_predicted = m_rom[ns]->predict(a_t);
 #ifndef serial
-      MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
 #endif
-      gettimeofday(&m_predict_end, NULL);
-      copyToHyPar( u_predicted->getData(), a_s );
+        gettimeofday(&m_predict_end, NULL);
+        copyToHyPar( u_predicted->getData(), a_s, ns );
 
-      long long walltime;
-      walltime = (  (m_predict_end.tv_sec*1000000 + m_predict_end.tv_usec)
-                  - (m_predict_start.tv_sec*1000000 + m_predict_start.tv_usec) );
-      m_predict_wctime = (double) walltime / 1000000.0;
+        long long walltime;
+        walltime = (  (m_predict_end.tv_sec*1000000 + m_predict_end.tv_usec)
+                    - (m_predict_start.tv_sec*1000000 + m_predict_start.tv_usec) );
+        m_predict_wctime += (double) walltime / 1000000.0;
+      }
     }
 
     /*! Save ROM object to file */
     inline void saveROM(const std::string& a_fname_root=""/*!< filename root */)
     {
       if (m_save_ROM) {      
-        if (!m_rank) {
-          printf("libROMInterface::saveROM() - saving ROM objects.\n");
+        for (int ns = 0; ns < m_nsims; ns++) {
+          std::string fname_root = a_fname_root;
+          if (m_nsims > 1) {
+            char idx_string[_MAX_STRING_SIZE_];
+            sprintf(idx_string, "sim%03d", ns);
+            fname_root += std::string(idx_string);
+          }
+          if (!m_rank) {
+            printf("libROMInterface::saveROM() - saving ROM objects.\n");
+          }
+          m_rom[ns]->save(fname_root);
         }
-        m_rom->save(a_fname_root);
       }
       return;
     }
 
-    /*! Copy HyPar solution to the work vector m_U */
-    void copyFromHyPar( double*, void* );
+    /*! Copy HyPar solution to the work vectors m_U */
+    void copyFromHyPar( std::vector<double*>&, void* );
 
-    /*! Copy the work vector m_U to HyPar */
-    void copyToHyPar( double*, void* );
+    /*! Copy the work vectors m_U to HyPar */
+    void copyToHyPar( std::vector<double*>&, void* );
+
+    /*! Copy a vector to HyPar */
+    void copyToHyPar( double*, void*, int );
 
   protected:
 
@@ -301,8 +323,7 @@ class libROMInterface
     int m_nproc;  /*!< Number of MPI ranks */
     int m_nsims;  /*!< Number of simulations */
 
-    int m_vec_size; /*!< Solution vector size */
-    std::vector<int> m_vec_offsets; /*!< Offset for each simulation */
+    std::vector<int> m_vec_size; /*!< Solution vector size for each simulation*/
 
     int m_rdim; /*!< Reduced model dimensionality */
     int m_sampling_freq; /*!< Frequency at which to take samples */
@@ -310,8 +331,8 @@ class libROMInterface
     std::string m_mode; /*!< Mode: none, train */
     std::string m_rom_type; /*!< Type of ROM (eg: DMD) */
 
-    ROMObject* m_rom; /*!< ROM object */
-    double* m_U; /*!< Work vector */
+    std::vector<ROMObject*> m_rom; /*!< ROM objects */
+    std::vector<double*> m_U; /*!< Work vectors */
 
     struct timeval m_train_start; /*<! Training start time */
     struct timeval m_train_end; /*<! Training end time */

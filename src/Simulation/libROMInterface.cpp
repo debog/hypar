@@ -165,7 +165,7 @@ void DMDROMObject::save(const std::string& a_fname_root /*!< Filename root */)
     std::string fname = fname_root + std::string(idx_string);
     std::string summary_fname = summary_fname_root + std::string(idx_string);
     if (!m_rank) {
-      printf( "  Saving DMD object and summary (filenames %s, %s).\n", 
+      printf( "  Saving DMD object and summary (%s, %s).\n", 
               fname.c_str(), summary_fname.c_str() );
     }
     m_dmd[i]->save(fname);
@@ -212,11 +212,9 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
   m_nproc = a_nproc;
   m_nsims = a_nsims;
 
-  m_vec_size = 0;
-  m_vec_offsets.resize(m_nsims);
+  m_vec_size.resize(m_nsims);
   for (int ns = 0; ns < m_nsims; ns++) {
-    m_vec_offsets[ns] = m_vec_size;
-    m_vec_size += (sim[ns].solver.npoints_local * sim[ns].solver.nvars);
+    m_vec_size[ns] = (sim[ns].solver.npoints_local * sim[ns].solver.nvars);
   }
 
   char mode_c_str[_MAX_STRING_SIZE_];
@@ -277,7 +275,6 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
     printf("  mode: %s\n", mode_c_str);
     printf("  type: %s\n", type_c_str);
     printf("  save to file: %s\n", save_c_str);
-    printf("  local vector size: %d\n", m_vec_size);
   }
 
 #ifndef serial
@@ -293,32 +290,38 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 
   m_save_ROM = (((std::string(save_c_str) == "true")) && (m_mode == "train"));
 
+  m_rom.resize( m_nsims, nullptr );
+  m_U.resize( m_nsims, nullptr );
   if (m_mode == "train") {
     if (m_rom_type == _ROM_TYPE_DMD_) {
-      m_rom = new DMDROMObject( m_vec_size, 
-                                m_sampling_freq*a_dt, 
-                                m_rdim, 
-                                m_rank, 
-                                m_nproc );
+      for (int ns = 0; ns < m_nsims; ns++) {
+        m_rom[ns] = new DMDROMObject( m_vec_size[ns], 
+                                      m_sampling_freq*a_dt, 
+                                      m_rdim, 
+                                      m_rank, 
+                                      m_nproc );
+      }
     }
-    m_U = new double[m_vec_size];
+    for (int ns = 0; ns < m_nsims; ns++) {
+      m_U[ns] = new double[m_vec_size[ns]];
+    }
   }
 
   m_is_defined = true;
   return;
 }
 
-/*! Copy HyPar solution to the work vector a_U. Note that the HyPar solution has ghost
- * points but the work vector a_U is a serialized vector of the solution without ghost
+/*! Copy HyPar solution to the work vectors a_U. Note that the HyPar solution has ghost
+ * points but the work vectors a_U is a serialized vector of the solution without ghost
  * points */
-void libROMInterface::copyFromHyPar(  double* a_U,  /*!< work vector */
-                                      void* a_s     /*!< Array of simulation objects of 
-                                                         type #SimulationObject */ )
+void libROMInterface::copyFromHyPar(  std::vector<double*>& a_U,  /*!< work vector */
+                                      void*                 a_s   /*!< Array of simulation objects of 
+                                                                       type #SimulationObject */ )
 {
   SimulationObject* sim = (SimulationObject*) a_s;
 
   for (int ns = 0; ns < m_nsims; ns++) {
-    double* vec = a_U + m_vec_offsets[ns];
+    double* vec = a_U[ns];
     double* u = sim[ns].solver.u;
 
     std::vector<int> index(sim[ns].solver.ndims);
@@ -336,17 +339,17 @@ void libROMInterface::copyFromHyPar(  double* a_U,  /*!< work vector */
   return;
 }
 
-/*! Copy the work vector a_U to HyPar solution. Note that the HyPar solution has ghost
- * points but the work vector a_U is a serialized vector of the solution without ghost
+/*! Copy the work vectors a_U to HyPar solution. Note that the HyPar solution has ghost
+ * points but the work vectors a_U is a serialized vector of the solution without ghost
  * points */
-void libROMInterface::copyToHyPar(  double* a_U,  /*!< Work vector */
-                                    void* a_s     /*!< Array of simulation objects of 
-                                                       type #SimulationObject */ )
+void libROMInterface::copyToHyPar(  std::vector<double*>& a_U,  /*!< Work vector */
+                                    void*                 a_s   /*!< Array of simulation objects of 
+                                                                     type #SimulationObject */ )
 {
   SimulationObject* sim = (SimulationObject*) a_s;
 
   for (int ns = 0; ns < m_nsims; ns++) {
-    double* vec = a_U + m_vec_offsets[ns];
+    double* vec = a_U[ns];
     double* u = sim[ns].solver.u_rom_predicted;
 
     std::vector<int> index(sim[ns].solver.ndims);
@@ -360,6 +363,31 @@ void libROMInterface::copyToHyPar(  double* a_U,  /*!< Work vector */
                   index.data(),
                   sim[ns].solver.nvars );
   }
+
+  return;
+}
+
+/*! Copy a vector a_vec to HyPar solution. Note that the HyPar solution has ghost
+ * points but the vector a_vec is a serialized vector of the solution without ghost
+ * points */
+void libROMInterface::copyToHyPar(  double* a_vec,  /*!< Work vector */
+                                    void*   a_s,    /*!< Array of simulation objects of 
+                                                         type #SimulationObject */
+                                    int     a_idx   /*!< Simulation object index */ )
+{
+  SimulationObject* sim = (SimulationObject*) a_s;
+
+  double* u = sim[a_idx].solver.u_rom_predicted;
+  std::vector<int> index(sim[a_idx].solver.ndims);
+
+  ArrayCopynD(  sim[a_idx].solver.ndims,
+                a_vec,
+                u,
+                sim[a_idx].solver.dim_local,
+                0,
+                sim[a_idx].solver.ghosts,
+                index.data(),
+                sim[a_idx].solver.nvars );
 
   return;
 }
