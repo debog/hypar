@@ -90,7 +90,10 @@ def getSolutionSnapshots( path,
                           nvars, 
                           size,
                           op_root='op'):
-  ndof = nvars * np.prod(size)
+  if nsims > 1:
+    ndof = nvars * np.prod(size[0,:])
+  else:
+    ndof = nvars * np.prod(size)
   snapshots = np.empty((0,ndof),np.float64)
   for sim in range(nsims):
     if n_op_files > 1:
