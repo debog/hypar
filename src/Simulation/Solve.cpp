@@ -187,7 +187,6 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   
     if (rom_interface.mode() == _ROM_MODE_TRAIN_) {
   
-      if (!rank) printf("libROM: Training ROM.\n");
       rom_interface.train();
       if (!rank) printf("libROM: total training wallclock time: %f (seconds).\n", 
                         rom_interface.trainWallclockTime() );
@@ -197,10 +196,9 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   
         double waqt = op_times_arr[iter];
   
-        if (!rank) printf("libROM: Predicting solution at time %1.4e using ROM.\n", waqt);
         rom_interface.predict(sim, waqt);
-        if (!rank) printf("libROM:   wallclock time: %f (seconds).\n", 
-                          rom_interface.predictWallclockTime() );
+        if (!rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n", 
+                            waqt, rom_interface.predictWallclockTime() );
         total_rom_predict_time += rom_interface.predictWallclockTime();
   
         /* calculate diff between ROM and PDE solutions */
@@ -232,6 +230,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
         = sim[ns].solver.rom_diff_norms[1]
         = sim[ns].solver.rom_diff_norms[2]
         = -1;
+      strcpy(sim[ns].solver.ConservationCheck,"no");
     }
 
     rom_interface.loadROM();
@@ -262,10 +261,9 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   
       double waqt = op_times_arr[iter];
   
-      if (!rank) printf("libROM: Predicting solution at time %1.4e using ROM.\n", waqt);
       rom_interface.predict(sim, waqt);
-      if (!rank) printf("libROM:   wallclock time: %f (seconds).\n", 
-                        rom_interface.predictWallclockTime() );
+      if (!rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n", 
+                          waqt, rom_interface.predictWallclockTime() );
       total_rom_predict_time += rom_interface.predictWallclockTime();
   
       /* write the solution to file */

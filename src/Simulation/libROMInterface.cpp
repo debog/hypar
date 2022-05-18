@@ -43,6 +43,7 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
   m_nproc = a_nproc;
 
   m_dmd.clear();
+  m_dmd_is_trained.clear();
   m_intervals.clear();
   m_vec_size = a_vec_size;
   m_dt = a_dt;
@@ -126,11 +127,13 @@ void DMDROMObject::train()
 
   if (m_dmd.size() > 0) {
     for (int i = 0; i < m_dmd.size(); i++) {
-      int ncol = m_dmd[i]->getSnapshotMatrix()->numColumns();
-      if (!m_rank) {
-        printf("DMDROMObject::train() - training DMD object %d with %d samples.\n", i, ncol );
+      if (!m_dmd_is_trained[i]) {
+        int ncol = m_dmd[i]->getSnapshotMatrix()->numColumns();
+        if (!m_rank) {
+          printf("DMDROMObject::train() - training DMD object %d with %d samples.\n", i, ncol );
+        }
+        m_dmd[i]->train(m_rdim);
       }
-      m_dmd[i]->train(m_rdim);
     }
   } else {
     printf("ERROR in DMDROMObject::train(): m_dmd is of size zero!");

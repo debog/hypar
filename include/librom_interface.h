@@ -108,7 +108,9 @@ class DMDROMObject : public ROMObject
       if (m_tic == 0) {
 
         m_dmd.push_back( new CAROM::DMD(m_vec_size, m_dt) );
+        m_dmd_is_trained.push_back(false);
         m_intervals.push_back( Interval(a_time, m_t_final) );
+
         if (!m_rank) {
           printf("DMDROMObject::takeSample() - creating new DMD object, t=%f (total: %d).\n",
                  m_intervals[m_curr_win].first, m_dmd.size());
@@ -118,10 +120,22 @@ class DMDROMObject : public ROMObject
       } else {
 
         m_dmd[m_curr_win]->takeSample( a_U.getData(), a_time );
+
         if (m_tic%m_num_window_samples == 0) {
+
           m_intervals[m_curr_win].second = a_time;
+          int ncol = m_dmd[m_curr_win]->getSnapshotMatrix()->numColumns();
+          if (!m_rank) {
+            printf("DMDROMObject::train() - training DMD object %d with %d samples.\n", 
+                    m_curr_win, ncol );
+          }
+          m_dmd[m_curr_win]->train(m_rdim);
+          m_dmd_is_trained[m_curr_win] = true;
+
           m_curr_win++;
+
           m_dmd.push_back( new CAROM::DMD(m_vec_size, m_dt) );
+          m_dmd_is_trained.push_back(false);
           m_intervals.push_back( Interval(a_time, m_t_final) );
           m_dmd[m_curr_win]->takeSample( a_U.getData(), a_time );
           if (!m_rank) {
@@ -162,6 +176,7 @@ class DMDROMObject : public ROMObject
   protected:
 
     std::vector<CAROM::DMD*> m_dmd; /*!< Vector of DMD objects */
+    std::vector<bool> m_dmd_is_trained; /*!< Flag to indicate if DMD is trained */
     std::vector<Interval> m_intervals; /*!< Time intervals for each DMD object */
 
     int m_rank;   /*!< MPI rank */
@@ -257,9 +272,25 @@ class libROMInterface
                             const double a_t /*!< Current simulation time */ )
     {
       copyFromHyPar( m_U, a_s );
+      gettimeofday(&m_train_start, NULL);
       for (int ns = 0; ns < m_nsims; ns++) {
         m_rom[ns]->takeSample( *(m_U[ns]), a_t );
       }
+      gettimeofday(&m_train_end, NULL);
+
+      long long walltime;
+      walltime = (  (m_train_end.tv_sec*1000000 + m_train_end.tv_usec)
+                  - (m_train_start.tv_sec*1000000 + m_train_start.tv_usec) );
+      m_train_wctime += (double) walltime / 1000000.0;
+
+#ifndef serial
+      MPI_Allreduce(  MPI_IN_PLACE,
+                      &m_train_wctime,
+                      1,
+                      MPI_DOUBLE,
+                      MPI_MAX,
+                      MPI_COMM_WORLD );
+#endif
     }
 
     /*! Project initial solution for prediction */
@@ -275,27 +306,24 @@ class libROMInterface
     /*! Train the ROM object */
     inline void train()
     {
-#ifndef serial
-      MPI_Barrier(MPI_COMM_WORLD);
-#endif
       gettimeofday(&m_train_start, NULL);
       for (int ns = 0; ns < m_nsims; ns++) {
-        if (m_nsims > 1) {
-          if (!m_rank) {
-            printf("Training ROM object for domain %d.\n", ns);
-          }
-        }
         m_rom[ns]->train();
       }
-#ifndef serial
-      MPI_Barrier(MPI_COMM_WORLD);
-#endif
       gettimeofday(&m_train_end, NULL);
 
       long long walltime;
       walltime = (  (m_train_end.tv_sec*1000000 + m_train_end.tv_usec)
                   - (m_train_start.tv_sec*1000000 + m_train_start.tv_usec) );
-      m_train_wctime = (double) walltime / 1000000.0;
+      m_train_wctime += (double) walltime / 1000000.0;
+#ifndef serial
+      MPI_Allreduce(  MPI_IN_PLACE,
+                      &m_train_wctime,
+                      1,
+                      MPI_DOUBLE,
+                      MPI_MAX,
+                      MPI_COMM_WORLD );
+#endif
     }
 
     /*! Predict the solution at a given time */
@@ -304,14 +332,8 @@ class libROMInterface
     {
       m_predict_wctime = 0.0;
       for (int ns = 0; ns < m_nsims; ns++) {
-#ifndef serial
-        MPI_Barrier(MPI_COMM_WORLD);
-#endif
         gettimeofday(&m_predict_start, NULL);
         const CAROM::Vector* const u_predicted = m_rom[ns]->predict(a_t);
-#ifndef serial
-        MPI_Barrier(MPI_COMM_WORLD);
-#endif
         gettimeofday(&m_predict_end, NULL);
         copyToHyPar( *u_predicted, a_s, ns );
 
@@ -320,6 +342,14 @@ class libROMInterface
                     - (m_predict_start.tv_sec*1000000 + m_predict_start.tv_usec) );
         m_predict_wctime += (double) walltime / 1000000.0;
       }
+#ifndef serial
+      MPI_Allreduce(  MPI_IN_PLACE,
+                      &m_predict_wctime,
+                      1,
+                      MPI_DOUBLE,
+                      MPI_MAX,
+                      MPI_COMM_WORLD );
+#endif
     }
 
     /*! Save ROM object to file */
