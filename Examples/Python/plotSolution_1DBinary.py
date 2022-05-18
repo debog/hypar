@@ -104,6 +104,7 @@ if solver_inp_data['op_overwrite'] == 'no':
       plt_fname = plt_dir_name+'/fig_'+f'{var:02d}'+'_'+f'{i:05d}'+'.png'
       print('Saving %s' % plt_fname)
       plt.savefig(plt_fname)
+      plt.close()
 
 else:
 
@@ -145,4 +146,5 @@ else:
     plt_fname = plt_dir_name+'/fig_'+f'{var:02d}'+'.png'
     print('Saving %s' % plt_fname)
     plt.savefig(plt_fname)
+    plt.close()
 
