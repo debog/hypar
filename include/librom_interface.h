@@ -53,7 +53,7 @@ class ROMObject
     /*! Project initial solution for prediction */
     virtual void projectInitialSolution( CAROM::Vector& ) = 0;
     /*! take a sample (solution snapshot) */
-    virtual void takeSample( CAROM::Vector&, const double ) = 0;
+    virtual void takeSample( const CAROM::Vector&, const double ) = 0;
     /*! train the ROM object */
     virtual void train() = 0;
     /*! compute prediction at given time */
@@ -95,60 +95,22 @@ class DMDROMObject : public ROMObject
     /*! Project initial solution for prediction */
     virtual void projectInitialSolution(  CAROM::Vector& a_U /*!< solution vector */ )
     {
-      for (int i = 0; i < m_dmd.size(); i++) {
-        m_dmd[i]->projectInitialCondition( &a_U );
+      if (m_dmd.size() == 0) {
+        if (!m_rank) {
+          printf("ERROR in DMDROMObject::projectInitialSolution() - m_dmd is a vector of size 0.\n");
+        }
+        return;
+      }
+
+      m_dmd[0]->projectInitialCondition( &a_U );
+      for (int i = 1; i < m_dmd.size(); i++) {
+        m_dmd[i]->projectInitialCondition( m_dmd[i-1]->predict(m_intervals[i].first) );
       }
       return;
     }
 
     /*! take a sample (solution snapshot) */
-    virtual void takeSample(  CAROM::Vector& a_U, /*!< solution vector */
-                              const double a_time /*!< sample time */ )
-    {
-      if (m_tic == 0) {
-
-        m_dmd.push_back( new CAROM::DMD(m_vec_size, m_dt) );
-        m_dmd_is_trained.push_back(false);
-        m_intervals.push_back( Interval(a_time, m_t_final) );
-
-        if (!m_rank) {
-          printf("DMDROMObject::takeSample() - creating new DMD object, t=%f (total: %d).\n",
-                 m_intervals[m_curr_win].first, m_dmd.size());
-        }
-        m_dmd[m_curr_win]->takeSample( a_U.getData(), a_time );
-
-      } else {
-
-        m_dmd[m_curr_win]->takeSample( a_U.getData(), a_time );
-
-        if (m_tic%m_num_window_samples == 0) {
-
-          m_intervals[m_curr_win].second = a_time;
-          int ncol = m_dmd[m_curr_win]->getSnapshotMatrix()->numColumns();
-          if (!m_rank) {
-            printf("DMDROMObject::train() - training DMD object %d with %d samples.\n", 
-                    m_curr_win, ncol );
-          }
-          m_dmd[m_curr_win]->train(m_rdim);
-          m_dmd_is_trained[m_curr_win] = true;
-
-          m_curr_win++;
-
-          m_dmd.push_back( new CAROM::DMD(m_vec_size, m_dt) );
-          m_dmd_is_trained.push_back(false);
-          m_intervals.push_back( Interval(a_time, m_t_final) );
-          m_dmd[m_curr_win]->takeSample( a_U.getData(), a_time );
-          if (!m_rank) {
-            printf("DMDROMObject::takeSample() - creating new DMD object, t=%f (total: %d).\n",
-                   m_intervals[m_curr_win].first, m_dmd.size());
-          }
-        }
-
-      }
-
-      m_tic++;
-      return;
-    }
+    virtual void takeSample( const CAROM::Vector&, const double );
 
     /*! train the DMD object */
     virtual void train();
