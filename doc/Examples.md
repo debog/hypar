@@ -5933,26 +5933,26 @@ solution file. This script will need the environment variable
 Dynamic Mode Decomposition
 --------------------------
 
-\subpage linear_adv_sine_librom_dmd \n
-\subpage linear_adv_disc_librom_dmd \n
-\subpage sod_shock_tube_librom_dmd \n
-\subpage shu_osher_librom_dmd \n
+\subpage linear_adv_sine_librom_dmd_train \n
+\subpage linear_adv_disc_librom_dmd_train \n
+\subpage sod_shock_tube_librom_dmd_train \n
+\subpage shu_osher_librom_dmd_train \n
 \n
-\subpage euler2d_vortex_librom_dmd \n
-\subpage euler2d_riemann4_librom_dmd \n
-\subpage euler2d_rtb_librom_dmd \n
-\subpage navstok2d_ldsc_librom_dmd \n
-\subpage vlasov_1d1v_selfconsistent_librom_dmd \n
+\subpage euler2d_vortex_librom_dmd_train \n
+\subpage euler2d_riemann4_librom_dmd_train \n
+\subpage euler2d_rtb_librom_dmd_train \n
+\subpage navstok2d_ldsc_librom_dmd_train \n
+\subpage vlasov_1d1v_selfconsistent_librom_dmd_train \n
 \n
-\subpage ns3d_cylinder_steady_incompressible_viscous_librom_dmd \n
-\subpage ns3d_cylinder_unsteady_incompressible_viscous_librom_dmd \n
-\subpage ns3d_shock_cylinder_interaction_librom_dmd \n
+\subpage ns3d_cylinder_steady_incompressible_viscous_librom_dmd_train \n
+\subpage ns3d_cylinder_unsteady_incompressible_viscous_librom_dmd_train \n
+\subpage ns3d_shock_cylinder_interaction_librom_dmd_train \n
 
-\page linear_adv_sine_librom_dmd 1D Linear Advection - Sine Wave (Training a DMD)
+\page linear_adv_sine_librom_dmd_train 1D Linear Advection - Sine Wave (Training a DMD)
 
 See \ref linear_adv_sine to familiarize yourself with this case.
 
-Location: \b hypar/Examples/1D/LinearAdvection/SineWave_libROM_DMD
+Location: \b hypar/Examples/1D/LinearAdvection/SineWave_libROM_DMD_Train
           (This directory contains all the input files needed
           to run this case.)
 
@@ -5984,22 +5984,22 @@ Input files required:
 ---------------------
 
 \b librom.inp
-\include 1D/LinearAdvection/SineWave_libROM_DMD/librom.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Train/librom.inp
 
 \b solver.inp
-\include 1D/LinearAdvection/SineWave_libROM_DMD/solver.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 1D/LinearAdvection/SineWave_libROM_DMD/boundary.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Train/boundary.inp
 
 \b physics.inp
-\include 1D/LinearAdvection/SineWave_libROM_DMD/physics.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Train/physics.inp
 
 \b lusolver.inp (optional)
-\include 1D/LinearAdvection/SineWave_libROM_DMD/lusolver.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Train/lusolver.inp
 
 \b weno.inp (optional)
-\include 1D/LinearAdvection/SineWave_libROM_DMD/weno.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Train/weno.inp
 
 To generate \b initial.inp, compile and run the 
 following code in the run directory. \b Note: if the
@@ -6008,7 +6008,7 @@ the file \b initial.inp can also be used as the exact
 solution \b exact.inp (i.e. create a sym link called 
 \a exact.inp pointing to \a initial.inp, or just copy
 \a initial.inp to \a exact.inp).
-\include 1D/LinearAdvection/SineWave_libROM_DMD/aux/init.c
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -6039,7 +6039,7 @@ the HyPar solution, ROM (reduced-order model) refers to the DMD solution.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 1D/LinearAdvection/SineWave_libROM_DMD/pde_rom_diff.dat
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points (#HyPar::dim_global), 
 number of processors (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -6056,14 +6056,14 @@ will exist after the simulation is complete - they are in a format that
 is readable by libROM.
 
 Expected screen output:
-\include 1D/LinearAdvection/SineWave_libROM_DMD/out.log
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Train/out.log
 
 
-\page linear_adv_disc_librom_dmd 1D Linear Advection - Discontinuous Waves (Training a Time Windowed DMD)
+\page linear_adv_disc_librom_dmd_train 1D Linear Advection - Discontinuous Waves (Training a Time Windowed DMD)
 
 See \ref linear_adv_disc to familiarize yourself with this case.
 
-Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves_libROM_DMD
+Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Train
           (This directory contains all the input files needed
           to run this case.)
 
@@ -6105,22 +6105,22 @@ Input files required:
 ---------------------
 
 \b librom.inp
-\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/librom.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Train/librom.inp
 
 \b solver.inp
-\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/solver.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/boundary.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Train/boundary.inp
 
 \b physics.inp
-\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/physics.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Train/physics.inp
 
 \b lusolver.inp (optional)
-\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/lusolver.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Train/lusolver.inp
 
 \b weno.inp (optional)
-\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/weno.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Train/weno.inp
 
 To generate \b initial.inp, compile and run the 
 following code in the run directory. \b Note: if the
@@ -6129,7 +6129,7 @@ the file \b initial.inp can also be used as the exact
 solution \b exact.inp (i.e. create a sym link called 
 \a exact.inp pointing to \a initial.inp, or just copy
 \a initial.inp to \a exact.inp).
-\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/aux/init.c
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -6160,7 +6160,7 @@ the HyPar solution, ROM (reduced-order model) refers to the DMD solution.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/pde_rom_diff.dat
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points (#HyPar::dim_global), 
 number of processors (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -6177,16 +6177,16 @@ will exist after the simulation is complete - they are in a format that
 is readable by libROM.
 
 Expected screen output:
-\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD/out.log
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Train/out.log
 
-\page sod_shock_tube_librom_dmd 1D Euler Equations - Sod Shock Tube (Training a Time Windowed DMD)
+\page sod_shock_tube_librom_dmd_train 1D Euler Equations - Sod Shock Tube (Training a Time Windowed DMD)
 
 See \ref sod_shock_tube to familiarize yourself with this case.
 
 Description: 
 -------------------
 
-Location: \b hypar/Examples/1D/Euler1D/SodShockTube_libROM_DMD 
+Location: \b hypar/Examples/1D/Euler1D/SodShockTube_libROM_DMD_Train 
           (This directory contains all the input files needed
           to run this case.)
 
@@ -6219,20 +6219,20 @@ Input files required:
 --------------------
 
 \b librom.inp
-\include 1D/Euler1D/SodShockTube_libROM_DMD/librom.inp
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Train/librom.inp
 
 \b solver.inp:
-\include 1D/Euler1D/SodShockTube_libROM_DMD/solver.inp
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 1D/Euler1D/SodShockTube_libROM_DMD/boundary.inp
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Train/boundary.inp
 
 \b physics.inp
-\include 1D/Euler1D/SodShockTube_libROM_DMD/physics.inp
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Train/physics.inp
 
 To generate \b initial.inp, compile and run the 
 following code in the run directory:
-\include 1D/Euler1D/SodShockTube_libROM_DMD/aux/init.c
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -6264,7 +6264,7 @@ the HyPar solution, ROM (reduced-order model) refers to the DMD solution.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 1D/Euler1D/SodShockTube_libROM_DMD/pde_rom_diff.dat
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points (#HyPar::dim_global), 
 number of processors (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -6281,13 +6281,13 @@ will exist after the simulation is complete - they are in a format that
 is readable by libROM.
 
 Expected screen output:
-\include 1D/Euler1D/SodShockTube_libROM_DMD/out.log
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Train/out.log
 
-\page euler2d_vortex_librom_dmd 2D Euler Equations - Isentropic Vortex Convection (Training a DMD)
+\page euler2d_vortex_librom_dmd_train 2D Euler Equations - Isentropic Vortex Convection (Training a DMD)
 
 See \ref euler2d_vortex to familiarize yourself with this case.
 
-Location: \b hypar/Examples/2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD
+Location: \b hypar/Examples/2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train
           (This directory contains all the input files needed
           to run this case.)
 
@@ -6326,27 +6326,27 @@ Input files required:
 ---------------------
 
 \b librom.inp
-\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/librom.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/librom.inp
 
 \b solver.inp
-\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/solver.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/boundary.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/boundary.inp
 
 \b physics.inp
-\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/physics.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/physics.inp
 
 \b weno.inp (optional)
-\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/weno.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/weno.inp
 
 \b lusolver.inp (optional)
-\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/lusolver.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/lusolver.inp
 
 To generate \b initial.inp (initial solution) and \b exact.inp
 (exact solution), compile and run the following code in the run 
 directory.
-\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/aux/exact.c
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/aux/exact.c
 
 Output:
 -------
@@ -6391,7 +6391,7 @@ their difference.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/pde_rom_diff.dat
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
 number of processors in each dimension (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -6409,13 +6409,13 @@ will exist after the simulation is complete - they are in a format that
 is readable by libROM.
 
 Expected screen output:
-\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD/out.log
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/out.log
 
-\page euler2d_riemann4_librom_dmd 2D Euler Equations - Riemann Problem Case 4 (Training a Time Windowed DMD)
+\page euler2d_riemann4_librom_dmd_train 2D Euler Equations - Riemann Problem Case 4 (Training a Time Windowed DMD)
 
 See \ref euler2d_riemann4 to familiarize yourself with this case.
 
-Location: \b hypar/Examples/2D/NavierStokes2D/Riemann2DCase4_libROM_DMD
+Location: \b hypar/Examples/2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train
           (This directory contains all the input files needed
           to run this case.)
 
@@ -6447,23 +6447,23 @@ Input files required:
 ---------------------
 
 \b librom.inp
-\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/librom.inp
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/librom.inp
 
 \b solver.inp
-\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/solver.inp
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/boundary.inp
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/boundary.inp
 
 \b physics.inp
-\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/physics.inp
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/physics.inp
 
 \b weno.inp (optional)
-\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/weno.inp
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/weno.inp
 
 To generate \b initial.inp, compile and run the 
 following code in the run directory.
-\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/aux/init.c
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -6508,7 +6508,7 @@ is the difference between the two.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/pde_rom_diff.dat
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
 number of processors in each dimension (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -6526,13 +6526,13 @@ will exist after the simulation is complete - they are in a format that
 is readable by libROM.
 
 Expected screen output:
-\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD/out.log
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/out.log
 
-\page vlasov_1d1v_selfconsistent_librom_dmd 2D (1D-1V) Vlasov Equation - Two-Stream Instability (Training a Time-Windowed DMD)
+\page vlasov_1d1v_selfconsistent_librom_dmd_train 2D (1D-1V) Vlasov Equation - Two-Stream Instability (Training a Time-Windowed DMD)
 
 See \ref vlasov_1d1v_selfconsistent to familiarize yourself with this case.
 
-Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD
+Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train
           (This directory contains all the input files needed
           to run this case.)
 
@@ -6563,20 +6563,20 @@ Input files required:
 ---------------------
 
 \b librom.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/librom.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/librom.inp
 
 \b solver.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/solver.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/boundary.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/boundary.inp
 
 \b physics.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/physics.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/physics.inp
 
 To generate \b initial.inp (initial solution), compile and run the 
 following code in the run directory. 
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/aux/init.c
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -6622,7 +6622,7 @@ Diff is the difference between the two.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/pde_rom_diff.dat
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
 number of processors in each dimension (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -6640,13 +6640,13 @@ will exist after the simulation is complete - they are in a format that
 is readable by libROM.
 
 Expected screen output:
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD/out.log
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/out.log
 
-\page navstok2d_ldsc_librom_dmd 2D Navier-Stokes Equations -  Lid-Driven Square Cavity (Training a Time-Windowed DMD)
+\page navstok2d_ldsc_librom_dmd_train 2D Navier-Stokes Equations -  Lid-Driven Square Cavity (Training a Time-Windowed DMD)
 
 See \ref navstok2d_ldsc to familiarize yourself with this case.
 
-Location: \b hypar/Examples/2D/NavierStokes2D/LidDrivenCavity_libROM_DMD
+Location: \b hypar/Examples/2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train
           (This directory contains all the input files needed
           to run this case.)
 
@@ -6705,21 +6705,21 @@ Input files required:
 ---------------------
 
 \b librom.inp
-\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/librom.inp
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/librom.inp
 
 \b solver.inp
-\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/solver.inp
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/boundary.inp
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/boundary.inp
 
 \b physics.inp (\b Note: this file specifies \f$Re = 3200\f$,
 change \a Re here for other Reynolds numbers.)
-\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/physics.inp
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/physics.inp
 
 To generate \b initial.inp (initial solution), compile 
 and run the following code in the run directory
-\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/aux/init.c
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -6762,7 +6762,7 @@ is the difference in the velocity magnitude between the two.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/pde_rom_diff.dat
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
 number of processors in each dimension (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -6780,13 +6780,13 @@ will exist after the simulation is complete - they are in a format that
 is readable by libROM.
 
 Expected screen output:
-\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD/out.log
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/out.log
 
-\page ns3d_cylinder_steady_incompressible_viscous_librom_dmd 3D Navier-Stokes - Steady, incompressible, viscous flow around a cylinder (Training a Time-Windowed DMD)
+\page ns3d_cylinder_steady_incompressible_viscous_librom_dmd_train 3D Navier-Stokes - Steady, incompressible, viscous flow around a cylinder (Training a Time-Windowed DMD)
 
 See \ref ns3d_cylinder_steady_incompressible_viscous to familiarize yourself with this case.
 
-Location: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD
+Location: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train
 
 Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
 
@@ -6841,21 +6841,21 @@ Reduced Order Modeling:
 Input files required:
 ---------------------
 
-These files are all located in: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD
+These files are all located in: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train
 
 \b librom.inp
-\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/librom.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/librom.inp
 
 \b solver.inp
-\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/solver.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/boundary.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/boundary.inp
 
 \b physics.inp : The following file specifies a Reynolds number
 of 10 (corresponding to \f$Re_D\f$ of 20). To try other Reynolds 
 numbers, change it here.
-\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/physics.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/physics.inp
 
 \b cylinder.stl : the filename "cylinder.stl" \b must match
 the input for \a immersed_body in \a solver.inp.\n
@@ -6863,7 +6863,7 @@ Located at \b hypar/Examples/STLGeometries/cylinder.stl
 
 To generate \b initial.inp (initial solution), compile 
 and run the following code in the run directory.
-\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/aux/init.c
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -6911,7 +6911,7 @@ the DMD solution, and Diff is the difference between the two.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/pde_rom_diff.dat
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
 number of processors in each dimension (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -6921,13 +6921,13 @@ and cleaning up),
 and total wall time.
 
 Expected screen output:
-\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD/out.log
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/out.log
 
-\page ns3d_cylinder_unsteady_incompressible_viscous_librom_dmd 3D Navier-Stokes - Unsteady, incompressible, viscous flow around a cylinder with vortex shedding (Training a Time-Windowed DMD)
+\page ns3d_cylinder_unsteady_incompressible_viscous_librom_dmd_train 3D Navier-Stokes - Unsteady, incompressible, viscous flow around a cylinder with vortex shedding (Training a Time-Windowed DMD)
 
 See \ref ns3d_cylinder_unsteady_incompressible_viscous to familiarize yourself with this case.
 
-Location: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD
+Location: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train
 
 Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
 
@@ -6951,8 +6951,8 @@ Boundary conditions:
     (this is the default).
 
 Reference:
-  + Taneda, S., "Experimental Investigation of the Wakes behind Cylinders and Plates at Low 
-    Reynolds Numbers," Journal of the Physical Society of Japan, Vol. 11, 302–307, 1956. 
+  + Taneda, S., Experimental Investigation of the Wakes behind Cylinders and Plates at Low 
+    Reynolds Numbers, Journal of the Physical Society of Japan, Vol. 11, 302–307, 1956. 
 
 Initial solution: \f$\rho=1, u=0.1, v=w=0, p=1/\gamma\f$ everywhere in the domain.
 
@@ -6979,19 +6979,19 @@ Reduced Order Modeling:
 Input files required:
 ---------------------
 
-These files are all located in: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD/
+These files are all located in: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/
 
 \b librom.inp
-\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD/librom.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/librom.inp
 
 \b solver.inp
-\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD/solver.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD/boundary.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/boundary.inp
 
 \b physics.inp
-\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD/physics.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/physics.inp
 
 \b cylinder.stl : the filename "cylinder.stl" \b must match
 the input for \a immersed_body in \a solver.inp.\n
@@ -7012,7 +7012,7 @@ The following steps are recommended:
 - Now, using this initial solution, where the time-periodic vortex shedding has developed,
   run this simulation with frequent solution output to visualize the vortex shedding.
 
-\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD/aux/init.c
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -7060,7 +7060,7 @@ the DMD solution, and Diff is the difference between the two.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD/pde_rom_diff.dat
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
 number of processors in each dimension (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -7070,13 +7070,13 @@ and cleaning up),
 and total wall time.
 
 Expected screen output:
-\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD/out.log
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/out.log
 
-\page euler2d_rtb_librom_dmd 2D Euler Equations (with gravitational force) - Rising Thermal Bubble (Training a Time-Windowed DMD)
+\page euler2d_rtb_librom_dmd_train 2D Euler Equations (with gravitational force) - Rising Thermal Bubble (Training a Time-Windowed DMD)
 
 See \ref euler2d_rtb to familiarize yourself with this case.
 
-Location: \b hypar/Examples/2D/NavierStokes2D/RisingThermalBubble_libROM_DMD
+Location: \b hypar/Examples/2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train
           (This directory contains all the input files needed
           to run this case.)
 
@@ -7119,23 +7119,23 @@ Input files required:
 ---------------------
 
 \b librom.inp
-\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/librom.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/librom.inp
 
 \b solver.inp
-\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/solver.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/boundary.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/boundary.inp
 
 \b physics.inp
-\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/physics.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/physics.inp
 
 \b weno.inp (optional)
-\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/weno.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/weno.inp
 
 To generate \b initial.inp (initial solution), compile 
 and run the following code in the run directory.
-\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/aux/init.c
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -7169,7 +7169,7 @@ can be used to compute and plot the temperature and density
 perturbations. These variables are then written to either
 a tecplot2d or text file.
 (compile and run it in the run directory):
-\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/aux/PostProcess.cpp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/aux/PostProcess.cpp
 
 The following animation shows the potential temperature for the HyPar solutions.
 It was plotted using VisIt
@@ -7193,7 +7193,7 @@ following figure shows this diff at the final time for the density.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/pde_rom_diff.dat
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
 number of processors in each dimension (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -7203,16 +7203,16 @@ and cleaning up),
 and total wall time.
 
 Expected screen output:
-\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD/out.log
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/out.log
 
-\page shu_osher_librom_dmd 1D Euler Equations - Shu-Osher Problem (Training a Time Windowed DMD)
+\page shu_osher_librom_dmd_train 1D Euler Equations - Shu-Osher Problem (Training a Time Windowed DMD)
 
 See \ref shu_osher to familiarize yourself with this case.
 
 Description: 
 ------------
 
-Location: \b hypar/Examples/1D/Euler1D/ShuOsherProblem_libROM_DMD 
+Location: \b hypar/Examples/1D/Euler1D/ShuOsherProblem_libROM_DMD_Train 
           (This directory contains all the input files needed
           to run this case. If there is a \a Run.m, run it in
           MATLAB to quickly set up, run, and visualize the 
@@ -7244,23 +7244,23 @@ Reduced Order Modeling:
 Input files required:
 --------------------
 \b librom.inp:
-\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/librom.inp
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/librom.inp
 
 \b solver.inp:
-\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/solver.inp
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/boundary.inp
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/boundary.inp
 
 \b physics.inp
-\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/physics.inp
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/physics.inp
 
 \b weno.inp (optional)
-\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/weno.inp
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/weno.inp
 
 To generate \b initial.inp, compile and run the 
 following code in the run directory:
-\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/aux/init.c
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -7292,7 +7292,7 @@ the HyPar solution, ROM (reduced-order model) refers to the DMD solution.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/pde_rom_diff.dat
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points (#HyPar::dim_global), 
 number of processors (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -7309,13 +7309,13 @@ will exist after the simulation is complete - they are in a format that
 is readable by libROM.
 
 Expected screen output:
-\include 1D/Euler1D/ShuOsherProblem_libROM_DMD/out.log
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/out.log
 
-\page ns3d_shock_cylinder_interaction_librom_dmd 3D Navier-Stokes - Inviscid Shock-Cylinder Interaction (Training a Time-Windowed DMD)
+\page ns3d_shock_cylinder_interaction_librom_dmd_train 3D Navier-Stokes - Inviscid Shock-Cylinder Interaction (Training a Time-Windowed DMD)
 
 See \ref ns3d_shock_cylinder_interaction to familiarize yourself with this case.
 
-Location: \b hypar/Examples/3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD
+Location: \b hypar/Examples/3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train
 
 Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h - by default
                      #NavierStokes3D::Re is set to \b -1 which makes the
@@ -7359,19 +7359,19 @@ Reduced Order Modeling:
 Input files required:
 ---------------------
 
-These files are all located in: \b hypar/Examples/3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/
+These files are all located in: \b hypar/Examples/3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/
 
 \b librom.inp
-\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/librom.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/librom.inp
 
 \b solver.inp
-\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/solver.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/boundary.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/boundary.inp
 
 \b physics.inp
-\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/physics.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/physics.inp
 
 \b cylinder.stl : the filename "cylinder.stl" \b must match
 the input for \a immersed_body in \a solver.inp.\n
@@ -7379,7 +7379,7 @@ Located at \b hypar/Examples/STLGeometries/cylinder.stl
 
 To generate \b initial.inp (initial solution), compile 
 and run the following code in the run directory.
-\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/aux/init.c
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -7426,7 +7426,7 @@ the DMD solution, and Diff is the difference between the two.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/pde_rom_diff.dat
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
 number of processors in each dimension (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -7436,4 +7436,4 @@ and cleaning up),
 and total wall time.
 
 Expected screen output:
-\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD/out.log
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/out.log
