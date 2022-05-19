@@ -100,11 +100,11 @@ if solver_inp_data['op_overwrite'] == 'no':
   
   for var in range(nvars):
     for i in range(n_snapshots):
-      fig = plt.figure(figsize=figsize)
-      ax = plt.axes()
-      ax.set( xlim=(np.min(x), np.max(x)), 
-              ylim=(np.min(y), np.max(y)) )
       for s in range(nsims):
+        fig = plt.figure(figsize=figsize)
+        ax = plt.axes()
+        ax.set( xlim=(np.min(x), np.max(x)), 
+                ylim=(np.min(y), np.max(y)) )
         solution_snapshots_sim = solution_snapshots[s*n_snapshots:(s+1)*n_snapshots]
         sol2d = np.transpose(solution_snapshots_sim.reshape(n_snapshots,size[1],size[0],nvars))
         plot = ax.pcolor(x2d, y2d, sol2d[var,:,:,i], cmap=colormap)
@@ -116,6 +116,7 @@ if solver_inp_data['op_overwrite'] == 'no':
           plt_fname = plt_dir_name+'/fig_'+f'{var:02d}'+'_'+f'{i:05d}'+'.png'
         print('Saving %s' % plt_fname)
         plt.savefig(plt_fname)
+        plt.close()
 
 else:
 
@@ -152,11 +153,11 @@ else:
   y2d, x2d = np.meshgrid(y, x)
   
   for var in range(nvars):
-    fig = plt.figure(figsize=figsize)
-    ax = plt.axes()
-    ax.set( xlim=(np.min(x), np.max(x)), 
-            ylim=(np.min(y), np.max(y)) )
     for s in range(nsims):
+      fig = plt.figure(figsize=figsize)
+      ax = plt.axes()
+      ax.set( xlim=(np.min(x), np.max(x)), 
+              ylim=(np.min(y), np.max(y)) )
       solution_snapshots_sim = solution_snapshots[s*n_snapshots:(s+1)*n_snapshots]
       sol2d = np.transpose(solution_snapshots_sim.reshape(size[1],size[0],nvars))
       plot = ax.pcolor(x2d, y2d, sol2d[var,:,:], cmap=colormap)
@@ -168,3 +169,4 @@ else:
           plt_fname = plt_dir_name+'/fig_'+f'{var:02d}'+'.png'
       print('Saving %s' % plt_fname)
       plt.savefig(plt_fname)
+      plt.close()
