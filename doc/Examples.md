@@ -5931,8 +5931,15 @@ solution file. This script will need the environment variable
 \b HYPAR_DIR (/path/to/hypar) to be defined, so make sure this variable exists.
 
 Dynamic Mode Decomposition
---------------------------
+==========================
 
+Training Examples
+-----------------
+
+The following examples demonstrate training a #DMDROMObject using the solutions
+from a PDE simulation. The same procedure (i.e. providing the libROM input file 
+\b librom.inp with the appropriate inputs) can be used with any other simulation.\n
+\n
 \subpage linear_adv_sine_librom_dmd_train \n
 \subpage linear_adv_disc_librom_dmd_train \n
 \subpage sod_shock_tube_librom_dmd_train \n
@@ -5948,7 +5955,18 @@ Dynamic Mode Decomposition
 \subpage ns3d_cylinder_unsteady_incompressible_viscous_librom_dmd_train \n
 \subpage ns3d_shock_cylinder_interaction_librom_dmd_train \n
 
-\page linear_adv_sine_librom_dmd_train 1D Linear Advection - Sine Wave (Training a DMD)
+Prediction Examples
+-------------------
+
+The following examples demonstrate using a trained #DMDROMObject to compute the
+solution instead of the discretizing the PDE in space and time. The same steps
+(i.e. providing the libROM input file \b librom.inp and trained DMD objects
+consistent with the computational domain) can be used for any other simulation.\n
+\n
+\subpage linear_adv_sine_librom_dmd_predict \n
+\subpage linear_adv_disc_librom_dmd_predict \n
+
+\page linear_adv_sine_librom_dmd_train 1D Linear Advection - Sine Wave
 
 See \ref linear_adv_sine to familiarize yourself with this case.
 
@@ -6059,7 +6077,7 @@ Expected screen output:
 \include 1D/LinearAdvection/SineWave_libROM_DMD_Train/out.log
 
 
-\page linear_adv_disc_librom_dmd_train 1D Linear Advection - Discontinuous Waves (Training a Time Windowed DMD)
+\page linear_adv_disc_librom_dmd_train 1D Linear Advection - Discontinuous Waves (Time Windowed DMD)
 
 See \ref linear_adv_disc to familiarize yourself with this case.
 
@@ -6179,7 +6197,7 @@ is readable by libROM.
 Expected screen output:
 \include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Train/out.log
 
-\page sod_shock_tube_librom_dmd_train 1D Euler Equations - Sod Shock Tube (Training a Time Windowed DMD)
+\page sod_shock_tube_librom_dmd_train 1D Euler Equations - Sod Shock Tube (Time Windowed DMD)
 
 See \ref sod_shock_tube to familiarize yourself with this case.
 
@@ -6283,7 +6301,7 @@ is readable by libROM.
 Expected screen output:
 \include 1D/Euler1D/SodShockTube_libROM_DMD_Train/out.log
 
-\page euler2d_vortex_librom_dmd_train 2D Euler Equations - Isentropic Vortex Convection (Training a DMD)
+\page euler2d_vortex_librom_dmd_train 2D Euler Equations - Isentropic Vortex Convection
 
 See \ref euler2d_vortex to familiarize yourself with this case.
 
@@ -6411,7 +6429,7 @@ is readable by libROM.
 Expected screen output:
 \include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/out.log
 
-\page euler2d_riemann4_librom_dmd_train 2D Euler Equations - Riemann Problem Case 4 (Training a Time Windowed DMD)
+\page euler2d_riemann4_librom_dmd_train 2D Euler Equations - Riemann Problem Case 4 (Time Windowed DMD)
 
 See \ref euler2d_riemann4 to familiarize yourself with this case.
 
@@ -6528,7 +6546,7 @@ is readable by libROM.
 Expected screen output:
 \include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/out.log
 
-\page vlasov_1d1v_selfconsistent_librom_dmd_train 2D (1D-1V) Vlasov Equation - Two-Stream Instability (Training a Time-Windowed DMD)
+\page vlasov_1d1v_selfconsistent_librom_dmd_train 2D (1D-1V) Vlasov Equation - Two-Stream Instability (Time-Windowed DMD)
 
 See \ref vlasov_1d1v_selfconsistent to familiarize yourself with this case.
 
@@ -6642,7 +6660,7 @@ is readable by libROM.
 Expected screen output:
 \include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/out.log
 
-\page navstok2d_ldsc_librom_dmd_train 2D Navier-Stokes Equations -  Lid-Driven Square Cavity (Training a Time-Windowed DMD)
+\page navstok2d_ldsc_librom_dmd_train 2D Navier-Stokes Equations -  Lid-Driven Square Cavity (Time-Windowed DMD)
 
 See \ref navstok2d_ldsc to familiarize yourself with this case.
 
@@ -6782,7 +6800,7 @@ is readable by libROM.
 Expected screen output:
 \include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/out.log
 
-\page ns3d_cylinder_steady_incompressible_viscous_librom_dmd_train 3D Navier-Stokes - Steady, incompressible, viscous flow around a cylinder (Training a Time-Windowed DMD)
+\page ns3d_cylinder_steady_incompressible_viscous_librom_dmd_train 3D Navier-Stokes - Steady, incompressible, viscous flow around a cylinder (Time-Windowed DMD)
 
 See \ref ns3d_cylinder_steady_incompressible_viscous to familiarize yourself with this case.
 
@@ -6923,7 +6941,7 @@ and total wall time.
 Expected screen output:
 \include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/out.log
 
-\page ns3d_cylinder_unsteady_incompressible_viscous_librom_dmd_train 3D Navier-Stokes - Unsteady, incompressible, viscous flow around a cylinder with vortex shedding (Training a Time-Windowed DMD)
+\page ns3d_cylinder_unsteady_incompressible_viscous_librom_dmd_train 3D Navier-Stokes - Unsteady, incompressible, viscous flow around a cylinder with vortex shedding (Time-Windowed DMD)
 
 See \ref ns3d_cylinder_unsteady_incompressible_viscous to familiarize yourself with this case.
 
@@ -7072,7 +7090,7 @@ and total wall time.
 Expected screen output:
 \include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/out.log
 
-\page euler2d_rtb_librom_dmd_train 2D Euler Equations (with gravitational force) - Rising Thermal Bubble (Training a Time-Windowed DMD)
+\page euler2d_rtb_librom_dmd_train 2D Euler Equations (with gravitational force) - Rising Thermal Bubble (Time-Windowed DMD)
 
 See \ref euler2d_rtb to familiarize yourself with this case.
 
@@ -7205,7 +7223,7 @@ and total wall time.
 Expected screen output:
 \include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/out.log
 
-\page shu_osher_librom_dmd_train 1D Euler Equations - Shu-Osher Problem (Training a Time Windowed DMD)
+\page shu_osher_librom_dmd_train 1D Euler Equations - Shu-Osher Problem (Time Windowed DMD)
 
 See \ref shu_osher to familiarize yourself with this case.
 
@@ -7311,7 +7329,7 @@ is readable by libROM.
 Expected screen output:
 \include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/out.log
 
-\page ns3d_shock_cylinder_interaction_librom_dmd_train 3D Navier-Stokes - Inviscid Shock-Cylinder Interaction (Training a Time-Windowed DMD)
+\page ns3d_shock_cylinder_interaction_librom_dmd_train 3D Navier-Stokes - Inviscid Shock-Cylinder Interaction (Time-Windowed DMD)
 
 See \ref ns3d_shock_cylinder_interaction to familiarize yourself with this case.
 
@@ -7437,3 +7455,209 @@ and total wall time.
 
 Expected screen output:
 \include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/out.log
+
+\page linear_adv_sine_librom_dmd_predict 1D Linear Advection - Sine Wave
+
+See \ref linear_adv_sine to familiarize yourself with this case. This example uses 
+a DMD object that has already been trained (see \ref linear_adv_sine_librom_dmd_train).
+
+Location: \b hypar/Examples/1D/LinearAdvection/SineWave_libROM_DMD_Predict
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Linear Advection Equation (linearadr.h)
+
+Reduced Order Modeling: This example predicts the solution from a trained 
+DMD object. The code does \b not solve the PDE by discretizing in space and
+integrating in time.
+
+References:
+  + Ghosh, D., Baeder, J. D., "Compact Reconstruction Schemes with 
+    Weighted ENO Limiting for Hyperbolic Conservation Laws", 
+    SIAM Journal on Scientific Computing, 34 (3), 2012, A1678–A1706
+
+Domain: \f$0 \le x < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution: \f$u\left(x,0\right) = \sin\left(2\pi x\right)\f$
+
+Reduced Order Modeling:
+ + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+
+Note:
+-----
+
+In this mode, HyPar will run just like an usual PDE simulation, except that it will swap out
+the numerical spatial discretization and time integration with the ROM-based prediction. The
+input files and output files will be the same as a regular simulation with the following 
+comments:
++ Numerical method inputs are ignored (eg. those that specify spatial discretization and
+  time integration methods).
++ In solver.inp, the values for dt, n_iter, and file_op_iter is used only to compute the 
+  simulation times at which to compute and write the solution. The time step size, dt, 
+  need not respect any CFL criterion.
++ #HyPar::ConservationCheck is set to "no" since it is not possible to compute conservation
+  loss for a general domain (because boundary fluxes are not being computed).
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/librom.inp
+
+<B> DMD Object(s) </B>:\n
+The trained DMD object(s) must be located in the directory specified in \b librom.inp
+as \a dmd_dirname (#DMDROMObject::m_dirname). For this example, they were generated
+using \ref linear_adv_sine_librom_dmd_train.
+
+\b solver.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/solver.inp
+
+\b boundary.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/boundary.inp
+
+\b physics.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/physics.inp
+
+To generate \b initial.inp, compile and run the 
+following code in the run directory. \b Note: if the
+final time is an integer multiple of the time period,
+the file \b initial.inp can also be used as the exact
+solution \b exact.inp (i.e. create a sym link called 
+\a exact.inp pointing to \a initial.inp, or just copy
+\a initial.inp to \a exact.inp).
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/aux/init.c
+
+Output:
+-------
+After running the code, there should be the following output
+files:
+
++ 31 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00030.bin; 
+these are the solutions as <B> predicted by the ROM </B>. 
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=3\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b Examples/Python/plotSolution_1DBinary.py)
+can be used to generate plots from these binary files.
+Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The animation shows the evolution of the solution.
+@image html Solution_1DLinearAdvSinelibROM_DMD_Predict.gif
+
+Expected screen output:
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/out.log
+
+
+\page linear_adv_disc_librom_dmd_predict 1D Linear Advection - Discontinuous Waves (Time Windowed DMD)
+
+See \ref linear_adv_disc to familiarize yourself with this case. This example uses 
+a DMD object that has already been trained (see \ref linear_adv_disc_librom_dmd_train).
+
+Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Linear Advection Equation (linearadr.h)
+
+Reduced Order Modeling: This example predicts the solution from trained time-windowed 
+DMD objects. The code does \b not solve the PDE by discretizing in space and
+integrating in time.
+
+References:
+  + Ghosh, D., Baeder, J. D., "Compact Reconstruction Schemes with 
+    Weighted ENO Limiting for Hyperbolic Conservation Laws", 
+    SIAM Journal on Scientific Computing, 34 (3), 2012, A1678–A1706
+
+Domain: \f$-1 \le x \le 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution:
+  \f{equation}{
+    u\left(x,0\right) = \left\{\begin{array}{lc} 
+                          \exp\left(-\log\left(2\right)\frac{\left(x+7\right)^2}{0.0009}\right) & -0.8\le x \le -0.6 \\
+                          1 & -0.4\le x \le -0.2 \\
+                          1 - \left|10\left(x-0.1\right)\right| & 0\le x \le 0.2 \\
+                          \sqrt{1-100\left(x-0.5\right)^2} & 0.4\le x \le 0.6 \\
+                          0 & {\rm otherwise}
+                        \end{array}\right.
+  \f}
+
+Reduced Order Modeling:
+ + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+
+Note:
+-----
+
+In this mode, HyPar will run just like an usual PDE simulation, except that it will swap out
+the numerical spatial discretization and time integration with the ROM-based prediction. The
+input files and output files will be the same as a regular simulation with the following 
+comments:
++ Numerical method inputs are ignored (eg. those that specify spatial discretization and
+  time integration methods).
++ In solver.inp, the values for dt, n_iter, and file_op_iter is used only to compute the 
+  simulation times at which to compute and write the solution. The time step size, dt, 
+  need not respect any CFL criterion.
++ #HyPar::ConservationCheck is set to "no" since it is not possible to compute conservation
+  loss for a general domain (because boundary fluxes are not being computed).
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/librom.inp
+
+<B> DMD Object(s) </B>:\n
+The trained DMD object(s) must be located in the directory specified in \b librom.inp
+as \a dmd_dirname (#DMDROMObject::m_dirname). For this example, they were generated
+using \ref linear_adv_disc_librom_dmd_train.
+
+\b solver.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/solver.inp
+
+\b boundary.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/boundary.inp
+
+\b physics.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/physics.inp
+
+To generate \b initial.inp, compile and run the 
+following code in the run directory. \b Note: if the
+final time is an integer multiple of the time period,
+the file \b initial.inp can also be used as the exact
+solution \b exact.inp (i.e. create a sym link called 
+\a exact.inp pointing to \a initial.inp, or just copy
+\a initial.inp to \a exact.inp).
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/aux/init.c
+
+Output:
+-------
+After running the code, there should be the following output
+files:
+
++ 21 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00020.bin; 
+these are the solutions as <B> predicted by the ROM </B>. 
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=3\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b Examples/Python/plotSolution_1DBinary.py)
+can be used to generate plots from these binary files.
+Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The animation shows the evolution of the solution.
+@image html Solution_1DLinearAdvDisclibROM_DMD_Predict.gif
+
+Expected screen output:
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/out.log
