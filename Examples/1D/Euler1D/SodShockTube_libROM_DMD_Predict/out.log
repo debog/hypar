@@ -1,0 +1,109 @@
+HyPar - Parallel (MPI) version with 10 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 1
+  No. of variables                           : 3
+  Domain size                                : 201 
+  Processes along each dimension             : 10 
+  Exact solution domain size                 : 201 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 20
+  Restart iteration                          : 0
+  Time integration scheme                    : euler 
+  Spatial discretization scheme (hyperbolic) : 1
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : characteristic
+  Spatial discretization type   (parabolic ) : nonconservative-1stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 1.000000E-02
+  Check for conservation                     : no
+  Screen output iterations                   : 1
+  File output iterations                     : 1
+  Initial solution file type                 : ascii
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : no
+  Physical model                             : euler1d
+Partitioning domain and allocating data arrays.
+Reading array from ASCII file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  5.6312499999999999E-01
+ 1:  0.0000000000000000E+00
+ 2:  1.3762500000000000E+00
+Reading boundary conditions from boundary.inp.
+  Boundary                    extrapolate:  Along dimension  0 and face +1
+  Boundary                    extrapolate:  Along dimension  0 and face -1
+2 boundary condition(s) read.
+Initializing solvers.
+Initializing physics. Model = "euler1d"
+Reading physical model inputs from file "physics.inp".
+Setting up libROM interface.
+libROM inputs and parameters:
+  reduced model dimensionality:  17860400
+  sampling frequency:  0
+  mode: predict
+  type: DMD
+  save to file: true
+libROM DMD inputs:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+libROMInterface::loadROM() - loading ROM objects.
+  Loading DMD object (DMD/dmdobj_0000), time window=[0.00e+00,2.00e-02].
+  Loading DMD object (DMD/dmdobj_0001), time window=[2.00e-02,4.00e-02].
+  Loading DMD object (DMD/dmdobj_0002), time window=[4.00e-02,6.00e-02].
+  Loading DMD object (DMD/dmdobj_0003), time window=[6.00e-02,8.00e-02].
+  Loading DMD object (DMD/dmdobj_0004), time window=[8.00e-02,1.00e-01].
+  Loading DMD object (DMD/dmdobj_0005), time window=[1.00e-01,1.20e-01].
+  Loading DMD object (DMD/dmdobj_0006), time window=[1.20e-01,1.40e-01].
+  Loading DMD object (DMD/dmdobj_0007), time window=[1.40e-01,1.60e-01].
+  Loading DMD object (DMD/dmdobj_0008), time window=[1.60e-01,1.80e-01].
+  Loading DMD object (DMD/dmdobj_0009), time window=[1.80e-01,-1.00e+00].
+libROM: Predicted solution at time 0.0000e+00 using ROM, wallclock time: 0.000227.
+Writing solution file op_00000.bin.
+libROM: Predicted solution at time 1.0000e-02 using ROM, wallclock time: 0.089848.
+Writing solution file op_00001.bin.
+libROM: Predicted solution at time 2.0000e-02 using ROM, wallclock time: 0.078646.
+Writing solution file op_00002.bin.
+libROM: Predicted solution at time 3.0000e-02 using ROM, wallclock time: 0.109507.
+Writing solution file op_00003.bin.
+libROM: Predicted solution at time 4.0000e-02 using ROM, wallclock time: 0.103133.
+Writing solution file op_00004.bin.
+libROM: Predicted solution at time 5.0000e-02 using ROM, wallclock time: 0.170235.
+Writing solution file op_00005.bin.
+libROM: Predicted solution at time 6.0000e-02 using ROM, wallclock time: 0.084616.
+Writing solution file op_00006.bin.
+libROM: Predicted solution at time 7.0000e-02 using ROM, wallclock time: 0.060489.
+Writing solution file op_00007.bin.
+libROM: Predicted solution at time 8.0000e-02 using ROM, wallclock time: 0.104553.
+Writing solution file op_00008.bin.
+libROM: Predicted solution at time 9.0000e-02 using ROM, wallclock time: 0.034927.
+Writing solution file op_00009.bin.
+libROM: Predicted solution at time 1.0000e-01 using ROM, wallclock time: 0.084440.
+Writing solution file op_00010.bin.
+libROM: Predicted solution at time 1.1000e-01 using ROM, wallclock time: 0.087856.
+Writing solution file op_00011.bin.
+libROM: Predicted solution at time 1.2000e-01 using ROM, wallclock time: 0.033666.
+Writing solution file op_00012.bin.
+libROM: Predicted solution at time 1.3000e-01 using ROM, wallclock time: 0.098264.
+Writing solution file op_00013.bin.
+libROM: Predicted solution at time 1.4000e-01 using ROM, wallclock time: 0.069375.
+Writing solution file op_00014.bin.
+libROM: Predicted solution at time 1.5000e-01 using ROM, wallclock time: 0.096944.
+Writing solution file op_00015.bin.
+libROM: Predicted solution at time 1.6000e-01 using ROM, wallclock time: 0.132303.
+Writing solution file op_00016.bin.
+libROM: Predicted solution at time 1.7000e-01 using ROM, wallclock time: 0.068642.
+Writing solution file op_00017.bin.
+libROM: Predicted solution at time 1.8000e-01 using ROM, wallclock time: 0.085706.
+Writing solution file op_00018.bin.
+libROM: Predicted solution at time 1.9000e-01 using ROM, wallclock time: 0.064509.
+Writing solution file op_00019.bin.
+libROM: Predicted solution at time 2.0000e-01 using ROM, wallclock time: 0.075884.
+Writing solution file op_00020.bin.
+libROM: total prediction/query wallclock time: 1.733770 (seconds).
+Solver runtime (in seconds): 2.9325660000000000E+00
+Total  runtime (in seconds): 3.0228090000000001E+00
+Deallocating arrays.
+Finished.

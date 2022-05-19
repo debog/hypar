@@ -1,0 +1,14 @@
+begin
+  ndims             1
+  nvars             3
+  size              201
+  iproc             10
+  ghost             3
+  n_iter            20
+  dt                0.01
+  screen_op_iter    1
+  file_op_iter      1
+  op_file_format    binary
+  op_overwrite      no
+  model             euler1d
+end

@@ -5965,6 +5965,7 @@ consistent with the computational domain) can be used for any other simulation.\
 \n
 \subpage linear_adv_sine_librom_dmd_predict \n
 \subpage linear_adv_disc_librom_dmd_predict \n
+\subpage sod_shock_tube_librom_dmd_predict \n
 
 \page linear_adv_sine_librom_dmd_train 1D Linear Advection - Sine Wave
 
@@ -6300,6 +6301,1464 @@ is readable by libROM.
 
 Expected screen output:
 \include 1D/Euler1D/SodShockTube_libROM_DMD_Train/out.log
+
+\page euler2d_vortex_librom_dmd_train 2D Euler Equations - Isentropic Vortex Convection
+
+See \ref euler2d_vortex to familiarize yourself with this case.
+
+Location: \b hypar/Examples/2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Euler Equations (navierstokes2d.h - By default,
+                     #NavierStokes2D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 2D Euler
+                     equations are solved.)
+
+Reference: C.-W. Shu, "Essentially Non-oscillatory and Weighted Essentially 
+           Non-oscillatory Schemes for Hyperbolic Conservation Laws", 
+           ICASE Report 97-65, 1997
+
+Domain: \f$0 \le x,y \le 10\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions.
+
+Initial solution: The freestream flow is given by
+\f{equation}{
+  \rho_\infty = 1,\ u_\infty = 0.1,\ v_\infty = 0,\ p_\infty = 1
+\f}
+and a vortex is introduced, specified as
+\f{align}{
+\rho &= \left[ 1 - \frac{\left(\gamma-1\right)b^2}{8\gamma\pi^2} e^{1-r^2} \right]^{\frac{1}{\gamma-1}},\ p = \rho^\gamma, \\
+u &= u_\infty - \frac{b}{2\pi} e^{\frac{1}{2}\left(1-r^2\right)} \left(y-y_c\right),\ v = v_\infty + \frac{b}{2\pi} e^{\frac{1}{2}\left(1-r^2\right)} \left(x-x_c\right),
+\f}
+where \f$b=0.5\f$ is the vortex strength and \f$r = \left[(x-x_c)^2 + (y-y_c)^2 \right]^{1/2}\f$ is the distance from the vortex center \f$\left(x_c,y_c\right) = \left(5,5\right)\f$.
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
+ + Time integration: SSPRK3 (TimeRK(), #_RK_SSP3_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/librom.inp
+
+\b solver.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/boundary.inp
+
+\b physics.inp
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/physics.inp
+
+\b weno.inp (optional)
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/weno.inp
+
+\b lusolver.inp (optional)
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/lusolver.inp
+
+To generate \b initial.inp (initial solution) and \b exact.inp
+(exact solution), compile and run the following code in the run 
+directory.
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/aux/exact.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 4
+processors along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be the following output
+files:
+
++ 21 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00020.bin; 
+these are the \b HyPar solutions\b. 
+
++ 21 output files \b op_rom_00000.bin, \b op_rom_00001.bin, ... \b op_rom_00020.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=20\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot2d, and Tecplot/VisIt
+or something similar can be used to plot the resulting files.
+
+The following plot shows evolution of the density - FOM (full-order model) refers to
+the HyPar solution, ROM (reduced-order model) refers to the DMD solution, and "Diff" is
+their difference.
+@image html Solution_2DNavStokVortex_libROM_DMD.gif
+
+\b Wall \b clock \b times:
+- PDE solution: 5.85 seconds
+- DMD training time: 5.25 seconds
+- DMD prediction/query time: 0.28 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error
+(or give some HDF5 file-writing error); the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 2D/NavierStokes2D/InviscidVortexConvection_libROM_DMD_Train/out.log
+
+\page euler2d_riemann4_librom_dmd_train 2D Euler Equations - Riemann Problem Case 4 (Time Windowed DMD)
+
+See \ref euler2d_riemann4 to familiarize yourself with this case.
+
+Location: \b hypar/Examples/2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Euler Equations (navierstokes2d.h - By default,
+                     #NavierStokes2D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 2D Euler
+                     equations are solved.)
+
+Reference:
+  + P. Lax and X.-D. Liu, "Solution of two-dimensional Riemann
+    problems of gas dynamics by positive schemes," SIAM J Sci 
+    Comp 19 (1998), 319–340.
+
+Domain: \f$-0.5 \le x,y \le 0.5\f$, \a "extrapolate" (#_EXTRAPOLATE_)
+        boundary conditions.
+
+Initial solution: see \b Case \b 4 in the reference.
+
+Numerical method:
+ + Spatial discretization (hyperbolic): Characteristic-based 5th order WENO (Interp1PrimFifthOrderWENOChar())
+ + Time integration: SSPRK3 (TimeRK(), #_RK_SSP3_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Number of samples per time window: 50 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/librom.inp
+
+\b solver.inp
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/boundary.inp
+
+\b physics.inp
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/physics.inp
+
+\b weno.inp (optional)
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/weno.inp
+
+To generate \b initial.inp, compile and run the 
+following code in the run directory.
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 4
+processors along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be the following output
+files:
+
++ 11 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00010.bin; 
+these are the \b HyPar solutions\b. 
+
++ 11 output files \b op_rom_00000.bin, \b op_rom_00001.bin, ... \b op_rom_00010.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=0.25\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot2d, and Tecplot/VisIt
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the final solution (density) - FOM (full-order model) refers to
+the HyPar solution, ROM (reduced-order model) refers to the DMD solution, and Diff
+is the difference between the two.
+@image html Solution_2DNavStokRiemann4_libROMDMD.png
+
+\b Wall \b clock \b times:
+- PDE solution: 111.1 seconds
+- DMD training time: 17.6 seconds
+- DMD prediction/query time: 1.4 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error
+(or give some HDF5 file-writing error); the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/out.log
+
+\page vlasov_1d1v_selfconsistent_librom_dmd_train 2D (1D-1V) Vlasov Equation - Two-Stream Instability (Time-Windowed DMD)
+
+See \ref vlasov_1d1v_selfconsistent to familiarize yourself with this case.
+
+Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D (1D-1V) Vlasov Equation (vlasov.h)
+
+Domain: 
+  + \f$0 \le x < 2\pi\f$, \a "periodic" (#_PERIODIC_)
+  + \f$-7 \le y < 7\f$, \a "dirichlet" (#_DIRICHLET_) (\f$f = 0\f$)
+
+
+Initial solution: 
+\f$f\left(x,v\right) = \frac{4}{\pi T}\left(1+\frac{1}{10}\cos\left(2k\pi\frac{x}{L}\right)\right)\left[\exp\left(-\frac{\left(v-2\right)^2}{2T}\right) + \exp\left(-\frac{\left(v+2\right)^2}{2T}\right)\right]\f$, \f$k=1,T=1,L=2\pi\f$.
+
+Self-consistent electric field is computed by solving the Poisson equation
+in a periodic domain using Fourier transforms. This examples *requires* HyPar
+to be compiled with FFTW (http://www.fftw.org/).
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Number of samples per time window: 200 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/librom.inp
+
+\b solver.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/solver.inp
+
+\b boundary.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/boundary.inp
+
+\b physics.inp
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/physics.inp
+
+To generate \b initial.inp (initial solution), compile and run the 
+following code in the run directory. 
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 4
+processors along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be the following output
+files:
+
++ 26 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00025.bin; 
+these are the \b HyPar solutions\b. 
+
++ 26 output files \b op_rom_00000.bin, \b op_rom_00001.bin, ... \b op_rom_00025.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=5\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the evolution of the distribution function - 
+FOM (full-order model) refers to the HyPar solution, 
+ROM (reduced-order model) refers to the DMD solution, and 
+Diff is the difference between the two.
+@image html Solution_1D1VVlasov_SelfConsistentE_libROM_DMD.gif
+
+\b Wall \b clock \b times:
+- PDE solution: 11.34 seconds
+- DMD training time: 2.30 seconds
+- DMD prediction/query time: 0.34 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error
+(or give some HDF5 file-writing error); the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/out.log
+
+\page navstok2d_ldsc_librom_dmd_train 2D Navier-Stokes Equations -  Lid-Driven Square Cavity (Time-Windowed DMD)
+
+See \ref navstok2d_ldsc to familiarize yourself with this case.
+
+Location: \b hypar/Examples/2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Navier-Stokes Equations (navierstokes2d.h)
+
+Reference: 
++ Erturk, E., Corke, T.C., and Gokcol, C., "Numerical Solutions of
+  2-D Steady Incompressible Driven Cavity Flow at High Reynolds Numbers",
+  International Journal for Numerical Methods in Fluids, 48, 2005,
+  http://dx.doi.org/10.1002/fld.953.
++ Ghia, U., Ghia, K.N., Shin, C.T., "High-Re Solutions for Incompressible
+  Flow using the Navier-Stokes Equations and a Multigrid Method", Journal
+  of Computational Physics, 48, 1982, http://dx.doi.org/10.1016/0021-9991(82)90058-4.
+
+Note that this is an incompressible problem being solved here using the compressible
+Navier-Stokes equations in terms of non-dimensional flow variables. The density and 
+pressure are taken such that the speed of sound is 1.0, and the flow velocities 
+specified in the initial and boundary conditions correspond to a characteristic 
+Mach number of 0.1 (thus, they are 0.1 times the values in the above reference).
+
+Domain: \f$0 \le x, y \le 1\f$
+
+Boundary conditions:
++ No-slip wall BC on \f$x=0,1, 0 \le y \le 1\f$ (#_NOSLIP_WALL_ with 0 wall velocity).
++ No-slip wall BC on \f$y=0, 0 \le x \le 1\f$ (#_NOSLIP_WALL_ with 0 wall velocity).
++ Moving no-slip wall BC on \f$y=1, 0 \le x \le 1\f$ (#_NOSLIP_WALL_ with specified 
+  wall velocity of 0.1 in the x-direction).
+
+Initial solution: \f$\rho=1, p=1/\gamma\f$. The velocities are specified according to 
+the references above, but scaled by a factor of 0.1 to ensure that the characteristic
+Mach number is 0.1.
+
+Other parameters:
+  + \f$\gamma = 1.4\f$ (#NavierStokes2D::gamma)
+  + \f$Re = \frac {\rho u L } {\mu} = 100, 1000, 3200\f$ (Reynolds number) (#NavierStokes2D::Re), 
+    where \f$L=1\f$ is the cavity length and width.
+  + \f$Pr = 0.72\f$ (Prandtl number) (#NavierStokes2D::Pr)
+  + \f$M_\infty = 0.1\f$ (characteristic Mach number) (#NavierStokes2D::Minf)
+
+\b Note: Pressure is taken as \f$1/\gamma\f$ in the above so that the freestream 
+speed of sound is 1.
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
+ + Spatial discretization (parabolic) : 4th order (FirstDerivativeFourthOrderCentral()) 
+                                        non-conservative 2-stage (ParabolicFunctionNC2Stage())
+ + Time integration: 4th order, 4-stage Runge-Kutta (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Sampling frequency: 50 (libROMInterface::m_sampling_freq)
+ + Number of samples per time window: 200 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/librom.inp
+
+\b solver.inp
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/boundary.inp
+
+\b physics.inp (\b Note: this file specifies \f$Re = 3200\f$,
+change \a Re here for other Reynolds numbers.)
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/physics.inp
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 4
+processor along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be the following output
+files:
+
++ 1 output file \b op.bin; 
+this is the \b HyPar solutions\b. 
+
++ 1 output file \b op_rom.bin; 
+this is the \b predicted solutions from the DMD object(s)\b.
+
+All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotStreamlines.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot2d, and Tecplot/VisIt
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the final solution (velocity streamlines colored by
+the velocity magnitude) - FOM (full-order model) refers to
+the HyPar solution, ROM (reduced-order model) refers to the DMD solution, and Diff
+is the difference in the velocity magnitude between the two.
+@image html Solution_2DNavStokLDSC_Re3200_libROM_DMD.png
+
+\b Wall \b clock \b times:
+- PDE solution: 554.6 seconds
+- DMD training time: 58.6 seconds
+- DMD prediction/query time: 0.3 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error
+(or give some HDF5 file-writing error); the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Train/out.log
+
+\page ns3d_cylinder_steady_incompressible_viscous_librom_dmd_train 3D Navier-Stokes - Steady, incompressible, viscous flow around a cylinder (Time-Windowed DMD)
+
+See \ref ns3d_cylinder_steady_incompressible_viscous to familiarize yourself with this case.
+
+Location: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train
+
+Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
+
+Domain: The domain consists of a fine uniform grid around the cylinder defined by [-2,6] X [-2,2],
+        and a stretched grid beyond this zone.
+\b Note: This is a 2D flow simulated using a 3-dimensional setup by taking the length of the
+         domain along \a z to be very small and with only 3 grid points (the domain size along \a z
+         \b must \b be smaller than the cylinder length).
+
+Geometry: A cylinder of radius 1.0 centered at (0,0)
+          (\b hypar/Examples/STLGeometries/cylinder.stl)
+
+See \ref ns3d_cylinder_steady_incompressible_viscous for pictures showing the domain and geometry.
+
+Boundary conditions:
+  + xmin: Subsonic inflow #_SUBSONIC_INFLOW_
+  + xmax: Subsonic outflow #_SUBSONIC_OUTFLOW_
+  + ymin and ymax: Subsonic "ambivalent" #_SUBSONIC_AMBIVALENT_
+  + zmin and zmax: Periodic #_PERIODIC_ (to simulate a 2D flow in the x-y plane)
+  + The immersed body wall is specified as adiabatic (#_IB_ADIABATIC_);
+    (this is the default).
+
+Reference:
+  + Taneda, S., "Experimental Investigation of the Wakes behind Cylinders and Plates at Low 
+    Reynolds Numbers," Journal of the Physical Society of Japan, Vol. 11, 302–307, 1956. 
+  + Dennis, S. C. R., Chang, G.-Z., "Numerical solutions for steady flow past a circular
+    cylinder at Reynolds numbers up to 100", Journal of Fluid Mechanics, 42 (3), 1970,
+    pp. 471-489.
+
+Initial solution: \f$\rho=1, u=0.1, v=w=0, p=1/\gamma\f$ everywhere in the domain.
+
+Other parameters (all dimensional quantities are in SI units):
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes3D::gamma)
+  + Freestream Mach number \f$M_{\infty} = 0.1\f$ (#NavierStokes3D::Minf)
+  + Prandlt number \f$Pr = 0.72\f$ (#NavierStokes3D::Pr)
+  + Reynolds number \f$Re = \frac {\rho u L } {\mu} = 10\f$ (#NavierStokes3D::Re) (\b Note: 
+    since the diameter of the cylinder is 2.0, the cylinder-diameter-based Reynolds number is 
+    \f$Re_D = 2Re = 20\f$.
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Spatial discretization (parabolic) : 4th order (FirstDerivativeFourthOrderCentral()) 
+                                        non-conservative 2-stage (NavierStokes3DParabolicFunction())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Sampling frequency: 10 (libROMInterface::m_sampling_freq)
+ + Number of samples per time window: 500 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+These files are all located in: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train
+
+\b librom.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/librom.inp
+
+\b solver.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/solver.inp
+
+\b boundary.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/boundary.inp
+
+\b physics.inp : The following file specifies a Reynolds number
+of 10 (corresponding to \f$Re_D\f$ of 20). To try other Reynolds 
+numbers, change it here.
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/physics.inp
+
+\b cylinder.stl : the filename "cylinder.stl" \b must match
+the input for \a immersed_body in \a solver.inp.\n
+Located at \b hypar/Examples/STLGeometries/cylinder.stl
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory.
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/aux/init.c
+
+Output:
+-------
+
+Note that \b iproc is set to 
+
+      8 4 1
+
+in \b solver.inp (i.e., 8 processors along \a x, 4
+processors along \a y, and 1 processor along \a z). Thus, 
+this example should be run with 32 MPI ranks (or change \b iproc).
+
+Please see the original example in the "Immersed Boundaries Examples" section
+for a full description of the output files and how to view them. The following only
+contains libROM-specific comments.
+
+After running the code, there should be the following output
+files:
+
++ 1 output file \b op.bin; 
+this is the \b HyPar solutions\b. 
+
++ 1 output file \b op_rom.bin; 
+this is the \b predicted solutions from the DMD object(s)\b.
+
+All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot3d, and Tecplot/VisIt
+or something similar can be used to plot the resulting text files.
+
+The following figure shows the flow at \f$Re_D=20\f$. The pressure is plotted in the overall
+domain, and the wake is shown by plotting the x-velocity, where it is negative.
+FOM (full-order model) refers to the HyPar solution, ROM (reduced-order model) refers to 
+the DMD solution, and Diff is the difference between the two.
+@image html Solution_3DNavStokCylinder_ReD020_libROM_DMD.png
+
+\b Wall \b clock \b times:
+- PDE solution: 3038 seconds
+- DMD training time: 249 seconds
+- DMD prediction/query time: 1.3 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Expected screen output:
+\include 3D/NavierStokes3D/2D_Cylinder/Steady_Viscous_Incompressible_libROM_DMD_Train/out.log
+
+\page ns3d_cylinder_unsteady_incompressible_viscous_librom_dmd_train 3D Navier-Stokes - Unsteady, incompressible, viscous flow around a cylinder with vortex shedding (Time-Windowed DMD)
+
+See \ref ns3d_cylinder_unsteady_incompressible_viscous to familiarize yourself with this case.
+
+Location: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train
+
+Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
+
+Domain: The domain consists of a fine uniform grid around the cylinder defined by [-4,12] X [-2,2],
+        and a stretched grid beyond this zone.
+\b Note: This is a 2D flow simulated using a 3-dimensional setup by taking the length of the
+         domain along \a z to be very small and with only 3 grid points (the domain size along \a z
+         \b must \b be smaller than the cylinder length).
+
+Geometry: A cylinder of radius 1.0 centered at (0,0)
+          (\b hypar/Examples/STLGeometries/cylinder.stl)
+
+See \ref ns3d_cylinder_unsteady_incompressible_viscous for pictures show the domain and geometry.
+
+Boundary conditions:
+  + xmin: Subsonic inflow #_SUBSONIC_INFLOW_
+  + xmax: Subsonic outflow #_SUBSONIC_OUTFLOW_
+  + ymin and ymax: Subsonic "ambivalent" #_SUBSONIC_AMBIVALENT_
+  + zmin and zmax: Periodic #_PERIODIC_ (to simulate a 2D flow in the x-y plane)
+  + The immersed body wall is specified as adiabatic (#_IB_ADIABATIC_);
+    (this is the default).
+
+Reference:
+  + Taneda, S., Experimental Investigation of the Wakes behind Cylinders and Plates at Low 
+    Reynolds Numbers, Journal of the Physical Society of Japan, Vol. 11, 302–307, 1956. 
+
+Initial solution: \f$\rho=1, u=0.1, v=w=0, p=1/\gamma\f$ everywhere in the domain.
+
+Other parameters (all dimensional quantities are in SI units):
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes3D::gamma)
+  + Freestream Mach number \f$M_{\infty} = 0.1\f$ (#NavierStokes3D::Minf)
+  + Prandlt number \f$Pr = 0.72\f$ (#NavierStokes3D::Pr)
+  + Reynolds number \f$Re = \frac {\rho u L } {\mu} = 50\f$ (#NavierStokes3D::Re) (\b Note: 
+    since the diameter of the cylinder is 2.0, the cylinder-diameter-based Reynolds number is 
+    \f$Re_D = 2Re = 100\f$.
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Spatial discretization (parabolic) : 4th order (FirstDerivativeFourthOrderCentral()) 
+                                        non-conservative 2-stage (NavierStokes3DParabolicFunction())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Sampling frequency: 2 (libROMInterface::m_sampling_freq)
+ + Number of samples per time window: 1000 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+These files are all located in: \b hypar/Examples/3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/
+
+\b librom.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/librom.inp
+
+\b solver.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/solver.inp
+
+\b boundary.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/boundary.inp
+
+\b physics.inp
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/physics.inp
+
+\b cylinder.stl : the filename "cylinder.stl" \b must match
+the input for \a immersed_body in \a solver.inp.\n
+Located at \b hypar/Examples/STLGeometries/cylinder.stl
+
+To generate \b initial.inp (initial solution), the following code will generate the
+domain with a clustered mesh and uniform horizontal flow. It will take
+time to develop the time-periodic vortex shedding flow from this initial solution.
+The following steps are recommended:
+- Use the code below to generate a initial solution file (initial.inp) in a separate directory,
+  and set the \a n_iter to 50000 in that directory. Change \a op_overwrite to "yes" to avoid
+  writing too many solution files. Run HyPar.
+- Use the code hypar/Extras/BinaryOPToInitialSolution.c to generate
+  the initial solution file from the final solution of the above simulation.
+  This code will write out a file called "solution.inp"; just rename it
+  to "initial.inp" and place it in the directory where this simulation will
+  be run.
+- Now, using this initial solution, where the time-periodic vortex shedding has developed,
+  run this simulation with frequent solution output to visualize the vortex shedding.
+
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/aux/init.c
+
+Output:
+-------
+
+Note that \b iproc is set to 
+
+      8 4 1
+
+in \b solver.inp (i.e., 8 processors along \a x, 4
+processors along \a y, and 1 processor along \a z). Thus, 
+this example should be run with 32 MPI ranks (or change \b iproc).
+
+Please see the original example in the "Immersed Boundaries Examples" section
+for a full description of the output files and how to view them. The following only
+contains libROM-specific comments.
+
+After running the code, there should be the following output
+files:
+
++ 41 output file \b op_00000.bin, ..., op_00040.bin; 
+these are the \b HyPar solutions\b. 
+
++ 41 output file \b op_rom_00000.bin, ..., op_rom_00040.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot3d, and Tecplot/VisIt
+or something similar can be used to plot the resulting text files.
+
+The following figure shows the vortex shedding. The pressure is plotted in the overall
+domain, and the wake is shown by plotting the x-velocity, where it is negative.
+FOM (full-order model) refers to the HyPar solution, ROM (reduced-order model) refers to 
+the DMD solution, and Diff is the difference between the two.
+@image html Solution_3DNavStokCylinder_ReD100_libROM_DMD.gif
+
+\b Wall \b clock \b times:
+- PDE solution: 2413 seconds
+- DMD training time: 2113 seconds
+- DMD prediction/query time: 9.8 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Expected screen output:
+\include 3D/NavierStokes3D/2D_Cylinder/Unsteady_Viscous_Incompressible_libROM_DMD_Train/out.log
+
+\page euler2d_rtb_librom_dmd_train 2D Euler Equations (with gravitational force) - Rising Thermal Bubble (Time-Windowed DMD)
+
+See \ref euler2d_rtb to familiarize yourself with this case.
+
+Location: \b hypar/Examples/2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Euler Equations (navierstokes2d.h - By default,
+                     #NavierStokes2D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 2D Euler
+                     equations are solved.)
+
+Reference:
+  + Giraldo, F.X., Restelli, M., "A study of spectral element and
+    discontinuous Galerkin methods for the Navier–Stokes equations
+    in nonhydrostatic mesoscale atmospheric modeling: Equation sets
+    and test cases", J. Comput. Phys., 227, 2008, 3849--3877, 
+    (Section 3.2).
+
+Domain: \f$0 \le x,y \le 1000\,m\f$, 
+        "slip-wall" (#_SLIP_WALL_) boundary conditions on all sides.
+
+Initial solution: See references above.
+
+Other parameters (all dimensional quantities are in SI units):
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes2D::gamma)
+  + Universal gas constant \f$R = 287.058\f$ (#NavierStokes2D::R)
+  + Gravitational force per unit mass \f$g = 9.8\f$ along \a y-axis (#NavierStokes2D::grav_y)
+  + Reference density (at zero altitude) \f$\rho_{ref} = 1.1612055171196529\f$ (#NavierStokes2D::rho0)
+  + Reference pressure (at zero altitude) \f$P_{ref} = 100000\f$ (#NavierStokes2D::p0)
+  + Hydrostatic balance type 2 (#NavierStokes2D::HB)
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: SSPRK3 (TimeRK(), #_RK_SSP3_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Sampling frequency: 7 (libROMInterface::m_sampling_freq)
+ + Number of samples per time window: 1000 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/librom.inp
+
+\b solver.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/boundary.inp
+
+\b physics.inp
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/physics.inp
+
+\b weno.inp (optional)
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/weno.inp
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory.
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      6 6
+
+in \b solver.inp (i.e., 6 processors along \a x, and 6
+processor along \a y). Thus, this example should be run
+with 36 MPI ranks (or change \b iproc).
+
+After running the code, there should be the following output
+files:
+
++ 41 output file \b op_00000.bin, ..., op_00040.bin; 
+this is the \b HyPar solutions\b. 
+
++ 41 output file \b op_rom_00000.bin, ..., op_rom_00040.bin; 
+this is the \b predicted solutions from the DMD object(s)\b.
+
+All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The binary file contains the conserved variables
+\f$\left(\rho, \rho u, \rho v, e\right)\f$. The following code
+converts these variables to the primitive variables of interest
+to atmospheric flows \f$\left(\rho, u, v, p, \theta\right)\f$.
+It also writes out the hydrostatically balanced quantities 
+\f$\left(\rho_0,\pi_0, \theta_0\right)\f$ for this case that
+can be used to compute and plot the temperature and density
+perturbations. These variables are then written to either
+a tecplot2d or text file.
+(compile and run it in the run directory):
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/aux/PostProcess.cpp
+
+The following animation shows the potential temperature for the HyPar solutions.
+It was plotted using VisIt
+(https://wci.llnl.gov/simulation/computer-codes/visit/) with 
+tecplot2d format chosen in the above postprocessing code.
+@image html Solution_2DNavStokRTB_libROM_DMD_FOM.gif
+The following animation shows the same for the libROM solution predicted
+by the DMD object:
+@image html Solution_2DNavStokRTB_libROM_DMD_ROM.gif
+
+The provided Python script (\b plotDiff.py) computes and plots the diff
+of the HyPar and DMD solutions for each of the conserved variables. The
+following figure shows this diff at the final time for the density.
+@image html Solution_2DNavStokRTB_libROM_DMD_diff_density.png
+
+\b Wall \b clock \b times:
+- PDE solution: 1419 seconds
+- DMD training time: 1068 seconds
+- DMD prediction/query time: 2.73 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Expected screen output:
+\include 2D/NavierStokes2D/RisingThermalBubble_libROM_DMD_Train/out.log
+
+\page shu_osher_librom_dmd_train 1D Euler Equations - Shu-Osher Problem (Time Windowed DMD)
+
+See \ref shu_osher to familiarize yourself with this case.
+
+Description: 
+------------
+
+Location: \b hypar/Examples/1D/Euler1D/ShuOsherProblem_libROM_DMD_Train 
+          (This directory contains all the input files needed
+          to run this case. If there is a \a Run.m, run it in
+          MATLAB to quickly set up, run, and visualize the 
+          example).
+
+Governing equations: 1D Euler equations (euler1d.h)
+
+References: 
+  + C.-W. Shu and S. Osher, "Efficient implementation of
+    essentially non-oscillatory schemes ,II," J. Comput.
+    Phys., 83 (1989), pp. 32–78
+
+Domain: \f$-5 \le x \le 5\f$, \a "extrapolate" (#_EXTRAPOLATE_) 
+        boundary conditions
+
+Initial Solution:
+  + \f$ -5 \le x < -4\f$: \f$\rho = 27/7, u = 4\sqrt{35}/7, p = 31/3\f$
+  + \f$ -4 \le x \le 5\f$: \f$\rho = 1 + 0.2\sin\left(5x\right), u = 0, p = 1\f$
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): Characteristic-based 5th order WENO (Interp1PrimFifthOrderWENOChar())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Number of samples per time window: 60 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+--------------------
+\b librom.inp:
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/librom.inp
+
+\b solver.inp:
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/solver.inp
+
+\b boundary.inp
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/boundary.inp
+
+\b physics.inp
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/physics.inp
+
+\b weno.inp (optional)
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/weno.inp
+
+To generate \b initial.inp, compile and run the 
+following code in the run directory:
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/aux/init.c
+
+Output:
+-------
+After running the code, there should be the following output
+files:
+
++ 11 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00010.bin; 
+these are the \b HyPar solutions\b. 
+
++ 11 output files \b op_rom_00000.bin, \b op_rom_00001.bin, ... \b op_rom_00010.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=1.8\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. It will plot the 3 conserved variables - density, momentum, and energy. 
+Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the final solution (density) - FOM (full-order model) refers to
+the HyPar solution, ROM (reduced-order model) refers to the DMD solution.
+@image html Solution_1DShuOsherProblem_libROM_DMD.png
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/pde_rom_diff.dat
+The numbers are: number of grid points (#HyPar::dim_global), 
+number of processors (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up), and total wall time.
+
+By default, the code will write the trained DMD object(s) to files in a 
+subdirectory (#DMDROMObject::m_dirname - default value is "DMD"). If the
+subdirectory does not exist, the code \b may \b not report an error
+(or give some HDF5 file-writing error); the DMD
+objects will not be written! If the subdirectory exists, several files
+will exist after the simulation is complete - they are in a format that
+is readable by libROM.
+
+Expected screen output:
+\include 1D/Euler1D/ShuOsherProblem_libROM_DMD_Train/out.log
+
+\page ns3d_shock_cylinder_interaction_librom_dmd_train 3D Navier-Stokes - Inviscid Shock-Cylinder Interaction (Time-Windowed DMD)
+
+See \ref ns3d_shock_cylinder_interaction to familiarize yourself with this case.
+
+Location: \b hypar/Examples/3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train
+
+Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h - by default
+                     #NavierStokes3D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 3D Euler
+                     equations are solved.)
+
+Domain: \f$-2.5 \le x \le 7.5\f$, \f$-5 \le y \le 5\f$
+\b Note: This is a 2D flow simulated using a 3-dimensional setup by taking the length of the
+         domain along \a z to be very small and with only 3 grid points (the domain size along \a z
+         \b must \b be smaller than the cylinder length).
+
+Geometry: A cylinder of radius 1.0 centered at (0,0)
+          (\b hypar/Examples/STLGeometries/cylinder.stl)
+
+Boundary conditions:
+  + xmin: Subsonic inflow #_SUBSONIC_INFLOW_ (with post-shock flow conditions)
+  + xmax: Supersonic inflow #_SUPERSONIC_OUTFLOW_ (with pre-shock flow conditions)
+  + ymin and ymax: Slip walls #_SLIP_WALL_
+  + zmin and zmax: Periodic #_PERIODIC_ (to simulate a 2D flow in the x-y plane)
+  + The immersed body wall is specified as adiabatic (#_IB_ADIABATIC_);
+    (this is the default).
+
+Reference:
++ O. Boiron, G. Chiavassa, R. Donat, A high-resolution penalization method for large Mach number 
+  flows in the presence of obstacles, Computers & Fluids, 38 (2009), pp. 703-714, Section 5.1
+
+Initial solution: see reference
+
+Other parameters:
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes3D::gamma)
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Reduced Order Modeling:
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 32 (DMDROMObject::m_rdim)
+ + Number of samples per time window: 100 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+These files are all located in: \b hypar/Examples/3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/
+
+\b librom.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/librom.inp
+
+\b solver.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/solver.inp
+
+\b boundary.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/boundary.inp
+
+\b physics.inp
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/physics.inp
+
+\b cylinder.stl : the filename "cylinder.stl" \b must match
+the input for \a immersed_body in \a solver.inp.\n
+Located at \b hypar/Examples/STLGeometries/cylinder.stl
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory.
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/aux/init.c
+
+Output:
+-------
+
+Note that \b iproc is set to 
+
+      4 4 1
+
+in \b solver.inp (i.e., 4 processors along \a x, 4
+processors along \a y, and 1 processor along \a z). Thus, 
+this example should be run with 16 MPI ranks (or change \b iproc).
+
+Please see the original example in the "Immersed Boundaries Examples" section
+for a full description of the output files and how to view them. The following only
+contains libROM-specific comments.
+
+After running the code, there should be the following output
+files:
+
++ 11 output file \b op_00000.bin, ..., op_00010.bin; 
+these are the \b HyPar solutions\b. 
+
++ 11 output file \b op_rom_00000.bin, ..., op_rom_00010.bin; 
+these are the \b predicted solutions from the DMD object(s)\b.
+
+All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b plotSolution.py)
+can be used to generate plots from the binary files that compare the HyPar and DMD
+solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot3d, and Tecplot/VisIt
+or something similar can be used to plot the resulting text files.
+
+The following plot shows the density contours for the final solution (t=2).
+FOM (full-order model) refers to the HyPar solution, ROM (reduced-order model) refers to 
+the DMD solution, and Diff is the difference between the two.
+@image html Solution_3DNavStokShockCyl_Density_libROM_DMD.png
+
+\b Wall \b clock \b times:
+- PDE solution: 815 seconds
+- DMD training time: 155 seconds
+- DMD prediction/query time: 33 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Expected screen output:
+\include 3D/NavierStokes3D/2D_Shock_Cylinder_Interaction_libROM_DMD_Train/out.log
+
+\page linear_adv_sine_librom_dmd_predict 1D Linear Advection - Sine Wave
+
+See \ref linear_adv_sine to familiarize yourself with this case. This example uses 
+a DMD object that has already been trained (see \ref linear_adv_sine_librom_dmd_train).
+
+Location: \b hypar/Examples/1D/LinearAdvection/SineWave_libROM_DMD_Predict
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Linear Advection Equation (linearadr.h)
+
+Reduced Order Modeling: This example predicts the solution from a trained 
+DMD object. The code does \b not solve the PDE by discretizing in space and
+integrating in time.
+
+References:
+  + Ghosh, D., Baeder, J. D., "Compact Reconstruction Schemes with 
+    Weighted ENO Limiting for Hyperbolic Conservation Laws", 
+    SIAM Journal on Scientific Computing, 34 (3), 2012, A1678–A1706
+
+Domain: \f$0 \le x < 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution: \f$u\left(x,0\right) = \sin\left(2\pi x\right)\f$
+
+Reduced Order Modeling:
+ + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+
+Note:
+-----
+
+In this mode, HyPar will run just like an usual PDE simulation, except that it will swap out
+the numerical spatial discretization and time integration with the ROM-based prediction. The
+input files and output files will be the same as a regular simulation with the following 
+comments:
++ Numerical method inputs are ignored (eg. those that specify spatial discretization and
+  time integration methods).
++ In solver.inp, the values for dt, n_iter, and file_op_iter is used only to compute the 
+  simulation times at which to compute and write the solution. The time step size, dt, 
+  need not respect any CFL criterion.
++ #HyPar::ConservationCheck is set to "no" since it is not possible to compute conservation
+  loss for a general domain (because boundary fluxes are not being computed).
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/librom.inp
+
+<B> DMD Object(s) </B>:\n
+The trained DMD object(s) must be located in the directory specified in \b librom.inp
+as \a dmd_dirname (#DMDROMObject::m_dirname). For this example, they were generated
+using \ref linear_adv_sine_librom_dmd_train.
+
+\b solver.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/solver.inp
+
+\b boundary.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/boundary.inp
+
+\b physics.inp
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/physics.inp
+
+To generate \b initial.inp, compile and run the 
+following code in the run directory. \b Note: if the
+final time is an integer multiple of the time period,
+the file \b initial.inp can also be used as the exact
+solution \b exact.inp (i.e. create a sym link called 
+\a exact.inp pointing to \a initial.inp, or just copy
+\a initial.inp to \a exact.inp).
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/aux/init.c
+
+Output:
+-------
+After running the code, there should be the following output
+files:
+
++ 31 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00030.bin; 
+these are the solutions as <B> predicted by the ROM </B>. 
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=3\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b Examples/Python/plotSolution_1DBinary.py)
+can be used to generate plots from these binary files.
+Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The animation shows the evolution of the solution.
+@image html Solution_1DLinearAdvSinelibROM_DMD_Predict.gif
+
+Expected screen output:
+\include 1D/LinearAdvection/SineWave_libROM_DMD_Predict/out.log
+
+
+\page linear_adv_disc_librom_dmd_predict 1D Linear Advection - Discontinuous Waves (Time Windowed DMD)
+
+See \ref linear_adv_disc to familiarize yourself with this case. This example uses 
+a DMD object that has already been trained (see \ref linear_adv_disc_librom_dmd_train).
+
+Location: \b hypar/Examples/1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Linear Advection Equation (linearadr.h)
+
+Reduced Order Modeling: This example predicts the solution from trained time-windowed 
+DMD objects. The code does \b not solve the PDE by discretizing in space and
+integrating in time.
+
+References:
+  + Ghosh, D., Baeder, J. D., "Compact Reconstruction Schemes with 
+    Weighted ENO Limiting for Hyperbolic Conservation Laws", 
+    SIAM Journal on Scientific Computing, 34 (3), 2012, A1678–A1706
+
+Domain: \f$-1 \le x \le 1\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions
+
+Initial solution:
+  \f{equation}{
+    u\left(x,0\right) = \left\{\begin{array}{lc} 
+                          \exp\left(-\log\left(2\right)\frac{\left(x+7\right)^2}{0.0009}\right) & -0.8\le x \le -0.6 \\
+                          1 & -0.4\le x \le -0.2 \\
+                          1 - \left|10\left(x-0.1\right)\right| & 0\le x \le 0.2 \\
+                          \sqrt{1-100\left(x-0.5\right)^2} & 0.4\le x \le 0.6 \\
+                          0 & {\rm otherwise}
+                        \end{array}\right.
+  \f}
+
+Reduced Order Modeling:
+ + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+
+Note:
+-----
+
+In this mode, HyPar will run just like an usual PDE simulation, except that it will swap out
+the numerical spatial discretization and time integration with the ROM-based prediction. The
+input files and output files will be the same as a regular simulation with the following 
+comments:
++ Numerical method inputs are ignored (eg. those that specify spatial discretization and
+  time integration methods).
++ In solver.inp, the values for dt, n_iter, and file_op_iter is used only to compute the 
+  simulation times at which to compute and write the solution. The time step size, dt, 
+  need not respect any CFL criterion.
++ #HyPar::ConservationCheck is set to "no" since it is not possible to compute conservation
+  loss for a general domain (because boundary fluxes are not being computed).
+
+Input files required:
+---------------------
+
+\b librom.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/librom.inp
+
+<B> DMD Object(s) </B>:\n
+The trained DMD object(s) must be located in the directory specified in \b librom.inp
+as \a dmd_dirname (#DMDROMObject::m_dirname). For this example, they were generated
+using \ref linear_adv_disc_librom_dmd_train.
+
+\b solver.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/solver.inp
+
+\b boundary.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/boundary.inp
+
+\b physics.inp
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/physics.inp
+
+To generate \b initial.inp, compile and run the 
+following code in the run directory. \b Note: if the
+final time is an integer multiple of the time period,
+the file \b initial.inp can also be used as the exact
+solution \b exact.inp (i.e. create a sym link called 
+\a exact.inp pointing to \a initial.inp, or just copy
+\a initial.inp to \a exact.inp).
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/aux/init.c
+
+Output:
+-------
+After running the code, there should be the following output
+files:
+
++ 21 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00020.bin; 
+these are the solutions as <B> predicted by the ROM </B>. 
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=3\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b Examples/Python/plotSolution_1DBinary.py)
+can be used to generate plots from these binary files.
+Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The animation shows the evolution of the solution.
+@image html Solution_1DLinearAdvDisclibROM_DMD_Predict.gif
+
+Expected screen output:
+\include 1D/LinearAdvection/DiscontinuousWaves_libROM_DMD_Predict/out.log
+
+\page sod_shock_tube_librom_dmd_predict 1D Euler Equations - Sod Shock Tube (Time Windowed DMD)
+
+See \ref sod_shock_tube to familiarize yourself with this case. This example
+uses a DMD object that has already been trained (see \ref sod_shock_tube_librom_dmd_train).
+
+Location: \b hypar/Examples/1D/Euler1D/SodShockTube_libROM_DMD_Predict 
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 1D Euler equations (euler1d.h)
+
+Reduced Order Modeling: This example predicts the solution from a trained 
+DMD object. The code does \b not solve the PDE by discretizing in space and
+integrating in time.
+
+References: 
+  + G.A. Sod, "A survey of several finite difference methods 
+    for systems of nonlinear hyperbolic conservation laws," 
+    J. Comput. Phys., 27, 1 (1978).
+  + C. B. Laney, "Computational Gasdynamics", Cambridge 
+    University Press, 1998.
+
+Domain: \f$0 \le x \le 1.0\f$, \a "extrapolate" (#_EXTRAPOLATE_) 
+        boundary conditions
+
+Initial Solution:
+  + \f$ 0 \le x < 0.5\f$: \f$\rho = 1, u = 0, p = 1\f$
+  + \f$ 0.5 \le x \le 1\f$: \f$\rho = 0.125, u = 0, p = 0.1\f$
+
+Reduced Order Modeling:
+ + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+
+Note:
+-----
+
+In this mode, HyPar will run just like an usual PDE simulation, except that it will swap out
+the numerical spatial discretization and time integration with the ROM-based prediction. The
+input files and output files will be the same as a regular simulation with the following 
+comments:
++ Numerical method inputs are ignored (eg. those that specify spatial discretization and
+  time integration methods).
++ In solver.inp, the values for dt, n_iter, and file_op_iter is used only to compute the 
+  simulation times at which to compute and write the solution. The time step size, dt, 
+  need not respect any CFL criterion.
++ #HyPar::ConservationCheck is set to "no" since it is not possible to compute conservation
+  loss for a general domain (because boundary fluxes are not being computed).
+
+Input files required:
+--------------------
+
+\b librom.inp
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Predict/librom.inp
+
+<B> DMD Object(s) </B>:\n
+The trained DMD object(s) must be located in the directory specified in \b librom.inp
+as \a dmd_dirname (#DMDROMObject::m_dirname). For this example, they were generated
+using \ref sod_shock_tube_librom_dmd_train.
+
+\b solver.inp:
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Predict/solver.inp
+
+\b boundary.inp
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Predict/boundary.inp
+
+\b physics.inp
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Predict/physics.inp
+
+To generate \b initial.inp, compile and run the 
+following code in the run directory:
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Predict/aux/init.c
+
+Output:
+-------
+After running the code, there should be the following output
+files:
+
++ 21 output files \b op_00000.bin, \b op_00001.bin, ... \b op_00020.bin; 
+these are the solutions as <B> predicted by the ROM </B>. 
+
+The first of each of these file sets is the solution at \f$t=0\f$ and 
+the final one is the solution at \f$t=0.2\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, a separate file is written
+for solutions at each output time. All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The provided Python script (\b Examples/Python/plotSolution_1DBinary.py)
+can be used to generate plots from these binary files.
+Alternatively, #HyPar::op_file_format can be set to \a text, and GNUPlot 
+or something similar can be used to plot the resulting text files.
+
+The animation shows the evolution of the solution (density).
+@image html Solution_1DSodShockTubeROM_DMD_Predict.gif
+
+Expected screen output:
+\include 1D/Euler1D/SodShockTube_libROM_DMD_Predict/out.log
 
 \page euler2d_vortex_librom_dmd_train 2D Euler Equations - Isentropic Vortex Convection
 
