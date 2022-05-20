@@ -4152,7 +4152,7 @@ various geometries. To use the immersed boundary implementation in HyPar, an STL
 representation of the immersed body is necessary. Note:
 + The immersed boundary method is \b only implemented for 3-dimensional simulations (#HyPar::ndims = 3).
 + It can be used with only those physical models that define an immersed boundary implementation (#HyPar::IBFunction()), for
-  example, the 3D Navier-Stokes equations (NavierStokes3DIBAdiabatic(), NavierStokes3DIBIsothermal()).
+  example, the 3D Navier-Stokes (#NavierStokes3D) equations (NavierStokes3DIBAdiabatic(), NavierStokes3DIBIsothermal()).
 
 3D Navier-Stokes Equations:
 ---------------------------
