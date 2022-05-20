@@ -1,0 +1,37 @@
+1D-1V VLASOV EQUATION
+WITH libROM DMD PREDICTION
+
+  df         df                     df 
+  --  +  v ------  +  (E + v x B) ------  =  0
+  dt         dx                     dv
+
+   0 <= x <= 2pi;   Periodic
+  -6 <= v <= 6; Homogenous Dirichlet
+
+
+NOTE: This example requires HyPar be compiled
+with the FFTW library.
+
+Instead of solving the discretized PDE, HyPar uses a trained
+DMD to predict the solution.
+
+Use Examples/Python/plotSolution_2DBinary.py to plot solutions.
+
+The following input files are required:
++ solver.inp    -   General solver parameters
++ boundary.inp  -   Boundary conditions
++ physics.inp   -   Physical parameters 
++ initial.inp   -   Initial solution
+
++ librom.inp    -   Contains libROM-specific inputs
+
++ DMD           -   Trained DMD objects; must be located
+                    in the directory specified in librom.inp
+                    as "dmd_dirname".
+
+Visualization:
+** See hypar/README for other (optional) input files
+
+Notes:-
+The code aux/init.c is an example to generate the initial
+solution file(s) in the correct format required by the solver.  

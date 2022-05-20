@@ -1,0 +1,18 @@
+begin
+  ndims               2
+  nvars               4
+  size                128 128
+  iproc               4 4
+  ghost               3
+  par_space_type      nonconservative-2stage
+  n_iter              1
+  dt                  250.0
+  screen_op_iter      1
+  file_op_iter        1
+  input_mode          serial
+  ip_file_type        binary
+  output_mode         serial
+  op_file_format      binary
+  op_overwrite        yes
+  model               navierstokes2d
+end

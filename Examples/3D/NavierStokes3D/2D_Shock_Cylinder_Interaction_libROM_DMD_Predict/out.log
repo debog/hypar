@@ -1,0 +1,110 @@
+srun: job 9716432 queued and waiting for resources
+srun: job 9716432 has been allocated resources
+HyPar - Parallel (MPI) version with 16 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 3
+  No. of variables                           : 5
+  Domain size                                : 256 256 3 
+  Processes along each dimension             : 4 4 1 
+  Exact solution domain size                 : 256 256 3 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 10
+  Restart iteration                          : 0
+  Time integration scheme                    : euler 
+  Spatial discretization scheme (hyperbolic) : 1
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : characteristic
+  Spatial discretization type   (parabolic ) : nonconservative-1stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 2.000000E-01
+  Check for conservation                     : no
+  Screen output iterations                   : 1
+  File output iterations                     : 1
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : no
+  Physical model                             : navierstokes3d
+  Immersed Body                              : cylinder.stl
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  1.3577505742780760E+01
+ 1:  6.1066251110367062E+00
+ 2:  0.0000000000000000E+00
+ 3:  0.0000000000000000E+00
+ 4:  5.1720680582882707E+01
+Reading boundary conditions from boundary.inp.
+  Boundary                subsonic-inflow:  Along dimension  0 and face +1
+  Boundary              supersonic-inflow:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+  Boundary                       periodic:  Along dimension  2 and face +1
+  Boundary                       periodic:  Along dimension  2 and face -1
+6 boundary condition(s) read.
+Immersed body read from cylinder.stl:
+    Number of facets: 628
+    Bounding box: [-1.0,1.0] X [-1.0,1.0] X [-5.0,5.0]
+    Number of grid points inside immersed body: 6408 ( 3.3%).
+    Number of immersed boundary points        : 1242 ( 0.6%).
+    Immersed body simulation mode             : 2d (xy).
+Initializing solvers.
+Initializing physics. Model = "navierstokes3d"
+Reading physical model inputs from file "physics.inp".
+Writing solution file iblank_00000.bin.
+Setting up libROM interface.
+libROM inputs and parameters:
+  reduced model dimensionality:  0
+  sampling frequency:  0
+  mode: predict
+  type: DMD
+  save to file: true
+libROM DMD inputs:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+libROMInterface::loadROM() - loading ROM objects.
+  Loading DMD object (DMD/dmdobj_0000), time window=[0.00e+00,5.00e-01].
+  Loading DMD object (DMD/dmdobj_0001), time window=[5.00e-01,1.00e+00].
+  Loading DMD object (DMD/dmdobj_0002), time window=[1.00e+00,1.50e+00].
+  Loading DMD object (DMD/dmdobj_0003), time window=[1.50e+00,-1.00e+00].
+libROM: Predicted solution at time 0.0000e+00 using ROM, wallclock time: 2.920385.
+Writing immersed body surface data file surface00000.dat.
+Writing solution file op_00000.bin.
+libROM: Predicted solution at time 2.0000e-01 using ROM, wallclock time: 3.025760.
+Writing immersed body surface data file surface00001.dat.
+Writing solution file op_00001.bin.
+libROM: Predicted solution at time 4.0000e-01 using ROM, wallclock time: 3.076432.
+Writing immersed body surface data file surface00002.dat.
+Writing solution file op_00002.bin.
+libROM: Predicted solution at time 6.0000e-01 using ROM, wallclock time: 3.057626.
+Writing immersed body surface data file surface00003.dat.
+Writing solution file op_00003.bin.
+libROM: Predicted solution at time 8.0000e-01 using ROM, wallclock time: 3.049425.
+Writing immersed body surface data file surface00004.dat.
+Writing solution file op_00004.bin.
+libROM: Predicted solution at time 1.0000e+00 using ROM, wallclock time: 3.158879.
+Writing immersed body surface data file surface00005.dat.
+Writing solution file op_00005.bin.
+libROM: Predicted solution at time 1.2000e+00 using ROM, wallclock time: 3.187523.
+Writing immersed body surface data file surface00006.dat.
+Writing solution file op_00006.bin.
+libROM: Predicted solution at time 1.4000e+00 using ROM, wallclock time: 3.042254.
+Writing immersed body surface data file surface00007.dat.
+Writing solution file op_00007.bin.
+libROM: Predicted solution at time 1.6000e+00 using ROM, wallclock time: 3.046216.
+Writing immersed body surface data file surface00008.dat.
+Writing solution file op_00008.bin.
+libROM: Predicted solution at time 1.8000e+00 using ROM, wallclock time: 3.068598.
+Writing immersed body surface data file surface00009.dat.
+Writing solution file op_00009.bin.
+libROM: Predicted solution at time 2.0000e+00 using ROM, wallclock time: 3.130178.
+Writing immersed body surface data file surface00010.dat.
+Writing solution file op_00010.bin.
+libROM: total prediction/query wallclock time: 33.763276 (seconds).
+Solver runtime (in seconds): 9.7125058999999993E+01
+Total  runtime (in seconds): 9.7660359999999997E+01
+Deallocating arrays.
+Finished.

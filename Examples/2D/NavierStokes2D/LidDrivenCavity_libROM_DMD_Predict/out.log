@@ -1,0 +1,69 @@
+HyPar - Parallel (MPI) version with 16 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 4
+  Domain size                                : 128 128 
+  Processes along each dimension             : 4 4 
+  Exact solution domain size                 : 128 128 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 1
+  Restart iteration                          : 0
+  Time integration scheme                    : euler 
+  Spatial discretization scheme (hyperbolic) : 1
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : characteristic
+  Spatial discretization type   (parabolic ) : nonconservative-2stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 2.500000E+02
+  Check for conservation                     : no
+  Screen output iterations                   : 1
+  File output iterations                     : 1
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : yes
+  Physical model                             : navierstokes2d
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  1.0158100316200525E+00
+ 1:  -1.7347234759768071E-17
+ 2:  -8.6736173798840355E-19
+ 3:  1.8148063242358203E+00
+Reading boundary conditions from boundary.inp.
+  Boundary                    noslip-wall:  Along dimension  0 and face +1
+  Boundary                    noslip-wall:  Along dimension  0 and face -1
+  Boundary                    noslip-wall:  Along dimension  1 and face +1
+  Boundary                    noslip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+Initializing physics. Model = "navierstokes2d"
+Reading physical model inputs from file "physics.inp".
+Setting up libROM interface.
+libROM inputs and parameters:
+  reduced model dimensionality:  0
+  sampling frequency:  0
+  mode: predict
+  type: DMD
+  save to file: true
+libROM DMD inputs:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+libROMInterface::loadROM() - loading ROM objects.
+  Loading DMD object (DMD/dmdobj_0000), time window=[0.00e+00,5.00e+01].
+  Loading DMD object (DMD/dmdobj_0001), time window=[5.00e+01,1.00e+02].
+  Loading DMD object (DMD/dmdobj_0002), time window=[1.00e+02,1.50e+02].
+  Loading DMD object (DMD/dmdobj_0003), time window=[1.50e+02,2.00e+02].
+  Loading DMD object (DMD/dmdobj_0004), time window=[2.00e+02,-1.00e+00].
+libROM: Predicted solution at time 0.0000e+00 using ROM, wallclock time: 0.053045.
+Writing solution file op.bin.
+libROM: Predicted solution at time 2.5000e+02 using ROM, wallclock time: 0.146811.
+Writing solution file op.bin.
+libROM: total prediction/query wallclock time: 0.199856 (seconds).
+Solver runtime (in seconds): 8.3036480000000008E+00
+Total  runtime (in seconds): 8.6806149999999995E+00
+Deallocating arrays.
+Finished.

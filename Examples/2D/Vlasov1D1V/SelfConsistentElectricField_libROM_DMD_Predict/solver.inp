@@ -1,0 +1,15 @@
+begin
+	ndims              2
+	nvars              1
+	size               128 128
+	iproc              4 4
+	ghost              3
+	n_iter             25
+	dt                 0.2
+	screen_op_iter     1
+	file_op_iter       1
+	op_file_format     binary
+	ip_file_type       binary
+	op_overwrite       no
+	model              vlasov
+end

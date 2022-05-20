@@ -1,0 +1,84 @@
+srun: job 9716416 queued and waiting for resources
+srun: job 9716416 has been allocated resources
+HyPar - Parallel (MPI) version with 32 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 3
+  No. of variables                           : 5
+  Domain size                                : 200 96 3 
+  Processes along each dimension             : 8 4 1 
+  Exact solution domain size                 : 200 96 3 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 1
+  Restart iteration                          : 0
+  Time integration scheme                    : euler 
+  Spatial discretization scheme (hyperbolic) : 1
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : characteristic
+  Spatial discretization type   (parabolic ) : nonconservative-2stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 1.000000E+03
+  Check for conservation                     : no
+  Screen output iterations                   : 1
+  File output iterations                     : 1
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : yes
+  Physical model                             : navierstokes3d
+  Immersed Body                              : cylinder.stl
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  2.5654236261034112E+02
+ 1:  2.5654236261034061E+01
+ 2:  0.0000000000000000E+00
+ 3:  0.0000000000000000E+00
+ 4:  4.5939407361723192E+02
+Reading boundary conditions from boundary.inp.
+  Boundary                subsonic-inflow:  Along dimension  0 and face +1
+  Boundary               subsonic-outflow:  Along dimension  0 and face -1
+  Boundary            subsonic-ambivalent:  Along dimension  1 and face +1
+  Boundary            subsonic-ambivalent:  Along dimension  1 and face -1
+  Boundary                       periodic:  Along dimension  2 and face +1
+  Boundary                       periodic:  Along dimension  2 and face -1
+6 boundary condition(s) read.
+Immersed body read from cylinder.stl:
+    Number of facets: 628
+    Bounding box: [-1.0,1.0] X [-1.0,1.0] X [-5.0,5.0]
+    Number of grid points inside immersed body: 3456 ( 6.0%).
+    Number of immersed boundary points        : 882 ( 1.5%).
+    Immersed body simulation mode             : 2d (xy).
+Initializing solvers.
+Initializing physics. Model = "navierstokes3d"
+Reading physical model inputs from file "physics.inp".
+Writing solution file iblank.bin.
+Setting up libROM interface.
+libROM inputs and parameters:
+  reduced model dimensionality:  0
+  sampling frequency:  0
+  mode: predict
+  type: DMD
+  save to file: true
+libROM DMD inputs:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+libROMInterface::loadROM() - loading ROM objects.
+  Loading DMD object (DMD/dmdobj_0000), time window=[0.00e+00,2.00e+02].
+  Loading DMD object (DMD/dmdobj_0001), time window=[2.00e+02,4.00e+02].
+  Loading DMD object (DMD/dmdobj_0002), time window=[4.00e+02,6.00e+02].
+  Loading DMD object (DMD/dmdobj_0003), time window=[6.00e+02,8.00e+02].
+  Loading DMD object (DMD/dmdobj_0004), time window=[8.00e+02,-1.00e+00].
+libROM: Predicted solution at time 0.0000e+00 using ROM, wallclock time: 0.119344.
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+libROM: Predicted solution at time 1.0000e+03 using ROM, wallclock time: 0.140830.
+Writing immersed body surface data file surface.dat.
+Writing solution file op.bin.
+libROM: total prediction/query wallclock time: 0.260174 (seconds).
+Solver runtime (in seconds): 9.5630539999999993E+00
+Total  runtime (in seconds): 9.8863149999999997E+00
+Deallocating arrays.
+Finished.

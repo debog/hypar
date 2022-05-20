@@ -1,0 +1,16 @@
+begin
+  ndims             3
+  nvars             5
+  size              200 96 3
+  iproc             8 4 1
+  ghost             3
+  n_iter            1
+  par_space_type    nonconservative-2stage
+  dt                1000
+  file_op_iter      1
+  ip_file_type      binary
+  op_file_format    binary
+  op_overwrite      yes
+  model             navierstokes3d
+  immersed_body     cylinder.stl
+end

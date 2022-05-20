@@ -359,3 +359,43 @@ write_sg_errors    | char[]       | #SparseGridsSimulation::m_print_sg_errors   
         end
 
   If this file does not exist, HyPar will not use the sparse grids method.
+
+\section librom_inp librom.inp
+
+Requirement: \b mandatory if one wants to use the libROM (https://www.librom.net/) interface. This file
+is read only if HyPar is compiled with the libROM interface (see compilation instructions).
+
+Read by: libROMInterface::define(), DMDROMObject::DMDROMObject()
+
+Description: Specify the parameters related to reduced-order modeling using libROM.
+
+Format: ASCII text
+
+        begin
+            <keyword>   <value>
+            <keyword>   <value>
+            <keyword>   <value>
+            ...
+            <keyword>   <value>
+        end
+
+where the list of keywords and their type are:\n
+Keyword name       | Type         | Variable                                      | Default value
+------------------ | ------------ | --------------------------------------------- | ------------------------
+rdim               | int          | #libROMInterface::m_rdim                      | 10
+sampling_frequency | int          | #libROMInterface::m_sampling_freq             | 1
+mode               | string       | #libROMInterface::m_mode                      | "train"
+type               | string       | #libROMInterface::m_rom_type                  | "DMD"
+save_to_file       | string       | #libROMInterface::m_save_ROM                  | "true"
+dmd_num_win_samples| int          | #DMDROMObject::m_num_window_samples           | INT_MAX
+dmd_dirname        | string       | #DMDROMObject::m_dirname                      | "DMD"
+
+
+\b Notes:
++ Even if you want to use the default values for all the parameters, the file
+  \b librom.inp must exist with just the text
+
+        begin
+        end
+
+  If this file does not exist, HyPar will not use the libROM interface.
