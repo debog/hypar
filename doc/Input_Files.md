@@ -380,15 +380,16 @@ Format: ASCII text
         end
 
 where the list of keywords and their type are:\n
-Keyword name       | Type         | Variable                                      | Default value
------------------- | ------------ | --------------------------------------------- | ------------------------
-rdim               | int          | #libROMInterface::m_rdim                      | 10
-sampling_frequency | int          | #libROMInterface::m_sampling_freq             | 1
-mode               | string       | #libROMInterface::m_mode                      | "train"
-type               | string       | #libROMInterface::m_rom_type                  | "DMD"
-save_to_file       | string       | #libROMInterface::m_save_ROM                  | "true"
-dmd_num_win_samples| int          | #DMDROMObject::m_num_window_samples           | INT_MAX
-dmd_dirname        | string       | #DMDROMObject::m_dirname                      | "DMD"
+Keyword name           | Type         | Variable                                      | Default value
+---------------------- | ------------ | --------------------------------------------- | ------------------------
+rdim                   | int          | #libROMInterface::m_rdim                      | -1
+sampling_frequency     | int          | #libROMInterface::m_sampling_freq             | 1
+mode                   | string       | #libROMInterface::m_mode                      | "train"
+type                   | string       | #libROMInterface::m_rom_type                  | "DMD"
+save_to_file           | string       | #libROMInterface::m_save_ROM                  | "true"
+dmd_num_win_samples    | int          | #DMDROMObject::m_num_window_samples           | INT_MAX
+dmd_dirname            | string       | #DMDROMObject::m_dirname                      | "DMD"
+dmd_write_snapshot_mat | bool         | #DMDROMObject::m_write_snapshot_mat           | false
 
 
 \b Notes:
@@ -399,3 +400,4 @@ dmd_dirname        | string       | #DMDROMObject::m_dirname                    
         end
 
   If this file does not exist, HyPar will not use the libROM interface.
++ The default value for \a rdim is invalid, so it \b must be specified.

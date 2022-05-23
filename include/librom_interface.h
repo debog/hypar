@@ -154,6 +154,8 @@ class DMDROMObject : public ROMObject
     int m_tic; /*! private ticker to count number of samples taken */
     int m_curr_win; /*! private index for current window */
 
+    bool m_write_snapshot_mat;  /*!< Write snapshot matrix to file or not */
+
     std::string m_dirname; /*!< Subdirectory where DMD objects are written to or read from */
 
   private:

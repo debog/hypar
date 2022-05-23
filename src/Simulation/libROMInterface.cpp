@@ -25,10 +25,11 @@
 
     where the list of keywords and their type (that this function
     will look for) are:\n
-    Keyword name       | Type         | Variable                                      | Default value
-    ------------------ | ------------ | --------------------------------------------- | -------------------
-    dmd_num_win_samples| int          | #DMDROMObject::m_num_window_samples           | INT_MAX
-    dmd_dirname        | string       | #DMDROMObject::m_dirname                      | "DMD"
+    Keyword name           | Type         | Variable                                      | Default value
+    ---------------------- | ------------ | --------------------------------------------- | -------------------
+    dmd_num_win_samples    | int          | #DMDROMObject::m_num_window_samples           | INT_MAX
+    dmd_dirname            | string       | #DMDROMObject::m_dirname                      | "DMD"
+    dmd_write_snapshot_mat | bool         | #DMDROMObject::m_write_snapshot_mat           | false
 
     Note: other keywords in this file may be read by other functions.
    
@@ -53,6 +54,7 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
   m_num_window_samples = INT_MAX;
 
   char dirname_c_str[_MAX_STRING_SIZE_] = "DMD";
+  char write_snapshot_mat[_MAX_STRING_SIZE_] = "false";
 
   if (!m_rank) {
 
@@ -72,6 +74,8 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
             ferr = fscanf(in,"%d", &m_num_window_samples); if (ferr != 1) return;
           } else if (std::string(word) == "dmd_dirname") {
             ferr = fscanf(in,"%s", dirname_c_str); if (ferr != 1) return;
+          } else if (std::string(word) == "dmd_write_snapshot_mat") {
+            ferr = fscanf(in,"%s", write_snapshot_mat); if (ferr != 1) return;
           }
           if (ferr != 1) return;
         }
@@ -89,14 +93,17 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
     printf("libROM DMD inputs:\n");
     printf("  number of samples per window:   %d\n", m_num_window_samples);
     printf("  directory name for DMD onjects: %s\n", dirname_c_str);
+    printf("  write snapshot matrix to file:  %s\n", write_snapshot_mat);
   }
 
 #ifndef serial
   MPI_Bcast(&m_num_window_samples,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(dirname_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+  MPI_Bcast(write_snapshot_mat,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
 #endif
 
   m_dirname = std::string( dirname_c_str );
+  m_write_snapshot_mat = (std::string(write_snapshot_mat) == "true");
 
   if (m_num_window_samples <= m_rdim) {
     printf("ERROR:DMDROMObject::DMDROMObject() - m_num_window_samples <= m_rdim!!");
@@ -133,6 +140,13 @@ void DMDROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector *
       if (!m_rank) {
         printf("DMDROMObject::train() - training DMD object %d with %d samples.\n", 
                 m_curr_win, ncol );
+      }
+
+      if (m_write_snapshot_mat) {
+        char idx_string[_MAX_STRING_SIZE_];
+        sprintf(idx_string, "%04d", m_curr_win);
+        std::string fname_root(m_dirname + "/snapshot_mat_"+std::string(idx_string));
+        m_dmd[m_curr_win]->getSnapshotMatrix()->write(fname_root);
       }
       m_dmd[m_curr_win]->train(m_rdim);
       m_dmd_is_trained[m_curr_win] = true;
@@ -180,6 +194,12 @@ void DMDROMObject::train()
         int ncol = m_dmd[i]->getSnapshotMatrix()->numColumns();
         if (!m_rank) {
           printf("DMDROMObject::train() - training DMD object %d with %d samples.\n", i, ncol );
+        }
+        if (m_write_snapshot_mat) {
+          char idx_string[_MAX_STRING_SIZE_];
+          sprintf(idx_string, "%04d", i);
+          std::string fname_root(m_dirname + "/snapshot_mat_"+std::string(idx_string));
+          m_dmd[i]->getSnapshotMatrix()->write(fname_root);
         }
         m_dmd[i]->train(m_rdim);
       }
@@ -316,13 +336,13 @@ void DMDROMObject::load(const std::string& a_fname_root /*!< Filename root */)
     where the list of keywords and their type that this function will read are:\n
     Keyword name       | Type         | Variable                                      | Default value
     ------------------ | ------------ | --------------------------------------------- | -------------------
-    rdim               | int          | #libROMInterface::m_rdim                      | 10
+    rdim               | int          | #libROMInterface::m_rdim                      | -1
     sampling_frequency | int          | #libROMInterface::m_sampling_freq             | 1
     mode               | string       | #libROMInterface::m_mode                      | "train"
     type               | string       | #libROMInterface::m_rom_type                  | "DMD"
     save_to_file       | string       | #libROMInterface::m_save_ROM                  | "true"
 
-    Note: other keywords in this file may be read by other functions.
+    Note: other keywords in this file may be read by other functions. The default value for \a rdim is invalid, so it \b must be specified.
    
 */
 void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of type #SimulationObject */
