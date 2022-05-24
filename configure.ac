@@ -209,6 +209,7 @@ AC_CONFIG_FILES([
    src/PhysicalModels/ShallowWater1D/Makefile
    src/PhysicalModels/ShallowWater2D/Makefile
    src/PhysicalModels/Vlasov/Makefile
+ src/ROM/Makefile
  src/SecondDerivative/Makefile
  src/Simulation/Makefile
  src/SparseGrids/Makefile

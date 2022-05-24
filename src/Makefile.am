@@ -13,6 +13,7 @@ SUBDIRS = \
   PhysicalModels \
   MathFunctions \
   MPIFunctions \
+	ROM \
   SecondDerivative \
   Simulation \
   SparseGrids \
@@ -27,6 +28,7 @@ HyPar_LDADD = \
   HyParFunctions/libHyParFunctions.a \
   TimeIntegration/libTimeIntegration.a \
   PETScFunctions/libPETScFunctions.a \
+  ROM/libROM.a \
   BoundaryConditions/libBoundaryConditions.a \
   PhysicalModels/LinearADR/libLinearADR.a \
   PhysicalModels/Burgers/libBurgers.a \
