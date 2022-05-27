@@ -1,0 +1,6 @@
+begin
+  rdim                32
+  sampling_frequency  20
+  mode                train
+  dmd_num_win_samples 200
+end

@@ -1,0 +1,17 @@
+begin
+  ndims               3
+  nvars               5
+  size                192 192 192
+  iproc               8 8 8
+  ghost               3
+  n_iter              20
+  dt                  10
+  screen_op_iter      1
+  file_op_iter        1
+  input_mode          serial
+  ip_file_type        binary
+  output_mode         serial
+  op_file_format      binary
+  op_overwrite        no
+  model               navierstokes3d
+end
