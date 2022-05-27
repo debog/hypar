@@ -166,12 +166,13 @@ def plotData( data_3d: np.ndarray,
                               y3d[0, :, :], 
                               z3d[0, :, :], 
                               zdir='x', offset=x.max()/2, **kw2 )
-  fig.colorbar(plot_contour2, ax=ax)
+  cb = fig.colorbar(plot_contour2, ax=ax)
+  cb.ax.set_yticklabels(["{:.2f}".format(i) for i in cb.get_ticks()])
   
   ax.set_xlabel("x (m)")
   ax.set_ylabel("z (m)")
   ax.set_zlabel("y (m)")
-  ax.set_title("{:}, t={:.3}".format(varname, t_solution))
+  ax.set_title("{:}, t={:.1f}".format(varname, t_solution))
   
   ax.set_xlim(np.min(x3d), np.max(x3d))
   ax.set_ylim(np.min(y3d), np.max(y3d))
