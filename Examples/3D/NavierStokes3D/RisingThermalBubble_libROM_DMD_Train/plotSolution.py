@@ -3,7 +3,7 @@ Python script to create plots of atmoshpheric flow variables
 of a HyPar simulation of the rising thermal bubble case. 
 This particular file is for the
 3D Navier-Stokes/Euler physics, where the solution vector
-components are (rho, rho*u, rho*v, e).
+components are (rho, rho*u, rho*v, rho*w, e).
 
 - if op_overwrite is set to "no", a plot is generated
 for each variable (solution vector component) and each
