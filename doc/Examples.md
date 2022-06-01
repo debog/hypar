@@ -6004,6 +6004,7 @@ Numerical method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 2 (DMDROMObject::m_rdim)
 
@@ -6125,6 +6126,7 @@ Numerical Method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
  + Number of samples per time window: 100 (DMDROMObject::m_num_window_samples)
@@ -6244,6 +6246,7 @@ Numerical Method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 8 (DMDROMObject::m_rdim)
  + Number of samples per time window: 40 (DMDROMObject::m_num_window_samples)
@@ -6357,6 +6360,7 @@ Numerical method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
 
@@ -6482,6 +6486,7 @@ Numerical method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
  + Number of samples per time window: 50 (DMDROMObject::m_num_window_samples)
@@ -6603,6 +6608,7 @@ Numerical Method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
  + Number of samples per time window: 200 (DMDROMObject::m_num_window_samples)
@@ -6749,6 +6755,7 @@ Numerical method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
  + Sampling frequency: 50 (libROMInterface::m_sampling_freq)
@@ -6891,6 +6898,7 @@ Numerical Method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
  + Sampling frequency: 10 (libROMInterface::m_sampling_freq)
@@ -7034,6 +7042,7 @@ Numerical Method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
  + Sampling frequency: 2 (libROMInterface::m_sampling_freq)
@@ -7178,6 +7187,7 @@ Numerical method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
  + Sampling frequency: 7 (libROMInterface::m_sampling_freq)
@@ -7310,6 +7320,7 @@ Numerical Method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
  + Number of samples per time window: 60 (DMDROMObject::m_num_window_samples)
@@ -7430,6 +7441,7 @@ Numerical Method:
 
 Reduced Order Modeling:
  + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
  + Latent subspace dimension: 32 (DMDROMObject::m_rdim)
  + Number of samples per time window: 100 (DMDROMObject::m_num_window_samples)
@@ -7543,6 +7555,7 @@ Initial solution: \f$u\left(x,0\right) = \sin\left(2\pi x\right)\f$
 
 Reduced Order Modeling:
  + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
 
 Note:
@@ -7651,6 +7664,7 @@ Initial solution:
 
 Reduced Order Modeling:
  + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
 
 Note:
@@ -7753,6 +7767,7 @@ Initial Solution:
 
 Reduced Order Modeling:
  + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
 
 Note:
@@ -7858,6 +7873,7 @@ where \f$b=0.5\f$ is the vortex strength and \f$r = \left[(x-x_c)^2 + (y-y_c)^2 
 
 Reduced Order Modeling:
  + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
 
 Note:
@@ -8000,6 +8016,7 @@ speed of sound is 1.
 
 Reduced Order Modeling:
  + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
 
 Note:
@@ -8103,6 +8120,7 @@ to be compiled with FFTW (http://www.fftw.org/).
 
 Reduced Order Modeling:
  + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
 
 Note:
@@ -8229,6 +8247,7 @@ Other parameters:
 
 Reduced Order Modeling:
  + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
 
 Note:
@@ -8356,6 +8375,7 @@ Other parameters:
 
 Reduced Order Modeling:
  + Mode: predict (libROMInterface::m_mode, #_ROM_MODE_PREDICT_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
  + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
 
 Note:
