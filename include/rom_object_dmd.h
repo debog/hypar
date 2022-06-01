@@ -39,7 +39,13 @@ class DMDROMObject : public ROMObject
   public:
 
     /*! Constructor */
-    DMDROMObject( const int, const double, const int, const int, const int);
+    DMDROMObject( const int, 
+                  const double, 
+                  const int, 
+                  const int, 
+                  const int,
+                  const int,
+                  const int a_var_idx = -1);
 
     /*! Destructor */
     virtual ~DMDROMObject()
@@ -107,8 +113,11 @@ class DMDROMObject : public ROMObject
 
     int m_num_window_samples; /*!< Number of samples per DMD for time-windowing */
 
-    int m_tic; /*! private ticker to count number of samples taken */
-    int m_curr_win; /*! private index for current window */
+    int m_tic; /*!< private ticker to count number of samples taken */
+    int m_curr_win; /*!< private index for current window */
+
+    int m_sim_idx; /*!< simulation index of this object for ensemble simulations */
+    int m_var_idx; /*!< component index of this object if component-wise ROMs are being used */
 
     bool m_write_snapshot_mat;  /*!< Write snapshot matrix to file or not */
 

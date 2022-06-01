@@ -36,7 +36,9 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
                             const double  a_dt,       /*!< time step size */
                             const int     a_rdim,     /*!< latent space dimension */
                             const int     a_rank,     /*!< MPI rank of this process */
-                            const int     a_nproc     /*!< Number of MPI processes */ )
+                            const int     a_nproc,    /*!< Number of MPI processes */
+                            const int     a_sim_idx,  /*!< Simulation index (for ensemble simulations */
+                            const int     a_var_idx   /*!< Vector component index */ )
 {
   m_rank = a_rank;
   m_nproc = a_nproc;
@@ -48,6 +50,9 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
   m_dt = a_dt;
   m_t_final = -1;
   m_rdim = a_rdim;
+
+  m_sim_idx = a_sim_idx;
+  m_var_idx = a_var_idx;
 
   m_num_window_samples = INT_MAX;
 
@@ -92,6 +97,12 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
     printf("  number of samples per window:   %d\n", m_num_window_samples);
     printf("  directory name for DMD onjects: %s\n", dirname_c_str);
     printf("  write snapshot matrix to file:  %s\n", write_snapshot_mat);
+    if (m_sim_idx >= 0) {
+      printf("  simulation domain:  %d\n", m_sim_idx);
+    }
+    if (m_var_idx >= 0) {
+      printf("  Vector component:  %d\n", m_var_idx);
+    }
   }
 
 #ifndef serial
@@ -122,8 +133,8 @@ void DMDROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector *
     m_intervals.push_back( Interval(a_time, m_t_final) );
 
     if (!m_rank) {
-      printf("DMDROMObject::takeSample() - creating new DMD object, t=%f (total: %d).\n",
-             m_intervals[m_curr_win].first, m_dmd.size());
+      printf( "DMDROMObject::takeSample() - creating new DMD object for sim. domain %d, var %d, t=%f (total: %d).\n",
+              m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_dmd.size());
     }
     m_dmd[m_curr_win]->takeSample( a_U.getData(), a_time );
 
@@ -136,8 +147,8 @@ void DMDROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector *
       m_intervals[m_curr_win].second = a_time;
       int ncol = m_dmd[m_curr_win]->getSnapshotMatrix()->numColumns();
       if (!m_rank) {
-        printf("DMDROMObject::train() - training DMD object %d with %d samples.\n", 
-                m_curr_win, ncol );
+        printf( "DMDROMObject::train() - training DMD object %d for sim. domain %d, var %d with %d samples.\n", 
+                m_curr_win, m_sim_idx, m_var_idx, ncol );
       }
 
       if (m_write_snapshot_mat) {
@@ -156,8 +167,8 @@ void DMDROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector *
       m_intervals.push_back( Interval(a_time, m_t_final) );
       m_dmd[m_curr_win]->takeSample( a_U.getData(), a_time );
       if (!m_rank) {
-        printf("DMDROMObject::takeSample() - creating new DMD object, t=%f (total: %d).\n",
-               m_intervals[m_curr_win].first, m_dmd.size());
+        printf("DMDROMObject::takeSample() - creating new DMD object for sim. domain %d, var %d, t=%f (total: %d).\n",
+               m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_dmd.size());
       }
     }
 
@@ -179,7 +190,9 @@ void DMDROMObject::train()
       m_intervals.pop_back();
       m_intervals[m_intervals.size()-1].second = m_t_final;
       if (!m_rank) {
-        printf("DMDROMObject::train() - last window DMD has %d sample(s) only; deleted it ",
+        printf("DMDROMObject::train() - last window DMD for sim. domain %d, var %d has %d sample(s) only; deleted it ",
+               m_sim_idx,
+               m_var_idx,
                num_columns );
         printf("(total: %d).\n", m_dmd.size());
       }
@@ -191,7 +204,8 @@ void DMDROMObject::train()
       if (!m_dmd_is_trained[i]) {
         int ncol = m_dmd[i]->getSnapshotMatrix()->numColumns();
         if (!m_rank) {
-          printf("DMDROMObject::train() - training DMD object %d with %d samples.\n", i, ncol );
+          printf( "DMDROMObject::train() - training DMD object %d for sim. domain %d, var %d with %d samples.\n", 
+                  m_curr_win, m_sim_idx, m_var_idx, ncol );
         }
         if (m_write_snapshot_mat) {
           char idx_string[_MAX_STRING_SIZE_];

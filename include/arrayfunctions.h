@@ -435,6 +435,50 @@ INLINE int ArrayCopynD(int    ndims,    /*!< number of dimensions */
   return(0);
 }
 
+/*! Copies a component of an n-D array to another n-D array of at least one component
+ * (both of which are stored in memory as 1D arrays); the two arrays *must* be of 
+ * the same n-dimensional size (locally and globally) */
+INLINE int ArrayCopynDComponent(  int    ndims,      /*!< number of dimensions */
+                                  const double *x,   /*!< copy-from array */
+                                  double *y,         /*!< copy-to   array */
+                                  int    *dim,       /*!< integer array of size in each dimension */
+                                  int    g1,         /*!< number of ghost points in copy-from array x */
+                                  int    g2,         /*!< number of ghost points in copy-to   array y */
+                                  int    *index,     /*!< pre-allocated (by the calling function) integer array of size ndims */
+                                  int    nvars_from, /*!< number of components/variables in copy-from array */
+                                  int    nvars_to,   /*!< number of components/variables in copy-from array */
+                                  int    var_from,   /*!< component to copy from in x */
+                                  int    var_to      /*!< component to copy to in y */ )
+{
+  if (!y) {
+    fprintf(stderr,"Error in ArrayCopynD(): array \"y\" not allocated.\n");
+    return(1);
+  }
+  if (!x) {
+    fprintf(stderr,"Error in ArrayCopynD(): array \"x\" not allocated.\n");
+    return(1);
+  }
+  if ((var_from >= nvars_from) || (var_from < 0)) {
+    fprintf(stderr,"Error in ArrayCopynD(): specified component exceeds bounds.\n");
+    return(1);
+  }
+  if ((var_to >= nvars_to) || (var_to < 0)) {
+    fprintf(stderr,"Error in ArrayCopynD(): specified component exceeds bounds.\n");
+    return(1);
+  }
+
+  int done = 0;
+  _ArraySetValue_(index,ndims,0);
+  while (!done) {
+    int p1, p2;
+    _ArrayIndex1D_(ndims,dim,index,g1,p1); 
+    _ArrayIndex1D_(ndims,dim,index,g2,p2);
+    (y+p2*nvars_to)[var_to] = (x+p1*nvars_from)[var_from];
+    _ArrayIncrementIndex_(ndims,dim,index,done);
+  }
+  return(0);
+}
+
 /*! Returns the maximum magnitude element in an n-D array (useful for L_inf norm) */
 INLINE double ArrayMaxnD(int    nvars,  /*!< number of elements at one array location,
                                              can be > 1 for systems of equations */

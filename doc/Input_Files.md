@@ -385,6 +385,7 @@ Keyword name           | Type         | Variable                                
 rdim                   | int          | #libROMInterface::m_rdim                      | -1
 sampling_frequency     | int          | #libROMInterface::m_sampling_freq             | 1
 mode                   | string       | #libROMInterface::m_mode                      | "train"
+component_mode         | string       | #libROMInterface::m_comp_mode                 | "monolithic"
 type                   | string       | #libROMInterface::m_rom_type                  | "DMD"
 save_to_file           | string       | #libROMInterface::m_save_ROM                  | "true"
 dmd_num_win_samples    | int          | #DMDROMObject::m_num_window_samples           | INT_MAX
