@@ -1,4 +1,5 @@
 2D NAVIER-STOKES EQUATIONS FOR COMPRESSIBLE FLOWS
+WITH libROM DMD TRAINING
 
   d   [ rho   ]   d   [   rho*u    ]    d  [   rho*v   ]
   --  [ rho*u ] + --  [rho*u*u + p ] +  -- [  rho*u*v  ] =  Viscous + Gravity terms
@@ -32,6 +33,15 @@ Domain:
   0 <= x,y <= 1000
   "slip-walls" boundary conditions on all boundaries
 
+In addition to the evolution of the vortex, a DMD
+object is created using libROM and trained on the 
+simulation data. The solution is predicted using this
+DMD object at the same output times as the actual
+simulation.
+
+Use plotSolution.py to plot the HyPar and DMD solutions
+and compute/plot the diff between the two.
+
 The following input files are required:
 + solver.inp    -   General solver parameters
 + boundary.inp  -   Boundary conditions
@@ -39,6 +49,8 @@ The following input files are required:
 + initial.inp   -   Initial solution file (can be generated
                     by compiling and running aux/init.c in
                     the run directory).
+
++ librom.inp    -   Contains libROM-specific inputs
 
 ** See hypar/README for other (optional) input files
 
