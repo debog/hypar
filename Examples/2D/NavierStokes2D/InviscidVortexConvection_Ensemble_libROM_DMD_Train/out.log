@@ -1,0 +1,869 @@
+srun: job 9871774 queued and waiting for resources
+srun: job 9871774 has been allocated resources
+HyPar - Parallel (MPI) version with 8 processes
+Compiled with PETSc time integration.
+-- Ensemble Simulation --
+Number of simulation domains: 4
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 4
+  Domain sizes:
+    domain   0 - 128 16 
+    domain   1 - 64 32 
+    domain   2 - 32 64 
+    domain   3 - 16 128 
+  Processes along each dimension:
+    domain   0 - 8 1 
+    domain   1 - 4 2 
+    domain   2 - 2 4 
+    domain   3 - 1 8 
+  Exact solution domain sizes:
+    domain   0 - 128 16 
+    domain   1 - 64 32 
+    domain   2 - 32 64 
+    domain   3 - 16 128 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 800
+  Restart iteration                          : 0
+  Time integration scheme                    : rk (44)
+  Spatial discretization scheme (hyperbolic) : upw5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : components
+  Spatial discretization type   (parabolic ) : nonconservative-2stage
+  Spatial discretization scheme (parabolic ) : 4
+  Time Step                                  : 2.500000E-02
+  Check for conservation                     : yes
+  Screen output iterations                   : 10
+  File output iterations                     : 80
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : no
+  Physical model                             : navierstokes2d
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial_0.inp (Serial mode).
+Volume integral of the initial solution on domain 0:
+ 0:  9.9980704056142386E+01
+ 1:  4.9990355858047224E+01
+ 2:  -4.7874680497717037E-07
+ 3:  2.6245709333707828E+02
+Reading array from binary file initial_1.inp (Serial mode).
+Volume integral of the initial solution on domain 1:
+ 0:  9.9980704056028685E+01
+ 1:  4.9990353943002333E+01
+ 2:  -9.5749390466304263E-07
+ 3:  2.6245709237590307E+02
+Reading array from binary file initial_2.inp (Serial mode).
+Volume integral of the initial solution on domain 2:
+ 0:  9.9980704056028713E+01
+ 1:  4.9990352985508281E+01
+ 2:  -1.9149879755598655E-06
+ 3:  2.6245709189715598E+02
+Reading array from binary file initial_3.inp (Serial mode).
+Volume integral of the initial solution on domain 3:
+ 0:  9.9980704056142400E+01
+ 1:  4.9990352506818013E+01
+ 2:  -3.8299760370981050E-06
+ 3:  2.6245709166146372E+02
+Domain 0: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 1: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 2: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 3: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+Initializing physics. Model = "navierstokes2d"
+Reading physical model inputs from file "physics.inp".
+Setting up libROM interface.
+libROMInterface inputs and parameters:
+  reduced model dimensionality:  16
+  sampling frequency:  1
+  mode: train
+  component mode: monolithic
+  type: DMD
+  save to file: true
+DMDROMObject details:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+  write snapshot matrix to file:  false
+  simulation domain:  0
+DMDROMObject details:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+  write snapshot matrix to file:  false
+  simulation domain:  1
+DMDROMObject details:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+  write snapshot matrix to file:  false
+  simulation domain:  2
+DMDROMObject details:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+  write snapshot matrix to file:  false
+  simulation domain:  3
+Setting up time integration.
+Solving in time (from 0 to 800 iterations)
+Writing solution file op_0_00000.bin.
+Writing solution file op_1_00000.bin.
+Writing solution file op_2_00000.bin.
+Writing solution file op_3_00000.bin.
+DMDROMObject::takeSample() - creating new DMD object for sim. domain 0, var -1, t=0.000000 (total: 1).
+DMDROMObject::takeSample() - creating new DMD object for sim. domain 1, var -1, t=0.000000 (total: 1).
+DMDROMObject::takeSample() - creating new DMD object for sim. domain 2, var -1, t=0.000000 (total: 1).
+DMDROMObject::takeSample() - creating new DMD object for sim. domain 3, var -1, t=0.000000 (total: 1).
+--
+iter=     10,  t=2.500e-01
+  CFL=4.034E-01,   norm=3.0058E-04
+  wctime=3.9E-03 (s)
+  cons_err=1.0593E-15
+--
+
+--
+iter=     20,  t=5.000e-01
+  CFL=4.036E-01,   norm=3.0019E-04
+  wctime=3.9E-03 (s)
+  cons_err=9.9360E-16
+--
+
+--
+iter=     30,  t=7.500e-01
+  CFL=4.038E-01,   norm=2.9981E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.1220E-15
+--
+
+--
+iter=     40,  t=1.000e+00
+  CFL=4.036E-01,   norm=2.9949E-04
+  wctime=3.8E-03 (s)
+  cons_err=5.4417E-16
+--
+
+--
+iter=     50,  t=1.250e+00
+  CFL=4.029E-01,   norm=2.9915E-04
+  wctime=3.8E-03 (s)
+  cons_err=6.9091E-16
+--
+
+--
+iter=     60,  t=1.500e+00
+  CFL=4.028E-01,   norm=2.9876E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.1507E-15
+--
+
+--
+iter=     70,  t=1.750e+00
+  CFL=4.029E-01,   norm=2.9839E-04
+  wctime=3.7E-03 (s)
+  cons_err=9.8368E-16
+--
+
+--
+iter=     80,  t=2.000e+00
+  CFL=4.035E-01,   norm=2.9808E-04
+  wctime=3.7E-03 (s)
+  cons_err=6.6662E-16
+--
+
+Writing solution file op_0_00001.bin.
+Writing solution file op_1_00001.bin.
+Writing solution file op_2_00001.bin.
+Writing solution file op_3_00001.bin.
+--
+iter=     90,  t=2.250e+00
+  CFL=4.036E-01,   norm=2.9782E-04
+  wctime=4.0E-03 (s)
+  cons_err=7.5428E-16
+--
+
+--
+iter=    100,  t=2.500e+00
+  CFL=4.030E-01,   norm=2.9755E-04
+  wctime=3.8E-03 (s)
+  cons_err=8.3922E-16
+--
+
+--
+iter=    110,  t=2.750e+00
+  CFL=4.023E-01,   norm=2.9729E-04
+  wctime=3.9E-03 (s)
+  cons_err=8.3577E-16
+--
+
+--
+iter=    120,  t=3.000e+00
+  CFL=4.023E-01,   norm=2.9701E-04
+  wctime=3.8E-03 (s)
+  cons_err=9.5526E-16
+--
+
+--
+iter=    130,  t=3.250e+00
+  CFL=4.031E-01,   norm=2.9673E-04
+  wctime=3.8E-03 (s)
+  cons_err=8.8312E-16
+--
+
+--
+iter=    140,  t=3.500e+00
+  CFL=4.033E-01,   norm=2.9643E-04
+  wctime=3.9E-03 (s)
+  cons_err=8.8664E-16
+--
+
+--
+iter=    150,  t=3.750e+00
+  CFL=4.029E-01,   norm=2.9615E-04
+  wctime=3.8E-03 (s)
+  cons_err=7.5810E-16
+--
+
+--
+iter=    160,  t=4.000e+00
+  CFL=4.019E-01,   norm=2.9589E-04
+  wctime=3.8E-03 (s)
+  cons_err=6.6840E-16
+--
+
+Writing solution file op_0_00002.bin.
+Writing solution file op_1_00002.bin.
+Writing solution file op_2_00002.bin.
+Writing solution file op_3_00002.bin.
+--
+iter=    170,  t=4.250e+00
+  CFL=4.018E-01,   norm=2.9565E-04
+  wctime=3.7E-03 (s)
+  cons_err=9.8873E-16
+--
+
+--
+iter=    180,  t=4.500e+00
+  CFL=4.027E-01,   norm=2.9540E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.0980E-15
+--
+
+--
+iter=    190,  t=4.750e+00
+  CFL=4.031E-01,   norm=2.9516E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.1470E-15
+--
+
+--
+iter=    200,  t=5.000e+00
+  CFL=4.028E-01,   norm=2.9493E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.1162E-15
+--
+
+--
+iter=    210,  t=5.250e+00
+  CFL=4.019E-01,   norm=2.9470E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.0588E-15
+--
+
+--
+iter=    220,  t=5.500e+00
+  CFL=4.014E-01,   norm=2.9447E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.0202E-15
+--
+
+--
+iter=    230,  t=5.750e+00
+  CFL=4.024E-01,   norm=2.9424E-04
+  wctime=3.8E-03 (s)
+  cons_err=9.2504E-16
+--
+
+--
+iter=    240,  t=6.000e+00
+  CFL=4.028E-01,   norm=2.9402E-04
+  wctime=3.7E-03 (s)
+  cons_err=7.6878E-16
+--
+
+Writing solution file op_0_00003.bin.
+Writing solution file op_1_00003.bin.
+Writing solution file op_2_00003.bin.
+Writing solution file op_3_00003.bin.
+--
+iter=    250,  t=6.250e+00
+  CFL=4.026E-01,   norm=2.9380E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.1997E-15
+--
+
+--
+iter=    260,  t=6.500e+00
+  CFL=4.019E-01,   norm=2.9356E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.1527E-15
+--
+
+--
+iter=    270,  t=6.750e+00
+  CFL=4.010E-01,   norm=2.9333E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.0762E-15
+--
+
+--
+iter=    280,  t=7.000e+00
+  CFL=4.020E-01,   norm=2.9313E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.0174E-15
+--
+
+--
+iter=    290,  t=7.250e+00
+  CFL=4.026E-01,   norm=2.9294E-04
+  wctime=3.8E-03 (s)
+  cons_err=9.1791E-16
+--
+
+--
+iter=    300,  t=7.500e+00
+  CFL=4.025E-01,   norm=2.9274E-04
+  wctime=3.8E-03 (s)
+  cons_err=8.9965E-16
+--
+
+--
+iter=    310,  t=7.750e+00
+  CFL=4.018E-01,   norm=2.9253E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.0051E-15
+--
+
+--
+iter=    320,  t=8.000e+00
+  CFL=4.007E-01,   norm=2.9234E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.1746E-15
+--
+
+Writing solution file op_0_00004.bin.
+Writing solution file op_1_00004.bin.
+Writing solution file op_2_00004.bin.
+Writing solution file op_3_00004.bin.
+--
+iter=    330,  t=8.250e+00
+  CFL=4.017E-01,   norm=2.9216E-04
+  wctime=3.6E-03 (s)
+  cons_err=7.6627E-16
+--
+
+--
+iter=    340,  t=8.500e+00
+  CFL=4.023E-01,   norm=2.9197E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.0783E-15
+--
+
+--
+iter=    350,  t=8.750e+00
+  CFL=4.023E-01,   norm=2.9177E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.2007E-15
+--
+
+--
+iter=    360,  t=9.000e+00
+  CFL=4.017E-01,   norm=2.9157E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.1601E-15
+--
+
+--
+iter=    370,  t=9.250e+00
+  CFL=4.007E-01,   norm=2.9138E-04
+  wctime=3.7E-03 (s)
+  cons_err=9.2310E-16
+--
+
+--
+iter=    380,  t=9.500e+00
+  CFL=4.014E-01,   norm=2.9121E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.3744E-15
+--
+
+--
+iter=    390,  t=9.750e+00
+  CFL=4.020E-01,   norm=2.9104E-04
+  wctime=3.6E-03 (s)
+  cons_err=9.3141E-16
+--
+
+--
+iter=    400,  t=1.000e+01
+  CFL=4.021E-01,   norm=2.9087E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.0234E-15
+--
+
+Writing solution file op_0_00005.bin.
+Writing solution file op_1_00005.bin.
+Writing solution file op_2_00005.bin.
+Writing solution file op_3_00005.bin.
+--
+iter=    410,  t=1.025e+01
+  CFL=4.016E-01,   norm=2.9068E-04
+  wctime=3.7E-03 (s)
+  cons_err=9.0313E-16
+--
+
+--
+iter=    420,  t=1.050e+01
+  CFL=4.006E-01,   norm=2.9050E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.2216E-15
+--
+
+--
+iter=    430,  t=1.075e+01
+  CFL=4.010E-01,   norm=2.9032E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.3412E-15
+--
+
+--
+iter=    440,  t=1.100e+01
+  CFL=4.018E-01,   norm=2.9015E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.0837E-15
+--
+
+--
+iter=    450,  t=1.125e+01
+  CFL=4.019E-01,   norm=2.8998E-04
+  wctime=3.9E-03 (s)
+  cons_err=1.2461E-15
+--
+
+--
+iter=    460,  t=1.150e+01
+  CFL=4.015E-01,   norm=2.8983E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.1418E-15
+--
+
+--
+iter=    470,  t=1.175e+01
+  CFL=4.006E-01,   norm=2.8968E-04
+  wctime=3.9E-03 (s)
+  cons_err=9.8024E-16
+--
+
+--
+iter=    480,  t=1.200e+01
+  CFL=4.008E-01,   norm=2.8955E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.1560E-15
+--
+
+Writing solution file op_0_00006.bin.
+Writing solution file op_1_00006.bin.
+Writing solution file op_2_00006.bin.
+Writing solution file op_3_00006.bin.
+--
+iter=    490,  t=1.225e+01
+  CFL=4.016E-01,   norm=2.8940E-04
+  wctime=3.6E-03 (s)
+  cons_err=1.2067E-15
+--
+
+--
+iter=    500,  t=1.250e+01
+  CFL=4.018E-01,   norm=2.8924E-04
+  wctime=3.7E-03 (s)
+  cons_err=7.8907E-16
+--
+
+--
+iter=    510,  t=1.275e+01
+  CFL=4.014E-01,   norm=2.8906E-04
+  wctime=3.6E-03 (s)
+  cons_err=1.0813E-15
+--
+
+--
+iter=    520,  t=1.300e+01
+  CFL=4.005E-01,   norm=2.8888E-04
+  wctime=3.8E-03 (s)
+  cons_err=9.8098E-16
+--
+
+--
+iter=    530,  t=1.325e+01
+  CFL=4.005E-01,   norm=2.8871E-04
+  wctime=3.6E-03 (s)
+  cons_err=1.0639E-15
+--
+
+--
+iter=    540,  t=1.350e+01
+  CFL=4.013E-01,   norm=2.8855E-04
+  wctime=3.6E-03 (s)
+  cons_err=9.5043E-16
+--
+
+--
+iter=    550,  t=1.375e+01
+  CFL=4.016E-01,   norm=2.8842E-04
+  wctime=3.6E-03 (s)
+  cons_err=1.0284E-15
+--
+
+--
+iter=    560,  t=1.400e+01
+  CFL=4.013E-01,   norm=2.8830E-04
+  wctime=3.8E-03 (s)
+  cons_err=7.2515E-16
+--
+
+Writing solution file op_0_00007.bin.
+Writing solution file op_1_00007.bin.
+Writing solution file op_2_00007.bin.
+Writing solution file op_3_00007.bin.
+--
+iter=    570,  t=1.425e+01
+  CFL=4.005E-01,   norm=2.8818E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.0092E-15
+--
+
+--
+iter=    580,  t=1.450e+01
+  CFL=4.003E-01,   norm=2.8805E-04
+  wctime=3.6E-03 (s)
+  cons_err=1.1762E-15
+--
+
+--
+iter=    590,  t=1.475e+01
+  CFL=4.011E-01,   norm=2.8790E-04
+  wctime=3.6E-03 (s)
+  cons_err=8.2795E-16
+--
+
+--
+iter=    600,  t=1.500e+01
+  CFL=4.014E-01,   norm=2.8774E-04
+  wctime=3.6E-03 (s)
+  cons_err=1.2266E-15
+--
+
+--
+iter=    610,  t=1.525e+01
+  CFL=4.012E-01,   norm=2.8759E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.1735E-15
+--
+
+--
+iter=    620,  t=1.550e+01
+  CFL=4.004E-01,   norm=2.8744E-04
+  wctime=3.7E-03 (s)
+  cons_err=8.5961E-16
+--
+
+--
+iter=    630,  t=1.575e+01
+  CFL=4.000E-01,   norm=2.8730E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.1097E-15
+--
+
+--
+iter=    640,  t=1.600e+01
+  CFL=4.009E-01,   norm=2.8717E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.2362E-15
+--
+
+Writing solution file op_0_00008.bin.
+Writing solution file op_1_00008.bin.
+Writing solution file op_2_00008.bin.
+Writing solution file op_3_00008.bin.
+--
+iter=    650,  t=1.625e+01
+  CFL=4.013E-01,   norm=2.8706E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.1482E-15
+--
+
+--
+iter=    660,  t=1.650e+01
+  CFL=4.011E-01,   norm=2.8696E-04
+  wctime=3.9E-03 (s)
+  cons_err=1.1292E-15
+--
+
+--
+iter=    670,  t=1.675e+01
+  CFL=4.004E-01,   norm=2.8684E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.1013E-15
+--
+
+--
+iter=    680,  t=1.700e+01
+  CFL=3.998E-01,   norm=2.8671E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.1764E-15
+--
+
+--
+iter=    690,  t=1.725e+01
+  CFL=4.007E-01,   norm=2.8656E-04
+  wctime=3.7E-03 (s)
+  cons_err=1.1443E-15
+--
+
+--
+iter=    700,  t=1.750e+01
+  CFL=4.011E-01,   norm=2.8641E-04
+  wctime=3.9E-03 (s)
+  cons_err=1.1120E-15
+--
+
+--
+iter=    710,  t=1.775e+01
+  CFL=4.009E-01,   norm=2.8626E-04
+  wctime=4.1E-03 (s)
+  cons_err=1.0669E-15
+--
+
+--
+iter=    720,  t=1.800e+01
+  CFL=4.003E-01,   norm=2.8612E-04
+  wctime=4.0E-03 (s)
+  cons_err=1.1845E-15
+--
+
+Writing solution file op_0_00009.bin.
+Writing solution file op_1_00009.bin.
+Writing solution file op_2_00009.bin.
+Writing solution file op_3_00009.bin.
+--
+iter=    730,  t=1.825e+01
+  CFL=3.996E-01,   norm=2.8600E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.1458E-15
+--
+
+--
+iter=    740,  t=1.850e+01
+  CFL=4.005E-01,   norm=2.8590E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.2140E-15
+--
+
+--
+iter=    750,  t=1.875e+01
+  CFL=4.010E-01,   norm=2.8581E-04
+  wctime=3.9E-03 (s)
+  cons_err=1.0910E-15
+--
+
+--
+iter=    760,  t=1.900e+01
+  CFL=4.008E-01,   norm=2.8572E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.3392E-15
+--
+
+--
+iter=    770,  t=1.925e+01
+  CFL=4.002E-01,   norm=2.8563E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.3038E-15
+--
+
+--
+iter=    780,  t=1.950e+01
+  CFL=3.994E-01,   norm=2.8551E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.2373E-15
+--
+
+--
+iter=    790,  t=1.975e+01
+  CFL=4.004E-01,   norm=2.8538E-04
+  wctime=3.8E-03 (s)
+  cons_err=1.1883E-15
+--
+
+--
+iter=    800,  t=2.000e+01
+  CFL=4.008E-01,   norm=2.8524E-04
+  wctime=3.9E-03 (s)
+  cons_err=1.3113E-15
+--
+
+Completed time integration (Final time: 20.000000), total wctime: 2.973399 (seconds).
+
+Reading array from binary file exact_0.inp (Serial mode).
+Reading array from binary file exact_1.inp (Serial mode).
+Reading array from binary file exact_2.inp (Serial mode).
+Reading array from binary file exact_3.inp (Serial mode).
+Writing solution file op_0_00010.bin.
+Writing solution file op_1_00010.bin.
+Writing solution file op_2_00010.bin.
+Writing solution file op_3_00010.bin.
+DMDROMObject::train() - training DMD object 0 for sim. domain 0, var -1 with 800 samples.
+Using 16 basis vectors out of 799.
+DMDROMObject::train() - training DMD object 0 for sim. domain 1, var -1 with 800 samples.
+Using 16 basis vectors out of 799.
+DMDROMObject::train() - training DMD object 0 for sim. domain 2, var -1 with 800 samples.
+Using 16 basis vectors out of 799.
+DMDROMObject::train() - training DMD object 0 for sim. domain 3, var -1 with 800 samples.
+Using 16 basis vectors out of 799.
+libROM: total training wallclock time: 17.205359 (seconds).
+libROM: Predicted solution at time 0.0000e+00 using ROM, wallclock time: 0.048486.
+Writing solution file op_rom_0_00000.bin.
+Writing solution file op_rom_1_00000.bin.
+Writing solution file op_rom_2_00000.bin.
+Writing solution file op_rom_3_00000.bin.
+libROM: Predicted solution at time 2.0000e+00 using ROM, wallclock time: 0.144886.
+Writing solution file op_rom_0_00001.bin.
+Writing solution file op_rom_1_00001.bin.
+Writing solution file op_rom_2_00001.bin.
+Writing solution file op_rom_3_00001.bin.
+libROM: Predicted solution at time 4.0000e+00 using ROM, wallclock time: 0.159695.
+Writing solution file op_rom_0_00002.bin.
+Writing solution file op_rom_1_00002.bin.
+Writing solution file op_rom_2_00002.bin.
+Writing solution file op_rom_3_00002.bin.
+libROM: Predicted solution at time 6.0000e+00 using ROM, wallclock time: 0.158351.
+Writing solution file op_rom_0_00003.bin.
+Writing solution file op_rom_1_00003.bin.
+Writing solution file op_rom_2_00003.bin.
+Writing solution file op_rom_3_00003.bin.
+libROM: Predicted solution at time 8.0000e+00 using ROM, wallclock time: 0.157260.
+Writing solution file op_rom_0_00004.bin.
+Writing solution file op_rom_1_00004.bin.
+Writing solution file op_rom_2_00004.bin.
+Writing solution file op_rom_3_00004.bin.
+libROM: Predicted solution at time 1.0000e+01 using ROM, wallclock time: 0.188052.
+Writing solution file op_rom_0_00005.bin.
+Writing solution file op_rom_1_00005.bin.
+Writing solution file op_rom_2_00005.bin.
+Writing solution file op_rom_3_00005.bin.
+libROM: Predicted solution at time 1.2000e+01 using ROM, wallclock time: 0.140341.
+Writing solution file op_rom_0_00006.bin.
+Writing solution file op_rom_1_00006.bin.
+Writing solution file op_rom_2_00006.bin.
+Writing solution file op_rom_3_00006.bin.
+libROM: Predicted solution at time 1.4000e+01 using ROM, wallclock time: 0.192303.
+Writing solution file op_rom_0_00007.bin.
+Writing solution file op_rom_1_00007.bin.
+Writing solution file op_rom_2_00007.bin.
+Writing solution file op_rom_3_00007.bin.
+libROM: Predicted solution at time 1.6000e+01 using ROM, wallclock time: 0.145928.
+Writing solution file op_rom_0_00008.bin.
+Writing solution file op_rom_1_00008.bin.
+Writing solution file op_rom_2_00008.bin.
+Writing solution file op_rom_3_00008.bin.
+libROM: Predicted solution at time 1.8000e+01 using ROM, wallclock time: 0.140958.
+Writing solution file op_rom_0_00009.bin.
+Writing solution file op_rom_1_00009.bin.
+Writing solution file op_rom_2_00009.bin.
+Writing solution file op_rom_3_00009.bin.
+libROM: Predicted solution at time 2.0000e+01 using ROM, wallclock time: 0.163256.
+libROM:   Calculating diff between PDE and ROM solutions.
+Writing solution file op_rom_0_00010.bin.
+Writing solution file op_rom_1_00010.bin.
+Writing solution file op_rom_2_00010.bin.
+Writing solution file op_rom_3_00010.bin.
+libROM: total prediction/query wallclock time: 1.639516 (seconds).
+libROMInterface::saveROM() - saving ROM objects.
+  Saving DMD object and summary (DMD/sim000_dmdobj_0000, DMD/sim000_dmd_summary_0000).
+  Saving DMD object and summary (DMD/sim001_dmdobj_0000, DMD/sim001_dmd_summary_0000).
+  Saving DMD object and summary (DMD/sim002_dmdobj_0000, DMD/sim002_dmd_summary_0000).
+  Saving DMD object and summary (DMD/sim003_dmdobj_0000, DMD/sim003_dmd_summary_0000).
+
+Computed errors for domain 0:
+  L1         Error           : 4.1238244275162105E-04
+  L2         Error           : 6.6048850300174722E-04
+  Linfinity  Error           : 2.8208016839606949E-03
+Conservation Errors:
+	1.4213597362969310E-16
+	1.4213596274004524E-16
+	1.3530843112619095E-16
+	0.0000000000000000E+00
+Norms of the diff between ROM and PDE solutions for domain 0:
+  L1         Norm            : 5.1966511182692648E-05
+  L2         Norm            : 6.7993407039774591E-05
+  Linfinity  Norm            : 2.8306046677553968E-04
+Computed errors for domain 1:
+  L1         Error           : 2.2556689331766041E-05
+  L2         Error           : 4.0247800079219933E-05
+  Linfinity  Error           : 2.0848669144594750E-04
+Conservation Errors:
+	2.8427194725970949E-16
+	0.0000000000000000E+00
+	4.0245584642661925E-16
+	2.1658175950297532E-16
+Norms of the diff between ROM and PDE solutions for domain 1:
+  L1         Norm            : 8.6968924004254859E-06
+  L2         Norm            : 1.3078924761977727E-05
+  Linfinity  Norm            : 5.1163426069659959E-05
+Computed errors for domain 2:
+  L1         Error           : 5.4507507453902390E-05
+  L2         Error           : 1.1949237026544009E-04
+  Linfinity  Error           : 6.6465958194586591E-04
+Conservation Errors:
+	0.0000000000000000E+00
+	7.1067985453721403E-16
+	6.0541849311590568E-16
+	4.3316351979608274E-16
+Norms of the diff between ROM and PDE solutions for domain 2:
+  L1         Norm            : 9.3636871844137154E-06
+  L2         Norm            : 1.4733109129199239E-05
+  Linfinity  Norm            : 6.3452113911991739E-05
+Computed errors for domain 3:
+  L1         Error           : 8.0060438500059586E-04
+  L2         Error           : 1.4963661436511748E-03
+  Linfinity  Error           : 7.7062334587321086E-03
+Conservation Errors:
+	2.8427194725938616E-16
+	4.2640791680546264E-16
+	4.7403351860139664E-17
+	2.1658176009253655E-16
+Norms of the diff between ROM and PDE solutions for domain 3:
+  L1         Norm            : 3.6564490516619690E-05
+  L2         Norm            : 4.1326103524608316E-05
+  Linfinity  Norm            : 1.0357316065887225E-04
+Solver runtime (in seconds): 2.4459927000000000E+01
+Total  runtime (in seconds): 2.4533866000000000E+01
+
+Deallocating arrays.
+Finished.

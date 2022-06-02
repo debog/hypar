@@ -1,0 +1,15 @@
+begin
+  ndims               2
+  nvars               4
+  size                128 16 64 32 32 64 16 128
+  iproc               8 1 4 2 2 4 1 8
+  ghost               3
+  n_iter              20
+  dt                  2.0
+  screen_op_iter      1
+  file_op_iter        1
+  ip_file_type        binary
+  op_file_format      binary
+  op_overwrite        no
+  model               navierstokes2d
+end

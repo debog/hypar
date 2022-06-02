@@ -1,0 +1,261 @@
+srun: job 9871796 queued and waiting for resources
+srun: job 9871796 has been allocated resources
+HyPar - Parallel (MPI) version with 8 processes
+Compiled with PETSc time integration.
+-- Ensemble Simulation --
+Number of simulation domains: 4
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 4
+  Domain sizes:
+    domain   0 - 128 16 
+    domain   1 - 64 32 
+    domain   2 - 32 64 
+    domain   3 - 16 128 
+  Processes along each dimension:
+    domain   0 - 8 1 
+    domain   1 - 4 2 
+    domain   2 - 2 4 
+    domain   3 - 1 8 
+  Exact solution domain sizes:
+    domain   0 - 128 16 
+    domain   1 - 64 32 
+    domain   2 - 32 64 
+    domain   3 - 16 128 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 20
+  Restart iteration                          : 0
+  Time integration scheme                    : euler 
+  Spatial discretization scheme (hyperbolic) : 1
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : characteristic
+  Spatial discretization type   (parabolic ) : nonconservative-1stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 2.000000E+00
+  Check for conservation                     : no
+  Screen output iterations                   : 1
+  File output iterations                     : 1
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : no
+  Physical model                             : navierstokes2d
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial_0.inp (Serial mode).
+Volume integral of the initial solution on domain 0:
+ 0:  9.9980704056142386E+01
+ 1:  4.9990355858047224E+01
+ 2:  -4.7874680497717037E-07
+ 3:  2.6245709333707828E+02
+Reading array from binary file initial_1.inp (Serial mode).
+Volume integral of the initial solution on domain 1:
+ 0:  9.9980704056028685E+01
+ 1:  4.9990353943002333E+01
+ 2:  -9.5749390466304263E-07
+ 3:  2.6245709237590307E+02
+Reading array from binary file initial_2.inp (Serial mode).
+Volume integral of the initial solution on domain 2:
+ 0:  9.9980704056028713E+01
+ 1:  4.9990352985508281E+01
+ 2:  -1.9149879755598655E-06
+ 3:  2.6245709189715598E+02
+Reading array from binary file initial_3.inp (Serial mode).
+Volume integral of the initial solution on domain 3:
+ 0:  9.9980704056142400E+01
+ 1:  4.9990352506818013E+01
+ 2:  -3.8299760370981050E-06
+ 3:  2.6245709166146372E+02
+Domain 0: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 1: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 2: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Domain 3: Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                       periodic:  Along dimension  1 and face +1
+  Boundary                       periodic:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+Initializing physics. Model = "navierstokes2d"
+Reading physical model inputs from file "physics.inp".
+Setting up libROM interface.
+libROMInterface inputs and parameters:
+  reduced model dimensionality:  0
+  sampling frequency:  0
+  mode: predict
+  component mode: monolithic
+  type: DMD
+  save to file: true
+DMDROMObject details:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+  write snapshot matrix to file:  false
+  simulation domain:  0
+DMDROMObject details:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+  write snapshot matrix to file:  false
+  simulation domain:  1
+DMDROMObject details:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+  write snapshot matrix to file:  false
+  simulation domain:  2
+DMDROMObject details:
+  number of samples per window:   2147483647
+  directory name for DMD onjects: DMD
+  write snapshot matrix to file:  false
+  simulation domain:  3
+libROMInterface::loadROM() - loading ROM objects.
+  Loading DMD object (DMD/sim000_dmdobj_0000), time window=[0.00e+00,-1.00e+00].
+  Loading DMD object (DMD/sim001_dmdobj_0000), time window=[0.00e+00,-1.00e+00].
+  Loading DMD object (DMD/sim002_dmdobj_0000), time window=[0.00e+00,-1.00e+00].
+  Loading DMD object (DMD/sim003_dmdobj_0000), time window=[0.00e+00,-1.00e+00].
+libROM: Predicted solution at time 0.0000e+00 using ROM, wallclock time: 0.046420.
+Writing solution file op_0_00000.bin.
+Writing solution file op_1_00000.bin.
+Writing solution file op_2_00000.bin.
+Writing solution file op_3_00000.bin.
+libROM: Predicted solution at time 2.0000e+00 using ROM, wallclock time: 0.377388.
+Writing solution file op_0_00001.bin.
+Writing solution file op_1_00001.bin.
+Writing solution file op_2_00001.bin.
+Writing solution file op_3_00001.bin.
+libROM: Predicted solution at time 4.0000e+00 using ROM, wallclock time: 0.277099.
+Writing solution file op_0_00002.bin.
+Writing solution file op_1_00002.bin.
+Writing solution file op_2_00002.bin.
+Writing solution file op_3_00002.bin.
+libROM: Predicted solution at time 6.0000e+00 using ROM, wallclock time: 0.164393.
+Writing solution file op_0_00003.bin.
+Writing solution file op_1_00003.bin.
+Writing solution file op_2_00003.bin.
+Writing solution file op_3_00003.bin.
+libROM: Predicted solution at time 8.0000e+00 using ROM, wallclock time: 0.317533.
+Writing solution file op_0_00004.bin.
+Writing solution file op_1_00004.bin.
+Writing solution file op_2_00004.bin.
+Writing solution file op_3_00004.bin.
+libROM: Predicted solution at time 1.0000e+01 using ROM, wallclock time: 0.327655.
+Writing solution file op_0_00005.bin.
+Writing solution file op_1_00005.bin.
+Writing solution file op_2_00005.bin.
+Writing solution file op_3_00005.bin.
+libROM: Predicted solution at time 1.2000e+01 using ROM, wallclock time: 0.490690.
+Writing solution file op_0_00006.bin.
+Writing solution file op_1_00006.bin.
+Writing solution file op_2_00006.bin.
+Writing solution file op_3_00006.bin.
+libROM: Predicted solution at time 1.4000e+01 using ROM, wallclock time: 0.300612.
+Writing solution file op_0_00007.bin.
+Writing solution file op_1_00007.bin.
+Writing solution file op_2_00007.bin.
+Writing solution file op_3_00007.bin.
+libROM: Predicted solution at time 1.6000e+01 using ROM, wallclock time: 0.445686.
+Writing solution file op_0_00008.bin.
+Writing solution file op_1_00008.bin.
+Writing solution file op_2_00008.bin.
+Writing solution file op_3_00008.bin.
+libROM: Predicted solution at time 1.8000e+01 using ROM, wallclock time: 0.422203.
+Writing solution file op_0_00009.bin.
+Writing solution file op_1_00009.bin.
+Writing solution file op_2_00009.bin.
+Writing solution file op_3_00009.bin.
+libROM: Predicted solution at time 2.0000e+01 using ROM, wallclock time: 0.281449.
+Writing solution file op_0_00010.bin.
+Writing solution file op_1_00010.bin.
+Writing solution file op_2_00010.bin.
+Writing solution file op_3_00010.bin.
+libROM: Predicted solution at time 2.2000e+01 using ROM, wallclock time: 0.306459.
+Writing solution file op_0_00011.bin.
+Writing solution file op_1_00011.bin.
+Writing solution file op_2_00011.bin.
+Writing solution file op_3_00011.bin.
+libROM: Predicted solution at time 2.4000e+01 using ROM, wallclock time: 0.239885.
+Writing solution file op_0_00012.bin.
+Writing solution file op_1_00012.bin.
+Writing solution file op_2_00012.bin.
+Writing solution file op_3_00012.bin.
+libROM: Predicted solution at time 2.6000e+01 using ROM, wallclock time: 0.409468.
+Writing solution file op_0_00013.bin.
+Writing solution file op_1_00013.bin.
+Writing solution file op_2_00013.bin.
+Writing solution file op_3_00013.bin.
+libROM: Predicted solution at time 2.8000e+01 using ROM, wallclock time: 0.451675.
+Writing solution file op_0_00014.bin.
+Writing solution file op_1_00014.bin.
+Writing solution file op_2_00014.bin.
+Writing solution file op_3_00014.bin.
+libROM: Predicted solution at time 3.0000e+01 using ROM, wallclock time: 0.486015.
+Writing solution file op_0_00015.bin.
+Writing solution file op_1_00015.bin.
+Writing solution file op_2_00015.bin.
+Writing solution file op_3_00015.bin.
+libROM: Predicted solution at time 3.2000e+01 using ROM, wallclock time: 0.393061.
+Writing solution file op_0_00016.bin.
+Writing solution file op_1_00016.bin.
+Writing solution file op_2_00016.bin.
+Writing solution file op_3_00016.bin.
+libROM: Predicted solution at time 3.4000e+01 using ROM, wallclock time: 0.386338.
+Writing solution file op_0_00017.bin.
+Writing solution file op_1_00017.bin.
+Writing solution file op_2_00017.bin.
+Writing solution file op_3_00017.bin.
+libROM: Predicted solution at time 3.6000e+01 using ROM, wallclock time: 0.423654.
+Writing solution file op_0_00018.bin.
+Writing solution file op_1_00018.bin.
+Writing solution file op_2_00018.bin.
+Writing solution file op_3_00018.bin.
+libROM: Predicted solution at time 3.8000e+01 using ROM, wallclock time: 0.376927.
+Writing solution file op_0_00019.bin.
+Writing solution file op_1_00019.bin.
+Writing solution file op_2_00019.bin.
+Writing solution file op_3_00019.bin.
+libROM: Predicted solution at time 4.0000e+01 using ROM, wallclock time: 0.322458.
+Writing solution file op_0_00020.bin.
+Writing solution file op_1_00020.bin.
+Writing solution file op_2_00020.bin.
+Writing solution file op_3_00020.bin.
+Reading array from binary file exact_0.inp (Serial mode).
+Reading array from binary file exact_1.inp (Serial mode).
+Reading array from binary file exact_2.inp (Serial mode).
+Reading array from binary file exact_3.inp (Serial mode).
+libROM: total prediction/query wallclock time: 7.247068 (seconds).
+
+Computed errors for domain 0:
+  L1         Error           : 5.2467358855806906E-04
+  L2         Error           : 8.8007557788456281E-04
+  Linfinity  Error           : 4.3915974480057572E-03
+Computed errors for domain 1:
+  L1         Error           : 2.6959656426921270E-05
+  L2         Error           : 5.3068313792219375E-05
+  Linfinity  Error           : 3.3333474494947766E-04
+Computed errors for domain 2:
+  L1         Error           : 1.3821732655081582E-04
+  L2         Error           : 2.8195158158055835E-04
+  Linfinity  Error           : 1.5228766380886607E-03
+Computed errors for domain 3:
+  L1         Error           : 1.1545797344537944E-03
+  L2         Error           : 2.1123019392421121E-03
+  Linfinity  Error           : 1.0828177028891904E-02
+Solver runtime (in seconds): 9.8096689999999995E+00
+Total  runtime (in seconds): 1.0059555000000000E+01
+
+Deallocating arrays.
+Finished.
