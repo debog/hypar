@@ -2,13 +2,13 @@
 # Note that if the following are specified in this file, the corresponding inputs in solver.inp are *ignored*.
 # + "-ts_dt" (time step size): ignores "dt" in solver.inp
 # + "-ts_max_steps" (maximum number of time iterations): ignores "n_iter" in solver.inp
-# + "-ts_final_time" (final simulation time): ignores "n_iter" X "dt" in solver.inp
+# + "-ts_max_time" (final simulation time): ignores "n_iter" X "dt" in solver.inp
 
 # Use PETSc time-integration
 -use-petscts
 
 # Final time
--ts_final_time 2.0
+-ts_max_time 2.0
 
 # Time step size
 -ts_dt 0.0025
