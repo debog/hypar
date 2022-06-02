@@ -3,8 +3,8 @@
 # Before starting, it will be useful to briefly go through 
 # the documentation, user manuals and examples for PETSc's 
 # time-integration (TS) module:
-# http://www.mcs.anl.gov/petsc/petsc-current/docs/manual.pdf (Chapter 6)
-# http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/index.html
+# https://petsc.org/release/docs/manual.pdf (Chapter 6)
+# https://petsc.org/release/docs/manualpages/TS/index.html
 
 # Some basic useful input flags are listed here that are needed
 # to run a case. See PETSc documentation for more input options

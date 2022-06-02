@@ -1,5 +1,5 @@
 /*! @file petscinterface.h
-    @brief Contains variables and function definitions for time integration with PETSc (http://www.mcs.anl.gov/petsc/)
+    @brief Contains variables and function definitions for time integration with PETSc (https://petsc.org/release/)
     @author Debojyoti Ghosh
  */
 
@@ -24,13 +24,13 @@
 /*! \def PETScContext
     \brief Structure containing the variables for time-integration with PETSc
  * This structure contains all the variables needed to integration in time using
- * PETSc's TS module (http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/index.html).
+ * PETSc's TS module (https://petsc.org/release/docs/manualpages/TS/index.html).
 */
 
 /*! \brief  Structure containing the variables for time-integration with PETSc
  *
  * This structure contains all the variables needed to integration in time using
- * PETSc's TS module (http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/index.html).
+ * PETSc's TS module (https://petsc.org/release/docs/manualpages/TS/index.html).
 */
 typedef struct _petsccontext_ {
   /*! object of type #HyPar containing the solver context */

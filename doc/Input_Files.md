@@ -261,7 +261,7 @@ Format: ASCII text
 
 \b Note: The contents of this file may also be specified as command line flags.
 
-This file contains all the inputs required for the PETSc time integrators. See PETSc documentation (http://www.mcs.anl.gov/petsc/documentation/)
+This file contains all the inputs required for the PETSc time integrators. See PETSc documentation (https://petsc.org/release/docs/)
 for all the inputs that PETSc needs, or <B>see the PETSc examples</B> for the inputs relevant to HyPar. In addition, following 
 are the HyPar-specific inputs (they are all optional, if not specified, default values are used):
 + <B>-use-petscts</B>: If this flag is specified, PETSc time integration is used. If not specified, native time integration is used 
@@ -271,7 +271,7 @@ are the HyPar-specific inputs (they are all optional, if not specified, default 
 + <B>-with_pc</B>: If this flag is specified, a preconditioning matrix will be assembled for use with the preconditioners available
   in PETSc. If not specified, no preconditioning will be used (default).
 
-In addition, if an IMEX time integrator (TSARKIMEX - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX.html) 
+In addition, if an IMEX time integrator (TSARKIMEX - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX.html) 
 is being used, the following terms specify how the hyperbolic, parabolic,
 and source terms are integrated in time (explicitly or implicitly):
 + <B>-hyperbolic_explicit</B>: treat hyperbolic term explicitly (\b default).

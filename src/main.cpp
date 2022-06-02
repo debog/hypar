@@ -27,8 +27,8 @@
   + Can use <B>sparse grids</B> for faster computations on high-dimensional problems
   + Written entirely in C/C++ and uses the MPICH library. It also uses OpenMP threads 
     but this is a work-in-progress.
-  + Can be <B>compiled with PETSc</B> (http://www.mcs.anl.gov/petsc/), if available, where 
-    it can use PETSc's time integration module TS (http://www.mcs.anl.gov/petsc/petsc-current/src/ts/).
+  + Can be <B>compiled with PETSc</B> (https://petsc.org/release/), if available, where 
+    it can use PETSc's time integration module TS (https://petsc.org/release/src/ts/).
   + For 3-dimensional simulations, the <B>immersed boundaries</B> can be used to
     solve over non-Cartesian geometries.
   + Can be <B>compiled with libROM</B> (https://www.librom.net/), if available, where

@@ -30,7 +30,7 @@
   Specific details of the method implemented here are available in:
   + Ghosh, D., Constantinescu, E. M., Brown, J., "Scalable Nonlinear Compact Schemes", 
     Technical Memorandum, ANL/MCS-TM-340, Argonne National Laboratory, April 2014,
-    (http://www.mcs.anl.gov/publication/scalable-nonlinear-compact-schemes)
+    (http://debog.github.io/Files/2014_Ghosh_Consta_Brown_MCSTR340.pdf)
     (also available at http://debog.github.io/Files/2014_Ghosh_Consta_Brown_MCSTR340.pdf).
   + Ghosh, D., Constantinescu, E. M., Brown, J., Efficient Implementation of Nonlinear 
     Compact Schemes on Massively Parallel Platforms, SIAM Journal on Scientific Computing, 

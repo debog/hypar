@@ -2848,7 +2848,7 @@ Expected screen output:
 \page petsc_examples PETSc Examples
 
 The following are some examples that use explicit, implicit or semi-implicit (IMEX) time
-integration methods implemented in PETSc (https://www.mcs.anl.gov/petsc/). To run them, 
+integration methods implemented in PETSc (https://petsc.org/release/). To run them, 
 HyPar needs to be compiled \b with \b PETSc. Familiarity with using PETSc is assumed.
 
 \b Note: 
@@ -2910,8 +2910,8 @@ Initial solution: \f$u\left(x,0\right) = \sin\left(2\pi x\right)\f$
 Numerical Method:
  + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
  + Time integration: PETSc (SolvePETSc()) 
-    - Method class: <B>Runge-Kutta</B> (TSRK - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSRK.html)
-    - Specific method: <B>Classical 4th-order RK</B> (TSRK4 - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSRK4.html#TSRK4)
+    - Method class: <B>Runge-Kutta</B> (TSRK - https://petsc.org/release/docs/manualpages/TS/TSRK.html)
+    - Specific method: <B>Classical 4th-order RK</B> (TSRK4 - https://petsc.org/release/docs/manualpages/TS/TSRK4.html#TSRK4)
 
 Input files required:
 ---------------------
@@ -3009,8 +3009,8 @@ Initial solution:
 Numerical Method:
  + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
  + Time integration: PETSc (SolvePETSc()) 
-    - Method class: <B>Runge-Kutta</B> (TSRK - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSRK.html)
-    - Specific method: <B>Dormand-Prince</B> (TSRK5DP - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSRK5DP.html#TSRK5DP)
+    - Method class: <B>Runge-Kutta</B> (TSRK - https://petsc.org/release/docs/manualpages/TS/TSRK.html)
+    - Specific method: <B>Dormand-Prince</B> (TSRK5DP - https://petsc.org/release/docs/manualpages/TS/TSRK5DP.html#TSRK5DP)
 
 Input files required:
 ---------------------
@@ -3079,7 +3079,7 @@ Initial solution: \f$u\left(x,0\right) = \sin\left(2\pi x\right)\f$
 Numerical Method:
   + Spatial discretization (parabolic): 2nd order (Interp2PrimSecondOrder()),
                                         conservative (ParabolicFunctionCons1Stage())
-  + Time integration: PETSc (SolvePETSc()) - <B>Crank-Nicholson</B> (TSCN - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSCN.html)
+  + Time integration: PETSc (SolvePETSc()) - <B>Crank-Nicholson</B> (TSCN - https://petsc.org/release/docs/manualpages/TS/TSCN.html)
 
 Input files required:
 ---------------------
@@ -3154,10 +3154,10 @@ Numerical Method:
  + Spatial discretization (parabolic): 2nd order (Interp2PrimSecondOrder()), 
                                        conservative (ParabolicFunctionCons1Stage())
  + Time integration: PETSc (SolvePETSc()) 
-   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX.html) -
+   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX.html) -
      Although the ARK methods are semi-implicit (IMEX), here they are used in the "fully implicit" mode, i.e., the implicit 
      method is used to solve the complete equation (Note the flag \b -ts_arkimex_fully_implicit in <B>.petscrc</B>).
-   - Specific method: <B>Kennedy-Carpenter ARK4</B> (TSARKIMEX4 - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX4.html)
+   - Specific method: <B>Kennedy-Carpenter ARK4</B> (TSARKIMEX4 - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX4.html)
 
 
 Input files required:
@@ -3272,8 +3272,8 @@ Other parameters (all dimensional quantities are in SI units):
 Numerical method:
  + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
  + Time integration: PETSc (SolvePETSc()) 
-   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX.html)
-   - Specific method: <B>Kennedy-Carpenter ARK4</B> (TSARKIMEX4 - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX4.html)
+   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX.html)
+   - Specific method: <B>Kennedy-Carpenter ARK4</B> (TSARKIMEX4 - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX4.html)
 
 
 Input files required:
@@ -3397,10 +3397,10 @@ Numerical method:
  + Spatial discretization (parabolic) : 4th order (FirstDerivativeFourthOrderCentral()) 
                                         non-conservative 2-stage (ParabolicFunctionNC2Stage())
  + Time integration: PETSc (SolvePETSc()) 
-   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX.html) -
+   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX.html) -
      Although the ARK methods are semi-implicit (IMEX), here they are used in the "fully implicit" mode, i.e., the implicit 
      method is used to solve the complete equation (Note the flag \b -ts_arkimex_fully_implicit in <B>.petscrc</B>).
-   - Specific method: <B>ARK2e</B> (TSARKIMEX2E - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX2E.html)
+   - Specific method: <B>ARK2e</B> (TSARKIMEX2E - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX2E.html)
 
 This is a steady state problem - the solution converges to a steady laminar flow over a 
 flat plate, and the residuals decrease with time. The skin friction coefficient is given by
@@ -3549,8 +3549,8 @@ Numerical method:
  + Spatial discretization (parabolic) : 4th order (FirstDerivativeFourthOrderCentral()) 
                                         non-conservative 2-stage (ParabolicFunctionNC2Stage())
  + Time integration: PETSc (SolvePETSc()) 
-   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX.html)
-   - Specific method: <B>Kennedy-Carpenter ARK4</B> (TSARKIMEX4 - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX4.html)
+   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX.html)
+   - Specific method: <B>Kennedy-Carpenter ARK4</B> (TSARKIMEX4 - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX4.html)
 
 Input files required:
 ---------------------
@@ -3654,8 +3654,8 @@ Other parameters (all dimensional quantities are in SI units):
 Numerical Method:
  + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
  + Time integration: PETSc (SolvePETSc()) 
-   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX.html)
-   - Specific method: <B>ARK 2e</B> (TSARKIMEX2E - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX2E.html)
+   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX.html)
+   - Specific method: <B>ARK 2e</B> (TSARKIMEX2E - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX2E.html)
 
 Input files required:
 ---------------------
@@ -3781,7 +3781,7 @@ where \f$b=0.5\f$ is the vortex strength and \f$r = \left[(x-x_c)^2 + (y-y_c)^2 
 
 Numerical method:
  + Spatial discretization (hyperbolic): 5th order compact upwind (Interp1PrimFifthOrderCompactUpwind())
- + Time integration: PETSc (SolvePETSc()) - <B>Crank-Nicholson</B> (TSCN - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSCN.html)
+ + Time integration: PETSc (SolvePETSc()) - <B>Crank-Nicholson</B> (TSCN - https://petsc.org/release/docs/manualpages/TS/TSCN.html)
 
 Input files required:
 ---------------------
@@ -3921,8 +3921,8 @@ where \f$b=0.5\f$ is the vortex strength and \f$r = \left[(x-x_c)^2 + (y-y_c)^2 
 Numerical method:
  + Spatial discretization (hyperbolic): 5th order upwind (Interp1PrimFifthOrderUpwind())
  + Time integration: PETSc (SolvePETSc()) 
-   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX.html)
-   - Specific method: <B>Kennedy-Carpenter ARK4</B> (TSARKIMEX4 - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX4.html)
+   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX.html)
+   - Specific method: <B>Kennedy-Carpenter ARK4</B> (TSARKIMEX4 - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX4.html)
 
 Input files required:
 ---------------------
@@ -4067,8 +4067,8 @@ Other parameters (all dimensional quantities are in SI units):
 Numerical method:
  + Spatial discretization (hyperbolic): 5th order compact upwind (Interp1PrimFifthOrderCompactUpwind())
  + Time integration: PETSc (SolvePETSc()) 
-   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX.html)
-   - Specific method: <B>Kennedy-Carpenter ARK4</B> (TSARKIMEX4 - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX4.html)
+   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX.html)
+   - Specific method: <B>Kennedy-Carpenter ARK4</B> (TSARKIMEX4 - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX4.html)
 
 
 Input files required:

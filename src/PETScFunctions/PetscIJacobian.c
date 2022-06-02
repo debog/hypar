@@ -40,13 +40,13 @@
 
     \b Notes:
     + The Jacobian is defined as the PETSc type MatShell 
-      (http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Mat/MATSHELL.html)
+      (https://petsc.org/release/docs/manualpages/Mat/MATSHELL.html)
     + \a Y and \a Ydot in the code are \f${\bf U}\f$ and \f$\dot{\bf U}\f$, respectively. PETsc denotes
       the state vector with \f${\bf Y}\f$ in its time integrators.
-    + See http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/index.html for documentation on
+    + See https://petsc.org/release/docs/manualpages/TS/index.html for documentation on
       PETSc's time integrators.
     + All functions and variables whose names start with Vec, Mat, PC, KSP, SNES, and TS are defined by PETSc. Refer to
-      the PETSc documentation (http://www.mcs.anl.gov/petsc/petsc-current/docs/). Usually, googling with the function
+      the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
       or variable name yields the specific doc page dealing with that function/variable.
 */
 PetscErrorCode PetscIJacobian(
@@ -104,10 +104,10 @@ PetscErrorCode PetscIJacobian(
     + For a nonlinear spatial discretization, the right-hand-side \b must be computed without the nonlinearity
       (i.e. with a previously computed or "frozen" discretization operator). This ensures that the Jacobian being
       computed is consistent.
-    + See http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/index.html for documentation on
+    + See https://petsc.org/release/docs/manualpages/TS/index.html for documentation on
       PETSc's time integrators.
     + All functions and variables whose names start with Vec, Mat, PC, KSP, SNES, and TS are defined by PETSc. Refer to
-      the PETSc documentation (http://www.mcs.anl.gov/petsc/petsc-current/docs/). Usually, googling with the function
+      the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
       or variable name yields the specific doc page dealing with that function/variable.
 */
 PetscErrorCode PetscJacobianFunction_JFNK(
@@ -222,10 +222,10 @@ PetscErrorCode PetscJacobianFunction_JFNK(
     + For a nonlinear spatial discretization, the right-hand-side \b must be computed without the nonlinearity
       (i.e. with a previously computed or "frozen" discretization operator). This ensures that the Jacobian being
       computed is consistent, and is truly linear.
-    + See http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/index.html for documentation on
+    + See https://petsc.org/release/docs/manualpages/TS/index.html for documentation on
       PETSc's time integrators.
     + All functions and variables whose names start with Vec, Mat, PC, KSP, SNES, and TS are defined by PETSc. Refer to
-      the PETSc documentation (http://www.mcs.anl.gov/petsc/petsc-current/docs/). Usually, googling with the function
+      the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
       or variable name yields the specific doc page dealing with that function/variable.
 */
 PetscErrorCode PetscJacobianFunction_Linear(

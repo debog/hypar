@@ -56,9 +56,9 @@
   \f}
   this function computes the approximation of the Jacobian of only the hyperbolic term. 
 
-  + See http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/PC/index.html for more information on PETSc preconditioners.
+  + See https://petsc.org/release/docs/manualpages/PC/index.html for more information on PETSc preconditioners.
   + All functions and variables whose names start with Vec, Mat, PC, KSP, SNES, and TS are defined by PETSc. Refer to
-    the PETSc documentation (http://www.mcs.anl.gov/petsc/petsc-current/docs/). Usually, googling with the function
+    the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
     or variable name yields the specific doc page dealing with that function/variable.
 */
 int PetscComputePreconMatImpl(

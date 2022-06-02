@@ -36,9 +36,9 @@
   Currently supported classes of time integrators for which custom methods
   can be provided:
   + RK (Runge-Kutta): See TSRKRegister 
-    (http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSRKRegister.html)
+    (https://petsc.org/release/docs/manualpages/TS/TSRKRegister.html)
   + ARK (Additive Runge-Kutta): See TSARKIMEXRegister 
-    (http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSRKRegister.html)
+    (https://petsc.org/release/docs/manualpages/TS/TSRKRegister.html)
 
   To do:
   + Add support for TSGLEE when it gets merged to PETSc's master.

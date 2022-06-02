@@ -3,7 +3,7 @@
     @author Debojyoti Ghosh
 
     Integrate the spatially discretized system in time using PETSc's TS module.\n
-    (http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/index.html)
+    (https://petsc.org/release/docs/manualpages/TS/index.html)
 */
 
 #ifdef with_petsc
@@ -30,7 +30,7 @@ int OutputSolution (void*,int);   /*!< Write solutions to file */
 
     This function integrates the semi-discrete ODE (obtained from discretizing
     the PDE in space) using the time-integration module of PETSc 
-    (http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/index.html).
+    (https://petsc.org/release/docs/manualpages/TS/index.html).
     The time-integration context is set up using the parameters specified in 
     the input file. However, they can also be specified using PETSc's command
     line inputs.\n

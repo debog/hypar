@@ -1,4 +1,4 @@
-# See PETSc documentation for more details (https://www.mcs.anl.gov/petsc/documentation/index.html).
+# See PETSc documentation for more details (https://petsc.org/release/overview/).
 # Note that if the following are specified in this file, the corresponding inputs in solver.inp are *ignored*.
 # + "-ts_dt" (time step size): ignores "dt" in solver.inp
 # + "-ts_max_steps" (maximum number of time iterations): ignores "n_iter" in solver.inp

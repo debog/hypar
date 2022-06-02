@@ -137,17 +137,17 @@ The following explicit time integration methods are implemented in HyPar (see ti
 PETSc Time Integrators
 ----------------------
 
-If compiled with PETSc (https://www.mcs.anl.gov/petsc/), HyPar can use all the time integration methods and features implemented in the \b TS module of
+If compiled with PETSc (https://petsc.org/release/), HyPar can use all the time integration methods and features implemented in the \b TS module of
 PETSc. See the following for relevant documentation of PETSc time integrators:
-+ http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/index.html
-+ http://www.mcs.anl.gov/petsc/petsc-current/src/ts/examples/tutorials/index.html
-+ http://www.mcs.anl.gov/petsc/petsc-current/docs/manual.pdf (Chapter 6: Scalable ODE and DAE Solvers)
++ https://petsc.org/release/docs/manualpages/TS/index.html
++ https://petsc.org/release/src/ts/examples/tutorials/index.html
++ https://petsc.org/release/docs/manual.pdf (Chapter 6: Scalable ODE and DAE Solvers)
 
 In addition to explicit time integration, the semi-discrete ODE can be solved using 
-+ \b Implicit \b methods (Eg. backward Euler (TSBEULER - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSBEULER.html),
-Crank-Nicholson (TSCN - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSCN.html#TSCN), \f$\theta\f$-method (TSTHETA - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSTHETA.html#TSTHETA), 
++ \b Implicit \b methods (Eg. backward Euler (TSBEULER - https://petsc.org/release/docs/manualpages/TS/TSBEULER.html),
+Crank-Nicholson (TSCN - https://petsc.org/release/docs/manualpages/TS/TSCN.html#TSCN), \f$\theta\f$-method (TSTHETA - https://petsc.org/release/docs/manualpages/TS/TSTHETA.html#TSTHETA), 
 etc.)
-+ <B>Semi-implicit (IMEX) methods</B> (TSARKIMEX - http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSARKIMEX.html)
++ <B>Semi-implicit (IMEX) methods</B> (TSARKIMEX - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX.html)
 
 Implementation: see petscinterface.h and SolvePETSc().
 

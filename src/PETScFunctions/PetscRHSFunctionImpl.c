@@ -23,15 +23,15 @@
   \f}
   This function computes \f${\bf F}\left({\bf U}\right)\f$, given \f${\bf U}\f$.
 
-  \sa TSSetRHSFunction (http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/TSSetRHSFunction.html)
+  \sa TSSetRHSFunction (https://petsc.org/release/docs/manualpages/TS/TSSetRHSFunction.html)
 
   Note:
   + This function is essentially identical to PetscRHSFunctionExpl().
   + \f${\bf U}\f$ is \a Y in the code.
-  + See http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/TS/index.html for documentation on
+  + See https://petsc.org/release/docs/manualpages/TS/index.html for documentation on
     PETSc's time integrators.
   + All functions and variables whose names start with Vec, Mat, PC, KSP, SNES, and TS are defined by PETSc. Refer to
-    the PETSc documentation (http://www.mcs.anl.gov/petsc/petsc-current/docs/). Usually, googling with the function
+    the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
     or variable name yields the specific doc page dealing with that function/variable.
 */
 PetscErrorCode PetscRHSFunctionImpl(
