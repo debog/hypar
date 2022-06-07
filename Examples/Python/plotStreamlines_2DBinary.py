@@ -84,7 +84,7 @@ if solver_inp_data['op_overwrite'] == 'no':
   print('  niter = ', niter)
   print('  final time = ', t_final)
   print('  snapshot dt = ', dt_snapshots)
-  print('  number of snapshots = ', n_snapshots)
+  print('  expected number of snapshots = ', n_snapshots)
   
   '''
   Load simulation data (solution snapshots)
@@ -96,6 +96,8 @@ if solver_inp_data['op_overwrite'] == 'no':
                                                               nvars, 
                                                               size )
   solution_snapshots = np.float32(solution_snapshots)
+  n_snapshots = solution_snapshots.shape[0]
+  print('  number of snapshots = ', n_snapshots)
   x = grid[:size[0]]
   y = grid[size[0]:]
   print('2D Domain:');
