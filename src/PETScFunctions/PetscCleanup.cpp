@@ -6,14 +6,21 @@
 #ifdef with_petsc
 
 #include <stdlib.h>
-#include <petscinterface.h>
+#include <petscinterface_struct.h>
 
 /*! Clean up allocations in the PETSc interface */
 int PetscCleanup(void *obj /*!< Object of type #PETScContext */)
 {
   PETScContext *ctxt = (PETScContext*) obj;
-  if (ctxt->globalDOF) free(ctxt->globalDOF);
-  if (ctxt->points)    free(ctxt->points);
+  for (int i = 0; i < ctxt->globalDOF.size(); i++) {
+    free(ctxt->globalDOF[i]);
+  }
+  ctxt->globalDOF.clear();
+  for (int i = 0; i < ctxt->points.size(); i++) {
+    free(ctxt->points[i]);
+  }
+  ctxt->points.clear();
+  if (ctxt->offsets) free(ctxt->offsets);
   return(0);
 }
 

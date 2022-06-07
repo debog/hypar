@@ -1,4 +1,4 @@
-/*! @file PetscComputePreconMatIMEX.c
+/*! @file PetscComputePreconMatIMEX.cpp
     @brief Contains the function to assemble the preconditioning matrix
     @author Debojyoti Ghosh
 */
@@ -7,8 +7,6 @@
 
 #include <stdio.h>
 #include <arrayfunctions.h>
-#include <mpivars.h>
-#include <hypar.h>
 #include <petscinterface.h>
 
 #undef __FUNCT__
@@ -64,11 +62,9 @@
     the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
     or variable name yields the specific doc page dealing with that function/variable.
 */
-int PetscComputePreconMatIMEX(
-                              Mat Pmat,   /*!< Preconditioning matrix to construct */
+int PetscComputePreconMatIMEX(Mat Pmat,   /*!< Preconditioning matrix to construct */
                               Vec Y,      /*!< Solution vector */
-                              void *ctxt  /*!< Application context */
-                             )
+                              void *ctxt  /*!< Application context */ )
 {
   /* Same implementation as PetscComputePreconMatImpl() */
   return(PetscComputePreconMatImpl(Pmat,Y,ctxt));

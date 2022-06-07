@@ -1,4 +1,4 @@
-/*! @file PetscRegisterTIMethods.c
+/*! @file PetscRegisterTIMethods.cpp
     @brief Register a custom time-integration method
     @author Debojyoti Ghosh
 */
@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <petscinterface.h>
+#include <petscinterface_struct.h>
 
 #undef __FUNCT__
 #define __FUNCT__ "PetscRegisterTIMethods"
@@ -43,9 +43,7 @@
   To do:
   + Add support for TSGLEE when it gets merged to PETSc's master.
 */
-int PetscRegisterTIMethods(
-                            int rank /*!< MPI rank */
-                          )
+int PetscRegisterTIMethods(int rank /*!< MPI rank */)
 {
   PetscErrorCode ierr;
   int            ierr2;

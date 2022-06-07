@@ -1,4 +1,4 @@
-/*! @file PetscGlobalDOF.c
+/*! @file PetscGlobalDOF.cpp
     @author Debojyoti Ghosh
     @brief Compute the global DOF index for all the grid points
 */
@@ -6,20 +6,19 @@
 #ifdef with_petsc
 
 #include <stdlib.h>
+#include <vector>
 #include <basic.h>
 #include <arrayfunctions.h>
-#include <mpivars.h>
-#include <hypar.h>
+#include <mpivars_cpp.h>
+#include <simulation_object.h>
 #include <petscinterface.h>
 
-static int ApplyPeriodicity(
-                              int     dir,    /*!< Spatial dimension along which to apply periodicity */
+static int ApplyPeriodicity(  int     dir,    /*!< Spatial dimension along which to apply periodicity */
                               int     ndims,  /*!< Number of spatial dimensions */
                               int     *size,  /*!< Integer array with the number of grid points in 
                                                    each spatial dimension */
                               int     ghosts, /*!< Number of ghost points */
-                              double  *phi    /*!< The array on which to apply the boundary condition */
-                           )
+                              double  *phi    /*!< The array on which to apply the boundary condition */ )
 {
   int bounds[ndims], index1[ndims], index2[ndims], offset[ndims], 
       done, p1 = 0, p2 = 0;
@@ -67,47 +66,58 @@ static int ApplyPeriodicity(
     + Thus, ghost points corresponding to physical, non-periodic boundaries retain the 
       initial value of -1.
 */
-int PetscGlobalDOF(void *c /*!< Object of type #PETScContext*/)
+int PetscGlobalDOF(void* c /*!< Object of type #PETScContext*/)
 {
-  PETScContext  *ctxt   = (PETScContext*) c;
-  HyPar         *solver = (HyPar*) ctxt->solver;
-  MPIVariables  *mpi    = (MPIVariables*) ctxt->mpi;
-  _DECLARE_IERR_;
+  PETScContext* ctxt = (PETScContext*) c;
+  SimulationObject* sim = (SimulationObject*) ctxt->simobj;
+  int nsims = ctxt->nsims;
 
-  int   *dim      = solver->dim_local,
-        ndims     = solver->ndims,
-        ghosts    = solver->ghosts,
-        size_wg   = solver->npoints_local_wghosts,
-        rank      = mpi->rank,
-        nproc     = mpi->nproc,
-        nv        = ndims + 1, i;
+  ctxt->globalDOF.resize(nsims, nullptr);
 
-  /* if globalDOF already allocated, free it */
-  if (ctxt->globalDOF) free(ctxt->globalDOF);
-  ctxt->globalDOF = (double*) calloc(size_wg,sizeof(double));
-  _ArraySetValue_(ctxt->globalDOF,size_wg,-1.0);
-
-  int local_sizes[nproc];
-  _ArraySetValue_(local_sizes,nproc,0);
+  /* compute MPI offset */
+  int nproc = sim[0].mpi.nproc;
+  int rank = sim[0].mpi.rank;
+  std::vector<int> local_sizes(nproc ,0);
   local_sizes[rank] = ctxt->npoints;
-  MPIMax_integer(local_sizes,local_sizes,nproc,&mpi->world);
+  MPIMax_integer(local_sizes.data(),local_sizes.data(),nproc,&sim[0].mpi.world);
 
-  int myOffset = 0;
-  for (i=0; i<rank; i++) myOffset += local_sizes[i];
+  int MPIOffset = 0;
+  for (int i=0; i<rank; i++) MPIOffset += local_sizes[i];
 
-  for (i=0; i<ctxt->npoints; i++) {
-    int p = (ctxt->points+i*nv)[ndims];
-    ctxt->globalDOF[p] = (double) (i + myOffset);
-  }
+  int simOffset = 0;
+  for (int ns = 0; ns < nsims; ns++) {
 
-  for (i=0; i<ndims; i++) {
-    if (solver->isPeriodic[i]) {
-      IERR ApplyPeriodicity(i,ndims,dim,ghosts,ctxt->globalDOF); CHECKERR(ierr);
+    HyPar* solver = &(sim[ns].solver);
+    MPIVariables* mpi = &(sim[ns].mpi);
+
+    int   *dim        = solver->dim_local,
+          ndims       = solver->ndims,
+          ghosts      = solver->ghosts,
+          npoints     = solver->npoints_local,
+          npoints_wg  = solver->npoints_local_wghosts,
+          rank        = mpi->rank,
+          nproc       = mpi->nproc,
+          nv          = ndims + 1, i;
+
+    ctxt->globalDOF[ns] = (double*) calloc( npoints_wg, sizeof(double) );
+    _ArraySetValue_(ctxt->globalDOF[ns], npoints_wg, -1.0);
+
+    for (int i = 0; i < npoints; i++) {
+      int p = (ctxt->points[ns]+i*nv)[ndims];
+      ctxt->globalDOF[ns][p] = (double) (i + simOffset + MPIOffset);
     }
-  }
-  IERR MPIExchangeBoundariesnD(ndims,1,dim,ghosts,mpi,ctxt->globalDOF);
 
-  return(0);
+    for (int i=0; i<ndims; i++) {
+      if (solver->isPeriodic[i]) {
+        ApplyPeriodicity(i,ndims,dim,ghosts,ctxt->globalDOF[ns]);
+      }
+    }
+    MPIExchangeBoundariesnD(ndims,1,dim,ghosts,mpi,ctxt->globalDOF[ns]);
+
+    simOffset += npoints;
+  }
+
+  return 0;
 }
 
 #endif
