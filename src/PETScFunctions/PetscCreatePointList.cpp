@@ -73,9 +73,9 @@ int PetscCreatePointList(void *obj /*!< Object of type #PETScContext */)
   int global_ndofs;
   MPISum_integer(&global_npoints,&(ctxt->npoints),1,&sim[0].mpi.world);
   MPISum_integer(&global_ndofs,&(ctxt->ndofs),1,&sim[0].mpi.world);
-  if (!sim[0].mpi.rank) {
-    printf("PETSc: total number of computational points is %d.\n",global_npoints);
-    printf("PETSc: total number of computational DOFs is %d.\n",global_ndofs);
+  if (!ctxt->rank) {
+    printf("PETSc:    total number of computational points is %d.\n",global_npoints);
+    printf("PETSc:    total number of computational DOFs is %d.\n",global_ndofs);
   }
 
   return 0;

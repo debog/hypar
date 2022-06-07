@@ -82,7 +82,7 @@ PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
 
   }
 
-  if ((!sim[0].mpi.rank) && (iter%sim[0].solver.screen_op_iter == 0)) {
+  if ((!context->rank) && (iter%sim[0].solver.screen_op_iter == 0)) {
 
     if (nsims > 1) {
       printf("--\n");

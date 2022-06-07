@@ -37,6 +37,13 @@
  * PETSc's TS module (https://petsc.org/release/docs/manualpages/TS/index.html).
 */
 typedef struct _petsccontext_ {
+  
+  /*! MPI rank */
+  int rank;
+
+  /*! number of MPI ranks */
+  int nproc;
+
   /*! array of simulation objects of type #SimulationObject */
   void *simobj;
 

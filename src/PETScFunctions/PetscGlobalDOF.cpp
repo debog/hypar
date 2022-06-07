@@ -75,14 +75,12 @@ int PetscGlobalDOF(void* c /*!< Object of type #PETScContext*/)
   ctxt->globalDOF.resize(nsims, nullptr);
 
   /* compute MPI offset */
-  int nproc = sim[0].mpi.nproc;
-  int rank = sim[0].mpi.rank;
-  std::vector<int> local_sizes(nproc ,0);
-  local_sizes[rank] = ctxt->npoints;
-  MPIMax_integer(local_sizes.data(),local_sizes.data(),nproc,&sim[0].mpi.world);
+  std::vector<int> local_sizes(ctxt->nproc ,0);
+  local_sizes[ctxt->rank] = ctxt->npoints;
+  MPIMax_integer(local_sizes.data(),local_sizes.data(),ctxt->nproc,&sim[0].mpi.world);
 
   int MPIOffset = 0;
-  for (int i=0; i<rank; i++) MPIOffset += local_sizes[i];
+  for (int i=0; i<ctxt->rank; i++) MPIOffset += local_sizes[i];
 
   int simOffset = 0;
   for (int ns = 0; ns < nsims; ns++) {
@@ -95,8 +93,6 @@ int PetscGlobalDOF(void* c /*!< Object of type #PETScContext*/)
           ghosts      = solver->ghosts,
           npoints     = solver->npoints_local,
           npoints_wg  = solver->npoints_local_wghosts,
-          rank        = mpi->rank,
-          nproc       = mpi->nproc,
           nv          = ndims + 1, i;
 
     ctxt->globalDOF[ns] = (double*) calloc( npoints_wg, sizeof(double) );

@@ -38,12 +38,10 @@ extern "C" int OutputSolution (void*,int);   /*!< Write solutions to file */
     (usually googling with the function name shows the man page for that function 
     on PETSc's website).
 */
-
 int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObject */
                 int   nsims,  /*!< number of simulation objects */
                 int   rank,   /*!< MPI rank of this process */
-                int   nproc   /*!< Number of MPI processes */
-               )
+                int   nproc   /*!< Number of MPI processes */ )
 {
   SimulationObject* sim = (SimulationObject*) s;
 
@@ -62,6 +60,9 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
   /* create and set a PETSc context */
   PETScContext context;
+
+  context.rank = rank;
+  context.nproc = nproc;
 
   context.simobj = sim;
   context.nsims = nsims;
