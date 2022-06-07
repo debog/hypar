@@ -34,7 +34,7 @@ import modHyParUtils as hyparutils
 
 font = {'size':22}
 matplotlib.rc('font', **font)
-colormap='Spectral'
+colormap='jet'
 
 figsize=(12,10)
 plt_dir_name='plots'
