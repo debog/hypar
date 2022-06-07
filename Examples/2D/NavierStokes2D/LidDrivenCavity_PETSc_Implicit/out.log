@@ -1,0 +1,90 @@
+srun: job 9980406 queued and waiting for resources
+srun: job 9980406 has been allocated resources
+HyPar - Parallel (MPI) version with 16 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 4
+  Domain size                                : 128 128 
+  Processes along each dimension             : 4 4 
+  Exact solution domain size                 : 128 128 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 25000
+  Restart iteration                          : 0
+  Time integration scheme                    : PETSc 
+  Spatial discretization scheme (hyperbolic) : upw5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : components
+  Spatial discretization type   (parabolic ) : nonconservative-2stage
+  Spatial discretization scheme (parabolic ) : 4
+  Time Step                                  : 1.000000E-02
+  Check for conservation                     : no
+  Screen output iterations                   : 10
+  File output iterations                     : 100
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : yes
+  Physical model                             : navierstokes2d
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  1.0158100316200525E+00
+ 1:  -1.7347234759768071E-17
+ 2:  -8.6736173798840355E-19
+ 3:  1.8148063242358203E+00
+Reading boundary conditions from boundary.inp.
+  Boundary                    noslip-wall:  Along dimension  0 and face +1
+  Boundary                    noslip-wall:  Along dimension  0 and face -1
+  Boundary                    noslip-wall:  Along dimension  1 and face +1
+  Boundary                    noslip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+Initializing physics. Model = "navierstokes2d"
+Reading physical model inputs from file "physics.inp".
+Setting up PETSc time integration... 
+PETSc:    total number of computational points is 16384.
+PETSc:    total number of computational DOFs is 65536.
+Implicit-Explicit time-integration:-
+Hyperbolic        term: Implicit
+Parabolic         term: Implicit
+Source            term: Implicit
+SolvePETSc(): Problem type is nonlinear.
+** Starting PETSc time integration **
+Writing solution file op.bin.
+iter=     10  dt=4.525E-02  t=3.198E-01  CFL=6.262E+00  norm=3.0309E-02  
+iter=     20  dt=5.962E-02  t=8.389E-01  CFL=8.241E+00  norm=3.2289E-02  
+iter=     30  dt=7.221E-02  t=1.492E+00  CFL=1.015E+01  norm=3.3464E-02  
+iter=     40  dt=8.504E-02  t=2.273E+00  CFL=1.187E+01  norm=3.8478E-02  
+iter=     50  dt=9.766E-02  t=3.178E+00  CFL=1.360E+01  norm=4.0025E-02  
+iter=     60  dt=1.107E-01  t=4.210E+00  CFL=1.557E+01  norm=4.3005E-02  
+iter=     70  dt=1.232E-01  t=5.370E+00  CFL=1.740E+01  norm=3.7940E-02  
+iter=     80  dt=1.375E-01  t=6.668E+00  CFL=1.939E+01  norm=3.7970E-02  
+iter=     90  dt=1.507E-01  t=8.101E+00  CFL=2.119E+01  norm=3.9712E-02  
+iter=    100  dt=1.646E-01  t=9.677E+00  CFL=2.289E+01  norm=4.4672E-02  
+Writing solution file op.bin.
+iter=    110  dt=1.798E-01  t=1.140E+01  CFL=2.523E+01  norm=2.3712E-02  
+iter=    120  dt=1.956E-01  t=1.328E+01  CFL=2.731E+01  norm=3.0056E-02  
+iter=    130  dt=2.123E-01  t=1.531E+01  CFL=2.975E+01  norm=3.0924E-02  
+iter=    140  dt=2.305E-01  t=1.751E+01  CFL=3.246E+01  norm=2.1651E-02  
+iter=    150  dt=2.505E-01  t=1.989E+01  CFL=3.484E+01  norm=2.8821E-02  
+iter=    160  dt=2.679E-01  t=2.247E+01  CFL=3.747E+01  norm=2.2700E-02  
+iter=    170  dt=2.914E-01  t=2.526E+01  CFL=4.049E+01  norm=3.7055E-02  
+iter=    180  dt=3.156E-01  t=2.827E+01  CFL=4.396E+01  norm=3.2539E-02  
+iter=    190  dt=3.463E-01  t=3.156E+01  CFL=4.831E+01  norm=2.8748E-02  
+iter=    200  dt=3.667E-01  t=3.512E+01  CFL=5.109E+01  norm=2.1596E-02  
+Writing solution file op.bin.
+iter=    210  dt=3.916E-01  t=3.893E+01  CFL=5.466E+01  norm=2.0914E-02  
+iter=    220  dt=4.255E-01  t=4.299E+01  CFL=5.886E+01  norm=1.6388E-02  
+iter=    230  dt=4.671E-01  t=4.740E+01  CFL=6.490E+01  norm=1.6122E-02  
+iter=    240  dt=5.491E-01  t=5.238E+01  CFL=7.615E+01  norm=8.1433E-03  
+iter=    250  dt=8.980E-01  t=5.890E+01  CFL=1.246E+02  norm=1.3328E-03  
+iter=    260  dt=6.192E+01  t=1.187E+02  CFL=8.590E+03  norm=1.0463E-03  
+** Completed PETSc time integration **
+Writing solution file op.bin.
+Solver runtime (in seconds): 4.0300219099999998E+02
+Total  runtime (in seconds): 4.0305459200000001E+02
+Deallocating arrays.
+Finished.

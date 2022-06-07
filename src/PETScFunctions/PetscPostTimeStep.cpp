@@ -87,10 +87,12 @@ PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
     if (nsims > 1) {
       printf("--\n");
       printf("iter=%7d,  t=%1.3e\n", iter, waqt);
+      printf("  dt=%1.3E  ", dt);
       printf("  CFL=%1.3E, ", max_cfl);
       printf("  norm=%1.4E\n", total_norm);
     } else {
       printf("iter=%7d  ", iter);
+      printf("dt=%1.3E  ", dt);
       printf("t=%1.3E  ", waqt);
       printf("CFL=%1.3E  ", max_cfl );
       printf("norm=%1.4E  ", total_norm);
