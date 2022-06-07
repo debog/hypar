@@ -111,8 +111,13 @@ def getSimulationSnapshots( path: str,
         fname = path + '/'+op_root+'_'+f'{sim_idx:01d}'+'_'+f'{i:05d}'+'.bin'
       else:
         fname = path + '/'+op_root+'_'+f'{i:05d}'+'.bin'
-      x, u = readOpFile(fname, ndims, nvars, size)
-      snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
+
+      try:
+        x, u = readOpFile(fname, ndims, nvars, size)
+        snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
+      except:
+        pass
+
   else:
     if nsims >= 100:
       fname = path + '/'+op_root+'_'+f'{sim_idx:03d}'+'.bin'
@@ -122,8 +127,12 @@ def getSimulationSnapshots( path: str,
       fname = path + '/'+op_root+'_'+f'{sim_idx:01d}'+'.bin'
     else:
       fname = path + '/'+op_root+'.bin'
-    x, u = readOpFile(fname, ndims, nvars, size)
-    snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
+
+    try:
+      x, u = readOpFile(fname, ndims, nvars, size)
+      snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
+    except:
+      pass
 
   return x,snapshots
 
@@ -172,8 +181,13 @@ def getSolutionSnapshots( path: str,
           fname = path + '/'+op_root+'_'+f'{sim:01d}'+'_'+f'{i:05d}'+'.bin'
         else:
           fname = path + '/'+op_root+'_'+f'{i:05d}'+'.bin'
-        x, u = readOpFile(fname, ndims, nvars, size_sim)
-        snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
+
+        try:
+          x, u = readOpFile(fname, ndims, nvars, size_sim)
+          snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
+        except:
+          pass
+
     else:
       if nsims >= 100:
         fname = path + '/'+op_root+'_'+f'{sim:03d}'+'.bin'
@@ -183,8 +197,12 @@ def getSolutionSnapshots( path: str,
         fname = path + '/'+op_root+'_'+f'{sim:01d}'+'.bin'
       else:
         fname = path + '/'+op_root+'.bin'
-      x, u = readOpFile(fname, ndims, nvars, size_sim)
-      snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
+
+      try:
+        x, u = readOpFile(fname, ndims, nvars, size_sim)
+        snapshots = np.concatenate((snapshots,np.expand_dims(u,axis=0)),axis=0)
+      except:
+        pass
 
   return x,snapshots
 
