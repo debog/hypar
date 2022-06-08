@@ -2885,7 +2885,7 @@ Implicit-Explicit (IMEX) time integration:
 \subpage euler2d_igwave_petsc \n
 \subpage euler2d_rtb_petsc_imex (with local truncation error-based adaptive time-step) \n
 \subpage ns2d_ldsc_petsc_imex \n
-\subpage ns3d_bubble_petsc
+\subpage ns3d_bubble_petsc (this example does not work as shown anymore; bad preconditioning)
 
 
 \page linear_adv_sine_petsc 1D Linear Advection - Sine Wave
