@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include <sys/time.h>
 #include <vector>
 #include <common_cpp.h>
 #include <io_cpp.h>

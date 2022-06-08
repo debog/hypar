@@ -82,6 +82,13 @@ PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
 
   }
 
+  gettimeofday(&context->iter_end_time,NULL);
+  long long walltime;
+  walltime = (  (context->iter_end_time.tv_sec * 1000000 + context->iter_end_time.tv_usec)
+              - (context->iter_start_time.tv_sec * 1000000 + context->iter_start_time.tv_usec));
+  context->iter_wctime = (double) walltime / 1000000.0;
+  context->ti_runtime += context->iter_wctime;
+
   if ((!context->rank) && (iter%sim[0].solver.screen_op_iter == 0)) {
 
     if (nsims > 1) {
@@ -90,12 +97,14 @@ PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
       printf("  dt=%1.3E  ", dt);
       printf("  CFL=%1.3E, ", max_cfl);
       printf("  norm=%1.4E\n", total_norm);
+      printf("  wctime=%1.1E (s)\n",context->iter_wctime);
     } else {
       printf("iter=%7d  ", iter);
       printf("dt=%1.3E  ", dt);
       printf("t=%1.3E  ", waqt);
       printf("CFL=%1.3E  ", max_cfl );
       printf("norm=%1.4E  ", total_norm);
+      printf("wctime: %1.1E (s)  ",context->iter_wctime);
     }
 
     /* calculate and print conservation error */

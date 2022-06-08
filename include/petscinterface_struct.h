@@ -8,6 +8,7 @@
 #ifndef _PETSC_INTERFACE_STRUCT_H_
 #define _PETSC_INTERFACE_STRUCT_H_
 
+#include <sys/time.h>
 #include <vector>
 
 /* include PETSc header files */
@@ -105,6 +106,14 @@ typedef struct _petsccontext_ {
       \sa PetscGlobalDOF() */
   std::vector<double*> globalDOF;
 
+  /*! iteration start time */
+  struct timeval iter_start_time;
+  /*! iteration end time */
+  struct timeval iter_end_time;
+  /*! iteration wallclock time (in seconds) */
+  double iter_wctime;
+  /*! total time integration wall time (in seconds) */
+  double ti_runtime;
 } PETScContext;
 
 #endif

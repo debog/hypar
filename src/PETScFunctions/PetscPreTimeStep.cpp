@@ -28,6 +28,7 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
     fprintf(stderr,"Error in PetscPreTimeStep: Null context!\n");
     return(1);
   }
+  gettimeofday(&(context->iter_start_time),NULL);
   SimulationObject* sim = (SimulationObject*) context->simobj;
   int nsims = context->nsims;
 

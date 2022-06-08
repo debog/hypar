@@ -368,8 +368,12 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
   }
 
   if (!rank) printf("** Starting PETSc time integration **\n");
+  context.ti_runtime = 0.0;
   TSSolve(ts,Y);
-  if (!rank) printf("** Completed PETSc time integration **\n");
+  if (!rank) {
+    printf("** Completed PETSc time integration (Final time: %f), total wctime: %f (seconds) **\n",
+            context.waqt, context.ti_runtime );
+  }
 
   /* Get the number of time steps */
   for (int ns = 0; ns < nsims; ns++) {
