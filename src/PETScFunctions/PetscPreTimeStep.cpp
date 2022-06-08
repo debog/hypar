@@ -11,6 +11,10 @@
 #include <simulation_object.h>
 #include <petscinterface.h>
 
+#ifdef with_librom
+#include <librom_interface.h>
+#endif
+
 extern "C" int OutputSolution (void*,int);   /*!< Write solutions to file */
 
 #undef __FUNCT__
@@ -88,7 +92,17 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
       if (solver->PhysicsOutput) solver->PhysicsOutput(solver,mpi);
     }
     OutputSolution(sim, nsims);
+#ifdef with_librom
+    context->op_times_arr.push_back(waqt);
+#endif
   }
+
+#ifdef with_librom
+  if (      (context->rom_mode == _ROM_MODE_TRAIN_) 
+        &&  (iter%((libROMInterface*)context->rom_interface)->samplingFrequency() == 0)  ) {
+    ((libROMInterface*)context->rom_interface)->takeSample( sim, waqt );
+  }
+#endif
 
   PetscFunctionReturn(0);
 }

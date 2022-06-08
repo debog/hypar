@@ -10,6 +10,7 @@
 
 #include <sys/time.h>
 #include <vector>
+#include <string>
 
 /* include PETSc header files */
 #include <petscsys.h>
@@ -114,6 +115,15 @@ typedef struct _petsccontext_ {
   double iter_wctime;
   /*! total time integration wall time (in seconds) */
   double ti_runtime;
+
+#ifdef with_librom
+  /*! libROM interface */
+  void* rom_interface;
+  /*! ROM mode \sa #libROMInterface::m_mode */
+  std::string rom_mode;
+  /*! Array of simulation times to write solution output at */
+  std::vector<double> op_times_arr;
+#endif
 } PETScContext;
 
 #endif

@@ -150,6 +150,9 @@ PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
       if (solver->PhysicsOutput) solver->PhysicsOutput(solver,mpi);
     }
     OutputSolution(sim,nsims);
+#ifdef with_librom
+    context->op_times_arr.push_back(waqt);
+#endif
     context->tic=0;
   }
 
