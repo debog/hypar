@@ -17,5 +17,6 @@ libPETScFunctions_a_SOURCES = \
   PetscRHSFunctionExpl.cpp \
   PetscRHSFunctionImpl.cpp \
   PetscRHSFunctionIMEX.cpp \
+	PetscSetInitialGuessROM.cpp \
   TransferFromPETSc.cpp \
   TransferToPETSc.cpp

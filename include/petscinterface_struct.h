@@ -58,6 +58,18 @@ typedef struct _petsccontext_ {
   /*! Current time */
   double waqt;
 
+  /*! Simulation time at start of step */
+  double t_start;
+
+  /*! Current dt */
+  double dt;
+
+  /*! Stage times */
+  std::vector<double> stage_times;
+
+  /*! Current stage */
+  int stage_index;
+
   /*! A counter variable */
   int tic;
 

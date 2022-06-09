@@ -14,6 +14,9 @@
 #define _ROM_MODE_TRAIN_ "train"
 /*! Prediction mode */
 #define _ROM_MODE_PREDICT_ "predict"
+/*! Initial guess mode - use ROM prediction as initial guess
+ *  in implicit time integration */
+#define _ROM_MODE_INITIAL_GUESS_ "initial_guess"
 
 /*! Monolithic ROM for all components */
 #define _ROM_COMP_MODE_MONOLITHIC_ "monolithic"

@@ -63,6 +63,8 @@ PetscErrorCode PetscIFunctionIMEX(  TS        ts,     /*!< The time integration 
 
   PetscFunctionBegin;
 
+  context->waqt = t;
+
   for (int ns = 0; ns < nsims; ns++) {
 
     HyPar* solver = &(sim[ns].solver);

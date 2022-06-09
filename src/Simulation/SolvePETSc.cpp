@@ -88,6 +88,10 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
   context.globalDOF.clear();
   context.points.clear();
   context.ti_runtime = 0.0;
+  context.waqt = 0.0;
+  context.dt = sim[0].solver.dt;
+  context.stage_times.clear();
+  context.stage_index = 0;
 
 #ifdef with_librom
   if (!rank) printf("Setting up libROM interface.\n");
@@ -102,7 +106,13 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
 #ifdef with_librom
   if (      (context.rom_mode == _ROM_MODE_TRAIN_) 
+        ||  (context.rom_mode == _ROM_MODE_INITIAL_GUESS_ )
         ||  (context.rom_mode == _ROM_MODE_NONE_ ) ) {
+
+    if (context.rom_mode == _ROM_MODE_INITIAL_GUESS_) {
+      ((libROMInterface*)context.rom_interface)->loadROM();
+      ((libROMInterface*)context.rom_interface)->projectInitialSolution(sim);
+    }
 #endif
     PetscCreatePointList(&context);
   
@@ -129,7 +139,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
     TSSetMaxSteps(ts,sim[0].solver.n_iter);
     TSSetMaxTime(ts,sim[0].solver.dt*sim[0].solver.n_iter);
     TSSetTimeStep(ts,sim[0].solver.dt);
-    TSSetTime(ts,0.0);
+    TSSetTime(ts,context.waqt);
     TSSetExactFinalTime(ts,TS_EXACTFINALTIME_MATCHSTEP);
     TSSetType(ts,TSBEULER);
   
@@ -165,6 +175,12 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
       SNESType snestype;
       TSGetSNES(ts,&snes);
       SNESGetType(snes,&snestype);
+
+#ifdef with_librom
+      if (context.rom_mode == _ROM_MODE_INITIAL_GUESS_) {
+        SNESSetComputeInitialGuess(snes, PetscSetInitialGuessROM, &context);
+      }
+#endif
   
       /* Matrix-free representation of the Jacobian */
       flag_mat_a = 1;
@@ -319,6 +335,12 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
       SNESType snestype;
       TSGetSNES(ts,&snes);
       SNESGetType(snes,&snestype);
+  
+#ifdef with_librom
+      if (context.rom_mode == _ROM_MODE_INITIAL_GUESS_) {
+        SNESSetComputeInitialGuess(snes, PetscSetInitialGuessROM, &context);
+      }
+#endif
   
       /* Matrix-free representation of the Jacobian */
       flag_mat_a = 1;

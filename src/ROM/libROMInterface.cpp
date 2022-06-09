@@ -462,10 +462,10 @@ void libROMInterface::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vecto
   SimulationObject* sim = (SimulationObject*) a_s;
 
   double* u;
-  if (m_mode == _ROM_MODE_PREDICT_) {
-    u = sim[a_idx].solver.u;
-  } else {
+  if (m_mode == _ROM_MODE_TRAIN_) {
     u = sim[a_idx].solver.u_rom_predicted;
+  } else {
+    u = sim[a_idx].solver.u;
   }
   std::vector<int> index(sim[a_idx].solver.ndims);
 
@@ -497,10 +497,10 @@ void libROMInterface::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vecto
   SimulationObject* sim = (SimulationObject*) a_s;
 
   double* u;
-  if (m_mode == _ROM_MODE_PREDICT_) {
-    u = sim[a_idx].solver.u;
-  } else {
+  if (m_mode == _ROM_MODE_TRAIN_) {
     u = sim[a_idx].solver.u_rom_predicted;
+  } else {
+    u = sim[a_idx].solver.u;
   }
   std::vector<int> index(sim[a_idx].solver.ndims);
 

@@ -34,6 +34,12 @@ PetscErrorCode PetscPostStage(  TS        ts,         /*!< Time integrator of PE
   TSType time_scheme;
   TSGetType(ts,&time_scheme);
 
+  TSGetTimeStep(ts,&(context->dt));
+  context->stage_index = stageindex;
+  if (context->stage_times.size() == stageindex) {
+    context->stage_times.push_back(stagetime/context->dt);
+  }
+
   for (int ns = 0; ns < nsims; ns++) {
 
     HyPar* solver = &(sim[ns].solver);

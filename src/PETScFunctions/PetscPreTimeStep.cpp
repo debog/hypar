@@ -41,8 +41,14 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
 
   double waqt;
   TSGetTime(ts,&waqt);
+  double dt;
+  TSGetTimeStep(ts,&dt);
   int iter;
   TSGetStepNumber(ts,&iter);
+
+  context->dt = dt;
+  context->waqt = waqt;
+  context->t_start = waqt;
 
   TSType time_scheme;
   TSGetType(ts,&time_scheme);

@@ -56,6 +56,8 @@ PetscErrorCode PetscRHSFunctionIMEX(  TS        ts,   /*!< Time integration obje
   SimulationObject* sim = (SimulationObject*) context->simobj;
   int nsims = context->nsims;
 
+  context->waqt = t;
+
   PetscFunctionBegin;
   for (int ns = 0; ns < nsims; ns++) {
 

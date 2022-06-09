@@ -48,6 +48,11 @@ int PetscComputePreconMatImpl(Mat,Vec,void*);
 /*! Function to compute any error estimates, if available */
 PetscErrorCode PetscTimeError (TS);
 
+#ifdef with_librom
+/*! Function to compute initial guess of nonlinear solve using libROM */
+PetscErrorCode PetscSetInitialGuessROM(SNES,Vec,void*);
+#endif
+
 #endif
 
 #endif
