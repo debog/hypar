@@ -25,21 +25,23 @@ PetscErrorCode PetscSetInitialGuessROM( SNES  snes, /*!< Nonlinear solver object
 
   PetscFunctionBegin;
 
+  double stage_time = context->t_start;
   if (context->stage_times.size() > (context->stage_index+1)) {
-
-    double stage_time = context->t_start + context->stage_times[context->stage_index+1] * context->dt;
-        
-    ((libROMInterface*)context->rom_interface)->predict(sim, stage_time);
-    if (!context->rank) {
-      printf(  "libROM: Predicted ROM intial guess (time %1.4e), wallclock time: %f.\n", 
-               stage_time, ((libROMInterface*)context->rom_interface)->predictWallclockTime() );
-    }
-  
-    for (int ns = 0; ns < nsims; ns++) {
-      TransferVecToPETSc(sim[ns].solver.u,X,context,ns,context->offsets[ns]);
-    }
-
+    stage_time += context->stage_times[context->stage_index+1] * context->dt;
+  } else {
+    stage_time += context->dt;
   }
+        
+  ((libROMInterface*)context->rom_interface)->predict(sim, stage_time);
+  if (!context->rank) {
+    printf(  "libROM: Predicted ROM intial guess (time %1.4e), wallclock time: %f.\n", 
+             stage_time, ((libROMInterface*)context->rom_interface)->predictWallclockTime() );
+  }
+
+  for (int ns = 0; ns < nsims; ns++) {
+    TransferVecToPETSc(sim[ns].solver.u,X,context,ns,context->offsets[ns]);
+  }
+
 
   PetscFunctionReturn(0);
 }
