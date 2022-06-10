@@ -82,7 +82,9 @@ class libROMInterface
     /*! Destructor */
     ~libROMInterface()
     {
+      for (int i = 0; i < m_rom.size(); i++) delete m_rom[i];
       m_rom.clear();
+      for (int i = 0; i < m_U.size(); i++) delete m_U[i];
       m_U.clear();
     }
 

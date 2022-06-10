@@ -31,6 +31,9 @@ class ROMObject
 {
   public:
 
+    /*! virtual destructor */
+    virtual ~ROMObject() { }
+
     /*! Project initial solution for prediction */
     virtual void projectInitialSolution( CAROM::Vector& ) = 0;
     /*! take a sample (solution snapshot) */

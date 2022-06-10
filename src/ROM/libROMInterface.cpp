@@ -66,6 +66,9 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
       strcpy( type_c_str, _ROM_TYPE_NONE_ );
       strcpy( save_c_str, "false" );
 
+      m_rdim = -1;
+      m_sampling_freq = 1;
+
     } else {
 
       strcpy( mode_c_str, _ROM_MODE_TRAIN_ );
@@ -130,45 +133,58 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 
   m_save_ROM = (((std::string(save_c_str) == "true")) && (m_mode == _ROM_MODE_TRAIN_));
 
-  m_vec_size.resize(m_nsims);
-  for (int ns = 0; ns < m_nsims; ns++) {
-    m_vec_size[ns] = (sim[ns].solver.npoints_local);
-    if (m_comp_mode == _ROM_COMP_MODE_MONOLITHIC_) {
-      m_vec_size[ns] *= (sim[ns].solver.nvars);
-    }
-  }
+  if (m_mode != _ROM_MODE_NONE_) {
 
-  m_rom.clear();
-  m_U.clear();
-  if (m_comp_mode == _ROM_COMP_MODE_MONOLITHIC_) {
+    m_vec_size.resize(m_nsims);
     for (int ns = 0; ns < m_nsims; ns++) {
-      if (m_rom_type == _ROM_TYPE_DMD_) {
-        m_rom.push_back(new DMDROMObject( m_vec_size[ns], 
-                                          m_sampling_freq*a_dt, 
-                                          m_rdim, 
-                                          m_rank, 
-                                          m_nproc, 
-                                          ns ) );
+      m_vec_size[ns] = (sim[ns].solver.npoints_local);
+      if (m_comp_mode == _ROM_COMP_MODE_MONOLITHIC_) {
+        m_vec_size[ns] *= (sim[ns].solver.nvars);
       }
-      m_U.push_back(new CAROM::Vector(m_vec_size[ns],true));
     }
-  } else if (m_comp_mode == _ROM_COMP_MODE_COMPONENTWISE_) {
-    for (int ns = 0; ns < m_nsims; ns++) {
-      m_ncomps.push_back(sim[ns].solver.nvars);
-      for (int v = 0; v < sim[ns].solver.nvars; v++) {
+  
+    m_rom.clear();
+    m_U.clear();
+    if (m_comp_mode == _ROM_COMP_MODE_MONOLITHIC_) {
+      for (int ns = 0; ns < m_nsims; ns++) {
         if (m_rom_type == _ROM_TYPE_DMD_) {
           m_rom.push_back(new DMDROMObject( m_vec_size[ns], 
                                             m_sampling_freq*a_dt, 
                                             m_rdim, 
                                             m_rank, 
-                                            m_nproc,
-                                            ns,
-                                            v ) );
+                                            m_nproc, 
+                                            ns ) );
         }
         m_U.push_back(new CAROM::Vector(m_vec_size[ns],true));
       }
+    } else if (m_comp_mode == _ROM_COMP_MODE_COMPONENTWISE_) {
+      for (int ns = 0; ns < m_nsims; ns++) {
+        m_ncomps.push_back(sim[ns].solver.nvars);
+        for (int v = 0; v < sim[ns].solver.nvars; v++) {
+          if (m_rom_type == _ROM_TYPE_DMD_) {
+            m_rom.push_back(new DMDROMObject( m_vec_size[ns], 
+                                              m_sampling_freq*a_dt, 
+                                              m_rdim, 
+                                              m_rank, 
+                                              m_nproc,
+                                              ns,
+                                              v ) );
+          }
+          m_U.push_back(new CAROM::Vector(m_vec_size[ns],true));
+        }
+      }
     }
+
+  } else {
+
+    m_rom.clear();
+    m_U.clear();
+    m_ncomps.clear();
+
   }
+
+  m_train_wctime = 0;
+  m_predict_wctime = 0;
 
   m_is_defined = true;
   return;

@@ -50,8 +50,10 @@ class DMDROMObject : public ROMObject
     /*! Destructor */
     virtual ~DMDROMObject()
     {
+      for (int i = 0; i < m_dmd.size(); i++) delete m_dmd[i];
       m_dmd.clear();
       m_intervals.clear();
+      m_dmd_is_trained.clear();
     }
 
     /*! Project initial solution for prediction */
