@@ -42,7 +42,7 @@ hypar_baselines_branch="master"
 hypar_baselines_dir="baselines"
 
 # stuff about test directory
-hypar_test_dir="test"
+hypar_test_dir="_test"
 exclude_flag="--exclude={'op*','surface*','ibank*','initial*','out.log','.*','README.md'}"
 diff_filelistname="diff_file_list"
 diff_file="diff.log"
@@ -50,6 +50,7 @@ report_filename="test_report.txt"
 
 # other stuff
 RUN_SCRIPT="run.sh"
+NEEDS_PETSC="dep.PETSc"
 NEEDS_FFTW="dep.fftw"
 NEEDS_LIBROM="dep.libROM"
 
@@ -66,6 +67,14 @@ git checkout $hypar_branch
 echo "-------------------------"
 echo "compiling hypar..."
 autoreconf -i 2>&1 > $root_dir/$hypar_compile_log_file
+if [ -z "$PETSC_DIR" ]; then
+  echo "Environment variable PETSC_DIR not found."
+  echo "Compiling without PETSc; will not be able to run simulations that need PETSc."
+  opt_with_petsc=false
+else
+  echo "PETSc found at $PETSC_DIR. Compiling with PETSc."
+  opt_with_petsc=true
+fi
 if [ -z "$LIBROM_DIR" ]; then
   echo "Environment variable LIBROM_DIR not found."
   echo "Compiling without libROM; will not be able to run simulations that need libROM."
@@ -165,6 +174,9 @@ for f in *; do
     if [ -f "$NEEDS_LIBROM" ] && [ "$opt_with_librom" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (liROM)."
       echo "Skipping; $f has unmet dependencies (liROM)." >> $report_file
+    elif [ -f "$NEEDS_PETSC" ] && [ "$opt_with_petsc" == "false" ]; then
+      echo "Skipping; $f has unmet dependencies (PETSc)."
+      echo "Skipping; $f has unmet dependencies (PETSc)." >> $report_file
     elif [ -f "$NEEDS_FFTW" ] && [ "$opt_with_fftw" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (FFTW)."
       echo "Skipping; $f has unmet dependencies (FFTW)." >> $report_file
