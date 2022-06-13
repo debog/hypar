@@ -38,14 +38,15 @@ hypar_baselines_branch="master"
 hypar_baselines_dir="baselines"
 
 # stuff about test directory
-hypar_test_dir="test"
-exclude_flag="--exclude={'op*','surface*','ibank*','initial*','out.log','.*','README.md'}"
+hypar_test_dir="_test"
+exclude_flag="--exclude={'op*','surface*','ibank*','initial*','out.log','README.md'}"
 diff_filelistname="diff_file_list"
 diff_file="diff.log"
 report_filename="test_report.txt"
 
 # other stuff
 RUN_SCRIPT="run.sh"
+NEEDS_PETSC="dep.PETSc"
 NEEDS_FFTW="dep.fftw"
 NEEDS_LIBROM="dep.libROM"
 
@@ -70,6 +71,15 @@ fi
 # Since this is using a pre-compiled binary, we can only
 # guess whether it was compiled using various dependencies
 # by checking for the environment variables
+if [ -z "$PETSC_DIR" ]; then
+  echo "Environment variable PETSC_DIR not found."
+  echo "Will skip tests that need PETSc"
+  opt_with_petsc=false
+else
+  echo "PETSc found at $PETSC_DIR."
+  echo "HyPar was probably compiled with PETSc. Will attempt tests that need PETSc"
+  opt_with_petsc=true
+fi
 if [ -z "$LIBROM_DIR" ]; then
   echo "Environment variable LIBROM_DIR not found."
   echo "Will skip tests that need libROM"
@@ -150,6 +160,9 @@ for f in *; do
     if [ -f "$NEEDS_LIBROM" ] && [ "$opt_with_librom" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (liROM)."
       echo "Skipping; $f has unmet dependencies (liROM)." >> $report_file
+    elif [ -f "$NEEDS_PETSC" ] && [ "$opt_with_petsc" == "false" ]; then
+      echo "Skipping; $f has unmet dependencies (PETSc)."
+      echo "Skipping; $f has unmet dependencies (PETSc)." >> $report_file
     elif [ -f "$NEEDS_FFTW" ] && [ "$opt_with_fftw" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (FFTW)."
       echo "Skipping; $f has unmet dependencies (FFTW)." >> $report_file
