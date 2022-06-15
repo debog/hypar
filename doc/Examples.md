@@ -5949,6 +5949,7 @@ from a PDE simulation. The same procedure (i.e. providing the libROM input file
 \subpage euler2d_vortex_librom_dmd_train \n
 \subpage euler2d_riemann4_librom_dmd_train \n
 \subpage euler2d_rtb_librom_dmd_train \n
+\subpage euler2d_igwave_petsc_librom_dmd_train \n
 \subpage navstok2d_ldsc_librom_dmd_train \n
 \subpage vlasov_1d1v_selfconsistent_librom_dmd_train \n
 \n
@@ -7229,10 +7230,10 @@ with 36 MPI ranks (or change \b iproc).
 After running the code, there should be the following output
 files:
 
-+ 41 output file \b op_00000.bin, ..., op_00040.bin; 
++ 41 output file \b op_00000.bin, ..., \b op_00040.bin; 
 this is the \b HyPar solutions\b. 
 
-+ 41 output file \b op_rom_00000.bin, ..., op_rom_00040.bin; 
++ 41 output file \b op_rom_00000.bin, ..., \b op_rom_00040.bin; 
 this is the \b predicted solutions from the DMD object(s)\b.
 
 All the files are binary
@@ -8573,3 +8574,156 @@ The numbers are, respectively,
 
 Expected screen output (for Reynolds number 3200):
 \include 2D/NavierStokes2D/LidDrivenCavity_PETSc_Implicit/out.log
+
+\page euler2d_igwave_petsc_librom_dmd_train 2D Euler Equations (with gravitational force) - Inertia-Gravity Waves (Time-Windowed DMD) with PETSc IMEX time integration
+
+See \ref euler2d_igwave_petsc to familiarize yourself with this case.
+
+Location: \b hypar/Examples/2D/NavierStokes2D/InertiaGravityWave_PETSc_IMEX_libROM_DMD_Train
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D Euler Equations (navierstokes2d.h - By default,
+                     #NavierStokes2D::Re is set to \b -1 which makes the
+                     code skip the parabolic terms, i.e., the 2D Euler
+                     equations are solved.)
+
+Reduced Order Modeling: This example trains a DMD object and then
+predicts the solution using the DMD at the same times that the
+actual HyPar solution is written at.
+
+Reference:
+  + W. C. Skamarock and J. B. Klemp, "Efficiency and accuracy of 
+    the Klemp-Wilhelmson timesplitting technique", Monthly Weather 
+    Review, 122 (1994), pp. 2623–2630.
+  + Giraldo, F.X., Restelli, M., "A study of spectral element and
+    discontinuous Galerkin methods for the Navier–Stokes equations
+    in nonhydrostatic mesoscale atmospheric modeling: Equation sets
+    and test cases", J. Comput. Phys., 227, 2008, 3849--3877, 
+    (Section 3.1).
+
+The problem is solved here using <B>implicit-explicit (IMEX)</B> time
+integration, where the hyperbolic flux is partitioned into its entropy
+and acoustic components with the former integrated explicitly and the
+latter integrated implicitly. See the following reference:
++ Ghosh, D., Constantinescu, E. M., "Semi-Implicit Time Integration of 
+  Atmospheric Flows with Characteristic-Based Flux Partitioning", SIAM 
+  Journal on Scientific Computing, 38 (3), 2016, A1848-A1875, 
+  http://dx.doi.org/10.1137/15M1044369.
+
+Domain: \f$0 \le x \le 300,000\,m, 0 \le y \le 10,000\,m\f$, \a "periodic" (#_PERIODIC_)
+        boundary conditions along \f$x\f$, "slip-wall" (#_SLIP_WALL_) boundary conditions along \f$y\f$.
+
+Initial solution: See references above.
+
+Other parameters (all dimensional quantities are in SI units):
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes2D::gamma)
+  + Universal gas constant \f$R = 287.058\f$ (#NavierStokes2D::R)
+  + Gravitational force per unit mass \f$g = 9.8\f$ along \a y-axis (#NavierStokes2D::grav_y)
+  + Reference density (at zero altitude) \f$\rho_{ref} = 1.1612055171196529\f$ (#NavierStokes2D::rho0)
+  + Reference pressure (at zero altitude) \f$P_{ref} = 100000\f$ (#NavierStokes2D::p0)
+  + Hydrostatic balance type 3 (#NavierStokes2D::HB)
+  + Brunt-Vaisala frequency 0.01 (#NavierStokes2D::N_bv)
+
+Numerical method:
+ + Spatial discretization (hyperbolic): 5th order compact upwind (Interp1PrimFifthOrderCompactUpwind())
+ + Time integration: PETSc (SolvePETSc()) 
+   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX.html)
+   - Specific method: <B>Kennedy-Carpenter ARK4</B> (TSARKIMEX4 - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX4.html)
+
+Reduced Order Modeling:
+ + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 32 (DMDROMObject::m_rdim)
+ + Sampling frequency: 1 (libROMInterface::m_sampling_freq)
+ + Number of samples per time window: 50 (DMDROMObject::m_num_window_samples)
+
+
+Input files required:
+---------------------
+
+<B>librom.inp</B>
+\include 2D/NavierStokes2D/InertiaGravityWave_PETSc_IMEX_libROM_DMD_Train/librom.inp
+
+<B>.petscrc</B>
+\include 2D/NavierStokes2D/InertiaGravityWave_PETSc_IMEX_libROM_DMD_Train/petscrc
+
+\b solver.inp
+\include 2D/NavierStokes2D/InertiaGravityWave_PETSc_IMEX_libROM_DMD_Train/solver.inp
+
+\b boundary.inp
+\include 2D/NavierStokes2D/InertiaGravityWave_PETSc_IMEX_libROM_DMD_Train/boundary.inp
+
+\b physics.inp
+\include 2D/NavierStokes2D/InertiaGravityWave_PETSc_IMEX_libROM_DMD_Train/physics.inp
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory.
+\include 2D/NavierStokes2D/InertiaGravityWave_PETSc_IMEX_libROM_DMD_Train/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      24 1
+
+in \b solver.inp (i.e., 24 processors along \a x, and 1
+processor along \a y). Thus, this example should be run
+with 24 MPI ranks (or change \b iproc).
+
+After running the code, there should be the following output
+files:
+
++ 16 output file \b op_00000.bin, ..., \b op_00015.bin; 
+this is the \b HyPar solutions\b. 
+
++ 16 output file \b op_rom_00000.bin, ..., \b op_rom_00015.bin; 
+this is the \b predicted solutions from the DMD object(s)\b.
+
+All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+#HyPar::op_file_format is set to \a binary in \b solver.inp, and
+thus, all the files are written out in the binary format, see 
+WriteBinary(). The binary file contains the conserved variables
+\f$\left(\rho, \rho u, \rho v, e\right)\f$. The following code
+converts these variables to the primitive variables of interest
+to atmospheric flows \f$\left(\rho, u, v, p, \theta\right)\f$.
+It also writes out the hydrostatically balanced quantities 
+\f$\left(\rho_0,\pi_0, \theta_0\right)\f$ for this case that
+can be used to compute and plot the temperature and density
+perturbations. These variables are then written to either
+a tecplot2d or text file.
+(compile and run it in the run directory):
+\include 2D/NavierStokes2D/InertiaGravityWave_PETSc_IMEX_libROM_DMD_Train/aux/PostProcess.c
+
+Alternatively, the provided Python script (\b plotSolution.py)
+can be used to generate plots from the binary files of the atmospheric
+flow variables and compare the HyPar and DMD
+solutions. It will plot the potential temperature perturbation but can 
+be modified easily to plot other quantities.
+
+The following plot shows the potential temperature perturbation
+contours at the final time t=3000:
+@image html Solution_2DNavStokIGWavePETSc_libROMDMD_Train.png
+
+\b Wall \b clock \b times:
+- PDE solution: 521 seconds
+- DMD training time: 15.1 seconds
+- DMD prediction/query time: 8.7 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 2D/NavierStokes2D/InertiaGravityWave_PETSc_IMEX_libROM_DMD_Train/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Expected screen output:
+\include 2D/NavierStokes2D/InertiaGravityWave_PETSc_IMEX_libROM_DMD_Train/out.log
