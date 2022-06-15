@@ -1,0 +1,187 @@
+srun: job 10160167 queued and waiting for resources
+srun: job 10160167 has been allocated resources
+HyPar - Parallel (MPI) version with 24 processes
+Compiled with PETSc time integration.
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 4
+  Domain size                                : 1200 50 
+  Processes along each dimension             : 24 1 
+  Exact solution domain size                 : 1200 50 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 300
+  Restart iteration                          : 0
+  Time integration scheme                    : PETSc 
+  Spatial discretization scheme (hyperbolic) : cupw5
+  Split hyperbolic flux term?                : yes
+  Interpolation type for hyperbolic term     : components
+  Spatial discretization type   (parabolic ) : nonconservative-1stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 1.000000E+01
+  Check for conservation                     : no
+  Screen output iterations                   : 10
+  File output iterations                     : 20
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : no
+  Physical model                             : navierstokes2d
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  2.2722878895077395E+09
+ 1:  4.5445757790154785E+10
+ 2:  0.0000000000000000E+00
+ 3:  4.4309563899845638E+14
+Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                      slip-wall:  Along dimension  1 and face +1
+  Boundary                      slip-wall:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+tridiagLUInit: File "lusolver.inp" not found. Using default values.
+Initializing physics. Model = "navierstokes2d"
+Reading physical model inputs from file "physics.inp".
+Setting up PETSc time integration... 
+Setting up libROM interface.
+libROMInterface inputs and parameters:
+  reduced model dimensionality:  32
+  sampling frequency:  1
+  mode: train
+  component mode: monolithic
+  type: DMD
+  save to file: true
+DMDROMObject details:
+  number of samples per window:   50
+  directory name for DMD onjects: DMD
+  write snapshot matrix to file:  false
+  simulation domain:  0
+PETSc:    total number of computational points is 60000.
+PETSc:    total number of computational DOFs is 240000.
+Implicit-Explicit time-integration:-
+Hyperbolic (f-df) term: Explicit
+Hyperbolic (df)   term: Implicit
+Parabolic         term: Implicit
+Source            term: Implicit
+SolvePETSc(): Problem type is linear.
+** Starting PETSc time integration **
+Writing solution file op_00000.bin.
+DMDROMObject::takeSample() - creating new DMD object for sim. domain 0, var -1, t=0.000000 (total: 1).
+iter=     10  dt=1.000E+01  t=1.000E+02  CFL=1.701E+01  norm=1.0002E-01  wctime: 1.7E+00 (s)  
+iter=     20  dt=1.000E+01  t=2.000E+02  CFL=1.701E+01  norm=1.6347E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00001.bin.
+iter=     30  dt=1.000E+01  t=3.000E+02  CFL=1.701E+01  norm=1.4808E-01  wctime: 1.7E+00 (s)  
+iter=     40  dt=1.000E+01  t=4.000E+02  CFL=1.701E+01  norm=1.1472E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00002.bin.
+iter=     50  dt=1.000E+01  t=5.000E+02  CFL=1.701E+01  norm=1.0850E-01  wctime: 1.7E+00 (s)  
+DMDROMObject::train() - training DMD object 0 for sim. domain 0, var -1 with 51 samples.
+Using 32 basis vectors out of 50.
+DMDROMObject::takeSample() - creating new DMD object for sim. domain 0, var -1, t=500.000000 (total: 2).
+iter=     60  dt=1.000E+01  t=6.000E+02  CFL=1.701E+01  norm=1.4884E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00003.bin.
+iter=     70  dt=1.000E+01  t=7.000E+02  CFL=1.701E+01  norm=1.4899E-01  wctime: 1.7E+00 (s)  
+iter=     80  dt=1.000E+01  t=8.000E+02  CFL=1.701E+01  norm=1.1894E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00004.bin.
+iter=     90  dt=1.000E+01  t=9.000E+02  CFL=1.701E+01  norm=1.0875E-01  wctime: 1.7E+00 (s)  
+iter=    100  dt=1.000E+01  t=1.000E+03  CFL=1.701E+01  norm=1.4186E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00005.bin.
+DMDROMObject::train() - training DMD object 1 for sim. domain 0, var -1 with 51 samples.
+Using 32 basis vectors out of 50.
+DMDROMObject::takeSample() - creating new DMD object for sim. domain 0, var -1, t=1000.000000 (total: 3).
+iter=    110  dt=1.000E+01  t=1.100E+03  CFL=1.701E+01  norm=1.4984E-01  wctime: 1.7E+00 (s)  
+iter=    120  dt=1.000E+01  t=1.200E+03  CFL=1.701E+01  norm=1.3136E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00006.bin.
+iter=    130  dt=1.000E+01  t=1.300E+03  CFL=1.701E+01  norm=1.1261E-01  wctime: 1.7E+00 (s)  
+iter=    140  dt=1.000E+01  t=1.400E+03  CFL=1.701E+01  norm=1.3477E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00007.bin.
+iter=    150  dt=1.000E+01  t=1.500E+03  CFL=1.701E+01  norm=1.3695E-01  wctime: 1.7E+00 (s)  
+DMDROMObject::train() - training DMD object 2 for sim. domain 0, var -1 with 51 samples.
+Using 32 basis vectors out of 50.
+DMDROMObject::takeSample() - creating new DMD object for sim. domain 0, var -1, t=1500.000000 (total: 4).
+iter=    160  dt=1.000E+01  t=1.600E+03  CFL=1.701E+01  norm=1.4525E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00008.bin.
+iter=    170  dt=1.000E+01  t=1.700E+03  CFL=1.701E+01  norm=1.0836E-01  wctime: 1.7E+00 (s)  
+iter=    180  dt=1.000E+01  t=1.800E+03  CFL=1.701E+01  norm=1.1849E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00009.bin.
+iter=    190  dt=1.000E+01  t=1.900E+03  CFL=1.701E+01  norm=1.5889E-01  wctime: 1.7E+00 (s)  
+iter=    200  dt=1.000E+01  t=2.000E+03  CFL=1.701E+01  norm=1.3183E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00010.bin.
+DMDROMObject::train() - training DMD object 3 for sim. domain 0, var -1 with 51 samples.
+Using 32 basis vectors out of 50.
+DMDROMObject::takeSample() - creating new DMD object for sim. domain 0, var -1, t=2000.000000 (total: 5).
+iter=    210  dt=1.000E+01  t=2.100E+03  CFL=1.701E+01  norm=1.1340E-01  wctime: 1.7E+00 (s)  
+iter=    220  dt=1.000E+01  t=2.200E+03  CFL=1.701E+01  norm=1.3901E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00011.bin.
+iter=    230  dt=1.000E+01  t=2.300E+03  CFL=1.701E+01  norm=1.2231E-01  wctime: 1.7E+00 (s)  
+iter=    240  dt=1.000E+01  t=2.400E+03  CFL=1.701E+01  norm=1.3908E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00012.bin.
+iter=    250  dt=1.000E+01  t=2.500E+03  CFL=1.701E+01  norm=1.2931E-01  wctime: 1.7E+00 (s)  
+DMDROMObject::train() - training DMD object 4 for sim. domain 0, var -1 with 51 samples.
+Using 32 basis vectors out of 50.
+DMDROMObject::takeSample() - creating new DMD object for sim. domain 0, var -1, t=2500.000000 (total: 6).
+iter=    260  dt=1.000E+01  t=2.600E+03  CFL=1.701E+01  norm=1.3253E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00013.bin.
+iter=    270  dt=1.000E+01  t=2.700E+03  CFL=1.701E+01  norm=1.1236E-01  wctime: 1.7E+00 (s)  
+iter=    280  dt=1.000E+01  t=2.800E+03  CFL=1.701E+01  norm=1.5150E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00014.bin.
+iter=    290  dt=1.000E+01  t=2.900E+03  CFL=1.701E+01  norm=1.4059E-01  wctime: 1.7E+00 (s)  
+iter=    300  dt=1.000E+01  t=3.000E+03  CFL=1.701E+01  norm=1.0576E-01  wctime: 1.7E+00 (s)  
+Writing solution file op_00015.bin.
+** Completed PETSc time integration (Final time: 3000.000000), total wctime: 521.165210 (seconds) **
+DMDROMObject::train() - training DMD object 5 for sim. domain 0, var -1 with 50 samples.
+Using 32 basis vectors out of 49.
+libROM: total training wallclock time: 15.078729 (seconds).
+libROM: Predicted solution at time 0.0000e+00 using ROM, wallclock time: 0.530589.
+Writing solution file op_rom_00000.bin.
+libROM: Predicted solution at time 2.0000e+02 using ROM, wallclock time: 0.598458.
+Writing solution file op_rom_00001.bin.
+libROM: Predicted solution at time 4.0000e+02 using ROM, wallclock time: 0.558467.
+Writing solution file op_rom_00002.bin.
+libROM: Predicted solution at time 6.0000e+02 using ROM, wallclock time: 0.495275.
+Writing solution file op_rom_00003.bin.
+libROM: Predicted solution at time 8.0000e+02 using ROM, wallclock time: 0.492773.
+Writing solution file op_rom_00004.bin.
+libROM: Predicted solution at time 1.0000e+03 using ROM, wallclock time: 0.495487.
+Writing solution file op_rom_00005.bin.
+libROM: Predicted solution at time 1.2000e+03 using ROM, wallclock time: 0.495699.
+Writing solution file op_rom_00006.bin.
+libROM: Predicted solution at time 1.4000e+03 using ROM, wallclock time: 0.497169.
+Writing solution file op_rom_00007.bin.
+libROM: Predicted solution at time 1.6000e+03 using ROM, wallclock time: 0.518542.
+Writing solution file op_rom_00008.bin.
+libROM: Predicted solution at time 1.8000e+03 using ROM, wallclock time: 0.518565.
+Writing solution file op_rom_00009.bin.
+libROM: Predicted solution at time 2.0000e+03 using ROM, wallclock time: 0.503544.
+Writing solution file op_rom_00010.bin.
+libROM: Predicted solution at time 2.2000e+03 using ROM, wallclock time: 0.500226.
+Writing solution file op_rom_00011.bin.
+libROM: Predicted solution at time 2.4000e+03 using ROM, wallclock time: 0.518636.
+Writing solution file op_rom_00012.bin.
+libROM: Predicted solution at time 2.6000e+03 using ROM, wallclock time: 0.498987.
+Writing solution file op_rom_00013.bin.
+libROM: Predicted solution at time 2.8000e+03 using ROM, wallclock time: 0.496688.
+Writing solution file op_rom_00014.bin.
+libROM: Predicted solution at time 3.0000e+03 using ROM, wallclock time: 0.494127.
+Writing solution file op_rom_00015.bin.
+libROM: Predicted solution at time 3.0000e+03 using ROM, wallclock time: 0.499386.
+libROM:   Calculating diff between PDE and ROM solutions.
+Writing solution file op_rom_00016.bin.
+libROM: total prediction/query wallclock time: 8.712618 (seconds).
+libROMInterface::saveROM() - saving ROM objects.
+  Saving DMD object and summary (DMD/dmdobj_0000, DMD/dmd_summary_0000).
+  Saving DMD object and summary (DMD/dmdobj_0001, DMD/dmd_summary_0001).
+  Saving DMD object and summary (DMD/dmdobj_0002, DMD/dmd_summary_0002).
+  Saving DMD object and summary (DMD/dmdobj_0003, DMD/dmd_summary_0003).
+  Saving DMD object and summary (DMD/dmdobj_0004, DMD/dmd_summary_0004).
+  Saving DMD object and summary (DMD/dmdobj_0005, DMD/dmd_summary_0005).
+Norms of the diff between ROM and PDE solutions for domain 0:
+  L1         Norm            : 1.6823397339748363E-07
+  L2         Norm            : 2.0644508136507202E-07
+  Linfinity  Norm            : 6.2271161570040760E-07
+Solver runtime (in seconds): 5.4798857799999996E+02
+Total  runtime (in seconds): 5.4807861200000002E+02
+Deallocating arrays.
+Finished.
