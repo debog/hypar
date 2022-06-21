@@ -43,7 +43,7 @@ int LinearADRDiffusionJacobian( double* Jac,  /*!< Jacobian matrix of size 1 (nv
 
   int v;
   for (v = 0; v < nvars; v++) {
-    Jac[nvars*v+v] = param->d[nvars*dir+v];
+    Jac[nvars*v+v] = -param->d[nvars*dir+v];
   }
 
   return 0;
