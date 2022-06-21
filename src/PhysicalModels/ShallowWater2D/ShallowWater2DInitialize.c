@@ -18,7 +18,7 @@ int    ShallowWater2DSource     (double*,double*,void*,void*,double);
 int    ShallowWater2DUpwindRoe  (double*,double*,double*,double*,double*,double*,int,void*,double);
 int    ShallowWater2DUpwindLLF  (double*,double*,double*,double*,double*,double*,int,void*,double);
 
-int    ShallowWater2DJacobian          (double*,double*,void*,int,int);
+int    ShallowWater2DJacobian          (double*,double*,void*,int,int,int);
 int    ShallowWater2DRoeAverage        (double*,double*,double*,void*);
 int    ShallowWater2DLeftEigenvectors  (double*,double*,void*,int);
 int    ShallowWater2DRightEigenvectors (double*,double*,void*,int);

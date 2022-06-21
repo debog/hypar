@@ -11,15 +11,14 @@
     solution at a grid point. The Jacobian is square matrix of size nvar=3, and 
     is returned as a 1D array (double) of 9 elements in row-major format.
 */
-int Euler1DJacobian(
-                    double  *Jac, /*!< Jacobian matrix: 1D array of size nvar^2 = 9 */
+int Euler1DJacobian(double  *Jac, /*!< Jacobian matrix: 1D array of size nvar^2 = 9 */
                     double  *u,   /*!< solution at a grid point (array of size nvar = 3) */
                     void    *p,   /*!< object containing the physics-related parameters */
                     int     dir,  /*!< dimension (x/y/z) (not used, since this is 1D system) */
+                    int     nvars,/*!< number of vector components */
                     int     upw   /*!< 0 -> send back complete Jacobian, 
                                        1 -> send back Jacobian of right(+)-moving flux, 
-                                      -1 -> send back Jacobian of left(-)-moving flux */
-                   )
+                                      -1 -> send back Jacobian of left(-)-moving flux */ )
 {
   Euler1D       *param = (Euler1D*) p;
   static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
@@ -46,15 +45,14 @@ int Euler1DJacobian(
     #_Euler1DSetStiffJac_). The Jacobian is square matrix of size nvar=3, and is returned as 
     a 1D array (double) of 9 elements in row-major format.
 */
-int Euler1DStiffJacobian(
-                          double  *Jac, /*!< Jacobian matrix: 1D array of size nvar^2 = 9 */
+int Euler1DStiffJacobian( double  *Jac, /*!< Jacobian matrix: 1D array of size nvar^2 = 9 */
                           double  *u,   /*!< solution at a grid point (array of size nvar = 3) */
                           void    *p,   /*!< object containing the physics-related parameters */
                           int     dir,  /*!< dimension (x/y/z) (not used, since this is 1D system) */
+                          int     nvars,/*!< number of vector components */
                           int     upw   /*!< 0 -> send back complete Jacobian, 
                                              1 -> send back Jacobian of right(+)-moving flux, 
-                                            -1 -> send back Jacobian of left(-)-moving flux */
-                   )
+                                            -1 -> send back Jacobian of left(-)-moving flux */ )
 {
   Euler1D       *param = (Euler1D*) p;
   static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 

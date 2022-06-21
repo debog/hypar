@@ -207,11 +207,12 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
                             PETSC_NULL );
   
       if (context.flag_use_precon) {
-        /* check if flux Jacobian of the physical model is defined */
+        /* check if Jacobian of the physical model is defined */
         for (int ns = 0; ns < nsims; ns++) {
-          if (!sim[ns].solver.JFunction) {
+          if ((!sim[ns].solver.JFunction) && (!sim[ns].solver.KFunction)) {
             if (!rank) {
-              fprintf(stderr,"Error in SolvePETSc(): solver->JFunction (point-wise flux Jacobian) must ");
+              fprintf(stderr,"Error in SolvePETSc(): solver->JFunction  or solver->KFunction ");
+              fprintf(stderr,"(point-wise Jacobians for hyperbolic or parabolic terms) must ");
               fprintf(stderr,"be defined for preconditioning.\n");
             }
             PetscFunctionReturn(1);
@@ -373,11 +374,12 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
          so that we can define the complete operator (the shifted Jacobian aI - J ) */
   
       if (context.flag_use_precon) {
-        /* check if flux Jacobian of the physical model is defined */
+        /* check if Jacobian of the physical model is defined */
         for (int ns = 0; ns < nsims; ns++) {
-          if (!sim[ns].solver.JFunction) {
+          if ((!sim[ns].solver.JFunction) && (!sim[ns].solver.KFunction)) {
             if (!rank) {
-              fprintf(stderr,"Error in SolvePETSc(): solver->JFunction (point-wise flux Jacobian) must ");
+              fprintf(stderr,"Error in SolvePETSc(): solver->JFunction  or solver->KFunction ");
+              fprintf(stderr,"(point-wise Jacobians for hyperbolic or parabolic terms) must ");
               fprintf(stderr,"be defined for preconditioning.\n");
             }
             PetscFunctionReturn(1);
@@ -405,6 +407,10 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
   
     }
   
+    /* set options from input again because Jacobian/PC related options
+     * may have gotten overwritten above */
+    TSSetFromOptions(ts);
+
     /* Set pre/post-stage and post-timestep function */
     TSSetPreStep (ts,PetscPreTimeStep );
     TSSetPreStage(ts,PetscPreStage    );

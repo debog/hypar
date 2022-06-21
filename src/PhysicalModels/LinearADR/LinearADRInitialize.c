@@ -24,8 +24,10 @@ int    LinearADRUpwind            (double*,double*,double*,double*,
                                    double*,double*,int,void*,double);
 int    LinearADRCenteredFlux      (double*,double*,double*,double*,
                                    double*,double*,int,void*,double);
-int    LinearADRJacobian          (double*,double*,void*,int,int);
 int    LinearADRWriteAdvField     (void*,void*);
+
+int    LinearADRAdvectionJacobian (double*,double*,void*,int,int,int);
+int    LinearADRDiffusionJacobian (double*,double*,void*,int,int);
 
 /*! Initialize the linear advection-diffusion-reaction physics module - 
     allocate and set physics-related parameters, read physics-related inputs
@@ -54,10 +56,8 @@ int    LinearADRWriteAdvField     (void*,void*);
     + "physics.inp" is \b optional; if absent, default values will be used.
     + Please do *not* specify both "advection" and "advection_filename"!
 */
-int LinearADRInitialize(
-                        void *s, /*!< Solver object of type #HyPar */
-                        void *m  /*!< Object of type #MPIVariables containing MPI-related info */
-                       )
+int LinearADRInitialize(void *s, /*!< Solver object of type #HyPar */
+                        void *m  /*!< Object of type #MPIVariables containing MPI-related info */ )
 {
   HyPar         *solver  = (HyPar*)         s;
   MPIVariables  *mpi     = (MPIVariables*)  m; 
@@ -190,7 +190,8 @@ int LinearADRInitialize(
   solver->GFunction          = LinearADRDiffusionG;
   solver->HFunction          = LinearADRDiffusionH;
   solver->SFunction          = LinearADRReaction;
-  solver->JFunction          = LinearADRJacobian;
+  solver->JFunction          = LinearADRAdvectionJacobian;
+  solver->KFunction          = LinearADRDiffusionJacobian;
 
   if (!strcmp(physics->centered_flux,"no")) {
     solver->Upwind = LinearADRUpwind;

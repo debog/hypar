@@ -303,9 +303,14 @@ typedef struct main_parameters {
   int    (*UFunction)          (double*,double*,int,void*,void*,double);
 
   /*! Pointer to the function to calculate the flux Jacobian for a given solution state (assigned in the physical model initialization called from InitializePhysics()). The
-      flux Jacobian is the Jacobian of the analytical (*not* spatially discretized) flux for a given solution state (for example, at a grid point). The size is (#HyPar::nvars)^2 
-      and the matrix is stored as  a 1D array in row-major format. */
-  int    (*JFunction)          (double*,double*,void*,int,int);
+      advective flux Jacobian is the Jacobian of the analytical (*not* spatially discretized) advective flux for a given solution state (for example, at a grid point). 
+      The size is (#HyPar::nvars)^2 and the matrix is stored as  a 1D array in row-major format. */
+  int    (*JFunction)          (double*,double*,void*,int,int,int);
+
+  /*! Pointer to the function to calculate the diffusion term Jacobian for a given solution state (assigned in the physical model initialization called from InitializePhysics()). 
+      The diffusion Jacobian is the Jacobian of the analytical (*not* spatially discretized) diffusion term for a given solution state (for example, at a grid point). 
+      The size is (#HyPar::nvars)^2 and the matrix is stored as  a 1D array in row-major format. */
+  int    (*KFunction)          (double*,double*,void*,int,int);
 
   /*! Pointer to the function to do some pre-time-integration-stage computations, if required (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*PreStage)           (int,double**,void*,void*,double);

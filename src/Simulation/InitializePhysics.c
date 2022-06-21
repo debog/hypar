@@ -65,6 +65,7 @@ int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #Si
     solver->SFunction             = NULL;
     solver->UFunction             = NULL;
     solver->JFunction             = NULL;
+    solver->KFunction             = NULL;
     solver->Upwind                = NULL;
     solver->UpwinddF              = NULL;
     solver->UpwindFdF             = NULL;

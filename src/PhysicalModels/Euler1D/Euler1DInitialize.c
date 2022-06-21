@@ -29,8 +29,8 @@ int    Euler1DUpwinddFLLF   (double*,double*,double*,double*,double*,double*,int
 int    Euler1DUpwindSWFS    (double*,double*,double*,double*,double*,double*,int,void*,double);
 int    Euler1DUpwindRusanov (double*,double*,double*,double*,double*,double*,int,void*,double);
 
-int    Euler1DJacobian      (double*,double*,void*,int,int);
-int    Euler1DStiffJacobian (double*,double*,void*,int,int);
+int    Euler1DJacobian      (double*,double*,void*,int,int,int);
+int    Euler1DStiffJacobian (double*,double*,void*,int,int,int);
 
 int    Euler1DRoeAverage        (double*,double*,double*,void*);
 int    Euler1DLeftEigenvectors  (double*,double*,void*,int);

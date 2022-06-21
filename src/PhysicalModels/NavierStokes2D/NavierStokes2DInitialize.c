@@ -20,8 +20,8 @@ int    NavierStokes2DRoeAverage        (double*,double*,double*,void*);
 int    NavierStokes2DParabolicFunction (double*,double*,void*,void*,double);
 int    NavierStokes2DSource            (double*,double*,void*,void*,double);
 
-int    NavierStokes2DJacobian          (double*,double*,void*,int,int);
-int    NavierStokes2DStiffJacobian     (double*,double*,void*,int,int);
+int    NavierStokes2DJacobian          (double*,double*,void*,int,int,int);
+int    NavierStokes2DStiffJacobian     (double*,double*,void*,int,int,int);
 
 int    NavierStokes2DLeftEigenvectors  (double*,double*,void*,int);
 int    NavierStokes2DRightEigenvectors (double*,double*,void*,int);

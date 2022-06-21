@@ -16,6 +16,7 @@ int ShallowWater1DJacobian(
                     double  *u,   /*!< solution at a grid point (array of size nvar = 2) */
                     void    *p,   /*!< object containing the physics-related parameters */
                     int     dir,  /*!< dimension (x/y/z) (not used, since this is 1D system) */
+                    int     nvars,/*!< number of vector components */
                     int     upw   /*!< 0 -> send back complete Jacobian, 
                                        1 -> send back Jacobian of right(+)-moving flux, 
                                       -1 -> send back Jacobian of left(-)-moving flux */
