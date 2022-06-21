@@ -343,24 +343,6 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
       }
 #endif
   
-      /* Matrix-free representation of the Jacobian */
-      flag_mat_a = 1;
-      MatCreateShell(MPI_COMM_WORLD,context.ndofs,context.ndofs,PETSC_DETERMINE,
-                            PETSC_DETERMINE,&context,&A);
-      if ((!strcmp(snestype,SNESKSPONLY)) || (ptype == TS_LINEAR)) {
-        /* linear problem */
-        context.flag_is_linear = 1;
-        MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunction_Linear);
-        SNESSetType(snes,SNESKSPONLY);
-      } else {
-        /* nonlinear problem */
-        context.flag_is_linear = 0;
-        context.jfnk_eps = 1e-7;
-        PetscOptionsGetReal(NULL,NULL,"-jfnk_epsilon",&context.jfnk_eps,NULL);
-        MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunction_JFNK);
-      }
-      MatSetUp(A);
-  
       context.flag_use_precon = 0;
       PetscOptionsGetBool(  PETSC_NULL,
                             PETSC_NULL,
@@ -368,35 +350,118 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
                             (PetscBool*)(&context.flag_use_precon),
                             PETSC_NULL );
   
+      char precon_mat_type_c_st[_MAX_STRING_SIZE_] = "default";
+      PetscOptionsGetString(  PETSC_NULL,
+                              PETSC_NULL,
+                              "-pc_matrix_type",
+                              precon_mat_type_c_st,
+                              _MAX_STRING_SIZE_,
+                              PETSC_NULL );
+      context.precon_matrix_type = std::string(precon_mat_type_c_st);
+  
       /* Since we are using a MatShell to represent the action of the Jacobian 
          on a vector (Jacobian-free approach),
          we need to define the Jacobian through TSSetIJacobian, and not TSSetRHSJacobian, 
          so that we can define the complete operator (the shifted Jacobian aI - J ) */
   
       if (context.flag_use_precon) {
-        /* check if Jacobian of the physical model is defined */
-        for (int ns = 0; ns < nsims; ns++) {
-          if ((!sim[ns].solver.JFunction) && (!sim[ns].solver.KFunction)) {
-            if (!rank) {
-              fprintf(stderr,"Error in SolvePETSc(): solver->JFunction  or solver->KFunction ");
-              fprintf(stderr,"(point-wise Jacobians for hyperbolic or parabolic terms) must ");
-              fprintf(stderr,"be defined for preconditioning.\n");
+
+        if (context.precon_matrix_type == "default") {
+
+          /* check if Jacobian of the physical model is defined */
+          for (int ns = 0; ns < nsims; ns++) {
+            if ((!sim[ns].solver.JFunction) && (!sim[ns].solver.KFunction)) {
+              if (!rank) {
+                fprintf(stderr,"Error in SolvePETSc(): solver->JFunction  or solver->KFunction ");
+                fprintf(stderr,"(point-wise Jacobians for hyperbolic or parabolic terms) must ");
+                fprintf(stderr,"be defined for preconditioning.\n");
+              }
+              PetscFunctionReturn(1);
             }
-            PetscFunctionReturn(1);
           }
+          /* Matrix-free representation of the Jacobian */
+          flag_mat_a = 1;
+          MatCreateShell( MPI_COMM_WORLD,
+                          context.ndofs,
+                          context.ndofs,
+                          PETSC_DETERMINE,
+                          PETSC_DETERMINE,
+                          &context,
+                          &A);
+          if ((!strcmp(snestype,SNESKSPONLY)) || (ptype == TS_LINEAR)) {
+            /* linear problem */
+            context.flag_is_linear = 1;
+            MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunction_Linear);
+            SNESSetType(snes,SNESKSPONLY);
+          } else {
+            /* nonlinear problem */
+            context.flag_is_linear = 0;
+            context.jfnk_eps = 1e-7;
+            PetscOptionsGetReal(NULL,NULL,"-jfnk_epsilon",&context.jfnk_eps,NULL);
+            MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunction_JFNK);
+          }
+          MatSetUp(A);
+          /* Set up preconditioner matrix */
+          flag_mat_b = 1;
+          MatCreateAIJ( MPI_COMM_WORLD,
+                        context.ndofs, 
+                        context.ndofs,
+                        PETSC_DETERMINE, 
+                        PETSC_DETERMINE,
+                        (sim[0].solver.ndims*2+1)*sim[0].solver.nvars, NULL,
+                        2*sim[0].solver.ndims*sim[0].solver.nvars, NULL,
+                        &B );
+          MatSetBlockSize(B,sim[0].solver.nvars);
+          /* Set the IJacobian function for TS */
+          TSSetIJacobian(ts,A,B,PetscIJacobian,&context);
+          /* set PC side to right */
+          SNESGetKSP(snes,&ksp);
+          KSPSetPCSide(ksp, PC_RIGHT);
+
+        } else if (context.precon_matrix_type == "fd") {
+
+          flag_mat_a = 1;
+          MatCreateAIJ( MPI_COMM_WORLD,
+                        context.ndofs,
+                        context.ndofs,
+                        PETSC_DETERMINE,
+                        PETSC_DETERMINE,
+                        (sim[0].solver.ndims*2+1)*sim[0].solver.nvars, NULL,
+                        2*sim[0].solver.ndims*sim[0].solver.nvars, NULL,
+                        &A);
+          MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+          /* Set the Jacobian function for SNES */
+          SNESSetJacobian(snes, A, A, SNESComputeJacobianDefault, NULL);
+          /* set PC side to right */
+          SNESGetKSP(snes,&ksp);
+          KSPSetPCSide(ksp, PC_RIGHT);
+
         }
-        /* Set up preconditioner matrix */
-        flag_mat_b = 1;
-        MatCreateAIJ( MPI_COMM_WORLD,
-                      context.ndofs, context.ndofs,
-                      PETSC_DETERMINE, PETSC_DETERMINE,
-                      (sim[0].solver.ndims*2+1)*sim[0].solver.nvars, NULL,
-                      2*sim[0].solver.ndims*sim[0].solver.nvars, NULL,
-                      &B );
-        MatSetBlockSize(B,sim[0].solver.nvars);
-        /* Set the RHSJacobian function for TS */
-        TSSetIJacobian(ts,A,B,PetscIJacobian,&context);
+
       } else {
+
+        /* Matrix-free representation of the Jacobian */
+        flag_mat_a = 1;
+        MatCreateShell( MPI_COMM_WORLD,
+                        context.ndofs,
+                        context.ndofs,
+                        PETSC_DETERMINE,
+                        PETSC_DETERMINE,
+                        &context,
+                        &A);
+        if ((!strcmp(snestype,SNESKSPONLY)) || (ptype == TS_LINEAR)) {
+          /* linear problem */
+          context.flag_is_linear = 1;
+          MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunction_Linear);
+          SNESSetType(snes,SNESKSPONLY);
+        } else {
+          /* nonlinear problem */
+          context.flag_is_linear = 0;
+          context.jfnk_eps = 1e-7;
+          PetscOptionsGetReal(NULL,NULL,"-jfnk_epsilon",&context.jfnk_eps,NULL);
+          MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunction_JFNK);
+        }
+        MatSetUp(A);
         /* Set the RHSJacobian function for TS */
         TSSetIJacobian(ts,A,A,PetscIJacobian,&context);
         /* Set PC (preconditioner) to none */
@@ -407,10 +472,6 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
   
     }
   
-    /* set options from input again because Jacobian/PC related options
-     * may have gotten overwritten above */
-    TSSetFromOptions(ts);
-
     /* Set pre/post-stage and post-timestep function */
     TSSetPreStep (ts,PetscPreTimeStep );
     TSSetPreStage(ts,PetscPreStage    );
@@ -477,10 +538,10 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
     }
   
     /* clean up */
+    VecDestroy(&Y);
     if (flag_mat_a) { MatDestroy(&A); }
     if (flag_mat_b) { MatDestroy(&B); }
     TSDestroy(&ts);
-    VecDestroy(&Y);
   
     /* write a final solution file, if last iteration did not write one */
     if (context.tic) { 

@@ -105,6 +105,9 @@ typedef struct _petsccontext_ {
   /*! Flag to turn on preconditioning (off by default) */
   int flag_use_precon;
 
+  /*! Construct or use provided PC matrix */
+  std::string precon_matrix_type;
+
   /*! Flag to indicate if the system being solved for implicit time-integration is linear/nonlinear. */
   int flag_is_linear;
 
