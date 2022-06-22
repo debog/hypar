@@ -21,7 +21,7 @@ clear
 root_dir=$PWD
 
 # HyPar location 
-hypar_dir="/home/ghosh/Codes/hypar"
+hypar_dir="/path/to/hypar"
 # other HyPar-related stuff
 hypar_exec="HyPar"
 
@@ -150,6 +150,7 @@ echo " " >> $report_file
 
 n_pass=0
 n_fail=0
+n_skip=0
 echo "running tests..."
 echo " "
 for f in *; do
@@ -160,12 +161,15 @@ for f in *; do
     if [ -f "$NEEDS_LIBROM" ] && [ "$opt_with_librom" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (liROM)."
       echo "Skipping; $f has unmet dependencies (liROM)." >> $report_file
+      ((n_skip+=1))
     elif [ -f "$NEEDS_PETSC" ] && [ "$opt_with_petsc" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (PETSc)."
       echo "Skipping; $f has unmet dependencies (PETSc)." >> $report_file
+      ((n_skip+=1))
     elif [ -f "$NEEDS_FFTW" ] && [ "$opt_with_fftw" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (FFTW)."
       echo "Skipping; $f has unmet dependencies (FFTW)." >> $report_file
+      ((n_skip+=1))
     else
       if [ -f "$RUN_SCRIPT" ]; then
         chmod +x $RUN_SCRIPT && ./$RUN_SCRIPT
@@ -216,4 +220,5 @@ echo "all done. Bye!"
 echo "report in ${report_file}"
 echo "$n_pass file comparisons **passed**"
 echo "$n_fail file comparisons **failed**"
+echo "$n_skip tests **skipped**"
 echo "-------------------------"

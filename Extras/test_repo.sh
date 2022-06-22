@@ -22,7 +22,7 @@ root_dir=$PWD
 
 # some details about HyPar (repo and branch that we want to test)
 # change these to test a particular version of HyPar
-hypar_repo="https://gitlab.com/debojyoti.ghosh/hypar.git"
+hypar_repo="https://deboghosh@bitbucket.org/deboghosh/hypar.git"
 hypar_branch="master"
 # other HyPar-related stuff
 hypar_dir="hypar"
@@ -164,6 +164,7 @@ echo " " >> $report_file
 
 n_pass=0
 n_fail=0
+n_skip=0
 echo "running tests..."
 echo " "
 for f in *; do
@@ -174,12 +175,15 @@ for f in *; do
     if [ -f "$NEEDS_LIBROM" ] && [ "$opt_with_librom" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (liROM)."
       echo "Skipping; $f has unmet dependencies (liROM)." >> $report_file
+      ((n_skip+=1))
     elif [ -f "$NEEDS_PETSC" ] && [ "$opt_with_petsc" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (PETSc)."
       echo "Skipping; $f has unmet dependencies (PETSc)." >> $report_file
+      ((n_skip+=1))
     elif [ -f "$NEEDS_FFTW" ] && [ "$opt_with_fftw" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (FFTW)."
       echo "Skipping; $f has unmet dependencies (FFTW)." >> $report_file
+      ((n_skip+=1))
     else
       if [ -f "$RUN_SCRIPT" ]; then
         chmod +x $RUN_SCRIPT && ./$RUN_SCRIPT
@@ -230,4 +234,5 @@ echo "all done. Bye!"
 echo "report in ${report_file}"
 echo "$n_pass file comparisons **passed**"
 echo "$n_fail file comparisons **failed**"
+echo "$n_skip tests **skipped**"
 echo "-------------------------"
