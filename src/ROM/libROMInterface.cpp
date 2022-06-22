@@ -109,13 +109,15 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
     }
 
     /* print useful stuff to screen */
-    printf("libROMInterface inputs and parameters:\n");
-    printf("  reduced model dimensionality:  %d\n", m_rdim);
-    printf("  sampling frequency:  %d\n", m_sampling_freq);
-    printf("  mode: %s\n", mode_c_str);
-    printf("  component mode: %s\n", comp_mode_c_str);
-    printf("  type: %s\n", type_c_str);
-    printf("  save to file: %s\n", save_c_str);
+    if (std::string(mode_c_str) != _ROM_MODE_NONE_) {
+      printf("libROMInterface inputs and parameters:\n");
+      printf("  reduced model dimensionality:  %d\n", m_rdim);
+      printf("  sampling frequency:  %d\n", m_sampling_freq);
+      printf("  mode: %s\n", mode_c_str);
+      printf("  component mode: %s\n", comp_mode_c_str);
+      printf("  type: %s\n", type_c_str);
+      printf("  save to file: %s\n", save_c_str);
+    }
   }
 
 #ifndef serial
