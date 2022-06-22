@@ -36,6 +36,7 @@
   or variable name yields the specific doc page dealing with that function/variable.
 */
 int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
+                                        int width,  /*!< Stencil width */
                                         void *ctxt  /*!< Application context */ )
 {
   PETScContext* context = (PETScContext*) ctxt;
@@ -71,33 +72,35 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
   
       for (int dir = 0; dir < ndims; dir++) {
     
-        /* compute indices and global 1D indices for left and right neighbors */
-        _ArrayCopy1D_(index,indexL,ndims); indexL[dir]--;
-        int pL;  _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
-    
-        _ArrayCopy1D_(index,indexR,ndims); indexR[dir]++;
-        int pR;  _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
-    
-        int pg, pgL, pgR;
-        pg  = (int) context->globalDOF[ns][p];
-        pgL = (int) context->globalDOF[ns][pL];
-        pgR = (int) context->globalDOF[ns][pR];
-    
+        int pg = (int) context->globalDOF[ns][p];
         /* diagonal element */
         for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pg + v; }
         MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
+
+        for (int d = 1; d <= width; d++) {
     
-        /* left neighbor */
-        if (pgL >= 0) {
-          for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgL + v; }
-          MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
+          /* left neighbor */
+          _ArrayCopy1D_(index,indexL,ndims); 
+          indexL[dir] -= d;
+          int pL;  _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
+          int pgL = (int) context->globalDOF[ns][pL];
+          if (pgL >= 0) {
+            for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgL + v; }
+            MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
+          }
+    
+          _ArrayCopy1D_(index,indexR,ndims); 
+          indexR[dir] += d;
+          int pR;  _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
+          int pgR = (int) context->globalDOF[ns][pR];
+          /* right neighbor */
+          if (pgR >= 0) {
+            for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgR + v; }
+            MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
+          }
+
         }
-        
-        /* right neighbor */
-        if (pgR >= 0) {
-          for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgR + v; }
-          MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
-        }
+
       }
     }
   }

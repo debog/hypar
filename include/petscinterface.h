@@ -44,7 +44,7 @@ PetscErrorCode PetscPostTimeStep    (TS);
 /* preconditioning functions */
 int PetscComputePreconMatIMEX(Mat,Vec,void*);
 int PetscComputePreconMatImpl(Mat,Vec,void*);
-int PetscJacobianMatNonzeroEntriesImpl(Mat,void*);
+int PetscJacobianMatNonzeroEntriesImpl(Mat,int,void*);
 
 /*! Function to compute any error estimates, if available */
 PetscErrorCode PetscTimeError (TS);

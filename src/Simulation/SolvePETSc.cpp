@@ -279,6 +279,13 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
         } else if (context.precon_matrix_type == "colored_fd") {
 
+          int stencil_width = 1;
+          PetscOptionsGetInt( NULL,
+                              NULL,
+                              "-pc_matrix_colored_fd_stencil_width",
+                              &stencil_width,
+                              NULL );
+
           flag_mat_a = 1;
           MatCreateSNESMF(snes,&A);
           flag_mat_b = 1;
@@ -292,9 +299,10 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
                         &B);
           MatSetOption(B, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
           if (!rank) {
-            printf("PETSc:    Setting Jacobian non-zero pattern.\n");
+            printf("PETSc:    Setting Jacobian non-zero pattern (stencil width %d).\n",
+                    stencil_width );
           }
-          PetscJacobianMatNonzeroEntriesImpl(B, &context);
+          PetscJacobianMatNonzeroEntriesImpl(B, stencil_width, &context);
 
           /* Set the Jacobian function for SNES */
           SNESSetJacobian(snes, A, B, SNESComputeJacobianDefaultColor, NULL);
@@ -538,6 +546,13 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
         } else if (context.precon_matrix_type == "colored_fd") {
 
+          int stencil_width = 1;
+          PetscOptionsGetInt( NULL,
+                              NULL,
+                              "-pc_matrix_colored_fd_stencil_width",
+                              &stencil_width,
+                              NULL );
+
           flag_mat_a = 1;
           MatCreateSNESMF(snes,&A);
           flag_mat_b = 1;
@@ -551,9 +566,10 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
                         &B);
           MatSetOption(B, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
           if (!rank) {
-            printf("PETSc:    Setting Jacobian non-zero pattern.\n");
+            printf("PETSc:    Setting Jacobian non-zero pattern (stencil width %d).\n",
+                    stencil_width );
           }
-          PetscJacobianMatNonzeroEntriesImpl(B, &context);
+          PetscJacobianMatNonzeroEntriesImpl(B, stencil_width, &context);
 
           /* Set the Jacobian function for SNES */
           SNESSetJacobian(snes, A, B, SNESComputeJacobianDefaultColor, NULL);
