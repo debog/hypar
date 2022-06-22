@@ -6,16 +6,17 @@ libPETScFunctions_a_SOURCES = \
   PetscCreatePointList.cpp \
   PetscGlobalDOF.cpp \
   PetscError.cpp \
-  PetscIJacobian.cpp \
+  PetscIFunctionImpl.cpp \
   PetscIFunctionIMEX.cpp \
+  PetscIJacobian.cpp \
   PetscIJacobianIMEX.cpp \
+	PetscJacobianMatNonzeroEntriesImpl.cpp \
   PetscPostStage.cpp \
   PetscPostTimeStep.cpp \
   PetscPreStage.cpp \
   PetscPreTimeStep.cpp \
   PetscRegisterTIMethods.cpp \
   PetscRHSFunctionExpl.cpp \
-  PetscRHSFunctionImpl.cpp \
   PetscRHSFunctionIMEX.cpp \
 	PetscSetInitialGuessROM.cpp \
   TransferFromPETSc.cpp \

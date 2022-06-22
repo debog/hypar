@@ -1,5 +1,5 @@
-/*! @file PetscRHSFunctionImpl.cpp
-    @brief Compute the right-hand-side for implicit time-integration
+/*! @file PetscIFunctionImpl.cpp
+    @brief Compute the right-hand-side for implicit time integration.
     @author Debojyoti Ghosh
 */
 
@@ -13,20 +13,20 @@
 #include <petscinterface.h>
 
 #undef __FUNCT__
-#define __FUNCT__ "PetscRHSFunctionImpl"
+#define __FUNCT__ "PetscIFunctionImpl"
 
 /*!
-  Compute the right-hand-side (RHS) for the implicit time integration of the 
+  Compute the left-hand-side for the implicit time integration of the 
   governing equations: The spatially discretized ODE can be expressed as
   \f{equation}{
     \frac {d{\bf U}} {dt} = {\bf F}\left({\bf U}\right).
   \f}
-  This function computes \f${\bf F}\left({\bf U}\right)\f$, given \f${\bf U}\f$.
+  This function computes \f$\dot{\bf U} - {\bf F}\left({\bf U}\right)\f$, 
+  given \f${\bf U},\dot{\nf U}\f$.
 
-  \sa TSSetRHSFunction (https://petsc.org/release/docs/manualpages/TS/TSSetRHSFunction.html)
+  \sa TSSetIFunction (https://petsc.org/release/docs/manualpages/TS/TSSetIFunction.html)
 
   Note:
-  + This function is essentially identical to PetscRHSFunctionExpl().
   + \f${\bf U}\f$ is \a Y in the code.
   + See https://petsc.org/release/docs/manualpages/TS/index.html for documentation on
     PETSc's time integrators.
@@ -34,11 +34,12 @@
     the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
     or variable name yields the specific doc page dealing with that function/variable.
 */
-PetscErrorCode PetscRHSFunctionImpl(  TS        ts,   /*!< Time integration object */
-                                      PetscReal t,    /*!< Current simulation time */
-                                      Vec       Y,    /*!< State vector (input) */
-                                      Vec       F,    /*!< The computed right-hand-side vector */
-                                      void      *ctxt /*!< Object of type #PETScContext */ )
+PetscErrorCode PetscIFunctionImpl(  TS        ts,   /*!< Time integration object */
+                                    PetscReal t,    /*!< Current simulation time */
+                                    Vec       Y,    /*!< State vector (input) */
+                                    Vec       Ydot, /*!< Time derivative of the state vector (input) */
+                                    Vec       F,    /*!< The computed right-hand-side vector */
+                                    void      *ctxt /*!< Object of type #PETScContext */ )
 {
   PETScContext* context = (PETScContext*) ctxt;
   SimulationObject* sim = (SimulationObject*) context->simobj;
@@ -85,6 +86,9 @@ PetscErrorCode PetscRHSFunctionImpl(  TS        ts,   /*!< Time integration obje
     TransferVecToPETSc(rhs,F,context,ns,context->offsets[ns]);
 
   }
+
+  /* LHS = Ydot - F(u) */
+  VecAYPX(F,-1.0,Ydot);
 
   PetscFunctionReturn(0);
 }

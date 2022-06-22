@@ -17,6 +17,7 @@
 #include <petscvec.h>
 #include <petscmat.h>
 #include <petscts.h>
+#include <petscdmshell.h>
 
 /* some definitions */
 

@@ -19,9 +19,9 @@ int PetscRegisterTIMethods (int);
 
 /* Right and left -hand side functions */
 PetscErrorCode PetscRHSFunctionExpl (TS,PetscReal,Vec,Vec,void*);
-PetscErrorCode PetscRHSFunctionImpl (TS,PetscReal,Vec,Vec,void*);
 PetscErrorCode PetscRHSFunctionIMEX (TS,PetscReal,Vec,Vec,void*);
 PetscErrorCode PetscIFunctionIMEX   (TS,PetscReal,Vec,Vec,Vec,void*);
+PetscErrorCode PetscIFunctionImpl   (TS,PetscReal,Vec,Vec,Vec,void*);
 
 PetscErrorCode PetscIJacobianIMEX(TS,PetscReal,Vec,Vec,PetscReal,Mat,Mat,void*);
 PetscErrorCode PetscJacobianFunctionIMEX_JFNK       (Mat,Vec,Vec);             
@@ -44,6 +44,7 @@ PetscErrorCode PetscPostTimeStep    (TS);
 /* preconditioning functions */
 int PetscComputePreconMatIMEX(Mat,Vec,void*);
 int PetscComputePreconMatImpl(Mat,Vec,void*);
+int PetscJacobianMatNonzeroEntriesImpl(Mat,void*);
 
 /*! Function to compute any error estimates, if available */
 PetscErrorCode PetscTimeError (TS);
