@@ -31,6 +31,10 @@ The following input files are required:
 
 ** See hypar/README for other (optional) input files
 
+Visualizing the solution in Python:
+Run the script plotSolution.py. It will plot the potential
+temperature.
+
 Visualizing the solution in Tecplot or MATLAB:
 1)  Make sure op_file_format is set to binary in solver.inp.
 2)  Compile and run aux/PostProcess.c after the simulation is

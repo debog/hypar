@@ -1,39 +1,42 @@
+srun: job 10232779 queued and waiting for resources
+srun: job 10232779 has been allocated resources
 HyPar - Parallel (MPI) version with 64 processes
 Compiled with PETSc time integration.
+Allocated simulation object(s).
 Reading solver inputs from file "solver.inp".
-	No. of dimensions                          : 3
-	No. of variables                           : 5
-	Domain size                                : 101 101 101 
-	Processes along each dimension             : 4 4 4 
-	No. of ghosts pts                          : 3
-	No. of iter.                               : 200
-	Restart iteration                          : 0
-	Time integration scheme                    : PETSc 
-	Spatial discretization scheme (hyperbolic) : weno5
-	Split hyperbolic flux term?                : yes
-	Interpolation type for hyperbolic term     : components
-	Spatial discretization type   (parabolic ) : nonconservative-1stage
-	Spatial discretization scheme (parabolic ) : 2
-	Time Step                                  : 2.000000E+00
-	Check for conservation                     : no
-	Screen output iterations                   : 2
-	File output iterations                     : 20
-	Initial solution file type                 : binary
-	Initial solution read mode                 : serial
-	Solution file write mode                   : serial
-	Solution file format                       : binary
-	Overwrite solution file                    : no
-	Physical model                             : navierstokes3d
-Partitioning domain.
-Allocating data arrays.
+  No. of dimensions                          : 3
+  No. of variables                           : 5
+  Domain size                                : 64 64 64 
+  Processes along each dimension             : 4 4 4 
+  Exact solution domain size                 : 64 64 64 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 100
+  Restart iteration                          : 0
+  Time integration scheme                    : PETSc 
+  Spatial discretization scheme (hyperbolic) : weno5
+  Split hyperbolic flux term?                : yes
+  Interpolation type for hyperbolic term     : components
+  Spatial discretization type   (parabolic ) : nonconservative-1stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 4.000000E+00
+  Check for conservation                     : no
+  Screen output iterations                   : 1
+  File output iterations                     : 10
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : no
+  Physical model                             : navierstokes3d
+Partitioning domain and allocating data arrays.
 Reading array from binary file initial.inp (Serial mode).
 Volume integral of the initial solution:
- 0:  1.1485098672765636E+09
+ 0:  1.1686650873135223E+09
  1:  0.0000000000000000E+00
  2:  0.0000000000000000E+00
  3:  0.0000000000000000E+00
- 4:  2.4331366485782819E+14
-Reading boundary conditions from "boundary.inp".
+ 4:  2.4758406164981962E+14
+Reading boundary conditions from boundary.inp.
   Boundary                      slip-wall:  Along dimension  0 and face +1
   Boundary                      slip-wall:  Along dimension  0 and face -1
   Boundary                      slip-wall:  Along dimension  1 and face +1
@@ -46,6 +49,9 @@ Reading WENO parameters from weno.inp.
 Initializing physics. Model = "navierstokes3d"
 Reading physical model inputs from file "physics.inp".
 Setting up PETSc time integration... 
+Setting up libROM interface.
+PETSc:    total number of computational points is 262144.
+PETSc:    total number of computational DOFs is 1310720.
 Implicit-Explicit time-integration:-
 Hyperbolic (f-df) term: Explicit
 Hyperbolic (df)   term: Implicit
@@ -54,128 +60,118 @@ Source            term: Implicit
 SolvePETSc(): Problem type is linear.
 ** Starting PETSc time integration **
 Writing solution file op_00000.bin.
-Iteration:      2  Time: 4.000E+00  Max CFL: 6.945E+01  Max Diff. No.: -1.000E+00  
-Iteration:      4  Time: 8.000E+00  Max CFL: 6.945E+01  Max Diff. No.: -1.000E+00  
-Iteration:      6  Time: 1.200E+01  Max CFL: 6.945E+01  Max Diff. No.: -1.000E+00  
-Iteration:      8  Time: 1.600E+01  Max CFL: 6.945E+01  Max Diff. No.: -1.000E+00  
-Iteration:     10  Time: 2.000E+01  Max CFL: 6.946E+01  Max Diff. No.: -1.000E+00  
-Iteration:     12  Time: 2.400E+01  Max CFL: 6.946E+01  Max Diff. No.: -1.000E+00  
-Iteration:     14  Time: 2.800E+01  Max CFL: 6.946E+01  Max Diff. No.: -1.000E+00  
-Iteration:     16  Time: 3.200E+01  Max CFL: 6.946E+01  Max Diff. No.: -1.000E+00  
-Iteration:     18  Time: 3.600E+01  Max CFL: 6.947E+01  Max Diff. No.: -1.000E+00  
-Iteration:     20  Time: 4.000E+01  Max CFL: 6.947E+01  Max Diff. No.: -1.000E+00  
+iter=      1  dt=4.000E+00  t=4.000E+00  CFL=8.750E+01  norm=8.3897E-01  wctime: 6.3E+00 (s)  
+iter=      2  dt=4.000E+00  t=8.000E+00  CFL=8.751E+01  norm=4.9377E-01  wctime: 5.1E+00 (s)  
+iter=      3  dt=4.000E+00  t=1.200E+01  CFL=8.751E+01  norm=3.0869E-01  wctime: 5.1E+00 (s)  
+iter=      4  dt=4.000E+00  t=1.600E+01  CFL=8.751E+01  norm=1.6931E-01  wctime: 5.2E+00 (s)  
+iter=      5  dt=4.000E+00  t=2.000E+01  CFL=8.751E+01  norm=6.9070E-02  wctime: 5.3E+00 (s)  
+iter=      6  dt=4.000E+00  t=2.400E+01  CFL=8.752E+01  norm=1.8199E-02  wctime: 5.6E+00 (s)  
+iter=      7  dt=4.000E+00  t=2.800E+01  CFL=8.752E+01  norm=5.2558E-02  wctime: 5.7E+00 (s)  
+iter=      8  dt=4.000E+00  t=3.200E+01  CFL=8.752E+01  norm=7.8811E-02  wctime: 5.6E+00 (s)  
+iter=      9  dt=4.000E+00  t=3.600E+01  CFL=8.753E+01  norm=7.9325E-02  wctime: 5.5E+00 (s)  
+iter=     10  dt=4.000E+00  t=4.000E+01  CFL=8.753E+01  norm=7.9721E-02  wctime: 5.6E+00 (s)  
 Writing solution file op_00001.bin.
-Iteration:     22  Time: 4.400E+01  Max CFL: 6.947E+01  Max Diff. No.: -1.000E+00  
-Iteration:     24  Time: 4.800E+01  Max CFL: 6.948E+01  Max Diff. No.: -1.000E+00  
-Iteration:     26  Time: 5.200E+01  Max CFL: 6.949E+01  Max Diff. No.: -1.000E+00  
-Iteration:     28  Time: 5.600E+01  Max CFL: 6.950E+01  Max Diff. No.: -1.000E+00  
-Iteration:     30  Time: 6.000E+01  Max CFL: 6.952E+01  Max Diff. No.: -1.000E+00  
-Iteration:     32  Time: 6.400E+01  Max CFL: 6.953E+01  Max Diff. No.: -1.000E+00  
-Iteration:     34  Time: 6.800E+01  Max CFL: 6.954E+01  Max Diff. No.: -1.000E+00  
-Iteration:     36  Time: 7.200E+01  Max CFL: 6.955E+01  Max Diff. No.: -1.000E+00  
-Iteration:     38  Time: 7.600E+01  Max CFL: 6.956E+01  Max Diff. No.: -1.000E+00  
-Iteration:     40  Time: 8.000E+01  Max CFL: 6.957E+01  Max Diff. No.: -1.000E+00  
+iter=     11  dt=4.000E+00  t=4.400E+01  CFL=8.753E+01  norm=6.1882E-02  wctime: 5.7E+00 (s)  
+iter=     12  dt=4.000E+00  t=4.800E+01  CFL=8.755E+01  norm=5.4698E-02  wctime: 5.7E+00 (s)  
+iter=     13  dt=4.000E+00  t=5.200E+01  CFL=8.756E+01  norm=3.4127E-02  wctime: 5.7E+00 (s)  
+iter=     14  dt=4.000E+00  t=5.600E+01  CFL=8.757E+01  norm=3.0238E-02  wctime: 5.7E+00 (s)  
+iter=     15  dt=4.000E+00  t=6.000E+01  CFL=8.759E+01  norm=1.8179E-02  wctime: 5.7E+00 (s)  
+iter=     16  dt=4.000E+00  t=6.400E+01  CFL=8.760E+01  norm=1.9501E-02  wctime: 5.6E+00 (s)  
+iter=     17  dt=4.000E+00  t=6.800E+01  CFL=8.762E+01  norm=2.0295E-02  wctime: 5.6E+00 (s)  
+iter=     18  dt=4.000E+00  t=7.200E+01  CFL=8.763E+01  norm=1.9870E-02  wctime: 5.5E+00 (s)  
+iter=     19  dt=4.000E+00  t=7.600E+01  CFL=8.764E+01  norm=2.4144E-02  wctime: 5.5E+00 (s)  
+iter=     20  dt=4.000E+00  t=8.000E+01  CFL=8.765E+01  norm=2.1905E-02  wctime: 5.5E+00 (s)  
 Writing solution file op_00002.bin.
-Iteration:     42  Time: 8.400E+01  Max CFL: 6.958E+01  Max Diff. No.: -1.000E+00  
-Iteration:     44  Time: 8.800E+01  Max CFL: 6.959E+01  Max Diff. No.: -1.000E+00  
-Iteration:     46  Time: 9.200E+01  Max CFL: 6.960E+01  Max Diff. No.: -1.000E+00  
-Iteration:     48  Time: 9.600E+01  Max CFL: 6.960E+01  Max Diff. No.: -1.000E+00  
-Iteration:     50  Time: 1.000E+02  Max CFL: 6.961E+01  Max Diff. No.: -1.000E+00  
-Iteration:     52  Time: 1.040E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:     54  Time: 1.080E+02  Max CFL: 6.963E+01  Max Diff. No.: -1.000E+00  
-Iteration:     56  Time: 1.120E+02  Max CFL: 6.963E+01  Max Diff. No.: -1.000E+00  
-Iteration:     58  Time: 1.160E+02  Max CFL: 6.964E+01  Max Diff. No.: -1.000E+00  
-Iteration:     60  Time: 1.200E+02  Max CFL: 6.965E+01  Max Diff. No.: -1.000E+00  
+iter=     21  dt=4.000E+00  t=8.400E+01  CFL=8.767E+01  norm=2.5809E-02  wctime: 5.6E+00 (s)  
+iter=     22  dt=4.000E+00  t=8.800E+01  CFL=8.768E+01  norm=2.4004E-02  wctime: 5.5E+00 (s)  
+iter=     23  dt=4.000E+00  t=9.200E+01  CFL=8.769E+01  norm=2.6924E-02  wctime: 5.4E+00 (s)  
+iter=     24  dt=4.000E+00  t=9.600E+01  CFL=8.770E+01  norm=2.6488E-02  wctime: 5.4E+00 (s)  
+iter=     25  dt=4.000E+00  t=1.000E+02  CFL=8.771E+01  norm=2.8471E-02  wctime: 5.4E+00 (s)  
+iter=     26  dt=4.000E+00  t=1.040E+02  CFL=8.772E+01  norm=2.9182E-02  wctime: 5.4E+00 (s)  
+iter=     27  dt=4.000E+00  t=1.080E+02  CFL=8.773E+01  norm=3.0556E-02  wctime: 5.4E+00 (s)  
+iter=     28  dt=4.000E+00  t=1.120E+02  CFL=8.774E+01  norm=3.1884E-02  wctime: 5.4E+00 (s)  
+iter=     29  dt=4.000E+00  t=1.160E+02  CFL=8.774E+01  norm=3.3030E-02  wctime: 5.4E+00 (s)  
+iter=     30  dt=4.000E+00  t=1.200E+02  CFL=8.775E+01  norm=3.4593E-02  wctime: 5.4E+00 (s)  
 Writing solution file op_00003.bin.
-Iteration:     62  Time: 1.240E+02  Max CFL: 6.965E+01  Max Diff. No.: -1.000E+00  
-Iteration:     64  Time: 1.280E+02  Max CFL: 6.966E+01  Max Diff. No.: -1.000E+00  
-Iteration:     66  Time: 1.320E+02  Max CFL: 6.966E+01  Max Diff. No.: -1.000E+00  
-Iteration:     68  Time: 1.360E+02  Max CFL: 6.966E+01  Max Diff. No.: -1.000E+00  
-Iteration:     70  Time: 1.400E+02  Max CFL: 6.967E+01  Max Diff. No.: -1.000E+00  
-Iteration:     72  Time: 1.440E+02  Max CFL: 6.967E+01  Max Diff. No.: -1.000E+00  
-Iteration:     74  Time: 1.480E+02  Max CFL: 6.967E+01  Max Diff. No.: -1.000E+00  
-Iteration:     76  Time: 1.520E+02  Max CFL: 6.967E+01  Max Diff. No.: -1.000E+00  
-Iteration:     78  Time: 1.560E+02  Max CFL: 6.968E+01  Max Diff. No.: -1.000E+00  
-Iteration:     80  Time: 1.600E+02  Max CFL: 6.968E+01  Max Diff. No.: -1.000E+00  
+iter=     31  dt=4.000E+00  t=1.240E+02  CFL=8.776E+01  norm=3.5780E-02  wctime: 5.4E+00 (s)  
+iter=     32  dt=4.000E+00  t=1.280E+02  CFL=8.776E+01  norm=3.7400E-02  wctime: 5.5E+00 (s)  
+iter=     33  dt=4.000E+00  t=1.320E+02  CFL=8.777E+01  norm=3.8749E-02  wctime: 5.4E+00 (s)  
+iter=     34  dt=4.000E+00  t=1.360E+02  CFL=8.777E+01  norm=4.0389E-02  wctime: 5.4E+00 (s)  
+iter=     35  dt=4.000E+00  t=1.400E+02  CFL=8.778E+01  norm=4.1922E-02  wctime: 5.5E+00 (s)  
+iter=     36  dt=4.000E+00  t=1.440E+02  CFL=8.778E+01  norm=4.3614E-02  wctime: 5.5E+00 (s)  
+iter=     37  dt=4.000E+00  t=1.480E+02  CFL=8.778E+01  norm=4.5323E-02  wctime: 5.5E+00 (s)  
+iter=     38  dt=4.000E+00  t=1.520E+02  CFL=8.779E+01  norm=4.7126E-02  wctime: 5.5E+00 (s)  
+iter=     39  dt=4.000E+00  t=1.560E+02  CFL=8.779E+01  norm=4.9019E-02  wctime: 5.5E+00 (s)  
+iter=     40  dt=4.000E+00  t=1.600E+02  CFL=8.779E+01  norm=5.1002E-02  wctime: 5.5E+00 (s)  
 Writing solution file op_00004.bin.
-Iteration:     82  Time: 1.640E+02  Max CFL: 6.968E+01  Max Diff. No.: -1.000E+00  
-Iteration:     84  Time: 1.680E+02  Max CFL: 6.968E+01  Max Diff. No.: -1.000E+00  
-Iteration:     86  Time: 1.720E+02  Max CFL: 6.968E+01  Max Diff. No.: -1.000E+00  
-Iteration:     88  Time: 1.760E+02  Max CFL: 6.968E+01  Max Diff. No.: -1.000E+00  
-Iteration:     90  Time: 1.800E+02  Max CFL: 6.968E+01  Max Diff. No.: -1.000E+00  
-Iteration:     92  Time: 1.840E+02  Max CFL: 6.968E+01  Max Diff. No.: -1.000E+00  
-Iteration:     94  Time: 1.880E+02  Max CFL: 6.967E+01  Max Diff. No.: -1.000E+00  
-Iteration:     96  Time: 1.920E+02  Max CFL: 6.967E+01  Max Diff. No.: -1.000E+00  
-Iteration:     98  Time: 1.960E+02  Max CFL: 6.967E+01  Max Diff. No.: -1.000E+00  
-Iteration:    100  Time: 2.000E+02  Max CFL: 6.967E+01  Max Diff. No.: -1.000E+00  
+iter=     41  dt=4.000E+00  t=1.640E+02  CFL=8.779E+01  norm=5.3115E-02  wctime: 5.5E+00 (s)  
+iter=     42  dt=4.000E+00  t=1.680E+02  CFL=8.779E+01  norm=5.5348E-02  wctime: 5.4E+00 (s)  
+iter=     43  dt=4.000E+00  t=1.720E+02  CFL=8.779E+01  norm=5.7737E-02  wctime: 5.5E+00 (s)  
+iter=     44  dt=4.000E+00  t=1.760E+02  CFL=8.779E+01  norm=6.0271E-02  wctime: 5.4E+00 (s)  
+iter=     45  dt=4.000E+00  t=1.800E+02  CFL=8.779E+01  norm=6.2967E-02  wctime: 5.4E+00 (s)  
+iter=     46  dt=4.000E+00  t=1.840E+02  CFL=8.779E+01  norm=6.5806E-02  wctime: 5.4E+00 (s)  
+iter=     47  dt=4.000E+00  t=1.880E+02  CFL=8.779E+01  norm=6.8780E-02  wctime: 5.4E+00 (s)  
+iter=     48  dt=4.000E+00  t=1.920E+02  CFL=8.779E+01  norm=7.1853E-02  wctime: 5.4E+00 (s)  
+iter=     49  dt=4.000E+00  t=1.960E+02  CFL=8.778E+01  norm=7.5002E-02  wctime: 5.4E+00 (s)  
+iter=     50  dt=4.000E+00  t=2.000E+02  CFL=8.778E+01  norm=7.8176E-02  wctime: 5.4E+00 (s)  
 Writing solution file op_00005.bin.
-Iteration:    102  Time: 2.040E+02  Max CFL: 6.967E+01  Max Diff. No.: -1.000E+00  
-Iteration:    104  Time: 2.080E+02  Max CFL: 6.967E+01  Max Diff. No.: -1.000E+00  
-Iteration:    106  Time: 2.120E+02  Max CFL: 6.966E+01  Max Diff. No.: -1.000E+00  
-Iteration:    108  Time: 2.160E+02  Max CFL: 6.966E+01  Max Diff. No.: -1.000E+00  
-Iteration:    110  Time: 2.200E+02  Max CFL: 6.966E+01  Max Diff. No.: -1.000E+00  
-Iteration:    112  Time: 2.240E+02  Max CFL: 6.966E+01  Max Diff. No.: -1.000E+00  
-Iteration:    114  Time: 2.280E+02  Max CFL: 6.965E+01  Max Diff. No.: -1.000E+00  
-Iteration:    116  Time: 2.320E+02  Max CFL: 6.965E+01  Max Diff. No.: -1.000E+00  
-Iteration:    118  Time: 2.360E+02  Max CFL: 6.965E+01  Max Diff. No.: -1.000E+00  
-Iteration:    120  Time: 2.400E+02  Max CFL: 6.965E+01  Max Diff. No.: -1.000E+00  
+iter=     51  dt=4.000E+00  t=2.040E+02  CFL=8.778E+01  norm=8.1351E-02  wctime: 5.4E+00 (s)  
+iter=     52  dt=4.000E+00  t=2.080E+02  CFL=8.778E+01  norm=8.4469E-02  wctime: 5.4E+00 (s)  
+iter=     53  dt=4.000E+00  t=2.120E+02  CFL=8.777E+01  norm=8.7517E-02  wctime: 5.4E+00 (s)  
+iter=     54  dt=4.000E+00  t=2.160E+02  CFL=8.777E+01  norm=9.0442E-02  wctime: 5.4E+00 (s)  
+iter=     55  dt=4.000E+00  t=2.200E+02  CFL=8.777E+01  norm=9.3247E-02  wctime: 5.4E+00 (s)  
+iter=     56  dt=4.000E+00  t=2.240E+02  CFL=8.776E+01  norm=9.5891E-02  wctime: 5.3E+00 (s)  
+iter=     57  dt=4.000E+00  t=2.280E+02  CFL=8.776E+01  norm=9.8388E-02  wctime: 5.3E+00 (s)  
+iter=     58  dt=4.000E+00  t=2.320E+02  CFL=8.776E+01  norm=1.0072E-01  wctime: 5.3E+00 (s)  
+iter=     59  dt=4.000E+00  t=2.360E+02  CFL=8.775E+01  norm=1.0289E-01  wctime: 5.4E+00 (s)  
+iter=     60  dt=4.000E+00  t=2.400E+02  CFL=8.775E+01  norm=1.0491E-01  wctime: 5.4E+00 (s)  
 Writing solution file op_00006.bin.
-Iteration:    122  Time: 2.440E+02  Max CFL: 6.964E+01  Max Diff. No.: -1.000E+00  
-Iteration:    124  Time: 2.480E+02  Max CFL: 6.964E+01  Max Diff. No.: -1.000E+00  
-Iteration:    126  Time: 2.520E+02  Max CFL: 6.964E+01  Max Diff. No.: -1.000E+00  
-Iteration:    128  Time: 2.560E+02  Max CFL: 6.964E+01  Max Diff. No.: -1.000E+00  
-Iteration:    130  Time: 2.600E+02  Max CFL: 6.963E+01  Max Diff. No.: -1.000E+00  
-Iteration:    132  Time: 2.640E+02  Max CFL: 6.963E+01  Max Diff. No.: -1.000E+00  
-Iteration:    134  Time: 2.680E+02  Max CFL: 6.963E+01  Max Diff. No.: -1.000E+00  
-Iteration:    136  Time: 2.720E+02  Max CFL: 6.963E+01  Max Diff. No.: -1.000E+00  
-Iteration:    138  Time: 2.760E+02  Max CFL: 6.963E+01  Max Diff. No.: -1.000E+00  
-Iteration:    140  Time: 2.800E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
+iter=     61  dt=4.000E+00  t=2.440E+02  CFL=8.775E+01  norm=1.0679E-01  wctime: 5.5E+00 (s)  
+iter=     62  dt=4.000E+00  t=2.480E+02  CFL=8.774E+01  norm=1.0855E-01  wctime: 5.4E+00 (s)  
+iter=     63  dt=4.000E+00  t=2.520E+02  CFL=8.774E+01  norm=1.1019E-01  wctime: 5.4E+00 (s)  
+iter=     64  dt=4.000E+00  t=2.560E+02  CFL=8.774E+01  norm=1.1175E-01  wctime: 5.4E+00 (s)  
+iter=     65  dt=4.000E+00  t=2.600E+02  CFL=8.773E+01  norm=1.1323E-01  wctime: 5.4E+00 (s)  
+iter=     66  dt=4.000E+00  t=2.640E+02  CFL=8.773E+01  norm=1.1466E-01  wctime: 5.4E+00 (s)  
+iter=     67  dt=4.000E+00  t=2.680E+02  CFL=8.773E+01  norm=1.1607E-01  wctime: 5.4E+00 (s)  
+iter=     68  dt=4.000E+00  t=2.720E+02  CFL=8.772E+01  norm=1.1745E-01  wctime: 5.4E+00 (s)  
+iter=     69  dt=4.000E+00  t=2.760E+02  CFL=8.772E+01  norm=1.1887E-01  wctime: 5.4E+00 (s)  
+iter=     70  dt=4.000E+00  t=2.800E+02  CFL=8.772E+01  norm=1.2031E-01  wctime: 5.4E+00 (s)  
 Writing solution file op_00007.bin.
-Iteration:    142  Time: 2.840E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:    144  Time: 2.880E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:    146  Time: 2.920E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:    148  Time: 2.960E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:    150  Time: 3.000E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:    152  Time: 3.040E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:    154  Time: 3.080E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:    156  Time: 3.120E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:    158  Time: 3.160E+02  Max CFL: 6.961E+01  Max Diff. No.: -1.000E+00  
-Iteration:    160  Time: 3.200E+02  Max CFL: 6.961E+01  Max Diff. No.: -1.000E+00  
+iter=     71  dt=4.000E+00  t=2.840E+02  CFL=8.772E+01  norm=1.2183E-01  wctime: 5.4E+00 (s)  
+iter=     72  dt=4.000E+00  t=2.880E+02  CFL=8.771E+01  norm=1.2343E-01  wctime: 5.4E+00 (s)  
+iter=     73  dt=4.000E+00  t=2.920E+02  CFL=8.771E+01  norm=1.2515E-01  wctime: 5.4E+00 (s)  
+iter=     74  dt=4.000E+00  t=2.960E+02  CFL=8.771E+01  norm=1.2701E-01  wctime: 5.4E+00 (s)  
+iter=     75  dt=4.000E+00  t=3.000E+02  CFL=8.771E+01  norm=1.2903E-01  wctime: 5.4E+00 (s)  
+iter=     76  dt=4.000E+00  t=3.040E+02  CFL=8.770E+01  norm=1.3120E-01  wctime: 5.4E+00 (s)  
+iter=     77  dt=4.000E+00  t=3.080E+02  CFL=8.770E+01  norm=1.3355E-01  wctime: 5.4E+00 (s)  
+iter=     78  dt=4.000E+00  t=3.120E+02  CFL=8.770E+01  norm=1.3604E-01  wctime: 5.4E+00 (s)  
+iter=     79  dt=4.000E+00  t=3.160E+02  CFL=8.770E+01  norm=1.3869E-01  wctime: 5.4E+00 (s)  
+iter=     80  dt=4.000E+00  t=3.200E+02  CFL=8.769E+01  norm=1.4147E-01  wctime: 5.4E+00 (s)  
 Writing solution file op_00008.bin.
-Iteration:    162  Time: 3.240E+02  Max CFL: 6.961E+01  Max Diff. No.: -1.000E+00  
-Iteration:    164  Time: 3.280E+02  Max CFL: 6.961E+01  Max Diff. No.: -1.000E+00  
-Iteration:    166  Time: 3.320E+02  Max CFL: 6.961E+01  Max Diff. No.: -1.000E+00  
-Iteration:    168  Time: 3.360E+02  Max CFL: 6.961E+01  Max Diff. No.: -1.000E+00  
-Iteration:    170  Time: 3.400E+02  Max CFL: 6.961E+01  Max Diff. No.: -1.000E+00  
-Iteration:    172  Time: 3.440E+02  Max CFL: 6.961E+01  Max Diff. No.: -1.000E+00  
-Iteration:    174  Time: 3.480E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:    176  Time: 3.520E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:    178  Time: 3.560E+02  Max CFL: 6.962E+01  Max Diff. No.: -1.000E+00  
-Iteration:    180  Time: 3.600E+02  Max CFL: 6.961E+01  Max Diff. No.: -1.000E+00  
+iter=     81  dt=4.000E+00  t=3.240E+02  CFL=8.769E+01  norm=1.4436E-01  wctime: 5.5E+00 (s)  
+iter=     82  dt=4.000E+00  t=3.280E+02  CFL=8.769E+01  norm=1.4733E-01  wctime: 5.4E+00 (s)  
+iter=     83  dt=4.000E+00  t=3.320E+02  CFL=8.769E+01  norm=1.5035E-01  wctime: 5.4E+00 (s)  
+iter=     84  dt=4.000E+00  t=3.360E+02  CFL=8.768E+01  norm=1.5338E-01  wctime: 5.4E+00 (s)  
+iter=     85  dt=4.000E+00  t=3.400E+02  CFL=8.768E+01  norm=1.5636E-01  wctime: 5.4E+00 (s)  
+iter=     86  dt=4.000E+00  t=3.440E+02  CFL=8.768E+01  norm=1.5925E-01  wctime: 5.4E+00 (s)  
+iter=     87  dt=4.000E+00  t=3.480E+02  CFL=8.768E+01  norm=1.6198E-01  wctime: 5.4E+00 (s)  
+iter=     88  dt=4.000E+00  t=3.520E+02  CFL=8.767E+01  norm=1.6452E-01  wctime: 5.4E+00 (s)  
+iter=     89  dt=4.000E+00  t=3.560E+02  CFL=8.767E+01  norm=1.6679E-01  wctime: 5.4E+00 (s)  
+iter=     90  dt=4.000E+00  t=3.600E+02  CFL=8.767E+01  norm=1.6875E-01  wctime: 5.4E+00 (s)  
 Writing solution file op_00009.bin.
-Iteration:    182  Time: 3.640E+02  Max CFL: 6.961E+01  Max Diff. No.: -1.000E+00  
-Iteration:    184  Time: 3.680E+02  Max CFL: 6.960E+01  Max Diff. No.: -1.000E+00  
-Iteration:    186  Time: 3.720E+02  Max CFL: 6.960E+01  Max Diff. No.: -1.000E+00  
-Iteration:    188  Time: 3.760E+02  Max CFL: 6.959E+01  Max Diff. No.: -1.000E+00  
-Iteration:    190  Time: 3.800E+02  Max CFL: 6.958E+01  Max Diff. No.: -1.000E+00  
-Iteration:    192  Time: 3.840E+02  Max CFL: 6.957E+01  Max Diff. No.: -1.000E+00  
-Iteration:    194  Time: 3.880E+02  Max CFL: 6.955E+01  Max Diff. No.: -1.000E+00  
-Iteration:    196  Time: 3.920E+02  Max CFL: 6.954E+01  Max Diff. No.: -1.000E+00  
-Iteration:    198  Time: 3.960E+02  Max CFL: 6.952E+01  Max Diff. No.: -1.000E+00  
-Iteration:    200  Time: 4.000E+02  Max CFL: 6.951E+01  Max Diff. No.: -1.000E+00  
+iter=     91  dt=4.000E+00  t=3.640E+02  CFL=8.766E+01  norm=1.7036E-01  wctime: 5.4E+00 (s)  
+iter=     92  dt=4.000E+00  t=3.680E+02  CFL=8.766E+01  norm=1.7160E-01  wctime: 5.4E+00 (s)  
+iter=     93  dt=4.000E+00  t=3.720E+02  CFL=8.765E+01  norm=1.7247E-01  wctime: 5.3E+00 (s)  
+iter=     94  dt=4.000E+00  t=3.760E+02  CFL=8.764E+01  norm=1.7296E-01  wctime: 5.2E+00 (s)  
+iter=     95  dt=4.000E+00  t=3.800E+02  CFL=8.764E+01  norm=1.7312E-01  wctime: 5.1E+00 (s)  
+iter=     96  dt=4.000E+00  t=3.840E+02  CFL=8.763E+01  norm=1.7304E-01  wctime: 5.0E+00 (s)  
+iter=     97  dt=4.000E+00  t=3.880E+02  CFL=8.762E+01  norm=1.7295E-01  wctime: 4.9E+00 (s)  
+iter=     98  dt=4.000E+00  t=3.920E+02  CFL=8.760E+01  norm=1.7336E-01  wctime: 4.8E+00 (s)  
+iter=     99  dt=4.000E+00  t=3.960E+02  CFL=8.759E+01  norm=1.7536E-01  wctime: 4.7E+00 (s)  
+iter=    100  dt=4.000E+00  t=4.000E+02  CFL=8.757E+01  norm=1.8111E-01  wctime: 4.5E+00 (s)  
 Writing solution file op_00010.bin.
-** Completed PETSc time integration **
-Computed errors:
-  L1         Error           : 0.0000000000000000E+00
-  L2         Error           : 0.0000000000000000E+00
-  Linfinity  Error           : 0.0000000000000000E+00
-Conservation Errors:
-	0.0000000000000000E+00
-	0.0000000000000000E+00
-	0.0000000000000000E+00
-	0.0000000000000000E+00
-	0.0000000000000000E+00
-Solver runtime (in seconds): 3.9632955870000001E+03
-Total  runtime (in seconds): 3.9634643080000001E+03
+** Completed PETSc time integration (Final time: 400.000000), total wctime: 539.706822 (seconds) **
+Solver runtime (in seconds): 5.4347381399999995E+02
+Total  runtime (in seconds): 5.4361646699999994E+02
 Deallocating arrays.
 Finished.

@@ -22,7 +22,7 @@
     \frac {d{\bf U}} {dt} = {\bf F}\left({\bf U}\right).
   \f}
   This function computes \f$\dot{\bf U} - {\bf F}\left({\bf U}\right)\f$, 
-  given \f${\bf U},\dot{\nf U}\f$.
+  given \f${\bf U},\dot{\bf U}\f$.
 
   \sa TSSetIFunction (https://petsc.org/release/docs/manualpages/TS/TSSetIFunction.html)
 

@@ -2885,7 +2885,7 @@ Implicit-Explicit (IMEX) time integration:
 \subpage euler2d_igwave_petsc \n
 \subpage euler2d_rtb_petsc_imex (with local truncation error-based adaptive time-step) \n
 \subpage ns2d_ldsc_petsc_imex \n
-\subpage ns3d_bubble_petsc (this example does not work as shown anymore; bad preconditioning)
+\subpage ns3d_bubble_petsc
 
 
 \page linear_adv_sine_petsc 1D Linear Advection - Sine Wave
@@ -3608,16 +3608,11 @@ The numbers are, respectively,
 Expected screen output (for Reynolds number 3200):
 \include 2D/NavierStokes2D/LidDrivenCavity_PETSc_IMEX/output.log
 
-
-
-
 \page ns3d_bubble_petsc 3D Navier-Stokes Equations - Rising Thermal Bubble
 
-Location: \b hypar/Examples/3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX
+Location: \b hypar/Examples/3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX
           (This directory contains all the input files needed
-          to run this case. If there is a \a Run.m, run it in
-          MATLAB to quickly set up, run, and visualize the 
-          example).
+          to run this case.)
 
 Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
 
@@ -3662,23 +3657,23 @@ Input files required:
 ---------------------
 
 <B>.petscrc</B>
-\include 3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/petscrc
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX/petscrc
 
 \b solver.inp
-\include 3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/solver.inp
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX/solver.inp
 
 \b boundary.inp
-\include 3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/boundary.inp
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX/boundary.inp
 
 \b physics.inp
-\include 3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/physics.inp
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX/physics.inp
 
 \b weno.inp (optional)
-\include 3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/weno.inp
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX/weno.inp
 
 To generate \b initial.inp (initial solution), compile 
 and run the following code in the run directory.
-\include 3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/aux/init.c
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX/aux/init.c
 
 Output:
 -------
@@ -3698,22 +3693,28 @@ set to \a no in \b solver.inp, separate files are written
 for solutions at each output time. All the files are binary
 (#HyPar::op_file_format is set to \a binary in \b solver.inp).
 
-The following code (<B>Examples/3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/aux/PostProcess.c</B>)
-can be used to convert the binary solution file (with conserved variables 
-\f$\rho,\rho u,\rho v,\rho w,e\f$) to Tecplot or plain text files with the primitive
-and reference variables \f$\rho,u,v,w,P,\theta,\rho_0,P_0,\pi,\theta_0\f$ where the
-subscript \f$0\f$ indicates the hydrostatic mean value.
-\include 3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/aux/PostProcess.c
+The binary solution file contains the conserved variables
+(\f$\rho,\rho u,\rho v,\rho w,e\f$). The Python script
+plotSolution.py calculates the primitive
+and reference variables 
+\f$\rho,u,v,w,P,\theta,\rho_0,P_0,\pi,\theta_0\f$ (where the
+subscript \f$0\f$ indicates the hydrostatic mean value) and plots 
+3D figures for \f$\theta\f$ (potential temperature).
 
-The following figure shows the potential temperature iso-surface for the initial
-and final solutions (plotted in VisIt):
+The following figure shows the potential temperature at the final time. Colored
+contours are plotted in the X-Y plane, and contour lines are plotted in the Z-Y
+plane:
 @image html Solution_3DNavStok_Bubble3D_PETSc.png
+
+The code <B>Examples/3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX/aux/PostProcess.c</B>
+can be used to convert the binary solution files to Tecplot or plain text files with the 
+primitive and reference variables.
 
 The file \b Extras/ExtractSlice.c can be used to extract a slice perpendicular to any dimension
 at a specified location along that dimension. The extract slice is written out in the same
 binary format as the original solutions files (with the same names op_xxxxx.bin) in a 
 subdirectory called \b slices (\b Note: make the subdirectory called \a slices before running
-this code). The following code (<B>Examples/3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/aux/PostProcessSlice.c</B>)
+this code). The following code (<B>Examples/3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX/aux/PostProcessSlice.c</B>)
 can then be used (in the \b slices subdirectory) to convert the binary slice solution file (with conserved variables 
 \f$\rho,\rho u,\rho v,\rho w,e\f$) to Tecplot or plain text files with the primitive
 and reference variables \f$\rho,u,v,w,P,\theta,\rho_0,P_0,\pi,\theta_0\f$.
@@ -3726,15 +3727,9 @@ as follows:
 + In physics.inp, remove the component of \b gravity corresponding to the dimension perpendicular
   to the slice.
 
-\include 3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/aux/PostProcessSlice.c
-
-The following figure shows the potential temperature \f$\theta\f$ along a slice at \f$z=500\,{\rm m}\f$ 
-(plotted in VisIt):
-@image html Solution_3DNavStok_Bubble_PETSc.gif
-
 The file <B>function_counts.dat</B> reports the computational expense
 (in terms of the number of function counts):
-\include 3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/function_counts.dat
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX/function_counts.dat
 The numbers are, respectively,
 + Time iterations
 + Number of times the hyperbolic term was evaluated
@@ -3746,7 +3741,7 @@ The numbers are, respectively,
 + Number of calls to the matrix-free Jacobian function (PetscJacobianFunctionIMEX_Linear(), PetscJacobianFunctionIMEX_JFNK(), PetscJacobianFunction_JFNK(), or PetscJacobianFunction_Linear()).
 
 Expected screen output:
-\include 3D/NavierStokes3D/RisingThermalBubble_Config1_PETSc_IMEX/output.log
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX/output.log
 
 
 \page euler2d_vortex_petsc 2D Euler Equations - Isentropic Vortex Convection

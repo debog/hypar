@@ -7,15 +7,6 @@
 # Use PETSc time-integration
 -use-petscts
 
-# Final time
--ts_max_time 400.0
-
-# Time step size
--ts_dt 2.0
-
-# Maximum number of iterations
--ts_max_steps 200
-
 # Time integration scheme type - ARK
 -ts_type arkimex
 -ts_arkimex_type 2e
@@ -43,6 +34,8 @@
 -ksp_rtol 1e-6
 # Set absolute tolerance
 -ksp_atol 1e-6
+# Print residual
+-ksp_monitor
 
 # use a preconditioner for solving the system
 -with_pc
@@ -50,7 +43,4 @@
 # preconditioner type - block Jacobi
 -pc_type sor
 -pc_sor_omega 1.0
--pc_sor_its 1
-
-# apply right preconditioner
--ksp_pc_side RIGHT
+-pc_sor_its 10
