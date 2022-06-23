@@ -5944,13 +5944,14 @@ from a PDE simulation. The same procedure (i.e. providing the libROM input file
 \subpage euler2d_vortex_librom_dmd_train \n
 \subpage euler2d_riemann4_librom_dmd_train \n
 \subpage euler2d_rtb_librom_dmd_train \n
-\subpage euler2d_igwave_petsc_librom_dmd_train \n
+\subpage euler2d_igwave_petsc_librom_dmd_train (Requires PETSc)\n
 \subpage navstok2d_ldsc_librom_dmd_train \n
 \subpage vlasov_1d1v_selfconsistent_librom_dmd_train \n
 \n
 \subpage ns3d_cylinder_steady_incompressible_viscous_librom_dmd_train \n
 \subpage ns3d_cylinder_unsteady_incompressible_viscous_librom_dmd_train \n
 \subpage ns3d_shock_cylinder_interaction_librom_dmd_train \n
+\subpage ns3d_bubble_petsc_librom_dmd_train (Requires PETSc)\n
 
 Prediction Examples
 -------------------
@@ -8700,7 +8701,8 @@ solutions. It will plot the potential temperature perturbation but can
 be modified easily to plot other quantities.
 
 The following plot shows the potential temperature perturbation
-contours at the final time t=3000:
+contours at the final time t=3000 (FOM is the HyPar solution, ROM is 
+the DMD prediction, and diff is the difference between the two):
 @image html Solution_2DNavStokIGWavePETSc_libROMDMD_Train.png
 
 \b Wall \b clock \b times:
@@ -8722,3 +8724,142 @@ and total wall time.
 
 Expected screen output:
 \include 2D/NavierStokes2D/InertiaGravityWave_PETSc_IMEX_libROM_DMD_Train/out.log
+
+\page ns3d_bubble_petsc_librom_dmd_train 3D Navier-Stokes Equations (with gravitational force) - Rising Thermal Bubble (Time-Windowed DMD) with PETSc IMEX time integration
+
+See \ref ns3d_bubble_petsc to familiarize yourself with this case.
+
+Location: \b hypar/Examples/3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX_libROM_DMD_Train
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
+
+Domain: \f$0 \le x,y,z < 1000\,{\rm m}\f$, \a "slip-wall" (#_SLIP_WALL_) boundaries 
+        everywhere, with zero wall velocity.
+
+Reference:
+  + Kelly, J. F., Giraldo, F. X., "Continuous and discontinuous Galerkin methods for a scalable
+  three-dimensional nonhydrostatic atmospheric model: Limited-area mode", J. Comput. Phys., 231,
+  2012, pp. 7988-8008 (see section 5.1.2).
+  + Giraldo, F. X., Kelly, J. F., Constantinescu, E. M., "Implicit-Explicit Formulations of a
+  Three-Dimensional Nonhydrostatic Unified Model of the Atmosphere (NUMA)", SIAM J. Sci. Comput., 
+  35 (5), 2013, pp. B1162-B1194 (see section 4.1).
+
+The problem is solved here using <B>implicit-explicit (IMEX)</B> time
+integration, where the hyperbolic flux is partitioned into its entropy
+and acoustic components with the former integrated explicitly and the
+latter integrated implicitly. See the following reference:
++ Ghosh, D., Constantinescu, E. M., "Semi-Implicit Time Integration of 
+  Atmospheric Flows with Characteristic-Based Flux Partitioning", SIAM 
+  Journal on Scientific Computing, 38 (3), 2016, A1848-A1875, 
+  http://dx.doi.org/10.1137/15M1044369.
+
+Initial solution: A warm bubble in cool ambient atmosphere. Note that in this example, the
+gravitational forces and rising of the bubble is along the \a y-axis.
+
+Other parameters (all dimensional quantities are in SI units):
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes3D::gamma)
+  + Universal gas constant \f$R = 287.058\f$ (#NavierStokes3D::R)
+  + Gravitational force per unit mass \f$g = 9.8\f$ along \a y-axis (#NavierStokes3D::grav_y)
+  + Reference density (at zero altitude) \f$\rho_{ref} = 1.1612055171196529\f$ (#NavierStokes3D::rho0)
+  + Reference pressure (at zero altitude) \f$P_{ref} = 100000\f$ (#NavierStokes3D::p0)
+  + Hydrostatic balance type 2 (#NavierStokes3D::HB)
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: PETSc (SolvePETSc()) 
+   - Method Class: <B>Additive Runge-Kutta method</B> (TSARKIMEX - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX.html)
+   - Specific method: <B>ARK 2e</B> (TSARKIMEX2E - https://petsc.org/release/docs/manualpages/TS/TSARKIMEX2E.html)
+
+Reduced Order Modeling:
+ + Mode: train (libROMInterface::m_mode, #_ROM_MODE_TRAIN_)
+ + Component Mode: monolithic (libROMInterface::m_comp_mode, #_ROM_COMP_MODE_MONOLITHIC_)
+ + Type: Dynamic Mode Decomposition (DMD) with time windowing (libROMInterface::m_rom_type)
+ + Latent subspace dimension: 16 (DMDROMObject::m_rdim)
+ + Sampling frequency: 1 (libROMInterface::m_sampling_freq)
+ + Number of samples per time window: 50 (DMDROMObject::m_num_window_samples)
+
+Input files required:
+---------------------
+
+<B>.petscrc</B>
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX_libROM_DMD_Train/petscrc
+
+\b librom.inp
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX_libROM_DMD_Train/librom.inp
+
+\b solver.inp
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX_libROM_DMD_Train/solver.inp
+
+\b boundary.inp
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX_libROM_DMD_Train/boundary.inp
+
+\b physics.inp
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX_libROM_DMD_Train/physics.inp
+
+\b weno.inp (optional)
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX_libROM_DMD_Train/weno.inp
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory.
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX_libROM_DMD_Train/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, 4
+processors along \a y, and 4 processor along \a z). Thus, 
+this example should be run with 64 MPI ranks (or change \b iproc).
+
+After running the code, there should be the following output
+files:
+
++ 11 output file \b op_00000.bin, ..., \b op_00010.bin; 
+this is the \b HyPar solutions\b. 
+
++ 11 output file \b op_rom_00000.bin, ..., \b op_rom_00010.bin; 
+this is the \b predicted solutions from the DMD object(s)\b.
+
+All the files are binary
+(#HyPar::op_file_format is set to \a binary in \b solver.inp).
+
+The binary solution file contains the conserved variables
+(\f$\rho,\rho u,\rho v,\rho w,e\f$). 
+
+The Python script plotSolution.py calculates the primitive
+and reference variables 
+\f$\rho,u,v,w,P,\theta,\rho_0,P_0,\pi,\theta_0\f$ (where the
+subscript \f$0\f$ indicates the hydrostatic mean value) for both
+the op_* and op_rom_* files. It plots 3D figures for \f$\theta\f$ 
+(potential temperature) for the PDE solution, the DMD predictions,
+and the difference between the two.
+
+The following figure shows the potential temperature at the final time. Colored
+contours are plotted in the X-Y plane, and contour lines are plotted in the Z-Y
+plane (FOM is the HyPar solution, ROM is the DMD prediction, and diff is the 
+difference between the two):
+@image html Solution_3DNavStok_Bubble3D_PETSc_libROMDMD_Train.png
+
+\b Wall \b clock \b times:
+- PDE solution: 906 seconds
+- DMD training time: 22.5 seconds
+- DMD prediction/query time: 4.5 seconds
+
+The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
+at the final time are calculated and reported on screen (see below)
+as well as \b pde_rom_diff.dat:
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX_libROM_DMD_Train/pde_rom_diff.dat
+The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
+number of processors in each dimension (#MPIVariables::iproc),
+time step size (#HyPar::dt),
+L1, L2, and L-infinity norms of the diff (#HyPar::rom_diff_norms),
+solver wall time (seconds) (i.e., not accounting for initialization,
+and cleaning up),
+and total wall time.
+
+Expected screen output:
+\include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX_libROM_DMD_Train/out.log
