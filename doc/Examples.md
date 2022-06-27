@@ -1316,6 +1316,10 @@ Expected screen output:
 
 \page vlasov_1d1v_selfconsistent 2D (1D-1V) Vlasov Equation - Two-Stream Instability
 
+\b Note: this example requires HyPar to be compiled with the FFTW library (https://www.fftw.org/).
+While compiling, make sure that the configure step included the <B>\--enable-fftw</B> option
+(and if necessary, <B>\--with-fftw-dir=/path/to/fftw</B>).
+
 Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField
           (This directory contains all the input files needed
           to run this case.)
