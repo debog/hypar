@@ -53,6 +53,9 @@ output_mode        | char[]       | #HyPar::output_mode           | serial
 op_overwrite       | char[]       | #HyPar::op_overwrite          | no
 model              | char[]       | #HyPar::model                 | must be specified
 immersed_body      | char[]       | #HyPar::ib_filename           | "none"
+size_exact         | int[ndims]   | #HyPar::dim_global_ex         | #HyPar::dim_global
+use_gpu            | char[]       | #HyPar::use_gpu               | no
+gpu_device_no      | int          | #HyPar::gpu_device_no         | -1
 
 \b Notes:
 + "ndims" \b must be specified \b before "size" and "iproc".

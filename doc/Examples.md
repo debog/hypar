@@ -7,17 +7,19 @@ all use explicit time integration, and \b do \b not require HyPar to be compiled
 with any external library. 
 Most of them can be run on one or a small number of processors.
 
+\subpage gpu_examples : Examples that use NVidia GPUs.
+
+\subpage ib_examples : Examples that use the immersed boundary method to simulate various geometries.
+
+\subpage librom_examples : Examples that use reduced-order modeling capabilities from libROM.
+
+\subpage md_examples : Examples that use the multidomain functionality.
+
 \subpage petsc_examples : 
 Some examples that use implicit or semi-implicit (IMEX) time
 integration methods implemented in PETSc. To run them, HyPar needs to be compiled \b with \b PETSc.
 
-\subpage ib_examples : Examples that use the immersed boundary method to simulate various geometries.
-
-\subpage md_examples : Examples that use the multidomain functionality.
-
 \subpage sg_examples : Examples that use the sparse grids spatial discretization.
-
-\subpage librom_examples : Examples that use reduced-order modeling capabilities from libROM.
 
 \page basic_examples Basic Examples
 
@@ -8867,3 +8869,206 @@ and total wall time.
 
 Expected screen output:
 \include 3D/NavierStokes3D/RisingThermalBubble_PETSc_IMEX_libROM_DMD_Train/out.log
+
+\page gpu_examples CUDA-enabled Examples
+
+Implementation of HyPar on GPU is a work-in-progress. Currently, only the following 
+parts of the code has been implemented on NVidia GPUs with CUDA:
+
++ Spatial discretization schemes:
+  + 5th order WENO scheme (Interp1PrimFifthOrderWENO())
+  
++ Time integration schemes:
+  + Runge-Kutta time integration (TimeRK())
+
++ Boundary conditions:
+  + Periodic (#_PERIODIC_)
+  + "Slip-wall" (#_SLIP_WALL_)
+
++ Physical models:
+  + 3D Navier-Stokes (#NavierStokes3D)
+
+Implementation note: 
++ The CUDA implementation uses a different variable ordering than the
+  CPU code. While the CPU code uses the "Array of Structures" variable ordering, where
+  the innermost loop is over the vector components at a grid point, the CUDA implementation
+  uses the "Structure of Arrays" ordering, where the innermost loops are over the grid
+  points.
++ This implementation is designed for 1 GPU per MPI rank. Thus, on a node, the
+  simulation should be run with as many MPI ranks as there are GPUs.
+
+\subpage ns3d_isoturb_gpu \n
+\subpage ns3d_bubble_gpu
+
+\page ns3d_isoturb_gpu 3D Navier-Stokes Equations - Isotropic Turbulence Decay
+
+See \ref ns3d_isoturb to familiarize yourself with this case.
+
+Location: \b hypar/Examples/3D/NavierStokes3D/DNS_IsotropicTurbulenceDecay_CUDA
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
+
+Domain: \f$0 \le x,y,z < 2\pi\f$, "periodic" (#_PERIODIC_) boundaries 
+        everywhere.
+
+Initial solution: Isotropic turbulent flow - The initial solution is 
+specified in the Fourier space (with an energy
+distribution similar to that of turbulent flow), and then transformed
+to the physical space through an inverse transform.
+
+Other parameters:
+  + \f$\gamma = 1.4\f$ (#NavierStokes3D::gamma)
+  + \f$Re = \frac {\rho u L } {\mu} = 333.33\f$ (#NavierStokes3D::Re)
+  + \f$Pr = 0.72\f$ (Prandtl number) (#NavierStokes3D::Pr)
+  + \f$M_\infty = 0.3\f$ (turbulence fluctuation Mach number) (#NavierStokes3D::Minf)
+
+Numerical Method:
+  + Spatial discretization (hyperbolic): 5th order CRWENO (Interp1PrimFifthOrderCRWENO())
+  + Spatial discretization (parabolic) : 4th order (FirstDerivativeFourthOrderCentral()) 
+                                         non-conservative 2-stage (ParabolicFunctionNC2Stage())
+  + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Hardware Details:
+  + GPU: NVIDIA V100 (Volta)
+  + CPU: IBM Power9 
+  + Configuration: 16 nodes, 4 GPUs and 4 MPI ranks per node (64 GPUs and 64 MPI ranks).
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 3D/NavierStokes3D/DNS_IsotropicTurbulenceDecay_CUDA/solver.inp
+
+\b boundary.inp
+\include 3D/NavierStokes3D/DNS_IsotropicTurbulenceDecay_CUDA/boundary.inp
+
+\b physics.inp
+\include 3D/NavierStokes3D/DNS_IsotropicTurbulenceDecay_CUDA/physics.inp
+
+\b weno.inp (optional)
+\include 3D/NavierStokes3D/DNS_IsotropicTurbulenceDecay_CUDA/weno.inp
+
+To generate \b initial.inp (initial solution), compile 
+and run the following code in the run directory.
+\b Note: this code requires the \b FFTW library installed (http://www.fftw.org/).
+To compile:
+
+    gcc -I/path/to/fftw3.h -L/path/to/libfftw3.a -lfftw3 init.c
+
+(see the FFTW website on ways to install it).
+\include 3D/NavierStokes3D/DNS_IsotropicTurbulenceDecay_CUDA/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, 4
+processors along \a y, and 4 processor along \a z). Thus, 
+this example should be run with 64 MPI ranks (or change \b iproc)
+and 64 GPUs.
+
+After running the code, there should be 11 output
+files \b op_00000.bin, \b op_00001.bin, ... \b op_00010.bin; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=5\f$.
+
+See \ref ns3d_isoturb for detailed postprocessing instructions. The 
+following figure shows the initial and final (t=5) energy spectra:
+@image html Solution_3DNavStok_IsoTurb_CUDA_Spectrum.png
+
+The following figures show the density and internal energy contours
+on the X-Y plane mid-slice at the final time:
+@image html Solution_3DNavStok_IsoTurb_CUDA_density.png
+@image html Solution_3DNavStok_IsoTurb_CUDA_energy.png
+
+Expected screen output:
+\include 3D/NavierStokes3D/DNS_IsotropicTurbulenceDecay_CUDA/out.log
+
+\page ns3d_bubble_gpu 3D Navier-Stokes Equations - Rising Thermal Bubble
+
+See \ref ns3d_bubble to familiarize yourself with this case.
+
+Location: \b hypar/Examples/3D/NavierStokes3D/RisingThermalBubble_Config1_CUDA
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 3D Navier-Stokes Equations (navierstokes3d.h)
+
+Domain: \f$0 \le x,y,z < 1000\,{\rm m}\f$, \a "slip-wall" (#_SLIP_WALL_) boundaries 
+        everywhere, with zero wall velocity.
+
+Reference:
+  + Kelly, J. F., Giraldo, F. X., "Continuous and discontinuous Galerkin methods for a scalable
+  three-dimensional nonhydrostatic atmospheric model: Limited-area mode", J. Comput. Phys., 231,
+  2012, pp. 7988-8008 (see section 5.1.2).
+  + Giraldo, F. X., Kelly, J. F., Constantinescu, E. M., "Implicit-Explicit Formulations of a
+  Three-Dimensional Nonhydrostatic Unified Model of the Atmosphere (NUMA)", SIAM J. Sci. Comput., 
+  35 (5), 2013, pp. B1162-B1194 (see section 4.1).
+
+Initial solution: A warm bubble in cool ambient atmosphere. Note that in this example, the
+gravitational forces and rising of the bubble is along the \a y-axis.
+
+Other parameters (all dimensional quantities are in SI units):
+  + Specific heat ratio \f$\gamma = 1.4\f$ (#NavierStokes3D::gamma)
+  + Universal gas constant \f$R = 287.058\f$ (#NavierStokes3D::R)
+  + Gravitational force per unit mass \f$g = 9.8\f$ along \a y-axis (#NavierStokes3D::grav_y)
+  + Reference density (at zero altitude) \f$\rho_{ref} = 1.1612055171196529\f$ (#NavierStokes3D::rho0)
+  + Reference pressure (at zero altitude) \f$P_{ref} = 100000\f$ (#NavierStokes3D::p0)
+  + Hydrostatic balance type 2 (#NavierStokes3D::HB)
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: SSP RK3 (TimeRK(), #_RK_SSP3_)
+
+Hardware Details:
+  + GPU: NVIDIA V100 (Volta)
+  + CPU: IBM Power9 
+  + Configuration: 1 node, 1 GPU and 1 MPI rank
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 3D/NavierStokes3D/RisingThermalBubble_Config1_CUDA/solver.inp
+
+\b boundary.inp
+\include 3D/NavierStokes3D/RisingThermalBubble_Config1_CUDA/boundary.inp
+
+\b physics.inp
+\include 3D/NavierStokes3D/RisingThermalBubble_Config1_CUDA/physics.inp
+
+\b weno.inp (optional)
+\include 3D/NavierStokes3D/RisingThermalBubble_Config1_CUDA/weno.inp
+
+To generate \b initial_par.inp.* (initial solution), compile 
+and run the following code in the run directory.
+\include 3D/NavierStokes3D/RisingThermalBubble_Config1_CUDA/aux/init_parallel.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      1 1 1
+
+in \b solver.inp This example should be run with 1 MPI rank
+and 1 GPU.
+
+After running the code, there should be 17 output
+files \b op_00000.bin, \b op_00001.bin, ... \b op_00016.bin; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=200\,{\rm s}\f$. 
+
+See \ref ns3d_bubble for detailed postprocessing instructions.  
+The following figure is generated using aux/plotSolution.py and shows the 
+potential temperature at the final time. Colored
+contours are plotted in the X-Y plane, and contour lines are plotted in the Z-Y
+plane:
+@image html Solution_3DNavStok_Bubble3D_CUDA.png
+
+Expected screen output:
+\include 3D/NavierStokes3D/RisingThermalBubble_Config1_CUDA/out.log
+

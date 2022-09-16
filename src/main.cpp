@@ -7,6 +7,8 @@
 /*! @mainpage
 
   @author Debojyoti Ghosh [\b Email: (first name) (dot) (last name) (at) gmail (dot) com, \b Website: http://debog.github.io/]
+  @author John Loffeld
+  @author Youngdae Kim
 
   HyPar: Hyperbolic-Parabolic (with Source) Partial Differential Equations Solver
   -------------------------------------------------------------------------------
@@ -25,8 +27,8 @@
   + Allows arbitrary number of <B>spatial dimensions</B> and <B>vector components per grid point</B>.
   + Solves the PDEs over <B>Cartesian</B> grids.
   + Can use <B>sparse grids</B> for faster computations on high-dimensional problems
-  + Written entirely in C/C++ and uses the MPICH library. It also uses OpenMP threads 
-    but this is a work-in-progress.
+  + Written entirely in C/C++ and uses the MPICH library. It can use OpenMP threads and CUDA 
+    on NVidia GPUs, but these are works-in-progress.
   + Can be <B>compiled with PETSc</B> (https://petsc.org/release/), if available, where 
     it can use PETSc's time integration module TS (https://petsc.org/release/src/ts/).
   + For 3-dimensional simulations, the <B>immersed boundaries</B> can be used to
@@ -41,7 +43,7 @@
 
   Download
   --------
-  The code is available at: https://bitbucket.org/deboghosh/hypar
+  The code is available at: https://bitbucket.org/deboghosh/hypar <br>
 
   It can be cloned using git as follows:
   + git clone git@bitbucket.org:deboghosh/hypar.git (if you have a Bitbucket account)
@@ -72,8 +74,10 @@
 
   The configure options can include options such as BLAS/LAPACK location, MPI directory, etc. Type "./configure --help"
   to see a full list. The options specific to HyPar are:
-  + \--with-mpi-dir: Specify path where mpicc is installed.
+  + \--with-mpi-dir: Specify path where mpicc is installed, if not in standard path.
   + \--enable-omp: Enable OpenMP threads.
+  + \--enable-cuda: Enable CUDA if NVidia GPU present.
+  + \--with-cuda-dir: Specify path where CUDA is installed, if not in standard path.
   + \--enable-scalapack: Enable ScaLAPACK (this will make available a tridiagonal solver using ScaLAPACK).
   + \--enable-fftw: Enable FFTW (this will make available features that use the FFTW library).
   + \--with-blas-dir: Specify path where BLAS is installed (relevant only if \--enable-scalapack is specified).
@@ -82,6 +86,9 @@
   + \--with-fftw-dir: Specify path where FFTW is installed (relevant only if \--enable-fftw is specified).
   + \--with-fortran-lib: Specify path where FORTRAN libraries are installed (for ScaLAPACK) (relevant only if \--enable-scalapack 
     is specified).
+
+  \b Note:  Limited parts of the code have been implemented on CUDA. See \b Examples for currently available
+            CUDA-enabled simulations.
 
   Compiling with other scientific computing libraries
   ---------------------------------------------------

@@ -453,7 +453,7 @@ typedef struct main_parameters {
   double *gpu_dxinv;  /*!< A copy of #HyPar::dxinv on GPU */
   double *gpu_u;      /*!< A copy of #HyPar::u on GPU */
 
-  int StageBoundaryBuffer_size; /*!< size of #Hypar::gpu_StageBoundaryBuffer */
+  int StageBoundaryBuffer_size; /*!< size of #HyPar::StageBoundaryBuffer */
   double *StageBoundaryBuffer; /*!< Array to perform reduction */
 #endif
 
