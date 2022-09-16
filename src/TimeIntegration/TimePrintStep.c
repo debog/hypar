@@ -23,14 +23,14 @@ int TimePrintStep(void *ts /*!< Object of type #TimeIntegration */)
     if (nsims > 1) {
       printf("--\n");
       printf("iter=%7d,  t=%1.3e\n", TS->iter+1, TS->waqt);
-      printf("  CFL=%1.3E, ", TS->max_cfl);
-      printf("  norm=%1.4E\n", TS->norm);
+      if (TS->max_cfl >= 0) printf("  CFL=%1.3E\n, ", TS->max_cfl);
+      if (TS->norm >= 0) printf("  norm=%1.4E\n", TS->norm);
       printf("  wctime=%1.1E (s)\n",TS->iter_wctime);
     } else {
-      printf("iter=%7d  "       ,TS->iter+1  );
-      printf("t=%1.3E  "          ,TS->waqt    );
-      printf("CFL=%1.3E  "       ,TS->max_cfl );
-      printf("norm=%1.4E  "          ,TS->norm    );
+      printf("iter=%7d  ",TS->iter+1 );
+      printf("t=%1.3E  ",TS->waqt );
+      if (TS->max_cfl >= 0) printf("CFL=%1.3E  ",TS->max_cfl );
+      if (TS->norm >= 0) printf("norm=%1.4E  ",TS->norm );
       printf("wctime: %1.1E (s)  ",TS->iter_wctime);
     }
 
