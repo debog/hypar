@@ -11,8 +11,6 @@
 
 #ifdef CUDA_VAR_ORDERDING_AOS
 
-static int gpuNavierStokes2DSource_Xdir    (double*,double*,void*,void*,double);
-static int gpuNavierStokes2DSource_Ydir    (double*,double*,void*,void*,double);
 static int gpuNavierStokes2DSourceFunction (double*,const double*,const double*,void*,void*,double,int);
 static int gpuNavierStokes2DSourceUpwind   (double*,const double*,const double*,const double*,int,void*,double);
 
@@ -221,82 +219,6 @@ extern "C" int gpuNavierStokes2DSource(
     );
   }
   return(0);
-}
-
-int gpuNavierStokes2DSource_Xdir(
-  double *source,
-  double *u,
-  void *s,
-  void *m,
-  double t
-)
-{
-  HyPar           *solver = (HyPar* )         s;
-  NavierStokes2D  *param  = (NavierStokes2D*) solver->physics;
-
-  int     ndims   = solver->ndims;
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  double  *dxinv  = solver->dxinv;
-  double  RT      =  param->p0 / param->rho0;
-
-  double *gpu_u;
-
-  checkCuda( cudaMalloc(&gpu_u, (solver->npoints_local_wghosts*solver->nvars)*sizeof(double)) );
-  checkCuda( cudaMemcpy(solver->gpu_dxinv, dxinv, solver->size_x*sizeof(double), cudaMemcpyHostToDevice) );
-  checkCuda( cudaMemcpy(solver->fluxI, solver->fluxI, solver->ndof_nodes*sizeof(double), cudaMemcpyHostToDevice) );
-  checkCuda( cudaMemcpy(gpu_u, u, (solver->npoints_local_wghosts*solver->nvars)*sizeof(double), cudaMemcpyHostToDevice) );
-
-  int ngrid_points; _ArrayProduct1D_(dim,ndims,ngrid_points);
-  int nblocks = (ngrid_points - 1) / GPU_THREADS_PER_BLOCK + 1;
-  NavierStokes2DSource_Xdir_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    ngrid_points, ghosts, ndims, param->gamma, RT,
-    solver->gpu_dim_local, solver->gpu_dxinv, param->gpu_grav_field_f,
-    solver->fluxI, gpu_u, solver->source
-  );
-
-  double *source_h = (double *)malloc(solver->ndof_cells_wghosts*sizeof(double));
-  checkCuda( cudaMemcpy(source_h, solver->source, solver->ndof_cells_wghosts*sizeof(double), cudaMemcpyDeviceToHost) );
-
-  return (0);
-}
-
-int gpuNavierStokes2DSource_Ydir(
-  double *source,
-  double *u,
-  void *s,
-  void *m,
-  double t
-)
-{
-  HyPar           *solver = (HyPar* )         s;
-  NavierStokes2D  *param  = (NavierStokes2D*) solver->physics;
-
-  int     ndims   = solver->ndims;
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  double  *dxinv  = solver->dxinv;
-  double  RT      =  param->p0 / param->rho0;
-
-  double *gpu_u;
-
-  checkCuda( cudaMalloc(&gpu_u, (solver->npoints_local_wghosts*solver->nvars)*sizeof(double)) );
-  checkCuda( cudaMemcpy(solver->gpu_dxinv, dxinv, solver->size_x*sizeof(double), cudaMemcpyHostToDevice) );
-  checkCuda( cudaMemcpy(solver->fluxI, solver->fluxI, solver->ndof_nodes*sizeof(double), cudaMemcpyHostToDevice) );
-  checkCuda( cudaMemcpy(gpu_u, u, (solver->npoints_local_wghosts*solver->nvars)*sizeof(double), cudaMemcpyHostToDevice) );
-
-  int ngrid_points; _ArrayProduct1D_(dim,ndims,ngrid_points);
-  int nblocks = (ngrid_points - 1) / GPU_THREADS_PER_BLOCK + 1;
-  NavierStokes2DSource_Ydir_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    ngrid_points, ghosts, ndims, param->gamma, RT,
-    solver->gpu_dim_local, solver->gpu_dxinv, param->gpu_grav_field_f,
-    solver->fluxI, gpu_u, solver->source
-  );
-
-  double *source_h = (double *)malloc(solver->ndof_cells_wghosts*sizeof(double));
-  checkCuda( cudaMemcpy(source_h, solver->source, solver->ndof_cells_wghosts*sizeof(double), cudaMemcpyDeviceToHost) );
-
-  return (0);
 }
 
 /*! Compute the source function in the well-balanced treatment of the source terms. The source

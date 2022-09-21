@@ -49,7 +49,7 @@ void BCSlipWallU_dim2_kernel(
     /* flow variables in the interior */
     double rho, uvel, vvel, energy, pressure;
     double rho_gpt, uvel_gpt, vvel_gpt, energy_gpt, pressure_gpt;
-    _NavierStokes2DGetFlowVar_((phi+nvars*p2),_NavierStokes2D_stride_,rho,uvel,vvel,energy,pressure,gamma);
+    _NavierStokes2DGetFlowVar_((phi+nvars*p2),rho,uvel,vvel,energy,pressure,gamma);
     /* set the ghost point values */
     rho_gpt = rho;
     pressure_gpt = pressure;
@@ -111,7 +111,7 @@ void BCSlipWallU_dim3_kernel(
     /* flow variables in the interior */
     double rho, uvel, vvel, wvel, energy, pressure;
     double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
-    _NavierStokes3DGetFlowVar_((phi+nvars*p2),rho,uvel,vvel,wvel,energy,pressure,gamma);
+    _NavierStokes3DGetFlowVar_((phi+nvars*p2),_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,gamma);
     /* set the ghost point values */
     rho_gpt = rho;
     pressure_gpt = pressure;
