@@ -139,20 +139,10 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
 #if defined(HAVE_CUDA)
   if (simobj[0].solver.use_gpu) {
     for (int n = 0; n < nsims; n++) {
-      double *h_u               = (double *) malloc(simobj[n].solver.ndof_cells_wghosts*sizeof(double));
       int npoints_local_wghosts = simobj[n].solver.npoints_local_wghosts;
       int nvars                 = simobj[n].solver.nvars;
       int size_x                = simobj[n].solver.size_x;
 
-      for (int i=0; i<npoints_local_wghosts; i++) {
-        for (int v=0; v<nvars; v++) {
-          h_u[i+v*npoints_local_wghosts] = simobj[n].solver.u[i*nvars+v];
-        }
-      }
-
-      gpuMemcpy(simobj[n].solver.gpu_u, h_u,
-                simobj[n].solver.ndof_cells_wghosts*sizeof(double),
-                gpuMemcpyHostToDevice);
       gpuMemcpy(simobj[n].solver.gpu_x,
                 simobj[n].solver.x, simobj[n].solver.size_x*sizeof(double),
                 gpuMemcpyHostToDevice);
@@ -160,7 +150,24 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
                 simobj[n].solver.size_x*sizeof(double),
                 gpuMemcpyHostToDevice);
 
+#ifdef CUDA_VAR_ORDERDING_AOS
+      gpuMemcpy(simobj[n].solver.gpu_u, 
+                simobj[n].solver.u,
+                simobj[n].solver.ndof_cells_wghosts*sizeof(double),
+                gpuMemcpyHostToDevice);
+#else
+      double *h_u = (double *) malloc(simobj[n].solver.ndof_cells_wghosts*sizeof(double));
+      for (int i=0; i<npoints_local_wghosts; i++) {
+        for (int v=0; v<nvars; v++) {
+          h_u[i+v*npoints_local_wghosts] = simobj[n].solver.u[i*nvars+v];
+        }
+      }
+      gpuMemcpy(simobj[n].solver.gpu_u, 
+                h_u,
+                simobj[n].solver.ndof_cells_wghosts*sizeof(double),
+                gpuMemcpyHostToDevice);
       free(h_u);
+#endif
     }
   }
 #endif

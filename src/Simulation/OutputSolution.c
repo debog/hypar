@@ -83,6 +83,12 @@ int OutputSolution( void  *s,   /*!< Array of simulation objects of type #Simula
       /* Copy values from GPU memory to CPU memory for writing. */
       gpuMemcpy(solver->x, solver->gpu_x, sizeof(double)*solver->size_x, gpuMemcpyDeviceToHost);
 
+#ifdef CUDA_VAR_ORDERDING_AOS
+      gpuMemcpy(  solver->u, 
+                  solver->gpu_u, 
+                  sizeof(double)*solver->ndof_cells_wghosts, 
+                  gpuMemcpyDeviceToHost );
+#else
       double *h_u = (double *) malloc(sizeof(double)*solver->ndof_cells_wghosts);
       gpuMemcpy(h_u, solver->gpu_u, sizeof(double)*solver->ndof_cells_wghosts, gpuMemcpyDeviceToHost);
       for (int i=0; i<solver->npoints_local_wghosts; i++) {
@@ -91,6 +97,7 @@ int OutputSolution( void  *s,   /*!< Array of simulation objects of type #Simula
         }
       }
       free(h_u);
+#endif
     }
 #endif
 
