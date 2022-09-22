@@ -1,4 +1,4 @@
-AC_INIT([hypar],[0.1],[debojyoti.ghosh@gmail.com])
+AC_INIT([hypar],[4.1],[debojyoti.ghosh@gmail.com])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 echo -n AC_PACKAGE_VERSION>VERSION
