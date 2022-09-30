@@ -458,47 +458,46 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
   for (n = 0; n < nsims; n++) {
 
     /* Broadcast the input parameters */
-    IERR MPIBroadcast_integer(&(sim[n].solver.ndims),1,0,&(sim[n].mpi.world)); CHECKERR(ierr);
+    MPIBroadcast_integer(&(sim[n].solver.ndims),1,0,&(sim[n].mpi.world));
     if (sim[n].mpi.rank) {
       sim[n].solver.dim_global    = (int*) calloc (sim[n].solver.ndims,sizeof(int));
       sim[n].mpi.iproc            = (int*) calloc (sim[n].solver.ndims,sizeof(int));
       sim[n].solver.dim_global_ex = (int*) calloc (sim[n].solver.ndims,sizeof(int));
     }
-    IERR MPIBroadcast_integer(&(sim[n].solver.nvars)         ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_integer( sim[n].solver.dim_global      ,sim[n].solver.ndims,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_integer( sim[n].solver.dim_global_ex   ,sim[n].solver.ndims,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_integer( sim[n].mpi.iproc              ,sim[n].solver.ndims,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_integer(&(sim[n].mpi.N_IORanks)        ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_integer(&(sim[n].solver.ghosts)        ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_integer(&(sim[n].solver.n_iter)        ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_integer(&(sim[n].solver.restart_iter)  ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_integer(&(sim[n].solver.screen_op_iter),1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_integer(&(sim[n].solver.file_op_iter)  ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_integer(&(sim[n].solver.flag_ib)       ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
+    MPIBroadcast_integer(&(sim[n].solver.nvars)         ,1                  ,0,&(sim[n].mpi.world));
+    MPIBroadcast_integer( sim[n].solver.dim_global      ,sim[n].solver.ndims,0,&(sim[n].mpi.world));
+    MPIBroadcast_integer( sim[n].solver.dim_global_ex   ,sim[n].solver.ndims,0,&(sim[n].mpi.world));
+    MPIBroadcast_integer( sim[n].mpi.iproc              ,sim[n].solver.ndims,0,&(sim[n].mpi.world));
+    MPIBroadcast_integer(&(sim[n].mpi.N_IORanks)        ,1                  ,0,&(sim[n].mpi.world));
+    MPIBroadcast_integer(&(sim[n].solver.ghosts)        ,1                  ,0,&(sim[n].mpi.world));
+    MPIBroadcast_integer(&(sim[n].solver.n_iter)        ,1                  ,0,&(sim[n].mpi.world));
+    MPIBroadcast_integer(&(sim[n].solver.restart_iter)  ,1                  ,0,&(sim[n].mpi.world));
+    MPIBroadcast_integer(&(sim[n].solver.screen_op_iter),1                  ,0,&(sim[n].mpi.world));
+    MPIBroadcast_integer(&(sim[n].solver.file_op_iter)  ,1                  ,0,&(sim[n].mpi.world));
+    MPIBroadcast_integer(&(sim[n].solver.flag_ib)       ,1                  ,0,&(sim[n].mpi.world));
 #if defined(HAVE_CUDA)
-    IERR MPIBroadcast_integer(&(sim[n].solver.use_gpu)       ,1                  ,0,&(sim[n].mpi.world)); CHECKERR(ierr);
+    MPIBroadcast_integer(&(sim[n].solver.use_gpu)       ,1                  ,0,&(sim[n].mpi.world));
+    MPIBroadcast_integer(&(sim[n].solver.gpu_device_no) ,1                  ,0,&(sim[n].mpi.world));
 #endif
+    MPIBroadcast_character(sim[n].solver.time_scheme        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.time_scheme_type   ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.spatial_scheme_hyp ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.interp_type        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.spatial_type_par   ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.spatial_scheme_par ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.ConservationCheck  ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.SplitHyperbolicFlux,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.op_file_format     ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.ip_file_type       ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.input_mode         ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.output_mode        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.op_overwrite       ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.model              ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.ib_filename        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
 
-    IERR MPIBroadcast_character(sim[n].solver.time_scheme        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.time_scheme_type   ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.spatial_scheme_hyp ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.interp_type        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.spatial_type_par   ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.spatial_scheme_par ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.ConservationCheck  ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.SplitHyperbolicFlux,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.op_file_format     ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.ip_file_type       ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.input_mode         ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.output_mode        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.op_overwrite       ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.model              ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-    IERR MPIBroadcast_character(sim[n].solver.ib_filename        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-
-    IERR MPIBroadcast_double(&(sim[n].solver.dt),1,0,&(sim[n].mpi.world)); CHECKERR(ierr);
-
+    MPIBroadcast_double(&(sim[n].solver.dt),1,0,&(sim[n].mpi.world));
   }
 #endif
 
-  return(0);
+  return 0;
 }

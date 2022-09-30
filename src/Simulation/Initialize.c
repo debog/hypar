@@ -35,7 +35,7 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
   }
 
 #if defined(HAVE_CUDA)
-  if (simobj[0].solver.gpu_device_no >= 0) {
+  if (simobj[0].solver.use_gpu && (simobj[0].solver.gpu_device_no >= 0)) {
       gpuSetDevice(simobj[0].solver.gpu_device_no);
   }
 #endif
