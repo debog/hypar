@@ -151,7 +151,8 @@ int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int
 int main()
 {
   FILE    *in;
-  int     ndims, nvars, size, bytes,i,N_IORanks, proc, GroupSize;
+  int     ndims, nvars, i,N_IORanks, proc, GroupSize;
+  long    size, bytes;
   int     *dim_global,*dim_local,*iproc,IORank; proc;
   char    output_mode[_MAX_STRING_SIZE_], op_overwrite[_MAX_STRING_SIZE_];
   double  *Xg, *Ug;
@@ -251,7 +252,7 @@ int main()
       for (i=0; i<ndims; i++) size += dim_global[i];
       Xg = (double*) calloc (size, sizeof(double));
       size = nvars;
-      for (i=0; i<ndims; i++) size *= dim_global[i];
+      for (i=0; i<ndims; i++) size *= (long) dim_global[i];
       Ug = (double*) calloc (size, sizeof(double));
 
       for (IORank=0; IORank < N_IORanks; IORank++) {
@@ -292,7 +293,7 @@ int main()
           }
           int done = 0; int index[ndims]; for(i=0; i<ndims; i++) index[i]=0;
           while (!done) {
-            int p1; _ArrayIndex1DWO_(ndims,dim_global,index,is,0,p1);
+            long p1; _ArrayIndex1DWO_(ndims,dim_global,index,is,0,p1);
             int p2; _ArrayIndex1D_  (ndims,dim_local ,index,   0,p2);
             int v; for (v=0; v<nvars; v++) Ug[nvars*p1+v] = Ul[nvars*p2+v];
             _ArrayIncrementIndex_(ndims,dim_local,index,done);
@@ -349,7 +350,7 @@ int main()
     for (i=0; i<ndims; i++) size += dim_global[i];
     Xg = (double*) calloc (size, sizeof(double));
     size = nvars;
-    for (i=0; i<ndims; i++) size *= dim_global[i];
+    for (i=0; i<ndims; i++) size *= (long) dim_global[i];
     Ug = (double*) calloc (size, sizeof(double));
 
     for (IORank=0; IORank < N_IORanks; IORank++) {
@@ -390,7 +391,7 @@ int main()
         }
         int done = 0; int index[ndims]; for(i=0; i<ndims; i++) index[i]=0;
         while (!done) {
-          int p1; _ArrayIndex1DWO_(ndims,dim_global,index,is,0,p1);
+          long p1; _ArrayIndex1DWO_(ndims,dim_global,index,is,0,p1);
           int p2; _ArrayIndex1D_  (ndims,dim_local ,index,   0,p2);
           int v; for (v=0; v<nvars; v++) Ug[nvars*p1+v] = Ul[nvars*p2+v];
           _ArrayIncrementIndex_(ndims,dim_local,index,done);
