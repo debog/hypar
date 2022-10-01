@@ -94,8 +94,8 @@ int main(){
 
   /* Specifying the velocities in Fourier space */
   for (i=0; i<N*N*N; i++) uhat[i][0] = uhat[i][1] = 0.0;
-  for (i=0; i<N*N*N; i++) uhat[i][0] = vhat[i][1] = 0.0;
-  for (i=0; i<N*N*N; i++) uhat[i][0] = what[i][1] = 0.0;
+  for (i=0; i<N*N*N; i++) vhat[i][0] = vhat[i][1] = 0.0;
+  for (i=0; i<N*N*N; i++) what[i][0] = what[i][1] = 0.0;
 
 	for (i = 1; i < N/2; i++){
 		for (j = 0; j < N/2; j++){
