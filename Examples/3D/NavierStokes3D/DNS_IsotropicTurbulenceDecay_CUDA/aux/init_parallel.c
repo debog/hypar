@@ -54,6 +54,8 @@
     } \
   }
 
+static const double PI = 4 * atan(1.0);
+
 double raiseto(double x, double a) {
 	return exp(a*log(x));
 }
@@ -62,18 +64,14 @@ double magnitude(double a, double b) {
 	return sqrt(a*a + b*b);
 }
 
-void setVelocityComponent(  double* const uvel, 
-                            const int N,
-                            const double kp,
-                            const double u0,
-                            const int dir ) 
+void velocityComponent( const int N,
+                        const int dir,
+                        const double kp,
+                        const double u0,
+                        double* const uvel )
 {
-	const double PI = 4 * atan(1.0);
-
-  long N3 = (long) N * (long) N * (long) N;
-	int i,j,k;
-
-  /* Calculating the velocity components through a Fourier transform */
+	long N3 = N*N*N;
+	long i,j,k;
 
 	double kk = sqrt(3 * (N/2)*(N/2));
 	int kkmax = (int) kk;
@@ -87,13 +85,14 @@ void setVelocityComponent(  double* const uvel,
   /* Specifying the velocities in Fourier space */
   for (i=0; i<N3; i++) uhat[i][0] = uhat[i][1] = 0.0;
 
-	for (i = 1; i < N/2; i++) {
-		for (j = 0; j < N/2; j++) {
-			for (k = 0; k < N/2; k++) {
+	for (i = 1; i < N/2; i++){
+		for (j = 0; j < N/2; j++){
+			for (k = 0; k < N/2; k++){
 				double kk   = sqrt(i*i + j*j + k*k);
 				double th1  = 2*PI * ((double)rand())/((double)RAND_MAX);
 				double th2  = 2*PI * ((double)rand())/((double)RAND_MAX);
 				double phi1 = 2*PI * ((double)rand())/((double)RAND_MAX);
+
 				double E = 16.0 * sqrt(2.0/PI) * (u0*u0/kp) * raiseto(kk/kp, 4.0) 
                         * exp(-2.0*(kk/kp)*(kk/kp));
 				double alfa_real = sqrt(E/(4*PI*kk*kk))*cos(th1)*cos(phi1);
@@ -111,16 +110,18 @@ void setVelocityComponent(  double* const uvel,
 				  uhat[k+N*(j+N*i)][0] = -(beta_real*sqrt(i*i+j*j))/kk;
 				  uhat[k+N*(j+N*i)][1] = -(beta_imag*sqrt(i*i+j*j))/kk;
         }
+
 			}
 		}
 	}
-	for (i = 0; i < 1; i++) {
-		for (k = 0; k < N/2; k++) {
-			for (j = 1; j < N/2; j++) {
+	for (i = 0; i < 1; i++){
+		for (k = 0; k < N/2; k++){
+			for (j = 1; j < N/2; j++){
 				double kk   = sqrt(i*i + j*j + k*k);
 				double th1  = 2*PI * ((double)rand())/((double)RAND_MAX);
 				double th2  = 2*PI * ((double)rand())/((double)RAND_MAX);
 				double phi1 = 2*PI * ((double)rand())/((double)RAND_MAX);
+
 				double E = 16.0 * sqrt(2.0/PI) * (u0*u0/kp) * raiseto(kk/kp, 4.0) 
                         * exp(-2.0*(kk/kp)*(kk/kp));
 				double alfa_real = sqrt(E/(4*PI*kk*kk))*cos(th1)*cos(phi1);
@@ -138,12 +139,13 @@ void setVelocityComponent(  double* const uvel,
 				  uhat[k+N*(j+N*i)][0] = -(beta_real*sqrt(i*i+j*j))/kk;
 				  uhat[k+N*(j+N*i)][1] = -(beta_imag*sqrt(i*i+j*j))/kk;
         }
+
 			}
 		}
 	}
-	for (i = 0; i < 1; i++) {
-		for (j = 0; j < 1; j++) {
-			for (k = 0; k < N/2; k++) {
+	for (i = 0; i < 1; i++){
+		for (j = 0; j < 1; j++){
+			for (k = 0; k < N/2; k++){
 				uhat[k+N*(j+N*i)][0] = 0;
 				uhat[k+N*(j+N*i)][1] = 0;
 			}
@@ -216,31 +218,137 @@ void setVelocityComponent(  double* const uvel,
 	fftw_free(uhat);
 	fftw_destroy_plan(inv_trans_u);
 
-  double real_velocity = 0;
   double imag_velocity = 0;
-	for (i = 0; i < N; i++){
-		for (j = 0; j < N; j++){
-			for (k = 0; k < N; k++){
-				double uu;
-        uu = u[k+N*(j+N*i)][0];
-				real_velocity += uu*uu;
-        uu = u[k+N*(j+N*i)][1];
-				imag_velocity += uu*uu;
-			}
-		}
+	for (i = 0; i < N3; i++){
+		double uu = u[i][1];
+		imag_velocity += (uu*uu);
 	}
-	real_velocity = sqrt(real_velocity / (3*(double)N3));
-	imag_velocity = sqrt(imag_velocity / (3*(double)N3));
-	printf("RMS of real velocity: %1.16E\n",real_velocity);
-	printf("RMS of imaginary velocity: %1.16E\n",imag_velocity);
+	imag_velocity = sqrt(imag_velocity / ((double)N3));
+	printf("RMS of imaginary component of computed velocity: %1.6e\n",imag_velocity);
 
-  for (i = 0; i < N3; i++) {
+	for (i = 0; i < N3; i++){
     uvel[i] = u[i][0];
+	}
+
+  fftw_free(u);
+
+  return;
+}
+
+void setVelocityField(const int N,
+                      double* const uvel,
+                      double* const vvel,
+                      double* const wvel )
+{
+	double kp = 4.0;
+	double u0 = 0.3;
+
+	long N3 = N*N*N;
+	long i,j,k;
+	double dx = 2*PI / ((double)N);
+
+  printf("Computing u-velocity field.\n");
+  velocityComponent( N, 0, kp, u0, uvel ); 
+  printf("Computing v-velocity field.\n");
+  velocityComponent( N, 1, kp, u0, vvel ); 
+  printf("Computing w-velocity field.\n");
+  velocityComponent( N, 2, kp, u0, wvel ); 
+
+	double rms_velocity = 0;
+	for (i = 0; i < N3; i++){
+    double uu, vv, ww;
+		uu = uvel[i];
+		vv = vvel[i];
+		ww = wvel[i];
+		rms_velocity += (uu*uu + vv*vv + ww*ww);
+	}
+	rms_velocity = sqrt(rms_velocity / (3*((double)N3)));
+  
+  /* scale the velocity components so that rms velocity matches u0 */
+  double factor = u0 / rms_velocity;
+  printf("Scaling factor = %1.16E\n",factor);
+	for (i = 0; i < N3; i++){
+		uvel[i] *= factor;
+		vvel[i] *= factor;
+		wvel[i] *= factor;
+	}
+
+	rms_velocity = 0;
+	for (i = 0; i < N3; i++){
+    double uu, vv, ww;
+		uu = uvel[i];
+		vv = vvel[i];
+		ww = wvel[i];
+		rms_velocity += (uu*uu + vv*vv + ww*ww);
+	}
+	rms_velocity = sqrt(rms_velocity / (3*((double)N3)));
+	printf("RMS velocity (component-wise): %1.16E\n",rms_velocity);
+
+  /* calculate the divergence of velocity */
+  double DivergenceNorm = 0;
+  for (i=0; i<N; i++) {
+    for (j=0; j<N; j++) {
+      for (k=0; k<N; k++) {
+        double u1, u2, v1, v2, w1, w2;
+        u1 = (i==0   ? uvel[k+N*(j+N*(N-1))] : uvel[k+N*(j+N*(i-1))] );
+        u2 = (i==N-1 ? uvel[k+N*(j+N*(0  ))] : uvel[k+N*(j+N*(i+1))] );
+        v1 = (j==0   ? vvel[k+N*((N-1)+N*i)] : vvel[k+N*((j-1)+N*i)] );
+        v2 = (j==N-1 ? vvel[k+N*((0  )+N*i)] : vvel[k+N*((j+1)+N*i)] );
+        w1 = (k==0   ? wvel[(N-1)+N*(j+N*i)] : wvel[(k-1)+N*(j+N*i)] );
+        w2 = (k==N-1 ? wvel[(0  )+N*(j+N*i)] : wvel[(k+1)+N*(j+N*i)] );
+        double Divergence = ( (u2-u1) + (v2-v1) + (w2-w1) ) / (2.0*dx);
+        DivergenceNorm += (Divergence*Divergence);
+      }
+    }
   }
+  DivergenceNorm = sqrt(DivergenceNorm / ((double)N3));
+  printf("Velocity divergence: %1.16E\n",DivergenceNorm);
 
-	fftw_free(u);
+  /* calculate the Taylor microscales */
+  double TaylorMicroscale[3];
+  double Numerator[3] = {0,0,0};
+  double Denominator[3] = {0,0,0};
+  for (i=0; i<N; i++) {
+    for (j=0; j<N; j++) {
+      for (k=0; k<N; k++) {
+        double u1, u2, uu, v1, v2, vv, w1, w2, ww;
+        u1 = (i==0   ? uvel[k+N*(j+N*(N-1))] : uvel[k+N*(j+N*(i-1))] );
+        u2 = (i==N-1 ? uvel[k+N*(j+N*(0  ))] : uvel[k+N*(j+N*(i+1))] );
+        v1 = (j==0   ? vvel[k+N*((N-1)+N*i)] : vvel[k+N*((j-1)+N*i)] );
+        v2 = (j==N-1 ? vvel[k+N*((0  )+N*i)] : vvel[k+N*((j+1)+N*i)] );
+        w1 = (k==0   ? wvel[(N-1)+N*(j+N*i)] : wvel[(k-1)+N*(j+N*i)] );
+        w2 = (k==N-1 ? wvel[(0  )+N*(j+N*i)] : wvel[(k+1)+N*(j+N*i)] );
+        uu  = uvel[k+N*(j+N*i)];
+        vv  = vvel[k+N*(j+N*i)];
+        ww  = wvel[k+N*(j+N*i)];
 
-	return;
+        double du, dv, dw;
+        du = (u2 - u1) / (2.0*dx);
+        dv = (v2 - v1) / (2.0*dx);
+        dw = (w2 - w1) / (2.0*dx);
+
+        Numerator[0] += (uu*uu);
+        Numerator[1] += (vv*vv);
+        Numerator[2] += (ww*ww);
+
+        Denominator[0] += (du*du);
+        Denominator[1] += (dv*dv);
+        Denominator[2] += (dw*dw);
+      }
+    }
+  }
+  Numerator[0] /= (N*N*N); Denominator[0] /= (N*N*N);
+  Numerator[1] /= (N*N*N); Denominator[1] /= (N*N*N);
+  Numerator[2] /= (N*N*N); Denominator[2] /= (N*N*N);
+
+  TaylorMicroscale[0] = sqrt(Numerator[0]/Denominator[0]);
+  TaylorMicroscale[1] = sqrt(Numerator[1]/Denominator[1]);
+  TaylorMicroscale[2] = sqrt(Numerator[2]/Denominator[2]);
+
+  printf("Taylor microscales: %1.16E, %1.16E, %1.16E\n",
+         TaylorMicroscale[0],TaylorMicroscale[1],TaylorMicroscale[2]);
+
+  return;
 }
 
 void GetStringFromInteger(int a,char *A,int width)
@@ -308,11 +416,6 @@ int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int
 
 int main()
 {
-	const double PI = 4 * atan(1.0);
-  /* initial spectrum parameters */
-	double kp = 4.0;
-	double u0 = 0.3;
-
 	FILE *out, *in;
   int NI, NJ, NK, ndims, nvars, size, bytes, N_IORanks, i, j, k;
   int *dim_global,*dim_local,*iproc;
@@ -408,7 +511,7 @@ int main()
     printf("Error: NI,NJ,NK not equal. Bye!\n"); 
     return(0); 
   }
-	int N = NI;
+	long N = NI;
   long N3 = (long) N * (long) N * (long) N;
 	double dx = 2*PI / ((double)N);
 
@@ -416,107 +519,7 @@ int main()
   double* u = (double*) calloc (N3, sizeof(double));
   double* v = (double*) calloc (N3, sizeof(double));
   double* w = (double*) calloc (N3, sizeof(double));
-
-  printf("Computing u-velocity.\n"); 
-  setVelocityComponent( u, N, kp, u0, 0 );
-  printf("Computing v-velocity.\n"); 
-  setVelocityComponent( v, N, kp, u0, 1 );
-  printf("Computing w-velocity.\n"); 
-  setVelocityComponent( w, N, kp, u0, 2 );
-
-	double rms_velocity = 0;
-	for (i = 0; i < N3; i++){
-    double uu, vv, ww;
-		uu = u[i];
-		vv = v[i];
-		ww = w[i];
-    rms_velocity += (uu*uu + vv*vv + ww*ww);
-	}
-	rms_velocity = sqrt(rms_velocity / (3*(double)N3));
-
-  /* scale the velocity components so that rms velocity matches u0 */
-  double factor = u0 / rms_velocity;
-  printf("Scaling factor = %1.16E\n",factor);
-	for (i = 0; i < N3; i++) {
-	  u[i] *= factor;
-	  v[i] *= factor;
-	  w[i] *= factor;
-	}
-
-	rms_velocity = 0;
-	for (i = 0; i < N3; i++){
-    double uu, vv, ww;
-		uu = u[i];
-		vv = v[i];
-		ww = w[i];
-    rms_velocity += (uu*uu + vv*vv + ww*ww);
-	}
-	rms_velocity = sqrt(rms_velocity / (3*(double)N3));
-	printf("RMS velocity (component-wise): %1.16E\n",rms_velocity);
-
-  /* calculate the divergence of velocity */
-  double DivergenceNorm = 0;
-  for (i=0; i<N; i++) {
-    for (j=0; j<N; j++) {
-      for (k=0; k<N; k++) {
-        double u1, u2, v1, v2, w1, w2;
-        u1 = (i==0   ? u[k+N*(j+N*(N-1))] : u[k+N*(j+N*(i-1))] );
-        u2 = (i==N-1 ? u[k+N*(j+N*(0  ))] : u[k+N*(j+N*(i+1))] );
-        v1 = (j==0   ? v[k+N*((N-1)+N*i)] : v[k+N*((j-1)+N*i)] );
-        v2 = (j==N-1 ? v[k+N*((0  )+N*i)] : v[k+N*((j+1)+N*i)] );
-        w1 = (k==0   ? w[(N-1)+N*(j+N*i)] : w[(k-1)+N*(j+N*i)] );
-        w2 = (k==N-1 ? w[(0  )+N*(j+N*i)] : w[(k+1)+N*(j+N*i)] );
-        double Divergence = ( (u2-u1) + (v2-v1) + (w2-w1) ) / (2.0*dx);
-        DivergenceNorm += (Divergence*Divergence);
-      }
-    }
-  }
-  DivergenceNorm = sqrt(DivergenceNorm / ((double)N3));
-  printf("Velocity divergence: %1.16E\n",DivergenceNorm);
-
-  /* calculate the Taylor microscales */
-  double TaylorMicroscale[3];
-  double Numerator[3] = {0,0,0};
-  double Denominator[3] = {0,0,0};
-  for (i=0; i<N; i++) {
-    for (j=0; j<N; j++) {
-      for (k=0; k<N; k++) {
-        double u1, u2, uu, v1, v2, vv, w1, w2, ww;
-        u1 = (i==0   ? u[k+N*(j+N*(N-1))] : u[k+N*(j+N*(i-1))] );
-        u2 = (i==N-1 ? u[k+N*(j+N*(0  ))] : u[k+N*(j+N*(i+1))] );
-        v1 = (j==0   ? v[k+N*((N-1)+N*i)] : v[k+N*((j-1)+N*i)] );
-        v2 = (j==N-1 ? v[k+N*((0  )+N*i)] : v[k+N*((j+1)+N*i)] );
-        w1 = (k==0   ? w[(N-1)+N*(j+N*i)] : w[(k-1)+N*(j+N*i)] );
-        w2 = (k==N-1 ? w[(0  )+N*(j+N*i)] : w[(k+1)+N*(j+N*i)] );
-        uu  = u[k+N*(j+N*i)];
-        vv  = v[k+N*(j+N*i)];
-        ww  = w[k+N*(j+N*i)];
-
-        double du, dv, dw;
-        du = (u2 - u1) / (2.0*dx);
-        dv = (v2 - v1) / (2.0*dx);
-        dw = (w2 - w1) / (2.0*dx);
-
-        Numerator[0] += (uu*uu);
-        Numerator[1] += (vv*vv);
-        Numerator[2] += (ww*ww);
-
-        Denominator[0] += (du*du);
-        Denominator[1] += (dv*dv);
-        Denominator[2] += (dw*dw);
-      }
-    }
-  }
-  Numerator[0] /= ((double)N3); Denominator[0] /= ((double)N3);
-  Numerator[1] /= ((double)N3); Denominator[1] /= ((double)N3);
-  Numerator[2] /= ((double)N3); Denominator[2] /= ((double)N3);
-
-  TaylorMicroscale[0] = sqrt(Numerator[0]/Denominator[0]);
-  TaylorMicroscale[1] = sqrt(Numerator[1]/Denominator[1]);
-  TaylorMicroscale[2] = sqrt(Numerator[2]/Denominator[2]);
-
-  printf("Taylor microscales: %1.16E, %1.16E, %1.16E\n",
-         TaylorMicroscale[0],TaylorMicroscale[1],TaylorMicroscale[2]);
+  setVelocityField(N, u, v, w);
 
   printf("Generating grid.\n");
   double *Xg = (double*) calloc (NI+NJ+NK, sizeof(double));
@@ -588,9 +591,9 @@ int main()
         E = P/0.4 + 0.5*rho*(uvel*uvel+vvel*vvel+wvel*wvel);
 
         Ul[5*p+0] = rho;
-        Ul[5*p+1] = 0.0;
-        Ul[5*p+2] = 0.0;
-        Ul[5*p+3] = 0.0;
+        Ul[5*p+1] = rho*uvel;
+        Ul[5*p+2] = rho*vvel;
+        Ul[5*p+3] = rho*wvel;
         Ul[5*p+4] = E;
         _ArrayIncrementIndex_(ndims,dim_local,index,done);
       }
