@@ -7,6 +7,10 @@ AC_MSG_NOTICE([hypar AC_PACKAGE_VERSION])
 
 AM_INIT_AUTOMAKE
 AC_PREFIX_DEFAULT('$(top_srcdir)')
+includedir="${ac_pwd}/${srcdir}/include"
+if ! test -d ${includedir} ; then
+  includedir="${srcdir}/include"
+fi
 
 AC_ARG_ENABLE([serial],AS_HELP_STRING([--enable-serial],[Enable serial mode]))
 AC_ARG_ENABLE([cuda],AS_HELP_STRING([--enable-cuda],[Enable CUDA]))

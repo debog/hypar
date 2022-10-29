@@ -26,3 +26,4 @@ stamp-h1
 __pycache__
 .ipynb_checkpoints
 *.tmp
+doc/README
