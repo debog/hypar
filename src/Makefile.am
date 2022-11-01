@@ -61,7 +61,6 @@ HyPar_LDADD = \
 if ENABLE_CUDA
 HyPar_LDADD += HyParFunctions/libHyParFunctions_GPU.a
 HyPar_LDADD += BoundaryConditions/libBoundaryConditions_GPU.a
-HyPar_LDADD += PhysicalModels/Euler2D/libEuler2D_GPU.a
 HyPar_LDADD += PhysicalModels/NavierStokes2D/libNavierStokes2D_GPU.a
 HyPar_LDADD += PhysicalModels/NavierStokes3D/libNavierStokes3D_GPU.a
 HyPar_LDADD += InterpolationFunctions/libInterpolationFunctions_GPU.a
