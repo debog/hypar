@@ -26,14 +26,14 @@
 
 #define _ArraySetValue_(x,size,value)                                                                               \
   {                                                                                                                 \
-    int arraycounter;                                                                                               \
+    long arraycounter;                                                                                               \
     for (arraycounter = 0; arraycounter < (size); arraycounter++)  x[arraycounter] = (value);                       \
   }
 
 #define _ArrayIndex1D_(N,imax,i,ghost,index)  \
   { \
     index = i[N-1]+(ghost); \
-    int arraycounter; \
+    long arraycounter; \
     for (arraycounter = (N)-2; arraycounter > -1; arraycounter--) { \
       index = ((index*(imax[arraycounter]+2*(ghost))) + (i[arraycounter]+(ghost))); \
     } \
@@ -41,7 +41,7 @@
 
 #define _ArrayIncrementIndex_(N,imax,i,done) \
   { \
-    int arraycounter = 0; \
+    long arraycounter = 0; \
     while (arraycounter < (N)) { \
       if (i[arraycounter] == imax[arraycounter]-1) { \
         i[arraycounter] = 0; \
@@ -87,7 +87,7 @@ void IncrementFilename(char *f)
 
 int WriteBinary(int ndims, int nvars, int *dim, double *x, double *u, char *f)
 {
-  int size, d, index[ndims];
+  long size, d, index[ndims];
   size_t bytes;
   FILE *out;
   out = fopen(f,"wb");
@@ -155,7 +155,7 @@ int ExtractSlice(char *f, int slicedim, double slicepos)
   
   /* allocate grid and solution arrays */
   int sizex = 0;      for (d=0; d<ndims; d++) sizex += dims[d];
-  int sizeu = nvars;  for (d=0; d<ndims; d++) sizeu *= dims[d];
+  long sizeu = nvars; for (d=0; d<ndims; d++) sizeu *= dims[d];
   x = (double*) calloc (sizex,sizeof(double));
   U = (double*) calloc (sizeu,sizeof(double));
 
@@ -199,7 +199,7 @@ int ExtractSlice(char *f, int slicedim, double slicepos)
   Sx = (double*) calloc (slice_sizex,sizeof(double));
   SU = (double*) calloc (slice_sizeu,sizeof(double));
 
-  int offset = 0, soffset = 0;
+  long offset = 0, soffset = 0;
   for (d=0; d<ndims; d++) {
     if (d != slicedim) {
       int i;
@@ -213,7 +213,7 @@ int ExtractSlice(char *f, int slicedim, double slicepos)
   while (!done) {
     if (index[slicedim] == slice_index) {
 
-      int p1, p2, d;
+      long p1, p2, d;
       int index2[ndims];
       for (d=0; d<ndims; d++) index2[d] = index[d]; index2[slicedim]++;
       _ArrayIndex1D_(ndims,dims,index ,0,p1);
