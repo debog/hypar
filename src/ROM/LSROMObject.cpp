@@ -99,7 +99,7 @@ LSROMObject::LSROMObject( const int     a_vec_size, /*!< vector size */
     /* print useful stuff to screen */
     printf("LSROMObject details:\n");
     printf("  number of samples per window:   %d\n", m_num_window_samples);
-    printf("  directory name for LS onjects: %s\n", dirname_c_str);
+    printf("  directory name for LS objects: %s\n", dirname_c_str);
     printf("  write snapshot matrix to file:  %s\n", write_snapshot_mat);
     if (m_sim_idx >= 0) {
       printf("  simulation domain:  %d\n", m_sim_idx);
@@ -132,26 +132,20 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 {
   if (m_tic == 0) {
 
-    int max_num_snapshots = 100000;
-    bool update_right_SV = false;
-    bool isIncremental = false;
-    const std::string basisName = "basis";
-    const std::string basisFileName = basisName + std::to_string(id);
-    int numRowRB, numColumnRB;
-    m_options.pushback(new CAROM::Options(U->Size(), max_num_snapshots, 1, update_right_SV));
-    m_generator.pushback(new CAROM::BasisGenerator(*options, isIncremental, basisFileName));
-    m_ls_is_trained.push_back(false);
+    m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
+    m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisName));
     m_intervals.push_back( Interval(a_time, m_t_final) );
+//  m_ls_is_trained.push_back(false);
 
-    if (!m_rank) {
-      printf( "LSROMObject::takeSample() - creating new LS object for sim. domain %d, var %d, t=%f (total: %d).\n",
-              m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_ls.size());
-    }
-    bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+//  if (!m_rank) {
+//    printf( "LSROMObject::takeSample() - creating new LS object for sim. domain %d, var %d, t=%f (total: %d).\n",
+//            m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_ls.size());
+//  }
+//  bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 
-  } else {
+//} else {
 
-    bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+//  bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 
 //  if (m_tic%m_num_window_samples == 0) {
 //    printf("checking m_tic %d \n",m_tic);
@@ -182,7 +176,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 //      printf("LSROMObject::takeSample() - creating new LS object for sim. domain %d, var %d, t=%f (total: %d).\n",
 //             m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_ls.size());
 //    }
-    }
+//  }
 
   }
 
