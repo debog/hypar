@@ -6,9 +6,6 @@
 */
 
 #include <basic.h>
-#include "linalg/Vector.h"
-#include "linalg/BasisGenerator.h"
-#include "linalg/Options.h"
 #include <rom_object_ls.h>
 
 /*! Constructor 
