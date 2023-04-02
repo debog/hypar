@@ -120,6 +120,14 @@ class LSROMObject : public ROMObject
 
     std::string m_dirname; /*!< Subdirectory where LS objects are written to or read from */
 
+    /* parameters for generator and option */
+    int max_num_snapshots = 100000;
+    bool update_right_SV = false;
+    bool isIncremental = false;
+    const std::string basisName = "basis";
+    const std::string basisFileName;
+    int numRowRB, numColumnRB;
+
   private:
 };
 
