@@ -5,10 +5,12 @@
  *  @author Debojyoti Ghosh
 */
 
+#include <stdlib.h>
 #include <string.h>
 #include <arrayfunctions.h>
 #include <simulation_object.h>
 #include <rom_object_dmd.h>
+#include <rom_object_ls.h>
 #include <librom_interface.h>
 
 /*! Define the libROM interface
@@ -157,7 +159,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
                                             m_nproc, 
                                             ns ) );
         }
-        else if (m_rom_type == "LS") {
+        else if (m_rom_type == _ROM_TYPE_LS_) {
           m_rom.push_back(new LSROMObject( m_vec_size[ns],
                                             m_sampling_freq*a_dt,
                                             m_rdim,
