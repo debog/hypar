@@ -124,7 +124,6 @@ LSROMObject::LSROMObject( const int     a_vec_size, /*!< vector size */
 
   m_tic = 0;
   m_curr_win = 0;
-  printf("m_ls.size() %d \n",m_ls.size());
 }
 
 /*! take a sample (solution snapshot) */
@@ -237,5 +236,13 @@ void LSROMObject::train()
   return;
 }
 
+void LSROMObject::save(const std::string& a_fname_root /*!< Filename root */) const
+{
+    return;
+}
+void LSROMObject::load(const std::string& a_fname_root /*!< Filename root */)
+{
+    return;
+}
 
 #endif
