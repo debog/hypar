@@ -95,7 +95,7 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
     /* print useful stuff to screen */
     printf("DMDROMObject details:\n");
     printf("  number of samples per window:   %d\n", m_num_window_samples);
-    printf("  directory name for DMD onjects: %s\n", dirname_c_str);
+    printf("  directory name for DMD objects: %s\n", dirname_c_str);
     printf("  write snapshot matrix to file:  %s\n", write_snapshot_mat);
     if (m_sim_idx >= 0) {
       printf("  simulation domain:  %d\n", m_sim_idx);
