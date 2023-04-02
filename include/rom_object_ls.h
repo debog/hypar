@@ -94,7 +94,7 @@ class LSROMObject : public ROMObject
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
-    std::vector<CAROM::BasisGenerator> *m_generator; /*!< Vector of BasisGenerator objects */
+    std::vector<CAROM::BasisGenerator*> m_generator; /*!< Vector of BasisGenerator objects */
     std::vector<CAROM::Matrix*> m_spatialbasis; /*!< Vector of Matrix objects */
 
     std::vector<bool> m_ls_is_trained; /*!< Flag to indicate if LS is trained */
