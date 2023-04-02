@@ -15,14 +15,21 @@
 #include <vector>
 #include <utility>
 #include <linalg/Matrix.h>
+#include "linalg/Vector.h"
+#include "linalg/BasisGenerator.h"
+#include "linalg/Options.h"
 #include <rom_object.h>
 
 #ifndef serial
 #include <mpi.h>
 #endif
 
+/*! Interval type */
+typedef std::pair<double,double> Interval;
+
 class LSROMObject : public ROMObject
 {
+  public:
     /*! Constructor */
     LSROMObject(  const int, 
                   const double, 
@@ -35,8 +42,8 @@ class LSROMObject : public ROMObject
     /*! Destructor */
     virtual ~LSROMObject()
     {
-      for (int i = 0; i < m_ls.size(); i++) delete m_ls[i];
-      m_ls.clear();
+//    for (int i = 0; i < m_ls.size(); i++) delete m_ls[i];
+//    m_ls.clear();
       m_intervals.clear();
       m_ls_is_trained.clear();
     }
@@ -44,18 +51,18 @@ class LSROMObject : public ROMObject
     /*! Project initial solution for prediction */
     virtual void projectInitialSolution(  CAROM::Vector& a_U /*!< solution vector */ )
     {
-      if (m_ls.size() == 0) {
-        if (!m_rank) {
-          printf("ERROR in LSROMObject::projectInitialSolution() - m_ls is a vector of size 0.\n");
-        }
-        return;
-      }
+//    if (m_ls.size() == 0) {
+//      if (!m_rank) {
+//        printf("ERROR in LSROMObject::projectInitialSolution() - m_ls is a vector of size 0.\n");
+//      }
+//      return;
+//    }
 
-      m_ls[0]->projectInitialCondition( &a_U );
-      for (int i = 1; i < m_ls.size(); i++) {
-        m_ls[i]->projectInitialCondition( m_ls[i-1]->predict(m_intervals[i].first) );
-      }
-      return;
+//    m_ls[0]->projectInitialCondition( &a_U );
+//    for (int i = 1; i < m_ls.size(); i++) {
+//      m_ls[i]->projectInitialCondition( m_ls[i-1]->predict(m_intervals[i].first) );
+//    }
+//    return;
     }
 
     /*! take a sample (solution snapshot) */
