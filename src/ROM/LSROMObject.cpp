@@ -141,11 +141,13 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       printf( "LSROMObject::takeSample() - creating new generator object for sim. domain %d, var %d, t=%f (total: %d).\n",
               m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
     }
-//  bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+    /* QUESTION: should a_U be centered? */
+    bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+    m_generator[m_curr_win]->writeSnapshot();
 
-//} else {
+  } else {
 
-//  bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+    bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 
 //  if (m_tic%m_num_window_samples == 0) {
 //    printf("checking m_tic %d \n",m_tic);
