@@ -135,12 +135,12 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
     m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisName));
     m_intervals.push_back( Interval(a_time, m_t_final) );
-//  m_ls_is_trained.push_back(false);
+    m_ls_is_trained.push_back(false);
 
-//  if (!m_rank) {
-//    printf( "LSROMObject::takeSample() - creating new LS object for sim. domain %d, var %d, t=%f (total: %d).\n",
-//            m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_ls.size());
-//  }
+    if (!m_rank) {
+      printf( "LSROMObject::takeSample() - creating new generator object for sim. domain %d, var %d, t=%f (total: %d).\n",
+              m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
+    }
 //  bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 
 //} else {
