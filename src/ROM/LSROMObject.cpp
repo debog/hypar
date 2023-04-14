@@ -143,7 +143,18 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     }
     /* QUESTION: should a_U be centered? */
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
-    m_generator[m_curr_win]->writeSnapshot();
+    /* Below is printing the singular value */
+    m_S = m_generator[m_curr_win]->getSingularValues();
+    std::cout << "m_S: ";
+    for (int i = 0; i < m_S->dim(); i++) {
+            std::cout << (m_S->item(i)) << " ";
+    }
+    std::cout << std::endl;
+//  m_generator[m_curr_win]->writeSnapshot();
+    // In order to use WriteArray function in hypar,
+    // Instead of using writeSnapshot(), use getSnapshotMatrix if one likes to visualize the snapshot,
+    // Use getspatial basis if one likes to visualize the basis.
+    // In both cases, the question is how to use Matrix datatype with WriteArray.
 
   } else {
 
