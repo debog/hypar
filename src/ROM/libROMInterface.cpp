@@ -215,7 +215,7 @@ void libROMInterface::takeSample( void* a_s,        /*!< Array of simulation obj
   copyFromHyPar( m_U, a_s );
   gettimeofday(&m_train_start, NULL);
   for (int i = 0; i < m_rom.size(); i++) {
-    m_rom[i]->takeSample( *(m_U[i]), a_t );
+    m_rom[i]->takeSample( *(m_U[i]), a_t, a_s );
   }
   gettimeofday(&m_train_end, NULL);
 
