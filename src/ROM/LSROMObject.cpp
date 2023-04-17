@@ -7,6 +7,8 @@
 
 #include <basic.h>
 #include <rom_object_ls.h>
+#include <simulation_object.h>
+#include <io_cpp.h>
 
 /*! Constructor 
     This function will also look into the file
@@ -128,8 +130,10 @@ LSROMObject::LSROMObject( const int     a_vec_size, /*!< vector size */
 
 /*! take a sample (solution snapshot) */
 void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
-                                const double a_time /*!< sample time */ )
+                                const double a_time, /*!< sample time */ 
+                                void* a_s )
 {
+    SimulationObject* sim = (SimulationObject*) a_s;
   if (m_tic == 0) {
 
     m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
@@ -151,6 +155,16 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     }
     std::cout << std::endl;
 //  m_generator[m_curr_win]->writeSnapshot();
+      WriteArray( sim[0].solver.ndims,
+                  sim[0].solver.nvars,
+                  sim[0].solver.dim_global,
+                  sim[0].solver.dim_local,
+                  sim[0].solver.ghosts,
+                  sim[0].solver.x,
+                  a_U.getData(),
+                  &(sim[0].solver),
+                  &(sim[0].mpi),
+                  "sample_" );
     // In order to use WriteArray function in hypar,
     // Instead of using writeSnapshot(), use getSnapshotMatrix if one likes to visualize the snapshot,
     // Use getspatial basis if one likes to visualize the basis.
