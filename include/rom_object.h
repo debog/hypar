@@ -37,7 +37,7 @@ class ROMObject
     /*! Project initial solution for prediction */
     virtual void projectInitialSolution( CAROM::Vector& ) = 0;
     /*! take a sample (solution snapshot) */
-    virtual void takeSample( const CAROM::Vector&, const double ) = 0;
+    virtual void takeSample( const CAROM::Vector&, const double, void* ) = 0;
     /*! train the ROM object */
     virtual void train() = 0;
     /*! compute prediction at given time */
