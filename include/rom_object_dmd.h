@@ -74,7 +74,7 @@ class DMDROMObject : public ROMObject
     }
 
     /*! take a sample (solution snapshot) */
-    virtual void takeSample( const CAROM::Vector&, const double );
+    virtual void takeSample( const CAROM::Vector&, const double, void* );
 
     /*! train the DMD object */
     virtual void train();
