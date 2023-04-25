@@ -216,7 +216,7 @@ cat <<MFILE > petscmake$$
 PETSC_ARCH = ${PETSC_ARCH}
 PETSC_DIR  = ${PETSC_DIR}
 include ${PETSC_DIR}/lib/petsc/conf/variables
-include ${PETSC_DIR}/lib/petsc/conf/rules
+include ${PETSC_DIR}/lib/petsc/conf/rules.utils
 MFILE
       PETSC_INC="`make -f petscmake$$ getincludedirs`"
       PETSC_LIB="`make -f petscmake$$ getlinklibs`"

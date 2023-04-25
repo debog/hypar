@@ -256,10 +256,10 @@ int main(int argc, char **argv)
 
 #ifdef with_petsc
   use_petscts = PETSC_FALSE; /* default value */
-  ierr = PetscOptionsGetBool( PETSC_NULL,PETSC_NULL,
+  ierr = PetscOptionsGetBool( nullptr,nullptr,
                               "-use-petscts",
                               &use_petscts,
-                              PETSC_NULL); CHKERRQ(ierr);
+                              nullptr); CHKERRQ(ierr);
   if (use_petscts == PETSC_TRUE) use_petsc = 1;
   sim->usePetscTS(use_petscts);
 #endif
