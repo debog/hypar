@@ -246,8 +246,8 @@ extern "C" int gpuMPIExchangeBoundariesnD(
   }
 
   /* Wait till data is done received */
-  MPI_Waitall(2*ndims,rcvreq,MPI_STATUS_IGNORE);
-
+  MPI_Status status_arr[2*ndims];
+  MPI_Waitall(2*ndims,rcvreq,status_arr);
   /* copy received data to ghost points */
   for (d = 0; d < ndims; d++) {
     _ArrayCopy1D_(cpu_dim,bounds,ndims); bounds[d] = ghosts;
@@ -263,9 +263,8 @@ extern "C" int gpuMPIExchangeBoundariesnD(
     }
   }
   cudaDeviceSynchronize();
-
   /* Wait till send requests are complete before freeing memory */
-  MPI_Waitall(2*ndims,sndreq,MPI_STATUS_IGNORE);
+  MPI_Waitall(2*ndims,sndreq,status_arr);
 #endif
   return 0;
 }

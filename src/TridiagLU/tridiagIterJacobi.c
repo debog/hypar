@@ -166,7 +166,8 @@ int tridiagIterJacobi(
     }
     /* calculate error norm - boundary */
 #ifndef serial
-    MPI_Waitall(4,req,MPI_STATUS_IGNORE);
+    MPI_Status status_arr[4];
+    MPI_Waitall(4,req,status_arr);
 #endif
     if (context->evaluate_norm) {
       if (n > 1) {
