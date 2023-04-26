@@ -53,6 +53,7 @@ RUN_SCRIPT="run.sh"
 NEEDS_PETSC="dep.PETSc"
 NEEDS_FFTW="dep.fftw"
 NEEDS_LIBROM="dep.libROM"
+DISABLED=".disabled"
 
 # Clone HyPar
 echo "removing any previous HyPar copy..."
@@ -183,6 +184,10 @@ for f in *; do
     elif [ -f "$NEEDS_FFTW" ] && [ "$opt_with_fftw" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (FFTW)."
       echo "Skipping; $f has unmet dependencies (FFTW)." >> $report_file
+      ((n_skip+=1))
+    elif [ -f "$DISABLED" ]; then
+      echo "Skipping; $f test is disabled."
+      echo "Skipping; $f test is disabled." >> $report_file
       ((n_skip+=1))
     else
       if [ -f "$RUN_SCRIPT" ]; then
