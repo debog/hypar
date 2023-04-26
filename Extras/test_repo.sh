@@ -43,7 +43,7 @@ hypar_baselines_dir="baselines"
 
 # stuff about test directory
 hypar_test_dir="_test"
-exclude_flag="--exclude={'op*','surface*','ibank*','initial*','out.log','README.md'}"
+exclude_flag="--exclude={'op*','surface*','ibank*','initial*','out.log','README.md','.git*'}"
 diff_filelistname="diff_file_list"
 diff_file="diff.log"
 report_filename="test_report.txt"
