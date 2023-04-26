@@ -64,6 +64,7 @@ void IncrementFilenameIndex(
 void ResetFilenameIndex(  char *f,  /*!< Character string representing the integer */
                           int len   /*!< Length of the string */ )
 {
+  if (!f) return;
   int i;
   for (i = 0; i < len; i++) {
     f[i] = '0';
