@@ -157,12 +157,12 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 //  m_generator[m_curr_win]->writeSnapshot();
 //    CAROM::Vector a_tmp(m_generator[0]->getSnapshotMatrix()->getColumn(0),sim[0].solver.dim_global,false);
       double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData();
-      printf("filename_index %s\n",sim[0].solver.filename_index);
+
       WriteArray( sim[0].solver.ndims,
                   sim[0].solver.nvars,
                   sim[0].solver.dim_global,
                   sim[0].solver.dim_local,
-                  sim[0].solver.ghosts,
+                  0,
                   sim[0].solver.x,
                   vec_data,
                   &(sim[0].solver),
@@ -183,7 +183,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                   sim[0].solver.nvars,
                   sim[0].solver.dim_global,
                   sim[0].solver.dim_local,
-                  sim[0].solver.ghosts,
+                  0,
                   sim[0].solver.x,
                   vec_data,
                   &(sim[0].solver),
