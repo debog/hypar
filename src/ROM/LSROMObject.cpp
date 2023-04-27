@@ -148,20 +148,23 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     /* QUESTION: should a_U be centered? */
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
     /* Below is printing the singular value */
-    m_S = m_generator[m_curr_win]->getSingularValues();
-    std::cout << "m_S: ";
-    for (int i = 0; i < m_S->dim(); i++) {
-            std::cout << (m_S->item(i)) << " ";
-    }
-    std::cout << std::endl;
+//  m_S = m_generator[m_curr_win]->getSingularValues();
+//  std::cout << "m_S: ";
+//  for (int i = 0; i < m_S->dim(); i++) {
+//          std::cout << (m_S->item(i)) << " ";
+//  }
+//  std::cout << std::endl;
 //  m_generator[m_curr_win]->writeSnapshot();
+//    CAROM::Vector a_tmp(m_generator[0]->getSnapshotMatrix()->getColumn(0),sim[0].solver.dim_global,false);
+      double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData();
+      printf("filename_index %s\n",sim[0].solver.filename_index);
       WriteArray( sim[0].solver.ndims,
                   sim[0].solver.nvars,
                   sim[0].solver.dim_global,
                   sim[0].solver.dim_local,
                   sim[0].solver.ghosts,
                   sim[0].solver.x,
-                  a_U.getData(),
+                  vec_data,
                   &(sim[0].solver),
                   &(sim[0].mpi),
                   "sample_" );
@@ -174,37 +177,18 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 
-//  if (m_tic%m_num_window_samples == 0) {
-//    printf("checking m_tic %d \n",m_tic);
-
-//    m_intervals[m_curr_win].second = a_time;
-//    int ncol = m_ls[m_curr_win]->getSnapshotMatrix()->numColumns();
-//    if (!m_rank) {
-//      printf( "LSROMObject::train() - training LS object %d for sim. domain %d, var %d with %d samples.\n", 
-//              m_curr_win, m_sim_idx, m_var_idx, ncol );
-//    }
-
-//    if (m_write_snapshot_mat) {
-//      char idx_string[_MAX_STRING_SIZE_];
-//      sprintf(idx_string, "%04d", m_curr_win);
-//      std::string fname_root(m_dirname + "/snapshot_mat_"+std::string(idx_string));
-//      m_ls[m_curr_win]->getSnapshotMatrix()->write(fname_root);
-//    }
-//    m_ls[m_curr_win]->train(m_rdim);
-//    m_ls_is_trained[m_curr_win] = true;
-
-//    m_curr_win++;
-
-//    m_ls.push_back( new CAROM::LS(m_vec_size, m_dt) );
-//    m_ls_is_trained.push_back(false);
-//    m_intervals.push_back( Interval(a_time, m_t_final) );
-//    m_ls[m_curr_win]->takeSample( a_U.getData(), a_time );
-//    if (!m_rank) {
-//      printf("LSROMObject::takeSample() - creating new LS object for sim. domain %d, var %d, t=%f (total: %d).\n",
-//             m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_ls.size());
-//    }
-//  }
-
+      printf("filename_index %s\n",sim[0].solver.filename_index);
+      double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(m_tic)->getData();
+      WriteArray( sim[0].solver.ndims,
+                  sim[0].solver.nvars,
+                  sim[0].solver.dim_global,
+                  sim[0].solver.dim_local,
+                  sim[0].solver.ghosts,
+                  sim[0].solver.x,
+                  vec_data,
+                  &(sim[0].solver),
+                  &(sim[0].mpi),
+                  "sample_" );
   }
 
   m_tic++;
@@ -214,24 +198,6 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 /*! train the LS objects */
 void LSROMObject::train()
 {
-  /* make sure the number of columns for the last LS isn't less than m_rdim */
-  {
-    int last_win = m_generator.size() - 1;
-    int num_columns( m_generator[last_win]->getSnapshotMatrix()->numColumns() );
-    if (num_columns <= m_rdim) {
-      m_generator.pop_back();
-      m_intervals.pop_back();
-      m_intervals[m_intervals.size()-1].second = m_t_final;
-      if (!m_rank) {
-        printf("LSROMObject::train() - last window LS for sim. domain %d, var %d has %d sample(s) only; deleted it ",
-               m_sim_idx,
-               m_var_idx,
-               num_columns );
-        printf("(total: %d).\n", m_generator.size());
-      }
-    }
-  }
-
   if (m_generator.size() > 0) {
     for (int i = 0; i < m_generator.size(); i++) {
       if (!m_ls_is_trained[i]) {
@@ -241,10 +207,12 @@ void LSROMObject::train()
                   m_curr_win, m_sim_idx, m_var_idx, ncol );
         }
         if (m_write_snapshot_mat) {
+          printf( "inside m_write_snapshot_mat");
           char idx_string[_MAX_STRING_SIZE_];
           sprintf(idx_string, "%04d", i);
           std::string fname_root(m_dirname + "/snapshot_mat_"+std::string(idx_string));
-          m_generator[i]->getSnapshotMatrix()->write(fname_root);
+//        m_generator[i]->getSnapshotMatrix()->write(fname_root);
+//        m_generator[i]->getSnapshotMatrix()->print("s");
         }
 //      m_generator[i]->train(m_rdim);
 //      libROM merge phase code here
