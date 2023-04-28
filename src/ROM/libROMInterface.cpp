@@ -252,11 +252,11 @@ void libROMInterface::projectInitialSolution( void* a_s  /*!< Array of simulatio
 }
 
 /*! Train the ROM object */
-void libROMInterface::train()
+void libROMInterface::train(void* a_s)
 {
   gettimeofday(&m_train_start, NULL);
   for (int i = 0; i < m_rom.size(); i++) {
-    m_rom[i]->train();
+    m_rom[i]->train(a_s);
   }
   gettimeofday(&m_train_end, NULL);
 

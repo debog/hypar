@@ -180,7 +180,7 @@ void DMDROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector *
 }
 
 /*! train the DMD objects */
-void DMDROMObject::train()
+void DMDROMObject::train(void* a_s)
 {
   /* make sure the number of columns for the last DMD isn't less than m_rdim */
   {

@@ -12,6 +12,7 @@
 #include <timeintegration_cpp.h>
 #include <mpivars_cpp.h>
 #include <simulation_object.h>
+#include <stdlib.h>
 
 #ifdef with_librom
 #include <librom_interface.h>
@@ -186,9 +187,10 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   
     if (rom_interface.mode() == _ROM_MODE_TRAIN_) {
   
-      rom_interface.train();
+      rom_interface.train(sim);
       if (!rank) printf("libROM: total training wallclock time: %f (seconds).\n", 
                         rom_interface.trainWallclockTime() );
+      exit (0);
 
       double total_rom_predict_time = 0;
       for (int iter = 0; iter < op_times_arr.size(); iter++) {
