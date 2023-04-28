@@ -9,6 +9,8 @@
 #include <rom_object_ls.h>
 #include <simulation_object.h>
 #include <io_cpp.h>
+#include <cstring>
+
 
 /*! Constructor 
     This function will also look into the file
@@ -133,7 +135,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                                 const double a_time, /*!< sample time */ 
                                 void* a_s )
 {
-    SimulationObject* sim = (SimulationObject*) a_s;
+  SimulationObject* sim = (SimulationObject*) a_s;
   if (m_tic == 0) {
 
     m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
@@ -196,8 +198,9 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 }
 
 /*! train the LS objects */
-void LSROMObject::train()
+void LSROMObject::train(void* a_s)
 {
+  SimulationObject* sim = (SimulationObject*) a_s;
   if (m_generator.size() > 0) {
     for (int i = 0; i < m_generator.size(); i++) {
       if (!m_ls_is_trained[i]) {
@@ -207,15 +210,51 @@ void LSROMObject::train()
                   m_curr_win, m_sim_idx, m_var_idx, ncol );
         }
         if (m_write_snapshot_mat) {
-          printf( "inside m_write_snapshot_mat");
+          printf( "inside m_write_snapshot_mat \n");
           char idx_string[_MAX_STRING_SIZE_];
           sprintf(idx_string, "%04d", i);
           std::string fname_root(m_dirname + "/snapshot_mat_"+std::string(idx_string));
-//        m_generator[i]->getSnapshotMatrix()->write(fname_root);
-//        m_generator[i]->getSnapshotMatrix()->print("s");
+          // Need additional process in order to visualize it
+          m_generator[i]->getSnapshotMatrix()->write(fname_root);
         }
 //      m_generator[i]->train(m_rdim);
 //      libROM merge phase code here
+        printf( "before g\n");
+        const int rom_dim = m_generator[i]->getSpatialBasis()->numColumns();
+        printf( "numcolumns %d\n",rom_dim);
+        const CAROM::Vector* sing_vals = m_generator[i]->getSingularValues();
+        std::cout << "m_S: ";
+        for (int i = 0; i < sing_vals->dim(); i++) {
+                std::cout << (sing_vals->item(i)) << " ";
+        }
+        std::cout << std::endl;
+//      m_generator[i]->endSamples();
+//      const Matrix* mat;
+        int num_rows = m_generator[i]->getSpatialBasis()->numRows();
+        int num_cols = m_generator[i]->getSpatialBasis()->numColumns();
+//      const int d_dim = m_generator[i]->getSpatialBasis()->numRows();
+//      CAROM::Matrix* d_basis;
+//      d_basis = new CAROM::Matrix(num_rows, num_cols, false);
+//      printf( "rows, cols: %d %d \n",num_rows,num_cols);
+
+        for (int j = 0; j < num_cols; j++){
+          double* vec_data = m_generator[0]->getSpatialBasis()->getColumn(j)->getData();
+          const char* filename = "basis_";
+          std::string file_name = std::string(filename) + std::to_string(j);
+          char* file_name_buffer = new char[file_name.length() + 1];
+          std::strcpy(file_name_buffer, file_name.c_str());
+
+          WriteArray( sim[0].solver.ndims,
+                      sim[0].solver.nvars,
+                      sim[0].solver.dim_global,
+                      sim[0].solver.dim_local,
+                      0,
+                      sim[0].solver.x,
+                      vec_data,
+                      &(sim[0].solver),
+                      &(sim[0].mpi),
+                      file_name_buffer);
+        }
       }
     }
   } else {

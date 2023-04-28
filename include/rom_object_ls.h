@@ -69,7 +69,7 @@ class LSROMObject : public ROMObject
     virtual void takeSample( const CAROM::Vector&, const double, void* );
 
     /*! train the LS object */
-    virtual void train();
+    virtual void train(void* );
 
     /*! compute prediction at given time */
     virtual 

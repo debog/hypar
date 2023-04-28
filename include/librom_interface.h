@@ -108,7 +108,7 @@ class libROMInterface
     void projectInitialSolution( void* a_s );
 
     /*! Train the ROM object */
-    void train();
+    void train(void* a_s);
 
     /*! Predict the solution at a given time */
     void predict(void*  a_s, const double a_t) const;
