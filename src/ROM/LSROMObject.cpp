@@ -8,6 +8,7 @@
 #include <basic.h>
 #include <rom_object_ls.h>
 #include <simulation_object.h>
+#include <timeintegration.h>
 #include <io_cpp.h>
 #include <cstring>
 
@@ -36,6 +37,8 @@
     Note: other keywords in this file may be read by other functions.
    
 */
+extern "C" int TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
+
 LSROMObject::LSROMObject( const int     a_vec_size, /*!< vector size */
                             const double  a_dt,       /*!< time step size */
                             const int     a_rdim,     /*!< latent space dimension */
@@ -201,6 +204,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 void LSROMObject::train(void* a_s)
 {
   SimulationObject* sim = (SimulationObject*) a_s;
+
   if (m_generator.size() > 0) {
     for (int i = 0; i < m_generator.size(); i++) {
       if (!m_ls_is_trained[i]) {
@@ -217,28 +221,33 @@ void LSROMObject::train(void* a_s)
           // Need additional process in order to visualize it
           m_generator[i]->getSnapshotMatrix()->write(fname_root);
         }
-//      m_generator[i]->train(m_rdim);
-//      libROM merge phase code here
-        printf( "before g\n");
         const int rom_dim = m_generator[i]->getSpatialBasis()->numColumns();
         printf( "numcolumns %d\n",rom_dim);
         const CAROM::Vector* sing_vals = m_generator[i]->getSingularValues();
-        std::cout << "m_S: ";
-        for (int i = 0; i < sing_vals->dim(); i++) {
+        if (!m_rank) {
+          std::cout << "m_S: ";
+          for (int i = 0; i < sing_vals->dim(); i++) {
                 std::cout << (sing_vals->item(i)) << " ";
+          }
+          std::cout << std::endl;
         }
-        std::cout << std::endl;
-//      m_generator[i]->endSamples();
-//      const Matrix* mat;
         int num_rows = m_generator[i]->getSpatialBasis()->numRows();
         int num_cols = m_generator[i]->getSpatialBasis()->numColumns();
 //      const int d_dim = m_generator[i]->getSpatialBasis()->numRows();
-//      CAROM::Matrix* d_basis;
-//      d_basis = new CAROM::Matrix(num_rows, num_cols, false);
+        CAROM::Matrix* phi_hyper;
+        phi_hyper = new CAROM::Matrix(num_rows, num_cols, true);
 //      printf( "rows, cols: %d %d \n",num_rows,num_cols);
 
         for (int j = 0; j < num_cols; j++){
+          // vec_data is reduced basis \phi_j
           double* vec_data = m_generator[0]->getSpatialBasis()->getColumn(j)->getData();
+          int ierr = TimeRHSFunctionExplicit(phi_hyper->getColumn(j)->getData(),
+                               vec_data,
+                               &(sim[0].solver),
+                               &(sim[0].mpi),
+                               0);
+          CHECKERR(ierr);
+
           const char* filename = "basis_";
           std::string file_name = std::string(filename) + std::to_string(j);
           char* file_name_buffer = new char[file_name.length() + 1];
