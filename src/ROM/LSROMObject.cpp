@@ -9,6 +9,7 @@
 #include <rom_object_ls.h>
 #include <simulation_object.h>
 #include <timeintegration.h>
+#include <arrayfunctions.h>
 #include <io_cpp.h>
 #include <cstring>
 
@@ -231,28 +232,68 @@ void LSROMObject::train(void* a_s)
           }
           std::cout << std::endl;
         }
-        int num_rows = m_generator[i]->getSpatialBasis()->numRows();
+        // num_rows including ghost points
+        int num_rows = sim[0].solver.npoints_local_wghosts;
         int num_cols = m_generator[i]->getSpatialBasis()->numColumns();
 //      const int d_dim = m_generator[i]->getSpatialBasis()->numRows();
         CAROM::Matrix* phi_hyper;
         phi_hyper = new CAROM::Matrix(num_rows, num_cols, true);
-//      printf( "rows, cols: %d %d \n",num_rows,num_cols);
+        printf( "rows, cols: %d %d \n",num_rows,num_cols);
 
         for (int j = 0; j < num_cols; j++){
           // vec_data is reduced basis \phi_j
           double* vec_data = m_generator[0]->getSpatialBasis()->getColumn(j)->getData();
-          int ierr = TimeRHSFunctionExplicit(phi_hyper->getColumn(j)->getData(),
-                               vec_data,
+          double* vec_data1 = phi_hyper->getColumn(j)->getData();
+          copyToHyPar(*(m_generator[0]->getSpatialBasis()->getColumn(j)),&sim[0],0);
+
+//        const char* fname = "check_";
+//        std::string fname1 = std::string(fname) + std::to_string(j);
+//        char* fname_buffer = new char[fname1.length() + 1];
+//        std::strcpy(fname_buffer, fname1.c_str());
+
+//        WriteArray( sim[0].solver.ndims,
+//                    sim[0].solver.nvars,
+//                    sim[0].solver.dim_global,
+//                    sim[0].solver.dim_local,
+//                    sim[0].solver.ghosts,
+//                    sim[0].solver.x,
+//                    sim[0].solver.u,
+//                    &(sim[0].solver),
+//                    &(sim[0].mpi),
+//                    fname_buffer);
+
+//        int vec_data_size =  m_generator[0]->getSpatialBasis()->numRows();
+//        int vec_data1_size = phi_hyper->numRows();
+//        printf( "rows, cols: %d %d \n",vec_data_size,vec_data1_size);
+          int ierr = TimeRHSFunctionExplicit(vec_data1,
+                               sim[0].solver.u,
                                &(sim[0].solver),
                                &(sim[0].mpi),
                                0);
           CHECKERR(ierr);
+
+          const char* fname = "hyper_";
+          std::string fname1 = std::string(fname) + std::to_string(j);
+          char* fname_buffer = new char[fname1.length() + 1];
+          std::strcpy(fname_buffer, fname1.c_str());
+
+          WriteArray( sim[0].solver.ndims,
+                      sim[0].solver.nvars,
+                      sim[0].solver.dim_global,
+                      sim[0].solver.dim_local,
+                      sim[0].solver.ghosts,
+                      sim[0].solver.x,
+                      vec_data1,
+                      &(sim[0].solver),
+                      &(sim[0].mpi),
+                      fname_buffer);
 
           const char* filename = "basis_";
           std::string file_name = std::string(filename) + std::to_string(j);
           char* file_name_buffer = new char[file_name.length() + 1];
           std::strcpy(file_name_buffer, file_name.c_str());
 
+          // ghost is 0, x and y coordinate is not correctly outpost
           WriteArray( sim[0].solver.ndims,
                       sim[0].solver.nvars,
                       sim[0].solver.dim_global,
@@ -280,6 +321,30 @@ void LSROMObject::save(const std::string& a_fname_root /*!< Filename root */) co
 void LSROMObject::load(const std::string& a_fname_root /*!< Filename root */)
 {
     return;
+}
+
+void LSROMObject::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vector */
+                                    void* a_s, /*!< Array of simulation objects of 
+                                                    type #SimulationObject */
+                                    int a_idx /*!< Simulation object index */ ) const
+{
+  SimulationObject* sim = (SimulationObject*) a_s;
+
+  double* u;
+  u = sim[a_idx].solver.u;
+
+  std::vector<int> index(sim[a_idx].solver.ndims);
+
+  ArrayCopynD(  sim[a_idx].solver.ndims,
+                a_vec.getData(),
+                u,
+                sim[a_idx].solver.dim_local,
+                0,
+                sim[a_idx].solver.ghosts,
+                index.data(),
+                sim[a_idx].solver.nvars );
+
+  return;
 }
 
 #endif
