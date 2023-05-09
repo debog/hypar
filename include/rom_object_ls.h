@@ -91,6 +91,9 @@ class LSROMObject : public ROMObject
     /*! load LS object from file */
     virtual void load(const std::string& a_fname_root /*!< Filename root*/);
 
+    /*! Copy a vector to HyPar */
+    void copyToHyPar( const CAROM::Vector&, void*, int ) const;
+
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
