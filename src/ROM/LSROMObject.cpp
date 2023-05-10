@@ -156,39 +156,38 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     /* QUESTION: should a_U be centered? */
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 
-      double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData();
+    double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData();
 
-      WriteArray( sim[0].solver.ndims,
-                  sim[0].solver.nvars,
-                  sim[0].solver.dim_global,
-                  sim[0].solver.dim_local,
-                  0,
-                  sim[0].solver.x,
-                  vec_data,
-                  &(sim[0].solver),
-                  &(sim[0].mpi),
-                  "sample_" );
+    WriteArray( sim[0].solver.ndims,
+                sim[0].solver.nvars,
+                sim[0].solver.dim_global,
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.x,
+                vec_data,
+                &(sim[0].solver),
+                &(sim[0].mpi),
+                "sample_" );
     // In order to use WriteArray function in hypar,
     // Instead of using writeSnapshot(), use getSnapshotMatrix if one likes to visualize the snapshot,
     // Use getspatial basis if one likes to visualize the basis.
     // In both cases, the question is how to use Matrix datatype with WriteArray.
-
   } else {
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 
-      printf("filename_index %s\n",sim[0].solver.filename_index);
-      double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(m_tic)->getData();
-      WriteArray( sim[0].solver.ndims,
-                  sim[0].solver.nvars,
-                  sim[0].solver.dim_global,
-                  sim[0].solver.dim_local,
-                  0,
-                  sim[0].solver.x,
-                  vec_data,
-                  &(sim[0].solver),
-                  &(sim[0].mpi),
-                  "sample_" );
+    printf("filename_index %s\n",sim[0].solver.filename_index);
+    double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(m_tic)->getData();
+    WriteArray( sim[0].solver.ndims,
+                sim[0].solver.nvars,
+                sim[0].solver.dim_global,
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.x,
+                vec_data,
+                &(sim[0].solver),
+                &(sim[0].mpi),
+                "sample_" );
   }
 
   m_tic++;
