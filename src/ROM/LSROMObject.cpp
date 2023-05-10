@@ -265,12 +265,23 @@ void LSROMObject::train(void* a_s)
 //        int vec_data_size =  m_generator[0]->getSpatialBasis()->numRows();
 //        int vec_data1_size = phi_hyper->numRows();
 //        printf( "rows, cols: %d %d \n",vec_data_size,vec_data1_size);
+          CAROM::Vector column_vec(num_rows,false);
           int ierr = TimeRHSFunctionExplicit(vec_data1,
                                sim[0].solver.u,
                                &(sim[0].solver),
                                &(sim[0].mpi),
                                0);
           CHECKERR(ierr);
+          for (int i = 0; i < num_rows; i++) {
+            (*phi_hyper)(i, j) = vec_data1[i];
+          }
+
+//        phi_hyper->getColumn(j) = column_vec;
+//        for (int i = 0; i < num_rows; i++) {
+//          phi_hyper->getColumn(j)->item(i) = column_vec.item(i);
+//          printf("i, %d %f %f\n",i,phi_hyper->getColumn(j)->item(i),column_vec.item(i));
+//        }
+//        exit (0);
 
           const char* fname = "hyper_";
           std::string fname1 = std::string(fname) + std::to_string(j);
@@ -283,7 +294,7 @@ void LSROMObject::train(void* a_s)
                       sim[0].solver.dim_local,
                       sim[0].solver.ghosts,
                       sim[0].solver.x,
-                      vec_data1,
+                      phi_hyper->getColumn(j)->getData(),
                       &(sim[0].solver),
                       &(sim[0].mpi),
                       fname_buffer);
