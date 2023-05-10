@@ -144,6 +144,8 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 
     m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
     m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisName));
+//  printf("HEREEEEEE %d \n", isIncremental ? 1 : 0);
+//  exit (0);
     m_intervals.push_back( Interval(a_time, m_t_final) );
     m_ls_is_trained.push_back(false);
 
@@ -153,13 +155,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     }
     /* QUESTION: should a_U be centered? */
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
-    /* Below is printing the singular value */
-//  m_S = m_generator[m_curr_win]->getSingularValues();
-//  std::cout << "m_S: ";
-//  for (int i = 0; i < m_S->dim(); i++) {
-//          std::cout << (m_S->item(i)) << " ";
-//  }
-//  std::cout << std::endl;
+
 //  m_generator[m_curr_win]->writeSnapshot();
 //    CAROM::Vector a_tmp(m_generator[0]->getSnapshotMatrix()->getColumn(0),sim[0].solver.dim_global,false);
       double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData();
@@ -222,6 +218,7 @@ void LSROMObject::train(void* a_s)
           // Need additional process in order to visualize it
           m_generator[i]->getSnapshotMatrix()->write(fname_root);
         }
+        // Does everytime invoking getSpatialBasis() do computeSVD again?
         const int rom_dim = m_generator[i]->getSpatialBasis()->numColumns();
         printf( "numcolumns %d\n",rom_dim);
         const CAROM::Vector* sing_vals = m_generator[i]->getSingularValues();
@@ -316,6 +313,9 @@ void LSROMObject::train(void* a_s)
                       &(sim[0].mpi),
                       file_name_buffer);
         }
+
+        // construct hyper_ROM = phi^T hyper_phi phi
+//      phi_hyper
       }
     }
   } else {
