@@ -238,22 +238,6 @@ void LSROMObject::train(void* a_s)
           double* vec_data1 = phi_hyper->getColumn(j)->getData();
           copyToHyPar(*(m_generator[0]->getSpatialBasis()->getColumn(j)),&sim[0],0);
 
-//        const char* fname = "check_";
-//        std::string fname1 = std::string(fname) + std::to_string(j);
-//        char* fname_buffer = new char[fname1.length() + 1];
-//        std::strcpy(fname_buffer, fname1.c_str());
-
-//        WriteArray( sim[0].solver.ndims,
-//                    sim[0].solver.nvars,
-//                    sim[0].solver.dim_global,
-//                    sim[0].solver.dim_local,
-//                    sim[0].solver.ghosts,
-//                    sim[0].solver.x,
-//                    sim[0].solver.u,
-//                    &(sim[0].solver),
-//                    &(sim[0].mpi),
-//                    fname_buffer);
-
 //        int vec_data_size =  m_generator[0]->getSpatialBasis()->numRows();
 //        int vec_data1_size = phi_hyper->numRows();
 //        printf( "rows, cols: %d %d \n",vec_data_size,vec_data1_size);
