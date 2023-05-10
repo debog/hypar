@@ -208,7 +208,6 @@ void LSROMObject::train(void* a_s)
                   m_curr_win, m_sim_idx, m_var_idx, ncol );
         }
         if (m_write_snapshot_mat) {
-          printf( "inside m_write_snapshot_mat \n");
           char idx_string[_MAX_STRING_SIZE_];
           sprintf(idx_string, "%04d", i);
           std::string fname_root(m_dirname + "/snapshot_mat_"+std::string(idx_string));
@@ -216,23 +215,22 @@ void LSROMObject::train(void* a_s)
           m_generator[i]->getSnapshotMatrix()->write(fname_root);
         }
         // Does everytime invoking getSpatialBasis() do computeSVD again?
-        const int rom_dim = m_generator[i]->getSpatialBasis()->numColumns();
-        printf( "numcolumns %d\n",rom_dim);
         const CAROM::Vector* sing_vals = m_generator[i]->getSingularValues();
         if (!m_rank) {
-          std::cout << "m_S: ";
+          std::cout << "Singular Values: ";
           for (int i = 0; i < sing_vals->dim(); i++) {
                 std::cout << (sing_vals->item(i)) << " ";
           }
           std::cout << std::endl;
         }
+
         // num_rows including ghost points
         int num_rows = sim[0].solver.npoints_local_wghosts;
         int num_cols = m_generator[i]->getSpatialBasis()->numColumns();
-//      const int d_dim = m_generator[i]->getSpatialBasis()->numRows();
+
         CAROM::Matrix* phi_hyper;
         phi_hyper = new CAROM::Matrix(num_rows, num_cols, true);
-        printf( "rows, cols: %d %d \n",num_rows,num_cols);
+        printf( "Check phi_hyper rows, cols: %d %d \n",num_rows,num_cols);
 
         for (int j = 0; j < num_cols; j++){
           // vec_data is reduced basis \phi_j
