@@ -156,8 +156,6 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     /* QUESTION: should a_U be centered? */
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 
-//  m_generator[m_curr_win]->writeSnapshot();
-//    CAROM::Vector a_tmp(m_generator[0]->getSnapshotMatrix()->getColumn(0),sim[0].solver.dim_global,false);
       double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData();
 
       WriteArray( sim[0].solver.ndims,
