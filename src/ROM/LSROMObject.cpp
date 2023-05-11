@@ -225,27 +225,53 @@ void LSROMObject::train(void* a_s)
         }
 
         // num_rows including ghost points
-        int num_rows = sim[0].solver.npoints_local_wghosts;
+        // set npoints_local
+//      int num_rows = sim[0].solver.npoints_local_wghosts;
+        int num_rows = m_generator[i]->getSpatialBasis()->numRows();
         int num_cols = m_generator[i]->getSpatialBasis()->numColumns();
 
         CAROM::Matrix* phi_hyper;
         phi_hyper = new CAROM::Matrix(num_rows, num_cols, true);
         printf( "Check phi_hyper rows, cols: %d %d \n",num_rows,num_cols);
 
+        CAROM::Vector phi_hyper_col(num_rows,false);
+        std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+        std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+
         for (int j = 0; j < num_cols; j++){
           // vec_data is reduced basis \phi_j
-          double* vec_data = m_generator[0]->getSpatialBasis()->getColumn(j)->getData();
-          double* vec_data1 = phi_hyper->getColumn(j)->getData();
-          copyToHyPar(*(m_generator[0]->getSpatialBasis()->getColumn(j)),&sim[0],0);
+//        double* vec_data = m_generator[0]->getSpatialBasis()->getColumn(j)->getData();
+//        double* vec_data1 = phi_hyper->getColumn(j)->getData();
 
-          int ierr = TimeRHSFunctionExplicit(vec_data1,
-                               sim[0].solver.u,
-                               &(sim[0].solver),
-                               &(sim[0].mpi),
-                               0);
-          CHECKERR(ierr);
+          std::vector<int> index(sim[0].solver.ndims);
+          ArrayCopynD(sim[0].solver.ndims,
+                      m_generator[0]->getSpatialBasis()->getColumn(j)->getData(),
+                      vec_wghosts.data(),
+                      sim[0].solver.dim_local,
+                      0,
+                      sim[0].solver.ghosts,
+                      index.data(),
+                      sim[0].solver.nvars);
+
+//        copyToHyPar(*(m_generator[0]->getSpatialBasis()->getColumn(j)),&sim[0],0);
+
+          TimeRHSFunctionExplicit(rhs_wghosts.data(),
+                                  vec_wghosts.data(),
+                                  &(sim[0].solver),
+                                  &(sim[0].mpi),
+                                  0);
+
+          ArrayCopynD(sim[0].solver.ndims,
+                      rhs_wghosts.data(),
+                      phi_hyper_col.getData(),
+                      sim[0].solver.dim_local,
+                      sim[0].solver.ghosts,
+                      0,
+                      index.data(),
+                      sim[0].solver.nvars);
+
           for (int i = 0; i < num_rows; i++) {
-            (*phi_hyper)(i, j) = vec_data1[i];
+            (*phi_hyper)(i, j) = phi_hyper_col.getData()[i];
           }
 
           const char* fname = "hyper_";
@@ -257,7 +283,7 @@ void LSROMObject::train(void* a_s)
                       sim[0].solver.nvars,
                       sim[0].solver.dim_global,
                       sim[0].solver.dim_local,
-                      sim[0].solver.ghosts,
+                      0,
                       sim[0].solver.x,
                       phi_hyper->getColumn(j)->getData(),
                       &(sim[0].solver),
@@ -276,14 +302,16 @@ void LSROMObject::train(void* a_s)
                       sim[0].solver.dim_local,
                       0,
                       sim[0].solver.x,
-                      vec_data,
+                      m_generator[0]->getSpatialBasis()->getColumn(j)->getData(),
                       &(sim[0].solver),
                       &(sim[0].mpi),
                       file_name_buffer);
         }
 
-        // construct hyper_ROM = phi^T hyper_phi phi
-//      phi_hyper
+        // construct hyper_ROM = phi^T phi_hyper
+        printf("phi %d %d\n",m_generator[i]->getSpatialBasis()->numRows(),m_generator[i]->getSpatialBasis()->numColumns());
+        printf("phi_hyper %d %d\n",phi_hyper->numRows(),phi_hyper->numColumns());
+//      CAROM::Matrix* result =m_generator[0]->getSpatialBasis()->transposeMult(phi_hyper);
       }
     }
   } else {
