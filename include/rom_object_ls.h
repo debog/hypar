@@ -49,21 +49,7 @@ class LSROMObject : public ROMObject
     }
 
     /*! Project initial solution for prediction */
-    virtual void projectInitialSolution(  CAROM::Vector& a_U /*!< solution vector */ )
-    {
-//    if (m_ls.size() == 0) {
-//      if (!m_rank) {
-//        printf("ERROR in LSROMObject::projectInitialSolution() - m_ls is a vector of size 0.\n");
-//      }
-//      return;
-//    }
-
-//    m_ls[0]->projectInitialCondition( &a_U );
-//    for (int i = 1; i < m_ls.size(); i++) {
-//      m_ls[i]->projectInitialCondition( m_ls[i-1]->predict(m_intervals[i].first) );
-//    }
-//    return;
-    }
+    virtual void projectInitialSolution(  CAROM::Vector& );
 
     /*! take a sample (solution snapshot) */
     virtual void takeSample( const CAROM::Vector&, const double, void* );
@@ -99,6 +85,7 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
     std::vector<CAROM::BasisGenerator*> m_generator; /*!< Vector of BasisGenerator objects */
     std::vector<CAROM::Matrix*> m_spatialbasis; /*!< Vector of Matrix objects */
+    std::vector<CAROM::Vector*> m_projected_init; /*!< Vector of Vector objects */
     const CAROM::Vector* m_S; /*!< Vector of Singular value */
 
     std::vector<bool> m_ls_is_trained; /*!< Flag to indicate if LS is trained */

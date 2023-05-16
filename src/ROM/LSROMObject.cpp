@@ -55,6 +55,7 @@ LSROMObject::LSROMObject( const int     a_vec_size, /*!< vector size */
   m_options.clear();
   m_generator.clear();
   m_spatialbasis.clear();
+  m_projected_init.clear();
 
   m_ls_is_trained.clear();
   m_intervals.clear();
@@ -132,6 +133,39 @@ LSROMObject::LSROMObject( const int     a_vec_size, /*!< vector size */
 
   m_tic = 0;
   m_curr_win = 0;
+}
+
+void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U /*!< solution vector */ )
+{
+  /* Assumming m_generator[i]->getSpatialBasis() is called before */
+  if (m_generator.size() == 0) {
+    if (!m_rank) {
+      printf("ERROR in LSROMObject::projectInitialSolution() - m_ls is a vector of size 0.\n");
+    }
+    return;
+  }
+  for (int i = 0; i < m_generator.size(); i++) {
+    int num_rows = m_generator[i]->getSpatialBasis()->numRows();
+    m_projected_init.push_back(new CAROM::Vector(num_rows, false));
+    m_projected_init[i] = m_generator[i]->getSpatialBasis()->transposeMult(a_U);
+    printf("m_project size %d\n",m_projected_init[i]->dim());
+    if (!m_rank) {
+      std::cout << "Checking initial condition: ";
+      for (int j = 0; j < m_projected_init[i]->dim(); j++) {
+            std::cout << (m_projected_init[i]->item(j)) << " ";
+      }
+      std::cout << std::endl;
+    }
+  }
+
+  /* Currently only support for one time window
+   * Following code is copied from DMDObject for multiple windows and need to
+   * be modified accordingly for LS-ROM */
+//    m_ls[0]->projectInitialCondition( &a_U );
+//    for (int i = 1; i < m_ls.size(); i++) {
+//      m_ls[i]->projectInitialCondition( m_ls[i-1]->predict(m_intervals[i].first) );
+//    }
+//    return;
 }
 
 /*! take a sample (solution snapshot) */
@@ -315,7 +349,31 @@ void LSROMObject::train(void* a_s)
         printf("phi_hyper %d %d\n",phi_hyper->numRows(),phi_hyper->numColumns());
         CAROM::Matrix* result =m_generator[0]->getSpatialBasis()->transposeMult(phi_hyper);
         printf("result %d %d\n",result->numRows(),result->numColumns());
+        if (!m_rank) {
+          std::cout << "Checking ROM operator: \n";
+          for (int i = 0; i < result->numRows(); i++) {
+            for (int j = 0; j < result->numColumns(); j++) {
+                std::cout << (result->item(i,j)) << " ";
+            }
+          }
+          std::cout << std::endl;
+        }
       }
+        /* Below is just checking if the basis function is orthogonal */
+//      projectInitialSolution(*(m_generator[0]->getSpatialBasis()->getColumn(0)));
+//      projectInitialSolution(*(m_generator[0]->getSpatialBasis()->getColumn(1)));
+//      projectInitialSolution(*(m_generator[0]->getSpatialBasis()->getColumn(2)));
+//      projectInitialSolution(*(m_generator[0]->getSpatialBasis()->getColumn(3)));
+
+        /* Compute initial condition */
+        /* Can't simply pass *(m_generator[0]->getSnapshotMatrix()->getColumn(0))) since
+         * m_generator[0]->getSpatialBasis() is distributed whereas m_generator[0]->getSnapshotMatrix()
+         * is not distributed */
+        CAROM::Vector* snap_col;
+        snap_col = new CAROM::Vector(m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData(),
+                                     m_generator[0]->getSnapshotMatrix()->numRows(),true);
+        projectInitialSolution(*snap_col);
+
     }
   } else {
     printf("ERROR in LSROMObject::train(): m_generator is of size zero!");
