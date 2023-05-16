@@ -197,6 +197,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 /*! train the LS objects */
 void LSROMObject::train(void* a_s)
 {
+  /* In the training, initial condition for ROM should also be computed */
   SimulationObject* sim = (SimulationObject*) a_s;
 
   if (m_generator.size() > 0) {
@@ -211,10 +212,15 @@ void LSROMObject::train(void* a_s)
           char idx_string[_MAX_STRING_SIZE_];
           sprintf(idx_string, "%04d", i);
           std::string fname_root(m_dirname + "/snapshot_mat_"+std::string(idx_string));
-          // Need additional process in order to visualize it
           m_generator[i]->getSnapshotMatrix()->write(fname_root);
+          /* Since here is using gertSnapshotMatrix to write files, need additional process in order to visualize it
+             Similar in the case of DMD */
         }
-        // Does everytime invoking getSpatialBasis() do computeSVD again?
+        /* The code below is like m_dmd[i]->train(m_rdim) but in LS-ROM, there is no
+           m_ls object, instead, it has m_generator, m_options, m_spatialbasis, m_projected_init */
+
+        /* Call SVD on snapshot matrix and also check singular value decomposition
+           Does everytime invoking getSpatialBasis() do computeSVD again? */
         const CAROM::Vector* sing_vals = m_generator[i]->getSingularValues();
         if (!m_rank) {
           std::cout << "Singular Values: ";
@@ -224,9 +230,7 @@ void LSROMObject::train(void* a_s)
           std::cout << std::endl;
         }
 
-        // num_rows including ghost points
-        // set npoints_local
-//      int num_rows = sim[0].solver.npoints_local_wghosts;
+        /* Compute F(\Phi), where \Phi is the reduced basis matrix */
         int num_rows = m_generator[i]->getSpatialBasis()->numRows();
         int num_cols = m_generator[i]->getSpatialBasis()->numColumns();
 
@@ -239,10 +243,7 @@ void LSROMObject::train(void* a_s)
         std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
 
         for (int j = 0; j < num_cols; j++){
-          // vec_data is reduced basis \phi_j
-//        double* vec_data = m_generator[0]->getSpatialBasis()->getColumn(j)->getData();
-//        double* vec_data1 = phi_hyper->getColumn(j)->getData();
-
+          /* Extend reduced basis \phi_j with ghost points */
           std::vector<int> index(sim[0].solver.ndims);
           ArrayCopynD(sim[0].solver.ndims,
                       m_generator[0]->getSpatialBasis()->getColumn(j)->getData(),
@@ -253,14 +254,14 @@ void LSROMObject::train(void* a_s)
                       index.data(),
                       sim[0].solver.nvars);
 
-//        copyToHyPar(*(m_generator[0]->getSpatialBasis()->getColumn(j)),&sim[0],0);
-
+          /* Evaluate F(\phi_j) */
           TimeRHSFunctionExplicit(rhs_wghosts.data(),
                                   vec_wghosts.data(),
                                   &(sim[0].solver),
                                   &(sim[0].mpi),
                                   0);
 
+          /* Remove ghosts point in F(phi_j) */
           ArrayCopynD(sim[0].solver.ndims,
                       rhs_wghosts.data(),
                       phi_hyper_col.getData(),
@@ -270,6 +271,7 @@ void LSROMObject::train(void* a_s)
                       index.data(),
                       sim[0].solver.nvars);
 
+          /* Copy F(phi_j) back to columns of phi_hyper matrix */
           for (int i = 0; i < num_rows; i++) {
             (*phi_hyper)(i, j) = phi_hyper_col.getData()[i];
           }
@@ -311,7 +313,8 @@ void LSROMObject::train(void* a_s)
         // construct hyper_ROM = phi^T phi_hyper
         printf("phi %d %d\n",m_generator[i]->getSpatialBasis()->numRows(),m_generator[i]->getSpatialBasis()->numColumns());
         printf("phi_hyper %d %d\n",phi_hyper->numRows(),phi_hyper->numColumns());
-//      CAROM::Matrix* result =m_generator[0]->getSpatialBasis()->transposeMult(phi_hyper);
+        CAROM::Matrix* result =m_generator[0]->getSpatialBasis()->transposeMult(phi_hyper);
+        printf("result %d %d\n",result->numRows(),result->numColumns());
       }
     }
   } else {
