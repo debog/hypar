@@ -454,6 +454,22 @@ void LSROMObject::train(void* a_s)
 /*! compute prediction at given time */
 const CAROM::Vector* const LSROMObject::predict(const double a_t /*!< time at which to predict solution */ ) const
 {
+  int num_rows = m_generator[0]->getSpatialBasis()->numRows();
+  CAROM::Vector* recon_init = new CAROM::Vector(num_rows,false);
+  if(std::abs(a_t) < 1e-9) {
+    printf("a_t %d\n",a_t);
+//  projectInitialSolution(*(m_snapshots->getColumn(0)));
+    printf("m_project size %d\n",m_projected_init[0]->dim());
+    if (!m_rank) {
+      std::cout << "Checking initial condition: ";
+      for (int j = 0; j < m_projected_init[0]->dim(); j++) {
+            std::cout << (m_projected_init[0]->item(j)) << " ";
+      }
+      std::cout << std::endl;
+    }
+    recon_init = m_generator[0]->getSpatialBasis()->mult(m_projected_init[0]);
+  } else {
+  }
 //    for (int i = 0; i < m_ls.size(); i++) {
 //      if (   (a_t >= m_intervals[i].first)
 //          && (  (a_t < m_intervals[i].second) || (m_intervals[i].second < 0)  ) ){
@@ -462,7 +478,9 @@ const CAROM::Vector* const LSROMObject::predict(const double a_t /*!< time at wh
 //    }
 //    printf("ERROR in LSROMObject::predict(): m_ls is of size zero or interval not found!");
 //    return nullptr;
-    }
+  exit (0);
+  return recon_init;
+}
 
 void LSROMObject::save(const std::string& a_fname_root /*!< Filename root */) const
 {
