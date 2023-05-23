@@ -74,9 +74,9 @@ class LSROMObject : public ROMObject
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
     std::vector<CAROM::BasisGenerator*> m_generator; /*!< Vector of BasisGenerator objects */
-    std::vector<CAROM::Matrix*> m_spatialbasis; /*!< Vector of Matrix objects */
     std::vector<CAROM::Vector*> m_projected_init; /*!< Vector of Vector objects */
     const CAROM::Vector* m_S; /*!< Vector of Singular value */
+    CAROM::Matrix* m_snapshots; /*!< Snapshot Matrix */
 
     std::vector<bool> m_ls_is_trained; /*!< Flag to indicate if LS is trained */
     std::vector<Interval> m_intervals; /*!< Time intervals for each LS object */
