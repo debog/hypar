@@ -255,6 +255,14 @@ void LSROMObject::train(void* a_s)
 
         /* Call SVD on snapshot matrix and also check singular value decomposition
            Does everytime invoking getSpatialBasis() do computeSVD again? */
+//      const CAROM::Matrix* snapshots = new CAROM::Matrix(*m_generator[i]->getSnapshotMatrix());
+        const CAROM::Matrix* snapshots = new CAROM::Matrix(m_generator[i]->getSnapshotMatrix()->getData(),
+                                                           m_generator[i]->getSnapshotMatrix()->numRows(),
+                                                           m_generator[i]->getSnapshotMatrix()->numColumns(),
+                                                           true,
+                                                           true);
+
+        /* IMPORTANT!!! m_generator[i]->getSnapshotMatrix() is modified after getSingularValues or (computeSVD) is called */ 
         const CAROM::Vector* sing_vals = m_generator[i]->getSingularValues();
         if (!m_rank) {
           std::cout << "Singular Values: ";
@@ -358,7 +366,6 @@ void LSROMObject::train(void* a_s)
           }
           std::cout << std::endl;
         }
-      }
         /* Below is just checking if the basis function is orthogonal */
 //      projectInitialSolution(*(m_generator[0]->getSpatialBasis()->getColumn(0)));
 //      projectInitialSolution(*(m_generator[0]->getSpatialBasis()->getColumn(1)));
@@ -369,11 +376,68 @@ void LSROMObject::train(void* a_s)
         /* Can't simply pass *(m_generator[0]->getSnapshotMatrix()->getColumn(0))) since
          * m_generator[0]->getSpatialBasis() is distributed whereas m_generator[0]->getSnapshotMatrix()
          * is not distributed */
-        CAROM::Vector* snap_col;
-        snap_col = new CAROM::Vector(m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData(),
-                                     m_generator[0]->getSnapshotMatrix()->numRows(),true);
-        projectInitialSolution(*snap_col);
+//      CAROM::Vector* snap_col;
+//      snap_col = new CAROM::Vector(snapshots->getColumn(0)->getData(),
+//                                   m_generator[0]->getSnapshotMatrix()->numRows(),true);
+//      projectInitialSolution(*snap_col);
+        projectInitialSolution(*(snapshots->getColumn(9)));
 
+        CAROM::Vector* recon_init;
+        recon_init = new CAROM::Vector(num_rows,false);
+        recon_init = m_generator[0]->getSpatialBasis()->mult(m_projected_init[0]);
+
+        std::vector<int> index(sim[0].solver.ndims);
+        ArrayCopynD(sim[0].solver.ndims,
+                    recon_init->getData(),
+                    sim[0].solver.u_rom_predicted,
+                    sim[0].solver.dim_local,
+                    0,
+                    sim[0].solver.ghosts,
+                    index.data(),
+                    sim[0].solver.nvars);
+          const char* fnam2 = "recon_";
+          std::string fname2 = std::string(fnam2) + std::to_string(0);
+          char* fname_buffer2 = new char[fname2.length() + 1];
+          std::strcpy(fname_buffer2, fname2.c_str());
+
+          WriteArray( sim[0].solver.ndims,
+                      sim[0].solver.nvars,
+                      sim[0].solver.dim_global,
+                      sim[0].solver.dim_local,
+                      0,
+                      sim[0].solver.x,
+                      recon_init->getData(),
+                      &(sim[0].solver),
+                      &(sim[0].mpi),
+                      fname_buffer2);
+        ArrayCopynD(sim[0].solver.ndims,
+                    snapshots->getColumn(9)->getData(),
+                    sim[0].solver.u,
+                    sim[0].solver.dim_local,
+                    0,
+                    sim[0].solver.ghosts,
+                    index.data(),
+                    sim[0].solver.nvars);
+          const char* fnam3 = "snap_col_";
+          std::string fname3 = std::string(fnam3) + std::to_string(0);
+          char* fname_buffer3 = new char[fname3.length() + 1];
+          std::strcpy(fname_buffer3, fname3.c_str());
+
+//        double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData();
+          WriteArray( sim[0].solver.ndims,
+                      sim[0].solver.nvars,
+                      sim[0].solver.dim_global,
+                      sim[0].solver.dim_local,
+                      0,
+                      sim[0].solver.x,
+                      snapshots->getColumn(9)->getData(),
+                      &(sim[0].solver),
+                      &(sim[0].mpi),
+                      fname_buffer3);
+//      CalculateROMDiff(  &(sim[0].solver),
+//                         &(sim[0].mpi) );
+
+      }
     }
   } else {
     printf("ERROR in LSROMObject::train(): m_generator is of size zero!");
