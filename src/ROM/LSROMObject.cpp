@@ -55,7 +55,6 @@ LSROMObject::LSROMObject( const int     a_vec_size, /*!< vector size */
 /* my implementation */
   m_options.clear();
   m_generator.clear();
-  m_spatialbasis.clear();
   m_projected_init.clear();
 
   m_ls_is_trained.clear();
@@ -262,6 +261,11 @@ void LSROMObject::train(void* a_s)
                                                            m_generator[i]->getSnapshotMatrix()->numColumns(),
                                                            true,
                                                            true);
+        m_snapshots = new CAROM::Matrix(m_generator[i]->getSnapshotMatrix()->getData(),
+                                                           m_generator[i]->getSnapshotMatrix()->numRows(),
+                                                           m_generator[i]->getSnapshotMatrix()->numColumns(),
+                                                           true,
+                                                           true);
 
         /* IMPORTANT!!! m_generator[i]->getSnapshotMatrix() is modified after getSingularValues or (computeSVD) is called */ 
         const CAROM::Vector* sing_vals = m_generator[i]->getSingularValues();
@@ -381,7 +385,7 @@ void LSROMObject::train(void* a_s)
 //      snap_col = new CAROM::Vector(snapshots->getColumn(0)->getData(),
 //                                   m_generator[0]->getSnapshotMatrix()->numRows(),true);
 //      projectInitialSolution(*snap_col);
-        projectInitialSolution(*(snapshots->getColumn(9)));
+        projectInitialSolution(*(m_snapshots->getColumn(0)));
 
         CAROM::Vector* recon_init;
         recon_init = new CAROM::Vector(num_rows,false);
@@ -412,7 +416,7 @@ void LSROMObject::train(void* a_s)
                       &(sim[0].mpi),
                       fname_buffer2);
         ArrayCopynD(sim[0].solver.ndims,
-                    snapshots->getColumn(9)->getData(),
+                    m_snapshots->getColumn(9)->getData(),
                     sim[0].solver.u,
                     sim[0].solver.dim_local,
                     0,
@@ -431,7 +435,7 @@ void LSROMObject::train(void* a_s)
                       sim[0].solver.dim_local,
                       0,
                       sim[0].solver.x,
-                      snapshots->getColumn(9)->getData(),
+                      m_snapshots->getColumn(9)->getData(),
                       &(sim[0].solver),
                       &(sim[0].mpi),
                       fname_buffer3);
