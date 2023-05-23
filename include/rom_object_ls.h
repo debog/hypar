@@ -59,17 +59,7 @@ class LSROMObject : public ROMObject
 
     /*! compute prediction at given time */
     virtual 
-    const CAROM::Vector* const predict(const double a_t /*!< time at which to predict solution */ ) const
-    {
-//    for (int i = 0; i < m_ls.size(); i++) {
-//      if (   (a_t >= m_intervals[i].first) 
-//          && (  (a_t < m_intervals[i].second) || (m_intervals[i].second < 0)  ) ){
-//        return m_ls[i]->predict(a_t);
-//      }
-//    }
-//    printf("ERROR in LSROMObject::predict(): m_ls is of size zero or interval not found!");
-//    return nullptr;
-    }
+    const CAROM::Vector* const predict(const double ) const;
 
     /*! save LS object to file */
     virtual void save(const std::string& a_fname_root /*!< Filename root*/) const;

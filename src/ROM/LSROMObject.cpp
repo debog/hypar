@@ -39,6 +39,7 @@
    
 */
 extern "C" int TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
+extern "C" int CalculateROMDiff(void*,void*);
 
 LSROMObject::LSROMObject( const int     a_vec_size, /*!< vector size */
                             const double  a_dt,       /*!< time step size */
@@ -445,6 +446,19 @@ void LSROMObject::train(void* a_s)
 
   return;
 }
+
+/*! compute prediction at given time */
+const CAROM::Vector* const LSROMObject::predict(const double a_t /*!< time at which to predict solution */ ) const
+{
+//    for (int i = 0; i < m_ls.size(); i++) {
+//      if (   (a_t >= m_intervals[i].first)
+//          && (  (a_t < m_intervals[i].second) || (m_intervals[i].second < 0)  ) ){
+//        return m_ls[i]->predict(a_t);
+//      }
+//    }
+//    printf("ERROR in LSROMObject::predict(): m_ls is of size zero or interval not found!");
+//    return nullptr;
+    }
 
 void LSROMObject::save(const std::string& a_fname_root /*!< Filename root */) const
 {
