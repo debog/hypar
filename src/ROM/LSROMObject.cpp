@@ -8,7 +8,7 @@
 #include <basic.h>
 #include <rom_object_ls.h>
 #include <simulation_object.h>
-#include <timeintegration.h>
+//#include <timeintegration.h>
 #include <arrayfunctions.h>
 #include <io_cpp.h>
 #include <cstring>
@@ -280,6 +280,7 @@ void LSROMObject::train(void* a_s)
         /* Compute F(\Phi), where \Phi is the reduced basis matrix */
         int num_rows = m_generator[i]->getSpatialBasis()->numRows();
         int num_cols = m_generator[i]->getSpatialBasis()->numColumns();
+        m_rdim = num_cols;
 
         CAROM::Matrix* phi_hyper;
         phi_hyper = new CAROM::Matrix(num_rows, num_cols, true);
@@ -452,7 +453,7 @@ void LSROMObject::train(void* a_s)
 }
 
 /*! compute prediction at given time */
-const CAROM::Vector* const LSROMObject::predict(const double a_t /*!< time at which to predict solution */ ) const
+const CAROM::Vector* LSROMObject::predict(const double a_t /*!< time at which to predict solution */ )
 {
   int num_rows = m_generator[0]->getSpatialBasis()->numRows();
   CAROM::Vector* recon_init = new CAROM::Vector(num_rows,false);
@@ -468,7 +469,11 @@ const CAROM::Vector* const LSROMObject::predict(const double a_t /*!< time at wh
       std::cout << std::endl;
     }
     recon_init = m_generator[0]->getSpatialBasis()->mult(m_projected_init[0]);
+    /* Setup RK44 parameters */
+    TimeExplicitRKInitialize();
+    printf("checking m_rdim %d\n",m_rdim);
   } else {
+    TimeRK(a_t);
   }
 //    for (int i = 0; i < m_ls.size(); i++) {
 //      if (   (a_t >= m_intervals[i].first)
@@ -478,7 +483,6 @@ const CAROM::Vector* const LSROMObject::predict(const double a_t /*!< time at wh
 //    }
 //    printf("ERROR in LSROMObject::predict(): m_ls is of size zero or interval not found!");
 //    return nullptr;
-  exit (0);
   return recon_init;
 }
 
@@ -513,6 +517,113 @@ void LSROMObject::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vector */
                 sim[a_idx].solver.nvars );
 
   return;
+}
+
+int LSROMObject::TimeInitialize()
+{
+  /* initialize arrays to NULL, then allocate as necessary */
+  m_U    = NULL;
+  m_Udot = NULL;
+
+  /* explicit Runge-Kutta methods */
+  m_U     = (double**) calloc (nstages,sizeof(double*));
+  m_Udot  = (double**) calloc (nstages,sizeof(double*));
+  for (i = 0; i < nstages; i++) {
+    m_U[i]    = (double*) calloc (m_rdim,sizeof(double));
+    m_Udot[i] = (double*) calloc (m_rdim,sizeof(double));
+  }
+  return(0);
+}
+
+int LSROMObject::TimeExplicitRKInitialize()
+{
+  /* Currently only support RK44 */
+  nstages = 4;
+  A = (double*) calloc (nstages*nstages,sizeof(double));
+  b = (double*) calloc (nstages        ,sizeof(double));
+  c = (double*) calloc (nstages        ,sizeof(double));
+  _ArraySetValue_(A,nstages*nstages,0.0);
+  _ArraySetValue_(b,nstages        ,0.0);
+  _ArraySetValue_(c,nstages        ,0.0);
+  A[4] = 0.5; A[9] = 0.5; A[14] = 1.0;
+  c[1] = c[2] = 0.5; c[3] = 1.0;
+  b[0] = 1.0/6.0; b[1] = 1.0/3.0; b[2] = 1.0/3.0; b[3] = 1.0/6.0;
+  if (!m_rank) {
+    std::cout << "Checking A: ";
+    for (int j = 0; j < nstages*nstages; j++) {
+         std::cout << A[j] << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "Checking B: ";
+    for (int j = 0; j < nstages; j++) {
+         std::cout << b[j] << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "Checking C: ";
+    for (int j = 0; j < nstages; j++) {
+         std::cout << c[j] << " ";
+    }
+    std::cout << std::endl;
+  }
+  return(0);
+}
+
+int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution */ )
+{
+  /* Advance the ROM ODE using RK4 scheme */
+  int ns, stage, i;
+  printf("checking m_rdim %d\n",m_rdim);
+    /* Calculate stage values */
+  for (stage = 0; stage < nstages; stage++) {
+  
+    double stagetime = a_t + c[stage]*m_dt;
+    printf("stagetime %f\n",stagetime);
+//
+//  for (ns = 0; ns < nsims; ns++) {
+//    _ArrayCopy1D_(  m_romcoef,
+//                    m_U[stage],
+//                    m_rdim );
+//  }
+//
+//  for (i = 0; i < stage; i++) {
+//    _ArrayAXPY_(  TS->Udot[i],
+//                  (m_dt * A[stage*nstages+i]),
+//                  TS->U[stage],
+//                  TS->u_size_total );
+//  }
+//
+//  for (ns = 0; ns < nsims; ns++) {
+//    TS->RHSFunction( (TS->Udot[stage] + TS->u_offsets[ns]),
+//                     (TS->U[stage] + TS->u_offsets[ns]),
+//                     &(sim[ns].solver),
+//                     &(sim[ns].mpi),
+//                     stagetime);
+//  }
+//
+//  for (ns = 0; ns < nsims; ns++) {
+//    if (sim[ns].solver.PostStage) {
+//      sim[ns].solver.PostStage(  (TS->U[stage] + TS->u_offsets[ns]),
+//                                 &(sim[ns].solver),
+//                                 &(sim[ns].mpi),
+//                                 stagetime); CHECKERR(ierr);
+//    }
+//  }
+//
+//}
+//
+///* Step completion */
+//for (stage = 0; stage < params->nstages; stage++) {
+//
+//  for (ns = 0; ns < nsims; ns++) {
+//    _ArrayAXPY_(  (TS->Udot[stage] + TS->u_offsets[ns]),
+//                  (TS->dt * params->b[stage]),
+//                  (sim[ns].solver.u),
+//                  (TS->u_sizes[ns]) );
+//  }
+//
+  }
+  exit (0);
+  return(0);
 }
 
 #endif
