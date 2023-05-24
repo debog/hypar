@@ -41,7 +41,7 @@ class ROMObject
     /*! train the ROM object */
     virtual void train(void*) = 0;
     /*! compute prediction at given time */
-    virtual const CAROM::Vector* const predict( const double ) const = 0;
+    virtual const CAROM::Vector* predict( const double ) = 0;
     /*! save ROM object to file */
     virtual void save( const std::string& ) const = 0;
     /*! load ROM object from file */

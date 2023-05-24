@@ -81,7 +81,7 @@ class DMDROMObject : public ROMObject
 
     /*! compute prediction at given time */
     virtual 
-    const CAROM::Vector* const predict(const double a_t /*!< time at which to predict solution */ ) const
+    const CAROM::Vector* predict(const double a_t /*!< time at which to predict solution */ )
     {
       for (int i = 0; i < m_dmd.size(); i++) {
         if (   (a_t >= m_intervals[i].first) 
