@@ -59,7 +59,7 @@ class LSROMObject : public ROMObject
 
     /*! compute prediction at given time */
     virtual 
-    const CAROM::Vector* const predict(const double ) const;
+    const CAROM::Vector* predict(const double );
 
     /*! save LS object to file */
     virtual void save(const std::string& a_fname_root /*!< Filename root*/) const;
@@ -70,12 +70,19 @@ class LSROMObject : public ROMObject
     /*! Copy a vector to HyPar */
     void copyToHyPar( const CAROM::Vector&, void*, int ) const;
 
+    /*! Initialize the time integration for LSROM */
+    int TimeInitialize ();
+    /* RK Time integration for LSROM */
+    int TimeExplicitRKInitialize();
+    int TimeRK(const double );
+
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
     std::vector<CAROM::BasisGenerator*> m_generator; /*!< Vector of BasisGenerator objects */
     std::vector<CAROM::Vector*> m_projected_init; /*!< Vector of Vector objects */
     const CAROM::Vector* m_S; /*!< Vector of Singular value */
+    const CAROM::Vector* m_romcoef; /*!< Vector of rom coefficients */
     CAROM::Matrix* m_snapshots; /*!< Snapshot Matrix */
 
     std::vector<bool> m_ls_is_trained; /*!< Flag to indicate if LS is trained */
@@ -108,6 +115,17 @@ class LSROMObject : public ROMObject
     const std::string basisName = "basis";
     const std::string basisFileName;
     int numRowRB, numColumnRB;
+
+    /* parameters for RK, similar as in timeintegration_struct.h */
+    int nstages; /*!< number of stages */
+    double *A, /*!< Stage computation coefficients (Butcher tableau form),
+                   saved as a 1D-array in row-major form */
+           *b, /*!< Step completion coefficients (Butcher tableau form) */
+           *c; /*!< Stage time coefficients (Butcher tableau form) */
+    /*! Arrays to store stage values for a multi-stage time-integration method */
+    double  **m_U;
+    /*! Arrays to store stage right-hand-sides for a multi-stage time-integration method */
+    double  **m_Udot;
 
   private:
 };
