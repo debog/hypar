@@ -537,16 +537,21 @@ int LSROMObject::TimeInitialize()
 {
   int i;
   /* initialize arrays to NULL, then allocate as necessary */
-  m_U    = NULL;
-  m_Udot = NULL;
+  m_U.clear();
+  m_Udot.clear();
 
   /* explicit Runge-Kutta methods */
-  m_U     = (double**) calloc (nstages,sizeof(double*));
-  m_Udot  = (double**) calloc (nstages,sizeof(double*));
   for (i = 0; i < nstages; i++) {
-    m_U[i]    = (double*) calloc (m_rdim,sizeof(double));
-    m_Udot[i] = (double*) calloc (m_rdim,sizeof(double));
+    m_U.push_back(new CAROM::Vector(m_rdim,false));
+    m_Udot.push_back(new CAROM::Vector(m_rdim,false));
   }
+
+//m_U     = (double**) calloc (nstages,sizeof(double*));
+//m_Udot  = (double**) calloc (nstages,sizeof(double*));
+//for (i = 0; i < nstages; i++) {
+//  m_U[i]    = (double*) calloc (m_rdim,sizeof(double));
+//  m_Udot[i] = (double*) calloc (m_rdim,sizeof(double));
+//}
   return(0);
 }
 
@@ -601,22 +606,28 @@ int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution 
       std::cout << std::endl;
     }
 
-//  _ArrayCopy1D_(  m_romcoef->getData(),
-    std::cout << "m_romcoef: " << m_romcoef << std::endl;
-    std::cout << "m_U[stage]: " << m_U[stage] << std::endl;
-    std::cout << "m_rdim: " << m_rdim << std::endl;
+//  std::cout << "m_romcoef: " << m_romcoef << std::endl;
+//  std::cout << "m_U[stage]: " << m_U[stage] << std::endl;
+//  std::cout << "m_rdim: " << m_rdim << std::endl;
     _ArrayCopy1D_(  m_romcoef,
-                    m_U[stage],
+                    m_U[stage]->getData(),
                     m_rdim );
 
-//  for (i = 0; i < stage; i++) {
-//    printf("%f \n",m_dt * A[stage*nstages+i]);
-//    _ArrayAXPY_(  m_Udot[i],
-//                  (m_dt * A[stage*nstages+i]),
-//                  m_U[stage],
-//                  m_rdim );
-//  }
+    for (i = 0; i < stage; i++) {
+      _ArrayAXPY_(  m_Udot[i]->getData(),
+                    (m_dt * A[stage*nstages+i]),
+                    m_U[stage]->getData(),
+                    m_rdim );
+    }
 
+    m_Udot[stage] = m_romhyperb->mult(m_U[stage]);
+    if (!m_rank) {
+      std::cout << "Checking copy initial condition: ";
+      for (int j = 0; j < m_rdim; j++) {
+            std::cout << m_Udot[stage]->item(j) << " ";
+      }
+      std::cout << std::endl;
+    }
 //  TS->RHSFunction( (m_Udot[stage]),
 //                   (m_U[stage]),
 //                   &(sim[ns].solver),
