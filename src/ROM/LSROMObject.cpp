@@ -361,13 +361,13 @@ void LSROMObject::train(void* a_s)
         // construct hyper_ROM = phi^T phi_hyper
         printf("phi %d %d\n",m_generator[i]->getSpatialBasis()->numRows(),m_generator[i]->getSpatialBasis()->numColumns());
         printf("phi_hyper %d %d\n",phi_hyper->numRows(),phi_hyper->numColumns());
-        CAROM::Matrix* result =m_generator[0]->getSpatialBasis()->transposeMult(phi_hyper);
-        printf("result %d %d\n",result->numRows(),result->numColumns());
+        m_romhyperb=m_generator[0]->getSpatialBasis()->transposeMult(phi_hyper);
+        printf("m_romhyperb %d %d\n",m_romhyperb->numRows(),m_romhyperb->numColumns());
         if (!m_rank) {
           std::cout << "Checking ROM operator: \n";
-          for (int i = 0; i < result->numRows(); i++) {
-            for (int j = 0; j < result->numColumns(); j++) {
-                std::cout << (result->item(i,j)) << " ";
+          for (int i = 0; i < m_romhyperb->numRows(); i++) {
+            for (int j = 0; j < m_romhyperb->numColumns(); j++) {
+                std::cout << (m_romhyperb->item(i,j)) << " ";
             }
           }
           std::cout << std::endl;
@@ -458,8 +458,10 @@ const CAROM::Vector* LSROMObject::predict(const double a_t /*!< time at which to
   int num_rows = m_generator[0]->getSpatialBasis()->numRows();
   CAROM::Vector* recon_init = new CAROM::Vector(num_rows,false);
   if(std::abs(a_t) < 1e-9) {
-    printf("a_t %d\n",a_t);
+    printf("a_t %f\n",a_t);
 //  projectInitialSolution(*(m_snapshots->getColumn(0)));
+//  m_romcoef = new CAROM::Vector(m_projected_init[0]->getData(), m_rdim, false, true);
+    m_romcoef =  m_projected_init[0]->getData();
     printf("m_project size %d\n",m_projected_init[0]->dim());
     if (!m_rank) {
       std::cout << "Checking initial condition: ";
