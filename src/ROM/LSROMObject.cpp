@@ -546,12 +546,6 @@ int LSROMObject::TimeInitialize()
     m_Udot.push_back(new CAROM::Vector(m_rdim,false));
   }
 
-//m_U     = (double**) calloc (nstages,sizeof(double*));
-//m_Udot  = (double**) calloc (nstages,sizeof(double*));
-//for (i = 0; i < nstages; i++) {
-//  m_U[i]    = (double*) calloc (m_rdim,sizeof(double));
-//  m_Udot[i] = (double*) calloc (m_rdim,sizeof(double));
-//}
   return(0);
 }
 
