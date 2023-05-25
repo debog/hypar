@@ -460,23 +460,12 @@ const CAROM::Vector* LSROMObject::predict(const double a_t /*!< time at which to
   if(std::abs(a_t) < 1e-9) {
     printf("a_t %f\n",a_t);
 //  projectInitialSolution(*(m_snapshots->getColumn(0)));
-//  m_romcoef = new CAROM::Vector(m_projected_init[0]->getData(), m_rdim, false, true);
-    m_romcoef =  m_projected_init[0]->getData();
+    m_romcoef = new CAROM::Vector(m_projected_init[0]->getData(), m_rdim, false, true);
     printf("m_project size %d\n",m_projected_init[0]->dim());
     if (!m_rank) {
       std::cout << "Checking initial condition: ";
       for (int j = 0; j < m_projected_init[0]->dim(); j++) {
             std::cout << (m_projected_init[0]->item(j)) << " ";
-      }
-      std::cout << std::endl;
-    }
-//  _ArrayCopy1D_(  m_romcoef,
-//                  m_projected_init[0],
-//                  m_rdim );
-    if (!m_rank) {
-      std::cout << "Checking copy initial condition: ";
-      for (int j = 0; j < m_rdim; j++) {
-            std::cout << m_romcoef[j] << " ";
       }
       std::cout << std::endl;
     }
@@ -497,6 +486,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t /*!< time at which to
 //    }
 //    printf("ERROR in LSROMObject::predict(): m_ls is of size zero or interval not found!");
 //    return nullptr;
+  recon_init = m_generator[0]->getSpatialBasis()->mult(m_romcoef);
   return recon_init;
 }
 
@@ -592,18 +582,8 @@ int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution 
   
     double stagetime = a_t + c[stage]*m_dt;
     printf("stagetime %f\n",stagetime);
-    if (!m_rank) {
-      std::cout << "Checking copy initial condition: ";
-      for (int j = 0; j < m_rdim; j++) {
-            std::cout << m_romcoef[j] << " ";
-      }
-      std::cout << std::endl;
-    }
 
-//  std::cout << "m_romcoef: " << m_romcoef << std::endl;
-//  std::cout << "m_U[stage]: " << m_U[stage] << std::endl;
-//  std::cout << "m_rdim: " << m_rdim << std::endl;
-    _ArrayCopy1D_(  m_romcoef,
+    _ArrayCopy1D_(  m_romcoef->getData(),
                     m_U[stage]->getData(),
                     m_rdim );
 
@@ -615,13 +595,13 @@ int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution 
     }
 
     m_Udot[stage] = m_romhyperb->mult(m_U[stage]);
-    if (!m_rank) {
-      std::cout << "Checking copy initial condition: ";
-      for (int j = 0; j < m_rdim; j++) {
-            std::cout << m_Udot[stage]->item(j) << " ";
-      }
-      std::cout << std::endl;
-    }
+//  if (!m_rank) {
+//    std::cout << "Checking copy initial condition: ";
+//    for (int j = 0; j < m_rdim; j++) {
+//          std::cout << m_Udot[stage]->item(j) << " ";
+//    }
+//    std::cout << std::endl;
+//  }
 //  TS->RHSFunction( (m_Udot[stage]),
 //                   (m_U[stage]),
 //                   &(sim[ns].solver),
@@ -644,14 +624,14 @@ int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution 
 
     _ArrayAXPY_(  m_Udot[stage]->getData(),
                   (m_dt * b[stage]),
-                  m_romcoef,
+                  m_romcoef->getData(),
                   m_rdim );
 
   }
   if (!m_rank) {
     std::cout << "Checking solved coefficient: ";
     for (int j = 0; j < m_rdim; j++) {
-          std::cout << m_romcoef[j] << " ";
+          std::cout << m_romcoef->item(j) << " ";
     }
     std::cout << std::endl;
   }

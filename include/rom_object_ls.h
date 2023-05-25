@@ -82,8 +82,7 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::BasisGenerator*> m_generator; /*!< Vector of BasisGenerator objects */
     std::vector<CAROM::Vector*> m_projected_init; /*!< Vector of Vector objects */
     const CAROM::Vector* m_S; /*!< Vector of Singular value */
-    double* m_romcoef; /*!< Vector of rom coefficients */
-//  CAROM::Vector* m_romcoef; /*!< Vector of rom coefficients */
+    CAROM::Vector* m_romcoef; /*!< Vector of rom coefficients */
     CAROM::Matrix* m_snapshots; /*!< Snapshot Matrix */
     CAROM::Matrix* m_romhyperb; /*!< Reduced Hyperbolic Term Matrix */
 
