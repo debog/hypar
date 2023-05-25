@@ -643,20 +643,24 @@ int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution 
 //    }
 //  }
 //
-//}
-//
-///* Step completion */
-//for (stage = 0; stage < params->nstages; stage++) {
-//
-//  for (ns = 0; ns < nsims; ns++) {
-//    _ArrayAXPY_(  (TS->Udot[stage] + TS->u_offsets[ns]),
-//                  (TS->dt * params->b[stage]),
-//                  (sim[ns].solver.u),
-//                  (TS->u_sizes[ns]) );
-//  }
-//
   }
-  exit (0);
+
+  /* Step completion */
+  for (stage = 0; stage < nstages; stage++) {
+
+    _ArrayAXPY_(  m_Udot[stage]->getData(),
+                  (m_dt * b[stage]),
+                  m_romcoef,
+                  m_rdim );
+
+  }
+  if (!m_rank) {
+    std::cout << "Checking solved coefficient: ";
+    for (int j = 0; j < m_rdim; j++) {
+          std::cout << m_romcoef[j] << " ";
+    }
+    std::cout << std::endl;
+  }
   return(0);
 }
 
