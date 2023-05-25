@@ -470,10 +470,22 @@ const CAROM::Vector* LSROMObject::predict(const double a_t /*!< time at which to
       }
       std::cout << std::endl;
     }
+//  _ArrayCopy1D_(  m_romcoef,
+//                  m_projected_init[0],
+//                  m_rdim );
+    if (!m_rank) {
+      std::cout << "Checking copy initial condition: ";
+      for (int j = 0; j < m_rdim; j++) {
+            std::cout << m_romcoef[j] << " ";
+      }
+      std::cout << std::endl;
+    }
     recon_init = m_generator[0]->getSpatialBasis()->mult(m_projected_init[0]);
     /* Setup RK44 parameters */
     TimeExplicitRKInitialize();
     printf("checking m_rdim %d\n",m_rdim);
+    /* Initialize RK44 working variables */
+    TimeInitialize();
   } else {
     TimeRK(a_t);
   }
@@ -523,6 +535,7 @@ void LSROMObject::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vector */
 
 int LSROMObject::TimeInitialize()
 {
+  int i;
   /* initialize arrays to NULL, then allocate as necessary */
   m_U    = NULL;
   m_Udot = NULL;
@@ -580,28 +593,36 @@ int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution 
   
     double stagetime = a_t + c[stage]*m_dt;
     printf("stagetime %f\n",stagetime);
-//
-//  for (ns = 0; ns < nsims; ns++) {
-//    _ArrayCopy1D_(  m_romcoef,
-//                    m_U[stage],
-//                    m_rdim );
-//  }
-//
+    if (!m_rank) {
+      std::cout << "Checking copy initial condition: ";
+      for (int j = 0; j < m_rdim; j++) {
+            std::cout << m_romcoef[j] << " ";
+      }
+      std::cout << std::endl;
+    }
+
+//  _ArrayCopy1D_(  m_romcoef->getData(),
+    std::cout << "m_romcoef: " << m_romcoef << std::endl;
+    std::cout << "m_U[stage]: " << m_U[stage] << std::endl;
+    std::cout << "m_rdim: " << m_rdim << std::endl;
+    _ArrayCopy1D_(  m_romcoef,
+                    m_U[stage],
+                    m_rdim );
+
 //  for (i = 0; i < stage; i++) {
-//    _ArrayAXPY_(  TS->Udot[i],
+//    printf("%f \n",m_dt * A[stage*nstages+i]);
+//    _ArrayAXPY_(  m_Udot[i],
 //                  (m_dt * A[stage*nstages+i]),
-//                  TS->U[stage],
-//                  TS->u_size_total );
+//                  m_U[stage],
+//                  m_rdim );
 //  }
-//
-//  for (ns = 0; ns < nsims; ns++) {
-//    TS->RHSFunction( (TS->Udot[stage] + TS->u_offsets[ns]),
-//                     (TS->U[stage] + TS->u_offsets[ns]),
-//                     &(sim[ns].solver),
-//                     &(sim[ns].mpi),
-//                     stagetime);
-//  }
-//
+
+//  TS->RHSFunction( (m_Udot[stage]),
+//                   (m_U[stage]),
+//                   &(sim[ns].solver),
+//                   &(sim[ns].mpi),
+//                   stagetime);
+
 //  for (ns = 0; ns < nsims; ns++) {
 //    if (sim[ns].solver.PostStage) {
 //      sim[ns].solver.PostStage(  (TS->U[stage] + TS->u_offsets[ns]),
