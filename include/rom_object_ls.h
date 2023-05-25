@@ -125,11 +125,9 @@ class LSROMObject : public ROMObject
            *b, /*!< Step completion coefficients (Butcher tableau form) */
            *c; /*!< Stage time coefficients (Butcher tableau form) */
     /*! Arrays to store stage values for a multi-stage time-integration method */
-    //double  **m_U;
     std::vector<CAROM::Vector*> m_U;
 
     /*! Arrays to store stage right-hand-sides for a multi-stage time-integration method */
-    //double  **m_Udot;
     std::vector<CAROM::Vector*> m_Udot;
 
   private:
