@@ -85,7 +85,7 @@ class LSROMObject : public ROMObject
     double* m_romcoef; /*!< Vector of rom coefficients */
 //  CAROM::Vector* m_romcoef; /*!< Vector of rom coefficients */
     CAROM::Matrix* m_snapshots; /*!< Snapshot Matrix */
-    CAROM::Matrix* m_romhyperb; /*!< Snapshot Matrix */
+    CAROM::Matrix* m_romhyperb; /*!< Reduced Hyperbolic Term Matrix */
 
     std::vector<bool> m_ls_is_trained; /*!< Flag to indicate if LS is trained */
     std::vector<Interval> m_intervals; /*!< Time intervals for each LS object */
@@ -125,9 +125,12 @@ class LSROMObject : public ROMObject
            *b, /*!< Step completion coefficients (Butcher tableau form) */
            *c; /*!< Stage time coefficients (Butcher tableau form) */
     /*! Arrays to store stage values for a multi-stage time-integration method */
-    double  **m_U;
+    //double  **m_U;
+    std::vector<CAROM::Vector*> m_U;
+
     /*! Arrays to store stage right-hand-sides for a multi-stage time-integration method */
-    double  **m_Udot;
+    //double  **m_Udot;
+    std::vector<CAROM::Vector*> m_Udot;
 
   private:
 };
