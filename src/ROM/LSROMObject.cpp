@@ -147,10 +147,10 @@ void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U /*!< solution vect
   for (int i = 0; i < m_generator.size(); i++) {
     int num_rows = m_generator[i]->getSpatialBasis()->numRows();
     m_projected_init.push_back(new CAROM::Vector(num_rows, false));
-    m_projected_init[i] = m_generator[i]->getSpatialBasis()->transposeMult(a_U);
+    m_projected_init[i] = m_generator[i]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(a_U);
     printf("m_project size %d\n",m_projected_init[i]->dim());
     if (!m_rank) {
-      std::cout << "Checking initial condition: ";
+      std::cout << "Checking projected coefficients: ";
       for (int j = 0; j < m_projected_init[i]->dim(); j++) {
             std::cout << (m_projected_init[i]->item(j)) << " ";
       }
@@ -256,11 +256,11 @@ void LSROMObject::train(void* a_s)
         /* Call SVD on snapshot matrix and also check singular value decomposition
            Does everytime invoking getSpatialBasis() do computeSVD again? */
 //      const CAROM::Matrix* snapshots = new CAROM::Matrix(*m_generator[i]->getSnapshotMatrix());
-        const CAROM::Matrix* snapshots = new CAROM::Matrix(m_generator[i]->getSnapshotMatrix()->getData(),
-                                                           m_generator[i]->getSnapshotMatrix()->numRows(),
-                                                           m_generator[i]->getSnapshotMatrix()->numColumns(),
-                                                           true,
-                                                           true);
+//      const CAROM::Matrix* snapshots = new CAROM::Matrix(m_generator[i]->getSnapshotMatrix()->getData(),
+//                                                         m_generator[i]->getSnapshotMatrix()->numRows(),
+//                                                         m_generator[i]->getSnapshotMatrix()->numColumns(),
+//                                                         true,
+//                                                         true);
         m_snapshots = new CAROM::Matrix(m_generator[i]->getSnapshotMatrix()->getData(),
                                                            m_generator[i]->getSnapshotMatrix()->numRows(),
                                                            m_generator[i]->getSnapshotMatrix()->numColumns(),
@@ -268,29 +268,22 @@ void LSROMObject::train(void* a_s)
                                                            true);
 
         /* IMPORTANT!!! m_generator[i]->getSnapshotMatrix() is modified after getSingularValues or (computeSVD) is called */ 
-        const CAROM::Vector* sing_vals = m_generator[i]->getSingularValues();
-        if (!m_rank) {
-          std::cout << "Singular Values: ";
-          for (int i = 0; i < sing_vals->dim(); i++) {
-                std::cout << (sing_vals->item(i)) << " ";
-          }
-          std::cout << std::endl;
-        }
+        m_S = m_generator[i]->getSingularValues();
 
         /* Compute F(\Phi), where \Phi is the reduced basis matrix */
         int num_rows = m_generator[i]->getSpatialBasis()->numRows();
         int num_cols = m_generator[i]->getSpatialBasis()->numColumns();
-        m_rdim = num_cols;
+//      m_rdim = num_cols;
 
         CAROM::Matrix* phi_hyper;
-        phi_hyper = new CAROM::Matrix(num_rows, num_cols, true);
-        printf( "Check phi_hyper rows, cols: %d %d \n",num_rows,num_cols);
+        phi_hyper = new CAROM::Matrix(num_rows, m_rdim, true);
+        printf( "Check phi_hyper rows, cols: %d %d \n",num_rows,m_rdim);
 
         CAROM::Vector phi_hyper_col(num_rows,false);
         std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
         std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
 
-        for (int j = 0; j < num_cols; j++){
+        for (int j = 0; j < m_rdim; j++){
           /* Extend reduced basis \phi_j with ghost points */
           std::vector<int> index(sim[0].solver.ndims);
           ArrayCopynD(sim[0].solver.ndims,
@@ -361,7 +354,7 @@ void LSROMObject::train(void* a_s)
         // construct hyper_ROM = phi^T phi_hyper
         printf("phi %d %d\n",m_generator[i]->getSpatialBasis()->numRows(),m_generator[i]->getSpatialBasis()->numColumns());
         printf("phi_hyper %d %d\n",phi_hyper->numRows(),phi_hyper->numColumns());
-        m_romhyperb=m_generator[0]->getSpatialBasis()->transposeMult(phi_hyper);
+        m_romhyperb=m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(phi_hyper);
         printf("m_romhyperb %d %d\n",m_romhyperb->numRows(),m_romhyperb->numColumns());
         if (!m_rank) {
           std::cout << "Checking ROM operator: \n";
@@ -386,11 +379,12 @@ void LSROMObject::train(void* a_s)
 //      snap_col = new CAROM::Vector(snapshots->getColumn(0)->getData(),
 //                                   m_generator[0]->getSnapshotMatrix()->numRows(),true);
 //      projectInitialSolution(*snap_col);
+        projectInitialSolution(*(m_snapshots->getColumn(1)));
         projectInitialSolution(*(m_snapshots->getColumn(0)));
 
         CAROM::Vector* recon_init;
         recon_init = new CAROM::Vector(num_rows,false);
-        recon_init = m_generator[0]->getSpatialBasis()->mult(m_projected_init[0]);
+        recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init[0]);
 
         std::vector<int> index(sim[0].solver.ndims);
         ArrayCopynD(sim[0].solver.ndims,
@@ -417,7 +411,7 @@ void LSROMObject::train(void* a_s)
                       &(sim[0].mpi),
                       fname_buffer2);
         ArrayCopynD(sim[0].solver.ndims,
-                    m_snapshots->getColumn(9)->getData(),
+                    m_snapshots->getColumn(0)->getData(),
                     sim[0].solver.u,
                     sim[0].solver.dim_local,
                     0,
@@ -436,7 +430,7 @@ void LSROMObject::train(void* a_s)
                       sim[0].solver.dim_local,
                       0,
                       sim[0].solver.x,
-                      m_snapshots->getColumn(9)->getData(),
+                      m_snapshots->getColumn(0)->getData(),
                       &(sim[0].solver),
                       &(sim[0].mpi),
                       fname_buffer3);
@@ -448,6 +442,13 @@ void LSROMObject::train(void* a_s)
   } else {
     printf("ERROR in LSROMObject::train(): m_generator is of size zero!");
   }
+  if (!m_rank) {
+    std::cout << "Singular Values: ";
+    for (int i = 0; i < m_S->dim(); i++) {
+          std::cout << (m_S->item(i)) << " ";
+    }
+    std::cout << std::endl;
+  }
 
   return;
 }
@@ -457,6 +458,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t /*!< time at which to
 {
   int num_rows = m_generator[0]->getSpatialBasis()->numRows();
   CAROM::Vector* recon_init = new CAROM::Vector(num_rows,false);
+
   if(std::abs(a_t) < 1e-9) {
     printf("a_t %f\n",a_t);
 //  projectInitialSolution(*(m_snapshots->getColumn(0)));
@@ -469,7 +471,8 @@ const CAROM::Vector* LSROMObject::predict(const double a_t /*!< time at which to
       }
       std::cout << std::endl;
     }
-    recon_init = m_generator[0]->getSpatialBasis()->mult(m_projected_init[0]);
+    recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init[0]);
+
     /* Setup RK44 parameters */
     TimeExplicitRKInitialize();
     printf("checking m_rdim %d\n",m_rdim);
@@ -486,7 +489,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t /*!< time at which to
 //    }
 //    printf("ERROR in LSROMObject::predict(): m_ls is of size zero or interval not found!");
 //    return nullptr;
-  recon_init = m_generator[0]->getSpatialBasis()->mult(m_romcoef);
+  recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_romcoef);
   return recon_init;
 }
 
