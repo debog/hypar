@@ -106,12 +106,12 @@ int tridiagLUGS(
   int NT = 0; for (i=0; i<nproc; i++) NT += N[i];
 
   /* counts and displacements for gather and scatter operations */
-  int *counts = (int*) calloc (nproc, sizeof(int));
-  int *displ  = (int*) calloc (nproc, sizeof(int));
+  int *counts = (int*) calloc ((short)nproc, sizeof(int));
+  int *displ  = (int*) calloc ((short)nproc, sizeof(int));
 
   /* on all processes, calculate the number of systems each     */
   /* process has to solve                                       */
-  int *ns_local = (int*) calloc (nproc,sizeof(int));
+  int *ns_local = (int*) calloc ((short)nproc,sizeof(int));
   for (p=0; p<nproc; p++)    ns_local[p] = ns / nproc; 
   for (p=0; p<ns%nproc; p++) ns_local[p]++;
 

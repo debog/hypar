@@ -94,7 +94,8 @@ int BCReadTurbulentInflowData(void *b,void *m,int ndims,int nvars,int *DomainSiz
         MPI_Request req[2] = {MPI_REQUEST_NULL,MPI_REQUEST_NULL};
         MPI_Isend(size,ndims,MPI_INT,rank1D,2152,mpi->world,&req[0]);
         MPI_Isend(buffer,data_size,MPI_DOUBLE,rank1D,2153,mpi->world,&req[1]);
-        MPI_Waitall(2,&req[0],MPI_STATUS_IGNORE);
+        MPI_Status status_arr[3];
+        MPI_Waitall(2,&req[0],status_arr);
 #else
         fprintf(stderr,"Error in BCReadTurbulentInflowData(): This is a serial run. Invalid (non-zero) rank read.\n");
 #endif
@@ -234,7 +235,8 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
         MPI_Isend(size,ndims,MPI_INT,rank1D,2152,mpi->world,&req[0]);
         MPI_Isend(time_buffer,size[dim],MPI_DOUBLE,rank1D,2154,mpi->world,&req[2]);
         MPI_Isend(data_buffer,data_size,MPI_DOUBLE,rank1D,2153,mpi->world,&req[1]);
-        MPI_Waitall(3,&req[0],MPI_STATUS_IGNORE);
+        MPI_Status status_arr[3];
+        MPI_Waitall(3,&req[0],status_arr);
 #else
         fprintf(stderr,"Error in BCReadTemperatureData(): This is a serial run. Invalid (non-zero) rank read.\n");
 #endif

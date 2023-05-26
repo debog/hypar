@@ -178,8 +178,8 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
   
       /* implicit - explicit time integration */
   
-      TSSetRHSFunction(ts,PETSC_NULL,PetscRHSFunctionIMEX,&context);
-      TSSetIFunction  (ts,PETSC_NULL,PetscIFunctionIMEX,  &context);
+      TSSetRHSFunction(ts,nullptr,PetscRHSFunctionIMEX,&context);
+      TSSetIFunction  (ts,nullptr,PetscIFunctionIMEX,  &context);
   
       SNES     snes;
       KSP      ksp;
@@ -195,18 +195,18 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 #endif
   
       context.flag_use_precon = 0;
-      PetscOptionsGetBool(  PETSC_NULL,PETSC_NULL,
+      PetscOptionsGetBool(  nullptr,nullptr,
                             "-with_pc",
                             (PetscBool*)(&context.flag_use_precon),
-                            PETSC_NULL );
+                            nullptr );
   
       char precon_mat_type_c_st[_MAX_STRING_SIZE_] = "default";
-      PetscOptionsGetString(  PETSC_NULL,
-                              PETSC_NULL,
+      PetscOptionsGetString(  nullptr,
+                              nullptr,
                               "-pc_matrix_type",
                               precon_mat_type_c_st,
                               _MAX_STRING_SIZE_,
-                              PETSC_NULL );
+                              nullptr );
       context.precon_matrix_type = std::string(precon_mat_type_c_st);
   
       if (context.flag_use_precon) {
@@ -366,46 +366,46 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
       if (!strcmp(sim[0].solver.SplitHyperbolicFlux,"yes")) {
   
         flag = PETSC_FALSE; 
-        PetscOptionsGetBool(PETSC_NULL,PETSC_NULL,"-hyperbolic_f_explicit",&flag,PETSC_NULL);
+        PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_f_explicit",&flag,nullptr);
         if (flag == PETSC_TRUE) context.flag_hyperbolic_f = _EXPLICIT_; 
         flag = PETSC_FALSE; 
-        PetscOptionsGetBool(PETSC_NULL,PETSC_NULL,"-hyperbolic_f_implicit",&flag,PETSC_NULL);
+        PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_f_implicit",&flag,nullptr);
         if (flag == PETSC_TRUE) context.flag_hyperbolic_f = _IMPLICIT_; 
   
         flag = PETSC_FALSE; 
-        PetscOptionsGetBool(PETSC_NULL,PETSC_NULL,"-hyperbolic_df_explicit",&flag,PETSC_NULL);
+        PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_df_explicit",&flag,nullptr);
         if (flag == PETSC_TRUE) context.flag_hyperbolic_df = _EXPLICIT_; 
         flag = PETSC_FALSE; 
-        PetscOptionsGetBool(PETSC_NULL,PETSC_NULL,"-hyperbolic_df_implicit",&flag,PETSC_NULL);
+        PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_df_implicit",&flag,nullptr);
         if (flag == PETSC_TRUE) context.flag_hyperbolic_df = _IMPLICIT_; 
   
       } else {
   
         flag = PETSC_FALSE; 
-        PetscOptionsGetBool(PETSC_NULL,PETSC_NULL,"-hyperbolic_explicit",&flag,PETSC_NULL);
+        PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_explicit",&flag,nullptr);
         if (flag == PETSC_TRUE) context.flag_hyperbolic = _EXPLICIT_; 
         flag = PETSC_FALSE; 
-        PetscOptionsGetBool(PETSC_NULL,PETSC_NULL,"-hyperbolic_implicit",&flag,PETSC_NULL);
+        PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_implicit",&flag,nullptr);
         if (flag == PETSC_TRUE) context.flag_hyperbolic = _IMPLICIT_; 
   
       }
   
       flag = PETSC_FALSE; 
-      PetscOptionsGetBool(PETSC_NULL,PETSC_NULL,"-parabolic_explicit",&flag,PETSC_NULL);
+      PetscOptionsGetBool(nullptr,nullptr,"-parabolic_explicit",&flag,nullptr);
       if (flag == PETSC_TRUE) context.flag_parabolic = _EXPLICIT_; 
       flag = PETSC_FALSE; 
-      PetscOptionsGetBool(PETSC_NULL,PETSC_NULL,"-parabolic_implicit",&flag,PETSC_NULL);
+      PetscOptionsGetBool(nullptr,nullptr,"-parabolic_implicit",&flag,nullptr);
       if (flag == PETSC_TRUE) context.flag_parabolic = _IMPLICIT_; 
   
       flag = PETSC_FALSE; 
-      PetscOptionsGetBool(PETSC_NULL,PETSC_NULL,"-source_explicit",&flag,PETSC_NULL);
+      PetscOptionsGetBool(nullptr,nullptr,"-source_explicit",&flag,nullptr);
       if (flag == PETSC_TRUE) context.flag_source = _EXPLICIT_; 
       flag = PETSC_FALSE; 
-      PetscOptionsGetBool(PETSC_NULL,PETSC_NULL,"-source_implicit",&flag,PETSC_NULL);
+      PetscOptionsGetBool(nullptr,nullptr,"-source_implicit",&flag,nullptr);
       if (flag == PETSC_TRUE) context.flag_source = _IMPLICIT_; 
   
       flag = PETSC_FALSE;
-      PetscOptionsGetBool(PETSC_NULL,PETSC_NULL,"-ts_arkimex_fully_implicit",&flag,PETSC_NULL);
+      PetscOptionsGetBool(nullptr,nullptr,"-ts_arkimex_fully_implicit",&flag,nullptr);
       if (flag == PETSC_TRUE) {
         context.flag_hyperbolic_f   = _IMPLICIT_;
         context.flag_hyperbolic_df  = _IMPLICIT_;
@@ -437,7 +437,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
                 ||  (!strcmp(time_scheme,TSSSP  )) ) {
   
       /* Explicit time integration */    
-      TSSetRHSFunction(ts,PETSC_NULL,PetscRHSFunctionExpl,&context);
+      TSSetRHSFunction(ts,nullptr,PetscRHSFunctionExpl,&context);
   
     } else if (     (!strcmp(time_scheme,TSCN)) 
                 ||  (!strcmp(time_scheme,TSBEULER )) ) {
@@ -445,7 +445,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
   
       /* Implicit time integration */
   
-      TSSetIFunction(ts,PETSC_NULL,PetscIFunctionImpl,&context);
+      TSSetIFunction(ts,nullptr,PetscIFunctionImpl,&context);
   
       SNES     snes;
       KSP      ksp;
@@ -461,19 +461,19 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 #endif
   
       context.flag_use_precon = 0;
-      PetscOptionsGetBool(  PETSC_NULL,
-                            PETSC_NULL,
+      PetscOptionsGetBool(  nullptr,
+                            nullptr,
                             "-with_pc",
                             (PetscBool*)(&context.flag_use_precon),
-                            PETSC_NULL );
+                            nullptr );
   
       char precon_mat_type_c_st[_MAX_STRING_SIZE_] = "default";
-      PetscOptionsGetString(  PETSC_NULL,
-                              PETSC_NULL,
+      PetscOptionsGetString(  nullptr,
+                              nullptr,
                               "-pc_matrix_type",
                               precon_mat_type_c_st,
                               _MAX_STRING_SIZE_,
-                              PETSC_NULL );
+                              nullptr );
       context.precon_matrix_type = std::string(precon_mat_type_c_st);
   
       if (context.flag_use_precon) {

@@ -130,9 +130,9 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
     }
 
     /* Allocations */
-    simobj[n].solver.index = (int*) calloc (simobj[n].solver.ndims,sizeof(int));
-    simobj[n].solver.stride_with_ghosts = (int*) calloc (simobj[n].solver.ndims,sizeof(int));
-    simobj[n].solver.stride_without_ghosts = (int*) calloc (simobj[n].solver.ndims,sizeof(int));
+    simobj[n].solver.index = (int*) calloc ((short)simobj[n].solver.ndims,sizeof(int));
+    simobj[n].solver.stride_with_ghosts = (int*) calloc ((short)simobj[n].solver.ndims,sizeof(int));
+    simobj[n].solver.stride_without_ghosts = (int*) calloc ((short)simobj[n].solver.ndims,sizeof(int));
     int accu1 = 1, accu2 = 1;
     for (i=0; i<simobj[n].solver.ndims; i++) {
       simobj[n].solver.stride_with_ghosts[i]    = accu1;

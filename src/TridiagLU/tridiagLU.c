@@ -165,7 +165,8 @@ int tridiagLU(
     MPI_Request req[2] = {MPI_REQUEST_NULL,MPI_REQUEST_NULL};
     if (rank)             MPI_Irecv(recvbuf,nvar*ns,MPI_DOUBLE,rank-1,1436,*comm,&req[0]);
     if (rank != nproc-1)  MPI_Isend(sendbuf,nvar*ns,MPI_DOUBLE,rank+1,1436,*comm,&req[1]);
-    MPI_Waitall(2,&req[0],MPI_STATUS_IGNORE);
+    MPI_Status status_arr[2];
+    MPI_Waitall(2,&req[0],status_arr);
   }
   /* The first process sits this one out */
   if (rank) {
@@ -223,7 +224,8 @@ int tridiagLU(
     for (d=0; d<ns; d++)  xs1[d] = x[d];
     if (rank+1 < nproc) MPI_Irecv(xp1,ns,MPI_DOUBLE,rank+1,1323,*comm,&req[0]);
     if (rank)           MPI_Isend(xs1,ns,MPI_DOUBLE,rank-1,1323,*comm,&req[1]);
-    MPI_Waitall(2,&req[0],MPI_STATUS_IGNORE);
+    MPI_Status status_arr[2];
+    MPI_Waitall(2,&req[0],status_arr);
   }
 #else
   if (nproc > 1) {

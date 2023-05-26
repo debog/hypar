@@ -39,7 +39,7 @@ hypar_baselines_dir="baselines"
 
 # stuff about test directory
 hypar_test_dir="_test"
-exclude_flag="--exclude={'op*','surface*','ibank*','initial*','out.log','README.md'}"
+exclude_flag="--exclude={'op*','surface*','ibank*','initial*','out.log','README.md','.git*'}"
 diff_filelistname="diff_file_list"
 diff_file="diff.log"
 report_filename="test_report.txt"
@@ -49,6 +49,7 @@ RUN_SCRIPT="run.sh"
 NEEDS_PETSC="dep.PETSc"
 NEEDS_FFTW="dep.fftw"
 NEEDS_LIBROM="dep.libROM"
+DISABLED=".disabled"
 
 if [ -f "$HYPAR_EXEC_W_PATH" ]; then
 
@@ -169,6 +170,10 @@ for f in *; do
     elif [ -f "$NEEDS_FFTW" ] && [ "$opt_with_fftw" == "false" ]; then
       echo "Skipping; $f has unmet dependencies (FFTW)."
       echo "Skipping; $f has unmet dependencies (FFTW)." >> $report_file
+      ((n_skip+=1))
+    elif [ -f "$DISABLED" ]; then
+      echo "Skipping; $f test is disabled."
+      echo "Skipping; $f test is disabled." >> $report_file
       ((n_skip+=1))
     else
       if [ -f "$RUN_SCRIPT" ]; then

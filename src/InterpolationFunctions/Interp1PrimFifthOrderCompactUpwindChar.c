@@ -243,7 +243,8 @@ int Interp1PrimFifthOrderCompactUpwindChar(
   if (mpi->ip[dir]) for (d=0; d<Nsys*nvars; d++) sendbuf[d] = F[d];
   if (mpi->ip[dir] != mpi->iproc[dir]-1) MPI_Irecv(recvbuf,Nsys*nvars,MPI_DOUBLE,mpi->ip[dir]+1,214,mpi->comm[dir],&req[0]);
   if (mpi->ip[dir])                      MPI_Isend(sendbuf,Nsys*nvars,MPI_DOUBLE,mpi->ip[dir]-1,214,mpi->comm[dir],&req[1]);
-  MPI_Waitall(2,&req[0],MPI_STATUS_IGNORE);
+  MPI_Status status_arr[2];
+  MPI_Waitall(2,&req[0],status_arr);
   if (mpi->ip[dir] != mpi->iproc[dir]-1) for (d=0; d<Nsys*nvars; d++) F[d+Nsys*nvars*dim[dir]] = recvbuf[d];
 
 #endif
