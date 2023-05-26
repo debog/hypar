@@ -74,7 +74,7 @@ static int SetEFieldPrescribed( double* u,/*!< Conserved solution */
 
     double xvec[ndims_x];
     for (int d=0; d<ndims_x; d++) {
-      _GetCoordinate_(d,index[d]-ghosts,dim_local,ghosts,solver->x,xvec[d]);
+      _GetCoordinate_(d,index[d],dim_local,ghosts,solver->x,xvec[d]);
     }
 
     int p; 
