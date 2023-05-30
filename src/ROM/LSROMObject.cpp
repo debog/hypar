@@ -198,7 +198,6 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 
-    printf("filename_index %s\n",sim[0].solver.filename_index);
     double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(m_tic)->getData();
     WriteArray( sim[0].solver.ndims,
                 sim[0].solver.nvars,
