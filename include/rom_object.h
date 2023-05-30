@@ -46,6 +46,8 @@ class ROMObject
     virtual void save( const std::string& ) const = 0;
     /*! load ROM object from file */
     virtual void load( const std::string& ) = 0;
+    /*! Check the ROM object */
+    virtual void check(void*) = 0;
 
   protected:
 

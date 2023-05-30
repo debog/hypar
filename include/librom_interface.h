@@ -128,6 +128,9 @@ class libROMInterface
     /*! Copy a vector to HyPar */
     void copyToHyPar( const CAROM::Vector&, void*, int, int ) const;
 
+    /*! Check the ROM object */
+    void check(void* a_s);
+
   protected:
 
     bool m_is_defined;  /*!< Boolean to show if this object is defined */

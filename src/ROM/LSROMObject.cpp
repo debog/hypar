@@ -600,4 +600,9 @@ CAROM::Vector* LSROMObject::ReconlibROMfield(const CAROM::Vector* a_romcoef, con
   return a_rombasis->getFirstNColumns(a_rdim)->mult(a_romcoef);
 }
 
+/*! Check LS objects */
+void LSROMObject::check(void* a_s)
+{
+}
+
 #endif
