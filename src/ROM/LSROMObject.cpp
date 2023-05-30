@@ -172,8 +172,6 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 
     m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
     m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisName));
-//  printf("HEREEEEEE %d \n", isIncremental ? 1 : 0);
-//  exit (0);
     m_intervals.push_back( Interval(a_time, m_t_final) );
     m_ls_is_trained.push_back(false);
 
@@ -181,7 +179,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       printf( "LSROMObject::takeSample() - creating new generator object for sim. domain %d, var %d, t=%f (total: %d).\n",
               m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
     }
-    /* QUESTION: should a_U be centered? */
+
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 
     double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData();
@@ -196,10 +194,6 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                 &(sim[0].solver),
                 &(sim[0].mpi),
                 "sample_" );
-    // In order to use WriteArray function in hypar,
-    // Instead of using writeSnapshot(), use getSnapshotMatrix if one likes to visualize the snapshot,
-    // Use getspatial basis if one likes to visualize the basis.
-    // In both cases, the question is how to use Matrix datatype with WriteArray.
   } else {
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
