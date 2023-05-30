@@ -19,6 +19,7 @@
 #include "linalg/BasisGenerator.h"
 #include "linalg/Options.h"
 #include <rom_object.h>
+#include <simulation_object.h>
 
 #ifndef serial
 #include <mpi.h>
@@ -69,6 +70,9 @@ class LSROMObject : public ROMObject
 
     /*! Copy a vector to HyPar */
     void copyToHyPar( const CAROM::Vector&, void*, int ) const;
+
+    /*! Write out libROM field */
+    void OutputlibROMfield(double*, SimulationObject&, char*);
 
     /*! Initialize the time integration for LSROM */
     int TimeInitialize ();

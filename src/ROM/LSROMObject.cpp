@@ -181,34 +181,17 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     }
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
-
-    double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData();
-
-    WriteArray( sim[0].solver.ndims,
-                sim[0].solver.nvars,
-                sim[0].solver.dim_global,
-                sim[0].solver.dim_local,
-                0,
-                sim[0].solver.x,
-                vec_data,
-                &(sim[0].solver),
-                &(sim[0].mpi),
-                "sample_" );
+    char buffer[] = "sample_";  // Creates a modifiable buffer and copies the string literal
+    OutputlibROMfield(m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData(),
+                      sim[0],
+                      buffer);
   } else {
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
-
-    double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(m_tic)->getData();
-    WriteArray( sim[0].solver.ndims,
-                sim[0].solver.nvars,
-                sim[0].solver.dim_global,
-                sim[0].solver.dim_local,
-                0,
-                sim[0].solver.x,
-                vec_data,
-                &(sim[0].solver),
-                &(sim[0].mpi),
-                "sample_" );
+    char buffer[] = "sample_";  // Creates a modifiable buffer and copies the string literal
+    OutputlibROMfield(m_generator[0]->getSnapshotMatrix()->getColumn(m_tic)->getData(),
+                      sim[0],
+                      buffer);
   }
 
   m_tic++;
@@ -626,6 +609,19 @@ int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution 
     std::cout << std::endl;
   }
   return(0);
+}
+
+void LSROMObject::OutputlibROMfield(double* vec_data, SimulationObject& a_s, char* filename) {
+  WriteArray( a_s.solver.ndims,
+              a_s.solver.nvars,
+              a_s.solver.dim_global,
+              a_s.solver.dim_local,
+              0,
+              a_s.solver.x,
+              vec_data,
+              &(a_s.solver),
+              &(a_s.mpi),
+              filename);
 }
 
 #endif
