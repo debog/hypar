@@ -423,44 +423,33 @@ void LSROMObject::train(void* a_s)
   return;
 }
 
-/*! compute prediction at given time */
+/*! compute prediction at given time, the ROM coefficient is stored in m_romcoef  */
 const CAROM::Vector* LSROMObject::predict(const double a_t /*!< time at which to predict solution */ )
 {
-  int num_rows = m_generator[0]->getSpatialBasis()->numRows();
-  CAROM::Vector* recon_init = new CAROM::Vector(num_rows,false);
+  /* Need to modify the code so that is works for multiple windows */
+  for (int i = 0; i < m_generator.size(); i++) {
+    if (   (a_t >= m_intervals[i].first)
+        && (  (a_t < m_intervals[i].second) || (m_intervals[i].second < 0)  ) ){
 
-  if(std::abs(a_t) < 1e-9) {
-    printf("a_t %f\n",a_t);
-//  projectInitialSolution(*(m_snapshots->getColumn(0)));
-    m_romcoef = new CAROM::Vector(m_projected_init[0]->getData(), m_rdim, false, true);
-    printf("m_project size %d\n",m_projected_init[0]->dim());
-    if (!m_rank) {
-      std::cout << "Checking initial condition: ";
-      for (int j = 0; j < m_projected_init[0]->dim(); j++) {
-            std::cout << (m_projected_init[0]->item(j)) << " ";
+      if (!m_rank) printf("LSROM predicts at time t = %f in interval [%f, %f] \n",
+                          a_t,m_intervals[i].first,m_intervals[i].second);
+
+      if(std::abs(a_t) < 1e-9) {
+        projectInitialSolution(*(m_snapshots->getColumn(0)));
+        m_romcoef = new CAROM::Vector(m_projected_init[0]->getData(), m_rdim, false, true);
+
+        /* Setup RK44 parameters */
+        TimeExplicitRKInitialize();
+        /* Initialize RK44 working variables */
+        TimeInitialize();
+      } else {
+        TimeRK(a_t);
       }
-      std::cout << std::endl;
+      return ReconlibROMfield(m_romcoef, m_generator[0]->getSpatialBasis(), m_rdim);
     }
-    recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init[0]);
-
-    /* Setup RK44 parameters */
-    TimeExplicitRKInitialize();
-    printf("checking m_rdim %d\n",m_rdim);
-    /* Initialize RK44 working variables */
-    TimeInitialize();
-  } else {
-    TimeRK(a_t);
   }
-//    for (int i = 0; i < m_ls.size(); i++) {
-//      if (   (a_t >= m_intervals[i].first)
-//          && (  (a_t < m_intervals[i].second) || (m_intervals[i].second < 0)  ) ){
-//        return m_ls[i]->predict(a_t);
-//      }
-//    }
-//    printf("ERROR in LSROMObject::predict(): m_ls is of size zero or interval not found!");
-//    return nullptr;
-  recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_romcoef);
-  return recon_init;
+  printf("ERROR in LSROMObject::predict(): m_generator is of size zero or interval not found!");
+  return nullptr;
 }
 
 void LSROMObject::save(const std::string& a_fname_root /*!< Filename root */) const
@@ -604,6 +593,11 @@ void LSROMObject::OutputlibROMfield(double* vec_data, SimulationObject& a_s, cha
               &(a_s.solver),
               &(a_s.mpi),
               filename);
+}
+
+CAROM::Vector* LSROMObject::ReconlibROMfield(const CAROM::Vector* a_romcoef, const CAROM::Matrix* a_rombasis, const int a_rdim){
+
+  return a_rombasis->getFirstNColumns(a_rdim)->mult(a_romcoef);
 }
 
 #endif

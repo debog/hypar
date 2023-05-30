@@ -74,6 +74,9 @@ class LSROMObject : public ROMObject
     /*! Write out libROM field */
     void OutputlibROMfield(double*, SimulationObject&, char*);
 
+    /*! Reconstruct libROM field from coefficient */
+    CAROM::Vector* ReconlibROMfield(const CAROM::Vector*, const CAROM::Matrix*, const int);
+
     /*! Initialize the time integration for LSROM */
     int TimeInitialize ();
     /* RK Time integration for LSROM */
@@ -87,6 +90,7 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::Vector*> m_projected_init; /*!< Vector of Vector objects */
     const CAROM::Vector* m_S; /*!< Vector of Singular value */
     CAROM::Vector* m_romcoef; /*!< Vector of rom coefficients */
+    CAROM::Vector* m_recon; /*!< Vector of rom coefficients */
     CAROM::Matrix* m_snapshots; /*!< Snapshot Matrix */
     CAROM::Matrix* m_romhyperb; /*!< Reduced Hyperbolic Term Matrix */
 
