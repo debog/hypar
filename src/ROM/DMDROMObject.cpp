@@ -333,4 +333,9 @@ void DMDROMObject::load(const std::string& a_fname_root /*!< Filename root */)
   return;
 }
 
+/*! Check DMD objects */
+void DMDROMObject::check(void* a_s)
+{
+}
+
 #endif

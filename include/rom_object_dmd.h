@@ -99,6 +99,9 @@ class DMDROMObject : public ROMObject
     /*! load DMD object from file */
     virtual void load(const std::string& a_fname_root /*!< Filename root*/);
 
+    /*! Check the DMD object */
+    virtual void check(void* );
+
   protected:
 
     std::vector<CAROM::DMD*> m_dmd; /*!< Vector of DMD objects */
