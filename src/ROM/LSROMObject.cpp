@@ -525,23 +525,6 @@ int LSROMObject::TimeExplicitRKInitialize()
   A[4] = 0.5; A[9] = 0.5; A[14] = 1.0;
   c[1] = c[2] = 0.5; c[3] = 1.0;
   b[0] = 1.0/6.0; b[1] = 1.0/3.0; b[2] = 1.0/3.0; b[3] = 1.0/6.0;
-  if (!m_rank) {
-    std::cout << "Checking A: ";
-    for (int j = 0; j < nstages*nstages; j++) {
-         std::cout << A[j] << " ";
-    }
-    std::cout << std::endl;
-    std::cout << "Checking B: ";
-    for (int j = 0; j < nstages; j++) {
-         std::cout << b[j] << " ";
-    }
-    std::cout << std::endl;
-    std::cout << "Checking C: ";
-    for (int j = 0; j < nstages; j++) {
-         std::cout << c[j] << " ";
-    }
-    std::cout << std::endl;
-  }
   return(0);
 }
 
@@ -549,12 +532,11 @@ int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution 
 {
   /* Advance the ROM ODE using RK4 scheme */
   int ns, stage, i;
-  printf("checking m_rdim %d\n",m_rdim);
+
     /* Calculate stage values */
   for (stage = 0; stage < nstages; stage++) {
   
     double stagetime = a_t + c[stage]*m_dt;
-    printf("stagetime %f\n",stagetime);
 
     _ArrayCopy1D_(  m_romcoef->getData(),
                     m_U[stage]->getData(),
