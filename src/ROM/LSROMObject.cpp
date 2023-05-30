@@ -41,7 +41,7 @@
 extern "C" int TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
 extern "C" int CalculateROMDiff(void*,void*);
 
-LSROMObject::LSROMObject( const int     a_vec_size, /*!< vector size */
+LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
                             const double  a_dt,       /*!< time step size */
                             const int     a_rdim,     /*!< latent space dimension */
                             const int     a_rank,     /*!< MPI rank of this process */
@@ -52,7 +52,7 @@ LSROMObject::LSROMObject( const int     a_vec_size, /*!< vector size */
   m_rank = a_rank;
   m_nproc = a_nproc;
 
-/* my implementation */
+  /* my implementation */
   m_options.clear();
   m_generator.clear();
   m_projected_init.clear();
@@ -145,27 +145,21 @@ void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U /*!< solution vect
     return;
   }
   for (int i = 0; i < m_generator.size(); i++) {
+
     int num_rows = m_generator[i]->getSpatialBasis()->numRows();
     m_projected_init.push_back(new CAROM::Vector(num_rows, false));
     m_projected_init[i] = m_generator[i]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(a_U);
-    printf("m_project size %d\n",m_projected_init[i]->dim());
+
     if (!m_rank) {
+      printf("m_project size %d\n",m_projected_init[i]->dim());
       std::cout << "Checking projected coefficients: ";
       for (int j = 0; j < m_projected_init[i]->dim(); j++) {
             std::cout << (m_projected_init[i]->item(j)) << " ";
       }
       std::cout << std::endl;
     }
-  }
 
-  /* Currently only support for one time window
-   * Following code is copied from DMDObject for multiple windows and need to
-   * be modified accordingly for LS-ROM */
-//    m_ls[0]->projectInitialCondition( &a_U );
-//    for (int i = 1; i < m_ls.size(); i++) {
-//      m_ls[i]->projectInitialCondition( m_ls[i-1]->predict(m_intervals[i].first) );
-//    }
-//    return;
+  }
 }
 
 /*! take a sample (solution snapshot) */
