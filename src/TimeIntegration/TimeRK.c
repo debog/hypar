@@ -64,7 +64,7 @@ int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
 
       for (ns = 0; ns < nsims; ns++) {
         if (sim[ns].solver.PreStage) {
-          fprintf(stderr,"Call to solver->PreStage() commented out in TimeRK()!\n");
+          fprintf(stderr,"ERROR in TimeRK(): Call to solver->PreStage() commented out!\n");
           return 1;
 //          sim[ns].solver.PreStage( stage,
 //                                   (TS->gpu_U),
@@ -75,20 +75,20 @@ int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
       }
 
       for (ns = 0; ns < nsims; ns++) {
-          TS->RHSFunction( (TS->gpu_Udot + stage*TS->u_size_total + TS->u_offsets[ns]),
-                           (TS->gpu_U + stage*TS->u_size_total + TS->u_offsets[ns]),
-                           &(sim[ns].solver),
-                           &(sim[ns].mpi),
-                           stagetime  );
-      }
-
-      for (ns = 0; ns < nsims; ns++) {
         if (sim[ns].solver.PostStage) {
           sim[ns].solver.PostStage(  (TS->gpu_U + stage*TS->u_size_total + TS->u_offsets[ns]),
                                      &(sim[ns].solver),
                                      &(sim[ns].mpi),
                                      stagetime);
         }
+      }
+
+      for (ns = 0; ns < nsims; ns++) {
+          TS->RHSFunction( (TS->gpu_Udot + stage*TS->u_size_total + TS->u_offsets[ns]),
+                           (TS->gpu_U + stage*TS->u_size_total + TS->u_offsets[ns]),
+                           &(sim[ns].solver),
+                           &(sim[ns].mpi),
+                           stagetime  );
       }
 
       gpuArraySetValue(TS->gpu_BoundaryFlux + stage*TS->bf_size_total, TS->bf_size_total, 0.0);
@@ -142,7 +142,7 @@ int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
   
       for (ns = 0; ns < nsims; ns++) {
         if (sim[ns].solver.PreStage) {
-          fprintf(stderr,"Call to solver->PreStage() commented out in TimeRK()!\n");
+          fprintf(stderr,"ERROR in TimeRK(): Call to solver->PreStage() commented out!\n");
           return 1;
   //        sim[ns].solver.PreStage( stage,
   //                                 (TS->U),
@@ -153,20 +153,20 @@ int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
       }
   
       for (ns = 0; ns < nsims; ns++) {
-        TS->RHSFunction( (TS->Udot[stage] + TS->u_offsets[ns]),
-                         (TS->U[stage] + TS->u_offsets[ns]),
-                         &(sim[ns].solver),
-                         &(sim[ns].mpi),
-                         stagetime);
-      }
-  
-      for (ns = 0; ns < nsims; ns++) {
         if (sim[ns].solver.PostStage) {
           sim[ns].solver.PostStage(  (TS->U[stage] + TS->u_offsets[ns]),
                                      &(sim[ns].solver),
                                      &(sim[ns].mpi),
                                      stagetime); CHECKERR(ierr);
         }
+      }
+  
+      for (ns = 0; ns < nsims; ns++) {
+        TS->RHSFunction( (TS->Udot[stage] + TS->u_offsets[ns]),
+                         (TS->U[stage] + TS->u_offsets[ns]),
+                         &(sim[ns].solver),
+                         &(sim[ns].mpi),
+                         stagetime);
       }
   
       _ArraySetValue_(TS->BoundaryFlux[stage], TS->bf_size_total, 0.0);
