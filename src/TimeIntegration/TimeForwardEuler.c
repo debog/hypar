@@ -36,14 +36,6 @@ int TimeForwardEuler(
     HyPar* solver = &(sim[ns].solver);
     MPIVariables* mpi = &(sim[ns].mpi);
 
-    if (solver->PreStage) { 
-      IERR solver->PreStage(  0,
-                              &solver->u,
-                              solver,
-                              mpi,
-                              TS->waqt );   CHECKERR(ierr);
-    }
-
     double* rhs = TS->rhs + TS->u_offsets[ns];
   
     /* Evaluate right-hand side */
@@ -63,13 +55,6 @@ int TimeForwardEuler(
                         TS->dt,
                         solver->StepBoundaryIntegral,
                         TS->bf_sizes[ns] );
-  
-      if (solver->PostStage) { 
-        IERR solver->PostStage( solver->u,
-                                solver,
-                                mpi,
-                                TS->waqt ); CHECKERR(ierr); 
-    }
   }
 
   return(0);
