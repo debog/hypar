@@ -71,6 +71,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
 
   char dirname_c_str[_MAX_STRING_SIZE_] = "LS";
   char write_snapshot_mat[_MAX_STRING_SIZE_] = "false";
+  char direct_comp_hyperbolic[_MAX_STRING_SIZE_] = "false";
 
   if (!m_rank) {
 
@@ -92,6 +93,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
             ferr = fscanf(in,"%s", dirname_c_str); if (ferr != 1) return;
           } else if (std::string(word) == "ls_write_snapshot_mat") {
             ferr = fscanf(in,"%s", write_snapshot_mat); if (ferr != 1) return;
+          } else if (std::string(word) == "ls_direct_comp_hyperbolic") {
+            ferr = fscanf(in,"%s", direct_comp_hyperbolic); if (ferr != 1) return;
           }
           if (ferr != 1) return;
         }
@@ -110,6 +113,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
     printf("  number of samples per window:   %d\n", m_num_window_samples);
     printf("  directory name for LS objects: %s\n", dirname_c_str);
     printf("  write snapshot matrix to file:  %s\n", write_snapshot_mat);
+    printf("  directly compute hyperbolic term:  %s\n", direct_comp_hyperbolic);
     if (m_sim_idx >= 0) {
       printf("  simulation domain:  %d\n", m_sim_idx);
     }
@@ -122,10 +126,12 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
   MPI_Bcast(&m_num_window_samples,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(dirname_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(write_snapshot_mat,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+  MPI_Bcast(direct_comp_hyperbolic,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
 #endif
 
   m_dirname = std::string( dirname_c_str );
   m_write_snapshot_mat = (std::string(write_snapshot_mat) == "true");
+  m_direct_comp_hyperbolic = (std::string(direct_comp_hyperbolic) == "true");
 
   if (m_num_window_samples <= m_rdim) {
     printf("ERROR:LSROMObject::LSROMObject() - m_num_window_samples <= m_rdim!!");
