@@ -137,6 +137,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
 
 void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U /*!< solution vector */ )
 {
+  /* Need to modify the code so that is works for multiple windows */
   /* Assumming m_generator[i]->getSpatialBasis() is called before */
   if (m_generator.size() == 0) {
     if (!m_rank) {
@@ -480,6 +481,7 @@ void LSROMObject::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vector */
 
 int LSROMObject::TimeInitialize()
 {
+  /* Currenty assuming one window only */
   int i;
   /* initialize arrays to NULL, then allocate as necessary */
   m_U.clear();
@@ -496,6 +498,7 @@ int LSROMObject::TimeInitialize()
 
 int LSROMObject::TimeExplicitRKInitialize()
 {
+  /* Currenty assuming one window only */
   /* Currently only support RK44 */
   nstages = 4;
   A = (double*) calloc (nstages*nstages,sizeof(double));
@@ -512,6 +515,7 @@ int LSROMObject::TimeExplicitRKInitialize()
 
 int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution */ )
 {
+  /* Currenty assuming one window only */
   /* Advance the ROM ODE using RK4 scheme */
   int ns, stage, i;
 
