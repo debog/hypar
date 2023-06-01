@@ -78,7 +78,10 @@ class LSROMObject : public ROMObject
     virtual void check(void* );
 
     /*! Reconstruct libROM field from coefficient */
-    CAROM::Vector* ReconlibROMfield(const CAROM::Vector*, const CAROM::Matrix*, const int);
+    CAROM::Vector* ReconlibROMfield(const CAROM::Vector*, const CAROM::Matrix*, const int );
+
+    /*! Project a libROM field onto reduced space*/
+    CAROM::Vector* ProjectToRB(CAROM::Vector*, const CAROM::Matrix*, const int );
 
     /*! Initialize the time integration for LSROM */
     int TimeInitialize ();
