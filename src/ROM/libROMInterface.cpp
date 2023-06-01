@@ -284,7 +284,7 @@ void libROMInterface::predict(void*  a_s, /*!< Array of simulation objects of ty
 
     for (int ns = 0; ns < m_nsims; ns++) {
       gettimeofday(&m_predict_start, NULL);
-      const CAROM::Vector* const u_predicted = m_rom[ns]->predict(a_t);
+      const CAROM::Vector* const u_predicted = m_rom[ns]->predict(a_t,a_s);
       gettimeofday(&m_predict_end, NULL);
       copyToHyPar( *u_predicted, a_s, ns );
 
@@ -300,7 +300,7 @@ void libROMInterface::predict(void*  a_s, /*!< Array of simulation objects of ty
     for (int ns = 0; ns < m_nsims; ns++) {
       for (int v = 0; v < m_ncomps[ns]; v++) {
         gettimeofday(&m_predict_start, NULL);
-        const CAROM::Vector* const u_predicted = m_rom[count]->predict(a_t);
+        const CAROM::Vector* const u_predicted = m_rom[count]->predict(a_t,a_s);
         gettimeofday(&m_predict_end, NULL);
         copyToHyPar( *u_predicted, a_s, ns, v );
 

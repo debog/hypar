@@ -418,7 +418,8 @@ void LSROMObject::train(void* a_s)
 }
 
 /*! compute prediction at given time, the ROM coefficient is stored in m_romcoef  */
-const CAROM::Vector* LSROMObject::predict(const double a_t /*!< time at which to predict solution */ )
+const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which to predict solution */
+                                          void* a_s )
 {
   /* Need to modify the code so that is works for multiple windows */
   for (int i = 0; i < m_generator.size(); i++) {

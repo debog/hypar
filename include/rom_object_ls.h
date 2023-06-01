@@ -60,7 +60,7 @@ class LSROMObject : public ROMObject
 
     /*! compute prediction at given time */
     virtual 
-    const CAROM::Vector* predict(const double );
+    const CAROM::Vector* predict(const double, void* );
 
     /*! save LS object to file */
     virtual void save(const std::string& a_fname_root /*!< Filename root*/) const;
