@@ -438,7 +438,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
         /* Initialize RK44 working variables */
         TimeInitialize();
       } else {
-        TimeRK(a_t);
+        TimeRK(a_t,a_s);
       }
       return ReconlibROMfield(m_romcoef, m_generator[0]->getSpatialBasis(), m_rdim);
     }
@@ -514,11 +514,25 @@ int LSROMObject::TimeExplicitRKInitialize()
   return(0);
 }
 
-int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution */ )
+int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution */
+                        void* a_s )
 {
   /* Currenty assuming one window only */
   /* Advance the ROM ODE using RK4 scheme */
+
+  SimulationObject* sim = (SimulationObject*) a_s;
+  std::vector<int> index(sim[0].solver.ndims);
+  std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+
   int ns, stage, i;
+  int num_rows = m_generator[0]->getSpatialBasis()->numRows();
+  CAROM::Vector* m_fomwork;
+  CAROM::Vector* m_rhswork;
+  CAROM::Vector* m_romwork;
+  m_fomwork = new CAROM::Vector(num_rows,false);
+  m_rhswork = new CAROM::Vector(num_rows,true);
+  m_romwork = new CAROM::Vector(m_rdim,false);
 
     /* Calculate stage values */
   for (stage = 0; stage < nstages; stage++) {
@@ -537,6 +551,34 @@ int LSROMObject::TimeRK(const double a_t /*!< time at which to predict solution 
     }
 
     m_Udot[stage] = m_romhyperb->mult(m_U[stage]);
+    m_fomwork = ReconlibROMfield(m_U[stage], m_generator[0]->getSpatialBasis(), m_rdim);
+
+    ArrayCopynD(sim[0].solver.ndims,
+                m_fomwork->getData(),
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+
+    /* Evaluate F(\phi_j) */
+    TimeRHSFunctionExplicit(rhs_wghosts.data(),
+                            vec_wghosts.data(),
+                            &(sim[0].solver),
+                            &(sim[0].mpi),
+                            0);
+
+    ArrayCopynD(sim[0].solver.ndims,
+                rhs_wghosts.data(),
+                m_rhswork->getData(),
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                index.data(),
+                sim[0].solver.nvars);
+
+    m_Udot[stage] = ProjectToRB(m_rhswork,m_generator[0]->getSpatialBasis(), m_rdim);
 //  if (!m_rank) {
 //    std::cout << "Checking copy initial condition: ";
 //    for (int j = 0; j < m_rdim; j++) {
