@@ -2,6 +2,7 @@
     @author Debojyoti Ghosh
     @brief Write out the electric field to file
 */
+
 #include <stdlib.h>
 #include <string.h>
 #include <basic.h>
@@ -87,7 +88,7 @@ int VlasovWriteEField( void* s, /*!< Solver object of type #HyPar */
     } else {
       IERR MPIGatherArray1D(  mpi,
                               (mpi->rank ? NULL : e_field_g),
-                              param->e_field,
+                              (param->e_field+ghosts),
                               mpi->is[0],
                               mpi->ie[0],
                               solver->dim_local[0],
