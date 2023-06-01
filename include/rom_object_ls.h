@@ -87,7 +87,7 @@ class LSROMObject : public ROMObject
     int TimeInitialize ();
     /* RK Time integration for LSROM */
     int TimeExplicitRKInitialize();
-    int TimeRK(const double );
+    int TimeRK(const double, void* );
 
   protected:
 
@@ -120,6 +120,7 @@ class LSROMObject : public ROMObject
     int m_var_idx; /*!< component index of this object if component-wise ROMs are being used */
 
     bool m_write_snapshot_mat;  /*!< Write snapshot matrix to file or not */
+    bool m_direct_comp_hyperbolic;  /*!< Write snapshot matrix to file or not */
 
     std::string m_dirname; /*!< Subdirectory where LS objects are written to or read from */
 
