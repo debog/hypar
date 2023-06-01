@@ -220,30 +220,23 @@ void LSROMObject::train(void* a_s)
           /* Since here is using gertSnapshotMatrix to write files, need additional process in order to visualize it
              Similar in the case of DMD */
         }
+
         /* The code below is like m_dmd[i]->train(m_rdim) but in LS-ROM, there is no
            m_ls object, instead, it has m_generator, m_options, m_spatialbasis, m_projected_init */
 
-        /* Call SVD on snapshot matrix and also check singular value decomposition
-           Does everytime invoking getSpatialBasis() do computeSVD again? */
-//      const CAROM::Matrix* snapshots = new CAROM::Matrix(*m_generator[i]->getSnapshotMatrix());
-//      const CAROM::Matrix* snapshots = new CAROM::Matrix(m_generator[i]->getSnapshotMatrix()->getData(),
-//                                                         m_generator[i]->getSnapshotMatrix()->numRows(),
-//                                                         m_generator[i]->getSnapshotMatrix()->numColumns(),
-//                                                         true,
-//                                                         true);
         m_snapshots = new CAROM::Matrix(m_generator[i]->getSnapshotMatrix()->getData(),
                                                            m_generator[i]->getSnapshotMatrix()->numRows(),
                                                            m_generator[i]->getSnapshotMatrix()->numColumns(),
                                                            true,
                                                            true);
-
         /* IMPORTANT!!! m_generator[i]->getSnapshotMatrix() is modified after getSingularValues or (computeSVD) is called */ 
         m_S = m_generator[i]->getSingularValues();
 
         /* Compute F(\Phi), where \Phi is the reduced basis matrix */
+        /* Call SVD on snapshot matrix and also check singular value decomposition
+           Does everytime invoking getSpatialBasis() do computeSVD again? */
         int num_rows = m_generator[i]->getSpatialBasis()->numRows();
         int num_cols = m_generator[i]->getSpatialBasis()->numColumns();
-//      m_rdim = num_cols;
 
         CAROM::Matrix* phi_hyper;
         phi_hyper = new CAROM::Matrix(num_rows, m_rdim, true);
@@ -598,6 +591,12 @@ void LSROMObject::OutputlibROMfield(double* vec_data, SimulationObject& a_s, cha
 CAROM::Vector* LSROMObject::ReconlibROMfield(const CAROM::Vector* a_romcoef, const CAROM::Matrix* a_rombasis, const int a_rdim){
 
   return a_rombasis->getFirstNColumns(a_rdim)->mult(a_romcoef);
+}
+
+CAROM::Vector* LSROMObject::ProjectToRB(CAROM::Vector* a_field, const CAROM::Matrix* a_rombasis, const int a_rdim){
+  /* a_field is a serialized solution without ghost points */
+
+  return a_rombasis->getFirstNColumns(a_rdim)->transposeMult(a_field);
 }
 
 /*! Check LS objects */
