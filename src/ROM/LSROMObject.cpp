@@ -208,7 +208,11 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 /*! train the LS objects */
 void LSROMObject::train(void* a_s)
 {
-  /* In the training, initial condition for ROM should also be computed */
+  /* In the training, following quantities are computed:
+   * 1. reduced basis (m_generator[i]->getSpatialBasis)
+   * 2. reduced hyperbolic operator (constructHyperbolic)
+   * 3. Initial condition (projectInitialCondition) */
+
   SimulationObject* sim = (SimulationObject*) a_s;
 
   if (m_generator.size() > 0) {
@@ -351,6 +355,14 @@ void LSROMObject::train(void* a_s)
 //      projectInitialSolution(*snap_col);
         projectInitialSolution(*(m_snapshots->getColumn(1)));
         projectInitialSolution(*(m_snapshots->getColumn(0)));
+        if (!m_rank) {
+          printf("m_project size %d\n",m_projected_init[0]->dim());
+          std::cout << "Checking initial condition: ";
+          for (int j = 0; j < m_projected_init[0]->dim(); j++) {
+                std::cout << (m_projected_init[0]->item(j)) << " ";
+          }
+          std::cout << std::endl;
+        }
 
         CAROM::Vector* recon_init;
         recon_init = new CAROM::Vector(num_rows,false);
