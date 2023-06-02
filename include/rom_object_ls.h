@@ -89,6 +89,14 @@ class LSROMObject : public ROMObject
     int TimeExplicitRKInitialize();
     int TimeRK(const double, void* );
 
+    /* Construct reduced hyperbolic operator */
+    void ConstructROMHy(void*, const CAROM::Matrix*);
+
+    /* Dump ROM basis */
+    void OutputROMBasis(void*, const CAROM::Matrix*);
+
+    int CalSnapROMDiff(void*, void*, double*, double*);
+
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
@@ -143,6 +151,8 @@ class LSROMObject : public ROMObject
 
     /*! Arrays to store stage right-hand-sides for a multi-stage time-integration method */
     std::vector<CAROM::Vector*> m_Udot;
+
+    int m_snap; /*!< private ticker to count number of samples taken */
 
   private:
 };
