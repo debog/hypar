@@ -245,6 +245,7 @@ void LSROMObject::train(void* a_s)
                                                            true,
                                                            true);
         m_S = m_generator[i]->getSingularValues();
+        OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
 
         ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
 
