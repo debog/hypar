@@ -438,57 +438,63 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
                     m_rdim );
     }
 
-    m_Udot[stage] = m_romhyperb->mult(m_U[stage]);
-    m_fomwork = ReconlibROMfield(m_U[stage], m_generator[0]->getSpatialBasis(), m_rdim);
+    if (m_direct_comp_hyperbolic) {
+//    printf("compute hyperbolic term directly\n");
 
-    ArrayCopynD(sim[0].solver.ndims,
-                m_fomwork->getData(),
-                vec_wghosts.data(),
-                sim[0].solver.dim_local,
-                0,
-                sim[0].solver.ghosts,
-                index.data(),
-                sim[0].solver.nvars);
+      m_fomwork = ReconlibROMfield(m_U[stage], m_generator[0]->getSpatialBasis(), m_rdim);
 
-    /* Evaluate F(\phi_j) */
-    TimeRHSFunctionExplicit(rhs_wghosts.data(),
-                            vec_wghosts.data(),
-                            &(sim[0].solver),
-                            &(sim[0].mpi),
-                            0);
+      ArrayCopynD(sim[0].solver.ndims,
+                  m_fomwork->getData(),
+                  vec_wghosts.data(),
+                  sim[0].solver.dim_local,
+                  0,
+                  sim[0].solver.ghosts,
+                  index.data(),
+                  sim[0].solver.nvars);
 
-    ArrayCopynD(sim[0].solver.ndims,
-                rhs_wghosts.data(),
-                m_rhswork->getData(),
-                sim[0].solver.dim_local,
-                sim[0].solver.ghosts,
-                0,
-                index.data(),
-                sim[0].solver.nvars);
+      /* Evaluate F(\phi_j) */
+      TimeRHSFunctionExplicit(rhs_wghosts.data(),
+                              vec_wghosts.data(),
+                              &(sim[0].solver),
+                              &(sim[0].mpi),
+                              0);
 
-    m_Udot[stage] = ProjectToRB(m_rhswork,m_generator[0]->getSpatialBasis(), m_rdim);
-//  if (!m_rank) {
-//    std::cout << "Checking copy initial condition: ";
-//    for (int j = 0; j < m_rdim; j++) {
-//          std::cout << m_Udot[stage]->item(j) << " ";
-//    }
-//    std::cout << std::endl;
-//  }
-//  TS->RHSFunction( (m_Udot[stage]),
-//                   (m_U[stage]),
-//                   &(sim[ns].solver),
-//                   &(sim[ns].mpi),
-//                   stagetime);
+      sim[0].solver.PostStage( vec_wghosts.data(),
+                               &(sim[0].solver),
+                               &(sim[0].mpi),
+                               stagetime); CHECKERR(ierr);
 
-//  for (ns = 0; ns < nsims; ns++) {
-//    if (sim[ns].solver.PostStage) {
-//      sim[ns].solver.PostStage(  (TS->U[stage] + TS->u_offsets[ns]),
-//                                 &(sim[ns].solver),
-//                                 &(sim[ns].mpi),
-//                                 stagetime); CHECKERR(ierr);
-//    }
-//  }
-//
+
+      ArrayCopynD(sim[0].solver.ndims,
+                  rhs_wghosts.data(),
+                  m_rhswork->getData(),
+                  sim[0].solver.dim_local,
+                  sim[0].solver.ghosts,
+                  0,
+                  index.data(),
+                  sim[0].solver.nvars);
+
+      m_Udot[stage] = ProjectToRB(m_rhswork,m_generator[0]->getSpatialBasis(), m_rdim);
+      if (!m_rank) {
+        std::cout << "Checking hyperbolic term [directly]: ";
+        for (int j = 0; j < m_rdim; j++) {
+              std::cout << m_Udot[stage]->item(j) << " ";
+        }
+        std::cout << std::endl;
+      }
+    }
+    else {
+//    printf("compute hyperbolic term efficiently\n");
+      m_Udot[stage] = m_romhyperb->mult(m_U[stage]);
+      if (!m_rank) {
+        std::cout << "Checking hyperbolic term [efficient]: ";
+        for (int j = 0; j < m_rdim; j++) {
+              std::cout << m_Udot[stage]->item(j) << " ";
+        }
+        std::cout << std::endl;
+      }
+    }
+
   }
 
   /* Step completion */
