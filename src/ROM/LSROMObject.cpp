@@ -273,10 +273,31 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
 
       if (!m_rank) printf("LSROM predicts at time t = %f in interval [%f, %f] \n",
                           a_t,m_intervals[i].first,m_intervals[i].second);
+      std::vector<int> index(sim[0].solver.ndims);
+      std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+      std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+      int num_rows = m_generator[0]->getSpatialBasis()->numRows();
+      CAROM::Vector* m_fomwork;
+      CAROM::Vector* m_rhswork;
+      m_fomwork = new CAROM::Vector(num_rows,false);
+      m_rhswork = new CAROM::Vector(num_rows,true);
 
       if(std::abs(a_t) < 1e-9) {
         projectInitialSolution(*(m_snapshots->getColumn(0)));
         m_romcoef = new CAROM::Vector(m_projected_init[0]->getData(), m_rdim, false, true);
+        m_fomwork = ReconlibROMfield(m_romcoef, m_generator[0]->getSpatialBasis(), m_rdim);
+        ArrayCopynD(sim[0].solver.ndims,
+                    m_fomwork->getData(),
+                    vec_wghosts.data(),
+                    sim[0].solver.dim_local,
+                    0,
+                    sim[0].solver.ghosts,
+                    index.data(),
+                    sim[0].solver.nvars);
+        sim[0].solver.PostStage( vec_wghosts.data(),
+                                 &(sim[0].solver),
+                                 &(sim[0].mpi),
+                                 0); CHECKERR(ierr);
 
         /* Setup RK44 parameters */
         TimeExplicitRKInitialize();
@@ -285,6 +306,26 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
       } else {
         TimeRK(a_t,a_s);
       }
+      m_fomwork = ReconlibROMfield(m_romcoef, m_generator[0]->getSpatialBasis(), m_rdim);
+      ArrayCopynD(sim[0].solver.ndims,
+                  m_fomwork->getData(),
+                  vec_wghosts.data(),
+                  sim[0].solver.dim_local,
+                  0,
+                  sim[0].solver.ghosts,
+                  index.data(),
+                  sim[0].solver.nvars);
+      ArrayCopynD(sim[0].solver.ndims,
+                  m_snapshots->getColumn(m_snap)->getData(),
+                  rhs_wghosts.data(),
+                  sim[0].solver.dim_local,
+                  0,
+                  sim[0].solver.ghosts,
+                  index.data(),
+                  sim[0].solver.nvars);
+      CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),vec_wghosts.data(),rhs_wghosts.data());
+      printf("Checking reproduction error %.15f %.15f %.15f \n",sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+      m_snap++;
       return ReconlibROMfield(m_romcoef, m_generator[0]->getSpatialBasis(), m_rdim);
     }
   }
