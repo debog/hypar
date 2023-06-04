@@ -97,6 +97,10 @@ class LSROMObject : public ROMObject
 
     int CalSnapROMDiff(void*, void*, double*, double*);
 
+    void CheckSolProjError(void*);
+
+    void CheckHyProjError(void*);
+
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
@@ -104,6 +108,7 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::Vector*> m_projected_init; /*!< Vector of Vector objects */
     const CAROM::Vector* m_S; /*!< Vector of Singular value */
     CAROM::Vector* m_romcoef; /*!< Vector of rom coefficients */
+    CAROM::Vector* m_romhycoef; /*!< Vector of rom coefficients */
     CAROM::Vector* m_recon; /*!< Vector of rom coefficients */
     CAROM::Matrix* m_snapshots; /*!< Snapshot Matrix */
     CAROM::Matrix* m_romhyperb; /*!< Reduced Hyperbolic Term Matrix */

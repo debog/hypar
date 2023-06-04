@@ -247,6 +247,10 @@ void LSROMObject::train(void* a_s)
         m_S = m_generator[i]->getSingularValues();
         OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
         ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
+
+        CheckSolProjError(a_s);
+        CheckHyProjError(a_s);
+
       }
     }
   } else {
@@ -325,8 +329,10 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
                   sim[0].solver.ghosts,
                   index.data(),
                   sim[0].solver.nvars);
-      CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),vec_wghosts.data(),rhs_wghosts.data());
-      printf("Checking reproduction error %.15f %.15f %.15f \n",sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+      if (m_snap < sim[0].solver.n_iter){
+      CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),vec_wghosts.data());
+      printf("Reproduction error at iter %d, %.15f %.15f %.15f \n",m_snap,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+      }
       m_snap++;
       return ReconlibROMfield(m_romcoef, m_generator[0]->getSpatialBasis(), m_rdim);
     }
@@ -939,6 +945,117 @@ int LSROMObject::CalSnapROMDiff( void *s, /*!< Solver object of type #HyPar */
 
   free(u_diff);
   return 0;
+}
+
+/*! Check projection error in solution */
+void LSROMObject::CheckSolProjError(void* a_s)
+{
+  SimulationObject* sim = (SimulationObject*) a_s;
+  std::vector<double> snap_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<double> snapproj_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<int> index(sim[0].solver.ndims);
+
+  int num_rows = m_generator[0]->getSpatialBasis()->numRows();
+  int num_cols = m_snapshots->numColumns();
+  CAROM::Vector* recon_init;
+  recon_init = new CAROM::Vector(num_rows,false);
+
+  for (int j = 0; j < num_cols; j++){
+    projectInitialSolution(*(m_snapshots->getColumn(j)));
+    /* Extend reduced basis \phi_j with ghost points */
+    ArrayCopynD(sim[0].solver.ndims,
+                m_snapshots->getColumn(j)->getData(),
+                snap_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+
+    recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init[0]);
+    ArrayCopynD(sim[0].solver.ndims,
+                recon_init->getData(),
+                snapproj_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+      CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),snap_wghosts.data(),snapproj_wghosts.data());
+      printf("#%d snapshot projection error, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+  }
+}
+
+
+/*! Check projection error in hyperbolic term*/
+void LSROMObject::CheckHyProjError(void* a_s)
+{
+  SimulationObject* sim = (SimulationObject*) a_s;
+  std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<double> snap_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<double> snapproj_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<int> index(sim[0].solver.ndims);
+
+  int num_rows = m_generator[0]->getSpatialBasis()->numRows();
+  int num_cols = m_snapshots->numColumns();
+  CAROM::Vector* recon_init;
+  CAROM::Vector* phi_colwork;
+  recon_init = new CAROM::Vector(num_rows,false);
+  phi_colwork = new CAROM::Vector(num_rows,true);
+  for (int j = 0; j < num_cols; j++){
+    projectInitialSolution(*(m_snapshots->getColumn(j)));
+    /* Extend reduced basis \phi_j with ghost points */
+    ArrayCopynD(sim[0].solver.ndims,
+                m_snapshots->getColumn(j)->getData(),
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+
+    /* Evaluate F(\phi_j) */
+    TimeRHSFunctionExplicit(rhs_wghosts.data(),
+                            vec_wghosts.data(),
+                            &(sim[0].solver),
+                            &(sim[0].mpi),
+                            0);
+
+    /* Remove ghosts point in F(phi_j) */
+//  ArrayCopynD(sim[0].solver.ndims,
+//              rhs_wghosts.data(),
+//              phi_colwork->getData(),
+//              sim[0].solver.dim_local,
+//              sim[0].solver.ghosts,
+//              0,
+//              index.data(),
+//              sim[0].solver.nvars);
+//  CAROM::Vector* m_working;
+//  m_working = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(phi_colwork);
+//  recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_working);
+//  ArrayCopynD(sim[0].solver.ndims,
+//              recon_init->getData(),
+//              snapproj_wghosts.data(),
+//              sim[0].solver.dim_local,
+//              0,
+//              sim[0].solver.ghosts,
+//              index.data(),
+//              sim[0].solver.nvars);
+    CAROM::Vector* m_working;
+    m_working=m_romhyperb->mult(m_projected_init[0]);
+    recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_working);
+    ArrayCopynD(sim[0].solver.ndims,
+                recon_init->getData(),
+                snapproj_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+    CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),snapproj_wghosts.data());
+    printf("F(#%d snapshot) projection error, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+  }
 }
 
 #endif
