@@ -350,30 +350,6 @@ void LSROMObject::load(const std::string& a_fname_root /*!< Filename root */)
     return;
 }
 
-void LSROMObject::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vector */
-                                    void* a_s, /*!< Array of simulation objects of 
-                                                    type #SimulationObject */
-                                    int a_idx /*!< Simulation object index */ ) const
-{
-  SimulationObject* sim = (SimulationObject*) a_s;
-
-  double* u;
-  u = sim[a_idx].solver.u;
-
-  std::vector<int> index(sim[a_idx].solver.ndims);
-
-  ArrayCopynD(  sim[a_idx].solver.ndims,
-                a_vec.getData(),
-                u,
-                sim[a_idx].solver.dim_local,
-                0,
-                sim[a_idx].solver.ghosts,
-                index.data(),
-                sim[a_idx].solver.nvars );
-
-  return;
-}
-
 int LSROMObject::TimeInitialize()
 {
   /* Currenty assuming one window only */
