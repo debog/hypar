@@ -41,6 +41,8 @@
 */
 extern "C" int TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
 extern "C" int CalculateROMDiff(void*,void*);
+extern "C" void ResetFilenameIndex(char*, int); /*!< Reset filename index */
+extern "C" void IncrementFilenameIndex(char*,int);
 
 LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
                             const double  a_dt,       /*!< time step size */
@@ -249,7 +251,11 @@ void LSROMObject::train(void* a_s)
         ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
 
         CheckSolProjError(a_s);
+        ::ResetFilenameIndex( sim[0].solver.filename_index,
+                            sim[0].solver.index_length );
         CheckHyProjError(a_s);
+        ::ResetFilenameIndex( sim[0].solver.filename_index,
+                            sim[0].solver.index_length );
 
       }
     }
@@ -330,7 +336,8 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
                   index.data(),
                   sim[0].solver.nvars);
       if (m_snap < sim[0].solver.n_iter){
-      CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),vec_wghosts.data());
+      char buffer[] = "reproderr_";  // Creates a modifiable buffer and copies the string literal
+      CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),vec_wghosts.data(),buffer);
       printf("Reproduction error at iter %d, %.15f %.15f %.15f \n",m_snap,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
       }
       m_snap++;
@@ -831,7 +838,8 @@ void LSROMObject::OutputROMBasis(void* a_s, const CAROM::Matrix* a_rombasis)
 int LSROMObject::CalSnapROMDiff( void *s, /*!< Solver object of type #HyPar */
                     void *m,  /*!< MPI object of type #MPIVariables */
                     double* a_snapshot,
-                    double* a_romsol )
+                    double* a_romsol,
+                    char* filename)
 
 {
   HyPar* solver = (HyPar*) s;
@@ -917,6 +925,16 @@ int LSROMObject::CalSnapROMDiff( void *s, /*!< Solver object of type #HyPar */
     solver->rom_diff_norms[1] /= solution_norm[1];
     solver->rom_diff_norms[2] /= solution_norm[2];
   }
+  WriteArray( solver->ndims,
+              solver->nvars,
+              solver->dim_global,
+              solver->dim_local,
+              solver->ghosts,
+              solver->x,
+              u_diff,
+              solver,
+              mpi,
+              filename);
 
   free(u_diff);
   return 0;
@@ -956,7 +974,12 @@ void LSROMObject::CheckSolProjError(void* a_s)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
-      CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),snap_wghosts.data(),snapproj_wghosts.data());
+      char buffer[] = "snapprojerr_";  // Creates a modifiable buffer and copies the string literal
+      CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),snap_wghosts.data(),snapproj_wghosts.data(),buffer);
+      /* increment the index string, if required */
+      if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+        ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+      }
       printf("#%d snapshot projection error, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
   }
 }
@@ -1063,7 +1086,12 @@ void LSROMObject::CheckHyProjError(void* a_s)
 //                    &(sim[0].solver),
 //                    &(sim[0].mpi),
 //                    fname_buffer3);
-    CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),snapproj_wghosts.data());
+    char buffer[] = "hyprojerr_";  // Creates a modifiable buffer and copies the string literal
+    CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),snapproj_wghosts.data(),buffer);
+      /* increment the index string, if required */
+      if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+        ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+      }
     printf("F(#%d snapshot) projection error, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
   }
 }

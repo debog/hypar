@@ -95,7 +95,7 @@ class LSROMObject : public ROMObject
     /* Dump ROM basis */
     void OutputROMBasis(void*, const CAROM::Matrix*);
 
-    int CalSnapROMDiff(void*, void*, double*, double*);
+    int CalSnapROMDiff(void*, void*, double*, double*, char*);
 
     void CheckSolProjError(void*);
 
