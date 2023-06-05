@@ -434,6 +434,11 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
                   index.data(),
                   sim[0].solver.nvars);
 
+      sim[0].solver.PostStage( vec_wghosts.data(),
+                               &(sim[0].solver),
+                               &(sim[0].mpi),
+                               stagetime); CHECKERR(ierr);
+
       /* Evaluate F(\phi_j) */
       TimeRHSFunctionExplicit(rhs_wghosts.data(),
                               vec_wghosts.data(),
@@ -441,10 +446,6 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
                               &(sim[0].mpi),
                               0);
 
-      sim[0].solver.PostStage( vec_wghosts.data(),
-                               &(sim[0].solver),
-                               &(sim[0].mpi),
-                               stagetime); CHECKERR(ierr);
 
 
       ArrayCopynD(sim[0].solver.ndims,
@@ -466,7 +467,6 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
       }
     }
     else {
-//    printf("compute hyperbolic term efficiently\n");
       m_Udot[stage] = m_romhyperb->mult(m_U[stage]);
       if (!m_rank) {
         std::cout << "Checking hyperbolic term [efficient]: ";
@@ -722,7 +722,6 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis)
   /* Compute F(\Phi), where \Phi is the reduced basis matrix */
   CAROM::Matrix* phi_hyper;
   phi_hyper = new CAROM::Matrix(num_rows, m_rdim, true);
-  printf( "Check phi_hyper rows, cols: %d %d \n",num_rows,m_rdim);
 
   CAROM::Vector phi_hyper_col(num_rows,false);
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
@@ -979,6 +978,7 @@ void LSROMObject::CheckHyProjError(void* a_s)
   CAROM::Vector* phi_colwork;
   recon_init = new CAROM::Vector(num_rows,false);
   phi_colwork = new CAROM::Vector(num_rows,true);
+
   for (int j = 0; j < num_cols; j++){
     projectInitialSolution(*(m_snapshots->getColumn(j)));
     /* Extend reduced basis \phi_j with ghost points */
@@ -990,6 +990,10 @@ void LSROMObject::CheckHyProjError(void* a_s)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
+    sim[0].solver.PostStage( vec_wghosts.data(),
+                             &(sim[0].solver),
+                             &(sim[0].mpi),
+                             0); CHECKERR(ierr);
 
     /* Evaluate F(\phi_j) */
     TimeRHSFunctionExplicit(rhs_wghosts.data(),
@@ -998,7 +1002,7 @@ void LSROMObject::CheckHyProjError(void* a_s)
                             &(sim[0].mpi),
                             0);
 
-    /* Remove ghosts point in F(phi_j) */
+//  /* Remove ghosts point in F(phi_j) */
 //  ArrayCopynD(sim[0].solver.ndims,
 //              rhs_wghosts.data(),
 //              phi_colwork->getData(),
@@ -1029,6 +1033,36 @@ void LSROMObject::CheckHyProjError(void* a_s)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
+//        const char* fnam2 = "recon_";
+//        std::string fname2 = std::string(fnam2) + std::to_string(j);
+//        char* fname_buffer2 = new char[fname2.length() + 1];
+//        std::strcpy(fname_buffer2, fname2.c_str());
+
+//        WriteArray( sim[0].solver.ndims,
+//                    sim[0].solver.nvars,
+//                    sim[0].solver.dim_global,
+//                    sim[0].solver.dim_local,
+//                    sim[0].solver.ghosts,
+//                    sim[0].solver.x,
+//                    snapproj_wghosts.data(),
+//                    &(sim[0].solver),
+//                    &(sim[0].mpi),
+//                    fname_buffer2);
+//        const char* fnam3 = "snap_col_";
+//        std::string fname3 = std::string(fnam3) + std::to_string(j);
+//        char* fname_buffer3 = new char[fname3.length() + 1];
+//        std::strcpy(fname_buffer3, fname3.c_str());
+
+//        WriteArray( sim[0].solver.ndims,
+//                    sim[0].solver.nvars,
+//                    sim[0].solver.dim_global,
+//                    sim[0].solver.dim_local,
+//                    sim[0].solver.ghosts,
+//                    sim[0].solver.x,
+//                    rhs_wghosts.data(),
+//                    &(sim[0].solver),
+//                    &(sim[0].mpi),
+//                    fname_buffer3);
     CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),snapproj_wghosts.data());
     printf("F(#%d snapshot) projection error, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
   }
