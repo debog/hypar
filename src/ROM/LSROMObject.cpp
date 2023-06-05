@@ -814,18 +814,6 @@ void LSROMObject::OutputROMBasis(void* a_s, const CAROM::Matrix* a_rombasis)
     if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
         ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
     }
-
-//  // ghost is 0, x and y coordinate is not correctly outpost
-//  WriteArray( sim[0].solver.ndims,
-//              sim[0].solver.nvars,
-//              sim[0].solver.dim_global,
-//              sim[0].solver.dim_local,
-//              0,
-//              sim[0].solver.x,
-//              m_generator[0]->getSpatialBasis()->getColumn(j)->getData(),
-//              &(sim[0].solver),
-//              &(sim[0].mpi),
-//              file_name_buffer);
   }
 
   ::ResetFilenameIndex( sim[0].solver.filename_index,
