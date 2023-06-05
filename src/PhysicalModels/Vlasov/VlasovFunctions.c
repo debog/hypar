@@ -20,7 +20,7 @@ int VlasovPreStep( double  *u,   /*!< Solution (conserved variables) */
   HyPar  *solver = (HyPar*) s;
   Vlasov *param  = (Vlasov*) solver->physics;
 
-  int ierr = VlasovEField(solver->u, solver, waqt);
+  int ierr = VlasovEField(u, solver, waqt);
   if (ierr) return ierr;
 
   return 0;
@@ -39,7 +39,7 @@ int VlasovPostStage( double  *u,   /*!< Solution (conserved variables) */
   HyPar  *solver = (HyPar*) s;
   Vlasov *param  = (Vlasov*) solver->physics;
 
-  int ierr = VlasovEField(solver->u, solver, waqt);
+  int ierr = VlasovEField(u, solver, waqt);
   if (ierr) return ierr;
 
   return 0;
