@@ -192,14 +192,14 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     }
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
-    char buffer[] = "sample_";  // Creates a modifiable buffer and copies the string literal
+    char buffer[] = "sample";  // Creates a modifiable buffer and copies the string literal
     OutputlibROMfield(m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData(),
                       sim[0],
                       buffer);
   } else {
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
-    char buffer[] = "sample_";  // Creates a modifiable buffer and copies the string literal
+    char buffer[] = "sample";  // Creates a modifiable buffer and copies the string literal
     OutputlibROMfield(m_generator[0]->getSnapshotMatrix()->getColumn(m_tic)->getData(),
                       sim[0],
                       buffer);
@@ -251,11 +251,7 @@ void LSROMObject::train(void* a_s)
         ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
 
         CheckSolProjError(a_s);
-        ::ResetFilenameIndex( sim[0].solver.filename_index,
-                            sim[0].solver.index_length );
         CheckHyProjError(a_s);
-        ::ResetFilenameIndex( sim[0].solver.filename_index,
-                            sim[0].solver.index_length );
 
       }
     }
@@ -336,7 +332,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
                   index.data(),
                   sim[0].solver.nvars);
       if (m_snap < sim[0].solver.n_iter){
-      char buffer[] = "reproderr_";  // Creates a modifiable buffer and copies the string literal
+      char buffer[] = "reproderr";  // Creates a modifiable buffer and copies the string literal
       CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),vec_wghosts.data(),buffer);
       printf("Reproduction error at iter %d, %.15f %.15f %.15f \n",m_snap,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
       }
@@ -773,13 +769,14 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis)
       (*phi_hyper)(i, j) = phi_hyper_col.getData()[i];
     }
 
-    const char* fname = "hyper_";
-    std::string fname1 = std::string(fname) + std::to_string(j);
-    char* fname_buffer = new char[fname1.length() + 1];
-    std::strcpy(fname_buffer, fname1.c_str());
+    char buffer[] = "hyperbasis";  // Creates a modifiable buffer and copies the string literal
     OutputlibROMfield(phi_hyper->getColumn(j)->getData(),
                       sim[0],
-                      fname_buffer);
+                      buffer);
+    /* increment the index string, if required */
+    if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+        ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+    }
   }
 
   // construct hyper_ROM = phi^T phi_hyper
@@ -796,6 +793,8 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis)
     }
     std::cout << std::endl;
   }
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
 
   return;
 }
@@ -807,14 +806,14 @@ void LSROMObject::OutputROMBasis(void* a_s, const CAROM::Matrix* a_rombasis)
   SimulationObject* sim = (SimulationObject*) a_s;
 
   for (int j = 0; j < m_rdim; j++){
-    const char* filename = "basis_";
-    std::string file_name = std::string(filename) + std::to_string(j);
-    char* file_name_buffer = new char[file_name.length() + 1];
-    std::strcpy(file_name_buffer, file_name.c_str());
-
+    char buffer[] = "basis";  // Creates a modifiable buffer and copies the string literal
     OutputlibROMfield(a_rombasis->getColumn(j)->getData(),
                       sim[0],
-                      file_name_buffer);
+                      buffer);
+    /* increment the index string, if required */
+    if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+        ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+    }
 
 //  // ghost is 0, x and y coordinate is not correctly outpost
 //  WriteArray( sim[0].solver.ndims,
@@ -829,6 +828,8 @@ void LSROMObject::OutputROMBasis(void* a_s, const CAROM::Matrix* a_rombasis)
 //              file_name_buffer);
   }
 
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
   return;
 }
 
@@ -974,7 +975,7 @@ void LSROMObject::CheckSolProjError(void* a_s)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
-      char buffer[] = "snapprojerr_";  // Creates a modifiable buffer and copies the string literal
+      char buffer[] = "snapprojerr";  // Creates a modifiable buffer and copies the string literal
       CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),snap_wghosts.data(),snapproj_wghosts.data(),buffer);
       /* increment the index string, if required */
       if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
@@ -982,6 +983,8 @@ void LSROMObject::CheckSolProjError(void* a_s)
       }
       printf("#%d snapshot projection error, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
   }
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
 }
 
 
@@ -1086,7 +1089,7 @@ void LSROMObject::CheckHyProjError(void* a_s)
 //                    &(sim[0].solver),
 //                    &(sim[0].mpi),
 //                    fname_buffer3);
-    char buffer[] = "hyprojerr_";  // Creates a modifiable buffer and copies the string literal
+    char buffer[] = "hyprojerr";  // Creates a modifiable buffer and copies the string literal
     CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),snapproj_wghosts.data(),buffer);
       /* increment the index string, if required */
       if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
@@ -1094,6 +1097,8 @@ void LSROMObject::CheckHyProjError(void* a_s)
       }
     printf("F(#%d snapshot) projection error, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
   }
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
 }
 
 #endif
