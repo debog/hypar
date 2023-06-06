@@ -8,6 +8,7 @@
 #include <basic.h>
 #include <rom_object_ls.h>
 #include <simulation_object.h>
+#include <physicalmodels/vlasov.h>
 //#include <timeintegration.h>
 #include <arrayfunctions.h>
 #include <io_cpp.h>
@@ -59,6 +60,10 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
   m_options.clear();
   m_generator.clear();
   m_projected_init.clear();
+
+  /* precomputation idea */
+  m_optionsE.clear();
+  m_generatorE.clear();
 
   m_ls_is_trained.clear();
   m_intervals.clear();
@@ -179,6 +184,11 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                                 void* a_s )
 {
   SimulationObject* sim = (SimulationObject*) a_s;
+
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  std::vector<double> vec_wghosts(param->npts_local_x*param->ndims_x);
+  std::vector<int> index(sim[0].solver.ndims);
   if (m_tic == 0) {
 
     m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
@@ -196,6 +206,33 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     OutputlibROMfield(m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData(),
                       sim[0],
                       buffer);
+//  char buffer1[] = "esample";  // Creates a modifiable buffer and copies the string literal
+//  HyPar  *solver = (HyPar*)  sim[0];
+//  Vlasov* param = static_cast<Vlasov*>(sim[0].solver->physics);
+//  WriteArray( 1,
+//              sim[0].solver.nvars,
+//              sim[0].solver.dim_global,
+//              sim[0].solver.dim_local,
+//              sim[0].solver.ghosts,
+//              sim[0].solver.x,
+//              param->e_field,
+//              &(sim[0].solver),
+//              &(sim[0].mpi),
+//              buffer1);
+//  exit(0);
+//  printf("checking npts_local_x_wghosts ndims_x %d %d\n",param->npts_local_x_wghosts,param->ndims_x);
+//  printf("checking npts_local_x %d \n",param->npts_local_x);
+    m_optionsE.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+    m_generatorE.push_back(new CAROM::BasisGenerator(*m_optionsE[m_curr_win], isIncremental, basisName));
+    ArrayCopynD(1,
+                param->e_field,
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                index.data(),
+                sim[0].solver.nvars);
+    bool addESample = m_generatorE[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
   } else {
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
@@ -203,6 +240,15 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     OutputlibROMfield(m_generator[0]->getSnapshotMatrix()->getColumn(m_tic)->getData(),
                       sim[0],
                       buffer);
+    ArrayCopynD(1,
+                param->e_field,
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                index.data(),
+                sim[0].solver.nvars);
+    bool addESample = m_generatorE[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
   }
 
   m_tic++;
@@ -242,11 +288,18 @@ void LSROMObject::train(void* a_s)
          * getSingularValues or (computeSVD) is called, hence need to make a copy of snapshots */
         /* Does everytime invoking getSpatialBasis() do computeSVD again? */
         m_snapshots = new CAROM::Matrix(m_generator[i]->getSnapshotMatrix()->getData(),
-                                                           m_generator[i]->getSnapshotMatrix()->numRows(),
-                                                           m_generator[i]->getSnapshotMatrix()->numColumns(),
-                                                           true,
-                                                           true);
-        m_S = m_generator[i]->getSingularValues();
+                                        m_generator[i]->getSnapshotMatrix()->numRows(),
+                                        m_generator[i]->getSnapshotMatrix()->numColumns(),
+                                        true,
+                                        true);
+        printf("checking dimension of E snapshot matrix:%d %d\n",m_generatorE[i]->getSnapshotMatrix()->numRows(),m_generatorE[i]->getSnapshotMatrix()->numColumns());
+        m_snapshotsE = new CAROM::Matrix(m_generatorE[i]->getSnapshotMatrix()->getData(),
+                                         m_generatorE[i]->getSnapshotMatrix()->numRows(),
+                                         m_generatorE[i]->getSnapshotMatrix()->numColumns(),
+                                        true,
+                                        true);
+        m_S  = m_generator[i]->getSingularValues();
+        m_SE = m_generatorE[i]->getSingularValues();
         OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
         ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
 
@@ -265,6 +318,14 @@ void LSROMObject::train(void* a_s)
     }
     std::cout << std::endl;
   }
+  if (!m_rank) {
+    std::cout << "Singular Values for E: ";
+    for (int i = 0; i < m_SE->dim(); i++) {
+          std::cout << (m_SE->item(i)) << " ";
+    }
+    std::cout << std::endl;
+  }
+  exit(0);
 
   return;
 }
