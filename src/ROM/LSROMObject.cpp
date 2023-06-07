@@ -40,10 +40,11 @@
     Note: other keywords in this file may be read by other functions.
    
 */
-extern "C" int TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
-extern "C" int CalculateROMDiff(void*,void*);
+extern "C" int  TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
+extern "C" int  CalculateROMDiff(void*,void*);
 extern "C" void ResetFilenameIndex(char*, int); /*!< Reset filename index */
 extern "C" void IncrementFilenameIndex(char*,int);
+extern "C" int  VlasovWrite1DField(void*, void*, double*);
 
 LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
                             const double  a_dt,       /*!< time step size */
@@ -62,8 +63,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
   m_projected_init.clear();
 
   /* precomputation idea */
-  m_optionsE.clear();
-  m_generatorE.clear();
+  m_options_phi.clear();
+  m_generator_phi.clear();
 
   m_ls_is_trained.clear();
   m_intervals.clear();
@@ -166,14 +167,14 @@ void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U /*!< solution vect
     m_projected_init.push_back(new CAROM::Vector(num_rows, false));
     m_projected_init[i] = m_generator[i]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(a_U);
 
-    if (!m_rank) {
-      printf("m_project size %d\n",m_projected_init[i]->dim());
-      std::cout << "Checking projected coefficients: ";
-      for (int j = 0; j < m_projected_init[i]->dim(); j++) {
-            std::cout << (m_projected_init[i]->item(j)) << " ";
-      }
-      std::cout << std::endl;
-    }
+//  if (!m_rank) {
+//    printf("m_project size %d\n",m_projected_init[i]->dim());
+//    std::cout << "Checking projected coefficients: ";
+//    for (int j = 0; j < m_projected_init[i]->dim(); j++) {
+//          std::cout << (m_projected_init[i]->item(j)) << " ";
+//    }
+//    std::cout << std::endl;
+//  }
 
   }
 }
@@ -222,8 +223,8 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 //  exit(0);
 //  printf("checking npts_local_x_wghosts ndims_x %d %d\n",param->npts_local_x_wghosts,param->ndims_x);
 //  printf("checking npts_local_x %d \n",param->npts_local_x);
-    m_optionsE.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
-    m_generatorE.push_back(new CAROM::BasisGenerator(*m_optionsE[m_curr_win], isIncremental, basisName));
+    m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+    m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName));
     ArrayCopynD(1,
                 param->potential,
                 vec_wghosts.data(),
@@ -232,7 +233,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                 0,
                 index.data(),
                 sim[0].solver.nvars);
-    bool addESample = m_generatorE[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+    bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
   } else {
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
@@ -248,22 +249,24 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                 0,
                 index.data(),
                 sim[0].solver.nvars);
-    bool addESample = m_generatorE[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+    bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
   }
   if (!m_rank) {
     std::cout << "checking potential field";
     for (int i = 0; i < param->npts_local_x; i++) {
-          std::cout << param->e_field[i] << " ";
+          std::cout << param->potential[i] << " ";
     }
     std::cout << std::endl;
   }
-  if (!m_rank) {
-    std::cout << "checking vec_wghosts";
-    for (int i = 0; i < vec_wghosts.size(); i++) {
-          std::cout << vec_wghosts[i] << " ";
-    }
-    std::cout << std::endl;
-  }
+//if (!m_rank) {
+//  std::cout << "checking vec_wghosts";
+//  for (int i = 0; i < vec_wghosts.size(); i++) {
+//        std::cout << vec_wghosts[i] << " ";
+//  }
+//  std::cout << std::endl;
+//}
+  ::VlasovWrite1DField(&(sim[0].solver),&(sim[0].mpi),param->potential);
+  exit(0);
 
   m_tic++;
   return;
@@ -306,14 +309,14 @@ void LSROMObject::train(void* a_s)
                                         m_generator[i]->getSnapshotMatrix()->numColumns(),
                                         true,
                                         true);
-        printf("checking dimension of E snapshot matrix:%d %d\n",m_generatorE[i]->getSnapshotMatrix()->numRows(),m_generatorE[i]->getSnapshotMatrix()->numColumns());
-        m_snapshotsE = new CAROM::Matrix(m_generatorE[i]->getSnapshotMatrix()->getData(),
-                                         m_generatorE[i]->getSnapshotMatrix()->numRows(),
-                                         m_generatorE[i]->getSnapshotMatrix()->numColumns(),
+        printf("checking dimension of potential snapshot matrix:%d %d\n",m_generator_phi[i]->getSnapshotMatrix()->numRows(),m_generator_phi[i]->getSnapshotMatrix()->numColumns());
+        m_snapshots_phi = new CAROM::Matrix(m_generator_phi[i]->getSnapshotMatrix()->getData(),
+                                         m_generator_phi[i]->getSnapshotMatrix()->numRows(),
+                                         m_generator_phi[i]->getSnapshotMatrix()->numColumns(),
                                         true,
                                         true);
         m_S  = m_generator[i]->getSingularValues();
-        m_SE = m_generatorE[i]->getSingularValues();
+        m_S_phi = m_generator_phi[i]->getSingularValues();
         OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
         ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
 
@@ -326,17 +329,21 @@ void LSROMObject::train(void* a_s)
     printf("ERROR in LSROMObject::train(): m_generator is of size zero!");
   }
   if (!m_rank) {
-    std::cout << "Singular Values: ";
+    std::cout << "----------------\n";
+    std::cout << "Singular Values of f: ";
     for (int i = 0; i < m_S->dim(); i++) {
           std::cout << (m_S->item(i)) << " ";
     }
+    std::cout << "\n";
     std::cout << std::endl;
   }
   if (!m_rank) {
-    std::cout << "Singular Values for E: ";
-    for (int i = 0; i < m_SE->dim(); i++) {
-          std::cout << (m_SE->item(i)) << " ";
+    std::cout << "----------------\n";
+    std::cout << "Singular Values for potential: ";
+    for (int i = 0; i < m_S_phi->dim(); i++) {
+          std::cout << (m_S_phi->item(i)) << " ";
     }
+    std::cout << "\n";
     std::cout << std::endl;
   }
 
@@ -858,15 +865,15 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis)
   printf("phi_hyper %d %d\n",phi_hyper->numRows(),phi_hyper->numColumns());
   m_romhyperb=a_rombasis->getFirstNColumns(m_rdim)->transposeMult(phi_hyper);
   printf("m_romhyperb %d %d\n",m_romhyperb->numRows(),m_romhyperb->numColumns());
-  if (!m_rank) {
-    std::cout << "Checking ROM hyperbolic operator: \n";
-    for (int i = 0; i < m_romhyperb->numRows(); i++) {
-      for (int j = 0; j < m_romhyperb->numColumns(); j++) {
-          std::cout << (m_romhyperb->item(i,j)) << " ";
-      }
-    }
-    std::cout << std::endl;
-  }
+//if (!m_rank) {
+//  std::cout << "Checking ROM hyperbolic operator: \n";
+//  for (int i = 0; i < m_romhyperb->numRows(); i++) {
+//    for (int j = 0; j < m_romhyperb->numColumns(); j++) {
+//        std::cout << (m_romhyperb->item(i,j)) << " ";
+//    }
+//  }
+//  std::cout << std::endl;
+//}
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
 
@@ -1006,6 +1013,11 @@ int LSROMObject::CalSnapROMDiff( void *s, /*!< Solver object of type #HyPar */
 /*! Check projection error in solution */
 void LSROMObject::CheckSolProjError(void* a_s)
 {
+  if (!m_rank) {
+    std::cout << "----------------------------------------\n";
+    std::cout << "Checking projection error in snapshots: ";
+    std::cout << std::endl;
+  }
   SimulationObject* sim = (SimulationObject*) a_s;
   std::vector<double> snap_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<double> snapproj_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
@@ -1053,6 +1065,11 @@ void LSROMObject::CheckSolProjError(void* a_s)
 /*! Check projection error in hyperbolic term*/
 void LSROMObject::CheckHyProjError(void* a_s)
 {
+  if (!m_rank) {
+    std::cout << "----------------------------------------\n";
+    std::cout << "Checking projection error in F(snapshots): ";
+    std::cout << std::endl;
+  }
   SimulationObject* sim = (SimulationObject*) a_s;
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);

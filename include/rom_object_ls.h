@@ -160,10 +160,10 @@ class LSROMObject : public ROMObject
     int m_snap; /*!< private ticker to count number of samples taken */
 
     /* Below for precomputation idea */
-    std::vector<CAROM::Options*> m_optionsE; /*!< Vector of Options objects */
-    std::vector<CAROM::BasisGenerator*> m_generatorE; /*!< Vector of BasisGenerator objects */
-    CAROM::Matrix* m_snapshotsE; /*!< Snapshot Matrix */
-    const CAROM::Vector* m_SE; /*!< Vector of Singular value */
+    std::vector<CAROM::Options*> m_options_phi; /*!< Vector of Options objects */
+    std::vector<CAROM::BasisGenerator*> m_generator_phi; /*!< Vector of BasisGenerator objects */
+    CAROM::Matrix* m_snapshots_phi; /*!< Snapshot Matrix */
+    const CAROM::Vector* m_S_phi; /*!< Vector of Singular value */
 
   private:
 };
