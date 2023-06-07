@@ -225,7 +225,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     m_optionsE.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
     m_generatorE.push_back(new CAROM::BasisGenerator(*m_optionsE[m_curr_win], isIncremental, basisName));
     ArrayCopynD(1,
-                param->e_field,
+                param->potential,
                 vec_wghosts.data(),
                 sim[0].solver.dim_local,
                 sim[0].solver.ghosts,
@@ -241,7 +241,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                       sim[0],
                       buffer);
     ArrayCopynD(1,
-                param->e_field,
+                param->potential,
                 vec_wghosts.data(),
                 sim[0].solver.dim_local,
                 sim[0].solver.ghosts,
@@ -249,6 +249,20 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                 index.data(),
                 sim[0].solver.nvars);
     bool addESample = m_generatorE[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+  }
+  if (!m_rank) {
+    std::cout << "checking potential field";
+    for (int i = 0; i < param->npts_local_x; i++) {
+          std::cout << param->e_field[i] << " ";
+    }
+    std::cout << std::endl;
+  }
+  if (!m_rank) {
+    std::cout << "checking vec_wghosts";
+    for (int i = 0; i < vec_wghosts.size(); i++) {
+          std::cout << vec_wghosts[i] << " ";
+    }
+    std::cout << std::endl;
   }
 
   m_tic++;
@@ -325,7 +339,6 @@ void LSROMObject::train(void* a_s)
     }
     std::cout << std::endl;
   }
-  exit(0);
 
   return;
 }
