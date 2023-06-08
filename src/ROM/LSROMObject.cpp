@@ -44,7 +44,9 @@ extern "C" int  TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
 extern "C" int  CalculateROMDiff(void*,void*);
 extern "C" void ResetFilenameIndex(char*, int); /*!< Reset filename index */
 extern "C" void IncrementFilenameIndex(char*,int);
-extern "C" int  VlasovWrite1DField(void*, void*, double*);
+extern "C" int  VlasovWriteSpatialField(void*, void*, double*);
+extern "C" int FirstDerivativeSecondOrderCentral1D (double*,double*,int,int,void*,void*);
+extern "C" int FirstDerivativeSecondOrderCentral (double*,double*,int,int,void*,void*);
 
 LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
                             const double  a_dt,       /*!< time step size */
@@ -188,7 +190,9 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 
   HyPar  *solver = (HyPar*) &(sim[0].solver);
   Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
   std::vector<double> vec_wghosts(param->npts_local_x*param->ndims_x);
+  std::vector<double> vec_x_wghosts(param->npts_local_x_wghosts*param->ndims_x);
   std::vector<int> index(sim[0].solver.ndims);
   if (m_tic == 0) {
 
@@ -251,22 +255,45 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                 sim[0].solver.nvars);
     bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
   }
-  if (!m_rank) {
-    std::cout << "checking potential field";
-    for (int i = 0; i < param->npts_local_x; i++) {
-          std::cout << param->potential[i] << " ";
-    }
-    std::cout << std::endl;
-  }
 //if (!m_rank) {
-//  std::cout << "checking vec_wghosts";
-//  for (int i = 0; i < vec_wghosts.size(); i++) {
-//        std::cout << vec_wghosts[i] << " ";
+//  std::cout << "checking potential field\n";
+//  for (int i = 0; i < param->npts_local_x_wghosts; i++) {
+//        std::cout << "Index " << i << ": " << param->potential[i] << std::endl;
 //  }
 //  std::cout << std::endl;
 //}
-  ::VlasovWrite1DField(&(sim[0].solver),&(sim[0].mpi),param->potential);
-  exit(0);
+//if (!m_rank) {
+//  std::cout << "checking e field\n";
+//  for (int i = 0; i < param->npts_local_x_wghosts; i++) {
+//        std::cout << "Index " << i << ": " << param->e_field[i] << std::endl;
+//  }
+//  std::cout << std::endl;
+//}
+  ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),param->potential);
+//::FirstDerivativeSecondOrderCentral1D(vec_x_wghosts.data(),param->potential,0,1,&(sim[0].solver),&(sim[0].mpi));
+//MPIExchangeBoundaries1D(mpi, vec_x_wghosts.data(), solver->dim_local[0], solver->ghosts, 0, solver->ndims);
+//if (!m_rank) {
+//  std::cout << "checking vec_x_wghosts\n";
+//  for (int i = 0; i < vec_x_wghosts.size(); i++) {
+//        std::cout << "Index " << i << ": " << -vec_x_wghosts[i]*solver->dxinv[0] << std::endl;
+//  }
+//  std::cout << std::endl;
+//}
+//ArrayCopynD(1,
+//            vec_x_wghosts.data(),
+//            vec_wghosts.data(),
+//            sim[0].solver.dim_local,
+//            sim[0].solver.ghosts,
+//            0,
+//            index.data(),
+//            sim[0].solver.nvars);
+//if (!m_rank) {
+//  std::cout << "checking vec_wghosts \n";
+//  for (int i = 0; i < vec_wghosts.size(); i++) {
+//        std::cout << "Index " << i << ": " << -vec_wghosts[i]*solver->dxinv[0] << std::endl;
+//  }
+//  std::cout << std::endl;
+//}
 
   m_tic++;
   return;
@@ -311,12 +338,13 @@ void LSROMObject::train(void* a_s)
                                         true);
         printf("checking dimension of potential snapshot matrix:%d %d\n",m_generator_phi[i]->getSnapshotMatrix()->numRows(),m_generator_phi[i]->getSnapshotMatrix()->numColumns());
         m_snapshots_phi = new CAROM::Matrix(m_generator_phi[i]->getSnapshotMatrix()->getData(),
-                                         m_generator_phi[i]->getSnapshotMatrix()->numRows(),
-                                         m_generator_phi[i]->getSnapshotMatrix()->numColumns(),
-                                        true,
-                                        true);
+                                            m_generator_phi[i]->getSnapshotMatrix()->numRows(),
+                                            m_generator_phi[i]->getSnapshotMatrix()->numColumns(),
+                                            true,
+                                            true);
         m_S  = m_generator[i]->getSingularValues();
         m_S_phi = m_generator_phi[i]->getSingularValues();
+
         OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
         ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
 
@@ -542,23 +570,23 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
                   sim[0].solver.nvars);
 
       m_Udot[stage] = ProjectToRB(m_rhswork,m_generator[0]->getSpatialBasis(), m_rdim);
-      if (!m_rank) {
-        std::cout << "Checking hyperbolic term [directly]: ";
-        for (int j = 0; j < m_rdim; j++) {
-              std::cout << m_Udot[stage]->item(j) << " ";
-        }
-        std::cout << std::endl;
-      }
+//    if (!m_rank) {
+//      std::cout << "Checking hyperbolic term [directly]: ";
+//      for (int j = 0; j < m_rdim; j++) {
+//            std::cout << m_Udot[stage]->item(j) << " ";
+//      }
+//      std::cout << std::endl;
+//    }
     }
     else {
       m_Udot[stage] = m_romhyperb->mult(m_U[stage]);
-      if (!m_rank) {
-        std::cout << "Checking hyperbolic term [efficient]: ";
-        for (int j = 0; j < m_rdim; j++) {
-              std::cout << m_Udot[stage]->item(j) << " ";
-        }
-        std::cout << std::endl;
-      }
+//    if (!m_rank) {
+//      std::cout << "Checking hyperbolic term [efficient]: ";
+//      for (int j = 0; j < m_rdim; j++) {
+//            std::cout << m_Udot[stage]->item(j) << " ";
+//      }
+//      std::cout << std::endl;
+//    }
     }
 
   }
