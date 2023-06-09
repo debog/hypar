@@ -310,7 +310,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     }
     std::cout << std::endl;
   }
-  exit (0);
+//exit (0);
 
   m_tic++;
   return;
@@ -364,6 +364,8 @@ void LSROMObject::train(void* a_s)
 
         OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
         ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
+        ConstructPotentialROMRhs(a_s, m_generator[0]->getSpatialBasis(), m_generator_phi[0]->getSpatialBasis());
+        exit(0);
 
         CheckSolProjError(a_s);
         CheckHyProjError(a_s);
@@ -1223,6 +1225,114 @@ void LSROMObject::CheckHyProjError(void* a_s)
   }
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
+}
+
+/*! Construct potential ROM rhs */
+void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rombasis, const CAROM::Matrix* a_rombasisphi)
+{
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  if (param->ndims_x > 1) {
+    fprintf(stderr,"Error in ConstructPotentialROMRhs:\n");
+    fprintf(stderr,"  Implemented for 1 spatial dimension only.\n");
+  }
+
+  int *dim    = solver->dim_local;
+  int  N      = solver->dim_global[0];
+  int  ghosts = solver->ghosts;
+  int  ndims  = solver->ndims;
+
+  double       *sum_buffer     = param->sum_buffer;
+
+  int index[ndims], bounds[ndims], bounds_noghost[ndims], offset[ndims];
+
+//int num_rows = a_rombasis->numRows();
+//int num_cols = a_rombasis->numColumns();
+  int num_rows = a_rombasisphi->numRows();
+  int num_cols = a_rombasisphi->numColumns();
+  std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<int> idx(sim[0].solver.ndims);
+  printf("a_rombasisphi %d %d\n",a_rombasisphi->numRows(),a_rombasisphi->numColumns());
+
+  /* Compute F(\Phi), where \Phi is the reduced basis matrix */
+  CAROM::Matrix* integral_basis_phi;
+  integral_basis_phi= new CAROM::Matrix(num_rows, m_rdim, true);
+
+  for (int j = 0; j < m_rdim; j++){
+    // set bounds for array index to include ghost points
+    _ArrayCopy1D_(dim,bounds,ndims);
+    for (int k = 0; k < ndims; k++) bounds[k] += 2*ghosts;
+
+    // set bounds for array index to NOT include ghost points
+    _ArrayCopy1D_(dim,bounds_noghost,ndims);
+
+    // set offset such that index is compatible with ghost point arrangement
+    _ArraySetValue_(offset,ndims,-ghosts);
+
+    ArrayCopynD(sim[0].solver.ndims,
+                a_rombasis->getColumn(j)->getData(),
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                idx.data(),
+                sim[0].solver.nvars);
+    double* basis = vec_wghosts.data();
+    // First, integrate the particle distribution over velocity.
+    // Since the array dimension we want is not unit stride,
+    // first manually add up the local part of the array.
+    int done = 0; _ArraySetValue_(index,ndims,0);
+    _ArraySetValue_(sum_buffer,dim[0],0);
+    while (!done) {
+      //int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
+      int p; _ArrayIndex1D_(ndims,dim,index,ghosts,p);
+
+      // accumulate f at this spatial location
+      double dvinv; _GetCoordinate_(1,index[1],dim,ghosts,solver->dxinv,dvinv);
+      double x; _GetCoordinate_(0,index[0],dim,ghosts,solver->x,x);
+      double v; _GetCoordinate_(1,index[1],dim,ghosts,solver->x,v);
+
+      sum_buffer[index[0]] += basis[p] / dvinv;
+
+      _ArrayIncrementIndex_(ndims,bounds_noghost,index,done);
+    }
+    // Now we can add up globally using MPI reduction 
+    for (int i = 0; i < dim[0]; i++) {
+      MPISum_double(&sum_buffer[i], &sum_buffer[i], 1, &mpi->comm[1]);
+    }
+
+    // Find the average density over all x
+    double average_velocity = 0.0;
+    for (int i = 0; i < dim[0]; i++) {
+      average_velocity += sum_buffer[i];
+    }
+    MPISum_double(&average_velocity, &average_velocity, 1, &mpi->comm[0]);
+    average_velocity /= (double) N;
+
+    /* Copy \int basis_phi dv back to columns of integral_basis_phi matrix */
+    for (int i = 0; i < num_rows; i++) {
+      (*integral_basis_phi)(i, j) = sum_buffer[i] - average_velocity;
+    }
+  }
+
+  // construct hyper_ROM = phi^T integral_basis_phi
+  printf("phi %d %d\n",a_rombasis->numRows(),a_rombasis->numColumns());
+  printf("integral_basis_phi %d %d\n",integral_basis_phi->numRows(),integral_basis_phi->numColumns());
+  m_romrhs_phi=a_rombasisphi->getFirstNColumns(m_rdim)->transposeMult(integral_basis_phi);
+  printf("m_romrhs_phi %d %d\n",m_romhyperb->numRows(),m_romhyperb->numColumns());
+  if (!m_rank) {
+    std::cout << "Checking Potential ROM Rhs: \n";
+    for (int i = 0; i < m_romrhs_phi->numRows(); i++) {
+      for (int j = 0; j < m_romrhs_phi->numColumns(); j++) {
+          std::cout << (m_romrhs_phi->item(i,j)) << " ";
+      }
+    }
+    std::cout << std::endl;
+  }
+  return;
 }
 
 #endif
