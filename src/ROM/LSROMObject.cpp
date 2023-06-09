@@ -364,7 +364,9 @@ void LSROMObject::train(void* a_s)
 
         OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
         ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
+
         ConstructPotentialROMRhs(a_s, m_generator[0]->getSpatialBasis(), m_generator_phi[0]->getSpatialBasis());
+        ConstructPotentialROMLaplace(a_s, m_generator_phi[0]->getSpatialBasis());
         exit(0);
 
         CheckSolProjError(a_s);
@@ -1228,7 +1230,7 @@ void LSROMObject::CheckHyProjError(void* a_s)
 }
 
 /*! Construct potential ROM rhs */
-void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rombasis, const CAROM::Matrix* a_rombasisphi)
+void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rombasis_f, const CAROM::Matrix* a_rombasis_phi)
 {
   SimulationObject* sim = (SimulationObject*) a_s;
   HyPar  *solver = (HyPar*) &(sim[0].solver);
@@ -1245,21 +1247,21 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rom
   int  ghosts = solver->ghosts;
   int  ndims  = solver->ndims;
 
-  double       *sum_buffer     = param->sum_buffer;
+  double *sum_buffer = param->sum_buffer;
 
   int index[ndims], bounds[ndims], bounds_noghost[ndims], offset[ndims];
 
-//int num_rows = a_rombasis->numRows();
-//int num_cols = a_rombasis->numColumns();
-  int num_rows = a_rombasisphi->numRows();
-  int num_cols = a_rombasisphi->numColumns();
+  int num_rows = a_rombasis_phi->numRows();
+  int num_cols = a_rombasis_phi->numColumns();
+
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<int> idx(sim[0].solver.ndims);
-  printf("a_rombasisphi %d %d\n",a_rombasisphi->numRows(),a_rombasisphi->numColumns());
 
-  /* Compute F(\Phi), where \Phi is the reduced basis matrix */
-  CAROM::Matrix* integral_basis_phi;
-  integral_basis_phi= new CAROM::Matrix(num_rows, m_rdim, true);
+  printf("a_rombasis_phi %d %d\n",a_rombasis_phi->numRows(),a_rombasis_phi->numColumns());
+
+  /* Integrate f reduced basis over velocity */
+  CAROM::Matrix* integral_basis_f;
+  integral_basis_f = new CAROM::Matrix(num_rows, m_rdim, true);
 
   for (int j = 0; j < m_rdim; j++){
     // set bounds for array index to include ghost points
@@ -1273,13 +1275,14 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rom
     _ArraySetValue_(offset,ndims,-ghosts);
 
     ArrayCopynD(sim[0].solver.ndims,
-                a_rombasis->getColumn(j)->getData(),
+                a_rombasis_f->getColumn(j)->getData(),
                 vec_wghosts.data(),
                 sim[0].solver.dim_local,
                 0,
                 sim[0].solver.ghosts,
                 idx.data(),
                 sim[0].solver.nvars);
+
     double* basis = vec_wghosts.data();
     // First, integrate the particle distribution over velocity.
     // Since the array dimension we want is not unit stride,
@@ -1312,22 +1315,90 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rom
     MPISum_double(&average_velocity, &average_velocity, 1, &mpi->comm[0]);
     average_velocity /= (double) N;
 
-    /* Copy \int basis_phi dv back to columns of integral_basis_phi matrix */
+    /* Copy \int basis_f dv back to columns of integral_basis_f matrix */
     for (int i = 0; i < num_rows; i++) {
-      (*integral_basis_phi)(i, j) = sum_buffer[i] - average_velocity;
+      (*integral_basis_f)(i, j) = sum_buffer[i] - average_velocity;
     }
   }
 
-  // construct hyper_ROM = phi^T integral_basis_phi
-  printf("phi %d %d\n",a_rombasis->numRows(),a_rombasis->numColumns());
-  printf("integral_basis_phi %d %d\n",integral_basis_phi->numRows(),integral_basis_phi->numColumns());
-  m_romrhs_phi=a_rombasisphi->getFirstNColumns(m_rdim)->transposeMult(integral_basis_phi);
-  printf("m_romrhs_phi %d %d\n",m_romhyperb->numRows(),m_romhyperb->numColumns());
+  // construct rhs = basis_phi^T integral_basis_f
+  m_romrhs_phi=a_rombasis_phi->getFirstNColumns(m_rdim)->transposeMult(integral_basis_f);
+  printf("f %d %d\n",a_rombasis_f->numRows(),a_rombasis_f->numColumns());
+  printf("integral_basis_f %d %d\n",integral_basis_f->numRows(),integral_basis_f->numColumns());
+  printf("m_romrhs_phi %d %d\n",m_romrhs_phi->numRows(),m_romrhs_phi->numColumns());
   if (!m_rank) {
     std::cout << "Checking Potential ROM Rhs: \n";
     for (int i = 0; i < m_romrhs_phi->numRows(); i++) {
       for (int j = 0; j < m_romrhs_phi->numColumns(); j++) {
           std::cout << (m_romrhs_phi->item(i,j)) << " ";
+      }
+    }
+    std::cout << std::endl;
+  }
+  return;
+}
+
+/*! Construct potential ROM laplacian */
+void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a_rombasis_phi)
+{
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  if (param->ndims_x > 1) {
+    fprintf(stderr,"Error in ConstructPotentialROMRhs:\n");
+    fprintf(stderr,"  Implemented for 1 spatial dimension only.\n");
+  }
+
+  int *dim    = solver->dim_local;
+  int  N      = solver->dim_global[0];
+  int  ghosts = solver->ghosts;
+  int  ndims  = solver->ndims;
+
+  double *sum_buffer = param->sum_buffer;
+
+  int index[ndims], bounds[ndims], bounds_noghost[ndims], offset[ndims];
+
+  int num_rows = a_rombasis_phi->numRows();
+  int num_cols = a_rombasis_phi->numColumns();
+
+  std::vector<double> vec_wghosts(param->npts_local_x_wghosts);
+  std::vector<double> rhs_wghosts(param->npts_local_x_wghosts);
+  std::vector<int> idx(sim[0].solver.ndims);
+
+  printf("a_rombasis_phi %d %d\n",a_rombasis_phi->numRows(),a_rombasis_phi->numColumns());
+
+  /* Integrate f reduced basis over velocity */
+  CAROM::Matrix* laplace_phi;
+  laplace_phi = new CAROM::Matrix(num_rows, m_rdim, true);
+
+  for (int j = 0; j < m_rdim; j++){
+    ArrayCopynD(1,
+                a_rombasis_phi->getColumn(j)->getData(),
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                idx.data(),
+                sim[0].solver.nvars);
+
+
+    ::SecondDerivativeSecondOrderCentralNoGhosts(rhs_wghosts.data(),vec_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi));
+    /* Copy \int basis_f dv back to columns of integral_basis_f matrix */
+    for (int i = 0; i < num_rows; i++) {
+      (*laplace_phi)(i, j) = rhs_wghosts.data()[i];
+    }
+  }
+
+  // construct rhs = basis_phi^T integral_basis_f
+  m_romlaplace_phi=a_rombasis_phi->getFirstNColumns(m_rdim)->transposeMult(laplace_phi);
+  printf("m_romlaplace_phi %d %d\n",m_romlaplace_phi->numRows(),m_romlaplace_phi->numColumns());
+  if (!m_rank) {
+    std::cout << "Checking Potential ROM Laplace: \n";
+    for (int i = 0; i < m_romlaplace_phi->numRows(); i++) {
+      for (int j = 0; j < m_romlaplace_phi->numColumns(); j++) {
+          std::cout << (m_romlaplace_phi->item(i,j)) << " ";
       }
     }
     std::cout << std::endl;

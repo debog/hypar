@@ -101,8 +101,11 @@ class LSROMObject : public ROMObject
 
     void CheckHyProjError(void*);
 
-    /* Construct reduced hyperbolic operator */
+    /* Construct reduced rhs operator for potential */
     void ConstructPotentialROMRhs(void*, const CAROM::Matrix*, const CAROM::Matrix*);
+
+    /* Construct reduced laplace operator for potential */
+    void ConstructPotentialROMLaplace(void*, const CAROM::Matrix*);
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
@@ -167,6 +170,7 @@ class LSROMObject : public ROMObject
     CAROM::Matrix* m_snapshots_phi; /*!< Snapshot Matrix */
     const CAROM::Vector* m_S_phi; /*!< Vector of Singular value */
     CAROM::Matrix* m_romrhs_phi; /*!< Reduced Hyperbolic Term Matrix */
+    CAROM::Matrix* m_romlaplace_phi; /*!< Reduced Hyperbolic Term Matrix */
 
   private:
 };
