@@ -165,8 +165,7 @@ void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U /*!< solution vect
   }
   for (int i = 0; i < m_generator.size(); i++) {
 
-    int num_rows = m_generator[i]->getSpatialBasis()->numRows();
-    m_projected_init.push_back(new CAROM::Vector(num_rows, false));
+    m_projected_init.push_back(new CAROM::Vector(m_rdim, false));
     m_projected_init[i] = m_generator[i]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(a_U);
 
 //  if (!m_rank) {
@@ -353,23 +352,23 @@ void LSROMObject::train(void* a_s)
                                         m_generator[i]->getSnapshotMatrix()->numColumns(),
                                         true,
                                         true);
+        m_S  = m_generator[i]->getSingularValues();
+
+        OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
+        ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
+        CheckSolProjError(a_s);
+        CheckHyProjError(a_s);
+
         printf("checking dimension of potential snapshot matrix:%d %d\n",m_generator_phi[i]->getSnapshotMatrix()->numRows(),m_generator_phi[i]->getSnapshotMatrix()->numColumns());
         m_snapshots_phi = new CAROM::Matrix(m_generator_phi[i]->getSnapshotMatrix()->getData(),
                                             m_generator_phi[i]->getSnapshotMatrix()->numRows(),
                                             m_generator_phi[i]->getSnapshotMatrix()->numColumns(),
                                             true,
                                             true);
-        m_S  = m_generator[i]->getSingularValues();
         m_S_phi = m_generator_phi[i]->getSingularValues();
-
-        OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
-        ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
-
         ConstructPotentialROMRhs(a_s, m_generator[0]->getSpatialBasis(), m_generator_phi[0]->getSpatialBasis());
         ConstructPotentialROMLaplace(a_s, m_generator_phi[0]->getSpatialBasis());
 
-        CheckSolProjError(a_s);
-        CheckHyProjError(a_s);
         CheckPotentialProjError(a_s);
         CheckLaplaceProjError(a_s);
         exit(0);
@@ -1496,12 +1495,10 @@ void LSROMObject::projectInitialSolution_phi(  CAROM::Vector& a_U /*!< solution 
   }
   for (int i = 0; i < m_generator.size(); i++) {
 
-    int num_rows = m_generator_phi[i]->getSpatialBasis()->numRows();
-    m_projected_init_phi.push_back(new CAROM::Vector(num_rows, false));
+    m_projected_init_phi.push_back(new CAROM::Vector(m_rdim, false));
     m_projected_init_phi[i] = m_generator_phi[i]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(a_U);
 
     if (!m_rank) {
-      printf("num_rows %d\n",num_rows);
       printf("m_project_phi size %d\n",m_projected_init_phi[i]->dim());
       std::cout << "Checking projected coefficients phi: ";
       for (int j = 0; j < m_projected_init_phi[i]->dim(); j++) {
@@ -1633,7 +1630,6 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
   std::vector<int> index(sim[0].solver.ndims);
 
   int num_rows = m_generator_phi[0]->getSpatialBasis()->numRows();
-  int num_cols = m_snapshots_phi->numColumns();
   CAROM::Vector* recon_init;
   recon_init = new CAROM::Vector(num_rows,false);
   CAROM::Vector* recon_tmp;
@@ -1641,6 +1637,7 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
   CAROM::Vector* recon_tmp1;
   recon_tmp1 = new CAROM::Vector(num_rows,true);
 
+  int num_cols = m_snapshots_phi->numColumns();
   for (int j = 0; j < num_cols; j++){
     /* Extend reduced basis \phi_j with ghost points */
     ArrayCopynD(1,
