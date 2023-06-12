@@ -367,10 +367,12 @@ void LSROMObject::train(void* a_s)
 
         ConstructPotentialROMRhs(a_s, m_generator[0]->getSpatialBasis(), m_generator_phi[0]->getSpatialBasis());
         ConstructPotentialROMLaplace(a_s, m_generator_phi[0]->getSpatialBasis());
-        exit(0);
 
         CheckSolProjError(a_s);
         CheckHyProjError(a_s);
+        CheckPotentialProjError(a_s);
+        CheckLaplaceProjError(a_s);
+        exit(0);
 
       }
     }
@@ -955,10 +957,10 @@ void LSROMObject::OutputROMBasis(void* a_s, const CAROM::Matrix* a_rombasis)
  * snapshots and the reproduced solution by libROM.
 */
 int LSROMObject::CalSnapROMDiff( void *s, /*!< Solver object of type #HyPar */
-                    void *m,  /*!< MPI object of type #MPIVariables */
-                    double* a_snapshot,
-                    double* a_romsol,
-                    char* filename)
+                                 void *m,  /*!< MPI object of type #MPIVariables */
+                                 double* a_snapshot,
+                                 double* a_romsol,
+                                 char* filename)
 
 {
   HyPar* solver = (HyPar*) s;
@@ -973,6 +975,9 @@ int LSROMObject::CalSnapROMDiff( void *s, /*!< Solver object of type #HyPar */
   /* calculate solution norms (for relative error) */
   double solution_norm[3] = {0.0,0.0,0.0};
   /* L1 */
+  printf("dim_local %d %d\n",solver->dim_local[0],solver->dim_local[1]);
+  printf("%d %d\n",solver->dim_local[0],solver->dim_local[1]);
+  printf("npoints_global %d\n",solver->npoints_global);
   sum = ArraySumAbsnD ( solver->nvars,
                         solver->ndims,
                         solver->dim_local,
@@ -1347,7 +1352,7 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
   MPIVariables *mpi = (MPIVariables *) param->m;
 
   if (param->ndims_x > 1) {
-    fprintf(stderr,"Error in ConstructPotentialROMRhs:\n");
+    fprintf(stderr,"Error in ConstructPotentialLaplace:\n");
     fprintf(stderr,"  Implemented for 1 spatial dimension only.\n");
   }
 
@@ -1372,6 +1377,7 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
   /* Integrate f reduced basis over velocity */
   CAROM::Matrix* laplace_phi;
   laplace_phi = new CAROM::Matrix(num_rows, m_rdim, true);
+  CAROM::Vector laplace_col(num_rows,false);
 
   for (int j = 0; j < m_rdim; j++){
     ArrayCopynD(1,
@@ -1383,11 +1389,20 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
                 idx.data(),
                 sim[0].solver.nvars);
 
-
     ::SecondDerivativeSecondOrderCentralNoGhosts(rhs_wghosts.data(),vec_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi));
+
+    ArrayCopynD(1,
+                rhs_wghosts.data(),
+                laplace_col.getData(),
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                idx.data(),
+                sim[0].solver.nvars);
     /* Copy \int basis_f dv back to columns of integral_basis_f matrix */
     for (int i = 0; i < num_rows; i++) {
-      (*laplace_phi)(i, j) = rhs_wghosts.data()[i];
+//    (*laplace_phi)(i, j) = -1.0*laplace_col.getData()[i]*(solver->dxinv[0])*(solver->dxinv[0]);
+      (*laplace_phi)(i, j) = laplace_col.getData()[i];
     }
   }
 
@@ -1403,7 +1418,314 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
     }
     std::cout << std::endl;
   }
+//m_romlaplace_phi->inverse();
+//if (!m_rank) {
+//  std::cout << "Checking Potential ROM inverse Laplace: \n";
+//  for (int i = 0; i < m_romlaplace_phi->numRows(); i++) {
+//    for (int j = 0; j < m_romlaplace_phi->numColumns(); j++) {
+//        std::cout << (m_romlaplace_phi->item(i,j)) << " ";
+//    }
+//  }
+//  std::cout << std::endl;
+//}
   return;
+}
+
+/*! Check projection error in potential solution */
+void LSROMObject::CheckPotentialProjError(void* a_s)
+{
+  if (!m_rank) {
+    std::cout << "------------------------------------------------\n";
+    std::cout << "Checking projection error in potential snapshots: ";
+    std::cout << std::endl;
+  }
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  std::vector<double> snap_wghosts(param->npts_local_x_wghosts);
+  std::vector<double> snapproj_wghosts(param->npts_local_x_wghosts);
+  std::vector<int> index(sim[0].solver.ndims);
+
+  int num_rows = m_generator_phi[0]->getSpatialBasis()->numRows();
+  int num_cols = m_snapshots_phi->numColumns();
+  CAROM::Vector* recon_init;
+  recon_init = new CAROM::Vector(num_rows,false);
+
+  for (int j = 0; j < num_cols; j++){
+    /* Extend reduced basis \phi_j with ghost points */
+    ArrayCopynD(1,
+                m_snapshots_phi->getColumn(j)->getData(),
+                snap_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+
+    projectInitialSolution_phi(*(m_snapshots_phi->getColumn(j)));
+    recon_init = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init_phi[0]);
+    ArrayCopynD(1,
+                recon_init->getData(),
+                snapproj_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+      char buffer[] = "snapphiprojerr";  // Creates a modifiable buffer and copies the string literal
+      CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),snap_wghosts.data(),snapproj_wghosts.data(),buffer);
+      /* increment the index string, if required */
+      if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+        ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+      }
+      printf("#%d snapshot projection error phi, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+  }
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
+}
+
+void LSROMObject::projectInitialSolution_phi(  CAROM::Vector& a_U /*!< solution vector */ )
+{
+  if (m_generator_phi.size() == 0) {
+    if (!m_rank) {
+      printf("ERROR in LSROMObject::projectInitialSolution_phi() - m_ls is a vector of size 0.\n");
+    }
+    return;
+  }
+  for (int i = 0; i < m_generator.size(); i++) {
+
+    int num_rows = m_generator_phi[i]->getSpatialBasis()->numRows();
+    m_projected_init_phi.push_back(new CAROM::Vector(num_rows, false));
+    m_projected_init_phi[i] = m_generator_phi[i]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(a_U);
+
+    if (!m_rank) {
+      printf("num_rows %d\n",num_rows);
+      printf("m_project_phi size %d\n",m_projected_init_phi[i]->dim());
+      std::cout << "Checking projected coefficients phi: ";
+      for (int j = 0; j < m_projected_init_phi[i]->dim(); j++) {
+            std::cout << (m_projected_init_phi[i]->item(j)) << " ";
+      }
+      std::cout << std::endl;
+    }
+
+  }
+}
+
+int LSROMObject::CalSnapROMDiff_phi( void *s, /*!< Solver object of type #HyPar */
+                                     void *m,  /*!< MPI object of type #MPIVariables */
+                                     double* a_snapshot,
+                                     double* a_romsol,
+                                     char* filename)
+
+{
+  HyPar* solver = (HyPar*) s;
+  MPIVariables* mpi = (MPIVariables*) m;
+  Vlasov *param  = (Vlasov*) solver->physics;
+  double sum = 0, global_sum = 0;
+
+  static const double tolerance = 1e-15;
+
+  int size = param->npts_local_x_wghosts* solver->nvars;
+  double* u_diff = (double*) calloc (size, sizeof(double));
+
+  int* dim = (int*)malloc(sizeof(int));
+  *dim = param->npts_local_x;
+
+  /* calculate solution norms (for relative error) */
+  double solution_norm[3] = {0.0,0.0,0.0};
+  /* L1 */
+  sum = ArraySumAbsnD ( solver->nvars,
+                        1,
+                        dim,
+                        solver->ghosts,
+                        solver->index,
+                        a_snapshot );
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
+  solution_norm[0] = global_sum/((double)param->npts_local_x);
+  /* L2 */
+  sum = ArraySumSquarenD  ( solver->nvars,
+                            1,
+                            dim,
+                            solver->ghosts,
+                            solver->index,
+                            a_snapshot );
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
+  solution_norm[1] = sqrt(global_sum/((double)param->npts_local_x));
+  /* Linf */
+  sum = ArrayMaxnD  ( solver->nvars,
+                      1,
+                      dim,
+                      solver->ghosts,
+                      solver->index,
+                      a_snapshot  );
+  global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
+  solution_norm[2] = global_sum;
+
+  /* set u_diff to PDE solution */
+  _ArrayCopy1D_(a_snapshot, u_diff, size);
+  /* subtract the ROM solutions */
+  _ArrayAXPY_(a_romsol, -1.0, u_diff, size);
+
+  /* calculate L1 norm of error */
+  sum = ArraySumAbsnD ( solver->nvars,
+                        1,
+                        dim,
+                        solver->ghosts,
+                        solver->index,
+                        u_diff  );
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
+  solver->rom_diff_norms[0] = global_sum/((double)param->npts_local_x);
+
+  /* calculate L2 norm of error */
+  sum = ArraySumSquarenD  ( solver->nvars,
+                            1,
+                            dim,
+                            solver->ghosts,
+                            solver->index,
+                            u_diff  );
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
+  solver->rom_diff_norms[1] = sqrt(global_sum/((double)param->npts_local_x));
+
+  /* calculate Linf norm of error */
+  sum = ArrayMaxnD  ( solver->nvars,
+                      1,
+                      dim,
+                      solver->ghosts,
+                      solver->index,
+                      u_diff  );
+  global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
+  solver->rom_diff_norms[2] = global_sum;
+
+  /* decide whether to normalize and report relative diff norms,
+    or report absolute diff norms. */
+  if (    (solution_norm[0] > tolerance)
+      &&  (solution_norm[1] > tolerance)
+      &&  (solution_norm[2] > tolerance) ) {
+    solver->rom_diff_norms[0] /= solution_norm[0];
+    solver->rom_diff_norms[1] /= solution_norm[1];
+    solver->rom_diff_norms[2] /= solution_norm[2];
+  }
+
+  free(u_diff);
+  return 0;
+}
+
+/*! Check projection error in laplacian */
+void LSROMObject::CheckLaplaceProjError(void* a_s)
+{
+  if (!m_rank) {
+    std::cout << "------------------------------------------------\n";
+    std::cout << "Checking projection error in laplacian : ";
+    std::cout << std::endl;
+  }
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  std::vector<double> snap_wghosts(param->npts_local_x_wghosts);
+  std::vector<double> snaplap_wghosts(param->npts_local_x_wghosts);
+  std::vector<double> snapproj_wghosts(param->npts_local_x_wghosts);
+  std::vector<double> snapprojlap_wghosts(param->npts_local_x_wghosts);
+  std::vector<double> rhs_wghosts(param->npts_local_x_wghosts);
+  std::vector<int> index(sim[0].solver.ndims);
+
+  int num_rows = m_generator_phi[0]->getSpatialBasis()->numRows();
+  int num_cols = m_snapshots_phi->numColumns();
+  CAROM::Vector* recon_init;
+  recon_init = new CAROM::Vector(num_rows,false);
+  CAROM::Vector* recon_tmp;
+  recon_tmp = new CAROM::Vector(num_rows,true);
+  CAROM::Vector* recon_tmp1;
+  recon_tmp1 = new CAROM::Vector(num_rows,true);
+
+  for (int j = 0; j < num_cols; j++){
+    /* Extend reduced basis \phi_j with ghost points */
+    ArrayCopynD(1,
+                m_snapshots_phi->getColumn(j)->getData(),
+                snap_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+
+    ::SecondDerivativeSecondOrderCentralNoGhosts(snaplap_wghosts.data(),snap_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi));
+//  _ArrayScale1D_(snaplap_wghosts,-1.0*(solver->dxinv[0])*(solver->dxinv[0]),param->npts_local_x_wghosts)
+      std::cout << "Checking snaplap: ";
+      for (int i = 0; i < param->npts_local_x_wghosts ; i++) {
+            std::cout << (snaplap_wghosts.data()[i]) << " ";
+      }
+      std::cout << std::endl;
+
+    projectInitialSolution_phi(*(m_snapshots_phi->getColumn(j)));
+    CAROM::Vector* m_working;
+    m_working=m_romlaplace_phi->mult(m_projected_init_phi[0]);
+    if (!m_rank) {
+      printf("m_working size %d\n",m_working->dim());
+      std::cout << "Checking m_working coefficients: ";
+      for (int j = 0; j < m_working->dim(); j++) {
+            std::cout << (m_working->item(j)) << " ";
+      }
+      std::cout << std::endl;
+    }
+//  recon_init = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_working);
+    recon_init = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init_phi[0]);
+    ArrayCopynD(1,
+                recon_init->getData(),
+                snapproj_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+    ::SecondDerivativeSecondOrderCentralNoGhosts(snapprojlap_wghosts.data(),snapproj_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi));
+//  _ArrayScale1D_(snapprojlap_wghosts,-1.0*(solver->dxinv[0])*(solver->dxinv[0]),param->npts_local_x_wghosts)
+    ArrayCopynD(1,
+                snaplap_wghosts.data(),
+                recon_tmp->getData(),
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                index.data(),
+                sim[0].solver.nvars);
+
+    CAROM::Vector* m_working1;
+    m_working1=m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(recon_tmp);
+    if (!m_rank) {
+      printf("m_working1 size %d\n",m_working1->dim());
+      std::cout << "Checking m_working1 coefficients: ";
+      for (int j = 0; j < m_working1->dim(); j++) {
+            std::cout << (m_working1->item(j)) << " ";
+      }
+      std::cout << std::endl;
+    recon_tmp=m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_working1);
+    ArrayCopynD(1,
+                recon_tmp->getData(),
+                rhs_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+    }
+      std::cout << "Checking rhs_wghosts: ";
+      for (int i = 0; i < param->npts_local_x_wghosts ; i++) {
+            std::cout << (rhs_wghosts.data()[i]) << " ";
+      }
+      std::cout << std::endl;
+    char buffer[] = "laplaceprojerr";  // Creates a modifiable buffer and copies the string literal
+    CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),snaplap_wghosts.data(),rhs_wghosts.data(),buffer);
+    /* increment the index string, if required */
+    if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+      ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+    }
+    printf("#%d snapshot projection error in laplacian, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+  }
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
 }
 
 #endif

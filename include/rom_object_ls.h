@@ -106,6 +106,15 @@ class LSROMObject : public ROMObject
 
     /* Construct reduced laplace operator for potential */
     void ConstructPotentialROMLaplace(void*, const CAROM::Matrix*);
+
+    void CheckPotentialProjError(void*);
+
+    void CheckLaplaceProjError(void*);
+
+    int CalSnapROMDiff_phi(void*, void*, double*, double*, char*);
+
+    /*! Project initial solution for phi */
+    void projectInitialSolution_phi(  CAROM::Vector& );
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
@@ -167,6 +176,7 @@ class LSROMObject : public ROMObject
     /* Below for precomputation idea */
     std::vector<CAROM::Options*> m_options_phi; /*!< Vector of Options objects */
     std::vector<CAROM::BasisGenerator*> m_generator_phi; /*!< Vector of BasisGenerator objects */
+    std::vector<CAROM::Vector*> m_projected_init_phi; /*!< Vector of Vector objects */
     CAROM::Matrix* m_snapshots_phi; /*!< Snapshot Matrix */
     const CAROM::Vector* m_S_phi; /*!< Vector of Singular value */
     CAROM::Matrix* m_romrhs_phi; /*!< Reduced Hyperbolic Term Matrix */
