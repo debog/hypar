@@ -1449,8 +1449,8 @@ void LSROMObject::CheckPotentialProjError(void* a_s)
 
   int num_rows = m_generator_phi[0]->getSpatialBasis()->numRows();
   int num_cols = m_snapshots_phi->numColumns();
-  CAROM::Vector* recon_init;
-  recon_init = new CAROM::Vector(num_rows,false);
+  CAROM::Vector* recon_caromvec;
+  recon_caromvec= new CAROM::Vector(num_rows,false);
 
   for (int j = 0; j < num_cols; j++){
     /* Extend reduced basis \phi_j with ghost points */
@@ -1464,9 +1464,9 @@ void LSROMObject::CheckPotentialProjError(void* a_s)
                 sim[0].solver.nvars);
 
     projectInitialSolution_phi(*(m_snapshots_phi->getColumn(j)));
-    recon_init = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init_phi[0]);
+    recon_caromvec= m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init_phi[0]);
     ArrayCopynD(1,
-                recon_init->getData(),
+                recon_caromvec->getData(),
                 snapproj_wghosts.data(),
                 sim[0].solver.dim_local,
                 0,
@@ -1483,6 +1483,7 @@ void LSROMObject::CheckPotentialProjError(void* a_s)
   }
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
+  delete recon_caromvec;
 }
 
 void LSROMObject::projectInitialSolution_phi(  CAROM::Vector& a_U /*!< solution vector */ )
