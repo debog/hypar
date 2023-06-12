@@ -67,6 +67,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
   /* precomputation idea */
   m_options_phi.clear();
   m_generator_phi.clear();
+  m_projected_init_phi.clear();
 
   m_ls_is_trained.clear();
   m_intervals.clear();
@@ -629,6 +630,9 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
     }
     std::cout << std::endl;
   }
+  delete m_fomwork;
+  delete m_rhswork;
+  delete m_romwork;
   return(0);
 }
 
@@ -926,6 +930,7 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis)
 //}
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
+  delete phi_hyper;
 
   return;
 }
@@ -1112,6 +1117,7 @@ void LSROMObject::CheckSolProjError(void* a_s)
   }
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
+  delete recon_init;
 }
 
 
@@ -1231,6 +1237,8 @@ void LSROMObject::CheckHyProjError(void* a_s)
   }
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
+  delete recon_init;
+  delete phi_colwork;
 }
 
 /*! Construct potential ROM rhs */
@@ -1339,6 +1347,7 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rom
     }
     std::cout << std::endl;
   }
+  delete integral_basis_f;
   return;
 }
 
