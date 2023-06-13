@@ -238,6 +238,18 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                 index.data(),
                 sim[0].solver.nvars);
     bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+
+    m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+    m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
+    ArrayCopynD(1,
+                param->e_field,
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                index.data(),
+                sim[0].solver.nvars);
+    bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
   } else {
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
@@ -254,6 +266,16 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                 index.data(),
                 sim[0].solver.nvars);
     bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+
+    ArrayCopynD(1,
+                param->e_field,
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                index.data(),
+                sim[0].solver.nvars);
+    bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
   }
 //if (!m_rank) {
 //  std::cout << "checking potential field\n";
@@ -372,6 +394,13 @@ void LSROMObject::train(void* a_s)
 
         CheckPotentialProjError(a_s);
         CheckLaplaceProjError(a_s);
+        CheckRhsProjError(a_s);
+        m_snapshots_e = new CAROM::Matrix(m_generator_e[i]->getSnapshotMatrix()->getData(),
+                                          m_generator_e[i]->getSnapshotMatrix()->numRows(),
+                                          m_generator_e[i]->getSnapshotMatrix()->numColumns(),
+                                          true,
+                                          true);
+        CheckEProjError(a_s);
         exit(0);
 
       }
@@ -1939,6 +1968,67 @@ void LSROMObject::CheckRhsProjError(void* a_s)
   delete recon_caromvec;
   delete int_f_caromvec;
   delete m_coef;
+}
+
+/*! Check projection error in E solution */
+void LSROMObject::CheckEProjError(void* a_s)
+{
+  if (!m_rank) {
+    std::cout << "------------------------------------------------\n";
+    std::cout << "Checking projection error in E snapshots: ";
+    std::cout << std::endl;
+  }
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  std::vector<double> snap_wghosts(param->npts_local_x_wghosts);
+  std::vector<double> snapproj_wghosts(param->npts_local_x_wghosts);
+  std::vector<double> vec_x_wghosts(param->npts_local_x_wghosts*param->ndims_x);
+  std::vector<int> index(sim[0].solver.ndims);
+
+  int num_rows = m_generator_phi[0]->getSpatialBasis()->numRows();
+  int num_cols = m_snapshots_e->numColumns();
+  CAROM::Vector* recon_caromvec;
+  recon_caromvec= new CAROM::Vector(num_rows,false);
+
+  for (int j = 0; j < num_cols; j++){
+    ArrayCopynD(1,
+                m_snapshots_e->getColumn(j)->getData(),
+                snap_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+
+    projectInitialSolution_phi(*(m_snapshots_phi->getColumn(j)));
+    recon_caromvec= m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init_phi[0]);
+    ArrayCopynD(1,
+                recon_caromvec->getData(),
+                snapproj_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+    ::FirstDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),snapproj_wghosts.data(),0,1,&(sim[0].solver),&(sim[0].mpi));
+    _ArrayScale1D_(vec_x_wghosts,-1.0*(solver->dxinv[0]),param->npts_local_x_wghosts)
+
+    char buffer[] = "snapeprojerr";  // Creates a modifiable buffer and copies the string literal
+    CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),snap_wghosts.data(),vec_x_wghosts.data(),buffer);
+
+    /* increment the index string, if required */
+    if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+      ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+    }
+    printf("#%d snapshot projection error e, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+
+  }
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
+  delete recon_caromvec;
 }
 
 #endif
