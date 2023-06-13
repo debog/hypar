@@ -111,10 +111,17 @@ class LSROMObject : public ROMObject
 
     void CheckLaplaceProjError(void*);
 
+    void CheckRhsProjError(void*);
+
     int CalSnapROMDiff_phi(void*, void*, double*, double*, char*);
 
     /*! Project initial solution for phi */
     void projectInitialSolution_phi(  CAROM::Vector& );
+
+    /*! Evaluate Rhs */
+    void EvaluatePotentialRhs(void*, CAROM::Vector*, double*);
+
+    void CheckEProjError(void*);
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
@@ -181,6 +188,12 @@ class LSROMObject : public ROMObject
     const CAROM::Vector* m_S_phi; /*!< Vector of Singular value */
     CAROM::Matrix* m_romrhs_phi; /*!< Reduced Hyperbolic Term Matrix */
     CAROM::Matrix* m_romlaplace_phi; /*!< Reduced Hyperbolic Term Matrix */
+
+    /* Below for verify projection error in E*/
+    std::vector<CAROM::Options*> m_options_e; /*!< Vector of Options objects */
+    std::vector<CAROM::BasisGenerator*> m_generator_e; /*!< Vector of BasisGenerator objects */
+    std::vector<CAROM::Vector*> m_projected_init_e; /*!< Vector of Vector objects */
+    CAROM::Matrix* m_snapshots_e; /*!< Snapshot Matrix */
 
   private:
 };
