@@ -1432,10 +1432,10 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
                 0,
                 idx.data(),
                 sim[0].solver.nvars);
+
     /* Copy \int basis_f dv back to columns of integral_basis_f matrix */
     for (int i = 0; i < num_rows; i++) {
-//    (*laplace_phi)(i, j) = -1.0*laplace_col.getData()[i]*(solver->dxinv[0])*(solver->dxinv[0]);
-      (*laplace_phi)(i, j) = laplace_col.getData()[i];
+      (*laplace_phi)(i, j) = -1.0*laplace_col.getData()[i]*(solver->dxinv[0])*(solver->dxinv[0]);
     }
   }
 
@@ -1686,7 +1686,7 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
                 sim[0].solver.nvars);
 
     ::SecondDerivativeSecondOrderCentralNoGhosts(snaplap_wghosts.data(),snap_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi));
-//  _ArrayScale1D_(snaplap_wghosts,-1.0*(solver->dxinv[0])*(solver->dxinv[0]),param->npts_local_x_wghosts)
+    _ArrayScale1D_(snaplap_wghosts,-1.0*(solver->dxinv[0])*(solver->dxinv[0]),param->npts_local_x_wghosts)
       std::cout << "Checking snaplap: ";
       for (int i = 0; i < param->npts_local_x_wghosts ; i++) {
             std::cout << (snaplap_wghosts.data()[i]) << " ";
@@ -1725,7 +1725,6 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
                 index.data(),
                 sim[0].solver.nvars);
 
-    CAROM::Vector* m_working1;
     m_working1=m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(recon_tmp);
     if (!m_rank) {
       printf("m_working1 size %d\n",m_working1->dim());
@@ -1803,7 +1802,7 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
 
 }
 
-void LSROMObject::EvaluatePotentialRhs(void* a_s, const CAROM::Vector* a_vec, double* m_buffer)
+void LSROMObject::EvaluatePotentialRhs(void* a_s, CAROM::Vector* a_vec, double* m_buffer)
 {
   SimulationObject* sim = (SimulationObject*) a_s;
   HyPar  *solver = (HyPar*) &(sim[0].solver);
@@ -1821,8 +1820,6 @@ void LSROMObject::EvaluatePotentialRhs(void* a_s, const CAROM::Vector* a_vec, do
   int  ndims  = solver->ndims;
 
   int index[ndims], bounds[ndims], bounds_noghost[ndims], offset[ndims];
-
-  int num_rows = a_vec->dim();
 
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<int> idx(sim[0].solver.ndims);
@@ -1916,9 +1913,6 @@ void LSROMObject::CheckRhsProjError(void* a_s)
   for (int j = 0; j < num_cols; j++){
 
     EvaluatePotentialRhs(a_s, m_snapshots->getColumn(j), int_f);
-//  for (int i = 0; i < num_rows; i++) {
-//    printf("checking check_buffer %d %f\n",i,check_buffer[i]);
-//  }
 
     ArrayCopynD(1,
                 int_f,
