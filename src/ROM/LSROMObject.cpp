@@ -1398,10 +1398,6 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
   int  ghosts = solver->ghosts;
   int  ndims  = solver->ndims;
 
-  double *sum_buffer = param->sum_buffer;
-
-  int index[ndims], bounds[ndims], bounds_noghost[ndims], offset[ndims];
-
   int num_rows = a_rombasis_phi->numRows();
   int num_cols = a_rombasis_phi->numColumns();
 
@@ -1675,6 +1671,7 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
   recon_tmp = new CAROM::Vector(num_rows,true);
   CAROM::Vector* recon_tmp1;
   recon_tmp1 = new CAROM::Vector(num_rows,true);
+  CAROM::Vector* m_working1;
 
   int num_cols = m_snapshots_phi->numColumns();
   for (int j = 0; j < num_cols; j++){
