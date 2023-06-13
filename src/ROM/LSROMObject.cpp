@@ -1507,13 +1507,14 @@ void LSROMObject::CheckPotentialProjError(void* a_s)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
-      char buffer[] = "snapphiprojerr";  // Creates a modifiable buffer and copies the string literal
-      CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),snap_wghosts.data(),snapproj_wghosts.data(),buffer);
-      /* increment the index string, if required */
-      if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
-        ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
-      }
-      printf("#%d snapshot projection error phi, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+
+    char buffer[] = "snapphiprojerr";  // Creates a modifiable buffer and copies the string literal
+    CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),snap_wghosts.data(),snapproj_wghosts.data(),buffer);
+    /* increment the index string, if required */
+    if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+      ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+    }
+    printf("#%d snapshot projection error phi, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
   }
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
@@ -1528,20 +1529,18 @@ void LSROMObject::projectInitialSolution_phi(  CAROM::Vector& a_U /*!< solution 
     }
     return;
   }
-  for (int i = 0; i < m_generator.size(); i++) {
+  for (int i = 0; i < m_generator_phi.size(); i++) {
 
     m_projected_init_phi.push_back(new CAROM::Vector(m_rdim, false));
     m_projected_init_phi[i] = m_generator_phi[i]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(a_U);
 
     if (!m_rank) {
-      printf("m_project_phi size %d\n",m_projected_init_phi[i]->dim());
       std::cout << "Checking projected coefficients phi: ";
       for (int j = 0; j < m_projected_init_phi[i]->dim(); j++) {
             std::cout << (m_projected_init_phi[i]->item(j)) << " ";
       }
       std::cout << std::endl;
     }
-
   }
 }
 
@@ -1550,7 +1549,6 @@ int LSROMObject::CalSnapROMDiff_phi( void *s, /*!< Solver object of type #HyPar 
                                      double* a_snapshot,
                                      double* a_romsol,
                                      char* filename)
-
 {
   HyPar* solver = (HyPar*) s;
   MPIVariables* mpi = (MPIVariables*) m;
