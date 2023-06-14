@@ -122,6 +122,9 @@ class LSROMObject : public ROMObject
     void EvaluatePotentialRhs(void*, CAROM::Vector*, double*);
 
     void CheckEProjError(void*);
+
+    /* Dump ROM basis phi */
+    void OutputROMBasisPhi(void*, const CAROM::Matrix*);
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */

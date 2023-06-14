@@ -44,7 +44,7 @@ extern "C" int  TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
 extern "C" int  CalculateROMDiff(void*,void*);
 extern "C" void ResetFilenameIndex(char*, int); /*!< Reset filename index */
 extern "C" void IncrementFilenameIndex(char*,int);
-extern "C" int  VlasovWriteSpatialField(void*, void*, double*);
+extern "C" int  VlasovWriteSpatialField(void*, void*, double*, char*);
 extern "C" int FirstDerivativeSecondOrderCentralNoGhosts (double*,double*,int,int,void*,void*);
 extern "C" int SecondDerivativeSecondOrderCentralNoGhosts (double*,double*,int,void*,void*);
 
@@ -389,6 +389,7 @@ void LSROMObject::train(void* a_s)
                                             true,
                                             true);
         m_S_phi = m_generator_phi[i]->getSingularValues();
+        OutputROMBasisPhi(a_s, m_generator_phi[0]->getSpatialBasis());
         ConstructPotentialROMRhs(a_s, m_generator[0]->getSpatialBasis(), m_generator_phi[0]->getSpatialBasis());
         ConstructPotentialROMLaplace(a_s, m_generator_phi[0]->getSpatialBasis());
 
@@ -1834,6 +1835,8 @@ void LSROMObject::CheckRhsProjError(void* a_s)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
+    char buffer1[] = "int_f";
+    ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),int_f_wghosts.data(),buffer1);
 
     ArrayCopynD(1,
                 int_f,
@@ -1932,6 +1935,42 @@ void LSROMObject::CheckEProjError(void* a_s)
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
   delete recon_caromvec;
+}
+
+/*! Dump ROM basis phi */
+void LSROMObject::OutputROMBasisPhi(void* a_s, const CAROM::Matrix* a_rombasis)
+{
+  /* m_rdim is written out */
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  std::vector<double> vec_wghosts(param->npts_local_x_wghosts);
+  std::vector<int> index(sim[0].solver.ndims);
+
+  for (int j = 0; j < m_rdim; j++){
+
+    ArrayCopynD(1,
+                a_rombasis->getColumn(j)->getData(),
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+    char buffer[] = "basis_phi";
+    ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),vec_wghosts.data(),buffer);
+
+    /* increment the index string, if required */
+    if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+        ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+    }
+  }
+
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
+  return;
 }
 
 #endif
