@@ -1286,6 +1286,8 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rom
 
   int num_rows = a_rombasis_phi->numRows();
   double* int_f= (double*) calloc(num_rows, sizeof(double));
+  std::vector<double> int_f_wghosts(param->npts_local_x_wghosts);
+  std::vector<int> index(sim[0].solver.ndims);
 
   /* Integrate f reduced basis over velocity */
   CAROM::Matrix* integral_basis_f;
@@ -1293,11 +1295,27 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rom
 
   for (int j = 0; j < m_rdim; j++){
     EvaluatePotentialRhs(a_s, a_rombasis_f->getColumn(j), int_f);
+    ArrayCopynD(1,
+                int_f,
+                int_f_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+    char buffer[] = "int_basis";
+    ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),int_f_wghosts.data(),buffer);
     /* Copy \int basis_f dv back to columns of integral_basis_f matrix */
     for (int i = 0; i < num_rows; i++) {
       (*integral_basis_f)(i, j) = int_f[i];
     }
+    /* increment the index string, if required */
+    if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+      ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+    }
   }
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
 
   // construct rhs = basis_phi^T integral_basis_f
   m_romrhs_phi=a_rombasis_phi->getFirstNColumns(m_rdim)->transposeMult(integral_basis_f);
@@ -1723,7 +1741,7 @@ void LSROMObject::EvaluatePotentialRhs(void* a_s, CAROM::Vector* a_vec, double* 
   MPIVariables *mpi = (MPIVariables *) param->m;
 
   if (param->ndims_x > 1) {
-    fprintf(stderr,"Error in ConstructPotentialROMRhs:\n");
+    fprintf(stderr,"Error in EvaluatePotentialRhs:\n");
     fprintf(stderr,"  Implemented for 1 spatial dimension only.\n");
   }
 
@@ -1814,11 +1832,11 @@ void LSROMObject::CheckRhsProjError(void* a_s)
   std::vector<int> index(sim[0].solver.ndims);
 
   int num_rows = m_generator_phi[0]->getSpatialBasis()->numRows();
-  CAROM::Vector* recon_caromvec;
-  recon_caromvec= new CAROM::Vector(num_rows,false);
+  CAROM::Vector* recon_rhs;
+  recon_rhs = new CAROM::Vector(num_rows,false);
   CAROM::Vector* int_f_caromvec;
-  int_f_caromvec= new CAROM::Vector(num_rows,true);
-  CAROM::Vector* m_coef;
+  int_f_caromvec = new CAROM::Vector(num_rows,true);
+  CAROM::Vector* rhs_reduced;
 
   double* int_f= (double*) calloc(num_rows, sizeof(double));
   int num_cols = m_snapshots->numColumns();
@@ -1847,13 +1865,27 @@ void LSROMObject::CheckRhsProjError(void* a_s)
                 index.data(),
                 sim[0].solver.nvars);
 
-    projectInitialSolution(*(m_snapshots->getColumn(j)));
-    char buffer[] = "laplaceprojerr";  // Creates a modifiable buffer and copies the string literal
-
-    m_coef=m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(int_f_caromvec);
-    recon_caromvec=m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_coef);
+    /* Check 1 */
+    rhs_reduced = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(int_f_caromvec);
+    recon_rhs = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(rhs_reduced);
     ArrayCopynD(1,
-                recon_caromvec->getData(),
+                recon_rhs->getData(),
+                recon_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+    char buffer[] = "int_f_projerr";  // Creates a modifiable buffer and copies the string literal
+    CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),int_f_wghosts.data(),recon_wghosts.data(),buffer);
+    printf("#%d snapshot projection error in rhs (non reduced), %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+
+    /* Check 2 */
+    projectInitialSolution(*(m_snapshots->getColumn(j)));
+    rhs_reduced = m_romrhs_phi->mult(m_projected_init[0]);
+    recon_rhs = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(rhs_reduced);
+    ArrayCopynD(1,
+                recon_rhs->getData(),
                 recon_wghosts.data(),
                 sim[0].solver.dim_local,
                 0,
@@ -1861,7 +1893,8 @@ void LSROMObject::CheckRhsProjError(void* a_s)
                 index.data(),
                 sim[0].solver.nvars);
     CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),int_f_wghosts.data(),recon_wghosts.data(),buffer);
-    printf("#%d snapshot projection error in rhs (non reduced), %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+    printf("#%d snapshot projection error in rhs (reduced), %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+
 
     /* increment the index string, if required */
     if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
@@ -1871,9 +1904,9 @@ void LSROMObject::CheckRhsProjError(void* a_s)
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
   free(int_f);
-  delete recon_caromvec;
+  delete recon_rhs;
   delete int_f_caromvec;
-  delete m_coef;
+  delete rhs_reduced;
 }
 
 /*! Check projection error in E solution */
