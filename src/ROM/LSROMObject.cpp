@@ -75,6 +75,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
   m_dt = a_dt;
   m_t_final = -1;
   m_rdim = a_rdim;
+  m_rdim_phi = m_rdim;
 
   m_sim_idx = a_sim_idx;
   m_var_idx = a_var_idx;
@@ -84,6 +85,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
   char dirname_c_str[_MAX_STRING_SIZE_] = "LS";
   char write_snapshot_mat[_MAX_STRING_SIZE_] = "false";
   char direct_comp_hyperbolic[_MAX_STRING_SIZE_] = "false";
+  char solve_phi[_MAX_STRING_SIZE_] = "false";
 
   if (!m_rank) {
 
@@ -107,6 +109,10 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
             ferr = fscanf(in,"%s", write_snapshot_mat); if (ferr != 1) return;
           } else if (std::string(word) == "ls_direct_comp_hyperbolic") {
             ferr = fscanf(in,"%s", direct_comp_hyperbolic); if (ferr != 1) return;
+          } else if (std::string(word) == "ls_rdim_phi") {
+            ferr = fscanf(in,"%d", &m_rdim_phi); if (ferr != 1) return;
+          } else if (std::string(word) == "ls_solver_phi") {
+            ferr = fscanf(in,"%s", solve_phi); if (ferr != 1) return;
           }
           if (ferr != 1) return;
         }
@@ -123,9 +129,11 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
     /* print useful stuff to screen */
     printf("LSROMObject details:\n");
     printf("  number of samples per window:   %d\n", m_num_window_samples);
+    printf("  potential latent space dimension:  %d\n", m_rdim_phi);
     printf("  directory name for LS objects: %s\n", dirname_c_str);
     printf("  write snapshot matrix to file:  %s\n", write_snapshot_mat);
     printf("  directly compute hyperbolic term:  %s\n", direct_comp_hyperbolic);
+    printf("  solve potential:  %s\n", solve_phi);
     if (m_sim_idx >= 0) {
       printf("  simulation domain:  %d\n", m_sim_idx);
     }
@@ -135,18 +143,25 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
   }
 
 #ifndef serial
+  MPI_Bcast(&m_rdim_phi,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(&m_num_window_samples,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(dirname_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(write_snapshot_mat,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(direct_comp_hyperbolic,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+  MPI_Bcast(solve_phi,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
 #endif
 
   m_dirname = std::string( dirname_c_str );
   m_write_snapshot_mat = (std::string(write_snapshot_mat) == "true");
   m_direct_comp_hyperbolic = (std::string(direct_comp_hyperbolic) == "true");
+  m_solve_phi = (std::string(solve_phi) == "true");
 
   if (m_num_window_samples <= m_rdim) {
     printf("ERROR:LSROMObject::LSROMObject() - m_num_window_samples <= m_rdim!!");
+  }
+
+  if (m_rdim_phi > m_rdim) {
+    printf("ERROR:LSROMObject::LSROMObject() - m_rdim_phi > m_rdim!!");
   }
 
   m_tic = 0;

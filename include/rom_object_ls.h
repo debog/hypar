@@ -147,6 +147,7 @@ class LSROMObject : public ROMObject
     double  m_dt;       /*!< Time step size */
     double  m_t_final;  /*!< Final time */
     int     m_rdim;     /*!< Latent space dimension */
+    int     m_rdim_phi;     /*!< Phi Latent space dimension */
 
     int m_num_window_samples; /*!< Number of samples per LS for time-windowing */
 
@@ -157,7 +158,8 @@ class LSROMObject : public ROMObject
     int m_var_idx; /*!< component index of this object if component-wise ROMs are being used */
 
     bool m_write_snapshot_mat;  /*!< Write snapshot matrix to file or not */
-    bool m_direct_comp_hyperbolic;  /*!< Write snapshot matrix to file or not */
+    bool m_direct_comp_hyperbolic;  /*!< Compute Hyperbolic term directly or not */
+    bool m_solve_phi;  /*!< Solve potential or not */
 
     std::string m_dirname; /*!< Subdirectory where LS objects are written to or read from */
 
@@ -197,6 +199,7 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::BasisGenerator*> m_generator_e; /*!< Vector of BasisGenerator objects */
     std::vector<CAROM::Vector*> m_projected_init_e; /*!< Vector of Vector objects */
     CAROM::Matrix* m_snapshots_e; /*!< Snapshot Matrix */
+    CAROM::Matrix* m_basis_e; /*!< Basis Matrix */
 
   private:
 };
