@@ -1965,17 +1965,15 @@ void LSROMObject::CheckEProjError(void* a_s)
                 sim[0].solver.nvars);
 
     projectInitialSolution_phi(*(m_snapshots_phi->getColumn(j)));
-    recon_caromvec= m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init_phi[0]);
+    recon_caromvec = m_basis_e->mult(m_projected_init_phi[0]);
     ArrayCopynD(1,
                 recon_caromvec->getData(),
-                snapproj_wghosts.data(),
+                vec_x_wghosts.data(),
                 sim[0].solver.dim_local,
                 0,
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
-    ::FirstDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),snapproj_wghosts.data(),0,1,&(sim[0].solver),&(sim[0].mpi));
-    _ArrayScale1D_(vec_x_wghosts,-1.0*(solver->dxinv[0]),param->npts_local_x_wghosts)
 
     char buffer[] = "snapeprojerr";  // Creates a modifiable buffer and copies the string literal
     CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),snap_wghosts.data(),vec_x_wghosts.data(),buffer);
