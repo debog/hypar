@@ -416,6 +416,7 @@ void LSROMObject::train(void* a_s)
                                           m_generator_e[i]->getSnapshotMatrix()->numColumns(),
                                           true,
                                           true);
+        ConstructEBasis(a_s);
         CheckEProjError(a_s);
         exit(0);
 
@@ -1333,7 +1334,7 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rom
                         sim[0].solver.index_length );
 
   // construct rhs = basis_phi^T integral_basis_f
-  m_romrhs_phi=a_rombasis_phi->getFirstNColumns(m_rdim)->transposeMult(integral_basis_f);
+  m_romrhs_phi=a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(integral_basis_f);
   printf("f %d %d\n",a_rombasis_f->numRows(),a_rombasis_f->numColumns());
   printf("integral_basis_f %d %d\n",integral_basis_f->numRows(),integral_basis_f->numColumns());
   printf("m_romrhs_phi %d %d\n",m_romrhs_phi->numRows(),m_romrhs_phi->numColumns());
@@ -1380,10 +1381,10 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
 
   /* Integrate f reduced basis over velocity */
   CAROM::Matrix* laplace_phi;
-  laplace_phi = new CAROM::Matrix(num_rows, m_rdim, true);
+  laplace_phi = new CAROM::Matrix(num_rows, m_rdim_phi, true);
   CAROM::Vector laplace_col(num_rows,false);
 
-  for (int j = 0; j < m_rdim; j++){
+  for (int j = 0; j < m_rdim_phi; j++){
     ArrayCopynD(1,
                 a_rombasis_phi->getColumn(j)->getData(),
                 vec_wghosts.data(),
@@ -1411,7 +1412,7 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
   }
 
   // construct rhs = basis_phi^T integral_basis_f
-  m_romlaplace_phi=a_rombasis_phi->getFirstNColumns(m_rdim)->transposeMult(laplace_phi);
+  m_romlaplace_phi=a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(laplace_phi);
   printf("m_romlaplace_phi %d %d\n",m_romlaplace_phi->numRows(),m_romlaplace_phi->numColumns());
   if (!m_rank) {
     std::cout << "Checking Potential ROM Laplace: \n";
@@ -1469,7 +1470,7 @@ void LSROMObject::CheckPotentialProjError(void* a_s)
                 sim[0].solver.nvars);
 
     projectInitialSolution_phi(*(m_snapshots_phi->getColumn(j)));
-    recon_caromvec= m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init_phi[0]);
+    recon_caromvec= m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(m_projected_init_phi[0]);
     ArrayCopynD(1,
                 recon_caromvec->getData(),
                 snapproj_wghosts.data(),
@@ -1502,8 +1503,8 @@ void LSROMObject::projectInitialSolution_phi(  CAROM::Vector& a_U /*!< solution 
   }
   for (int i = 0; i < m_generator_phi.size(); i++) {
 
-    m_projected_init_phi.push_back(new CAROM::Vector(m_rdim, false));
-    m_projected_init_phi[i] = m_generator_phi[i]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(a_U);
+    m_projected_init_phi.push_back(new CAROM::Vector(m_rdim_phi, false));
+    m_projected_init_phi[i] = m_generator_phi[i]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->transposeMult(a_U);
 
     if (!m_rank) {
       std::cout << "Checking projected coefficients phi: ";
@@ -1665,7 +1666,7 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
     /* project snapshot onto reduced space */
     projectInitialSolution_phi(*(m_snapshots_phi->getColumn(j)));
     lap_reduced = m_romlaplace_phi->mult(m_projected_init_phi[0]);
-    recon_lap = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(lap_reduced);
+    recon_lap = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(lap_reduced);
     ArrayCopynD(1,
                 recon_lap->getData(),
                 recon_wghosts.data(),
@@ -1678,7 +1679,7 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
     printf("#%d snapshot projection error in laplacian (reduced), %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
 
     /* Check 2 */
-    recon_field = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init_phi[0]);
+    recon_field = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(m_projected_init_phi[0]);
     ArrayCopynD(1,
                 recon_field->getData(),
                 snapproj_wghosts.data(),
@@ -1698,8 +1699,8 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
                 index.data(),
                 sim[0].solver.nvars);
 
-    field_reduced = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(recon_field);
-    recon_lap = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(field_reduced);
+    field_reduced = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->transposeMult(recon_field);
+    recon_lap = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(field_reduced);
     ArrayCopynD(1,
                 recon_lap->getData(),
                 recon_wghosts.data(),
@@ -1726,8 +1727,8 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
                 index.data(),
                 sim[0].solver.nvars);
 
-    lap_reduced = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(recon_lap);
-    recon_lap = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(lap_reduced);
+    lap_reduced = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->transposeMult(recon_lap);
+    recon_lap = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(lap_reduced);
     ArrayCopynD(1,
                 recon_lap->getData(),
                 recon_wghosts.data(),
@@ -1881,8 +1882,15 @@ void LSROMObject::CheckRhsProjError(void* a_s)
                 sim[0].solver.nvars);
 
     /* Check 1 */
-    rhs_reduced = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(int_f_caromvec);
-    recon_rhs = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(rhs_reduced);
+    rhs_reduced = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->transposeMult(int_f_caromvec);
+    if (!m_rank) {
+      std::cout << "Checking rhs reduced: ";
+      for (int j = 0; j < rhs_reduced->dim(); j++) {
+            std::cout << (rhs_reduced->item(j)) << " ";
+      }
+      std::cout << std::endl;
+    }
+    recon_rhs = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(rhs_reduced);
     ArrayCopynD(1,
                 recon_rhs->getData(),
                 recon_wghosts.data(),
@@ -1898,7 +1906,7 @@ void LSROMObject::CheckRhsProjError(void* a_s)
     /* Check 2 */
     projectInitialSolution(*(m_snapshots->getColumn(j)));
     rhs_reduced = m_romrhs_phi->mult(m_projected_init[0]);
-    recon_rhs = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(rhs_reduced);
+    recon_rhs = m_generator_phi[0]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(rhs_reduced);
     ArrayCopynD(1,
                 recon_rhs->getData(),
                 recon_wghosts.data(),
@@ -1945,7 +1953,6 @@ void LSROMObject::CheckEProjError(void* a_s)
   int num_rows = m_generator_phi[0]->getSpatialBasis()->numRows();
   int num_cols = m_snapshots_e->numColumns();
   CAROM::Vector* recon_caromvec;
-  recon_caromvec= new CAROM::Vector(num_rows,false);
 
   for (int j = 0; j < num_cols; j++){
     ArrayCopynD(1,
@@ -1988,7 +1995,6 @@ void LSROMObject::CheckEProjError(void* a_s)
 /*! Dump ROM basis phi */
 void LSROMObject::OutputROMBasisPhi(void* a_s, const CAROM::Matrix* a_rombasis)
 {
-  /* m_rdim is written out */
   SimulationObject* sim = (SimulationObject*) a_s;
   HyPar  *solver = (HyPar*) &(sim[0].solver);
   Vlasov *param  = (Vlasov*) solver->physics;
@@ -1997,7 +2003,7 @@ void LSROMObject::OutputROMBasisPhi(void* a_s, const CAROM::Matrix* a_rombasis)
   std::vector<double> vec_wghosts(param->npts_local_x_wghosts);
   std::vector<int> index(sim[0].solver.ndims);
 
-  for (int j = 0; j < m_rdim; j++){
+  for (int j = 0; j < a_rombasis->numColumns(); j++){
 
     ArrayCopynD(1,
                 a_rombasis->getColumn(j)->getData(),
