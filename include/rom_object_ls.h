@@ -125,6 +125,8 @@ class LSROMObject : public ROMObject
 
     /* Dump ROM basis phi */
     void OutputROMBasisPhi(void*, const CAROM::Matrix*);
+
+    void ConstructEBasis(void*);
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */

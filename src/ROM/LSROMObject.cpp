@@ -2027,4 +2027,54 @@ void LSROMObject::OutputROMBasisPhi(void* a_s, const CAROM::Matrix* a_rombasis)
   return;
 }
 
+/*! Construct E basis from phi basis */
+void LSROMObject::ConstructEBasis(void* a_s)
+{
+  if (!m_rank) {
+    std::cout << "------------------------------------------------\n";
+    std::cout << "Construct E Basis: ";
+    std::cout << std::endl;
+  }
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  std::vector<double> basis_vec_wghosts(param->npts_local_x_wghosts);
+  std::vector<double> vec_x_wghosts(param->npts_local_x_wghosts*param->ndims_x);
+  std::vector<int> index(sim[0].solver.ndims);
+
+  int num_rows = m_generator_phi[0]->getSpatialBasis()->numRows();
+  double* vec_noghosts = (double*) calloc(num_rows, sizeof(double));
+
+  m_basis_e = new CAROM::Matrix(num_rows, m_rdim_phi, true);
+
+  for (int j = 0; j < m_rdim_phi; j++){
+    ArrayCopynD(1,
+                m_generator_phi[0]->getSpatialBasis()->getColumn(j)->getData(),
+                basis_vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+    ::FirstDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),basis_vec_wghosts.data(),0,1,&(sim[0].solver),&(sim[0].mpi));
+    _ArrayScale1D_(vec_x_wghosts,-1.0*(solver->dxinv[0]),param->npts_local_x_wghosts)
+
+    ArrayCopynD(1,
+                vec_x_wghosts.data(),
+                vec_noghosts,
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                index.data(),
+                sim[0].solver.nvars);
+    for (int i = 0; i < num_rows; i++) {
+      (*m_basis_e)(i, j) = vec_noghosts[i];
+    }
+
+  }
+  free(vec_noghosts);
+}
+
 #endif
