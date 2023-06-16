@@ -669,6 +669,49 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
 //      std::cout << std::endl;
 //    }
     }
+    else if (m_solve_phi) {
+      m_tmprhs = m_romrhs_phi->mult(m_U[stage]);
+      m_tmpsol = m_romlaplace_phi->mult(m_tmprhs);
+      m_potential = m_basis_e->mult(m_tmpsol);
+
+      ArrayCopynD(1,
+                  m_potential->getData(),
+                  param->potential,
+                  sim[0].solver.dim_local,
+                  0,
+                  sim[0].solver.ghosts,
+                  index.data(),
+                  sim[0].solver.nvars);
+
+      m_fomwork = ReconlibROMfield(m_U[stage], m_generator[0]->getSpatialBasis(), m_rdim);
+
+      ArrayCopynD(sim[0].solver.ndims,
+                  m_fomwork->getData(),
+                  vec_wghosts.data(),
+                  sim[0].solver.dim_local,
+                  0,
+                  sim[0].solver.ghosts,
+                  index.data(),
+                  sim[0].solver.nvars);
+
+      /* Evaluate F(\phi_j) */
+      TimeRHSFunctionExplicit(rhs_wghosts.data(),
+                              vec_wghosts.data(),
+                              &(sim[0].solver),
+                              &(sim[0].mpi),
+                              0);
+
+      ArrayCopynD(sim[0].solver.ndims,
+                  rhs_wghosts.data(),
+                  m_rhswork->getData(),
+                  sim[0].solver.dim_local,
+                  sim[0].solver.ghosts,
+                  0,
+                  index.data(),
+                  sim[0].solver.nvars);
+
+      m_Udot[stage] = ProjectToRB(m_rhswork,m_generator[0]->getSpatialBasis(), m_rdim);
+    }
     else {
       m_Udot[stage] = m_romhyperb->mult(m_U[stage]);
 //    if (!m_rank) {
