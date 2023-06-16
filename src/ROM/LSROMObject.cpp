@@ -47,6 +47,11 @@ extern "C" void IncrementFilenameIndex(char*,int);
 extern "C" int  VlasovWriteSpatialField(void*, void*, double*, char*);
 extern "C" int FirstDerivativeSecondOrderCentralNoGhosts (double*,double*,int,int,void*,void*);
 extern "C" int SecondDerivativeSecondOrderCentralNoGhosts (double*,double*,int,void*,void*);
+extern "C" int VlasovAdvection_x(double*,double*,int,void*,double);
+extern "C" int HyperbolicFunction_1dir (double*,double*,void*,void*,double,int,
+                                        int(*)(double*,double*,int,void*,double),
+                                        int(*)(double*,double*,double*,double*,double*,
+                                        double*,int,void*,double),int);
 
 LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
                             const double  a_dt,       /*!< time step size */
@@ -418,6 +423,17 @@ void LSROMObject::train(void* a_s)
                                           true);
         ConstructEBasis(a_s);
         CheckEProjError(a_s);
+//      solver->HyperbolicFunction( solver->hyp,
+//                                  m_snapshots->getColumn(0)->getData(),
+//                                  solver,
+//                                  mpi,
+//                                  0,
+//                                  1,
+//                                  solver->FFunction,
+//                                  solver->Upwind );
+//      ::VlasovAdvection_x( solver->hyp, m_snapshots->getColumn(0)->getData(),
+//                           0, solver, 0);
+        ConstructROMHy_x(a_s, m_generator[0]->getSpatialBasis());
         exit(0);
 
       }
@@ -572,6 +588,9 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   /* Advance the ROM ODE using RK4 scheme */
 
   SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
   std::vector<int> index(sim[0].solver.ndims);
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
@@ -584,6 +603,9 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   m_fomwork = new CAROM::Vector(num_rows,false);
   m_rhswork = new CAROM::Vector(num_rows,true);
   m_romwork = new CAROM::Vector(m_rdim,false);
+  CAROM::Vector* m_tmprhs;
+  CAROM::Vector* m_tmpsol;
+  CAROM::Vector* m_potential;
 
     /* Calculate stage values */
   for (stage = 0; stage < nstages; stage++) {
@@ -2073,6 +2095,69 @@ void LSROMObject::ConstructEBasis(void* a_s)
 
   }
   free(vec_noghosts);
+}
+
+/*! Construct reduced hyperbolic operator in x direction */
+void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis)
+{
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  int num_rows = a_rombasis->numRows();
+  int num_cols = a_rombasis->numColumns();
+
+  /* Compute F(\Phi), where \Phi is the reduced basis matrix */
+  CAROM::Matrix* phi_hyper_x;
+  phi_hyper_x = new CAROM::Matrix(num_rows, m_rdim, true);
+  CAROM::Vector phi_hyper_col(num_rows,false);
+
+  std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<int> index(sim[0].solver.ndims);
+
+  for (int j = 0; j < m_rdim; j++){
+    ArrayCopynD(sim[0].solver.ndims,
+                a_rombasis->getColumn(j)->getData(),
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+
+    HyperbolicFunction_1dir( rhs_wghosts.data(),
+                             vec_wghosts.data(),
+                             solver,
+                             mpi,
+                             0,
+                             1,
+                             solver->FFunction,
+                             solver->Upwind, 0 );
+
+    /* Remove ghosts point in F(phi_j) */
+    ArrayCopynD(sim[0].solver.ndims,
+                rhs_wghosts.data(),
+                phi_hyper_col.getData(),
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                index.data(),
+                sim[0].solver.nvars);
+
+    /* Copy F(phi_j) back to columns of phi_hyper matrix */
+    for (int i = 0; i < num_rows; i++) {
+      (*phi_hyper_x)(i, j) = phi_hyper_col.getData()[i];
+    }
+  }
+
+  // construct hyper_ROM = phi^T phi_hyper
+  m_romhyperb_x=a_rombasis->getFirstNColumns(m_rdim)->transposeMult(phi_hyper_x);
+  printf("m_romhyperb_x %d %d\n",m_romhyperb_x->numRows(),m_romhyperb_x->numColumns());
+  delete phi_hyper_x;
+
+  return;
 }
 
 #endif

@@ -127,6 +127,9 @@ class LSROMObject : public ROMObject
     void OutputROMBasisPhi(void*, const CAROM::Matrix*);
 
     void ConstructEBasis(void*);
+
+    /* Construct reduced hyperbolic operator in x direction */
+    void ConstructROMHy_x(void*, const CAROM::Matrix*);
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
@@ -202,6 +205,8 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::Vector*> m_projected_init_e; /*!< Vector of Vector objects */
     CAROM::Matrix* m_snapshots_e; /*!< Snapshot Matrix */
     CAROM::Matrix* m_basis_e; /*!< Basis Matrix */
+
+    CAROM::Matrix* m_romhyperb_x; /*!< Reduced Hyperbolic Term Matrix */
 
   private:
 };
