@@ -116,7 +116,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
             ferr = fscanf(in,"%s", direct_comp_hyperbolic); if (ferr != 1) return;
           } else if (std::string(word) == "ls_rdim_phi") {
             ferr = fscanf(in,"%d", &m_rdim_phi); if (ferr != 1) return;
-          } else if (std::string(word) == "ls_solver_phi") {
+          } else if (std::string(word) == "ls_solve_phi") {
             ferr = fscanf(in,"%s", solve_phi); if (ferr != 1) return;
           }
           if (ferr != 1) return;
