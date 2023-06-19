@@ -606,7 +606,7 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   m_romwork = new CAROM::Vector(m_rdim,false);
   CAROM::Vector* m_tmprhs;
   CAROM::Vector* m_tmpsol;
-  CAROM::Vector* m_potential;
+  CAROM::Vector* m_e;
 
     /* Calculate stage values */
   for (stage = 0; stage < nstages; stage++) {
@@ -673,11 +673,13 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
     else if (m_solve_phi) {
       m_tmprhs = m_romrhs_phi->mult(m_U[stage]);
       m_tmpsol = m_romlaplace_phi->mult(m_tmprhs);
-      m_potential = m_basis_e->mult(m_tmpsol);
+
+      /* Reconstruct potential */
+      m_e = m_basis_e->mult(m_tmpsol);
 
       ArrayCopynD(1,
-                  m_potential->getData(),
-                  param->potential,
+                  m_e->getData(),
+                  param->e_field,
                   sim[0].solver.dim_local,
                   0,
                   sim[0].solver.ghosts,
