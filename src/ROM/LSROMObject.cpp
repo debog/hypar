@@ -1489,7 +1489,7 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
     }
     std::cout << std::endl;
   }
-//m_romlaplace_phi->inverse();
+  m_romlaplace_phi->inverse();
 //if (!m_rank) {
 //  std::cout << "Checking Potential ROM inverse Laplace: \n";
 //  for (int i = 0; i < m_romlaplace_phi->numRows(); i++) {
