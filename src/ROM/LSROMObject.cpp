@@ -434,7 +434,7 @@ void LSROMObject::train(void* a_s)
 //      ::VlasovAdvection_x( solver->hyp, m_snapshots->getColumn(0)->getData(),
 //                           0, solver, 0);
         ConstructROMHy_x(a_s, m_generator[0]->getSpatialBasis());
-        ConstructROMHy_v(a_s, m_generator[0]->getSpatialBasis());
+        ConstructROMHy_v(a_s, m_generator[0]->getSpatialBasis(), m_basis_e);
         exit(0);
 
       }
@@ -2205,7 +2205,7 @@ void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis)
 }
 
 /*! Construct reduced hyperbolic tensor in v direction */
-void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis)
+void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, const CAROM::Matrix* a_rombasis_phi)
 {
   SimulationObject* sim = (SimulationObject*) a_s;
   HyPar  *solver = (HyPar*) &(sim[0].solver);
@@ -2218,17 +2218,28 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis)
   /* Compute F(\Phi), where \Phi is the reduced basis matrix */
   CAROM::Vector phi_hyper_col(num_rows,false);
 
+  std::vector<int> index(sim[0].solver.ndims);
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
-  std::vector<int> index(sim[0].solver.ndims);
 
-  for (int i = 0; i < m_rdim; i++){
+  for (int i = 0; i < m_rdim; i++) {
+
     m_romhyperb_v.push_back(new CAROM::Matrix(m_rdim_phi, m_rdim, true));
-    for (int j = 0; j < m_rdim_phi; j++){
-      for (int k = 0; k < m_rdim; k++){
+    for (int j = 0; j < m_rdim_phi; j++) {
+
+      for (int k = 0; k < m_rdim; k++) {
         ArrayCopynD(sim[0].solver.ndims,
                     a_rombasis->getColumn(k)->getData(),
                     vec_wghosts.data(),
+                    sim[0].solver.dim_local,
+                    0,
+                    sim[0].solver.ghosts,
+                    index.data(),
+                    sim[0].solver.nvars);
+
+        ArrayCopynD(1,
+                    a_rombasis_phi->getColumn(j)->getData(),
+                    param->e_field,
                     sim[0].solver.dim_local,
                     0,
                     sim[0].solver.ghosts,
@@ -2242,9 +2253,8 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis)
                                  0,
                                  1,
                                  solver->FFunction,
-                                 solver->Upwind, 0 );
+                                 solver->Upwind, 1 );
 
-        /* Remove ghosts point in F(phi_j) */
         ArrayCopynD(sim[0].solver.ndims,
                     rhs_wghosts.data(),
                     phi_hyper_col.getData(),
@@ -2254,8 +2264,7 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis)
                     index.data(),
                     sim[0].solver.nvars);
 
-        /* Copy F(phi_j) back to columns of phi_hyper matrix */
-          (*m_romhyperb_v[i])(j, k) = a_rombasis->getColumn(i)->inner_product(phi_hyper_col);
+        (*m_romhyperb_v[i])(j, k) = a_rombasis->getColumn(i)->inner_product(phi_hyper_col);
       }
     }
     printf("matrix size %d %d\n",m_romhyperb_v[i]->numRows(),m_romhyperb_v[i]->numColumns());

@@ -130,6 +130,9 @@ class LSROMObject : public ROMObject
 
     /* Construct reduced hyperbolic operator in x direction */
     void ConstructROMHy_x(void*, const CAROM::Matrix*);
+
+    /* Construct reduced hyperbolic tensor in v direction */
+    void ConstructROMHy_v(void*, const CAROM::Matrix*, const CAROM::Matrix*);
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
@@ -207,6 +210,7 @@ class LSROMObject : public ROMObject
     CAROM::Matrix* m_basis_e; /*!< Basis Matrix */
 
     CAROM::Matrix* m_romhyperb_x; /*!< Reduced Hyperbolic Term Matrix */
+    std::vector<CAROM::Matrix*> m_romhyperb_v; /*!< Reduced Hyperbolic Term Matrix */
 
   private:
 };
