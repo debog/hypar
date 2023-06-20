@@ -2232,6 +2232,7 @@ void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis)
   CAROM::Vector phi_hyper_col(num_rows,false);
 
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<double> vec1_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<int> index(sim[0].solver.ndims);
 
@@ -2244,7 +2245,23 @@ void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
+    ArrayCopynD(sim[0].solver.ndims,
+                a_rombasis->getColumn(j)->getData(),
+                vec1_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
 
+    solver->ApplyBoundaryConditions(solver,mpi,vec_wghosts.data(),NULL,0);
+    solver->ApplyIBConditions(solver,mpi,vec_wghosts.data(),0);
+    MPIExchangeBoundariesnD(  solver->ndims,
+                              solver->nvars,
+                              solver->dim_local,
+                              solver->ghosts,
+                              mpi,
+                              vec_wghosts.data());
     HyperbolicFunction_1dir( rhs_wghosts.data(),
                              vec_wghosts.data(),
                              solver,
@@ -2253,6 +2270,28 @@ void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis)
                              1,
                              solver->FFunction,
                              solver->Upwind, 0 );
+//  printf("checking Hyperbolic\n");
+//  solver->ApplyBoundaryConditions(solver,mpi,vec1_wghosts.data(),NULL,0);
+//  solver->ApplyIBConditions(solver,mpi,vec1_wghosts.data(),0);
+//  MPIExchangeBoundariesnD(  solver->ndims,
+//                            solver->nvars,
+//                            solver->dim_local,
+//                            solver->ghosts,
+//                            mpi,
+//                            vec1_wghosts.data());
+//      solver->HyperbolicFunction( solver->hyp,
+//                                  vec1_wghosts.data(),
+//                                  solver,
+//                                  mpi,
+//                                  0,
+//                                  1,
+//                                  solver->FFunction,
+//                                  solver->Upwind );
+//  printf("checking rhs_wghosts.data()\n");
+//  for (int k = 0; k < rhs_wghosts.size(); k++) {
+//    printf("k: %d,  value: %.15f\n",k,rhs_wghosts[k]);
+//  }
+//  exit (0);
 
     /* Remove ghosts point in F(phi_j) */
     ArrayCopynD(sim[0].solver.ndims,
@@ -2320,6 +2359,14 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
                     index.data(),
                     sim[0].solver.nvars);
 
+        solver->ApplyBoundaryConditions(solver,mpi,vec_wghosts.data(),NULL,0);
+        solver->ApplyIBConditions(solver,mpi,vec_wghosts.data(),0);
+        MPIExchangeBoundariesnD(  solver->ndims,
+                                  solver->nvars,
+                                  solver->dim_local,
+                                  solver->ghosts,
+                                  mpi,
+                                  vec_wghosts.data());
         HyperbolicFunction_1dir( rhs_wghosts.data(),
                                  vec_wghosts.data(),
                                  solver,
@@ -2339,6 +2386,7 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
                     sim[0].solver.nvars);
 
         (*m_romhyperb_v[i])(j, k) = a_rombasis->getColumn(i)->inner_product(phi_hyper_col);
+        printf("checking m_romhyperb_v %d %d %f\n",j,k,(*m_romhyperb_v[i])(j, k));
       }
     }
     printf("matrix size %d %d\n",m_romhyperb_v[i]->numRows(),m_romhyperb_v[i]->numColumns());
