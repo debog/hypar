@@ -607,6 +607,9 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   CAROM::Vector* m_tmprhs;
   CAROM::Vector* m_tmpsol;
   CAROM::Vector* m_e;
+  CAROM::Vector* m_contract1;
+  CAROM::Vector* m_contract2;
+  m_contract2 = new CAROM::Vector(m_rdim,false);
 
     /* Calculate stage values */
   for (stage = 0; stage < nstages; stage++) {
@@ -674,46 +677,114 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
       m_tmprhs = m_romrhs_phi->mult(m_U[stage]);
       m_tmpsol = m_romlaplace_phi->mult(m_tmprhs);
 
+      m_romwork = m_romhyperb_x->mult(m_U[stage]);
+//    /* Tensor contraction */
+      for (int i = 0; i < m_rdim; i++) {
+        m_contract1 = m_romhyperb_v[i]->mult(m_U[stage]);
+        m_contract2->item(i) = m_contract1->inner_product(m_tmpsol);
+      }
+      m_Udot[stage] = m_romwork->plus(m_contract2);
+      printf("Done tensor contraction\n");
+//
+//    m_e = m_basis_e->mult(m_tmpsol);
+
+//    ArrayCopynD(1,
+//                m_e->getData(),
+//                param->e_field,
+//                sim[0].solver.dim_local,
+//                0,
+//                sim[0].solver.ghosts,
+//                index.data(),
+//                sim[0].solver.nvars);
+
+//    m_fomwork = ReconlibROMfield(m_U[stage], m_generator[0]->getSpatialBasis(), m_rdim);
+
+//    ArrayCopynD(sim[0].solver.ndims,
+//                m_fomwork->getData(),
+//                vec_wghosts.data(),
+//                sim[0].solver.dim_local,
+//                0,
+//                sim[0].solver.ghosts,
+//                index.data(),
+//                sim[0].solver.nvars);
+//      solver->ApplyBoundaryConditions(solver,mpi,vec_wghosts.data(),NULL,0);
+//      solver->ApplyIBConditions(solver,mpi,vec_wghosts.data(),0);
+//      MPIExchangeBoundariesnD(  solver->ndims,
+//                                solver->nvars,
+//                                solver->dim_local,
+//                                solver->ghosts,
+//                                mpi,
+//                                vec_wghosts.data());
+
+//      HyperbolicFunction_1dir( rhs_wghosts.data(),
+//                               vec_wghosts.data(),
+//                               solver,
+//                               mpi,
+//                               0,
+//                               1,
+//                               solver->FFunction,
+//                               solver->Upwind, 1 );
+
+//    ArrayCopynD(sim[0].solver.ndims,
+//                rhs_wghosts.data(),
+//                m_rhswork->getData(),
+//                sim[0].solver.dim_local,
+//                sim[0].solver.ghosts,
+//                0,
+//                index.data(),
+//                sim[0].solver.nvars);
+
+//    m_contract2 = ProjectToRB(m_rhswork,m_generator[0]->getSpatialBasis(), m_rdim);
+//    m_Udot[stage] = m_romwork->plus(m_contract2);
+      *m_Udot[stage] *= -1.0;
+
       /* Reconstruct potential */
-      m_e = m_basis_e->mult(m_tmpsol);
+//    m_e = m_basis_e->mult(m_tmpsol);
 
-      ArrayCopynD(1,
-                  m_e->getData(),
-                  param->e_field,
-                  sim[0].solver.dim_local,
-                  0,
-                  sim[0].solver.ghosts,
-                  index.data(),
-                  sim[0].solver.nvars);
+//    ArrayCopynD(1,
+//                m_e->getData(),
+//                param->e_field,
+//                sim[0].solver.dim_local,
+//                0,
+//                sim[0].solver.ghosts,
+//                index.data(),
+//                sim[0].solver.nvars);
 
-      m_fomwork = ReconlibROMfield(m_U[stage], m_generator[0]->getSpatialBasis(), m_rdim);
+//    m_fomwork = ReconlibROMfield(m_U[stage], m_generator[0]->getSpatialBasis(), m_rdim);
 
-      ArrayCopynD(sim[0].solver.ndims,
-                  m_fomwork->getData(),
-                  vec_wghosts.data(),
-                  sim[0].solver.dim_local,
-                  0,
-                  sim[0].solver.ghosts,
-                  index.data(),
-                  sim[0].solver.nvars);
+//    ArrayCopynD(sim[0].solver.ndims,
+//                m_fomwork->getData(),
+//                vec_wghosts.data(),
+//                sim[0].solver.dim_local,
+//                0,
+//                sim[0].solver.ghosts,
+//                index.data(),
+//                sim[0].solver.nvars);
 
-      /* Evaluate F(\phi_j) */
-      TimeRHSFunctionExplicit(rhs_wghosts.data(),
-                              vec_wghosts.data(),
-                              &(sim[0].solver),
-                              &(sim[0].mpi),
-                              0);
+//    /* Evaluate F(\phi_j) */
+//    TimeRHSFunctionExplicit(rhs_wghosts.data(),
+//                            vec_wghosts.data(),
+//                            &(sim[0].solver),
+//                            &(sim[0].mpi),
+//                            0);
 
-      ArrayCopynD(sim[0].solver.ndims,
-                  rhs_wghosts.data(),
-                  m_rhswork->getData(),
-                  sim[0].solver.dim_local,
-                  sim[0].solver.ghosts,
-                  0,
-                  index.data(),
-                  sim[0].solver.nvars);
+//    ArrayCopynD(sim[0].solver.ndims,
+//                rhs_wghosts.data(),
+//                m_rhswork->getData(),
+//                sim[0].solver.dim_local,
+//                sim[0].solver.ghosts,
+//                0,
+//                index.data(),
+//                sim[0].solver.nvars);
 
-      m_Udot[stage] = ProjectToRB(m_rhswork,m_generator[0]->getSpatialBasis(), m_rdim);
+//    m_Udot[stage] = ProjectToRB(m_rhswork,m_generator[0]->getSpatialBasis(), m_rdim);
+      if (!m_rank) {
+        std::cout << "Checking hyperbolic term [phi]: ";
+        for (int j = 0; j < m_rdim; j++) {
+              std::cout << m_Udot[stage]->item(j) << " ";
+        }
+        std::cout << std::endl;
+      }
     }
     else {
       m_Udot[stage] = m_romhyperb->mult(m_U[stage]);
@@ -747,6 +818,7 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   delete m_fomwork;
   delete m_rhswork;
   delete m_romwork;
+  delete m_contract2;
   return(0);
 }
 
