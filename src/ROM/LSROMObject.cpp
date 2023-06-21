@@ -2386,7 +2386,7 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
                     sim[0].solver.nvars);
 
         (*m_romhyperb_v[i])(j, k) = a_rombasis->getColumn(i)->inner_product(phi_hyper_col);
-        printf("checking m_romhyperb_v %d %d %f\n",j,k,(*m_romhyperb_v[i])(j, k));
+//      printf("checking m_romhyperb_v %d %d %f\n",j,k,(*m_romhyperb_v[i])(j, k));
       }
     }
     printf("matrix size %d %d\n",m_romhyperb_v[i]->numRows(),m_romhyperb_v[i]->numColumns());
