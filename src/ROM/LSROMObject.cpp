@@ -53,13 +53,14 @@ extern "C" int HyperbolicFunction_1dir (double*,double*,void*,void*,double,int,
                                         int(*)(double*,double*,double*,double*,double*,
                                         double*,int,void*,double),int);
 
-LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
-                            const double  a_dt,       /*!< time step size */
-                            const int     a_rdim,     /*!< latent space dimension */
-                            const int     a_rank,     /*!< MPI rank of this process */
-                            const int     a_nproc,    /*!< Number of MPI processes */
-                            const int     a_sim_idx,  /*!< Simulation index (for ensemble simulations */
-                            const int     a_var_idx   /*!< Vector component index */ )
+LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
+                            const double  a_dt,             /*!< time step size */
+                            const int     a_sampling_freq,  /*!< sampling frequency */
+                            const int     a_rdim,           /*!< latent space dimension */
+                            const int     a_rank,           /*!< MPI rank of this process */
+                            const int     a_nproc,          /*!< Number of MPI processes */
+                            const int     a_sim_idx,        /*!< Simulation index (for ensemble simulations */
+                            const int     a_var_idx         /*!< Vector component index */ )
 {
   m_rank = a_rank;
   m_nproc = a_nproc;
@@ -78,6 +79,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size, /*!< vector size */
   m_intervals.clear();
   m_vec_size = a_vec_size;
   m_dt = a_dt;
+  m_sampling_freq = a_sampling_freq;
   m_t_final = -1;
   m_rdim = a_rdim;
   m_rdim_phi = m_rdim;
@@ -321,23 +323,24 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
               0,
               index.data(),
               sim[0].solver.nvars);
-  if (!m_rank) {
-    std::cout << "checking -grad phi (no ghosts)\n";
-    for (int i = 0; i < vec_wghosts.size(); i++) {
-          std::cout << "Index " << i << ": " << -vec_wghosts[i]*solver->dxinv[0] << std::endl;
-    }
-    std::cout << std::endl;
-  }
+//if (!m_rank) {
+//  std::cout << "checking -grad phi (no ghosts)\n";
+//  for (int i = 0; i < vec_wghosts.size(); i++) {
+//        std::cout << "Index " << i << ": " << -vec_wghosts[i]*solver->dxinv[0] << std::endl;
+//  }
+//  std::cout << std::endl;
+//}
   ::SecondDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),param->potential,0,&(sim[0].solver),&(sim[0].mpi));
   MPIExchangeBoundaries1D(mpi, vec_x_wghosts.data(), solver->dim_local[0], solver->ghosts, 0, solver->ndims);
-  if (!m_rank) {
-    std::cout << "checking - nabla phi (ghosts)\n";
-    for (int i = 0; i < vec_x_wghosts.size(); i++) {
-          std::cout << "Index " << i << ": " << -vec_x_wghosts[i]*(solver->dxinv[0])*(solver->dxinv[0])<< std::endl;
-    }
-    std::cout << std::endl;
-  }
+//if (!m_rank) {
+//  std::cout << "checking - nabla phi (ghosts)\n";
+//  for (int i = 0; i < vec_x_wghosts.size(); i++) {
+//        std::cout << "Index " << i << ": " << -vec_x_wghosts[i]*(solver->dxinv[0])*(solver->dxinv[0])<< std::endl;
+//  }
+//  std::cout << std::endl;
+//}
 //exit (0);
+  printf("checking m_tic %d\n",m_tic);
 
   m_tic++;
   return;

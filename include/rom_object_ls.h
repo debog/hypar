@@ -35,6 +35,7 @@ class LSROMObject : public ROMObject
     LSROMObject(  const int, 
                   const double, 
                   const int, 
+                  const int,
                   const int, 
                   const int,
                   const int,
@@ -211,6 +212,7 @@ class LSROMObject : public ROMObject
 
     CAROM::Matrix* m_romhyperb_x; /*!< Reduced Hyperbolic Term Matrix */
     std::vector<CAROM::Matrix*> m_romhyperb_v; /*!< Reduced Hyperbolic Term Matrix */
+    int m_sampling_freq;       /*!< Time step size */
 
   private:
 };
