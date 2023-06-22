@@ -161,7 +161,8 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
         }
         else if (m_rom_type == _ROM_TYPE_LS_) {
           m_rom.push_back(new LSROMObject( m_vec_size[ns],
-                                            m_sampling_freq*a_dt,
+                                            a_dt,
+                                            m_sampling_freq,
                                             m_rdim,
                                             m_rank,
                                             m_nproc,
