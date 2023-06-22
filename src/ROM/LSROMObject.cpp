@@ -522,7 +522,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
                     sim[0].solver.nvars);
         char buffer[] = "reproderr";  // Creates a modifiable buffer and copies the string literal
         CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),vec_wghosts.data(),buffer);
-        printf("Reproduction error at iter %d, %.15f %.15f %.15f \n",idx,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+        printf("Reconstructive error at # %d snapshot, %.15f %.15f %.15f \n",idx,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
       }
       m_snap++;
       return ReconlibROMfield(m_romcoef, m_generator[0]->getSpatialBasis(), m_rdim);
