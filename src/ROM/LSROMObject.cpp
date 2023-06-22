@@ -231,22 +231,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     OutputlibROMfield(m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData(),
                       sim[0],
                       buffer);
-//  char buffer1[] = "esample";  // Creates a modifiable buffer and copies the string literal
-//  HyPar  *solver = (HyPar*)  sim[0];
-//  Vlasov* param = static_cast<Vlasov*>(sim[0].solver->physics);
-//  WriteArray( 1,
-//              sim[0].solver.nvars,
-//              sim[0].solver.dim_global,
-//              sim[0].solver.dim_local,
-//              sim[0].solver.ghosts,
-//              sim[0].solver.x,
-//              param->e_field,
-//              &(sim[0].solver),
-//              &(sim[0].mpi),
-//              buffer1);
-//  exit(0);
-//  printf("checking npts_local_x_wghosts ndims_x %d %d\n",param->npts_local_x_wghosts,param->ndims_x);
-//  printf("checking npts_local_x %d \n",param->npts_local_x);
+
     m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
     m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName));
     ArrayCopynD(1,
