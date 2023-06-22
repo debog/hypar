@@ -383,6 +383,9 @@ void LSROMObject::train(void* a_s)
                                         m_generator[i]->getSnapshotMatrix()->numColumns(),
                                         true,
                                         true);
+        if (m_generator[i]->getSnapshotMatrix()->numColumns() < m_rdim) {
+          throw std::runtime_error("# of snapshots is less than m_rdim");
+        }
         m_S  = m_generator[i]->getSingularValues();
 
         OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
