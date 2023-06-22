@@ -1158,9 +1158,6 @@ int LSROMObject::CalSnapROMDiff( void *s, /*!< Solver object of type #HyPar */
   /* calculate solution norms (for relative error) */
   double solution_norm[3] = {0.0,0.0,0.0};
   /* L1 */
-  printf("dim_local %d %d\n",solver->dim_local[0],solver->dim_local[1]);
-  printf("%d %d\n",solver->dim_local[0],solver->dim_local[1]);
-  printf("npoints_global %d\n",solver->npoints_global);
   sum = ArraySumAbsnD ( solver->nvars,
                         solver->ndims,
                         solver->dim_local,
