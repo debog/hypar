@@ -500,27 +500,29 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
       } else {
         TimeRK(a_t,a_s);
       }
-      m_fomwork = ReconlibROMfield(m_romcoef, m_generator[0]->getSpatialBasis(), m_rdim);
-      ArrayCopynD(sim[0].solver.ndims,
-                  m_fomwork->getData(),
-                  vec_wghosts.data(),
-                  sim[0].solver.dim_local,
-                  0,
-                  sim[0].solver.ghosts,
-                  index.data(),
-                  sim[0].solver.nvars);
-      ArrayCopynD(sim[0].solver.ndims,
-                  m_snapshots->getColumn(m_snap)->getData(),
-                  rhs_wghosts.data(),
-                  sim[0].solver.dim_local,
-                  0,
-                  sim[0].solver.ghosts,
-                  index.data(),
-                  sim[0].solver.nvars);
-      if (m_snap < sim[0].solver.n_iter){
-      char buffer[] = "reproderr";  // Creates a modifiable buffer and copies the string literal
-      CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),vec_wghosts.data(),buffer);
-      printf("Reproduction error at iter %d, %.15f %.15f %.15f \n",m_snap,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+      if ((m_snap < sim[0].solver.n_iter) && (m_snap % m_sampling_freq == 0)){
+        int idx;
+        idx = m_snap/m_sampling_freq;
+        m_fomwork = ReconlibROMfield(m_romcoef, m_generator[0]->getSpatialBasis(), m_rdim);
+        ArrayCopynD(sim[0].solver.ndims,
+                    m_fomwork->getData(),
+                    vec_wghosts.data(),
+                    sim[0].solver.dim_local,
+                    0,
+                    sim[0].solver.ghosts,
+                    index.data(),
+                    sim[0].solver.nvars);
+        ArrayCopynD(sim[0].solver.ndims,
+                    m_snapshots->getColumn(idx)->getData(),
+                    rhs_wghosts.data(),
+                    sim[0].solver.dim_local,
+                    0,
+                    sim[0].solver.ghosts,
+                    index.data(),
+                    sim[0].solver.nvars);
+        char buffer[] = "reproderr";  // Creates a modifiable buffer and copies the string literal
+        CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),vec_wghosts.data(),buffer);
+        printf("Reproduction error at iter %d, %.15f %.15f %.15f \n",idx,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
       }
       m_snap++;
       return ReconlibROMfield(m_romcoef, m_generator[0]->getSpatialBasis(), m_rdim);
