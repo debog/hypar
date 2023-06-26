@@ -76,6 +76,9 @@ typedef struct vlasov_parameters {
   /*! electric field */
   double *e_field;
 
+  /*! potential field */
+  double *potential;
+
   /*! Pointer to MPI object of type #MPIVariables */
   void  *m;
 
@@ -97,6 +100,15 @@ typedef struct vlasov_parameters {
   ptrdiff_t local_ni, local_i_start;
   /*! */
   ptrdiff_t local_no, local_o_start;
+
+  /*! Forward FFT plan */
+  fftw_plan plan_forward_phi;
+  /*! Backward FFT plan */
+  fftw_plan plan_backward_phi;
+  /*! buffer */
+  fftw_complex *phys_buffer_phi;
+  /*! buffer */
+  fftw_complex *fourier_buffer_phi;
 #endif
 
 } Vlasov;
