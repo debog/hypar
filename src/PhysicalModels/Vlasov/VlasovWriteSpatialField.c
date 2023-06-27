@@ -27,7 +27,6 @@ int VlasovWriteSpatialField( void* s, /*!< Solver object of type #HyPar */
 
   if (!solver->WriteOutput) return 0;
 
-//char fname_root[_MAX_STRING_SIZE_] = "potential";
   if (solver->nsims > 1) {
     char index[_MAX_STRING_SIZE_];
     GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
