@@ -187,19 +187,19 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
       return(1);
     }
   
-    physics->phys_buffer = fftw_alloc_complex(physics->alloc_local);
-    physics->fourier_buffer = fftw_alloc_complex(physics->alloc_local);
+    physics->phys_buffer_e = fftw_alloc_complex(physics->alloc_local);
+    physics->fourier_buffer_e = fftw_alloc_complex(physics->alloc_local);
 
-    physics->plan_forward = fftw_mpi_plan_dft_1d(dim_global[0],
-                                                 physics->phys_buffer,
-                                                 physics->fourier_buffer,
+    physics->plan_forward_e = fftw_mpi_plan_dft_1d(dim_global[0],
+                                                 physics->phys_buffer_e,
+                                                 physics->fourier_buffer_e,
                                                  mpi->comm[0],
                                                  FFTW_FORWARD,
                                                  FFTW_ESTIMATE);
 
-    physics->plan_backward = fftw_mpi_plan_dft_1d(dim_global[0],
-                                                  physics->fourier_buffer,
-                                                  physics->phys_buffer,
+    physics->plan_backward_e = fftw_mpi_plan_dft_1d(dim_global[0],
+                                                  physics->fourier_buffer_e,
+                                                  physics->phys_buffer_e,
                                                   mpi->comm[0],
                                                   FFTW_BACKWARD,
                                                   FFTW_ESTIMATE);
