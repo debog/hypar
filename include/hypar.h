@@ -339,7 +339,7 @@ typedef struct main_parameters {
   int    (*PrintStep)          (void*,void*,double);
   /*! Pointer to the function to write (to file) physics-related data that may not be
       a part of the solution (assigned in the physical model initialization called from InitializePhysics()) */
-  int    (*PhysicsOutput)      (void*,void*);
+  int    (*PhysicsOutput)      (void*,void*,double*,char*);
 
   /*! Pointer to the function to read (from file) physics-related data that may not
       be a part of the solution (assigned in the physical model initialization called from InitializePhysics()) */
