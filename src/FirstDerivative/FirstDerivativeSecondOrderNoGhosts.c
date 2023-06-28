@@ -55,10 +55,7 @@ int FirstDerivativeSecondOrderCentralNoGhosts(
 
   // make below as arguments
   int ghosts = solver->ghosts;
-  int ndims  = 1;
   int nvars  = solver->nvars;
-  int* dim = (int*)malloc(sizeof(int));
-  *dim = param->npts_local_x;
 
   if ((!Df) || (!f)) {
     fprintf(stderr, "Error in FirstDerivativeSecondOrder(): input arrays not allocated.\n");
