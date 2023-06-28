@@ -1,6 +1,5 @@
 /*! @file VlasovEField.c
-    @author John Loffeld
-    @author Ping-Hsuan
+    @author John Loffeld, Ping-Hsuan Tsai
     @brief Contains the function to compute the electric field
 */
 
