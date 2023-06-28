@@ -2,6 +2,7 @@ noinst_LIBRARIES = libFirstDerivative.a
 libFirstDerivative_a_SOURCES = \
   FirstDerivativeFirstOrder.c \
   FirstDerivativeSecondOrder.c \
+  FirstDerivativeSecondOrderNoGhosts.c \
   FirstDerivativeFourthOrder.c
 
 if ENABLE_CUDA
