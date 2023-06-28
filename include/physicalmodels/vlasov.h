@@ -87,13 +87,13 @@ typedef struct vlasov_parameters {
   /*! Buffer sum */
   double *sum_buffer;
   /*! Forward FFT plan */
-  fftw_plan plan_forward;
+  fftw_plan plan_forward_e;
   /*! Backward FFT plan */
-  fftw_plan plan_backward;
+  fftw_plan plan_backward_e;
   /*! buffer */
-  fftw_complex *phys_buffer;
+  fftw_complex *phys_buffer_e;
   /*! buffer */
-  fftw_complex *fourier_buffer;
+  fftw_complex *fourier_buffer_e;
   /*! */
   ptrdiff_t alloc_local;
   /*! */
