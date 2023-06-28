@@ -24,8 +24,8 @@ int VlasovAdvection (double*,double*,int,void*,double);
 /*! Compute the upwind flux at interfaces */
 int VlasovUpwind (double*,double*,double*,double*,
                   double*,double*,int,void*,double);
-/*! Write self-consistent E-field to file */
-int VlasovWriteEField (void*, void*);
+/*! Write 1D spatial field to file */
+int VlasovWriteSpatialField (void*, void*, double*, char*);
 
 int VlasovPreStep(double*,void*,void*,double);
 int VlasovPostStage(double*,void*,void*,double);
@@ -232,7 +232,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   solver->ComputeCFL    = VlasovComputeCFL;
   solver->FFunction     = VlasovAdvection;
   solver->Upwind        = VlasovUpwind;
-  solver->PhysicsOutput = VlasovWriteEField;
+  solver->PhysicsOutput = VlasovWriteSpatialField;
   solver->PostStage     = VlasovPostStage;
 
   int ierr = VlasovEField(solver->u, solver, 0.0);
