@@ -41,7 +41,7 @@ int SecondDerivativeSecondOrderCentralNoGhosts(
                                                                    derivative is to be computed (with ghost points) */
                                                 int     dir,  /*!< The spatial dimension along which the derivative is computed */
                                                 void    *s,   /*!< Solver object of type #HyPar */
-                                                void    *m    /*!< MPI object of type #MPIVariables */
+                                                void    *m,   /*!< MPI object of type #MPIVariables */
                                                 int     ndims,/*!< Number of spatial/coordinate dimensions */
                                                 int     *dim  /*!< Local dimensions */
                                               )
