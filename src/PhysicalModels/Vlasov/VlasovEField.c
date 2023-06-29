@@ -1,5 +1,5 @@
 /*! @file VlasovEField.c
-    @author John Loffeld
+    @author John Loffeld, Ping-Hsuan Tsai
     @brief Contains the function to compute the electric field
 */
 
@@ -117,16 +117,21 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
   int  ghosts = solver->ghosts;
   int  ndims  = solver->ndims;
 
-  double       *sum_buffer     = param->sum_buffer;
-  double       *field          = param->e_field;
-  fftw_complex *phys_buffer    = param->phys_buffer;
-  fftw_complex *fourier_buffer = param->fourier_buffer;
-  fftw_plan     plan_forward   = param->plan_forward;
-  fftw_plan     plan_backward  = param->plan_backward;
-  ptrdiff_t     local_ni       = param->local_ni;
-  ptrdiff_t     local_i_start  = param->local_i_start;
-  ptrdiff_t     local_no       = param->local_no;
-  ptrdiff_t     local_o_start  = param->local_o_start;
+  double       *sum_buffer       = param->sum_buffer;
+  double       *field            = param->e_field;
+  fftw_complex *phys_buffer_e    = param->phys_buffer_e;
+  fftw_complex *fourier_buffer_e = param->fourier_buffer_e;
+  fftw_plan     plan_forward_e   = param->plan_forward_e;
+  fftw_plan     plan_backward_e  = param->plan_backward_e;
+  ptrdiff_t     local_ni         = param->local_ni;
+  ptrdiff_t     local_i_start    = param->local_i_start;
+  ptrdiff_t     local_no         = param->local_no;
+  ptrdiff_t     local_o_start    = param->local_o_start;
+
+  fftw_complex *phys_buffer_phi    = param->phys_buffer_phi;
+  fftw_complex *fourier_buffer_phi = param->fourier_buffer_phi;
+  fftw_plan     plan_forward_phi   = param->plan_forward_phi;
+  fftw_plan     plan_backward_phi  = param->plan_backward_phi;
 
   int index[ndims], bounds[ndims], bounds_noghost[ndims], offset[ndims];
 
@@ -164,7 +169,7 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
     MPISum_double(&sum_buffer[i], &sum_buffer[i], 1, &mpi->comm[1]);
   }
 
-  // Find the average velocity over all x
+  // Find the average density over all x
   double average_velocity = 0.0;
   for (int i = 0; i < dim[0]; i++) {
     average_velocity += sum_buffer[i];
@@ -174,44 +179,74 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
 
   // Copy velocity-integrated values into complex-valued FFTW buffer
   for (int i = 0; i < dim[0]; i++) {
-    phys_buffer[i][0] = sum_buffer[i] - average_velocity;
-    phys_buffer[i][1] = 0.0;
+    phys_buffer_e[i][0] = sum_buffer[i] - average_velocity;
+    phys_buffer_e[i][1] = 0.0;
   }
 
   // Execute the FFT
   MPI_Barrier(mpi->comm[0]);
-  fftw_execute(plan_forward);
+  fftw_execute(plan_forward_e);
   MPI_Barrier(mpi->comm[0]);
 
   // Simultaneously do a Poisson solve and take derivative in frequency space
   int freq_start = 0;
   if (local_o_start == 0) {
     freq_start = 1;
-    fourier_buffer[0][0] = 0.0;
-    fourier_buffer[0][1] = 0.0;
+    fourier_buffer_e[0][0] = 0.0;
+    fourier_buffer_e[0][1] = 0.0;
   }
+
+  // Simultaneously do a Poisson solve in frequency space
+  int freq_start_phi = 0;
+  if (local_o_start == 0) {
+    freq_start_phi = 1;
+    fourier_buffer_phi[0][0] = 0.0;
+    fourier_buffer_phi[0][1] = 0.0;
+  }
+
+  for (int i = freq_start_phi; i < local_no; i++) {
+    double freq_num = FFTFreqNum(i + local_o_start, N);
+    double thek = freq_num;
+    // Swapping values is due to multiplication by i
+    fourier_buffer_phi[i][0] = fourier_buffer_e[i][0] / (thek*thek);
+    fourier_buffer_phi[i][1] = fourier_buffer_e[i][1]/ (thek*thek);
+  }
+
 
   for (int i = freq_start; i < local_no; i++) {
     double freq_num = FFTFreqNum(i + local_o_start, N);
     double thek = freq_num;
-    double temp = fourier_buffer[i][0];
+    double temp = fourier_buffer_e[i][0];
     // Swapping values is due to multiplication by i
-    fourier_buffer[i][0] = - fourier_buffer[i][1] / thek;
-    fourier_buffer[i][1] = temp / thek;
+    fourier_buffer_e[i][0] = - fourier_buffer_e[i][1] / thek;
+    fourier_buffer_e[i][1] = temp / thek;
   }
 
   // Do an inverse Fourier transform to get back physical solved values
   MPI_Barrier(mpi->comm[0]);
-  fftw_execute(plan_backward);
+  fftw_execute(plan_backward_e);
   MPI_Barrier(mpi->comm[0]);
 
-  // copy the solved electric field into the velocity buffer
+  // Do an inverse Fourier transform to get back physical solved values
+  MPI_Barrier(mpi->comm[0]);
+  fftw_execute(plan_backward_phi);
+  MPI_Barrier(mpi->comm[0]);
+
+  // copy the solved electric field into the e buffer
   for (int i = 0; i < dim[0]; i++) {
-    param->e_field[i + ghosts] = - phys_buffer[i][0] / (double) N;
+    param->e_field[i + ghosts] = - phys_buffer_e[i][0] / (double) N;
   }
 
-  // Do halo exchange on the field
+  // copy the solved potential field into the potential buffer
+  for (int i = 0; i < dim[0]; i++) {
+    param->potential[i + ghosts] = phys_buffer_phi[i][0] / (double) N;
+  }
+
+  // Do halo exchange on the e
   MPIExchangeBoundaries1D(mpi, param->e_field, dim[0], ghosts, 0, ndims);
+
+  // Do halo exchange on the potential
+  MPIExchangeBoundaries1D(mpi, param->potential, dim[0], ghosts, 0, ndims);
 
 #endif
 

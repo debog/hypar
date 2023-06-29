@@ -24,8 +24,8 @@ int VlasovAdvection (double*,double*,int,void*,double);
 /*! Compute the upwind flux at interfaces */
 int VlasovUpwind (double*,double*,double*,double*,
                   double*,double*,int,void*,double);
-/*! Write self-consistent E-field to file */
-int VlasovWriteEField (void*, void*);
+/*! Write E-field and potential to file */
+int VlasovWriteEFieldAndPotential(void*, void*);
 
 int VlasovPreStep(double*,void*,void*,double);
 int VlasovPostStage(double*,void*,void*,double);
@@ -145,6 +145,9 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
      note that number of electric field components is the number of
      spatial dimensions */
   physics->e_field = (double*) calloc(  physics->npts_local_x_wghosts
+                                      * physics->ndims_x,
+                                        sizeof(double)  );
+  physics->potential = (double*) calloc(  physics->npts_local_x_wghosts
                                       * physics->ndims_x, 
                                         sizeof(double)  );
   
@@ -184,19 +187,36 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
       return(1);
     }
   
-    physics->phys_buffer = fftw_alloc_complex(physics->alloc_local);
-    physics->fourier_buffer = fftw_alloc_complex(physics->alloc_local);
-  
-    physics->plan_forward = fftw_mpi_plan_dft_1d(dim_global[0],
-                                                 physics->phys_buffer,
-                                                 physics->fourier_buffer,
+    physics->phys_buffer_e = fftw_alloc_complex(physics->alloc_local);
+    physics->fourier_buffer_e = fftw_alloc_complex(physics->alloc_local);
+
+    physics->plan_forward_e = fftw_mpi_plan_dft_1d(dim_global[0],
+                                                 physics->phys_buffer_e,
+                                                 physics->fourier_buffer_e,
                                                  mpi->comm[0],
                                                  FFTW_FORWARD,
                                                  FFTW_ESTIMATE);
-  
-    physics->plan_backward = fftw_mpi_plan_dft_1d(dim_global[0],
-                                                  physics->fourier_buffer,
-                                                  physics->phys_buffer,
+
+    physics->plan_backward_e = fftw_mpi_plan_dft_1d(dim_global[0],
+                                                  physics->fourier_buffer_e,
+                                                  physics->phys_buffer_e,
+                                                  mpi->comm[0],
+                                                  FFTW_BACKWARD,
+                                                  FFTW_ESTIMATE);
+
+    physics->phys_buffer_phi = fftw_alloc_complex(physics->alloc_local);
+    physics->fourier_buffer_phi = fftw_alloc_complex(physics->alloc_local);
+
+    physics->plan_forward_phi = fftw_mpi_plan_dft_1d(dim_global[0],
+                                                 physics->phys_buffer_phi,
+                                                 physics->fourier_buffer_phi,
+                                                 mpi->comm[0],
+                                                 FFTW_FORWARD,
+                                                 FFTW_ESTIMATE);
+
+    physics->plan_backward_phi = fftw_mpi_plan_dft_1d(dim_global[0],
+                                                  physics->fourier_buffer_phi,
+                                                  physics->phys_buffer_phi,
                                                   mpi->comm[0],
                                                   FFTW_BACKWARD,
                                                   FFTW_ESTIMATE);
@@ -212,7 +232,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   solver->ComputeCFL    = VlasovComputeCFL;
   solver->FFunction     = VlasovAdvection;
   solver->Upwind        = VlasovUpwind;
-  solver->PhysicsOutput = VlasovWriteEField;
+  solver->PhysicsOutput = VlasovWriteEFieldAndPotential;
   solver->PostStage     = VlasovPostStage;
 
   int ierr = VlasovEField(solver->u, solver, 0.0);

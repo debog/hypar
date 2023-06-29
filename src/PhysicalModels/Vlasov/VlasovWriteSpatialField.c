@@ -1,6 +1,6 @@
-/*! @file VlasovWriteEField.c
-    @author Debojyoti Ghosh
-    @brief Write out the electric field to file
+/*! @file VlasovWriteSpatialField.c
+    @author Ping-Hsuan Tsai
+    @brief Write out the field to file
 */
 
 #include <stdlib.h>
@@ -14,10 +14,15 @@
 #include <hypar.h>
 #include <physicalmodels/vlasov.h>
 
-/*! Write out the electric field to file */
-int VlasovWriteEField( void* s, /*!< Solver object of type #HyPar */
-                       void* m  /*!< MPI object of type #MPIVariables */
-                     )
+/*! Write out a spatial field or variable to file */
+int VlasovWriteSpatialField( void   *s,         /*!< Solver object of type #HyPar */
+                             void   *m,         /*!< MPI object of type #MPIVariables */
+                             double *a_field,   /*!< Vector field to write */
+                             char   *fname_root /*!< Filename root (extension is added automatically). 
+                                                      For unsteady output, a numerical index is added 
+                                                      that is the same as for the solution 
+                                                      output files. */
+                            )
 {
   HyPar         *solver = (HyPar*)        s;
   MPIVariables  *mpi    = (MPIVariables*) m;
@@ -25,7 +30,6 @@ int VlasovWriteEField( void* s, /*!< Solver object of type #HyPar */
 
   if (!solver->WriteOutput) return 0;
 
-  char fname_root[_MAX_STRING_SIZE_] = "efield";
   if (solver->nsims > 1) {
     char index[_MAX_STRING_SIZE_];
     GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
@@ -74,21 +78,21 @@ int VlasovWriteEField( void* s, /*!< Solver object of type #HyPar */
   }
 
   /* gather the field into a global array */
-  double *e_field_g;
+  double *field_g;
   {
     int size_g = param->npts_global_x * param->ndims_x;
-    e_field_g = (double*) calloc (size_g, sizeof(double));
-    _ArraySetValue_(e_field_g, size_g, 0.0);
+    field_g = (double*) calloc (size_g, sizeof(double));
+    _ArraySetValue_(field_g, size_g, 0.0);
 
     if (param->ndims_x > 1) {
       if (!mpi->rank) {
-        fprintf(stderr,"Warning in VlasovWriteEField():\n");
-        fprintf(stderr,"  E-field writing not yet supported for >1 spatial dimensions.\n");
+        fprintf(stderr,"Warning in VlasovWriteSpatialField():\n");
+        fprintf(stderr,"  field writing not yet supported for >1 spatial dimensions.\n");
       }
     } else {
       IERR MPIGatherArray1D(  mpi,
-                              (mpi->rank ? NULL : e_field_g),
-                              (param->e_field+ghosts),
+                              (mpi->rank ? NULL : field_g),
+                              (a_field+ghosts),
                               mpi->is[0],
                               mpi->ie[0],
                               solver->dim_local[0],
@@ -102,14 +106,14 @@ int VlasovWriteEField( void* s, /*!< Solver object of type #HyPar */
                 1,
                 dim_global_x,
                 xg,
-                e_field_g,
+                field_g,
                 filename,
                 idx );
   }
 
   /* free up arrays */
   free(xg);
-  free(e_field_g);
+  free(field_g);
 
   return 0;
 }
