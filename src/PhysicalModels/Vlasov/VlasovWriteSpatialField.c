@@ -14,12 +14,14 @@
 #include <hypar.h>
 #include <physicalmodels/vlasov.h>
 
-/*! Write out the field to file */
-int VlasovWriteSpatialField( void* s,         /*!< Solver object of type #HyPar */
-                             void* m,         /*!< MPI object of type #MPIVariables */
-                             double* a_field, /*!< Vector field to write */
-                             char* fname_root /*!< Filename root (extension is added automatically). For unsteady output,
-                                              a numerical index is added that is the same as for the solution output files. */
+/*! Write out a spatial field or variable to file */
+int VlasovWriteSpatialField( void   *s,         /*!< Solver object of type #HyPar */
+                             void   *m,         /*!< MPI object of type #MPIVariables */
+                             double *a_field,   /*!< Vector field to write */
+                             char   *fname_root /*!< Filename root (extension is added automatically). 
+                                                      For unsteady output, a numerical index is added 
+                                                      that is the same as for the solution 
+                                                      output files. */
                             )
 {
   HyPar         *solver = (HyPar*)        s;
