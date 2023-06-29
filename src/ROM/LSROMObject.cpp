@@ -45,8 +45,8 @@ extern "C" int  CalculateROMDiff(void*,void*);
 extern "C" void ResetFilenameIndex(char*, int); /*!< Reset filename index */
 extern "C" void IncrementFilenameIndex(char*,int);
 extern "C" int  VlasovWriteSpatialField(void*, void*, double*, char*);
-extern "C" int FirstDerivativeSecondOrderCentralNoGhosts (double*,double*,int,int,void*,void*);
-extern "C" int SecondDerivativeSecondOrderCentralNoGhosts (double*,double*,int,void*,void*);
+extern "C" int FirstDerivativeSecondOrderCentralNoGhosts (double*,double*,int,int,void*,void*,int,int*);
+extern "C" int SecondDerivativeSecondOrderCentralNoGhosts (double*,double*,int,void*,void*,int,int*);
 extern "C" int VlasovAdvection_x(double*,double*,int,void*,double);
 extern "C" int HyperbolicFunction_1dir (double*,double*,void*,void*,double,int,
                                         int(*)(double*,double*,int,void*,double),
@@ -330,7 +330,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 //  }
 //  std::cout << std::endl;
 //}
-  ::SecondDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),param->potential,0,&(sim[0].solver),&(sim[0].mpi));
+  ::SecondDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),param->potential,0,&(sim[0].solver),&(sim[0].mpi),1,&(param->npts_local_x));
   MPIExchangeBoundaries1D(mpi, vec_x_wghosts.data(), solver->dim_local[0], solver->ghosts, 0, solver->ndims);
 //if (!m_rank) {
 //  std::cout << "checking - nabla phi (ghosts)\n";
@@ -1524,7 +1524,7 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
                 idx.data(),
                 sim[0].solver.nvars);
 
-    ::SecondDerivativeSecondOrderCentralNoGhosts(rhs_wghosts.data(),vec_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi));
+    ::SecondDerivativeSecondOrderCentralNoGhosts(rhs_wghosts.data(),vec_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi),1,&(param->npts_local_x));
 
     ArrayCopynD(1,
                 rhs_wghosts.data(),
@@ -1784,7 +1784,7 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
                 index.data(),
                 sim[0].solver.nvars);
 
-    ::SecondDerivativeSecondOrderCentralNoGhosts(lap_snap_wghosts.data(),snap_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi));
+    ::SecondDerivativeSecondOrderCentralNoGhosts(lap_snap_wghosts.data(),snap_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi),1,&(param->npts_local_x));
     _ArrayScale1D_(lap_snap_wghosts,-1.0*(solver->dxinv[0])*(solver->dxinv[0]),param->npts_local_x_wghosts);
 //  std::cout << "Checking laplacian of snap: ";
 //  for (int i = 0; i < param->npts_local_x_wghosts ; i++) {
@@ -1818,7 +1818,7 @@ void LSROMObject::CheckLaplaceProjError(void* a_s)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
-    ::SecondDerivativeSecondOrderCentralNoGhosts(lap_snapproj_wghosts.data(),snapproj_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi));
+    ::SecondDerivativeSecondOrderCentralNoGhosts(lap_snapproj_wghosts.data(),snapproj_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi),1,&(param->npts_local_x));
     _ArrayScale1D_(lap_snapproj_wghosts,-1.0*(solver->dxinv[0])*(solver->dxinv[0]),param->npts_local_x_wghosts);
     ArrayCopynD(1,
                 lap_snapproj_wghosts.data(),
@@ -2186,7 +2186,7 @@ void LSROMObject::ConstructEBasis(void* a_s)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
-    ::FirstDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),basis_vec_wghosts.data(),0,1,&(sim[0].solver),&(sim[0].mpi));
+    ::FirstDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),basis_vec_wghosts.data(),0,1,&(sim[0].solver),&(sim[0].mpi),1,&(param->npts_local_x));
     _ArrayScale1D_(vec_x_wghosts,-1.0*(solver->dxinv[0]),param->npts_local_x_wghosts)
 
     ArrayCopynD(1,
