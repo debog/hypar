@@ -9,4 +9,4 @@ libVlasov_a_SOURCES = \
   VlasovInitialize.c \
   VlasovUpwind.c \
   VlasovWriteSpatialField.c \
-	VlasovWriteEField.c
+	VlasovWriteEFieldAndPotential.c
