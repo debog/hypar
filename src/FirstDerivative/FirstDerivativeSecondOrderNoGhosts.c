@@ -8,12 +8,6 @@
 #include <basic.h>
 #include <arrayfunctions.h>
 #include <firstderivative.h>
-#include <physicalmodels/vlasov.h>
-
-#include <mpivars.h>
-#include <hypar.h>
-typedef MPIVariables  MPIContext;
-typedef HyPar         SolverContext;
 
 #ifdef with_omp
 #include <omp.h>
@@ -28,33 +22,26 @@ typedef HyPar         SolverContext;
     \n\n
     Notes:
     + The first derivative is computed at the grid points or the cell centers.
-    + The first derivative is computed at the ghost points too. Thus, biased schemes are used
-      at and near the boundaries.
     + \b Df and \b f are 1D arrays containing the function and its computed derivatives on a multi-
       dimensional grid. The derivative along the specified dimension \b dir is computed by looping
       through all grid lines along \b dir.
+    + \b Df and \b f must have the same number of ghost points (including the case with 0 ghost points).
     + Biased stencils are used at the boundary and ghost point values are not used. So this function can be used
       when the ghost values are not filled.
 */
 int FirstDerivativeSecondOrderCentralNoGhosts(
-                                                double  *Df,  /*!< Array to hold the computed first derivative (with ghost points) */
-                                                double  *f,   /*!< Array containing the grid point function values whose first 
-                                                                   derivative is to be computed (with ghost points) */
-                                                int     dir,  /*!< The spatial dimension along which the derivative is computed */
-                                                int     bias, /*!< Forward or backward differencing for non-central 
-                                                                   finite-difference schemes (-1: backward, 1: forward)*/
-                                                void    *s,   /*!< Solver object of type #SolverContext */
-                                                void    *m,   /*!< MPI object of type #MPIContext */
-                                                int     ndims,/*!< Number of spatial/coordinate dimensions */
-                                                int     *dim  /*!< Local dimensions */
-                                              )
+                                                double  *Df,    /*!< Array to hold the computed first derivative (with ghost points) */
+                                                double  *f,     /*!< Array containing the grid point function values whose first 
+                                                                     derivative is to be computed (with ghost points) */
+                                                int     dir,    /*!< The spatial dimension along which the derivative is computed */
+                                                int     bias,   /*!< Forward or backward differencing for non-central 
+                                                                     finite-difference schemes (-1: backward, 1: forward)*/
+                                                int     ndims,  /*!< Number of spatial/coordinate dimensions */
+                                                int     *dim,   /*!< Local dimensions */
+                                                int     ghosts, /*!< Number of ghost points */
+                                                int     nvars   /*!< Number of vector components at each grid points */ )
 {
-  SolverContext *solver = (SolverContext*) s;
-  Vlasov *param  = (Vlasov*) solver->physics;
-  int           i, j, v;
-
-  int ghosts = solver->ghosts;
-  int nvars  = solver->nvars;
+  int  i, j, v;
 
   if ((!Df) || (!f)) {
     fprintf(stderr, "Error in FirstDerivativeSecondOrder(): input arrays not allocated.\n");
@@ -71,24 +58,33 @@ int FirstDerivativeSecondOrderCentralNoGhosts(
   for (j=0; j<N_outer; j++) {
     _ArrayIndexnD_(ndims,j,bounds_outer,index_outer,0);
     _ArrayCopy1D_(index_outer,indexC,ndims);
-    /* interior */
-    for (i = 0; i < dim[dir]; i++) {
-      int qC, qL, qR;
-      int qR2, qL2;
-      indexC[dir] = i-2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL2);
-      indexC[dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL);
+    /* left boundary */
+    {
+      i = 0;
+      int qC, qR, qR2;
       indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
       indexC[dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR);
       indexC[dir] = i+2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR2);
-      if (i==0) {
-        for (v=0; v<nvars; v++)  Df[qC*nvars+v] = (-0.5*f[qR2*nvars+v]+2*f[qR*nvars+v]-1.5*f[qC*nvars+v]);
-      } else if (i==dim[dir]-1) {
-        for (v=0; v<nvars; v++)  Df[qC*nvars+v] = (0.5*f[qL2*nvars+v]-2*f[qL*nvars+v]+1.5*f[qC*nvars+v]);
-      } else {
-        for (v=0; v<nvars; v++)  Df[qC*nvars+v] = 0.5 * (f[qR*nvars+v]-f[qL*nvars+v]);
-      }
+      for (v=0; v<nvars; v++)  Df[qC*nvars+v] = (-0.5*f[qR2*nvars+v]+2*f[qR*nvars+v]-1.5*f[qC*nvars+v]);
+    }
+    /* interior */
+    for (i = 1; i < dim[dir]-1; i++) {
+      int qC, qL, qR;
+      indexC[dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL);
+      indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
+      indexC[dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR);
+      for (v=0; v<nvars; v++)  Df[qC*nvars+v] = 0.5 * (f[qR*nvars+v]-f[qL*nvars+v]);
+    }
+    /* right boundary */
+    {
+      i = dim[dir] - 1;
+      int qC, qL, qL2;
+      indexC[dir] = i-2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL2);
+      indexC[dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL);
+      indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
+      for (v=0; v<nvars; v++)  Df[qC*nvars+v] = (0.5*f[qL2*nvars+v]-2*f[qL*nvars+v]+1.5*f[qC*nvars+v]);
     }
   }
   
-  return(0);
+  return 0;
 }
