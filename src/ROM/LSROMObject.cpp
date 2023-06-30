@@ -303,6 +303,25 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       m_ls_is_trained.push_back(false);
       m_intervals.push_back( Interval(a_time, m_t_final) );
       bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+      ArrayCopynD(1,
+                  param->potential,
+                  vec_wghosts.data(),
+                  sim[0].solver.dim_local,
+                  sim[0].solver.ghosts,
+                  0,
+                  index.data(),
+                  sim[0].solver.nvars);
+      bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+
+      ArrayCopynD(1,
+                  param->e_field,
+                  vec_wghosts.data(),
+                  sim[0].solver.dim_local,
+                  sim[0].solver.ghosts,
+                  0,
+                  index.data(),
+                  sim[0].solver.nvars);
+      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
       if (!m_rank) {
         printf( "LSROMObject::takeSample() - creating new generator object for sim. domain %d, var %d, t=%f (total: %d).\n",
                 m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
