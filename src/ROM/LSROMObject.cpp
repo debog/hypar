@@ -283,6 +283,31 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                 index.data(),
                 sim[0].solver.nvars);
     bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+
+    if (m_tic%m_num_window_samples == 0) {
+
+      m_intervals[m_curr_win].second = a_time;
+      int ncol = m_generator[m_curr_win]->getSnapshotMatrix()->numColumns();
+      if (!m_rank) {
+        printf( "LSROMObject::train() - training LS object %d for sim. domain %d, var %d with %d samples.\n",
+                m_curr_win, m_sim_idx, m_var_idx, ncol );
+      }
+      m_ls_is_trained[m_curr_win] = true;
+      m_curr_win++;
+      m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
+      m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisName));
+      m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+      m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName));
+      m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+      m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
+      m_ls_is_trained.push_back(false);
+      m_intervals.push_back( Interval(a_time, m_t_final) );
+      bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+      if (!m_rank) {
+        printf( "LSROMObject::takeSample() - creating new generator object for sim. domain %d, var %d, t=%f (total: %d).\n",
+                m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
+      }
+    }
   }
 //if (!m_rank) {
 //  std::cout << "checking potential field\n";
