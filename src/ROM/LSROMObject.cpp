@@ -432,8 +432,8 @@ void LSROMObject::train(void* a_s)
         }
         m_S  = m_generator[i]->getSingularValues();
 
-        OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
-        ConstructROMHy(a_s, m_generator[0]->getSpatialBasis());
+//      OutputROMBasis(a_s, m_generator[0]->getSpatialBasis());
+        ConstructROMHy(a_s, m_generator[i]->getSpatialBasis());
         CheckSolProjError(a_s);
         CheckHyProjError(a_s);
 
@@ -444,9 +444,9 @@ void LSROMObject::train(void* a_s)
                                             true,
                                             true);
         m_S_phi = m_generator_phi[i]->getSingularValues();
-        OutputROMBasisPhi(a_s, m_generator_phi[0]->getSpatialBasis());
-        ConstructPotentialROMRhs(a_s, m_generator[0]->getSpatialBasis(), m_generator_phi[0]->getSpatialBasis());
-        ConstructPotentialROMLaplace(a_s, m_generator_phi[0]->getSpatialBasis());
+        OutputROMBasisPhi(a_s, m_generator_phi[i]->getSpatialBasis());
+        ConstructPotentialROMRhs(a_s, m_generator[i]->getSpatialBasis(), m_generator_phi[i]->getSpatialBasis());
+        ConstructPotentialROMLaplace(a_s, m_generator_phi[i]->getSpatialBasis());
 
         CheckPotentialProjError(a_s);
         CheckLaplaceProjError(a_s);
@@ -468,32 +468,32 @@ void LSROMObject::train(void* a_s)
 //                                  solver->Upwind );
 //      ::VlasovAdvection_x( solver->hyp, m_snapshots->getColumn(0)->getData(),
 //                           0, solver, 0);
-        ConstructROMHy_x(a_s, m_generator[0]->getSpatialBasis());
-        ConstructROMHy_v(a_s, m_generator[0]->getSpatialBasis(), m_basis_e);
-        exit(0);
+        ConstructROMHy_x(a_s, m_generator[i]->getSpatialBasis());
+        ConstructROMHy_v(a_s, m_generator[i]->getSpatialBasis(), m_basis_e);
+//      exit(0);
 
+      }
+      if (!m_rank) {
+        std::cout << "----------------\n";
+        std::cout << "Singular Values of f: ";
+        for (int i = 0; i < m_S->dim(); i++) {
+              std::cout << (m_S->item(i)) << " ";
+        }
+        std::cout << "\n";
+        std::cout << std::endl;
+      }
+      if (!m_rank) {
+        std::cout << "----------------\n";
+        std::cout << "Singular Values for potential: ";
+        for (int i = 0; i < m_S_phi->dim(); i++) {
+              std::cout << (m_S_phi->item(i)) << " ";
+        }
+        std::cout << "\n";
+        std::cout << std::endl;
       }
     }
   } else {
     printf("ERROR in LSROMObject::train(): m_generator is of size zero!");
-  }
-  if (!m_rank) {
-    std::cout << "----------------\n";
-    std::cout << "Singular Values of f: ";
-    for (int i = 0; i < m_S->dim(); i++) {
-          std::cout << (m_S->item(i)) << " ";
-    }
-    std::cout << "\n";
-    std::cout << std::endl;
-  }
-  if (!m_rank) {
-    std::cout << "----------------\n";
-    std::cout << "Singular Values for potential: ";
-    for (int i = 0; i < m_S_phi->dim(); i++) {
-          std::cout << (m_S_phi->item(i)) << " ";
-    }
-    std::cout << "\n";
-    std::cout << std::endl;
   }
 
   return;
@@ -629,6 +629,7 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   HyPar  *solver = (HyPar*) &(sim[0].solver);
   Vlasov *param  = (Vlasov*) solver->physics;
   MPIVariables *mpi = (MPIVariables *) param->m;
+
   std::vector<int> index(sim[0].solver.ndims);
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
@@ -721,7 +722,6 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
         m_contract2->item(i) = m_contract1->inner_product(m_tmpsol);
       }
       m_Udot[stage] = m_romwork->plus(m_contract2);
-      printf("Done tensor contraction\n");
 //
 //    m_e = m_basis_e->mult(m_tmpsol);
 
