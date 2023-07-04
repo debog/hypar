@@ -464,14 +464,17 @@ void LSROMObject::train(void* a_s)
         CheckLaplaceProjError(a_s,i);
         CheckRhsProjError(a_s,i);
 
-//      m_snapshots_e.pushback(new CAROM::Matrix(
-//                             m_generator_e[i]->getSnapshotMatrix()->getData(),
-//                             m_generator_e[i]->getSnapshotMatrix()->numRows(),
-//                             m_generator_e[i]->getSnapshotMatrix()->numColumns(),
-//                             true,
-//                             true));
-//      ConstructEBasis(a_s);
-//      CheckEProjError(a_s);
+        m_snapshots_e.push_back(new CAROM::Matrix(
+                               m_generator_e[i]->getSnapshotMatrix()->getData(),
+                               m_generator_e[i]->getSnapshotMatrix()->numRows(),
+                               m_generator_e[i]->getSnapshotMatrix()->numColumns(),
+                               true,
+                               true));
+        m_basis_e.push_back(new CAROM::Matrix(
+                            m_generator_phi[i]->getSpatialBasis()->numRows(),
+                            m_rdim_phi, true));
+        ConstructEBasis(a_s,i);
+        CheckEProjError(a_s,i);
 //      solver->HyperbolicFunction( solver->hyp,
 //                                  m_snapshots->getColumn(0)->getData(),
 //                                  solver,
@@ -483,7 +486,7 @@ void LSROMObject::train(void* a_s)
 //      ::VlasovAdvection_x( solver->hyp, m_snapshots->getColumn(0)->getData(),
 //                           0, solver, 0);
         ConstructROMHy_x(a_s, m_generator[i]->getSpatialBasis());
-        ConstructROMHy_v(a_s, m_generator[i]->getSpatialBasis(), m_basis_e);
+        ConstructROMHy_v(a_s, m_generator[i]->getSpatialBasis(), m_basis_e[i]);
 //      exit(0);
 
       }
@@ -2158,12 +2161,12 @@ void LSROMObject::CheckEProjError(void* a_s, int idx)
   std::vector<int> index(sim[0].solver.ndims);
 
   int num_rows = m_generator_phi[idx]->getSpatialBasis()->numRows();
-  int num_cols = m_snapshots_e->numColumns();
+  int num_cols = m_snapshots_e[idx]->numColumns();
   CAROM::Vector* recon_caromvec;
 
   for (int j = 0; j < num_cols; j++){
     ArrayCopynD(1,
-                m_snapshots_e->getColumn(j)->getData(),
+                m_snapshots_e[idx]->getColumn(j)->getData(),
                 snap_wghosts.data(),
                 sim[0].solver.dim_local,
                 0,
@@ -2171,8 +2174,9 @@ void LSROMObject::CheckEProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
 
-    projectInitialSolution_phi(*(m_snapshots_phi[idx]->getColumn(j)));
-    recon_caromvec = m_basis_e->mult(m_projected_init_phi[idx]);
+//  projectInitialSolution_phi(*(m_snapshots_phi[idx]->getColumn(j)));
+    m_projected_init_phi[idx] = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_generator_phi[idx]->getSpatialBasis(), m_rdim_phi);
+    recon_caromvec = m_basis_e[idx]->mult(m_projected_init_phi[idx]);
     ArrayCopynD(1,
                 recon_caromvec->getData(),
                 vec_x_wghosts.data(),
@@ -2254,8 +2258,6 @@ void LSROMObject::ConstructEBasis(void* a_s,int idx)
   int num_rows = m_generator_phi[idx]->getSpatialBasis()->numRows();
   double* vec_noghosts = (double*) calloc(num_rows, sizeof(double));
 
-  m_basis_e = new CAROM::Matrix(num_rows, m_rdim_phi, true);
-
   for (int j = 0; j < m_rdim_phi; j++){
     ArrayCopynD(1,
                 m_generator_phi[idx]->getSpatialBasis()->getColumn(j)->getData(),
@@ -2277,7 +2279,7 @@ void LSROMObject::ConstructEBasis(void* a_s,int idx)
                 index.data(),
                 sim[0].solver.nvars);
     for (int i = 0; i < num_rows; i++) {
-      (*m_basis_e)(i, j) = vec_noghosts[i];
+      (*m_basis_e[idx])(i, j) = vec_noghosts[i];
     }
 
   }

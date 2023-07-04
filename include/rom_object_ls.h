@@ -207,8 +207,8 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::Options*> m_options_e; /*!< Vector of Options objects */
     std::vector<CAROM::BasisGenerator*> m_generator_e; /*!< Vector of BasisGenerator objects */
     std::vector<CAROM::Vector*> m_projected_init_e; /*!< Vector of Vector objects */
-    CAROM::Matrix* m_snapshots_e; /*!< Snapshot Matrix */
-    CAROM::Matrix* m_basis_e; /*!< Basis Matrix */
+    std::vector<CAROM::Matrix*> m_snapshots_e; /*!< Snapshot Matrix */
+    std::vector<CAROM::Matrix*> m_basis_e; /*!< Basis Matrix */
 
     CAROM::Matrix* m_romhyperb_x; /*!< Reduced Hyperbolic Term Matrix */
     std::vector<CAROM::Matrix*> m_romhyperb_v; /*!< Reduced Hyperbolic Term Matrix */
