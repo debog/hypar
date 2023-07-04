@@ -108,11 +108,11 @@ class LSROMObject : public ROMObject
     /* Construct reduced laplace operator for potential */
     void ConstructPotentialROMLaplace(void*, const CAROM::Matrix*);
 
-    void CheckPotentialProjError(void*);
+    void CheckPotentialProjError(void*,int);
 
-    void CheckLaplaceProjError(void*);
+    void CheckLaplaceProjError(void*,int);
 
-    void CheckRhsProjError(void*);
+    void CheckRhsProjError(void*,int);
 
     int CalSnapROMDiff_phi(void*, void*, double*, double*, char*);
 
@@ -122,12 +122,12 @@ class LSROMObject : public ROMObject
     /*! Evaluate Rhs */
     void EvaluatePotentialRhs(void*, CAROM::Vector*, double*);
 
-    void CheckEProjError(void*);
+    void CheckEProjError(void*,int);
 
     /* Dump ROM basis phi */
-    void OutputROMBasisPhi(void*, const CAROM::Matrix*);
+    void OutputROMBasisPhi(void*, const CAROM::Matrix*,int);
 
-    void ConstructEBasis(void*);
+    void ConstructEBasis(void*,int);
 
     /* Construct reduced hyperbolic operator in x direction */
     void ConstructROMHy_x(void*, const CAROM::Matrix*);
@@ -198,7 +198,7 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::Options*> m_options_phi; /*!< Vector of Options objects */
     std::vector<CAROM::BasisGenerator*> m_generator_phi; /*!< Vector of BasisGenerator objects */
     std::vector<CAROM::Vector*> m_projected_init_phi; /*!< Vector of Vector objects */
-    CAROM::Matrix* m_snapshots_phi; /*!< Snapshot Matrix */
+    std::vector<CAROM::Matrix*> m_snapshots_phi; /*!< Snapshot Matrix */
     const CAROM::Vector* m_S_phi; /*!< Vector of Singular value */
     CAROM::Matrix* m_romrhs_phi; /*!< Reduced Hyperbolic Term Matrix */
     CAROM::Matrix* m_romlaplace_phi; /*!< Reduced Hyperbolic Term Matrix */
