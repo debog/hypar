@@ -230,84 +230,43 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
     char buffer[] = "sample";  // Creates a modifiable buffer and copies the string literal
-    OutputlibROMfield(m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData(),
-                      sim[0],
-                      buffer);
+//  OutputlibROMfield(m_generator[m_curr_win]->getSnapshotMatrix()->getColumn(0)->getData(),
+//                    sim[0],
+//                    buffer);
 
-    m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
-    m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName));
-    ArrayCopynD(1,
-                param->potential,
-                vec_wghosts.data(),
-                sim[0].solver.dim_local,
-                sim[0].solver.ghosts,
-                0,
-                index.data(),
-                sim[0].solver.nvars);
-    bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+    if (m_solve_phi) {
+      m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+      m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName));
+      ArrayCopynD(1,
+                  param->potential,
+                  vec_wghosts.data(),
+                  sim[0].solver.dim_local,
+                  sim[0].solver.ghosts,
+                  0,
+                  index.data(),
+                  sim[0].solver.nvars);
+      bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
 
-    m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
-    m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
-    ArrayCopynD(1,
-                param->e_field,
-                vec_wghosts.data(),
-                sim[0].solver.dim_local,
-                sim[0].solver.ghosts,
-                0,
-                index.data(),
-                sim[0].solver.nvars);
-    bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+      m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+      m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
+      ArrayCopynD(1,
+                  param->e_field,
+                  vec_wghosts.data(),
+                  sim[0].solver.dim_local,
+                  sim[0].solver.ghosts,
+                  0,
+                  index.data(),
+                  sim[0].solver.nvars);
+      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+    }
   } else {
 
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
     char buffer[] = "sample";  // Creates a modifiable buffer and copies the string literal
-    OutputlibROMfield(m_generator[0]->getSnapshotMatrix()->getColumn(m_tic)->getData(),
-                      sim[0],
-                      buffer);
-    ArrayCopynD(1,
-                param->potential,
-                vec_wghosts.data(),
-                sim[0].solver.dim_local,
-                sim[0].solver.ghosts,
-                0,
-                index.data(),
-                sim[0].solver.nvars);
-    bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
-
-    ArrayCopynD(1,
-                param->e_field,
-                vec_wghosts.data(),
-                sim[0].solver.dim_local,
-                sim[0].solver.ghosts,
-                0,
-                index.data(),
-                sim[0].solver.nvars);
-    bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
-
-    if (m_tic%m_num_window_samples == 0) {
-
-      m_intervals[m_curr_win].second = a_time;
-      int ncol = m_generator[m_curr_win]->getSnapshotMatrix()->numColumns();
-      if (!m_rank) {
-        printf( "LSROMObject::train() - training LS object %d for sim. domain %d, var %d with %d samples.\n",
-                m_curr_win, m_sim_idx, m_var_idx, ncol );
-      }
-      m_ls_is_trained[m_curr_win] = false;
-      m_curr_win++;
-
-      m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
-      m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisName));
-
-      m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
-      m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName));
-
-      m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
-      m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
-      m_ls_is_trained.push_back(false);
-
-      m_intervals.push_back( Interval(a_time, m_t_final) );
-
-      bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+//  OutputlibROMfield(m_generator[m_curr_win]->getSnapshotMatrix()->getColumn(0)->getData(),
+//                    sim[0],
+//                    buffer);
+    if (m_solve_phi) {
       ArrayCopynD(1,
                   param->potential,
                   vec_wghosts.data(),
@@ -327,6 +286,53 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                   index.data(),
                   sim[0].solver.nvars);
       bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+    }
+
+    if (m_tic%m_num_window_samples == 0) {
+
+      m_intervals[m_curr_win].second = a_time;
+      int ncol = m_generator[m_curr_win]->getSnapshotMatrix()->numColumns();
+      if (!m_rank) {
+        printf( "LSROMObject::train() - training LS object %d for sim. domain %d, var %d with %d samples.\n",
+                m_curr_win, m_sim_idx, m_var_idx, ncol );
+      }
+      m_ls_is_trained[m_curr_win] = false;
+      m_curr_win++;
+
+      m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
+      m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisName));
+      if (m_solve_phi) {
+        m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+        m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName));
+
+        m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+        m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
+
+        bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+        ArrayCopynD(1,
+                    param->potential,
+                    vec_wghosts.data(),
+                    sim[0].solver.dim_local,
+                    sim[0].solver.ghosts,
+                    0,
+                    index.data(),
+                    sim[0].solver.nvars);
+        bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+
+        ArrayCopynD(1,
+                    param->e_field,
+                    vec_wghosts.data(),
+                    sim[0].solver.dim_local,
+                    sim[0].solver.ghosts,
+                    0,
+                    index.data(),
+                    sim[0].solver.nvars);
+        bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+      }
+
+      m_ls_is_trained.push_back(false);
+      m_intervals.push_back( Interval(a_time, m_t_final) );
+
       if (!m_rank) {
         printf( "LSROMObject::takeSample() - creating new generator object for sim. domain %d, var %d, t=%f (total: %d).\n",
                 m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
@@ -442,51 +448,54 @@ void LSROMObject::train(void* a_s)
         m_S  = m_generator[i]->getSingularValues();
 
         OutputROMBasis(a_s, m_generator[i]->getSpatialBasis(),i);
-        ConstructROMHy(a_s, m_generator[i]->getSpatialBasis());
+        m_romhyperb.push_back(new CAROM::Matrix(m_rdim,m_rdim,true));
+        ConstructROMHy(a_s, m_generator[i]->getSpatialBasis(),i);
         CheckSolProjError(a_s,i);
         CheckHyProjError(a_s,i);
 
 //      printf("checking dimension of potential snapshot matrix:%d %d\n",m_generator_phi[i]->getSnapshotMatrix()->numRows(),m_generator_phi[i]->getSnapshotMatrix()->numColumns());
-        m_projected_init_phi.push_back(new CAROM::Vector(m_rdim_phi, false));
-        m_snapshots_phi.push_back(new CAROM::Matrix(
-                                 m_generator_phi[i]->getSnapshotMatrix()->getData(),
-                                 m_generator_phi[i]->getSnapshotMatrix()->numRows(),
-                                 m_generator_phi[i]->getSnapshotMatrix()->numColumns(),
+        if (m_solve_phi) {
+          m_projected_init_phi.push_back(new CAROM::Vector(m_rdim_phi, false));
+          m_snapshots_phi.push_back(new CAROM::Matrix(
+                                   m_generator_phi[i]->getSnapshotMatrix()->getData(),
+                                   m_generator_phi[i]->getSnapshotMatrix()->numRows(),
+                                   m_generator_phi[i]->getSnapshotMatrix()->numColumns(),
+                                   true,
+                                   true));
+
+          m_S_phi = m_generator_phi[i]->getSingularValues();
+          OutputROMBasisPhi(a_s, m_generator_phi[i]->getSpatialBasis(),i);
+          ConstructPotentialROMRhs(a_s, m_generator[i]->getSpatialBasis(), m_generator_phi[i]->getSpatialBasis());
+          ConstructPotentialROMLaplace(a_s, m_generator_phi[i]->getSpatialBasis());
+
+          CheckPotentialProjError(a_s,i);
+          CheckLaplaceProjError(a_s,i);
+          CheckRhsProjError(a_s,i);
+
+          m_snapshots_e.push_back(new CAROM::Matrix(
+                                 m_generator_e[i]->getSnapshotMatrix()->getData(),
+                                 m_generator_e[i]->getSnapshotMatrix()->numRows(),
+                                 m_generator_e[i]->getSnapshotMatrix()->numColumns(),
                                  true,
                                  true));
-
-        m_S_phi = m_generator_phi[i]->getSingularValues();
-        OutputROMBasisPhi(a_s, m_generator_phi[i]->getSpatialBasis(),i);
-        ConstructPotentialROMRhs(a_s, m_generator[i]->getSpatialBasis(), m_generator_phi[i]->getSpatialBasis());
-        ConstructPotentialROMLaplace(a_s, m_generator_phi[i]->getSpatialBasis());
-
-        CheckPotentialProjError(a_s,i);
-        CheckLaplaceProjError(a_s,i);
-        CheckRhsProjError(a_s,i);
-
-        m_snapshots_e.push_back(new CAROM::Matrix(
-                               m_generator_e[i]->getSnapshotMatrix()->getData(),
-                               m_generator_e[i]->getSnapshotMatrix()->numRows(),
-                               m_generator_e[i]->getSnapshotMatrix()->numColumns(),
-                               true,
-                               true));
-        m_basis_e.push_back(new CAROM::Matrix(
-                            m_generator_phi[i]->getSpatialBasis()->numRows(),
-                            m_rdim_phi, true));
-        ConstructEBasis(a_s,i);
-        CheckEProjError(a_s,i);
-//      solver->HyperbolicFunction( solver->hyp,
-//                                  m_snapshots->getColumn(0)->getData(),
-//                                  solver,
-//                                  mpi,
-//                                  0,
-//                                  1,
-//                                  solver->FFunction,
-//                                  solver->Upwind );
-//      ::VlasovAdvection_x( solver->hyp, m_snapshots->getColumn(0)->getData(),
-//                           0, solver, 0);
-        ConstructROMHy_x(a_s, m_generator[i]->getSpatialBasis());
-        ConstructROMHy_v(a_s, m_generator[i]->getSpatialBasis(), m_basis_e[i]);
+          m_basis_e.push_back(new CAROM::Matrix(
+                              m_generator_phi[i]->getSpatialBasis()->numRows(),
+                              m_rdim_phi, true));
+          ConstructEBasis(a_s,i);
+          CheckEProjError(a_s,i);
+//        solver->HyperbolicFunction( solver->hyp,
+//                                    m_snapshots->getColumn(0)->getData(),
+//                                    solver,
+//                                    mpi,
+//                                    0,
+//                                    1,
+//                                    solver->FFunction,
+//                                    solver->Upwind );
+//        ::VlasovAdvection_x( solver->hyp, m_snapshots->getColumn(0)->getData(),
+//                             0, solver, 0);
+          ConstructROMHy_x(a_s, m_generator[i]->getSpatialBasis());
+          ConstructROMHy_v(a_s, m_generator[i]->getSpatialBasis(), m_basis_e[i]);
+        }
 //      exit(0);
 
       }
@@ -499,14 +508,16 @@ void LSROMObject::train(void* a_s)
         std::cout << "\n";
         std::cout << std::endl;
       }
-      if (!m_rank) {
-        std::cout << "----------------\n";
-        std::cout << "Singular Values for potential: ";
-        for (int i = 0; i < m_S_phi->dim(); i++) {
-              std::cout << (m_S_phi->item(i)) << " ";
+      if (m_solve_phi) {
+        if (!m_rank) {
+          std::cout << "----------------\n";
+          std::cout << "Singular Values for potential: ";
+          for (int i = 0; i < m_S_phi->dim(); i++) {
+                std::cout << (m_S_phi->item(i)) << " ";
+          }
+          std::cout << "\n";
+          std::cout << std::endl;
         }
-        std::cout << "\n";
-        std::cout << std::endl;
       }
     }
   } else {
