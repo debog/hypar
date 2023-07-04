@@ -292,16 +292,21 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
         printf( "LSROMObject::train() - training LS object %d for sim. domain %d, var %d with %d samples.\n",
                 m_curr_win, m_sim_idx, m_var_idx, ncol );
       }
-      m_ls_is_trained[m_curr_win] = true;
+      m_ls_is_trained[m_curr_win] = false;
       m_curr_win++;
+
       m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
       m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisName));
+
       m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
       m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName));
+
       m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
       m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
       m_ls_is_trained.push_back(false);
+
       m_intervals.push_back( Interval(a_time, m_t_final) );
+
       bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
       ArrayCopynD(1,
                   param->potential,
