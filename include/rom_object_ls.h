@@ -94,13 +94,13 @@ class LSROMObject : public ROMObject
     void ConstructROMHy(void*, const CAROM::Matrix*);
 
     /* Dump ROM basis */
-    void OutputROMBasis(void*, const CAROM::Matrix*);
+    void OutputROMBasis(void*, const CAROM::Matrix*,int);
 
     int CalSnapROMDiff(void*, void*, double*, double*, char*);
 
-    void CheckSolProjError(void*);
+    void CheckSolProjError(void*,int);
 
-    void CheckHyProjError(void*);
+    void CheckHyProjError(void*,int);
 
     /* Construct reduced rhs operator for potential */
     void ConstructPotentialROMRhs(void*, const CAROM::Matrix*, const CAROM::Matrix*);
@@ -143,7 +143,7 @@ class LSROMObject : public ROMObject
     CAROM::Vector* m_romcoef; /*!< Vector of rom coefficients */
     CAROM::Vector* m_romhycoef; /*!< Vector of rom coefficients */
     CAROM::Vector* m_recon; /*!< Vector of rom coefficients */
-    CAROM::Matrix* m_snapshots; /*!< Snapshot Matrix */
+    std::vector<CAROM::Matrix*> m_snapshots; /*!< Snapshot Matrix */
     CAROM::Matrix* m_romhyperb; /*!< Reduced Hyperbolic Term Matrix */
 
     std::vector<bool> m_ls_is_trained; /*!< Flag to indicate if LS is trained */
