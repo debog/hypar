@@ -182,7 +182,7 @@ void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U /*!< solution vect
   /* Assumming m_generator[i]->getSpatialBasis() is called before */
   if (m_generator.size() == 0) {
     if (!m_rank) {
-      printf("ERROR in LSROMObject::projectInitialSolution() - m_ls is a vector of size 0.\n");
+      printf("ERROR in LSROMObject::projectInitialSolution() - m_generator is a vector of size 0.\n");
     }
     return;
   }
