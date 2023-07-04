@@ -91,7 +91,7 @@ class LSROMObject : public ROMObject
     int TimeRK(const double, void* );
 
     /* Construct reduced hyperbolic operator */
-    void ConstructROMHy(void*, const CAROM::Matrix*);
+    void ConstructROMHy(void*, const CAROM::Matrix*,int);
 
     /* Dump ROM basis */
     void OutputROMBasis(void*, const CAROM::Matrix*,int);
@@ -144,7 +144,7 @@ class LSROMObject : public ROMObject
     CAROM::Vector* m_romhycoef; /*!< Vector of rom coefficients */
     CAROM::Vector* m_recon; /*!< Vector of rom coefficients */
     std::vector<CAROM::Matrix*> m_snapshots; /*!< Snapshot Matrix */
-    CAROM::Matrix* m_romhyperb; /*!< Reduced Hyperbolic Term Matrix */
+    std::vector<CAROM::Matrix*> m_romhyperb; /*!< Reduced Hyperbolic Term Matrix */
 
     std::vector<bool> m_ls_is_trained; /*!< Flag to indicate if LS is trained */
     std::vector<Interval> m_intervals; /*!< Time intervals for each LS object */
