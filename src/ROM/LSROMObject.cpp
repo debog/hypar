@@ -69,11 +69,16 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_options.clear();
   m_generator.clear();
   m_projected_init.clear();
+  m_snapshots.clear();
+  m_romhyperb.clear();
 
   /* precomputation idea */
   m_options_phi.clear();
   m_generator_phi.clear();
   m_projected_init_phi.clear();
+  m_snapshots_phi.clear();
+  m_snapshots_e.clear();
+  m_basis_e.clear();
 
   m_ls_is_trained.clear();
   m_intervals.clear();
