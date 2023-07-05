@@ -103,10 +103,10 @@ class LSROMObject : public ROMObject
     void CheckHyProjError(void*,int);
 
     /* Construct reduced rhs operator for potential */
-    void ConstructPotentialROMRhs(void*, const CAROM::Matrix*, const CAROM::Matrix*);
+    void ConstructPotentialROMRhs(void*, const CAROM::Matrix*, const CAROM::Matrix*, int);
 
     /* Construct reduced laplace operator for potential */
-    void ConstructPotentialROMLaplace(void*, const CAROM::Matrix*);
+    void ConstructPotentialROMLaplace(void*, const CAROM::Matrix*, int);
 
     void CheckPotentialProjError(void*,int);
 
@@ -139,12 +139,12 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
     std::vector<CAROM::BasisGenerator*> m_generator; /*!< Vector of BasisGenerator objects */
     std::vector<CAROM::Vector*> m_projected_init; /*!< Vector of Vector objects */
+    std::vector<CAROM::Matrix*> m_snapshots; /*!< Snapshot Matrix */
+    std::vector<CAROM::Matrix*> m_romhyperb; /*!< Reduced Hyperbolic Term Matrix */
     const CAROM::Vector* m_S; /*!< Vector of Singular value */
     CAROM::Vector* m_romcoef; /*!< Vector of rom coefficients */
     CAROM::Vector* m_romhycoef; /*!< Vector of rom coefficients */
     CAROM::Vector* m_recon; /*!< Vector of rom coefficients */
-    std::vector<CAROM::Matrix*> m_snapshots; /*!< Snapshot Matrix */
-    std::vector<CAROM::Matrix*> m_romhyperb; /*!< Reduced Hyperbolic Term Matrix */
 
     std::vector<bool> m_ls_is_trained; /*!< Flag to indicate if LS is trained */
     std::vector<Interval> m_intervals; /*!< Time intervals for each LS object */
@@ -199,9 +199,9 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::BasisGenerator*> m_generator_phi; /*!< Vector of BasisGenerator objects */
     std::vector<CAROM::Vector*> m_projected_init_phi; /*!< Vector of Vector objects */
     std::vector<CAROM::Matrix*> m_snapshots_phi; /*!< Snapshot Matrix */
+    std::vector<CAROM::Matrix*> m_romrhs_phi; /*!< Reduced Hyperbolic Term Matrix */
+    std::vector<CAROM::Matrix*> m_romlaplace_phi; /*!< Reduced Hyperbolic Term Matrix */
     const CAROM::Vector* m_S_phi; /*!< Vector of Singular value */
-    CAROM::Matrix* m_romrhs_phi; /*!< Reduced Hyperbolic Term Matrix */
-    CAROM::Matrix* m_romlaplace_phi; /*!< Reduced Hyperbolic Term Matrix */
 
     /* Below for verify projection error in E*/
     std::vector<CAROM::Options*> m_options_e; /*!< Vector of Options objects */

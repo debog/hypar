@@ -470,8 +470,12 @@ void LSROMObject::train(void* a_s)
 
           m_S_phi = m_generator_phi[i]->getSingularValues();
           OutputROMBasisPhi(a_s, m_generator_phi[i]->getSpatialBasis(),i);
-          ConstructPotentialROMRhs(a_s, m_generator[i]->getSpatialBasis(), m_generator_phi[i]->getSpatialBasis());
-          ConstructPotentialROMLaplace(a_s, m_generator_phi[i]->getSpatialBasis());
+
+          m_romrhs_phi.push_back(new CAROM::Matrix(m_rdim_phi,m_rdim,true));
+          ConstructPotentialROMRhs(a_s, m_generator[i]->getSpatialBasis(), m_generator_phi[i]->getSpatialBasis(),i);
+
+          m_romlaplace_phi.push_back(new CAROM::Matrix(m_rdim_phi,m_rdim_phi,true));
+          ConstructPotentialROMLaplace(a_s, m_generator_phi[i]->getSpatialBasis(),i);
 
           CheckPotentialProjError(a_s,i);
           CheckLaplaceProjError(a_s,i);
@@ -1509,7 +1513,7 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
 }
 
 /*! Construct potential ROM rhs */
-void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rombasis_f, const CAROM::Matrix* a_rombasis_phi)
+void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rombasis_f, const CAROM::Matrix* a_rombasis_phi, int idx)
 {
   SimulationObject* sim = (SimulationObject*) a_s;
   HyPar  *solver = (HyPar*) &(sim[0].solver);
@@ -1555,15 +1559,15 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rom
                         sim[0].solver.index_length );
 
   // construct rhs = basis_phi^T integral_basis_f
-  m_romrhs_phi=a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(integral_basis_f);
+  m_romrhs_phi[idx]=a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(integral_basis_f);
   printf("f %d %d\n",a_rombasis_f->numRows(),a_rombasis_f->numColumns());
   printf("integral_basis_f %d %d\n",integral_basis_f->numRows(),integral_basis_f->numColumns());
-  printf("m_romrhs_phi %d %d\n",m_romrhs_phi->numRows(),m_romrhs_phi->numColumns());
+  printf("m_romrhs_phi %d %d\n",m_romrhs_phi[idx]->numRows(),m_romrhs_phi[idx]->numColumns());
   if (!m_rank) {
     std::cout << "Checking Potential ROM Rhs: \n";
-    for (int i = 0; i < m_romrhs_phi->numRows(); i++) {
-      for (int j = 0; j < m_romrhs_phi->numColumns(); j++) {
-          std::cout << (m_romrhs_phi->item(i,j)) << " ";
+    for (int i = 0; i < m_romrhs_phi[idx]->numRows(); i++) {
+      for (int j = 0; j < m_romrhs_phi[idx]->numColumns(); j++) {
+          std::cout << (m_romrhs_phi[idx]->item(i,j)) << " ";
       }
     }
     std::cout << std::endl;
@@ -1574,7 +1578,7 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rom
 }
 
 /*! Construct potential ROM laplacian */
-void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a_rombasis_phi)
+void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a_rombasis_phi, int idx)
 {
   SimulationObject* sim = (SimulationObject*) a_s;
   HyPar  *solver = (HyPar*) &(sim[0].solver);
@@ -1596,7 +1600,7 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
 
   std::vector<double> vec_wghosts(param->npts_local_x_wghosts);
   std::vector<double> rhs_wghosts(param->npts_local_x_wghosts);
-  std::vector<int> idx(sim[0].solver.ndims);
+  std::vector<int> index(sim[0].solver.ndims);
 
   printf("a_rombasis_phi %d %d\n",a_rombasis_phi->numRows(),a_rombasis_phi->numColumns());
 
@@ -1612,7 +1616,7 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
                 sim[0].solver.dim_local,
                 0,
                 sim[0].solver.ghosts,
-                idx.data(),
+                index.data(),
                 sim[0].solver.nvars);
 
     ::SecondDerivativeSecondOrderCentralNoGhosts(rhs_wghosts.data(),vec_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi),1,&(param->npts_local_x));
@@ -1623,7 +1627,7 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
                 sim[0].solver.dim_local,
                 sim[0].solver.ghosts,
                 0,
-                idx.data(),
+                index.data(),
                 sim[0].solver.nvars);
 
     /* Copy \int basis_f dv back to columns of integral_basis_f matrix */
@@ -1633,18 +1637,18 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
   }
 
   // construct rhs = basis_phi^T integral_basis_f
-  m_romlaplace_phi=a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(laplace_phi);
-  printf("m_romlaplace_phi %d %d\n",m_romlaplace_phi->numRows(),m_romlaplace_phi->numColumns());
+  m_romlaplace_phi[idx]=a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(laplace_phi);
+  printf("m_romlaplace_phi %d %d\n",m_romlaplace_phi[idx]->numRows(),m_romlaplace_phi[idx]->numColumns());
   if (!m_rank) {
     std::cout << "Checking Potential ROM Laplace: \n";
-    for (int i = 0; i < m_romlaplace_phi->numRows(); i++) {
-      for (int j = 0; j < m_romlaplace_phi->numColumns(); j++) {
-          std::cout << (m_romlaplace_phi->item(i,j)) << " ";
+    for (int i = 0; i < m_romlaplace_phi[idx]->numRows(); i++) {
+      for (int j = 0; j < m_romlaplace_phi[idx]->numColumns(); j++) {
+          std::cout << (m_romlaplace_phi[idx]->item(i,j)) << " ";
       }
     }
     std::cout << std::endl;
   }
-  m_romlaplace_phi->inverse();
+  m_romlaplace_phi[idx]->inverse();
 //if (!m_rank) {
 //  std::cout << "Checking Potential ROM inverse Laplace: \n";
 //  for (int i = 0; i < m_romlaplace_phi->numRows(); i++) {
@@ -1888,7 +1892,7 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
     /* project snapshot onto reduced space */
 //  projectInitialSolution_phi(*(m_snapshots_phi->getColumn(j)));
     m_projected_init_phi[idx] = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_generator_phi[idx]->getSpatialBasis(), m_rdim_phi);
-    lap_reduced = m_romlaplace_phi->mult(m_projected_init_phi[idx]);
+    lap_reduced = m_romlaplace_phi[idx]->mult(m_projected_init_phi[idx]);
     recon_lap = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(lap_reduced);
     ArrayCopynD(1,
                 recon_lap->getData(),
@@ -2129,7 +2133,7 @@ void LSROMObject::CheckRhsProjError(void* a_s, int idx)
     /* Check 2 */
 //  projectInitialSolution(*(m_snapshots[0]->getColumn(j)));
     m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_generator[idx]->getSpatialBasis(), m_rdim);
-    rhs_reduced = m_romrhs_phi->mult(m_projected_init[idx]);
+    rhs_reduced = m_romrhs_phi[idx]->mult(m_projected_init[idx]);
     recon_rhs = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(rhs_reduced);
     ArrayCopynD(1,
                 recon_rhs->getData(),
@@ -2239,7 +2243,7 @@ void LSROMObject::OutputROMBasisPhi(void* a_s, const CAROM::Matrix* a_rombasis, 
     char buffer[] = "basis_phi";
     char fbuffer[100];
     sprintf(fbuffer, "%s_%d",buffer,idx);
-//  ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),vec_wghosts.data(),buffer);
+    ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),vec_wghosts.data(),fbuffer);
 
     /* increment the index string, if required */
     if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
