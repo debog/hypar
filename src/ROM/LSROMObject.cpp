@@ -502,8 +502,10 @@ void LSROMObject::train(void* a_s)
 //                                    solver->Upwind );
 //        ::VlasovAdvection_x( solver->hyp, m_snapshots->getColumn(0)->getData(),
 //                             0, solver, 0);
-          ConstructROMHy_x(a_s, m_generator[i]->getSpatialBasis());
-          ConstructROMHy_v(a_s, m_generator[i]->getSpatialBasis(), m_basis_e[i]);
+          m_romhyperb_x.push_back(new CAROM::Matrix(m_rdim,m_rdim,true));
+          ConstructROMHy_x(a_s, m_generator[i]->getSpatialBasis(),i);
+          m_romhyperb_v.push_back(std::vector<CAROM::Matrix*>());
+          ConstructROMHy_v(a_s, m_generator[i]->getSpatialBasis(), m_basis_e[i],i);
         }
 //      exit(0);
 
@@ -2305,7 +2307,7 @@ void LSROMObject::ConstructEBasis(void* a_s,int idx)
 }
 
 /*! Construct reduced hyperbolic operator in x direction */
-void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis)
+void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis, int idx)
 {
   SimulationObject* sim = (SimulationObject*) a_s;
   HyPar  *solver = (HyPar*) &(sim[0].solver);
@@ -2399,15 +2401,16 @@ void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis)
   }
 
   // construct hyper_ROM = phi^T phi_hyper
-  m_romhyperb_x=a_rombasis->getFirstNColumns(m_rdim)->transposeMult(phi_hyper_x);
-  printf("m_romhyperb_x %d %d\n",m_romhyperb_x->numRows(),m_romhyperb_x->numColumns());
+  m_romhyperb_x[idx]=a_rombasis->getFirstNColumns(m_rdim)->transposeMult(phi_hyper_x);
+  printf("m_romhyperb_x %d %d\n",m_romhyperb_x[idx]->numRows(),m_romhyperb_x[idx]->numColumns());
+
   delete phi_hyper_x;
 
   return;
 }
 
 /*! Construct reduced hyperbolic tensor in v direction */
-void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, const CAROM::Matrix* a_rombasis_phi)
+void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, const CAROM::Matrix* a_rombasis_phi, int idx)
 {
   SimulationObject* sim = (SimulationObject*) a_s;
   HyPar  *solver = (HyPar*) &(sim[0].solver);
@@ -2426,7 +2429,7 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
 
   for (int i = 0; i < m_rdim; i++) {
 
-    m_romhyperb_v.push_back(new CAROM::Matrix(m_rdim_phi, m_rdim, true));
+    m_romhyperb_v[idx].push_back(new CAROM::Matrix(m_rdim_phi, m_rdim, true));
     for (int j = 0; j < m_rdim_phi; j++) {
 
       for (int k = 0; k < m_rdim; k++) {
@@ -2474,11 +2477,11 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
                     index.data(),
                     sim[0].solver.nvars);
 
-        (*m_romhyperb_v[i])(j, k) = a_rombasis->getColumn(i)->inner_product(phi_hyper_col);
+        (*(m_romhyperb_v[idx])[i])(j, k) = a_rombasis->getColumn(i)->inner_product(phi_hyper_col);
 //      printf("checking m_romhyperb_v %d %d %f\n",j,k,(*m_romhyperb_v[i])(j, k));
       }
     }
-    printf("matrix size %d %d\n",m_romhyperb_v[i]->numRows(),m_romhyperb_v[i]->numColumns());
+    printf("matrix size %d %d\n",m_romhyperb_v[idx][i]->numRows(),m_romhyperb_v[idx][i]->numColumns());
   }
     printf("i size %d\n",m_romhyperb_v.size());
 
