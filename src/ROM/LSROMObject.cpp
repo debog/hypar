@@ -348,63 +348,9 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       }
     }
   }
-//if (!m_rank) {
-//  std::cout << "checking potential field\n";
-//  for (int i = 0; i < param->npts_local_x_wghosts; i++) {
-//        std::cout << "Index " << i << ": " << param->potential[i] << std::endl;
-//  }
-//  std::cout << std::endl;
-//}
-//if (!m_rank) {
-//  std::cout << "checking e field\n";
-//  for (int i = 0; i < param->npts_local_x_wghosts; i++) {
-//        std::cout << "Index " << i << ": " << param->e_field[i] << std::endl;
-//  }
-//  std::cout << std::endl;
-//}
   if (!m_rank) {
-    std::cout << "checking e field (no ghosts) \n";
-    for (int i = 0; i < vec_wghosts.size(); i++) {
-          std::cout << "Index " << i << ": " << vec_wghosts[i] << std::endl;
-    }
-    std::cout << std::endl;
+    printf("checking m_tic %d\n",m_tic);
   }
-  ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),param->potential);
-  ::FirstDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),param->potential,0,1,&(sim[0].solver),&(sim[0].mpi));
-  MPIExchangeBoundaries1D(mpi, vec_x_wghosts.data(), solver->dim_local[0], solver->ghosts, 0, solver->ndims);
-  if (!m_rank) {
-    std::cout << "checking grad phi (ghosts)\n";
-    for (int i = 0; i < vec_x_wghosts.size(); i++) {
-          std::cout << "Index " << i << ": " << -vec_x_wghosts[i]*solver->dxinv[0] << std::endl;
-    }
-    std::cout << std::endl;
-  }
-  ArrayCopynD(1,
-              vec_x_wghosts.data(),
-              vec_wghosts.data(),
-              sim[0].solver.dim_local,
-              sim[0].solver.ghosts,
-              0,
-              index.data(),
-              sim[0].solver.nvars);
-//if (!m_rank) {
-//  std::cout << "checking -grad phi (no ghosts)\n";
-//  for (int i = 0; i < vec_wghosts.size(); i++) {
-//        std::cout << "Index " << i << ": " << -vec_wghosts[i]*solver->dxinv[0] << std::endl;
-//  }
-//  std::cout << std::endl;
-//}
-  ::SecondDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),param->potential,0,&(sim[0].solver),&(sim[0].mpi),1,&(param->npts_local_x));
-  MPIExchangeBoundaries1D(mpi, vec_x_wghosts.data(), solver->dim_local[0], solver->ghosts, 0, solver->ndims);
-//if (!m_rank) {
-//  std::cout << "checking - nabla phi (ghosts)\n";
-//  for (int i = 0; i < vec_x_wghosts.size(); i++) {
-//        std::cout << "Index " << i << ": " << -vec_x_wghosts[i]*(solver->dxinv[0])*(solver->dxinv[0])<< std::endl;
-//  }
-//  std::cout << std::endl;
-//}
-//exit (0);
-  printf("checking m_tic %d\n",m_tic);
 
   m_tic++;
   return;
