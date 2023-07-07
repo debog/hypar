@@ -442,16 +442,7 @@ void LSROMObject::train(void* a_s)
                               m_rdim_phi, true));
           ConstructEBasis(a_s,i);
           CheckEProjError(a_s,i);
-//        solver->HyperbolicFunction( solver->hyp,
-//                                    m_snapshots->getColumn(0)->getData(),
-//                                    solver,
-//                                    mpi,
-//                                    0,
-//                                    1,
-//                                    solver->FFunction,
-//                                    solver->Upwind );
-//        ::VlasovAdvection_x( solver->hyp, m_snapshots->getColumn(0)->getData(),
-//                             0, solver, 0);
+
           m_romhyperb_x.push_back(new CAROM::Matrix(m_rdim,m_rdim,true));
           ConstructROMHy_x(a_s, m_generator[i]->getSpatialBasis(),i);
           m_romhyperb_v.push_back(std::vector<CAROM::Matrix*>());
