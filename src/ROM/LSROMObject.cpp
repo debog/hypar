@@ -527,23 +527,15 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
         TimeInitialize();
       } else {
         if ((m_snap[i]==0) && (i>0)) {
-          printf("Time to do projection\n");
           m_fomwork = ReconlibROMfield(m_romcoef, m_generator[i-1]->getSpatialBasis(), m_rdim);
           m_romcoef = ProjectToRB(m_fomwork,m_generator[i]->getSpatialBasis(), m_rdim);
         }
-  if (!m_rank) {
-    std::cout << "Checking coefficient before TimeRK: ";
-    for (int j = 0; j < m_rdim; j++) {
-          std::cout << m_romcoef->item(j) << " ";
-    }
-    std::cout << std::endl;
-  }
         TimeRK(a_t,a_s,i);
       }
       if ((m_snap[i] < sim[0].solver.n_iter) && (m_snap[i] % m_sampling_freq == 0)){
         int idx;
         idx = m_snap[i]/m_sampling_freq;
-        printf("idx %d m_snap %d m_sampling_freq %d \n",idx,m_snap[i],m_sampling_freq);
+        if (!m_rank) printf("idx %d m_snap %d m_sampling_freq %d \n",idx,m_snap[i],m_sampling_freq);
         m_fomwork = ReconlibROMfield(m_romcoef, m_generator[i]->getSpatialBasis(), m_rdim);
         ArrayCopynD(sim[0].solver.ndims,
                     m_fomwork->getData(),
@@ -563,7 +555,11 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
                     sim[0].solver.nvars);
         char buffer[] = "reproderr";  // Creates a modifiable buffer and copies the string literal
         CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),vec_wghosts.data(),buffer);
-        printf("Reconstructive error at # %d snapshot, %.15f %.15f %.15f \n",idx,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+        if (!m_rank) printf("Reconstructive error at # %d snapshot, %.15f %.15f %.15f \n",
+                            idx,
+                            sim[0].solver.rom_diff_norms[0],
+                            sim[0].solver.rom_diff_norms[1],
+                            sim[0].solver.rom_diff_norms[2]);
       }
       m_snap[i]++;
       return ReconlibROMfield(m_romcoef, m_generator[i]->getSpatialBasis(), m_rdim);
@@ -1136,19 +1132,13 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis, int
   }
 
   // construct hyper_ROM = phi^T phi_hyper
-  printf("phi %d %d\n",a_rombasis->numRows(),a_rombasis->numColumns());
-  printf("phi_hyper %d %d\n",phi_hyper->numRows(),phi_hyper->numColumns());
   m_romhyperb[idx]=a_rombasis->getFirstNColumns(m_rdim)->transposeMult(phi_hyper);
-  printf("m_romhyperb %d %d\n",m_romhyperb[idx]->numRows(),m_romhyperb[idx]->numColumns());
-//if (!m_rank) {
-//  std::cout << "Checking ROM hyperbolic operator: \n";
-//  for (int i = 0; i < m_romhyperb->numRows(); i++) {
-//    for (int j = 0; j < m_romhyperb->numColumns(); j++) {
-//        std::cout << (m_romhyperb->item(i,j)) << " ";
-//    }
-//  }
-//  std::cout << std::endl;
-//}
+  if (!m_rank){
+    printf("phi %d %d\n",a_rombasis->numRows(),a_rombasis->numColumns());
+    printf("phi_hyper %d %d\n",phi_hyper->numRows(),phi_hyper->numColumns());
+    if (!m_rank) printf("m_romhyperb %d %d\n",m_romhyperb[idx]->numRows(),m_romhyperb[idx]->numColumns());
+  }
+
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
   delete phi_hyper;
@@ -1310,6 +1300,14 @@ void LSROMObject::CheckSolProjError(void* a_s, int idx)
   for (int j = 0; j < num_cols; j++){
 //  projectInitialSolution(*(m_snapshots[idx]->getColumn(j)));
     m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_generator[idx]->getSpatialBasis(), m_rdim);
+    if (!m_rank) {
+      printf("%d m_project size %d\n",idx,m_projected_init[idx]->dim());
+      std::cout << "Checking projected coefficients: ";
+      for (int j = 0; j < m_projected_init[idx]->dim(); j++) {
+            std::cout << (m_projected_init[idx]->item(j)) << " ";
+      }
+      std::cout << std::endl;
+    }
     /* Extend reduced basis \phi_j with ghost points */
     ArrayCopynD(sim[0].solver.ndims,
                 m_snapshots[idx]->getColumn(j)->getData(),
@@ -1335,7 +1333,11 @@ void LSROMObject::CheckSolProjError(void* a_s, int idx)
       if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
         ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
       }
-      printf("#%d snapshot projection error, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+      if (!m_rank) printf("#%d snapshot projection error, %.15f %.15f %.15f \n",
+                          j,
+                          sim[0].solver.rom_diff_norms[0],
+                          sim[0].solver.rom_diff_norms[1],
+                          sim[0].solver.rom_diff_norms[2]);
   }
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
@@ -1416,7 +1418,11 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
 
     char buffer[] = "hyprojerr";  // Creates a modifiable buffer and copies the string literal
     CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),snapproj_wghosts.data(),buffer);
-    printf("F(#%d snapshot) projection error (simply project), %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+    if (!m_rank) printf("F(#%d snapshot) projection error (simply project), %.15f %.15f %.15f \n",
+                        j,
+                        sim[0].solver.rom_diff_norms[0],
+                        sim[0].solver.rom_diff_norms[1],
+                        sim[0].solver.rom_diff_norms[2]);
 
     /* Check 3 */
     m_working=m_romhyperb[idx]->mult(m_projected_init[idx]);
@@ -1461,7 +1467,12 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
 //                    fname_buffer3);
 //
     CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),snapproj_wghosts.data(),buffer);
-    printf("F(#%d snapshot) projection error (reduced), %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+    if (!m_rank) printf("F(#%d snapshot) projection error (reduced), %.15f %.15f %.15f \n",
+                        j,
+                        sim[0].solver.rom_diff_norms[0],
+                        sim[0].solver.rom_diff_norms[1],
+                        sim[0].solver.rom_diff_norms[2]);
+
     /* increment the index string, if required */
     if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
       ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
@@ -1521,17 +1532,17 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rom
 
   // construct rhs = basis_phi^T integral_basis_f
   m_romrhs_phi[idx]=a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(integral_basis_f);
-  printf("f %d %d\n",a_rombasis_f->numRows(),a_rombasis_f->numColumns());
-  printf("integral_basis_f %d %d\n",integral_basis_f->numRows(),integral_basis_f->numColumns());
-  printf("m_romrhs_phi %d %d\n",m_romrhs_phi[idx]->numRows(),m_romrhs_phi[idx]->numColumns());
   if (!m_rank) {
-    std::cout << "Checking Potential ROM Rhs: \n";
-    for (int i = 0; i < m_romrhs_phi[idx]->numRows(); i++) {
-      for (int j = 0; j < m_romrhs_phi[idx]->numColumns(); j++) {
-          std::cout << (m_romrhs_phi[idx]->item(i,j)) << " ";
-      }
-    }
-    std::cout << std::endl;
+    printf("f %d %d\n",a_rombasis_f->numRows(),a_rombasis_f->numColumns());
+    printf("integral_basis_f %d %d\n",integral_basis_f->numRows(),integral_basis_f->numColumns());
+    printf("m_romrhs_phi %d %d\n",m_romrhs_phi[idx]->numRows(),m_romrhs_phi[idx]->numColumns());
+//  std::cout << "Checking Potential ROM Rhs: \n";
+//  for (int i = 0; i < m_romrhs_phi[idx]->numRows(); i++) {
+//    for (int j = 0; j < m_romrhs_phi[idx]->numColumns(); j++) {
+//        std::cout << (m_romrhs_phi[idx]->item(i,j)) << " ";
+//    }
+//  }
+//  std::cout << std::endl;
   }
   free(int_f);
   delete integral_basis_f;
@@ -1562,8 +1573,6 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
   std::vector<double> vec_wghosts(param->npts_local_x_wghosts);
   std::vector<double> rhs_wghosts(param->npts_local_x_wghosts);
   std::vector<int> index(sim[0].solver.ndims);
-
-  printf("a_rombasis_phi %d %d\n",a_rombasis_phi->numRows(),a_rombasis_phi->numColumns());
 
   /* Integrate f reduced basis over velocity */
   CAROM::Matrix* laplace_phi;
@@ -1599,15 +1608,15 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
 
   // construct rhs = basis_phi^T integral_basis_f
   m_romlaplace_phi[idx]=a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(laplace_phi);
-  printf("m_romlaplace_phi %d %d\n",m_romlaplace_phi[idx]->numRows(),m_romlaplace_phi[idx]->numColumns());
   if (!m_rank) {
-    std::cout << "Checking Potential ROM Laplace: \n";
-    for (int i = 0; i < m_romlaplace_phi[idx]->numRows(); i++) {
-      for (int j = 0; j < m_romlaplace_phi[idx]->numColumns(); j++) {
-          std::cout << (m_romlaplace_phi[idx]->item(i,j)) << " ";
-      }
-    }
-    std::cout << std::endl;
+    printf("m_romlaplace_phi %d %d\n",m_romlaplace_phi[idx]->numRows(),m_romlaplace_phi[idx]->numColumns());
+//  std::cout << "Checking Potential ROM Laplace: \n";
+//  for (int i = 0; i < m_romlaplace_phi[idx]->numRows(); i++) {
+//    for (int j = 0; j < m_romlaplace_phi[idx]->numColumns(); j++) {
+//        std::cout << (m_romlaplace_phi[idx]->item(i,j)) << " ";
+//    }
+//  }
+//  std::cout << std::endl;
   }
   m_romlaplace_phi[idx]->inverse();
 //if (!m_rank) {
@@ -1657,6 +1666,14 @@ void LSROMObject::CheckPotentialProjError(void* a_s, int idx)
 
 //  projectInitialSolution_phi(*(m_snapshots_phi->getColumn(j)));
     m_projected_init_phi[idx] = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_generator_phi[idx]->getSpatialBasis(), m_rdim_phi);
+    if (!m_rank) {
+      printf("%d m_project phi size %d\n",idx,m_projected_init_phi[idx]->dim());
+      std::cout << "Checking phi projected coefficients: ";
+      for (int j = 0; j < m_projected_init_phi[idx]->dim(); j++) {
+            std::cout << (m_projected_init_phi[idx]->item(j)) << " ";
+      }
+      std::cout << std::endl;
+    }
     recon_caromvec= m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(m_projected_init_phi[idx]);
     ArrayCopynD(1,
                 recon_caromvec->getData(),
@@ -1673,7 +1690,11 @@ void LSROMObject::CheckPotentialProjError(void* a_s, int idx)
     if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
       ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
     }
-    printf("#%d snapshot projection error phi, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+    if (!m_rank) printf("#%d snapshot projection error phi, %.15f %.15f %.15f \n",
+                        j,
+                        sim[0].solver.rom_diff_norms[0],
+                        sim[0].solver.rom_diff_norms[1],
+                        sim[0].solver.rom_diff_norms[2]);
   }
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
@@ -1864,7 +1885,11 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
     CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),lap_snap_wghosts.data(),recon_wghosts.data(),buffer);
-    printf("#%d snapshot projection error in laplacian (reduced), %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+    if (!m_rank) printf("#%d snapshot projection error in laplacian (reduced), %.15f %.15f %.15f \n",
+                        j,
+                        sim[0].solver.rom_diff_norms[0],
+                        sim[0].solver.rom_diff_norms[1],
+                        sim[0].solver.rom_diff_norms[2]);
 
     /* Check 2 */
     recon_field = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(m_projected_init_phi[idx]);
@@ -1903,8 +1928,11 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
 //    }
 //    std::cout << std::endl;
     CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),lap_snap_wghosts.data(),recon_wghosts.data(),buffer);
-    printf("#%d snapshot projection error in laplacian (non reduced), %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
-
+    if (!m_rank) printf("#%d snapshot projection error in laplacian (non reduced), %.15f %.15f %.15f \n",
+                        j,
+                        sim[0].solver.rom_diff_norms[0],
+                        sim[0].solver.rom_diff_norms[1],
+                        sim[0].solver.rom_diff_norms[2]);
     /* Check 3 */
     ArrayCopynD(1,
                 lap_snap_wghosts.data(),
@@ -1926,7 +1954,11 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
     CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),lap_snap_wghosts.data(),recon_wghosts.data(),buffer);
-    printf("#%d snapshot projection error in laplacian (simply project), %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+    if (!m_rank) printf("#%d snapshot projection error in laplacian (simply project), %.15f %.15f %.15f \n",
+                        j,
+                        sim[0].solver.rom_diff_norms[0],
+                        sim[0].solver.rom_diff_norms[1],
+                        sim[0].solver.rom_diff_norms[2]);
 
     /* increment the index string, if required */
     if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
@@ -2089,7 +2121,11 @@ void LSROMObject::CheckRhsProjError(void* a_s, int idx)
                 sim[0].solver.nvars);
     char buffer[] = "int_f_projerr";  // Creates a modifiable buffer and copies the string literal
     CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),int_f_wghosts.data(),recon_wghosts.data(),buffer);
-    printf("#%d snapshot projection error in rhs (non reduced), %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+    if (!m_rank) printf("#%d snapshot projection error in rhs (non reduced), %.15f %.15f %.15f \n",
+                        j,
+                        sim[0].solver.rom_diff_norms[0],
+                        sim[0].solver.rom_diff_norms[1],
+                        sim[0].solver.rom_diff_norms[2]);
 
     /* Check 2 */
 //  projectInitialSolution(*(m_snapshots[0]->getColumn(j)));
@@ -2105,7 +2141,11 @@ void LSROMObject::CheckRhsProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
     CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),int_f_wghosts.data(),recon_wghosts.data(),buffer);
-    printf("#%d snapshot projection error in rhs (reduced), %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+    if (!m_rank) printf("#%d snapshot projection error in rhs (reduced), %.15f %.15f %.15f \n",
+                        j,
+                        sim[0].solver.rom_diff_norms[0],
+                        sim[0].solver.rom_diff_norms[1],
+                        sim[0].solver.rom_diff_norms[2]);
 
 
     /* increment the index string, if required */
@@ -2172,7 +2212,11 @@ void LSROMObject::CheckEProjError(void* a_s, int idx)
     if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
       ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
     }
-    printf("#%d snapshot projection error e, %.15f %.15f %.15f \n",j,sim[0].solver.rom_diff_norms[0],sim[0].solver.rom_diff_norms[1],sim[0].solver.rom_diff_norms[2]);
+    if (!m_rank) printf("#%d snapshot projection error e, %.15f %.15f %.15f \n",
+                        j,
+                        sim[0].solver.rom_diff_norms[0],
+                        sim[0].solver.rom_diff_norms[1],
+                        sim[0].solver.rom_diff_norms[2]);
 
   }
   ::ResetFilenameIndex( sim[0].solver.filename_index,
@@ -2361,7 +2405,7 @@ void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis, i
 
   // construct hyper_ROM = phi^T phi_hyper
   m_romhyperb_x[idx]=a_rombasis->getFirstNColumns(m_rdim)->transposeMult(phi_hyper_x);
-  printf("m_romhyperb_x %d %d\n",m_romhyperb_x[idx]->numRows(),m_romhyperb_x[idx]->numColumns());
+  if (!m_rank) printf("m_romhyperb_x %d %d\n",m_romhyperb_x[idx]->numRows(),m_romhyperb_x[idx]->numColumns());
 
   delete phi_hyper_x;
 
@@ -2436,13 +2480,13 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
                     index.data(),
                     sim[0].solver.nvars);
 
-        (*(m_romhyperb_v[idx])[i])(j, k) = a_rombasis->getColumn(i)->inner_product(phi_hyper_col);
-//      printf("checking m_romhyperb_v %d %d %f\n",j,k,(*m_romhyperb_v[i])(j, k));
+        (*(m_romhyperb_v[idx][i]))(j, k) = a_rombasis->getColumn(i)->inner_product(phi_hyper_col);
+//      printf("checking m_romhyperb_v %d %d %f\n",j,k,((*(m_romhyperb_v[idx][i]))(j, k)));
       }
     }
-    printf("matrix size %d %d\n",m_romhyperb_v[idx][i]->numRows(),m_romhyperb_v[idx][i]->numColumns());
+    if (!m_rank) printf("matrix size %d %d\n",m_romhyperb_v[idx][i]->numRows(),m_romhyperb_v[idx][i]->numColumns());
   }
-    printf("i size %d\n",m_romhyperb_v.size());
+    if (!m_rank) printf("i size %d\n",m_romhyperb_v.size());
 
   return;
 }
