@@ -502,15 +502,17 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
       int num_rows = m_generator[i]->getSpatialBasis()->numRows();
 
       CAROM::Vector* m_fomwork;
-      CAROM::Vector* m_rhswork;
       m_fomwork = new CAROM::Vector(num_rows,false);
-      m_rhswork = new CAROM::Vector(num_rows,true);
+      CAROM::Vector* m_working;
+      m_working = new CAROM::Vector(m_rdim, false);
 
       if(std::abs(a_t) < 1e-9) {
 //      projectInitialSolution(*(m_snapshots[i]->getColumn(0)));
-        m_projected_init[i] = ProjectToRB(m_snapshots[i]->getColumn(0),m_generator[i]->getSpatialBasis(), m_rdim);
+//      m_projected_init[i] = ProjectToRB(m_snapshots[i]->getColumn(0),m_generator[i]->getSpatialBasis(), m_rdim);
+        m_working = ProjectToRB(m_snapshots[i]->getColumn(0),m_basis[i], m_rdim);
+        MPISum_double(m_projected_init[i]->getData(),m_working->getData(),m_rdim,&mpi->world);
         m_romcoef = new CAROM::Vector(m_projected_init[i]->getData(), m_rdim, false, true);
-        m_fomwork = ReconlibROMfield(m_romcoef, m_generator[i]->getSpatialBasis(), m_rdim);
+        m_fomwork = ReconlibROMfield(m_romcoef, m_basis[i], m_rdim);
 
         ArrayCopynD(sim[0].solver.ndims,
                     m_fomwork->getData(),
@@ -531,8 +533,9 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
         TimeInitialize();
       } else {
         if ((m_snap[i]==0) && (i>0)) {
-          m_fomwork = ReconlibROMfield(m_romcoef, m_generator[i-1]->getSpatialBasis(), m_rdim);
-          m_romcoef = ProjectToRB(m_fomwork,m_generator[i]->getSpatialBasis(), m_rdim);
+          m_fomwork = ReconlibROMfield(m_romcoef, m_basis[i-1], m_rdim);
+          m_working = ProjectToRB(m_fomwork,m_basis[i], m_rdim);
+          MPISum_double(m_romcoef->getData(),m_working->getData(),m_rdim,&mpi->world);
         }
         TimeRK(a_t,a_s,i);
       }
@@ -540,7 +543,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
         int idx;
         idx = m_snap[i]/m_sampling_freq;
         if (!m_rank) printf("idx %d m_snap %d m_sampling_freq %d \n",idx,m_snap[i],m_sampling_freq);
-        m_fomwork = ReconlibROMfield(m_romcoef, m_generator[i]->getSpatialBasis(), m_rdim);
+        m_fomwork = ReconlibROMfield(m_romcoef, m_basis[i], m_rdim);
         ArrayCopynD(sim[0].solver.ndims,
                     m_fomwork->getData(),
                     vec_wghosts.data(),
@@ -566,7 +569,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
                             sim[0].solver.rom_diff_norms[2]);
       }
       m_snap[i]++;
-      return ReconlibROMfield(m_romcoef, m_generator[i]->getSpatialBasis(), m_rdim);
+      return ReconlibROMfield(m_romcoef, m_basis[i], m_rdim);
     }
   }
   printf("ERROR in LSROMObject::predict(): m_generator is of size zero or interval not found!");
@@ -638,7 +641,7 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   CAROM::Vector* m_rhswork;
   CAROM::Vector* m_romwork;
   m_fomwork = new CAROM::Vector(num_rows,false);
-  m_rhswork = new CAROM::Vector(num_rows,true);
+  m_rhswork = new CAROM::Vector(num_rows,false);
   m_romwork = new CAROM::Vector(m_rdim,false);
   CAROM::Vector* m_tmprhs;
   CAROM::Vector* m_tmpsol;
@@ -700,7 +703,9 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
                   index.data(),
                   sim[0].solver.nvars);
 
-      m_Udot[stage] = ProjectToRB(m_rhswork,m_generator[idx]->getSpatialBasis(), m_rdim);
+      m_romwork = ProjectToRB(m_rhswork,m_basis[idx], m_rdim);
+      MPISum_double(m_Udot[stage]->getData(),m_romwork->getData(),m_rdim,&mpi->world);
+
 //    if (!m_rank) {
 //      std::cout << "Checking hyperbolic term [directly]: ";
 //      for (int j = 0; j < m_rdim; j++) {
@@ -1074,13 +1079,18 @@ void LSROMObject::check(void* a_s)
 void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis, int idx)
 {
   SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
 
   int num_rows = a_rombasis->numRows();
   int num_cols = a_rombasis->numColumns();
 
   /* Compute F(\Phi), where \Phi is the reduced basis matrix */
   CAROM::Matrix* phi_hyper;
-  phi_hyper = new CAROM::Matrix(num_rows, m_rdim, true);
+  phi_hyper = new CAROM::Matrix(num_rows, m_rdim, false);
+  CAROM::Matrix* m_working;
+  m_working = new CAROM::Matrix(m_rdim,m_rdim, false);
 
   CAROM::Vector phi_hyper_col(num_rows,false);
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
@@ -1136,7 +1146,9 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis, int
   }
 
   // construct hyper_ROM = phi^T phi_hyper
-  m_romhyperb[idx]=a_rombasis->getFirstNColumns(m_rdim)->transposeMult(phi_hyper);
+//m_romhyperb[idx]=a_rombasis->getFirstNColumns(m_rdim)->transposeMult(phi_hyper);
+  m_working = a_rombasis->getFirstNColumns(m_rdim)->transposeMult(phi_hyper);
+  MPISum_double(m_romhyperb[idx]->getData(),m_working->getData(),m_rdim*m_rdim,&mpi->world);
   if (!m_rank){
     printf("phi %d %d\n",a_rombasis->numRows(),a_rombasis->numColumns());
     printf("phi_hyper %d %d\n",phi_hyper->numRows(),phi_hyper->numColumns());
@@ -1292,6 +1304,10 @@ void LSROMObject::CheckSolProjError(void* a_s, int idx)
   }
 
   SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
   std::vector<double> snap_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<double> snapproj_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<int> index(sim[0].solver.ndims);
@@ -1300,10 +1316,25 @@ void LSROMObject::CheckSolProjError(void* a_s, int idx)
   int num_cols = m_snapshots[idx]->numColumns();
   CAROM::Vector* recon_init;
   recon_init = new CAROM::Vector(num_rows,false);
+  CAROM::Vector* m_working;
+  m_working = new CAROM::Vector(m_rdim, false);
 
   for (int j = 0; j < num_cols; j++){
 //  projectInitialSolution(*(m_snapshots[idx]->getColumn(j)));
-    m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_generator[idx]->getSpatialBasis(), m_rdim);
+//  m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_generator[idx]->getSpatialBasis(), m_rdim);
+//  m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_basis[idx], m_rdim);
+//    printf("checking distributed? %d %d \n",m_snapshots[idx]->getColumn(j)->distributed(),m_generator[idx]->getSpatialBasis()->distributed());
+//    std::cout << "print local coefficients: ";
+//    printf("%d %d \n", m_snapshots[idx]->getColumn(j)->dim(),m_rank);
+//    printf("%d %d %d \n", m_generator[idx]->getSpatialBasis()->numRows(), m_generator[idx]->getSpatialBasis()->numColumns(),m_rank);
+//  m_working = ProjectToRB(m_snapshots[idx]->getColumn(j),m_generator[idx]->getSpatialBasis(), m_rdim);
+    m_working = ProjectToRB(m_snapshots[idx]->getColumn(j),m_basis[idx], m_rdim);
+      std::cout << "print local coefficients: ";
+      for (int k = 0; k < m_working->dim(); k++) {
+            std::cout << (m_working->item(k)) << " ";
+      }
+      std::cout << std::endl;
+    MPISum_double(m_projected_init[idx]->getData(),m_working->getData(),m_rdim,&mpi->world);
     if (!m_rank) {
       printf("%d m_project size %d\n",idx,m_projected_init[idx]->dim());
       std::cout << "Checking projected coefficients: ";
@@ -1322,7 +1353,7 @@ void LSROMObject::CheckSolProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
 
-    recon_init = m_generator[idx]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init[idx]);
+    recon_init = m_basis[idx]->getFirstNColumns(m_rdim)->mult(m_projected_init[idx]);
     ArrayCopynD(sim[0].solver.ndims,
                 recon_init->getData(),
                 snapproj_wghosts.data(),
@@ -1359,6 +1390,10 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
   }
 
   SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<double> snap_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
@@ -1370,14 +1405,17 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
   CAROM::Vector* recon_init;
   CAROM::Vector* phi_colwork;
   recon_init = new CAROM::Vector(num_rows,false);
-  phi_colwork = new CAROM::Vector(num_rows,true);
+  phi_colwork = new CAROM::Vector(num_rows,false);
+  CAROM::Vector* m_working;
+  m_working = new CAROM::Vector(m_rdim, false);
 
   for (int j = 0; j < num_cols; j++){
 
     /* Check 1 */
     /* Project snapshot onto reduced space */
 //  projectInitialSolution(*(m_snapshots[0]->getColumn(j)));
-    m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_generator[idx]->getSpatialBasis(), m_rdim);
+//  m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_generator[idx]->getSpatialBasis(), m_rdim);
+//  m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_basis[idx], m_rdim);
     /* Extend reduced basis \phi_j with ghost points */
     ArrayCopynD(sim[0].solver.ndims,
                 m_snapshots[idx]->getColumn(j)->getData(),
@@ -1408,9 +1446,11 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
                 0,
                 index.data(),
                 sim[0].solver.nvars);
-    CAROM::Vector* m_working;
-    m_working = m_generator[idx]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(phi_colwork);
-    recon_init = m_generator[idx]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_working);
+//  m_working = m_generator[idx]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(phi_colwork);
+//  recon_init = m_generator[idx]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_working);
+    m_working = m_basis[idx]->getFirstNColumns(m_rdim)->transposeMult(phi_colwork);
+    MPISum_double(m_projected_init[idx]->getData(),m_working->getData(),m_rdim,&mpi->world);
+    recon_init = m_basis[idx]->getFirstNColumns(m_rdim)->mult(m_projected_init[idx]);
     ArrayCopynD(sim[0].solver.ndims,
                 recon_init->getData(),
                 snapproj_wghosts.data(),
@@ -1429,8 +1469,10 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
                         sim[0].solver.rom_diff_norms[2]);
 
     /* Check 3 */
+    m_working = ProjectToRB(m_snapshots[idx]->getColumn(j),m_basis[idx], m_rdim);
+    MPISum_double(m_projected_init[idx]->getData(),m_working->getData(),m_rdim,&mpi->world);
     m_working=m_romhyperb[idx]->mult(m_projected_init[idx]);
-    recon_init = m_generator[idx]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_working);
+    recon_init = m_basis[idx]->getFirstNColumns(m_rdim)->mult(m_working);
     ArrayCopynD(sim[0].solver.ndims,
                 recon_init->getData(),
                 snapproj_wghosts.data(),
