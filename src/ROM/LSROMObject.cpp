@@ -45,13 +45,17 @@ extern "C" int  CalculateROMDiff(void*,void*);
 extern "C" void ResetFilenameIndex(char*, int); /*!< Reset filename index */
 extern "C" void IncrementFilenameIndex(char*,int);
 extern "C" int  VlasovWriteSpatialField(void*, void*, double*, char*);
-extern "C" int FirstDerivativeSecondOrderCentralNoGhosts (double*,double*,int,int,void*,void*,int,int*);
-extern "C" int SecondDerivativeSecondOrderCentralNoGhosts (double*,double*,int,void*,void*,int,int*);
+extern "C" int FirstDerivativeSecondOrderCentralNoGhosts(double*,double*,int,
+                                                         int,void*,void*,int,
+                                                         int*);
+extern "C" int SecondDerivativeSecondOrderCentralNoGhosts(double*,double*,int,
+                                                          void*,void*,int,int*);
+
 extern "C" int VlasovAdvection_x(double*,double*,int,void*,double);
-extern "C" int HyperbolicFunction_1dir (double*,double*,void*,void*,double,int,
-                                        int(*)(double*,double*,int,void*,double),
-                                        int(*)(double*,double*,double*,double*,double*,
-                                        double*,int,void*,double),int);
+extern "C" int HyperbolicFunction_1dir(double*,double*,void*,void*,double,int,
+                                       int(*)(double*,double*,int,void*,double),
+                                       int(*)(double*,double*,double*,double*,
+                                       double*,double*,int,void*,double),int);
 
 LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
                             const double  a_dt,             /*!< time step size */
