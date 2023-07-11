@@ -2272,6 +2272,8 @@ void LSROMObject::CheckEProjError(void* a_s, int idx)
   int num_rows = m_generator_phi[idx]->getSpatialBasis()->numRows();
   int num_cols = m_snapshots_e[idx]->numColumns();
   CAROM::Vector* recon_caromvec;
+  CAROM::Vector* m_working;
+  m_working = new CAROM::Vector(m_rdim_phi, false);
 
   for (int j = 0; j < num_cols; j++){
     ArrayCopynD(1,
@@ -2284,7 +2286,8 @@ void LSROMObject::CheckEProjError(void* a_s, int idx)
                 sim[0].solver.nvars);
 
 //  projectInitialSolution_phi(*(m_snapshots_phi[idx]->getColumn(j)));
-    m_projected_init_phi[idx] = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_generator_phi[idx]->getSpatialBasis(), m_rdim_phi);
+    m_working = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_basis_phi[idx], m_rdim_phi);
+    MPISum_double(m_projected_init_phi[idx]->getData(),m_working->getData(),m_rdim_phi,&mpi->world);
     recon_caromvec = m_basis_e[idx]->mult(m_projected_init_phi[idx]);
     ArrayCopynD(1,
                 recon_caromvec->getData(),
