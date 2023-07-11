@@ -1617,21 +1617,23 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s,
                         sim[0].solver.index_length );
 
   // construct rhs = basis_phi^T integral_basis_f
-  m_romrhs_phi[idx]=a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(integral_basis_f);
+  m_working = a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(integral_basis_f);
+  MPISum_double(m_romrhs_phi[idx]->getData(),m_working->getData(),m_rdim_phi*m_rdim,&mpi->world);
   if (!m_rank) {
     printf("f %d %d\n",a_rombasis_f->numRows(),a_rombasis_f->numColumns());
     printf("integral_basis_f %d %d\n",integral_basis_f->numRows(),integral_basis_f->numColumns());
     printf("m_romrhs_phi %d %d\n",m_romrhs_phi[idx]->numRows(),m_romrhs_phi[idx]->numColumns());
-//  std::cout << "Checking Potential ROM Rhs: \n";
-//  for (int i = 0; i < m_romrhs_phi[idx]->numRows(); i++) {
-//    for (int j = 0; j < m_romrhs_phi[idx]->numColumns(); j++) {
-//        std::cout << (m_romrhs_phi[idx]->item(i,j)) << " ";
-//    }
-//  }
-//  std::cout << std::endl;
+    std::cout << "Checking Potential ROM Rhs: \n";
+    for (int i = 0; i < m_romrhs_phi[idx]->numRows(); i++) {
+      for (int j = 0; j < m_romrhs_phi[idx]->numColumns(); j++) {
+          std::cout << (m_romrhs_phi[idx]->item(i,j)) << " ";
+      }
+    }
+    std::cout << std::endl;
   }
   free(int_f);
   delete integral_basis_f;
+  delete m_working;
   return;
 }
 
