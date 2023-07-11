@@ -1373,8 +1373,8 @@ void LSROMObject::CheckSolProjError(void* a_s, int idx)
     if (!m_rank) {
       printf("%d m_project size %d\n",idx,m_projected_init[idx]->dim());
       std::cout << "Checking projected coefficients: ";
-      for (int j = 0; j < m_projected_init[idx]->dim(); j++) {
-            std::cout << (m_projected_init[idx]->item(j)) << " ";
+      for (int k = 0; k < m_projected_init[idx]->dim(); k++) {
+            std::cout << (m_projected_init[idx]->item(k)) << " ";
       }
       std::cout << std::endl;
     }
