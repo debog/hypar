@@ -1733,6 +1733,8 @@ void LSROMObject::CheckPotentialProjError(void* a_s, int idx)
   int num_cols = m_snapshots_phi[idx]->numColumns();
   CAROM::Vector* recon_caromvec;
   recon_caromvec= new CAROM::Vector(num_rows,false);
+  CAROM::Vector* m_working;
+  m_working = new CAROM::Vector(m_rdim_phi, false);
 
   for (int j = 0; j < num_cols; j++){
     /* Extend reduced basis \phi_j with ghost points */
@@ -1745,17 +1747,17 @@ void LSROMObject::CheckPotentialProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
 
-//  projectInitialSolution_phi(*(m_snapshots_phi->getColumn(j)));
-    m_projected_init_phi[idx] = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_generator_phi[idx]->getSpatialBasis(), m_rdim_phi);
+    m_working = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_basis_phi[idx], m_rdim_phi);
+    MPISum_double(m_projected_init_phi[idx]->getData(),m_working->getData(),m_rdim_phi,&mpi->world);
     if (!m_rank) {
       printf("%d m_project phi size %d\n",idx,m_projected_init_phi[idx]->dim());
       std::cout << "Checking phi projected coefficients: ";
-      for (int j = 0; j < m_projected_init_phi[idx]->dim(); j++) {
-            std::cout << (m_projected_init_phi[idx]->item(j)) << " ";
+      for (int k = 0; k < m_projected_init_phi[idx]->dim(); k++) {
+            std::cout << (m_projected_init_phi[idx]->item(k)) << " ";
       }
       std::cout << std::endl;
     }
-    recon_caromvec= m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(m_projected_init_phi[idx]);
+    recon_caromvec= m_basis_phi[idx]->getFirstNColumns(m_rdim_phi)->mult(m_projected_init_phi[idx]);
     ArrayCopynD(1,
                 recon_caromvec->getData(),
                 snapproj_wghosts.data(),
