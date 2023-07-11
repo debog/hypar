@@ -76,12 +76,14 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_snapshots.clear();
   m_romhyperb.clear();
   m_snap.clear();
+  m_basis.clear();
 
   /* precomputation idea */
   m_options_phi.clear();
   m_generator_phi.clear();
   m_projected_init_phi.clear();
   m_snapshots_phi.clear();
+  m_basis_phi.clear();
   m_snapshots_e.clear();
   m_basis_e.clear();
 
@@ -93,6 +95,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_t_final = -1;
   m_rdim = a_rdim;
   m_rdim_phi = m_rdim;
+  m_rdims.clear();
+  m_rdims_phi.clear();
 
   m_sim_idx = a_sim_idx;
   m_var_idx = a_var_idx;
