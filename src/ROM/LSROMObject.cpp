@@ -1355,20 +1355,7 @@ void LSROMObject::CheckSolProjError(void* a_s, int idx)
   m_working = new CAROM::Vector(m_rdim, false);
 
   for (int j = 0; j < num_cols; j++){
-//  projectInitialSolution(*(m_snapshots[idx]->getColumn(j)));
-//  m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_generator[idx]->getSpatialBasis(), m_rdim);
-//  m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_basis[idx], m_rdim);
-//    printf("checking distributed? %d %d \n",m_snapshots[idx]->getColumn(j)->distributed(),m_generator[idx]->getSpatialBasis()->distributed());
-//    std::cout << "print local coefficients: ";
-//    printf("%d %d \n", m_snapshots[idx]->getColumn(j)->dim(),m_rank);
-//    printf("%d %d %d \n", m_generator[idx]->getSpatialBasis()->numRows(), m_generator[idx]->getSpatialBasis()->numColumns(),m_rank);
-//  m_working = ProjectToRB(m_snapshots[idx]->getColumn(j),m_generator[idx]->getSpatialBasis(), m_rdim);
     m_working = ProjectToRB(m_snapshots[idx]->getColumn(j),m_basis[idx], m_rdim);
-      std::cout << "print local coefficients: ";
-      for (int k = 0; k < m_working->dim(); k++) {
-            std::cout << (m_working->item(k)) << " ";
-      }
-      std::cout << std::endl;
     MPISum_double(m_projected_init[idx]->getData(),m_working->getData(),m_rdim,&mpi->world);
     if (!m_rank) {
       printf("%d m_project size %d\n",idx,m_projected_init[idx]->dim());
