@@ -1566,7 +1566,10 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
 }
 
 /*! Construct potential ROM rhs */
-void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rombasis_f, const CAROM::Matrix* a_rombasis_phi, int idx)
+void LSROMObject::ConstructPotentialROMRhs(void* a_s,
+                                           const CAROM::Matrix* a_rombasis_f,
+                                           const CAROM::Matrix* a_rombasis_phi,
+                                           int idx)
 {
   SimulationObject* sim = (SimulationObject*) a_s;
   HyPar  *solver = (HyPar*) &(sim[0].solver);
@@ -1585,7 +1588,9 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s, const CAROM::Matrix* a_rom
 
   /* Integrate f reduced basis over velocity */
   CAROM::Matrix* integral_basis_f;
-  integral_basis_f = new CAROM::Matrix(num_rows, m_rdim, true);
+  integral_basis_f = new CAROM::Matrix(num_rows, m_rdim, false);
+  CAROM::Matrix* m_working;
+  m_working = new CAROM::Matrix(m_rdim_phi, m_rdim, false);
 
   for (int j = 0; j < m_rdim; j++){
     EvaluatePotentialRhs(a_s, a_rombasis_f->getColumn(j), int_f);
