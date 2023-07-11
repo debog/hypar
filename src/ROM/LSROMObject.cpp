@@ -520,6 +520,9 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
                                           void* a_s )
 {
   SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
 
   for (int i = 0; i < m_generator.size(); i++) {
     if (   (a_t >= m_intervals[i].first)
