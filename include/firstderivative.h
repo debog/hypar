@@ -53,7 +53,7 @@ int FirstDerivativeFirstOrder         (double*,double*,int,int,void*,void*); /*!
 int FirstDerivativeSecondOrderCentral (double*,double*,int,int,void*,void*); /*!< Second order approximation to the first derivative (**note**: not divided by grid spacing) */
 int FirstDerivativeFourthOrderCentral (double*,double*,int,int,void*,void*); /*!< Fourth order approximation to the first derivative (**note**: not divided by grid spacing) */
 
-int FirstDerivativeSecondOrderCentralNoGhosts (double*,double*,int,int,int,int*,int,int); /*!< Second order approximation to the first derivative (**note**: not divided by grid spacing) */
+int FirstDerivativeSecondOrderCentralNoGhosts (double*,double*,int,int,int,int*,int,int,void*); /*!< Second order approximation to the first derivative (**note**: not divided by grid spacing) */
 
 #if defined(HAVE_CUDA)
 #if __cplusplus

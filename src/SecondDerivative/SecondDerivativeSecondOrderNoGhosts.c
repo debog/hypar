@@ -1,6 +1,6 @@
 /*! @file SecondDerivativeSecondOrderNoGhosts.c
     @brief 2nd order discretization of the second derivative.
-    @author Ping-Hsuan Tsai
+    @author Ping-Hsuan Tsai, Debojyoti Ghosh
 */
 
 #include <stdio.h>
@@ -8,7 +8,15 @@
 #include <basic.h>
 #include <arrayfunctions.h>
 #include <secondderivative.h>
+
 #include <mpivars.h>
+typedef MPIVariables  MPIContext;
+
+#undef  _MINIMUM_GHOSTS_
+/*! \def _MINIMUM_GHOSTS_
+ * Minimum number of ghost points required.
+*/
+#define _MINIMUM_GHOSTS_ 1
 
 /*! Computes the second-order finite-difference approximation to the second derivative (\b Note: not divided by the grid spacing):
     \f{equation}{
@@ -37,13 +45,17 @@ int SecondDerivativeSecondOrderCentralNoGhosts( double*  D2f,   /*!< Array to ho
                                                 int*    dim,    /*!< Local dimensions */
                                                 int     ghosts, /*!< Number of ghost points */
                                                 int     nvars,  /*!< Number of vector components at each grid points */
-                                                void*   m       /*!< MPI object of type #MPIVariables */)
+                                                void*   m       /*!< MPI object of type #MPIContext */)
 {
-  MPIVariables* mpi = (MPIVariables*) m;
+  MPIContext* mpi = (MPIContext*) m;
   int i, v;
 
   if ((!D2f) || (!f)) {
     fprintf(stderr, "Error in SecondDerivativeSecondOrder(): input arrays not allocated.\n");
+    return(1);
+  }
+  if (ghosts < _MINIMUM_GHOSTS_) {
+    fprintf(stderr, "Error in SecondDerivativeSecondOrderNoGhosts(): insufficient number of ghosts.\n");
     return(1);
   }
 
@@ -81,7 +93,7 @@ int SecondDerivativeSecondOrderCentralNoGhosts( double*  D2f,   /*!< Array to ho
     }
   }
 
-  if (mpi->ip[dir] == mpi->iproc[dir]-1) {
+  if (mpi->ip[dir] == (mpi->iproc[dir]-1)) {
     /* right physical boundary: overwrite the rightmost value with biased finite-difference */
     int done = 0; _ArraySetValue_(index_outer,ndims,0);
     while (!done) {
