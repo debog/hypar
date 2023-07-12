@@ -48,6 +48,6 @@
 int SecondDerivativeSecondOrderCentral (double*,double*,int,void*,void*); /*!< Second order approximation to the second derivative (**note**: not divided by square of grid spacing). */
 int SecondDerivativeFourthOrderCentral (double*,double*,int,void*,void*); /*!< Fourth order approximation to the second derivative (**note**: not divided by square of grid spacing). */
 
-int SecondDerivativeSecondOrderCentralNoGhosts (double*,double*,int,int,int*,int,int); /*!< Second order approximation to the second derivative (**note**: not divided by square of grid spacing). */
+int SecondDerivativeSecondOrderCentralNoGhosts (double*,double*,int,int,int*,int,int,void*); /*!< Second order approximation to the second derivative (**note**: not divided by square of grid spacing). */
 
 #endif
