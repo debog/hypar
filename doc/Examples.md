@@ -1322,7 +1322,7 @@ Expected screen output:
 While compiling, make sure that the configure step included the <B>\--enable-fftw</B> option
 (and if necessary, <B>\--with-fftw-dir=/path/to/fftw</B>).
 
-Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField
+Location: \b hypar/Examples/2D/Vlasov1D1V/TwoStreamInstability
           (This directory contains all the input files needed
           to run this case.)
 
@@ -1348,17 +1348,17 @@ Input files required:
 ---------------------
 
 \b solver.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField/solver.inp
+\include 2D/Vlasov1D1V/TwoStreamInstability/solver.inp
 
 \b boundary.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField/boundary.inp
+\include 2D/Vlasov1D1V/TwoStreamInstability/boundary.inp
 
 \b physics.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField/physics.inp
+\include 2D/Vlasov1D1V/TwoStreamInstability/physics.inp
 
 To generate \b initial.inp (initial solution), compile and run the 
 following code in the run directory. 
-\include 2D/Vlasov1D1V/SelfConsistentElectricField/aux/init.c
+\include 2D/Vlasov1D1V/TwoStreamInstability/aux/init.c
 
 Output:
 -------
@@ -1389,7 +1389,7 @@ files in plain text format (which can be read in and visualized in
 MATLAB for example).
 
 The following animation shows the evolution of the solution:
-@image html Solution_1D1VVlasov_SelfConsistentE.gif
+@image html Solution_1D1VVlasov_TwoStreamInstability.gif
 
 HyPar will also write out 1D text files named \b efield_00000.dat, ...,
 \b efield_00200.dat that contain the electric field at each time
@@ -1398,19 +1398,19 @@ field is a 1D scalar quantity, and the columns of these files are:
 grid index, x-coordinate, electric field value.
 The following plot shows the electric field at \f$t=40\f$, obtained
 by plotting \b efield_00200.dat:
-@image html Solution_E_1D1VVlasov_SelfConsistentE.png
+@image html Solution_E_1D1VVlasov_TwoStreamInstability.png
 
 Since #HyPar::ConservationCheck is set to \a yes in \b solver.inp,
 the code checks for conservation error and prints it to screen, as well
 as the file \b conservation.dat:
-\include 2D/Vlasov1D1V/SelfConsistentElectricField/conservation.dat
+\include 2D/Vlasov1D1V/TwoStreamInstability/conservation.dat
 The numbers are: number of grid points in each dimension (#HyPar::dim_global),
 number of processors in each dimension (#MPIVariables::iproc),
 time step size (#HyPar::dt),
 and conservation error (#HyPar::ConservationError).
 
 Expected screen output:
-\include 2D/Vlasov1D1V/SelfConsistentElectricField/output.log
+\include 2D/Vlasov1D1V/TwoStreamInstability/output.log
 
 \page euler2d_riemann4 2D Euler Equations - Riemann Problem Case 4
 
@@ -6584,7 +6584,7 @@ Expected screen output:
 
 See \ref vlasov_1d1v_selfconsistent to familiarize yourself with this case.
 
-Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train
+Location: \b hypar/Examples/2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Train
           (This directory contains all the input files needed
           to run this case.)
 
@@ -6621,20 +6621,20 @@ Input files required:
 ---------------------
 
 \b librom.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/librom.inp
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Train/librom.inp
 
 \b solver.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/solver.inp
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Train/solver.inp
 
 \b boundary.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/boundary.inp
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Train/boundary.inp
 
 \b physics.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/physics.inp
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Train/physics.inp
 
 To generate \b initial.inp (initial solution), compile and run the 
 following code in the run directory. 
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/aux/init.c
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Train/aux/init.c
 
 Output:
 -------
@@ -6670,7 +6670,7 @@ The following plot shows the evolution of the distribution function -
 FOM (full-order model) refers to the HyPar solution, 
 ROM (reduced-order model) refers to the DMD solution, and 
 Diff is the difference between the two.
-@image html Solution_1D1VVlasov_SelfConsistentE_libROM_DMD.gif
+@image html Solution_1D1VVlasov_TwoStreamInstability_libROM_DMD.gif
 
 \b Wall \b clock \b times:
 - PDE solution: 11.34 seconds
@@ -6680,7 +6680,7 @@ Diff is the difference between the two.
 The L1, L2, and Linf norms of the diff between the HyPar and ROM solution 
 at the final time are calculated and reported on screen (see below)
 as well as \b pde_rom_diff.dat:
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/pde_rom_diff.dat
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Train/pde_rom_diff.dat
 The numbers are: number of grid points in each dimension (#HyPar::dim_global), 
 number of processors in each dimension (#MPIVariables::iproc),
 time step size (#HyPar::dt),
@@ -6698,7 +6698,7 @@ will exist after the simulation is complete - they are in a format that
 is readable by libROM.
 
 Expected screen output:
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Train/out.log
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Train/out.log
 
 \page navstok2d_ldsc_librom_dmd_train 2D Navier-Stokes Equations -  Lid-Driven Square Cavity (Time-Windowed DMD)
 
@@ -8101,7 +8101,7 @@ See \ref vlasov_1d1v_selfconsistent to familiarize yourself with this case.
 This example uses a DMD object that has already been trained 
 (see \ref vlasov_1d1v_selfconsistent_librom_dmd_train).
 
-Location: \b hypar/Examples/2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Predict
+Location: \b hypar/Examples/2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Predict
           (This directory contains all the input files needed
           to run this case.)
 
@@ -8146,7 +8146,7 @@ Input files required:
 ---------------------
 
 \b librom.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Predict/librom.inp
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Predict/librom.inp
 
 <B> DMD Object(s) </B>:\n
 The trained DMD object(s) must be located in the directory specified in \b librom.inp
@@ -8154,17 +8154,17 @@ as \a dmd_dirname (#DMDROMObject::m_dirname). For this example, they were genera
 using \ref vlasov_1d1v_selfconsistent_librom_dmd_train.
 
 \b solver.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Predict/solver.inp
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Predict/solver.inp
 
 \b boundary.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Predict/boundary.inp
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Predict/boundary.inp
 
 \b physics.inp
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Predict/physics.inp
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Predict/physics.inp
 
 To generate \b initial.inp (initial solution), compile and run the 
 following code in the run directory. 
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Predict/aux/init.c
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Predict/aux/init.c
 
 Output:
 -------
@@ -8194,10 +8194,10 @@ solutions. Alternatively, #HyPar::op_file_format can be set to \a tecplot2d or \
 and Tecplot/VisIt or something similar can be used to plot the resulting files.
 
 The following plot shows the evolution of the distribution function:
-@image html Solution_1D1VVlasov_SelfConsistentE_libROM_DMD_Predict.gif
+@image html Solution_1D1VVlasov_TwoStreamInstability_libROM_DMD_Predict.gif
 
 Expected screen output:
-\include 2D/Vlasov1D1V/SelfConsistentElectricField_libROM_DMD_Predict/out.log
+\include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Predict/out.log
 
 \page ns3d_cylinder_steady_incompressible_viscous_librom_dmd_predict 3D Navier-Stokes - Steady, incompressible, viscous flow around a cylinder (Time-Windowed DMD)
 
