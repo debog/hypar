@@ -1,11 +1,11 @@
-1D-1V VLASOV EQUATION: TWO-STREAM INSTABILITY
+1D-1V VLASOV EQUATION: LANDAU DAMPING
 
-  df         df          df
-  --  +  v ------  +  E ----  =  0
+  df         df          df 
+  --  +  v ------  +  E -----  =  0
   dt         dx          dv
 
-   0 <= x <= 2pi;   Periodic
-  -6 <= v <= 6; Homogenous Dirichlet
+   0 <= x <= 2pi/k;   Periodic
+  -10*v_th <= v <= 10*v_th; Homogenous Dirichlet
 
 NOTE: This example requires HyPar be compiled
 with the FFTW library.

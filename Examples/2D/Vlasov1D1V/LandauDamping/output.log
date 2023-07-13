@@ -1,0 +1,352 @@
+HyPar - Parallel (MPI) version with 16 processes
+Allocated simulation object(s).
+Reading solver inputs from file "solver.inp".
+  No. of dimensions                          : 2
+  No. of variables                           : 1
+  Domain size                                : 128 128 
+  Processes along each dimension             : 4 4 
+  Exact solution domain size                 : 128 128 
+  No. of ghosts pts                          : 3
+  No. of iter.                               : 3000
+  Restart iteration                          : 0
+  Time integration scheme                    : rk (44)
+  Spatial discretization scheme (hyperbolic) : weno5
+  Split hyperbolic flux term?                : no
+  Interpolation type for hyperbolic term     : characteristic
+  Spatial discretization type   (parabolic ) : nonconservative-1stage
+  Spatial discretization scheme (parabolic ) : 2
+  Time Step                                  : 5.000000E-03
+  Check for conservation                     : yes
+  Screen output iterations                   : 20
+  File output iterations                     : 20
+  Initial solution file type                 : binary
+  Initial solution read mode                 : serial
+  Solution file write mode                   : serial
+  Solution file format                       : binary
+  Overwrite solution file                    : no
+  Physical model                             : vlasov
+Partitioning domain and allocating data arrays.
+Reading array from binary file initial.inp (Serial mode).
+Volume integral of the initial solution:
+ 0:  6.2831853071795827E+00
+Reading boundary conditions from boundary.inp.
+  Boundary                       periodic:  Along dimension  0 and face +1
+  Boundary                       periodic:  Along dimension  0 and face -1
+  Boundary                      dirichlet:  Along dimension  1 and face +1
+  Boundary                      dirichlet:  Along dimension  1 and face -1
+4 boundary condition(s) read.
+Initializing solvers.
+Warning: File weno.inp not found. Using default parameters for WENO5/CRWENO5/HCWENO5 scheme.
+Initializing physics. Model = "vlasov"
+Reading physical model inputs from file "physics.inp".
+Setting up libROM interface.
+Setting up time integration.
+Solving in time (from 0 to 3000 iterations)
+Writing solution file op_00000.bin.
+iter=     20  t=1.000E-01  CFL=1.003E+00  norm=5.9101E-06  wctime: 3.4E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00001.bin.
+iter=     40  t=2.000E-01  CFL=1.003E+00  norm=5.8255E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00002.bin.
+iter=     60  t=3.000E-01  CFL=1.003E+00  norm=5.6916E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00003.bin.
+iter=     80  t=4.000E-01  CFL=1.003E+00  norm=5.5201E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00004.bin.
+iter=    100  t=5.000E-01  CFL=1.003E+00  norm=5.3266E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00005.bin.
+iter=    120  t=6.000E-01  CFL=1.003E+00  norm=5.1290E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00006.bin.
+iter=    140  t=7.000E-01  CFL=1.003E+00  norm=4.9462E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00007.bin.
+iter=    160  t=8.000E-01  CFL=1.003E+00  norm=4.7952E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00008.bin.
+iter=    180  t=9.000E-01  CFL=1.003E+00  norm=4.6886E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-16
+Writing solution file op_00009.bin.
+iter=    200  t=1.000E+00  CFL=1.003E+00  norm=4.6325E-06  wctime: 3.3E-03 (s)    cons_err=4.2407E-16
+Writing solution file op_00010.bin.
+iter=    220  t=1.100E+00  CFL=1.003E+00  norm=4.6252E-06  wctime: 3.3E-03 (s)    cons_err=4.2407E-16
+Writing solution file op_00011.bin.
+iter=    240  t=1.200E+00  CFL=1.003E+00  norm=4.6584E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00012.bin.
+iter=    260  t=1.300E+00  CFL=1.003E+00  norm=4.7194E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00013.bin.
+iter=    280  t=1.400E+00  CFL=1.003E+00  norm=4.7943E-06  wctime: 3.3E-03 (s)    cons_err=7.0679E-16
+Writing solution file op_00014.bin.
+iter=    300  t=1.500E+00  CFL=1.003E+00  norm=4.8702E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-16
+Writing solution file op_00015.bin.
+iter=    320  t=1.600E+00  CFL=1.003E+00  norm=4.9370E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00016.bin.
+iter=    340  t=1.700E+00  CFL=1.003E+00  norm=4.9880E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00017.bin.
+iter=    360  t=1.800E+00  CFL=1.003E+00  norm=5.0197E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00018.bin.
+iter=    380  t=1.900E+00  CFL=1.003E+00  norm=5.0317E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00019.bin.
+iter=    400  t=2.000E+00  CFL=1.003E+00  norm=5.0259E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00020.bin.
+iter=    420  t=2.100E+00  CFL=1.003E+00  norm=5.0058E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00021.bin.
+iter=    440  t=2.200E+00  CFL=1.003E+00  norm=4.9759E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00022.bin.
+iter=    460  t=2.300E+00  CFL=1.003E+00  norm=4.9407E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-15
+Writing solution file op_00023.bin.
+iter=    480  t=2.400E+00  CFL=1.003E+00  norm=4.9045E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00024.bin.
+iter=    500  t=2.500E+00  CFL=1.003E+00  norm=4.8706E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00025.bin.
+iter=    520  t=2.600E+00  CFL=1.003E+00  norm=4.8415E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00026.bin.
+iter=    540  t=2.700E+00  CFL=1.003E+00  norm=4.8184E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-15
+Writing solution file op_00027.bin.
+iter=    560  t=2.800E+00  CFL=1.003E+00  norm=4.8014E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00028.bin.
+iter=    580  t=2.900E+00  CFL=1.003E+00  norm=4.7902E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00029.bin.
+iter=    600  t=3.000E+00  CFL=1.003E+00  norm=4.7836E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00030.bin.
+iter=    620  t=3.100E+00  CFL=1.003E+00  norm=4.7803E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00031.bin.
+iter=    640  t=3.200E+00  CFL=1.003E+00  norm=4.7792E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00032.bin.
+iter=    660  t=3.300E+00  CFL=1.003E+00  norm=4.7792E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00033.bin.
+iter=    680  t=3.400E+00  CFL=1.003E+00  norm=4.7794E-06  wctime: 3.3E-03 (s)    cons_err=0.0000E+00
+Writing solution file op_00034.bin.
+iter=    700  t=3.500E+00  CFL=1.003E+00  norm=4.7794E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00035.bin.
+iter=    720  t=3.600E+00  CFL=1.003E+00  norm=4.7790E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00036.bin.
+iter=    740  t=3.700E+00  CFL=1.003E+00  norm=4.7780E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-15
+Writing solution file op_00037.bin.
+iter=    760  t=3.800E+00  CFL=1.003E+00  norm=4.7767E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00038.bin.
+iter=    780  t=3.900E+00  CFL=1.003E+00  norm=4.7751E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00039.bin.
+iter=    800  t=4.000E+00  CFL=1.003E+00  norm=4.7735E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00040.bin.
+iter=    820  t=4.100E+00  CFL=1.003E+00  norm=4.7721E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00041.bin.
+iter=    840  t=4.200E+00  CFL=1.003E+00  norm=4.7709E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00042.bin.
+iter=    860  t=4.300E+00  CFL=1.003E+00  norm=4.7699E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00043.bin.
+iter=    880  t=4.400E+00  CFL=1.003E+00  norm=4.7693E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00044.bin.
+iter=    900  t=4.500E+00  CFL=1.003E+00  norm=4.7689E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00045.bin.
+iter=    920  t=4.600E+00  CFL=1.003E+00  norm=4.7688E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00046.bin.
+iter=    940  t=4.700E+00  CFL=1.003E+00  norm=4.7687E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00047.bin.
+iter=    960  t=4.800E+00  CFL=1.003E+00  norm=4.7687E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00048.bin.
+iter=    980  t=4.900E+00  CFL=1.003E+00  norm=4.7688E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00049.bin.
+iter=   1000  t=5.000E+00  CFL=1.003E+00  norm=4.7688E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00050.bin.
+iter=   1020  t=5.100E+00  CFL=1.003E+00  norm=4.7688E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00051.bin.
+iter=   1040  t=5.200E+00  CFL=1.003E+00  norm=4.7687E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00052.bin.
+iter=   1060  t=5.300E+00  CFL=1.003E+00  norm=4.7686E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00053.bin.
+iter=   1080  t=5.400E+00  CFL=1.003E+00  norm=4.7685E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00054.bin.
+iter=   1100  t=5.500E+00  CFL=1.003E+00  norm=4.7684E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00055.bin.
+iter=   1120  t=5.600E+00  CFL=1.003E+00  norm=4.7682E-06  wctime: 3.3E-03 (s)    cons_err=4.2407E-16
+Writing solution file op_00056.bin.
+iter=   1140  t=5.700E+00  CFL=1.003E+00  norm=4.7682E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00057.bin.
+iter=   1160  t=5.800E+00  CFL=1.003E+00  norm=4.7681E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00058.bin.
+iter=   1180  t=5.900E+00  CFL=1.003E+00  norm=4.7680E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00059.bin.
+iter=   1200  t=6.000E+00  CFL=1.003E+00  norm=4.7680E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00060.bin.
+iter=   1220  t=6.100E+00  CFL=1.003E+00  norm=4.7680E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-16
+Writing solution file op_00061.bin.
+iter=   1240  t=6.200E+00  CFL=1.003E+00  norm=4.7680E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00062.bin.
+iter=   1260  t=6.300E+00  CFL=1.003E+00  norm=4.7680E-06  wctime: 3.3E-03 (s)    cons_err=0.0000E+00
+Writing solution file op_00063.bin.
+iter=   1280  t=6.400E+00  CFL=1.003E+00  norm=4.7680E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00064.bin.
+iter=   1300  t=6.500E+00  CFL=1.003E+00  norm=4.7680E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00065.bin.
+iter=   1320  t=6.600E+00  CFL=1.003E+00  norm=4.7680E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00066.bin.
+iter=   1340  t=6.700E+00  CFL=1.003E+00  norm=4.7680E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00067.bin.
+iter=   1360  t=6.800E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00068.bin.
+iter=   1380  t=6.900E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=7.0679E-16
+Writing solution file op_00069.bin.
+iter=   1400  t=7.000E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00070.bin.
+iter=   1420  t=7.100E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=7.0679E-16
+Writing solution file op_00071.bin.
+iter=   1440  t=7.200E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=7.0679E-16
+Writing solution file op_00072.bin.
+iter=   1460  t=7.300E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00073.bin.
+iter=   1480  t=7.400E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=0.0000E+00
+Writing solution file op_00074.bin.
+iter=   1500  t=7.500E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-16
+Writing solution file op_00075.bin.
+iter=   1520  t=7.600E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00076.bin.
+iter=   1540  t=7.700E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=0.0000E+00
+Writing solution file op_00077.bin.
+iter=   1560  t=7.800E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=7.0679E-16
+Writing solution file op_00078.bin.
+iter=   1580  t=7.900E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00079.bin.
+iter=   1600  t=8.000E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00080.bin.
+iter=   1620  t=8.100E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00081.bin.
+iter=   1640  t=8.200E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-16
+Writing solution file op_00082.bin.
+iter=   1660  t=8.300E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-15
+Writing solution file op_00083.bin.
+iter=   1680  t=8.400E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=0.0000E+00
+Writing solution file op_00084.bin.
+iter=   1700  t=8.500E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00085.bin.
+iter=   1720  t=8.600E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00086.bin.
+iter=   1740  t=8.700E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00087.bin.
+iter=   1760  t=8.800E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00088.bin.
+iter=   1780  t=8.900E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00089.bin.
+iter=   1800  t=9.000E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00090.bin.
+iter=   1820  t=9.100E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00091.bin.
+iter=   1840  t=9.200E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00092.bin.
+iter=   1860  t=9.300E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00093.bin.
+iter=   1880  t=9.400E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00094.bin.
+iter=   1900  t=9.500E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00095.bin.
+iter=   1920  t=9.600E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00096.bin.
+iter=   1940  t=9.700E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00097.bin.
+iter=   1960  t=9.800E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00098.bin.
+iter=   1980  t=9.900E+00  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.2722E-15
+Writing solution file op_00099.bin.
+iter=   2000  t=1.000E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00100.bin.
+iter=   2020  t=1.010E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00101.bin.
+iter=   2040  t=1.020E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00102.bin.
+iter=   2060  t=1.030E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00103.bin.
+iter=   2080  t=1.040E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00104.bin.
+iter=   2100  t=1.050E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=7.0679E-16
+Writing solution file op_00105.bin.
+iter=   2120  t=1.060E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=7.0679E-16
+Writing solution file op_00106.bin.
+iter=   2140  t=1.070E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00107.bin.
+iter=   2160  t=1.080E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00108.bin.
+iter=   2180  t=1.090E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00109.bin.
+iter=   2200  t=1.100E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00110.bin.
+iter=   2220  t=1.110E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00111.bin.
+iter=   2240  t=1.120E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00112.bin.
+iter=   2260  t=1.130E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00113.bin.
+iter=   2280  t=1.140E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-15
+Writing solution file op_00114.bin.
+iter=   2300  t=1.150E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00115.bin.
+iter=   2320  t=1.160E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00116.bin.
+iter=   2340  t=1.170E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00117.bin.
+iter=   2360  t=1.180E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00118.bin.
+iter=   2380  t=1.190E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00119.bin.
+iter=   2400  t=1.200E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00120.bin.
+iter=   2420  t=1.210E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00121.bin.
+iter=   2440  t=1.220E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00122.bin.
+iter=   2460  t=1.230E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00123.bin.
+iter=   2480  t=1.240E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00124.bin.
+iter=   2500  t=1.250E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00125.bin.
+iter=   2520  t=1.260E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00126.bin.
+iter=   2540  t=1.270E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-16
+Writing solution file op_00127.bin.
+iter=   2560  t=1.280E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00128.bin.
+iter=   2580  t=1.290E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00129.bin.
+iter=   2600  t=1.300E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00130.bin.
+iter=   2620  t=1.310E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00131.bin.
+iter=   2640  t=1.320E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00132.bin.
+iter=   2660  t=1.330E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.1309E-15
+Writing solution file op_00133.bin.
+iter=   2680  t=1.340E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00134.bin.
+iter=   2700  t=1.350E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00135.bin.
+iter=   2720  t=1.360E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.2722E-15
+Writing solution file op_00136.bin.
+iter=   2740  t=1.370E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00137.bin.
+iter=   2760  t=1.380E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=2.8272E-16
+Writing solution file op_00138.bin.
+iter=   2780  t=1.390E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=7.0679E-16
+Writing solution file op_00139.bin.
+iter=   2800  t=1.400E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=1.4136E-15
+Writing solution file op_00140.bin.
+iter=   2820  t=1.410E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00141.bin.
+iter=   2840  t=1.420E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=7.0679E-16
+Writing solution file op_00142.bin.
+iter=   2860  t=1.430E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00143.bin.
+iter=   2880  t=1.440E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=4.2407E-16
+Writing solution file op_00144.bin.
+iter=   2900  t=1.450E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Writing solution file op_00145.bin.
+iter=   2920  t=1.460E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00146.bin.
+iter=   2940  t=1.470E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00147.bin.
+iter=   2960  t=1.480E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=5.6543E-16
+Writing solution file op_00148.bin.
+iter=   2980  t=1.490E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=9.8951E-16
+Writing solution file op_00149.bin.
+iter=   3000  t=1.500E+01  CFL=1.003E+00  norm=4.7679E-06  wctime: 3.3E-03 (s)    cons_err=8.4815E-16
+Completed time integration (Final time: 15.000000), total wctime: 9.710657 (seconds).
+Writing solution file op_00150.bin.
+Conservation Errors:
+	8.4814791505693827E-16
+Solver runtime (in seconds): 1.1697343999999999E+01
+Total  runtime (in seconds): 1.1760896000000001E+01
+Deallocating arrays.
+Finished.
