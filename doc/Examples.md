@@ -48,7 +48,7 @@ with any external libraries.
 \subpage burgers_2d_sine
 
 \subpage vlasov_1d1v_prescribed \n
-\subpage vlasov_1d1v_selfconsistent
+\subpage vlasov_1d1v_twostreaminstability
 
 \subpage euler2d_riemann4 \n
 \subpage euler2d_riemann6 \n
@@ -1316,7 +1316,7 @@ and conservation error (#HyPar::ConservationError).
 Expected screen output:
 \include 2D/Vlasov1D1V/PrescribedElectricField/output.log
 
-\page vlasov_1d1v_selfconsistent 2D (1D-1V) Vlasov Equation - Two-Stream Instability
+\page vlasov_1d1v_twostreaminstability 2D (1D-1V) Vlasov Equation - Two-Stream Instability
 
 \b Note: this example requires HyPar to be compiled with the FFTW library (https://www.fftw.org/).
 While compiling, make sure that the configure step included the <B>\--enable-fftw</B> option
@@ -5952,7 +5952,7 @@ from a PDE simulation. The same procedure (i.e. providing the libROM input file
 \subpage euler2d_rtb_librom_dmd_train \n
 \subpage euler2d_igwave_petsc_librom_dmd_train (Requires PETSc)\n
 \subpage navstok2d_ldsc_librom_dmd_train \n
-\subpage vlasov_1d1v_selfconsistent_librom_dmd_train \n
+\subpage vlasov_1d1v_twostreaminstability_librom_dmd_train \n
 \n
 \subpage ns3d_cylinder_steady_incompressible_viscous_librom_dmd_train \n
 \subpage ns3d_cylinder_unsteady_incompressible_viscous_librom_dmd_train \n
@@ -5973,7 +5973,7 @@ consistent with the computational domain) can be used for any other simulation.\
 \n
 \subpage euler2d_vortex_librom_dmd_predict \n
 \subpage navstok2d_ldsc_librom_dmd_predict \n
-\subpage vlasov_1d1v_selfconsistent_librom_dmd_predict \n
+\subpage vlasov_1d1v_twostreaminstability_librom_dmd_predict \n
 \n
 \subpage ns3d_cylinder_steady_incompressible_viscous_librom_dmd_predict \n
 \subpage ns3d_shock_cylinder_interaction_librom_dmd_predict \n
@@ -6580,9 +6580,9 @@ is readable by libROM.
 Expected screen output:
 \include 2D/NavierStokes2D/Riemann2DCase4_libROM_DMD_Train/out.log
 
-\page vlasov_1d1v_selfconsistent_librom_dmd_train 2D (1D-1V) Vlasov Equation - Two-Stream Instability (Time-Windowed DMD)
+\page vlasov_1d1v_twostreaminstability_librom_dmd_train 2D (1D-1V) Vlasov Equation - Two-Stream Instability (Time-Windowed DMD)
 
-See \ref vlasov_1d1v_selfconsistent to familiarize yourself with this case.
+See \ref vlasov_1d1v_twostreaminstability to familiarize yourself with this case.
 
 Location: \b hypar/Examples/2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Train
           (This directory contains all the input files needed
@@ -8095,11 +8095,11 @@ the velocity magnitude):
 Expected screen output:
 \include 2D/NavierStokes2D/LidDrivenCavity_libROM_DMD_Predict/out.log
 
-\page vlasov_1d1v_selfconsistent_librom_dmd_predict 2D (1D-1V) Vlasov Equation - Two-Stream Instability (Time-Windowed DMD)
+\page vlasov_1d1v_twostreaminstability_librom_dmd_predict 2D (1D-1V) Vlasov Equation - Two-Stream Instability (Time-Windowed DMD)
 
-See \ref vlasov_1d1v_selfconsistent to familiarize yourself with this case.
+See \ref vlasov_1d1v_twostreaminstability to familiarize yourself with this case.
 This example uses a DMD object that has already been trained 
-(see \ref vlasov_1d1v_selfconsistent_librom_dmd_train).
+(see \ref vlasov_1d1v_twostreaminstability_librom_dmd_train).
 
 Location: \b hypar/Examples/2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Predict
           (This directory contains all the input files needed
@@ -8151,7 +8151,7 @@ Input files required:
 <B> DMD Object(s) </B>:\n
 The trained DMD object(s) must be located in the directory specified in \b librom.inp
 as \a dmd_dirname (#DMDROMObject::m_dirname). For this example, they were generated
-using \ref vlasov_1d1v_selfconsistent_librom_dmd_train.
+using \ref vlasov_1d1v_twostreaminstability_librom_dmd_train.
 
 \b solver.inp
 \include 2D/Vlasov1D1V/TwoStreamInstability_libROM_DMD_Predict/solver.inp
