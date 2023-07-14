@@ -48,7 +48,8 @@ with any external libraries.
 \subpage burgers_2d_sine
 
 \subpage vlasov_1d1v_prescribed \n
-\subpage vlasov_1d1v_twostreaminstability
+\subpage vlasov_1d1v_twostreaminstability \n
+\subpage vlasov_1d1v_landaudamping
 
 \subpage euler2d_riemann4 \n
 \subpage euler2d_riemann6 \n
@@ -1411,6 +1412,91 @@ and conservation error (#HyPar::ConservationError).
 
 Expected screen output:
 \include 2D/Vlasov1D1V/TwoStreamInstability/output.log
+
+\page vlasov_1d1v_landaudamping 2D (1D-1V) Vlasov Equation - Landau Damping
+
+\b Note: this example requires HyPar to be compiled with the FFTW library (https://www.fftw.org/).
+While compiling, make sure that the configure step included the <B>\--enable-fftw</B> option
+(and if necessary, <B>\--with-fftw-dir=/path/to/fftw</B>).
+
+Location: \b hypar/Examples/2D/Vlasov1D1V/LandauDamping
+          (This directory contains all the input files needed
+          to run this case.)
+
+Governing equations: 2D (1D-1V) Vlasov Equation (vlasov.h)
+
+Reference: Finn et al., A Numerical Study of Landau Damping with PETSc-PIC,
+           https://doi.org/10.48550/arXiv.2303.12620
+
+Domain: 
+  + \f$0 \le x < 2\pi/k\f$, \a "periodic" (#_PERIODIC_)
+  + \f$-10 v_{th} \le v < 10 v_{th}\f$, \a "dirichlet" (#_DIRICHLET_) (\f$f = 0\f$)
+
+Initial solution: 
+\f$f\left(x,v\right) = \frac{1}{\sqrt{2\pi v_{th}^2}} \exp \left(-\frac{v^2}{2v_{th}^2}\right) \left[1+\alpha\cos\left( kx \right)\right] \f$.
+
+Self-consistent electric field is computed by solving the Poisson equation
+in a periodic domain using Fourier transforms. This examples *requires* HyPar
+to be compiled with FFTW (http://www.fftw.org/).
+
+Numerical Method:
+ + Spatial discretization (hyperbolic): 5th order WENO (Interp1PrimFifthOrderWENO())
+ + Time integration: RK4 (TimeRK(), #_RK_44_)
+
+Input files required:
+---------------------
+
+\b solver.inp
+\include 2D/Vlasov1D1V/LandauDamping/solver.inp
+
+\b boundary.inp
+\include 2D/Vlasov1D1V/LandauDamping/boundary.inp
+
+\b physics.inp
+\include 2D/Vlasov1D1V/LandauDamping/physics.inp
+
+To generate \b initial.inp (initial solution), compile and run the 
+following code in the run directory. 
+\include 2D/Vlasov1D1V/LandauDamping/aux/init.c
+
+Output:
+-------
+Note that \b iproc is set to 
+
+      4 4
+
+in \b solver.inp (i.e., 4 processors along \a x, and 4
+processors along \a y). Thus, this example should be run
+with 16 MPI ranks (or change \b iproc).
+
+After running the code, there should be 151 output
+files \b op_00000.bin, \b op_00001.bin, ... \b op_00150.bin; 
+the first one is the solution at \f$t=0\f$ and the final one
+is the solution at \f$t=15\f$. Since #HyPar::op_overwrite is
+set to \a no in \b solver.inp, separate files are written
+for solutions (distribution function) at each output time. 
+  
+#HyPar::op_file_format is set to \a binary in \b solver.inp, and
+thus, all the files are written out in the binary format, see 
+WriteBinary().
+
+Along with the solution files, the code will write out the 1D
+potential and electric fields in text files: 
+\b potential_00000.bin, \b potential_00001.bin, ... \b potential_00150.bin,
+and
+\b efield_00000.bin, \b efield_00001.bin, ... \b efield_00150.bin.
+The columns of these files are: grid index, x-coordinate, and 
+potential or electric field value, respectively.
+
+The code \b 2D/Vlasov1D1V/LandauDamping/aux/MaximumEHistory.c reads the
+the efield_<nnnnn>.dat files, calculates the maximum absolute value of the
+electric field at that time instant, and writes a text file, \b efield_history.dat, 
+with two columns: time and maximum absolute value of E-field. The following plot shows
+damping of the electric field with time, obtained by plotting \b efield_history.dat:
+@image html Solution_E_1D1VVlasov_LandauDamping.png
+
+Expected screen output:
+\include 2D/Vlasov1D1V/LandauDamping/output.log
 
 \page euler2d_riemann4 2D Euler Equations - Riemann Problem Case 4
 
