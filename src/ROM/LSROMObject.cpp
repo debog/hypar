@@ -1631,11 +1631,11 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s,
 
   /* Integrate f reduced basis over velocity */
   CAROM::Matrix* integral_basis_f;
-  integral_basis_f = new CAROM::Matrix(num_rows, m_rdim, false);
+  integral_basis_f = new CAROM::Matrix(num_rows, m_rdims[idx], false);
   CAROM::Matrix* m_working;
-  m_working = new CAROM::Matrix(m_rdim_phi, m_rdim, false);
+  m_working = new CAROM::Matrix(m_rdims_phi[idx], m_rdims[idx], false);
 
-  for (int j = 0; j < m_rdim; j++){
+  for (int j = 0; j < m_rdims[idx]; j++){
     EvaluatePotentialRhs(a_s, a_rombasis_f->getColumn(j), int_f);
     ArrayCopynD(1,
                 int_f,
@@ -1646,7 +1646,7 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s,
                 index.data(),
                 sim[0].solver.nvars);
     char buffer[] = "int_basis";
-    ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),int_f_wghosts.data(),buffer);
+//  ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),int_f_wghosts.data(),buffer);
     /* Copy \int basis_f dv back to columns of integral_basis_f matrix */
     for (int i = 0; i < num_rows; i++) {
       (*integral_basis_f)(i, j) = int_f[i];
@@ -1660,8 +1660,8 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s,
                         sim[0].solver.index_length );
 
   // construct rhs = basis_phi^T integral_basis_f
-  m_working = a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(integral_basis_f);
-  MPISum_double(m_romrhs_phi[idx]->getData(),m_working->getData(),m_rdim_phi*m_rdim,&mpi->world);
+  m_working = a_rombasis_phi->getFirstNColumns(m_rdims_phi[idx])->transposeMult(integral_basis_f);
+  MPISum_double(m_romrhs_phi[idx]->getData(),m_working->getData(),m_rdims_phi[idx]*m_rdims[idx],&mpi->world);
   if (!m_rank) {
     printf("f %d %d\n",a_rombasis_f->numRows(),a_rombasis_f->numColumns());
     printf("integral_basis_f %d %d\n",integral_basis_f->numRows(),integral_basis_f->numColumns());
@@ -1707,10 +1707,12 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
 
   /* Integrate f reduced basis over velocity */
   CAROM::Matrix* laplace_phi;
-  laplace_phi = new CAROM::Matrix(num_rows, m_rdim_phi, true);
+  laplace_phi = new CAROM::Matrix(num_rows, m_rdims_phi[idx], false);
   CAROM::Vector laplace_col(num_rows,false);
+  CAROM::Matrix* m_working;
+  m_working = new CAROM::Matrix(m_rdims_phi[idx], m_rdims_phi[idx], false);
 
-  for (int j = 0; j < m_rdim_phi; j++){
+  for (int j = 0; j < m_rdims_phi[idx]; j++){
     ArrayCopynD(1,
                 a_rombasis_phi->getColumn(j)->getData(),
                 vec_wghosts.data(),
@@ -1759,6 +1761,8 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
 //  }
 //  std::cout << std::endl;
 //}
+  delete laplace_phi;
+  delete m_working;
   return;
 }
 
