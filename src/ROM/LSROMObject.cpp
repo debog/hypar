@@ -417,78 +417,124 @@ void LSROMObject::train(void* a_s)
                   m_curr_win, m_sim_idx, m_var_idx, ncol );
         }
         if (m_write_snapshot_mat) {
+          /* Since here is using gertSnapshotMatrix to write files, need additional process in order to visualize it
+             Similar in the case of DMD */
           char idx_string[_MAX_STRING_SIZE_];
           sprintf(idx_string, "%04d", i);
           std::string fname_root(m_dirname + "/snapshot_mat_"+std::string(idx_string));
           m_generator[i]->getSnapshotMatrix()->write(fname_root);
-          /* Since here is using gertSnapshotMatrix to write files, need additional process in order to visualize it
-             Similar in the case of DMD */
         }
+
         /* The code below is like m_dmd[i]->train(m_rdim) but in LS-ROM, there is no
            m_ls object, instead, it has m_generator, m_options, m_spatialbasis, m_projected_init */
 
         /* IMPORTANT!!! m_generator[i]->getSnapshotMatrix() is modified after
          * getSingularValues or (computeSVD) is called, hence need to make a copy of snapshots */
         /* Does everytime invoking getSpatialBasis() do computeSVD again? */
-        m_projected_init.push_back(new CAROM::Vector(m_rdim, false));
-        m_snapshots.push_back(new CAROM::Matrix(
-                              m_generator[i]->getSnapshotMatrix()->getData(),
-                              m_generator[i]->getSnapshotMatrix()->numRows(),
-                              m_generator[i]->getSnapshotMatrix()->numColumns(),
-                              true,
-                              true));
+//    std::cout << "print generator matrix: ";
+//    for (int k = 0; k < m_generator[i]->getSnapshotMatrix()->getColumn(0)->dim(); k++) {
+//          std::cout << m_rank << " " << k << " " << (m_generator[i]->getSnapshotMatrix()->getColumn(0)->item(k)) << "\n";
+//    }
+//    std::cout << std::endl;
+//    exit(0);
+//      m_snapshots.push_back(new CAROM::Matrix(
+//                            m_generator[i]->getSnapshotMatrix()->getData(),
+//                            m_generator[i]->getSnapshotMatrix()->numRows(),
+//                            m_generator[i]->getSnapshotMatrix()->numColumns(),
+//                            true,
+//                            true));
+//      m_snapshots.push_back(new CAROM::Matrix(
+//                            m_generator[i]->getSnapshotMatrix()->numRows(),
+//                            m_generator[i]->getSnapshotMatrix()->numColumns(),
+//                            true));
+//      m_snapshots.push_back(new CAROM::Matrix());
+//      m_snapshots[0] = m_generator[i]->getSnapshotMatrix();
+        m_snapshots.push_back(new CAROM::Matrix(*m_generator[i]->getSnapshotMatrix()));
+//    std::cout << "print m_snapshots matrix: ";
+//    for (int k = 0; k < m_snapshots[0]->getColumn(0)->dim(); k++) {
+//          std::cout << m_rank << " " << k << " " << (m_snapshots[0]->getColumn(0)->item(k)) << "\n";
+//    }
+//    std::cout << std::endl;
+//    exit(0);
 
-        if (m_generator[i]->getSnapshotMatrix()->numColumns() < m_rdim) {
+        m_rdims.push_back(m_rdim);
+        if (m_generator[i]->getSnapshotMatrix()->numColumns() < m_rdims[i]) {
           throw std::runtime_error("# of snapshots is less than m_rdim");
         }
 
         m_S  = m_generator[i]->getSingularValues();
 
-        OutputROMBasis(a_s, m_generator[i]->getSpatialBasis(),i);
-        m_romhyperb.push_back(new CAROM::Matrix(m_rdim,m_rdim,true));
-        ConstructROMHy(a_s, m_generator[i]->getSpatialBasis(),i);
+        m_basis.push_back(new CAROM::Matrix(
+                              m_generator[i]->getSpatialBasis()->getData(),
+                              m_generator[i]->getSpatialBasis()->numRows(),
+                              m_generator[i]->getSpatialBasis()->numColumns(),
+                              false,
+                              true));
+        if (m_rdims[i] != m_generator[i]->getSpatialBasis()->numColumns()){
+          m_rdims[i] = m_generator[i]->getSpatialBasis()->numColumns();
+          if (!m_rank) printf("m_rdim %d is reset to %d \n",
+                              m_rdim,m_generator[i]->getSpatialBasis()->numColumns());
+        }
+        m_projected_init.push_back(new CAROM::Vector(m_rdims[i], false));
+        m_romcoef.push_back(new CAROM::Vector(m_rdims[i], false));
+
+        OutputROMBasis(a_s, m_generator[i]->getSpatialBasis(), i);
         CheckSolProjError(a_s,i);
-        CheckHyProjError(a_s,i);
 
-//      printf("checking dimension of potential snapshot matrix:%d %d\n",m_generator_phi[i]->getSnapshotMatrix()->numRows(),m_generator_phi[i]->getSnapshotMatrix()->numColumns());
+        if ((!m_solve_phi) && (!m_direct_comp_hyperbolic)) {
+          m_romhyperb.push_back(new CAROM::Matrix(m_rdims[i],m_rdims[i],false));
+          ConstructROMHy(a_s, m_basis[i], i);
+          CheckHyProjError(a_s,i);
+        }
+
         if (m_solve_phi) {
-          m_projected_init_phi.push_back(new CAROM::Vector(m_rdim_phi, false));
           m_snapshots_phi.push_back(new CAROM::Matrix(
-                                   m_generator_phi[i]->getSnapshotMatrix()->getData(),
-                                   m_generator_phi[i]->getSnapshotMatrix()->numRows(),
-                                   m_generator_phi[i]->getSnapshotMatrix()->numColumns(),
-                                   true,
-                                   true));
-
+                                    *m_generator_phi[i]->getSnapshotMatrix())),
+          m_rdims_phi.push_back(m_rdim_phi);
+					// m_snapshots_phi is not distributed due to getSnapshotMatrix
           m_S_phi = m_generator_phi[i]->getSingularValues();
+					// m_basis_phi is necessary since getSpatialBasis is distributed
+          m_basis_phi.push_back(new CAROM::Matrix(
+                                m_generator_phi[i]->getSpatialBasis()->getData(),
+                                m_generator_phi[i]->getSpatialBasis()->numRows(),
+                                m_generator_phi[i]->getSpatialBasis()->numColumns(),
+                                false,
+                                true));
+        if (m_rdims_phi[i] != m_generator_phi[i]->getSpatialBasis()->numColumns()){
+          m_rdims_phi[i] = m_generator_phi[i]->getSpatialBasis()->numColumns();
+          if (!m_rank) printf("m_rdim_phi %d is reset to %d \n",
+                              m_rdim_phi,
+                              m_generator_phi[i]->getSpatialBasis()->numColumns());
+        }
+          m_projected_init_phi.push_back(new CAROM::Vector(m_rdims_phi[i], false));
+
           OutputROMBasisPhi(a_s, m_generator_phi[i]->getSpatialBasis(),i);
 
-          m_romrhs_phi.push_back(new CAROM::Matrix(m_rdim_phi,m_rdim,true));
-          ConstructPotentialROMRhs(a_s, m_generator[i]->getSpatialBasis(), m_generator_phi[i]->getSpatialBasis(),i);
+          m_romrhs_phi.push_back(new CAROM::Matrix(m_rdims_phi[i], m_rdims[i], false));
+          ConstructPotentialROMRhs(a_s,
+                                   m_basis[i],
+                                   m_basis_phi[i],
+                                   i);
 
-          m_romlaplace_phi.push_back(new CAROM::Matrix(m_rdim_phi,m_rdim_phi,true));
-          ConstructPotentialROMLaplace(a_s, m_generator_phi[i]->getSpatialBasis(),i);
+          m_romlaplace_phi.push_back(new CAROM::Matrix(m_rdims_phi[i],m_rdims_phi[i],false));
+          ConstructPotentialROMLaplace(a_s, m_basis_phi[i], i);
 
           CheckPotentialProjError(a_s,i);
           CheckLaplaceProjError(a_s,i);
           CheckRhsProjError(a_s,i);
 
           m_snapshots_e.push_back(new CAROM::Matrix(
-                                 m_generator_e[i]->getSnapshotMatrix()->getData(),
-                                 m_generator_e[i]->getSnapshotMatrix()->numRows(),
-                                 m_generator_e[i]->getSnapshotMatrix()->numColumns(),
-                                 true,
-                                 true));
+                                  *m_generator_e[i]->getSnapshotMatrix()));
           m_basis_e.push_back(new CAROM::Matrix(
                               m_generator_phi[i]->getSpatialBasis()->numRows(),
-                              m_rdim_phi, true));
+                              m_rdims_phi[i], false));
           ConstructEBasis(a_s,i);
           CheckEProjError(a_s,i);
 
-          m_romhyperb_x.push_back(new CAROM::Matrix(m_rdim,m_rdim,true));
-          ConstructROMHy_x(a_s, m_generator[i]->getSpatialBasis(),i);
+          m_romhyperb_x.push_back(new CAROM::Matrix(m_rdims[i], m_rdims[i],false));
+          ConstructROMHy_x(a_s, m_basis[i], i);
           m_romhyperb_v.push_back(std::vector<CAROM::Matrix*>());
-          ConstructROMHy_v(a_s, m_generator[i]->getSpatialBasis(), m_basis_e[i],i);
+          ConstructROMHy_v(a_s, m_basis[i], m_basis_e[i], i);
         }
 //      exit(0);
 
@@ -764,50 +810,15 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
     }
     else if (m_solve_phi) {
       m_tmprhs = m_romrhs_phi[idx]->mult(m_U[stage]);
-//    if (!m_rank) {
-//      std::cout << "checking m_tmprhs ";
-//      for (int j = 0; j < m_rdims_phi[idx]; j++) {
-//            std::cout << j << " " << m_tmprhs->item(j) << "\n ";
-//      }
-//      std::cout << std::endl;
-//    }
       m_tmpsol = m_romlaplace_phi[idx]->mult(m_tmprhs);
-//    if (!m_rank) {
-//      std::cout << "checking m_tmpsol ";
-//      for (int j = 0; j < m_rdims_phi[idx]; j++) {
-//            std::cout << j << " " << m_tmpsol->item(j) << "\n ";
-//      }
-//      std::cout << std::endl;
-//    }
 
       m_romwork = m_romhyperb_x[idx]->mult(m_U[stage]);
-//    if (!m_rank) {
-//      std::cout << "checking m_romwork ";
-//      for (int j = 0; j < m_rdims[idx]; j++) {
-//            std::cout << j << " " << m_romwork->item(j) << "\n ";
-//      }
-//      std::cout << std::endl;
-//    }
 
 //    /* Tensor contraction */
       for (int k = 0; k < m_rdims[idx]; k++) {
         m_contract1 = m_romhyperb_v[idx][k]->mult(m_U[stage]);
-//    if (!m_rank) {
-//      std::cout << "checking m_contract1";
-//      for (int j = 0; j < m_rdims_phi[idx]; j++) {
-//            std::cout << j << " " << m_contract1->item(j) << "\n ";
-//      }
-//      std::cout << std::endl;
-//    }
         m_contract2->item(k) = m_contract1->inner_product(m_tmpsol);
       }
-//    if (!m_rank) {
-//      std::cout << "checking m_contract2";
-//      for (int j = 0; j < m_rdims[idx]; j++) {
-//            std::cout << j << " " << m_contract2->item(j) << "\n ";
-//      }
-//      std::cout << std::endl;
-//    }
       m_Udot[stage] = m_romwork->plus(m_contract2);
 //
 //    m_e = m_basis_e->mult(m_tmpsol);
