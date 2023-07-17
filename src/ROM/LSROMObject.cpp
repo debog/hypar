@@ -2003,20 +2003,24 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
 
-    ::SecondDerivativeSecondOrderCentralNoGhosts(lap_snap_wghosts.data(),snap_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi),1,&(param->npts_local_x));
+     MPIExchangeBoundaries1D(&(sim[0].mpi),snap_wghosts.data(),param->npts_local_x,
+                                  sim[0].solver.ghosts,0,sim[0].solver.ndims);
+    ::SecondDerivativeSecondOrderCentralNoGhosts(lap_snap_wghosts.data(),
+                                                 snap_wghosts.data(),
+                                                 0,
+                                                 1,
+                                                 &(param->npts_local_x),
+                                                 sim[0].solver.ghosts,
+                                                 1,
+                                                 &(sim[0].mpi));
     _ArrayScale1D_(lap_snap_wghosts,-1.0*(solver->dxinv[0])*(solver->dxinv[0]),param->npts_local_x_wghosts);
-//  std::cout << "Checking laplacian of snap: ";
-//  for (int i = 0; i < param->npts_local_x_wghosts ; i++) {
-//        std::cout << (lap_snap_wghosts.data()[i]) << " ";
-//  }
-//  std::cout << std::endl;
 
     /* Check 1 */
     /* project snapshot onto reduced space */
-//  projectInitialSolution_phi(*(m_snapshots_phi->getColumn(j)));
-    m_projected_init_phi[idx] = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_generator_phi[idx]->getSpatialBasis(), m_rdim_phi);
+    m_working = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_basis_phi[idx], m_rdims_phi[idx]);
+    MPISum_double(m_projected_init_phi[idx]->getData(),m_working->getData(),m_rdims_phi[idx],&mpi->world);
     lap_reduced = m_romlaplace_phi[idx]->mult(m_projected_init_phi[idx]);
-    recon_lap = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(lap_reduced);
+    recon_lap = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdims_phi[idx])->mult(lap_reduced);
     ArrayCopynD(1,
                 recon_lap->getData(),
                 recon_wghosts.data(),
@@ -2033,7 +2037,7 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
                         sim[0].solver.rom_diff_norms[2]);
 
     /* Check 2 */
-    recon_field = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(m_projected_init_phi[idx]);
+    recon_field = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdims_phi[idx])->mult(m_projected_init_phi[idx]);
     ArrayCopynD(1,
                 recon_field->getData(),
                 snapproj_wghosts.data(),
@@ -2042,7 +2046,17 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
-    ::SecondDerivativeSecondOrderCentralNoGhosts(lap_snapproj_wghosts.data(),snapproj_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi),1,&(param->npts_local_x));
+
+     MPIExchangeBoundaries1D(&(sim[0].mpi),snapproj_wghosts.data(),param->npts_local_x,
+                                  sim[0].solver.ghosts,0,sim[0].solver.ndims);
+    ::SecondDerivativeSecondOrderCentralNoGhosts(lap_snapproj_wghosts.data(),
+                                                 snapproj_wghosts.data(),
+                                                 0,
+                                                 1,
+                                                 &(param->npts_local_x),
+                                                 sim[0].solver.ghosts,
+                                                 1,
+                                                 &(sim[0].mpi));
     _ArrayScale1D_(lap_snapproj_wghosts,-1.0*(solver->dxinv[0])*(solver->dxinv[0]),param->npts_local_x_wghosts);
     ArrayCopynD(1,
                 lap_snapproj_wghosts.data(),
@@ -2053,8 +2067,8 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
 
-    field_reduced = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->transposeMult(recon_field);
-    recon_lap = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(field_reduced);
+    field_reduced = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdims_phi[idx])->transposeMult(recon_field);
+    recon_lap = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdims_phi[idx])->mult(field_reduced);
     ArrayCopynD(1,
                 recon_lap->getData(),
                 recon_wghosts.data(),
@@ -2063,11 +2077,7 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
-//    std::cout << "Checking recon_wghosts: ";
-//    for (int i = 0; i < param->npts_local_x_wghosts ; i++) {
-//          std::cout << (recon_wghosts.data()[i]) << " ";
-//    }
-//    std::cout << std::endl;
+
     CalSnapROMDiff_phi(&(sim[0].solver),&(sim[0].mpi),lap_snap_wghosts.data(),recon_wghosts.data(),buffer);
     if (!m_rank) printf("#%d snapshot projection error in laplacian (non reduced), %.15f %.15f %.15f \n",
                         j,
@@ -2084,8 +2094,8 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
 
-    lap_reduced = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->transposeMult(recon_lap);
-    recon_lap = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(lap_reduced);
+    lap_reduced = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdims_phi[idx])->transposeMult(recon_lap);
+    recon_lap = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdims_phi[idx])->mult(lap_reduced);
     ArrayCopynD(1,
                 recon_lap->getData(),
                 recon_wghosts.data(),
