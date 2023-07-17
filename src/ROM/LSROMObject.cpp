@@ -1236,7 +1236,6 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis, int
   }
 
   // construct hyper_ROM = phi^T phi_hyper
-//m_romhyperb[idx]=a_rombasis->getFirstNColumns(m_rdim)->transposeMult(phi_hyper);
   m_working = a_rombasis->getFirstNColumns(m_rdims[idx])->transposeMult(phi_hyper);
   MPISum_double(m_romhyperb[idx]->getData(), m_working->getData(), m_rdims[idx]*m_rdims[idx], &mpi->world);
   if (!m_rank){
@@ -1484,16 +1483,11 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
   recon_init = new CAROM::Vector(num_rows,false);
   phi_colwork = new CAROM::Vector(num_rows,false);
   CAROM::Vector* m_working;
-  m_working = new CAROM::Vector(m_rdim, false);
+  m_working = new CAROM::Vector(m_rdims[idx], false);
 
   for (int j = 0; j < num_cols; j++){
 
-    /* Check 1 */
-    /* Project snapshot onto reduced space */
-//  projectInitialSolution(*(m_snapshots[0]->getColumn(j)));
-//  m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_generator[idx]->getSpatialBasis(), m_rdim);
-//  m_projected_init[idx] = ProjectToRB(m_snapshots[idx]->getColumn(j),m_basis[idx], m_rdim);
-    /* Extend reduced basis \phi_j with ghost points */
+    /* Extend snapshot with ghost points */
     ArrayCopynD(sim[0].solver.ndims,
                 m_snapshots[idx]->getColumn(j)->getData(),
                 vec_wghosts.data(),
@@ -1514,7 +1508,7 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
                             &(sim[0].mpi),
                             0);
 
-//  /* Remove ghosts point in F(phi_j) */
+    /* Remove ghosts point in F(phi_j) */
     ArrayCopynD(sim[0].solver.ndims,
                 rhs_wghosts.data(),
                 phi_colwork->getData(),
@@ -1523,11 +1517,13 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
                 0,
                 index.data(),
                 sim[0].solver.nvars);
-//  m_working = m_generator[idx]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(phi_colwork);
-//  recon_init = m_generator[idx]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_working);
-    m_working = m_basis[idx]->getFirstNColumns(m_rdim)->transposeMult(phi_colwork);
-    MPISum_double(m_projected_init[idx]->getData(),m_working->getData(),m_rdim,&mpi->world);
-    recon_init = m_basis[idx]->getFirstNColumns(m_rdim)->mult(m_projected_init[idx]);
+
+    /* Check 1 */
+    /* Project snapshot onto reduced space and reconstruct */
+    m_working = m_basis[idx]->getFirstNColumns(m_rdims[idx])->transposeMult(phi_colwork);
+    MPISum_double(m_projected_init[idx]->getData(),m_working->getData(),m_rdims[idx],&mpi->world);
+
+    recon_init = m_basis[idx]->getFirstNColumns(m_rdims[idx])->mult(m_projected_init[idx]);
     ArrayCopynD(sim[0].solver.ndims,
                 recon_init->getData(),
                 snapproj_wghosts.data(),
@@ -1538,7 +1534,7 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
                 sim[0].solver.nvars);
 
     char buffer[] = "hyprojerr";  // Creates a modifiable buffer and copies the string literal
-    CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),snapproj_wghosts.data(),buffer);
+//  CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),snapproj_wghosts.data(),buffer);
     if (!m_rank) printf("F(#%d snapshot) projection error (simply project), %.15f %.15f %.15f \n",
                         j,
                         sim[0].solver.rom_diff_norms[0],
@@ -1546,10 +1542,10 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
                         sim[0].solver.rom_diff_norms[2]);
 
     /* Check 3 */
-    m_working = ProjectToRB(m_snapshots[idx]->getColumn(j),m_basis[idx], m_rdim);
-    MPISum_double(m_projected_init[idx]->getData(),m_working->getData(),m_rdim,&mpi->world);
+    m_working = ProjectToRB(m_snapshots[idx]->getColumn(j), m_basis[idx], m_rdims[idx]);
+    MPISum_double(m_projected_init[idx]->getData(),m_working->getData(), m_rdims[idx], &mpi->world);
     m_working=m_romhyperb[idx]->mult(m_projected_init[idx]);
-    recon_init = m_basis[idx]->getFirstNColumns(m_rdim)->mult(m_working);
+    recon_init = m_basis[idx]->getFirstNColumns(m_rdims[idx])->mult(m_working);
     ArrayCopynD(sim[0].solver.ndims,
                 recon_init->getData(),
                 snapproj_wghosts.data(),
@@ -1558,38 +1554,8 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
-//        const char* fnam2 = "recon_";
-//        std::string fname2 = std::string(fnam2) + std::to_string(j);
-//        char* fname_buffer2 = new char[fname2.length() + 1];
-//        std::strcpy(fname_buffer2, fname2.c_str());
 
-//        WriteArray( sim[0].solver.ndims,
-//                    sim[0].solver.nvars,
-//                    sim[0].solver.dim_global,
-//                    sim[0].solver.dim_local,
-//                    sim[0].solver.ghosts,
-//                    sim[0].solver.x,
-//                    snapproj_wghosts.data(),
-//                    &(sim[0].solver),
-//                    &(sim[0].mpi),
-//                    fname_buffer2);
-//        const char* fnam3 = "snap_col_";
-//        std::string fname3 = std::string(fnam3) + std::to_string(j);
-//        char* fname_buffer3 = new char[fname3.length() + 1];
-//        std::strcpy(fname_buffer3, fname3.c_str());
-
-//        WriteArray( sim[0].solver.ndims,
-//                    sim[0].solver.nvars,
-//                    sim[0].solver.dim_global,
-//                    sim[0].solver.dim_local,
-//                    sim[0].solver.ghosts,
-//                    sim[0].solver.x,
-//                    rhs_wghosts.data(),
-//                    &(sim[0].solver),
-//                    &(sim[0].mpi),
-//                    fname_buffer3);
-//
-    CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),snapproj_wghosts.data(),buffer);
+//  CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),snapproj_wghosts.data(),buffer);
     if (!m_rank) printf("F(#%d snapshot) projection error (reduced), %.15f %.15f %.15f \n",
                         j,
                         sim[0].solver.rom_diff_norms[0],
@@ -1605,6 +1571,7 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
                         sim[0].solver.index_length );
   delete recon_init;
   delete phi_colwork;
+  delete m_working;
 }
 
 /*! Construct potential ROM rhs */
