@@ -2220,15 +2220,15 @@ void LSROMObject::CheckRhsProjError(void* a_s, int idx)
 
   int num_rows = m_generator_phi[idx]->getSpatialBasis()->numRows();
   CAROM::Vector* recon_rhs;
-  recon_rhs = new CAROM::Vector(num_rows,false);
+  recon_rhs = new CAROM::Vector(num_rows, false);
   CAROM::Vector* int_f_caromvec;
-  int_f_caromvec = new CAROM::Vector(num_rows,false);
+  int_f_caromvec = new CAROM::Vector(num_rows, false);
   CAROM::Vector* m_w1;
   CAROM::Vector* m_w2;
   CAROM::Vector* rhs_reduced;
-  m_w1 = new CAROM::Vector(m_rdim_phi,false);
-  m_w2 = new CAROM::Vector(m_rdim,false);
-  rhs_reduced = new CAROM::Vector(m_rdim_phi,false);
+  m_w1 = new CAROM::Vector(m_rdims_phi[idx], false);
+  m_w2 = new CAROM::Vector(m_rdims[idx], false);
+  rhs_reduced = new CAROM::Vector(m_rdims_phi[idx], false);
 
   double* int_f= (double*) calloc(num_rows, sizeof(double));
   int num_cols = m_snapshots[idx]->numColumns();
@@ -2261,8 +2261,8 @@ void LSROMObject::CheckRhsProjError(void* a_s, int idx)
                 sim[0].solver.nvars);
 
     /* Check 1 */
-    m_w1 = m_basis_phi[idx]->getFirstNColumns(m_rdim_phi)->transposeMult(int_f_caromvec);
-    MPISum_double(rhs_reduced->getData(),m_w1->getData(),m_rdim_phi,&mpi->world);
+    m_w1 = m_basis_phi[idx]->getFirstNColumns(m_rdims_phi[idx])->transposeMult(int_f_caromvec);
+    MPISum_double(rhs_reduced->getData(),m_w1->getData(),m_rdims_phi[idx],&mpi->world);
     if (!m_rank) {
       std::cout << "Checking rhs reduced: ";
       for (int k = 0; k < rhs_reduced->dim(); k++) {
@@ -2270,7 +2270,7 @@ void LSROMObject::CheckRhsProjError(void* a_s, int idx)
       }
       std::cout << std::endl;
     }
-    recon_rhs = m_basis_phi[idx]->getFirstNColumns(m_rdim_phi)->mult(rhs_reduced);
+    recon_rhs = m_basis_phi[idx]->getFirstNColumns(m_rdims_phi[idx])->mult(rhs_reduced);
     ArrayCopynD(1,
                 recon_rhs->getData(),
                 recon_wghosts.data(),
@@ -2289,10 +2289,10 @@ void LSROMObject::CheckRhsProjError(void* a_s, int idx)
 
     /* Check 2 */
 //  projectInitialSolution(*(m_snapshots[0]->getColumn(j)));
-    m_w2 = ProjectToRB(m_snapshots[idx]->getColumn(j),m_basis[idx], m_rdim);
-    MPISum_double(m_projected_init[idx]->getData(),m_w2->getData(),m_rdim,&mpi->world);
+    m_w2 = ProjectToRB(m_snapshots[idx]->getColumn(j),m_basis[idx], m_rdims[idx]);
+    MPISum_double(m_projected_init[idx]->getData(),m_w2->getData(),m_rdims[idx],&mpi->world);
     rhs_reduced = m_romrhs_phi[idx]->mult(m_projected_init[idx]);
-    recon_rhs = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->mult(rhs_reduced);
+    recon_rhs = m_generator_phi[idx]->getSpatialBasis()->getFirstNColumns(m_rdims_phi[idx])->mult(rhs_reduced);
     ArrayCopynD(1,
                 recon_rhs->getData(),
                 recon_wghosts.data(),
@@ -2344,7 +2344,7 @@ void LSROMObject::CheckEProjError(void* a_s, int idx)
   int num_cols = m_snapshots_e[idx]->numColumns();
   CAROM::Vector* recon_caromvec;
   CAROM::Vector* m_working;
-  m_working = new CAROM::Vector(m_rdim_phi, false);
+  m_working = new CAROM::Vector(m_rdims_phi[idx], false);
 
   for (int j = 0; j < num_cols; j++){
     ArrayCopynD(1,
@@ -2357,8 +2357,8 @@ void LSROMObject::CheckEProjError(void* a_s, int idx)
                 sim[0].solver.nvars);
 
 //  projectInitialSolution_phi(*(m_snapshots_phi[idx]->getColumn(j)));
-    m_working = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_basis_phi[idx], m_rdim_phi);
-    MPISum_double(m_projected_init_phi[idx]->getData(),m_working->getData(),m_rdim_phi,&mpi->world);
+    m_working = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_basis_phi[idx], m_rdims_phi[idx]);
+    MPISum_double(m_projected_init_phi[idx]->getData(),m_working->getData(),m_rdims_phi[idx],&mpi->world);
     recon_caromvec = m_basis_e[idx]->mult(m_projected_init_phi[idx]);
     ArrayCopynD(1,
                 recon_caromvec->getData(),
@@ -2445,7 +2445,8 @@ void LSROMObject::ConstructEBasis(void* a_s,int idx)
   int num_rows = m_generator_phi[idx]->getSpatialBasis()->numRows();
   double* vec_noghosts = (double*) calloc(num_rows, sizeof(double));
 
-  for (int j = 0; j < m_rdim_phi; j++){
+  for (int j = 0; j < m_rdims_phi[idx]; j++){
+
     ArrayCopynD(1,
                 m_generator_phi[idx]->getSpatialBasis()->getColumn(j)->getData(),
                 basis_vec_wghosts.data(),
@@ -2454,7 +2455,21 @@ void LSROMObject::ConstructEBasis(void* a_s,int idx)
                 sim[0].solver.ghosts,
                 index.data(),
                 sim[0].solver.nvars);
-    ::FirstDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),basis_vec_wghosts.data(),0,1,&(sim[0].solver),&(sim[0].mpi),1,&(param->npts_local_x));
+
+     MPIExchangeBoundaries1D(&(sim[0].mpi),basis_vec_wghosts.data(),param->npts_local_x,
+                                  sim[0].solver.ghosts,0,sim[0].solver.ndims);
+    ::FirstDerivativeSecondOrderCentralNoGhosts(vec_x_wghosts.data(),
+                                                basis_vec_wghosts.data(),
+                                                0,
+                                                1,
+                                                1,
+                                                &(param->npts_local_x),
+                                                sim[0].solver.ghosts,
+                                                1,
+                                                &(sim[0].mpi));
+
+    if (mpi->ip[1] != 0) vec_x_wghosts = std::vector<double> (vec_x_wghosts.size(),0.0);
+
     _ArrayScale1D_(vec_x_wghosts,-1.0*(solver->dxinv[0]),param->npts_local_x_wghosts)
 
     ArrayCopynD(1,
@@ -2468,7 +2483,6 @@ void LSROMObject::ConstructEBasis(void* a_s,int idx)
     for (int i = 0; i < num_rows; i++) {
       (*m_basis_e[idx])(i, j) = vec_noghosts[i];
     }
-
   }
   free(vec_noghosts);
 }
