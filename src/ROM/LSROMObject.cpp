@@ -545,15 +545,13 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
       CAROM::Vector* m_fomwork;
       m_fomwork = new CAROM::Vector(num_rows,false);
       CAROM::Vector* m_working;
-      m_working = new CAROM::Vector(m_rdim, false);
+      m_working = new CAROM::Vector(m_rdims[i], false);
 
       if(std::abs(a_t) < 1e-9) {
-//      projectInitialSolution(*(m_snapshots[i]->getColumn(0)));
-//      m_projected_init[i] = ProjectToRB(m_snapshots[i]->getColumn(0),m_generator[i]->getSpatialBasis(), m_rdim);
-        m_working = ProjectToRB(m_snapshots[i]->getColumn(0),m_basis[i], m_rdim);
-        MPISum_double(m_projected_init[i]->getData(),m_working->getData(),m_rdim,&mpi->world);
-        m_romcoef = new CAROM::Vector(m_projected_init[i]->getData(), m_rdim, false, true);
-        m_fomwork = ReconlibROMfield(m_romcoef, m_basis[i], m_rdim);
+        m_working = ProjectToRB(m_snapshots[i]->getColumn(0), m_basis[i], m_rdims[i]);
+        MPISum_double(m_projected_init[i]->getData(), m_working->getData(), m_rdims[i], &mpi->world);
+        m_romcoef[i] = m_projected_init[i];
+        m_fomwork = ReconlibROMfield(m_romcoef[i], m_basis[i], m_rdims[i]);
 
         ArrayCopynD(sim[0].solver.ndims,
                     m_fomwork->getData(),
@@ -571,20 +569,23 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
         /* Setup RK44 parameters */
         TimeExplicitRKInitialize();
         /* Initialize RK44 working variables */
-        TimeInitialize();
+        TimeInitialize(m_rdims[i]);
       } else {
         if ((m_snap[i]==0) && (i>0)) {
-          m_fomwork = ReconlibROMfield(m_romcoef, m_basis[i-1], m_rdim);
-          m_working = ProjectToRB(m_fomwork,m_basis[i], m_rdim);
-          MPISum_double(m_romcoef->getData(),m_working->getData(),m_rdim,&mpi->world);
+          m_fomwork = ReconlibROMfield(m_romcoef[i-1], m_basis[i-1], m_rdims[i-1]);
+          m_working = ProjectToRB(m_fomwork, m_basis[i], m_rdims[i]);
+          MPISum_double(m_romcoef[i]->getData(), m_working->getData(), m_rdims[i], &mpi->world);
+          TimeInitialize(m_rdims[i]);
+      } else {
         }
         TimeRK(a_t,a_s,i);
       }
+
       if ((m_snap[i] < sim[0].solver.n_iter) && (m_snap[i] % m_sampling_freq == 0)){
         int idx;
         idx = m_snap[i]/m_sampling_freq;
         if (!m_rank) printf("idx %d m_snap %d m_sampling_freq %d \n",idx,m_snap[i],m_sampling_freq);
-        m_fomwork = ReconlibROMfield(m_romcoef, m_basis[i], m_rdim);
+        m_fomwork = ReconlibROMfield(m_romcoef[i], m_basis[i], m_rdims[i]);
         ArrayCopynD(sim[0].solver.ndims,
                     m_fomwork->getData(),
                     vec_wghosts.data(),
@@ -610,7 +611,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
                             sim[0].solver.rom_diff_norms[2]);
       }
       m_snap[i]++;
-      return ReconlibROMfield(m_romcoef, m_basis[i], m_rdim);
+      return ReconlibROMfield(m_romcoef[i], m_basis[i], m_rdims[i]);
     }
   }
   printf("ERROR in LSROMObject::predict(): m_generator is of size zero or interval not found!");
@@ -626,7 +627,7 @@ void LSROMObject::load(const std::string& a_fname_root /*!< Filename root */)
     return;
 }
 
-int LSROMObject::TimeInitialize()
+int LSROMObject::TimeInitialize(int a_rdim)
 {
   /* Currenty assuming one window only */
   int i;
@@ -636,8 +637,8 @@ int LSROMObject::TimeInitialize()
 
   /* explicit Runge-Kutta methods */
   for (i = 0; i < nstages; i++) {
-    m_U.push_back(new CAROM::Vector(m_rdim,false));
-    m_Udot.push_back(new CAROM::Vector(m_rdim,false));
+    m_U.push_back(new CAROM::Vector(a_rdim, false));
+    m_Udot.push_back(new CAROM::Vector(a_rdim, false));
   }
   return 0;
 }
@@ -678,39 +679,45 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
 
   int ns, stage, i;
   int num_rows = m_generator[idx]->getSpatialBasis()->numRows();
+
   CAROM::Vector* m_fomwork;
   CAROM::Vector* m_rhswork;
   CAROM::Vector* m_romwork;
+
   m_fomwork = new CAROM::Vector(num_rows,false);
   m_rhswork = new CAROM::Vector(num_rows,false);
-  m_romwork = new CAROM::Vector(m_rdim,false);
+  m_romwork = new CAROM::Vector(m_rdims[idx],false);
+
   CAROM::Vector* m_tmprhs;
   CAROM::Vector* m_tmpsol;
   CAROM::Vector* m_e;
   CAROM::Vector* m_contract1;
   CAROM::Vector* m_contract2;
-  m_contract2 = new CAROM::Vector(m_rdim,false);
+  if (m_solve_phi) {
+    m_contract1 = new CAROM::Vector(m_rdims_phi[idx],false);
+    m_contract2 = new CAROM::Vector(m_rdims[idx],false);
+  }
 
     /* Calculate stage values */
   for (stage = 0; stage < nstages; stage++) {
   
     double stagetime = a_t + c[stage]*m_dt;
 
-    _ArrayCopy1D_(  m_romcoef->getData(),
+    _ArrayCopy1D_(  m_romcoef[idx]->getData(),
                     m_U[stage]->getData(),
-                    m_rdim );
+                    m_rdims[idx] );
 
     for (i = 0; i < stage; i++) {
       _ArrayAXPY_(  m_Udot[i]->getData(),
                     (m_dt * A[stage*nstages+i]),
                     m_U[stage]->getData(),
-                    m_rdim );
+                    m_rdims[idx] );
     }
 
     if (m_direct_comp_hyperbolic) {
 //    printf("compute hyperbolic term directly\n");
 
-      m_fomwork = ReconlibROMfield(m_U[stage], m_generator[idx]->getSpatialBasis(), m_rdim);
+      m_fomwork = ReconlibROMfield(m_U[stage], m_generator[idx]->getSpatialBasis(), m_rdims[idx]);
 
       ArrayCopynD(sim[0].solver.ndims,
                   m_fomwork->getData(),
@@ -744,8 +751,8 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
                   index.data(),
                   sim[0].solver.nvars);
 
-      m_romwork = ProjectToRB(m_rhswork,m_basis[idx], m_rdim);
-      MPISum_double(m_Udot[stage]->getData(),m_romwork->getData(),m_rdim,&mpi->world);
+      m_romwork = ProjectToRB(m_rhswork, m_basis[idx], m_rdims[idx]);
+      MPISum_double(m_Udot[stage]->getData(), m_romwork->getData(), m_rdims[idx], &mpi->world);
 
 //    if (!m_rank) {
 //      std::cout << "Checking hyperbolic term [directly]: ";
@@ -757,14 +764,50 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
     }
     else if (m_solve_phi) {
       m_tmprhs = m_romrhs_phi[idx]->mult(m_U[stage]);
+//    if (!m_rank) {
+//      std::cout << "checking m_tmprhs ";
+//      for (int j = 0; j < m_rdims_phi[idx]; j++) {
+//            std::cout << j << " " << m_tmprhs->item(j) << "\n ";
+//      }
+//      std::cout << std::endl;
+//    }
       m_tmpsol = m_romlaplace_phi[idx]->mult(m_tmprhs);
+//    if (!m_rank) {
+//      std::cout << "checking m_tmpsol ";
+//      for (int j = 0; j < m_rdims_phi[idx]; j++) {
+//            std::cout << j << " " << m_tmpsol->item(j) << "\n ";
+//      }
+//      std::cout << std::endl;
+//    }
 
       m_romwork = m_romhyperb_x[idx]->mult(m_U[stage]);
+//    if (!m_rank) {
+//      std::cout << "checking m_romwork ";
+//      for (int j = 0; j < m_rdims[idx]; j++) {
+//            std::cout << j << " " << m_romwork->item(j) << "\n ";
+//      }
+//      std::cout << std::endl;
+//    }
+
 //    /* Tensor contraction */
-      for (int i = 0; i < m_rdim; i++) {
-        m_contract1 = m_romhyperb_v[idx][i]->mult(m_U[stage]);
-        m_contract2->item(i) = m_contract1->inner_product(m_tmpsol);
+      for (int k = 0; k < m_rdims[idx]; k++) {
+        m_contract1 = m_romhyperb_v[idx][k]->mult(m_U[stage]);
+//    if (!m_rank) {
+//      std::cout << "checking m_contract1";
+//      for (int j = 0; j < m_rdims_phi[idx]; j++) {
+//            std::cout << j << " " << m_contract1->item(j) << "\n ";
+//      }
+//      std::cout << std::endl;
+//    }
+        m_contract2->item(k) = m_contract1->inner_product(m_tmpsol);
       }
+//    if (!m_rank) {
+//      std::cout << "checking m_contract2";
+//      for (int j = 0; j < m_rdims[idx]; j++) {
+//            std::cout << j << " " << m_contract2->item(j) << "\n ";
+//      }
+//      std::cout << std::endl;
+//    }
       m_Udot[stage] = m_romwork->plus(m_contract2);
 //
 //    m_e = m_basis_e->mult(m_tmpsol);
@@ -885,21 +928,27 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
 
     _ArrayAXPY_(  m_Udot[stage]->getData(),
                   (m_dt * b[stage]),
-                  m_romcoef->getData(),
-                  m_rdim );
+                  m_romcoef[idx]->getData(),
+                  m_rdims[idx] );
 
   }
   if (!m_rank) {
     std::cout << "Checking solved coefficient: ";
-    for (int j = 0; j < m_rdim; j++) {
-          std::cout << m_romcoef->item(j) << " ";
+    for (int j = 0; j < m_rdims[idx]; j++) {
+          std::cout << m_romcoef[idx]->item(j) << " ";
     }
     std::cout << std::endl;
   }
   delete m_fomwork;
   delete m_rhswork;
   delete m_romwork;
-  delete m_contract2;
+  if (m_solve_phi) {
+    delete m_tmprhs;
+    delete m_tmpsol;
+    delete m_e;
+    delete m_contract1;
+    delete m_contract2;
+  }
   return 0;
 }
 
