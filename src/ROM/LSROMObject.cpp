@@ -1259,7 +1259,7 @@ void LSROMObject::OutputROMBasis(void* a_s, const CAROM::Matrix* a_rombasis, int
   /* m_rdim is written out */
   SimulationObject* sim = (SimulationObject*) a_s;
 
-  for (int j = 0; j < m_rdim; j++){
+  for (int j = 0; j < m_rdims[idx]; j++){
     char buffer[] = "basis";  // Creates a modifiable buffer and copies the string literal
     char fbuffer[100];
     sprintf(fbuffer, "%s_%d",buffer,idx);
@@ -1408,11 +1408,11 @@ void LSROMObject::CheckSolProjError(void* a_s, int idx)
   CAROM::Vector* recon_init;
   recon_init = new CAROM::Vector(num_rows,false);
   CAROM::Vector* m_working;
-  m_working = new CAROM::Vector(m_rdim, false);
+  m_working = new CAROM::Vector(m_rdims[idx], false);
 
   for (int j = 0; j < num_cols; j++){
-    m_working = ProjectToRB(m_snapshots[idx]->getColumn(j),m_basis[idx], m_rdim);
-    MPISum_double(m_projected_init[idx]->getData(),m_working->getData(),m_rdim,&mpi->world);
+    m_working = ProjectToRB(m_snapshots[idx]->getColumn(j), m_basis[idx], m_rdims[idx]);
+    MPISum_double(m_projected_init[idx]->getData(), m_working->getData(), m_rdims[idx], &mpi->world);
     if (!m_rank) {
       printf("%d m_project size %d\n",idx,m_projected_init[idx]->dim());
       std::cout << "Checking projected coefficients: ";
@@ -1431,7 +1431,7 @@ void LSROMObject::CheckSolProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
 
-    recon_init = m_basis[idx]->getFirstNColumns(m_rdim)->mult(m_projected_init[idx]);
+    recon_init = m_basis[idx]->getFirstNColumns(m_rdims[idx])->mult(m_projected_init[idx]);
     ArrayCopynD(sim[0].solver.ndims,
                 recon_init->getData(),
                 snapproj_wghosts.data(),
@@ -1441,7 +1441,7 @@ void LSROMObject::CheckSolProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
       char buffer[] = "snapprojerr";  // Creates a modifiable buffer and copies the string literal
-      CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),snap_wghosts.data(),snapproj_wghosts.data(),buffer);
+//    CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),snap_wghosts.data(),snapproj_wghosts.data(),buffer);
       /* increment the index string, if required */
       if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
         ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
