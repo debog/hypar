@@ -441,6 +441,12 @@ void LSROMObject::train(void* a_s)
           if (!m_rank) printf("m_rdim %d is reset to %d \n",
                               m_rdim,m_generator[i]->getSpatialBasis()->numColumns());
         }
+        if (!m_rank) {
+          std::cout << "----------------------------------------\n";
+          std::cout << "Time window #" << i << ": # f POD basis : " << m_rdims[i];
+          std::cout << std::endl;
+        }
+
         m_projected_init.push_back(new CAROM::Vector(m_rdims[i], false));
         m_romcoef.push_back(new CAROM::Vector(m_rdims[i], false));
 
@@ -466,12 +472,17 @@ void LSROMObject::train(void* a_s)
                                 m_generator_phi[i]->getSpatialBasis()->numColumns(),
                                 false,
                                 true));
-        if (m_rdims_phi[i] != m_generator_phi[i]->getSpatialBasis()->numColumns()){
-          m_rdims_phi[i] = m_generator_phi[i]->getSpatialBasis()->numColumns();
-          if (!m_rank) printf("m_rdim_phi %d is reset to %d \n",
-                              m_rdim_phi,
-                              m_generator_phi[i]->getSpatialBasis()->numColumns());
-        }
+          if (m_rdims_phi[i] != m_generator_phi[i]->getSpatialBasis()->numColumns()){
+            m_rdims_phi[i] = m_generator_phi[i]->getSpatialBasis()->numColumns();
+            if (!m_rank) printf("m_rdim_phi %d is reset to %d \n",
+                                m_rdim_phi,
+                                m_generator_phi[i]->getSpatialBasis()->numColumns());
+          }
+          if (!m_rank) {
+            std::cout << "----------------------------------------\n";
+            std::cout << "Time window #" << i << ": # potential POD basis : " << m_rdims_phi[i];
+            std::cout << std::endl;
+          }
           m_projected_init_phi.push_back(new CAROM::Vector(m_rdims_phi[i], false));
 
           OutputROMBasisPhi(a_s, m_generator_phi[i]->getSpatialBasis(),i);
