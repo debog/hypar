@@ -1749,7 +1749,8 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
   }
 
   // construct rhs = basis_phi^T integral_basis_f
-  m_romlaplace_phi[idx]=a_rombasis_phi->getFirstNColumns(m_rdim_phi)->transposeMult(laplace_phi);
+  m_working = a_rombasis_phi->getFirstNColumns(m_rdims_phi[idx])->transposeMult(laplace_phi);
+  MPISum_double(m_romlaplace_phi[idx]->getData(),m_working->getData(),m_rdims_phi[idx]*m_rdims_phi[idx],&mpi->world);
   if (!m_rank) {
     printf("m_romlaplace_phi %d %d\n",m_romlaplace_phi[idx]->numRows(),m_romlaplace_phi[idx]->numColumns());
 //  std::cout << "Checking Potential ROM Laplace: \n";
@@ -1761,15 +1762,7 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
 //  std::cout << std::endl;
   }
   m_romlaplace_phi[idx]->inverse();
-//if (!m_rank) {
-//  std::cout << "Checking Potential ROM inverse Laplace: \n";
-//  for (int i = 0; i < m_romlaplace_phi->numRows(); i++) {
-//    for (int j = 0; j < m_romlaplace_phi->numColumns(); j++) {
-//        std::cout << (m_romlaplace_phi->item(i,j)) << " ";
-//    }
-//  }
-//  std::cout << std::endl;
-//}
+
   delete laplace_phi;
   delete m_working;
   return;
@@ -1797,7 +1790,7 @@ void LSROMObject::CheckPotentialProjError(void* a_s, int idx)
   CAROM::Vector* recon_caromvec;
   recon_caromvec= new CAROM::Vector(num_rows,false);
   CAROM::Vector* m_working;
-  m_working = new CAROM::Vector(m_rdim_phi, false);
+  m_working = new CAROM::Vector(m_rdims_phi[idx], false);
 
   for (int j = 0; j < num_cols; j++){
     /* Extend reduced basis \phi_j with ghost points */
@@ -1810,8 +1803,8 @@ void LSROMObject::CheckPotentialProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
 
-    m_working = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_basis_phi[idx], m_rdim_phi);
-    MPISum_double(m_projected_init_phi[idx]->getData(),m_working->getData(),m_rdim_phi,&mpi->world);
+    m_working = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_basis_phi[idx], m_rdims_phi[idx]);
+    MPISum_double(m_projected_init_phi[idx]->getData(),m_working->getData(),m_rdims_phi[idx],&mpi->world);
     if (!m_rank) {
       printf("%d m_project phi size %d\n",idx,m_projected_init_phi[idx]->dim());
       std::cout << "Checking phi projected coefficients: ";
@@ -1820,7 +1813,7 @@ void LSROMObject::CheckPotentialProjError(void* a_s, int idx)
       }
       std::cout << std::endl;
     }
-    recon_caromvec= m_basis_phi[idx]->getFirstNColumns(m_rdim_phi)->mult(m_projected_init_phi[idx]);
+    recon_caromvec= m_basis_phi[idx]->getFirstNColumns(m_rdims_phi[idx])->mult(m_projected_init_phi[idx]);
     ArrayCopynD(1,
                 recon_caromvec->getData(),
                 snapproj_wghosts.data(),
@@ -1857,8 +1850,8 @@ void LSROMObject::projectInitialSolution_phi(  CAROM::Vector& a_U /*!< solution 
   }
   for (int i = 0; i < m_generator_phi.size(); i++) {
 
-    m_projected_init_phi.push_back(new CAROM::Vector(m_rdim_phi, false));
-    m_projected_init_phi[i] = m_generator_phi[i]->getSpatialBasis()->getFirstNColumns(m_rdim_phi)->transposeMult(a_U);
+    m_projected_init_phi.push_back(new CAROM::Vector(m_rdims_phi[i], false));
+    m_projected_init_phi[i] = m_generator_phi[i]->getSpatialBasis()->getFirstNColumns(m_rdims_phi[i])->transposeMult(a_U);
 
     if (!m_rank) {
       std::cout << "Checking projected coefficients phi: ";
@@ -1993,6 +1986,8 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
   CAROM::Vector* recon_lap;
   CAROM::Vector* field_reduced;
   CAROM::Vector* lap_reduced;
+  CAROM::Vector* m_working;
+  m_working = new CAROM::Vector(m_rdims_phi[idx], false);
 
   int num_cols = m_snapshots_phi[idx]->numColumns();
   char buffer[] = "laplace_projerr";  // Creates a modifiable buffer and copies the string literal
