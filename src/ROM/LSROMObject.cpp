@@ -1722,7 +1722,16 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
                 index.data(),
                 sim[0].solver.nvars);
 
-    ::SecondDerivativeSecondOrderCentralNoGhosts(rhs_wghosts.data(),vec_wghosts.data(),0,&(sim[0].solver),&(sim[0].mpi),1,&(param->npts_local_x));
+     MPIExchangeBoundaries1D(&(sim[0].mpi),vec_wghosts.data(),param->npts_local_x,
+                                  sim[0].solver.ghosts,0,sim[0].solver.ndims);
+    ::SecondDerivativeSecondOrderCentralNoGhosts(rhs_wghosts.data(),
+                                                 vec_wghosts.data(),
+                                                 0,
+                                                 1,
+                                                 &(param->npts_local_x),
+                                                 sim[0].solver.ghosts,
+                                                 1,
+                                                 &(sim[0].mpi));
 
     ArrayCopynD(1,
                 rhs_wghosts.data(),
