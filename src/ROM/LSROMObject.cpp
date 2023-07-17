@@ -218,21 +218,23 @@ void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U /*!< solution vect
 
 /*! take a sample (solution snapshot) */
 void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
-                                const double a_time, /*!< sample time */ 
-                                void* a_s )
+                               const double a_time, /*!< sample time */
+                               void* a_s )
 {
   SimulationObject* sim = (SimulationObject*) a_s;
 
   HyPar  *solver = (HyPar*) &(sim[0].solver);
   Vlasov *param  = (Vlasov*) solver->physics;
   MPIVariables *mpi = (MPIVariables *) param->m;
-  std::vector<double> vec_wghosts(param->npts_local_x*param->ndims_x);
-  std::vector<double> vec_x_wghosts(param->npts_local_x_wghosts*param->ndims_x);
+
+  std::vector<double> vec_wo_ghosts(param->npts_local_x, 0.0);
+  std::vector<double> vec_x_wghosts(param->npts_local_x_wghosts);
   std::vector<int> index(sim[0].solver.ndims);
 
   if (m_tic == 0) {
 
     m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
+    m_options[m_curr_win]->setSingularValueTol(1e-8);
     m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisName));
     m_intervals.push_back( Interval(a_time, m_t_final) );
     m_ls_is_trained.push_back(false);
@@ -255,7 +257,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       if (mpi->ip[1] == 0) {
           ArrayCopynD(1,
                       param->potential,
-                      vec_wghosts.data(),
+                      vec_wo_ghosts.data(),
                       sim[0].solver.dim_local,
                       sim[0].solver.ghosts,
                       0,
@@ -263,16 +265,16 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                       sim[0].solver.nvars);
       }
       else {
-        vec_wghosts = std::vector<double> (vec_wghosts.size(),0.0);
+        vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
       }
-      bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+      bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
 
       m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
       m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
       if (mpi->ip[1] == 0) {
       ArrayCopynD(1,
                   param->e_field,
-                  vec_wghosts.data(),
+                  vec_wo_ghosts.data(),
                   sim[0].solver.dim_local,
                   sim[0].solver.ghosts,
                   0,
@@ -280,9 +282,9 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                   sim[0].solver.nvars);
       }
       else {
-        vec_wghosts = std::vector<double> (vec_wghosts.size(),0.0);
+        vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
       }
-      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
     }
   } else {
 
@@ -295,7 +297,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       if (mpi->ip[1] == 0) {
           ArrayCopynD(1,
                       param->potential,
-                      vec_wghosts.data(),
+                      vec_wo_ghosts.data(),
                       sim[0].solver.dim_local,
                       sim[0].solver.ghosts,
                       0,
@@ -303,14 +305,14 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                       sim[0].solver.nvars);
       }
       else {
-        vec_wghosts = std::vector<double> (vec_wghosts.size(),0.0);
+        vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
       }
-      bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+      bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
 
       if (mpi->ip[1] == 0) {
         ArrayCopynD(1,
                     param->e_field,
-                    vec_wghosts.data(),
+                    vec_wo_ghosts.data(),
                     sim[0].solver.dim_local,
                     sim[0].solver.ghosts,
                     0,
@@ -318,9 +320,9 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                     sim[0].solver.nvars);
       }
       else {
-        vec_wghosts = std::vector<double> (vec_wghosts.size(),0.0);
+        vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
       }
-      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
     }
 
     if (m_tic%m_num_window_samples == 0) {
@@ -348,7 +350,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
         if (mpi->ip[1] == 0) {
           ArrayCopynD(1,
                       param->potential,
-                      vec_wghosts.data(),
+                      vec_wo_ghosts.data(),
                       sim[0].solver.dim_local,
                       sim[0].solver.ghosts,
                       0,
@@ -356,9 +358,9 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                       sim[0].solver.nvars);
         }
         else {
-          vec_wghosts = std::vector<double> (vec_wghosts.size(),0.0);
+          vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
         }
-        bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+        bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
 
         m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
         m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
@@ -366,7 +368,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
         if (mpi->ip[1] == 0) {
           ArrayCopynD(1,
                       param->e_field,
-                      vec_wghosts.data(),
+                      vec_wo_ghosts.data(),
                       sim[0].solver.dim_local,
                       sim[0].solver.ghosts,
                       0,
@@ -374,9 +376,9 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                       sim[0].solver.nvars);
         }
         else {
-          vec_wghosts = std::vector<double> (vec_wghosts.size(),0.0);
+          vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
         }
-        bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wghosts.data(), a_time, m_dt );
+        bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
       }
 
       m_ls_is_trained.push_back(false);
