@@ -421,31 +421,7 @@ void LSROMObject::train(void* a_s)
         /* IMPORTANT!!! m_generator[i]->getSnapshotMatrix() is modified after
          * getSingularValues or (computeSVD) is called, hence need to make a copy of snapshots */
         /* Does everytime invoking getSpatialBasis() do computeSVD again? */
-//    std::cout << "print generator matrix: ";
-//    for (int k = 0; k < m_generator[i]->getSnapshotMatrix()->getColumn(0)->dim(); k++) {
-//          std::cout << m_rank << " " << k << " " << (m_generator[i]->getSnapshotMatrix()->getColumn(0)->item(k)) << "\n";
-//    }
-//    std::cout << std::endl;
-//    exit(0);
-//      m_snapshots.push_back(new CAROM::Matrix(
-//                            m_generator[i]->getSnapshotMatrix()->getData(),
-//                            m_generator[i]->getSnapshotMatrix()->numRows(),
-//                            m_generator[i]->getSnapshotMatrix()->numColumns(),
-//                            true,
-//                            true));
-//      m_snapshots.push_back(new CAROM::Matrix(
-//                            m_generator[i]->getSnapshotMatrix()->numRows(),
-//                            m_generator[i]->getSnapshotMatrix()->numColumns(),
-//                            true));
-//      m_snapshots.push_back(new CAROM::Matrix());
-//      m_snapshots[0] = m_generator[i]->getSnapshotMatrix();
         m_snapshots.push_back(new CAROM::Matrix(*m_generator[i]->getSnapshotMatrix()));
-//    std::cout << "print m_snapshots matrix: ";
-//    for (int k = 0; k < m_snapshots[0]->getColumn(0)->dim(); k++) {
-//          std::cout << m_rank << " " << k << " " << (m_snapshots[0]->getColumn(0)->item(k)) << "\n";
-//    }
-//    std::cout << std::endl;
-//    exit(0);
 
         m_rdims.push_back(m_rdim);
         if (m_generator[i]->getSnapshotMatrix()->numColumns() < m_rdims[i]) {
