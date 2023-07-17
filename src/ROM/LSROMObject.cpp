@@ -203,16 +203,6 @@ void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U /*!< solution vect
 
     m_projected_init.push_back(new CAROM::Vector(m_rdim, false));
     m_projected_init[i] = m_generator[i]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(a_U);
-
-//  if (!m_rank) {
-//    printf("m_project size %d\n",m_projected_init[i]->dim());
-//    std::cout << "Checking projected coefficients: ";
-//    for (int j = 0; j < m_projected_init[i]->dim(); j++) {
-//          std::cout << (m_projected_init[i]->item(j)) << " ";
-//    }
-//    std::cout << std::endl;
-//  }
-
   }
 }
 
