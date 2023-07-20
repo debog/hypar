@@ -413,6 +413,9 @@ void LSROMObject::train(void* a_s)
    * 3. Initial condition (projectInitialCondition) */
 
   SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
 
   if (m_generator.size() > 0) {
     for (int i = 0; i < m_generator.size(); i++) {
@@ -465,7 +468,8 @@ void LSROMObject::train(void* a_s)
 
         if (i > 0) {
           m_fullscale.push_back(new CAROM::Matrix(m_rdims[i], m_rdims[i-1], false));
-          m_fullscale[i] = m_basis[i]->transposeMult(m_basis[i-1]);
+          m_matrix = m_basis[i]->transposeMult(m_basis[i-1]);
+          MPISum_double(m_fullscale[i-1]->getData(), m_matrix->getData(), m_rdims[i-1]*m_rdims[i], &mpi->world);
         }
 
         m_projected_init.push_back(new CAROM::Vector(m_rdims[i], false));
