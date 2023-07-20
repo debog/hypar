@@ -447,6 +447,11 @@ void LSROMObject::train(void* a_s)
           std::cout << std::endl;
         }
 
+        if (i > 0) {
+          m_fullscale.push_back(new CAROM::Matrix(m_rdims[i], m_rdims[i-1], false));
+          m_fullscale[i] = m_basis[i]->transposeMult(m_basis[i-1]);
+        }
+
         m_projected_init.push_back(new CAROM::Vector(m_rdims[i], false));
         m_romcoef.push_back(new CAROM::Vector(m_rdims[i], false));
 
