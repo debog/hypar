@@ -85,7 +85,7 @@ class LSROMObject : public ROMObject
     CAROM::Vector* ProjectToRB(CAROM::Vector*, const CAROM::Matrix*, const int );
 
     /*! Initialize the time integration for LSROM */
-    int TimeInitialize ();
+    int TimeInitialize (int);
     /* RK Time integration for LSROM */
     int TimeExplicitRKInitialize();
 
@@ -144,7 +144,7 @@ class LSROMObject : public ROMObject
     std::vector<const CAROM::Matrix*> m_basis; /*!< Snapshot Matrix */
     std::vector<CAROM::Matrix*> m_romhyperb; /*!< Reduced Hyperbolic Term Matrix */
     const CAROM::Vector* m_S; /*!< Vector of Singular value */
-    CAROM::Vector* m_romcoef; /*!< Vector of rom coefficients */
+    std::vector<CAROM::Vector*> m_romcoef; /*!< Vector of rom coefficients */
     CAROM::Vector* m_romhycoef; /*!< Vector of rom coefficients */
     CAROM::Vector* m_recon; /*!< Vector of rom coefficients */
 
@@ -159,6 +159,8 @@ class LSROMObject : public ROMObject
     double  m_t_final;  /*!< Final time */
     int     m_rdim;     /*!< Latent space dimension */
     int     m_rdim_phi;     /*!< Phi Latent space dimension */
+    std::vector<int> m_rdims;     /*!< Latent space dimension */
+    std::vector<int> m_rdims_phi;     /*!< Phi Latent space dimension */
 
     int m_num_window_samples; /*!< Number of samples per LS for time-windowing */
 
@@ -171,6 +173,9 @@ class LSROMObject : public ROMObject
     bool m_write_snapshot_mat;  /*!< Write snapshot matrix to file or not */
     bool m_direct_comp_hyperbolic;  /*!< Compute Hyperbolic term directly or not */
     bool m_solve_phi;  /*!< Solve potential or not */
+    bool m_c_err_snap;  /*!< Compute error of each snapshot*/
+
+    double m_energy_criteria;
 
     std::string m_dirname; /*!< Subdirectory where LS objects are written to or read from */
 
@@ -201,6 +206,7 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::BasisGenerator*> m_generator_phi; /*!< Vector of BasisGenerator objects */
     std::vector<CAROM::Vector*> m_projected_init_phi; /*!< Vector of Vector objects */
     std::vector<CAROM::Matrix*> m_snapshots_phi; /*!< Snapshot Matrix */
+    std::vector<const CAROM::Matrix*> m_basis_phi; /*!< Snapshot Matrix */
     std::vector<CAROM::Matrix*> m_romrhs_phi; /*!< Reduced Hyperbolic Term Matrix */
     std::vector<CAROM::Matrix*> m_romlaplace_phi; /*!< Reduced Hyperbolic Term Matrix */
     const CAROM::Vector* m_S_phi; /*!< Vector of Singular value */
@@ -215,6 +221,8 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::Matrix*> m_romhyperb_x; /*!< Reduced Hyperbolic Term Matrix */
     std::vector<std::vector<CAROM::Matrix*>> m_romhyperb_v; /*!< Reduced Hyperbolic Term Matrix */
     int m_sampling_freq;       /*!< Time step size */
+
+    std::vector<CAROM::Matrix*> m_fullscale;
 
   private:
 };
