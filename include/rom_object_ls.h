@@ -36,6 +36,7 @@ class LSROMObject : public ROMObject
                   const double, 
                   const int, 
                   const int,
+                  const int,
                   const int, 
                   const int,
                   const int,
@@ -188,6 +189,8 @@ class LSROMObject : public ROMObject
     bool isIncremental = false;
     const std::string basisName = "basis";
     const std::string basisFileName;
+    const std::string basisName_phi = "basis_phi";
+    const std::string basisFileName_phi;
     int numRowRB, numColumnRB;
 
     /* parameters for RK, similar as in timeintegration_struct.h */
@@ -226,6 +229,9 @@ class LSROMObject : public ROMObject
     int m_sampling_freq;       /*!< Time step size */
 
     std::vector<CAROM::Matrix*> m_fullscale;
+    CAROM::Matrix* m_matrix;
+
+    int m_parametric_id; /*!< frequency (iterations) of writing ROM solution to file */
 
   private:
 };
