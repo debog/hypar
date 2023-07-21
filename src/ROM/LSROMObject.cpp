@@ -2655,4 +2655,29 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
   return;
 }
 
+/*! Write snapshot matrix */
+void LSROMObject::writeSnapshot(void* a_s)
+{
+  if (m_generator.size() > 0) {
+    for (int i = 0; i < m_generator.size(); i++) {
+      m_generator[i]->writeSnapshot();
+      printf("checking snapshot dimension %d %d \n",m_generator[i]->getSnapshotMatrix()->numRows(),m_generator[i]->getSnapshotMatrix()->numColumns());
+      delete m_generator[i];
+      delete m_options[i];
+    }
+  }
+
+  if (m_solve_phi) {
+    if (m_generator_phi.size() > 0) {
+      for (int i = 0; i < m_generator_phi.size(); i++) {
+        m_generator_phi[i]->writeSnapshot();
+        printf("checking snapshot dimension phi %d %d \n",m_generator_phi[i]->getSnapshotMatrix()->numRows(),m_generator_phi[i]->getSnapshotMatrix()->numColumns());
+        delete m_generator_phi[i];
+        delete m_options_phi[i];
+      }
+    }
+  }
+  return;
+}
+
 #endif

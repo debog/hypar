@@ -135,6 +135,9 @@ class LSROMObject : public ROMObject
 
     /* Construct reduced hyperbolic tensor in v direction */
     void ConstructROMHy_v(void*, const CAROM::Matrix*, const CAROM::Matrix*,int);
+
+    /*! Write Snapshot matrix */
+    virtual void writeSnapshot(void* );
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */

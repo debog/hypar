@@ -48,6 +48,8 @@ class ROMObject
     virtual void load( const std::string& ) = 0;
     /*! Check the ROM object */
     virtual void check(void*) = 0;
+    /*! Write Snapshot matrix */
+    virtual void writeSnapshot(void*) = 0;
 
   protected:
 

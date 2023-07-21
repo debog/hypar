@@ -102,6 +102,9 @@ class DMDROMObject : public ROMObject
     /*! Check the DMD object */
     virtual void check(void* );
 
+    /*! Write Snapshot matrix */
+    virtual void writeSnapshot(void* );
+
   protected:
 
     std::vector<CAROM::DMD*> m_dmd; /*!< Vector of DMD objects */

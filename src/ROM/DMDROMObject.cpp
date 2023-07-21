@@ -338,4 +338,9 @@ void DMDROMObject::check(void* a_s)
 {
 }
 
+/*! Write snapshot matrix */
+void DMDROMObject::writeSnapshot(void* a_s)
+{
+}
+
 #endif
