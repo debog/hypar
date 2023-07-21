@@ -105,6 +105,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
 
   m_num_window_samples = INT_MAX;
   m_energy_criteria = -1;
+	m_nsets = 1;
 
   char dirname_c_str[_MAX_STRING_SIZE_] = "LS";
   char write_snapshot_mat[_MAX_STRING_SIZE_] = "false";
@@ -142,6 +143,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
             ferr = fscanf(in,"%le", &m_energy_criteria); if (ferr != 1) return;
           } else if (std::string(word) == "ls_c_err_snap") {
             ferr = fscanf(in,"%s", c_err_snap); if (ferr != 1) return;
+          } else if (std::string(word) == "ls_nsets") {
+            ferr = fscanf(in,"%d", &m_nsets); if (ferr != 1) return;
           }
           if (ferr != 1) return;
         }
@@ -165,6 +168,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
     printf("  directly compute hyperbolic term:  %s\n", direct_comp_hyperbolic);
     printf("  solve potential:  %s\n", solve_phi);
     printf("  compute error for each snapshot:  %s\n", c_err_snap);
+    printf("  number of parametric snapshot sets:   %d\n", m_nsets);
     if (m_sim_idx >= 0) {
       printf("  simulation domain:  %d\n", m_sim_idx);
     }
@@ -182,6 +186,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   MPI_Bcast(solve_phi,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(&m_energy_criteria,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
   MPI_Bcast(c_err_snap,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+  MPI_Bcast(&m_nsets,1,MPI_INT,0,MPI_COMM_WORLD);
 #endif
 
   m_dirname = std::string( dirname_c_str );
@@ -351,7 +356,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       if (m_energy_criteria > 0){
         m_options[m_curr_win]->setSingularValueTol(m_energy_criteria);
       }
-      const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
+      const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
       m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
 
       bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
@@ -361,7 +366,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
           m_options_phi[m_curr_win]->setSingularValueTol(m_energy_criteria);
         }
 
-        const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
+        const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
         m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName_phi));
 
         if (mpi->ip[1] == 0) {
@@ -2689,6 +2694,24 @@ void LSROMObject::writeSnapshot(void* a_s)
     }
   }
   return;
+}
+
+/*! Merge */
+void LSROMObject::merge(void* a_s)
+{
+	/* Currently only works for single-window approach */
+	/* Basis_generator is not sued not sure why it is called here */
+	std::unique_ptr<CAROM::BasisGenerator> basis_generator;
+	CAROM::Options* options = new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV);
+	CAROM::BasisGenerator* generator = new CAROM::BasisGenerator(*options, isIncremental, basisName);
+  for (int paramID=0; paramID<m_nsets; ++paramID)
+  {
+		std::string snapshot_filename = basisName + std::to_string(
+                                    paramID) + "_" + std::to_string(0)
+																		+ "_snapshot";
+    generator->loadSamples(snapshot_filename,"snapshot");
+  }
+  generator->endSamples(); // save the merged basis f
 }
 
 #endif
