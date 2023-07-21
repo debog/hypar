@@ -61,6 +61,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
                             const double  a_dt,             /*!< time step size */
                             const int     a_sampling_freq,  /*!< sampling frequency */
                             const int     a_rdim,           /*!< latent space dimension */
+                            const int     a_parametric_id,  /*!< Vector component index */
                             const int     a_rank,           /*!< MPI rank of this process */
                             const int     a_nproc,          /*!< Number of MPI processes */
                             const int     a_sim_idx,        /*!< Simulation index (for ensemble simulations */
@@ -100,6 +101,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
 
   m_sim_idx = a_sim_idx;
   m_var_idx = a_var_idx;
+  m_parametric_id = a_parametric_id;
 
   m_num_window_samples = INT_MAX;
   m_energy_criteria = -1;
@@ -239,7 +241,8 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       m_options[m_curr_win]->setSingularValueTol(m_energy_criteria);
     }
 
-    m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisName));
+    const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
+    m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
     m_intervals.push_back( Interval(a_time, m_t_final) );
     m_ls_is_trained.push_back(false);
     m_snap.push_back(0);
@@ -259,7 +262,8 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       if (m_energy_criteria > 0){
         m_options_phi[m_curr_win]->setSingularValueTol(m_energy_criteria);
       }
-      m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName));
+      const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
+      m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisFileName_phi));
       if (mpi->ip[1] == 0) {
           ArrayCopynD(1,
                       param->potential,
@@ -344,14 +348,21 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       m_curr_win++;
 
       m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
-      m_options[m_curr_win]->setSingularValueTol(1e-8);
-      m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisName));
+      if (m_energy_criteria > 0){
+        m_options[m_curr_win]->setSingularValueTol(m_energy_criteria);
+      }
+      const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
+      m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
 
       bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
       if (m_solve_phi) {
         m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
-        m_options_phi[m_curr_win]->setSingularValueTol(1e-8);
-        m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName));
+        if (m_energy_criteria > 0){
+          m_options_phi[m_curr_win]->setSingularValueTol(m_energy_criteria);
+        }
+
+        const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
+        m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName_phi));
 
         if (mpi->ip[1] == 0) {
           ArrayCopynD(1,
