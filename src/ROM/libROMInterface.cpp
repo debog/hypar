@@ -70,6 +70,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 
       m_rdim = -1;
       m_sampling_freq = 1;
+      m_parametric_id = 0;
 
     } else {
 
@@ -77,6 +78,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
       strcpy( comp_mode_c_str, _ROM_COMP_MODE_MONOLITHIC_ );
       strcpy( type_c_str,_ROM_TYPE_DMD_ );
       strcpy( save_c_str, "true" );
+      m_parametric_id = 0;
 
       int ferr;
       char word[_MAX_STRING_SIZE_];
@@ -97,6 +99,10 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
             ferr = fscanf(in,"%s", type_c_str); if (ferr != 1) return;
           } else if (std::string(word) == "save_to_file") {
             ferr = fscanf(in,"%s", save_c_str); if (ferr != 1) return;
+          } else if (std::string(word) == "file_op_iter") {
+            ferr = fscanf(in,"%d", &m_file_op_iter); if (ferr != 1) return;
+          } else if (std::string(word) == "parametric_id") {
+            ferr = fscanf(in,"%d", &m_parametric_id); if (ferr != 1) return;
           }
           if (ferr != 1) return;
         }
@@ -119,6 +125,8 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
       printf("  component mode: %s\n", comp_mode_c_str);
       printf("  type: %s\n", type_c_str);
       printf("  save to file: %s\n", save_c_str);
+      printf("  file op iter:  %d\n", m_file_op_iter);
+      printf("  parametric id:  %d\n", m_parametric_id);
     }
   }
 
@@ -129,6 +137,8 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
   MPI_Bcast(comp_mode_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(type_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(save_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+  MPI_Bcast(&m_file_op_iter,1,MPI_INT,0,MPI_COMM_WORLD);
+  MPI_Bcast(&m_parametric_id,1,MPI_INT,0,MPI_COMM_WORLD);
 #endif
 
   m_mode = std::string( mode_c_str );
@@ -164,6 +174,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
                                             a_dt,
                                             m_sampling_freq,
                                             m_rdim,
+                                            m_parametric_id,
                                             m_rank,
                                             m_nproc,
                                             ns ) );
@@ -562,6 +573,28 @@ void libROMInterface::writeSnapshot( void* a_s  /*!< Array of simulation objects
 {
   for (int i = 0; i < m_rom.size(); i++) {
     m_rom[i]->writeSnapshot(a_s);
+  }
+
+  return;
+}
+
+/*! Merge stage*/
+void libROMInterface::merge( void* a_s  /*!< Array of simulation objects of
+                                             type #SimulationObject */ )
+{
+  for (int i = 0; i < m_rom.size(); i++) {
+    m_rom[i]->merge(a_s);
+  }
+
+  return;
+}
+
+/*! Online stage*/
+void libROMInterface::merge( void* a_s  /*!< Array of simulation objects of
+                                             type #SimulationObject */ )
+{
+  for (int i = 0; i < m_rom.size(); i++) {
+    m_rom[i]->merge(a_s);
   }
 
   return;
