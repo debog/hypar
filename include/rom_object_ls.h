@@ -139,6 +139,12 @@ class LSROMObject : public ROMObject
 
     /*! Write Snapshot matrix */
     virtual void writeSnapshot(void* );
+
+    /*! Merge stage */
+    virtual void merge(void* );
+
+    /*! Online stage */
+    virtual void online(void* );
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
@@ -232,6 +238,9 @@ class LSROMObject : public ROMObject
     CAROM::Matrix* m_matrix;
 
     int m_parametric_id; /*!< frequency (iterations) of writing ROM solution to file */
+
+    /* rightnow m_nsets only for LSROM */
+    int m_nsets; /*!< Number of parametric snapshot sets */
 
   private:
 };

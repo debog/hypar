@@ -50,6 +50,8 @@ class ROMObject
     virtual void check(void*) = 0;
     /*! Write Snapshot matrix */
     virtual void writeSnapshot(void*) = 0;
+    /*! Merge stage */
+    virtual void merge(void*) = 0;
 
   protected:
 

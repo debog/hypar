@@ -105,6 +105,9 @@ class DMDROMObject : public ROMObject
     /*! Write Snapshot matrix */
     virtual void writeSnapshot(void* );
 
+    /*! Merge stage */
+    virtual void merge(void* );
+
   protected:
 
     std::vector<CAROM::DMD*> m_dmd; /*!< Vector of DMD objects */
