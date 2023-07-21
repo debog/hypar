@@ -12,6 +12,8 @@
 #define _ROM_MODE_NONE_ "none"
 /*! Training mode */
 #define _ROM_MODE_TRAIN_ "train"
+/*! OFFLINE mode */
+#define _ROM_MODE_OFFLINE_ "offline"
 /*! Prediction mode */
 #define _ROM_MODE_PREDICT_ "predict"
 /*! Initial guess mode - use ROM prediction as initial guess
@@ -64,6 +66,7 @@ class libROMInterface
       m_train_wctime = 0;
       m_predict_wctime = 0;
       m_save_ROM = true;
+      m_parametric_id = 0;
     }
 
     /*! Constructor */
@@ -100,6 +103,8 @@ class libROMInterface
     inline double trainWallclockTime() const { return m_train_wctime; }
     /*! return the prediction wall clock time */
     inline double predictWallclockTime() const { return m_predict_wctime; }
+    /*! return the file op iter */
+    inline int file_op_iter() const { return m_file_op_iter; }
 
     /*! Take a sample for training */
     void takeSample( void* a_s, const double a_t );
@@ -131,6 +136,8 @@ class libROMInterface
     /*! Check the ROM object */
     void check(void* a_s);
 
+    void writeSnapshot(void* a_s);
+
   protected:
 
     bool m_is_defined;  /*!< Boolean to show if this object is defined */
@@ -143,6 +150,8 @@ class libROMInterface
 
     int m_rdim; /*!< Reduced model dimensionality */
     int m_sampling_freq; /*!< Frequency at which to take samples */
+    int m_file_op_iter; /*!< frequency (iterations) of writing ROM solution to file */
+    int m_parametric_id; /*!< frequency (iterations) of writing ROM solution to file */
 
     std::string m_mode; /*!< Mode: none, train, predict */
     std::string m_comp_mode; /*!< Component mode: monolithic, component-wise */
