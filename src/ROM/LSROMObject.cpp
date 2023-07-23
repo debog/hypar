@@ -2712,6 +2712,30 @@ void LSROMObject::merge(void* a_s)
     generator->loadSamples(snapshot_filename,"snapshot");
   }
   generator->endSamples(); // save the merged basis f
+  delete generator;
+  delete options;
+
+	return;
+}
+
+/*! Merge */
+void LSROMObject::online(void* a_s)
+{
+	CAROM::BasisReader reader(basisName);
+	const CAROM::Matrix* spatialbasis;
+  if (m_energy_criteria > 0)
+  {
+    spatialbasis = reader.getSpatialBasis(0.0, 1-m_energy_criteria);
+  }
+  else
+  {
+    spatialbasis = reader.getSpatialBasis(0.0, m_rdim);
+  }
+	int numRowRB, numColumnRB;
+  numRowRB = spatialbasis->numRows();
+  numColumnRB = spatialbasis->numColumns();
+  if (!m_rank) printf("spatial basis dimension is %d x %d\n", numRowRB,
+                      numColumnRB);
 }
 
 #endif
