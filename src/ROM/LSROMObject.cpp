@@ -207,20 +207,38 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_curr_win = 0;
 }
 
-void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U /*!< solution vector */ )
+void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U, /*!< solution vector */
+                                           void* a_s)
 {
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
   /* Need to modify the code so that is works for multiple windows */
   /* Assumming m_generator[i]->getSpatialBasis() is called before */
-  if (m_generator.size() == 0) {
+  if (m_basis.size() == 0) {
     if (!m_rank) {
       printf("ERROR in LSROMObject::projectInitialSolution() - m_generator is a vector of size 0.\n");
     }
     return;
   }
-  for (int i = 0; i < m_generator.size(); i++) {
 
-    m_projected_init.push_back(new CAROM::Vector(m_rdim, false));
-    m_projected_init[i] = m_generator[i]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(a_U);
+  CAROM::Vector* m_fomwork;
+  m_fomwork = new CAROM::Vector(a_U.getData(), a_U.dim(), false);
+  for (int i = 0; i < m_basis.size(); i++) {
+    CAROM::Vector* m_working;
+    m_working = new CAROM::Vector(m_rdims[i], false);
+    m_projected_init.push_back(new CAROM::Vector(m_rdims[i], false));
+
+    m_working = ProjectToRB(m_fomwork, m_basis[i], m_rdims[i]);
+    MPISum_double(m_projected_init[i]->getData(), m_working->getData(), m_rdims[i], &mpi->world);
+  if (!m_rank) {
+    std::cout << "Checking projected initial: ";
+    for (int j = 0; j < m_rdims[i]; j++) {
+          std::cout << m_projected_init[i]->item(j) << " ";
+    }
+    std::cout << std::endl;
+  }
   }
 }
 
