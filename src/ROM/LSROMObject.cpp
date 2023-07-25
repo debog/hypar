@@ -2740,7 +2740,7 @@ void LSROMObject::merge(void* a_s)
 void LSROMObject::online(void* a_s)
 {
 	CAROM::BasisReader reader(basisName);
-	const CAROM::Matrix* spatialbasis;
+  const CAROM::Matrix* spatialbasis;
   if (m_energy_criteria > 0)
   {
     spatialbasis = reader.getSpatialBasis(0.0, 1-m_energy_criteria);
@@ -2749,11 +2749,33 @@ void LSROMObject::online(void* a_s)
   {
     spatialbasis = reader.getSpatialBasis(0.0, m_rdim);
   }
+  m_basis.push_back(new CAROM::Matrix(
+                              spatialbasis->getData(),
+                              spatialbasis->numRows(),
+                              spatialbasis->numColumns(),
+                              false,
+                              true));
 	int numRowRB, numColumnRB;
-  numRowRB = spatialbasis->numRows();
-  numColumnRB = spatialbasis->numColumns();
+  numRowRB = m_basis[0]->numRows();
+  numColumnRB = m_basis[0]->numColumns();
   if (!m_rank) printf("spatial basis dimension is %d x %d\n", numRowRB,
                       numColumnRB);
+  if (m_energy_criteria > 0) m_rdim = numColumnRB;
+  m_rdims.push_back(m_rdim);
+  if (!m_rank) {
+    std::cout << "----------------------------------------\n";
+    std::cout << "Time window #" << 0 << ": # f POD basis : " << m_rdims[0];
+    std::cout << std::endl;
+  }
+  m_projected_init.push_back(new CAROM::Vector(m_rdims[0], false));
+  m_romcoef.push_back(new CAROM::Vector(m_rdims[0], false));
+  m_intervals.push_back( Interval(0, m_t_final) );
+  m_snap.push_back(0);
+
+  if ((!m_solve_phi) && (!m_direct_comp_hyperbolic)) {
+    m_romhyperb.push_back(new CAROM::Matrix(m_rdims[0], m_rdims[0], false));
+    ConstructROMHy(a_s, m_basis[0], 0);
+  }
 }
 
 #endif
