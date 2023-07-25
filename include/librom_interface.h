@@ -14,6 +14,10 @@
 #define _ROM_MODE_TRAIN_ "train"
 /*! OFFLINE mode */
 #define _ROM_MODE_OFFLINE_ "offline"
+/*! Merge mode */
+#define _ROM_MODE_MERGE_ "merge"
+/*! ONLINE mode */
+#define _ROM_MODE_ONLINE_ "online"
 /*! Prediction mode */
 #define _ROM_MODE_PREDICT_ "predict"
 /*! Initial guess mode - use ROM prediction as initial guess
@@ -136,7 +140,20 @@ class libROMInterface
     /*! Check the ROM object */
     void check(void* a_s);
 
+    /*! Write Snapshot matrix */
     void writeSnapshot(void* a_s);
+
+    /*! Merge stage */
+    void merge(void* a_s);
+
+    /*! Online stage */
+    void online(void* a_s);
+
+    /*! Write final solution */
+    void writeFinal(void* a_s);
+
+    /*! Read final solution */
+    void readFinal(void* a_s);
 
   protected:
 

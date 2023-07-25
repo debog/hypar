@@ -57,7 +57,7 @@ class DMDROMObject : public ROMObject
     }
 
     /*! Project initial solution for prediction */
-    virtual void projectInitialSolution(  CAROM::Vector& a_U /*!< solution vector */ )
+    virtual void projectInitialSolution(  CAROM::Vector& a_U, void* /*!< solution vector */ )
     {
       if (m_dmd.size() == 0) {
         if (!m_rank) {
@@ -107,6 +107,9 @@ class DMDROMObject : public ROMObject
 
     /*! Merge stage */
     virtual void merge(void* );
+
+    /*! Online stage */
+    virtual void online(void* );
 
   protected:
 

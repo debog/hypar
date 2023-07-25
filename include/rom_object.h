@@ -35,7 +35,7 @@ class ROMObject
     virtual ~ROMObject() { }
 
     /*! Project initial solution for prediction */
-    virtual void projectInitialSolution( CAROM::Vector& ) = 0;
+    virtual void projectInitialSolution( CAROM::Vector&, void* ) = 0;
     /*! take a sample (solution snapshot) */
     virtual void takeSample( const CAROM::Vector&, const double, void* ) = 0;
     /*! train the ROM object */
@@ -52,6 +52,8 @@ class ROMObject
     virtual void writeSnapshot(void*) = 0;
     /*! Merge stage */
     virtual void merge(void*) = 0;
+    /*! Online stage */
+    virtual void online(void*) = 0;
 
   protected:
 

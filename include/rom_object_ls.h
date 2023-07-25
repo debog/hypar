@@ -52,7 +52,7 @@ class LSROMObject : public ROMObject
     }
 
     /*! Project initial solution for prediction */
-    virtual void projectInitialSolution(  CAROM::Vector& );
+    virtual void projectInitialSolution(  CAROM::Vector&, void* );
 
     /*! take a sample (solution snapshot) */
     virtual void takeSample( const CAROM::Vector&, const double, void* );
