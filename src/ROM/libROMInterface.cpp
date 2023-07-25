@@ -12,6 +12,9 @@
 #include <rom_object_dmd.h>
 #include <rom_object_ls.h>
 #include <librom_interface.h>
+#include <fstream>
+#include <iostream>
+#include <iomanip>
 
 /*! Define the libROM interface
   
@@ -257,7 +260,7 @@ void libROMInterface::projectInitialSolution( void* a_s  /*!< Array of simulatio
 
   copyFromHyPar( m_U, a_s );
   for (int i = 0; i < m_rom.size(); i++) {
-    m_rom[i]->projectInitialSolution( *(m_U[i]) );
+    m_rom[i]->projectInitialSolution( *(m_U[i]), a_s );
   }
 
   return;
@@ -502,7 +505,7 @@ void libROMInterface::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vecto
   SimulationObject* sim = (SimulationObject*) a_s;
 
   double* u;
-  if (m_mode == _ROM_MODE_TRAIN_) {
+  if ((m_mode == _ROM_MODE_TRAIN_) || (m_mode == _ROM_MODE_ONLINE_)) {
     u = sim[a_idx].solver.u_rom_predicted;
   } else {
     u = sim[a_idx].solver.u;
