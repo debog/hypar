@@ -611,7 +611,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
   Vlasov *param  = (Vlasov*) solver->physics;
   MPIVariables *mpi = (MPIVariables *) param->m;
 
-  for (int i = 0; i < m_generator.size(); i++) {
+  for (int i = 0; i < m_rdims.size(); i++) {
     if (   (a_t >= m_intervals[i].first)
         && (  (a_t < m_intervals[i].second) || (m_intervals[i].second < 0)  ) ){
 
@@ -621,7 +621,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
       std::vector<int> index(sim[0].solver.ndims);
       std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
       std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
-      int num_rows = m_generator[i]->getSpatialBasis()->numRows();
+      int num_rows = m_basis[i]->numRows();
 
       CAROM::Vector* m_fomwork;
       m_fomwork = new CAROM::Vector(num_rows,false);
