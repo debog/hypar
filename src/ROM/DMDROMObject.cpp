@@ -343,4 +343,14 @@ void DMDROMObject::writeSnapshot(void* a_s)
 {
 }
 
+/*! Merge */
+void DMDROMObject::merge(void* a_s)
+{
+}
+
+/*! Online */
+void DMDROMObject::online(void* a_s)
+{
+}
+
 #endif
