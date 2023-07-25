@@ -759,7 +759,7 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
 
   int ns, stage, i;
-  int num_rows = m_generator[idx]->getSpatialBasis()->numRows();
+  int num_rows = m_basis[idx]->numRows();
 
   CAROM::Vector* m_fomwork;
   CAROM::Vector* m_rhswork;
@@ -798,7 +798,7 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
     if (m_direct_comp_hyperbolic) {
 //    printf("compute hyperbolic term directly\n");
 
-      m_fomwork = ReconlibROMfield(m_U[stage], m_generator[idx]->getSpatialBasis(), m_rdims[idx]);
+      m_fomwork = ReconlibROMfield(m_U[stage], m_basis[idx], m_rdims[idx]);
 
       ArrayCopynD(sim[0].solver.ndims,
                   m_fomwork->getData(),
