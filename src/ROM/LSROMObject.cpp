@@ -2733,6 +2733,21 @@ void LSROMObject::merge(void* a_s)
   delete generator;
   delete options;
 
+  if (m_solve_phi) {
+	  CAROM::Options* options_phi = new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV);
+	  CAROM::BasisGenerator* generator_phi = new CAROM::BasisGenerator(*options_phi, isIncremental, basisName_phi);
+    for (int paramID=0; paramID<m_nsets; ++paramID)
+    {
+      std::string snapshot_filename = basisName_phi + std::to_string(
+                                      paramID) + "_" + std::to_string(0)
+	                                    + "_snapshot";
+      generator_phi->loadSamples(snapshot_filename,"snapshot");
+    }
+    generator_phi->endSamples(); // save the merged basis f
+    delete generator_phi;
+    delete options_phi;
+  }
+
 	return;
 }
 
