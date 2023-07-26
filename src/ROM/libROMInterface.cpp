@@ -596,40 +596,6 @@ void libROMInterface::merge( void* a_s  /*!< Array of simulation objects of
 void libROMInterface::online( void* a_s  /*!< Array of simulation objects of
                                              type #SimulationObject */ )
 {
-  int precision = 16;
-
-  // Assuming m_rom and m_U are declared and initialized elsewhere in the code
-
-  std::ostringstream sol_name;
-  sol_name << "rom-final." << std::setfill('0')
-           << std::setw(6) << m_rank;
-
-  std::ifstream isol(sol_name.str().c_str());
-  isol.precision(precision);
-
-  std::vector<double> data; // You can use a vector to store the data
-
-  if (isol.is_open()) {
-      double value;
-      std::string line;
-      while (std::getline(isol, line)) {
-          std::istringstream iss(line);
-          if (iss >> value) {
-              data.push_back(value); // Store the read value in the vector
-          } else {
-              std::cerr << "Error reading data from the file.\n";
-          }
-      }
-      isol.close();
-  } else {
-      std::cerr << "Error opening the file.\n";
-  }
-
-//// Now, 'data' contains the data read from the file
-//for (double value : data) {
-//    std::cout << value << std::endl;
-//}
-
   for (int i = 0; i < m_rom.size(); i++) {
     m_rom[i]->online(a_s);
   }
