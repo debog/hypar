@@ -2454,13 +2454,13 @@ void LSROMObject::ConstructEBasis(void* a_s,int idx)
   std::vector<double> vec_x_wghosts(param->npts_local_x_wghosts*param->ndims_x);
   std::vector<int> index(sim[0].solver.ndims);
 
-  int num_rows = m_generator_phi[idx]->getSpatialBasis()->numRows();
+  int num_rows = m_basis_phi[idx]->numRows();
   double* vec_noghosts = (double*) calloc(num_rows, sizeof(double));
 
   for (int j = 0; j < m_rdims_phi[idx]; j++){
 
     ArrayCopynD(1,
-                m_generator_phi[idx]->getSpatialBasis()->getColumn(j)->getData(),
+                m_basis_phi[idx]->getColumn(j)->getData(),
                 basis_vec_wghosts.data(),
                 sim[0].solver.dim_local,
                 0,
