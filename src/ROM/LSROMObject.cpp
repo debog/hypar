@@ -2717,6 +2717,12 @@ void LSROMObject::writeSnapshot(void* a_s)
 /*! Merge */
 void LSROMObject::merge(void* a_s)
 {
+
+  SimulationObject* sim = (SimulationObject*) a_s;
+
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
 	/* Currently only works for single-window approach */
 	/* Basis_generator is not sued not sure why it is called here */
 	std::unique_ptr<CAROM::BasisGenerator> basis_generator;
@@ -2734,7 +2740,7 @@ void LSROMObject::merge(void* a_s)
   delete options;
 
   if (m_solve_phi) {
-	  CAROM::Options* options_phi = new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV);
+	  CAROM::Options* options_phi = new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV);
 	  CAROM::BasisGenerator* generator_phi = new CAROM::BasisGenerator(*options_phi, isIncremental, basisName_phi);
     for (int paramID=0; paramID<m_nsets; ++paramID)
     {
