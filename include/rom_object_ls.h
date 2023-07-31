@@ -20,6 +20,7 @@
 #include "linalg/Options.h"
 #include <rom_object.h>
 #include <simulation_object.h>
+#include <fstream>
 
 #ifndef serial
 #include <mpi.h>
@@ -241,6 +242,11 @@ class LSROMObject : public ROMObject
 
     /* rightnow m_nsets only for LSROM */
     int m_nsets; /*!< Number of parametric snapshot sets */
+
+    std::ofstream outfile_twp;
+    std::string outputPath = ".";
+    const char *twpfile = "twp.csv";
+    int m_numwindows, m_numwindows_phi;
 
   private:
 };
