@@ -2715,33 +2715,68 @@ void LSROMObject::writeSnapshot(void* a_s)
       }
     }
   }
+  outfile_twp.open(outputPath + "/" + std::string(twpfile));
+  outfile_twp << m_generator.size();
+  if (m_solve_phi) outfile_twp << ", " << m_generator_phi.size();
+  outfile_twp.close();
   return;
 }
 
 /*! Merge */
 void LSROMObject::merge(void* a_s)
 {
-
   SimulationObject* sim = (SimulationObject*) a_s;
-
   HyPar  *solver = (HyPar*) &(sim[0].solver);
   Vlasov *param  = (Vlasov*) solver->physics;
   MPIVariables *mpi = (MPIVariables *) param->m;
+
 	/* Currently only works for single-window approach */
 	/* Basis_generator is not sued not sure why it is called here */
-	std::unique_ptr<CAROM::BasisGenerator> basis_generator;
-	CAROM::Options* options = new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV);
-	CAROM::BasisGenerator* generator = new CAROM::BasisGenerator(*options, isIncremental, basisName);
-  for (int paramID=0; paramID<m_nsets; ++paramID)
+  if (!m_rank) std::cout << "Reading time window parameters from file " << std::string(twpfile) << std::endl;
+  std::ifstream ifs(std::string(twpfile).c_str());
+  if (!ifs.is_open())
   {
-		std::string snapshot_filename = basisName + std::to_string(
-                                    paramID) + "_" + std::to_string(0)
-																		+ "_snapshot";
-    generator->loadSamples(snapshot_filename,"snapshot");
+    std::cout << "Error: invalid file" << std::endl;
   }
-  generator->endSamples(); // save the merged basis f
-  delete generator;
-  delete options;
+  const int nparamRead = m_solve_phi ? 2 : 1;
+
+  std::string line, word;
+  int count = 0;
+  while (getline(ifs, line))
+  {
+    std::stringstream s(line);
+    std::vector<std::string> row;
+
+    while (getline(s, word, ','))
+      row.push_back(word);
+    if (row.size() != nparamRead)
+    {
+      std::cout << "Error: CSV file does not specify " << nparamRead << " parameters" << std::endl;
+      ifs.close();
+    }
+    printf("number of windows %d \n",stoi(row[0]));
+    m_numwindows = stoi(row[0]);
+    if (m_solve_phi) m_numwindows_phi = stoi(row[1]);
+  }
+  ifs.close();
+
+  for (int sampleWindow = 0; sampleWindow < m_numwindows; ++sampleWindow)
+  {
+    const std::string basisFileName = basisName + "_" + std::to_string(sampleWindow);
+	  std::unique_ptr<CAROM::BasisGenerator> basis_generator;
+	  CAROM::Options* options = new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV);
+	  CAROM::BasisGenerator* generator = new CAROM::BasisGenerator(*options, isIncremental, basisFileName);
+    for (int paramID=0; paramID<m_nsets; ++paramID)
+    {
+	    std::string snapshot_filename = basisName + std::to_string(
+                                      paramID) + "_" + std::to_string(sampleWindow)
+	                                    + "_snapshot";
+      generator->loadSamples(snapshot_filename,"snapshot");
+    }
+    generator->endSamples(); // save the merged basis f
+    delete generator;
+    delete options;
+  }
 
   if (m_solve_phi) {
 	  CAROM::Options* options_phi = new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV);
