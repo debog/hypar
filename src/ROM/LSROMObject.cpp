@@ -14,6 +14,10 @@
 #include <io_cpp.h>
 #include <mpivars.h>
 #include <cstring>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
 
 
 /*! Constructor 
