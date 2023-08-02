@@ -616,8 +616,8 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
   MPIVariables *mpi = (MPIVariables *) param->m;
 
   for (int i = 0; i < m_rdims.size(); i++) {
-    if (   (a_t >= m_intervals[i].first)
-        && (  (a_t < m_intervals[i].second) || (m_intervals[i].second < 0)  ) ){
+    if (   ( (a_t >= m_intervals[i].first) || (std::abs(a_t - m_intervals[i].first < 1e-8)))
+        && (  ((a_t - m_intervals[i].second) < -1e-8)  || (m_intervals[i].second < 0)  ) ){
 
       if (!m_rank) printf("LS-ROM # %d predicts at time t = %f in interval [%f, %f] \n",
                           i,a_t,m_intervals[i].first,m_intervals[i].second);
