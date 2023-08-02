@@ -2715,9 +2715,18 @@ void LSROMObject::writeSnapshot(void* a_s)
       }
     }
   }
+
   outfile_twp.open(outputPath + "/" + std::string(twpfile));
   outfile_twp << m_generator.size();
   if (m_solve_phi) outfile_twp << ", " << m_generator_phi.size();
+  outfile_twp.close();
+
+  outfile_twp.open(outputPath + "/" + std::string(twintervalfile));
+  int precision = 16;
+  outfile_twp << std::setprecision(precision);
+  for (int i = 0; i < m_generator.size(); i++) {
+    outfile_twp << m_intervals[i].first << ", " << m_intervals[i].second << "\n";
+  }
   outfile_twp.close();
   return;
 }
@@ -2777,6 +2786,7 @@ void LSROMObject::online(void* a_s)
   MPIVariables *mpi = (MPIVariables *) param->m;
 
   ReadTimeWindows(a_s);
+  ReadTimeIntervals(a_s);
 
   for (int sampleWindow = 0; sampleWindow < m_numwindows; ++sampleWindow)
   {
@@ -2830,7 +2840,6 @@ void LSROMObject::online(void* a_s)
     }
     m_projected_init.push_back(new CAROM::Vector(m_rdims[sampleWindow], false));
     m_romcoef.push_back(new CAROM::Vector(m_rdims[sampleWindow], false));
-    m_intervals.push_back( Interval(0, m_t_final) );
     m_snap.push_back(0);
 
     if ((!m_solve_phi) && (!m_direct_comp_hyperbolic)) {
@@ -2926,6 +2935,47 @@ void LSROMObject::ReadTimeWindows(void* a_s)
     if (m_solve_phi) m_numwindows_phi = stoi(row[1]);
   }
   ifs.close();
+}
+
+void LSROMObject::ReadTimeIntervals(void* a_s)
+{
+  if (!m_rank) std::cout << "Reading time interval for each time window from file " << std::string(twintervalfile) << std::endl;
+  std::ifstream ifs(std::string(twintervalfile).c_str());
+  if (!ifs.is_open())
+  {
+    std::cout << "Error: invalid file" << std::endl;
+  }
+  const int nparamRead = 2;
+
+  std::string line, word;
+  int count = 0;
+  while (getline(ifs, line))
+  {
+    std::stringstream s(line);
+//   std::vector<std::string> row;
+
+//   while (getline(s, word, ','))
+//     row.push_back(word);
+//   if (row.size() != nparamRead)
+//   {
+//     std::cout << "Error: CSV file does not specify " << nparamRead << " parameters" << std::endl;
+//     ifs.close();
+//   }
+//   m_intervals.push_back( Interval(stod(row[0]), stod(row[1])) );
+//   printf("checking m_intervals %f %f \n",m_intervals[count].first, m_intervals[count].second);
+//   count++;
+    double firstValue, secondValue;
+    char comma;
+		if (s >> firstValue >> comma >> secondValue) {
+        m_intervals.push_back( Interval(firstValue, secondValue) );
+//      printf("checking m_intervals %f %f \n", m_intervals[count].first, m_intervals[count].second);
+        count++;
+    } else {
+        std::cout << "Error: Invalid data format in the file." << std::endl;
+    }
+  }
+  ifs.close();
+  // check if size of m_intervals is equal to number of windows
 }
 
 #endif
