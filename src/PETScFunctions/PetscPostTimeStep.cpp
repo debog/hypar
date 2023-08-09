@@ -12,7 +12,7 @@
 #include <simulation_object.h>
 #include <petscinterface.h>
 
-extern "C" int OutputSolution (void*,int);   /*!< Write solutions to file */
+int OutputSolution (void*,int,double);   /*!< Write solutions to file */
 
 #undef __FUNCT__
 #define __FUNCT__ "PetscPostTimeStep"
@@ -149,7 +149,7 @@ PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
       MPIVariables* mpi = &(sim[ns].mpi);
       if (solver->PhysicsOutput) solver->PhysicsOutput(solver,mpi);
     }
-    OutputSolution(sim,nsims);
+    OutputSolution(sim,nsims,waqt);
 #ifdef with_librom
     context->op_times_arr.push_back(waqt);
 #endif

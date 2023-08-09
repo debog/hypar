@@ -10,8 +10,8 @@ libSimulation_a_SOURCES = \
   InitializePhysicsData.c \
   InitializeSolvers.c \
   InitialSolution.c \
-  OutputSolution.c \
-  OutputROMSolution.c \
+  OutputSolution.cpp \
+  OutputROMSolution.cpp \
   ReadInputs.c \
   SimulationWriteErrors.c \
 	SingleSimulationDefine.cpp \

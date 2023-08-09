@@ -72,7 +72,7 @@ int SparseGridsSimulation::Solve()
   for (TS.iter = TS.restart_iter; TS.iter < TS.n_iter; TS.iter++) {
 
     /* Write initial solution to file if this is the first iteration */
-    if (!TS.iter) OutputSolution();
+    if (!TS.iter) OutputSolution(TS.waqt);
 
     /* Call pre-step function */
     TimePreStep  (&TS);
@@ -89,14 +89,14 @@ int SparseGridsSimulation::Solve()
 
     /* Write intermediate solution to file */
     if ((TS.iter+1)%m_sims_sg[0].solver.file_op_iter == 0) { 
-      OutputSolution();
+      OutputSolution(TS.waqt);
       tic = 0; 
     }
 
   }
 
   /* write a final solution file, if last iteration did not write one */
-  if (tic || (!TS.n_iter)) OutputSolution();
+  if (tic || (!TS.n_iter)) OutputSolution(TS.waqt);
 
   if (!m_rank) {
     printf("Completed time integration (Final time: %f).\n",TS.waqt);

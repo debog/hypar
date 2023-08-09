@@ -269,7 +269,7 @@ class SparseGridsSimulation : public Simulation
                               const int );
 
     /*! Output solutions to file */
-    void OutputSolution();
+    void OutputSolution(double);
 
     /*! Combination technique */
     void CombinationTechnique(SimulationObject* const);

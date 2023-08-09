@@ -5,10 +5,10 @@
 
 #include <sparse_grids_simulation.h>
 
-extern "C" int OutputSolution (void*,int);
+int OutputSolution (void*,int, double);
 
 /*! Write solutions to file */
-void SparseGridsSimulation::OutputSolution()
+void SparseGridsSimulation::OutputSolution(double a_time /*!< simulation time */)
 {
   /* if asked for, write individual sparse grids solutions */
   if (m_write_sg_solutions == 1) {
@@ -18,14 +18,14 @@ void SparseGridsSimulation::OutputSolution()
                                             &(m_sims_sg[ns].mpi) );
       }
     }
-    ::OutputSolution((void*)m_sims_sg.data(), m_nsims_sg);
+    ::OutputSolution((void*)m_sims_sg.data(), m_nsims_sg, a_time);
   }
 
   /* Combine the sparse grids solutions to full grid */
   CombinationTechnique(m_sim_fg);
 
   /* Write the full grid solution */
-  ::OutputSolution((void*)m_sim_fg, 1);
+  ::OutputSolution((void*)m_sim_fg, 1, a_time);
 
   return;
 }

@@ -50,6 +50,7 @@
     input_mode         | char[]       | #HyPar::input_mode            | serial
     output_mode        | char[]       | #HyPar::output_mode           | serial
     op_overwrite       | char[]       | #HyPar::op_overwrite          | no
+    plot_solution      | char[]       | #HyPar::plot_solution         | no
     model              | char[]       | #HyPar::model                 | must be specified
     immersed_body      | char[]       | #HyPar::ib_filename           | "none"
     size_exact         | int[ndims]   | #HyPar::dim_global_ex         | #HyPar::dim_global
@@ -138,6 +139,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
       strcpy(sim[n].solver.output_mode        ,"serial"        );
       strcpy(sim[n].solver.op_file_format     ,"text"          );
       strcpy(sim[n].solver.op_overwrite       ,"no"            );
+      strcpy(sim[n].solver.plot_solution      ,"no"            );
       strcpy(sim[n].solver.model              ,"none"          );
       strcpy(sim[n].solver.ConservationCheck  ,"no"            );
       strcpy(sim[n].solver.SplitHyperbolicFlux,"no"            );
@@ -382,6 +384,13 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.op_overwrite, sim[0].solver.op_overwrite);
 
+        } else if   (!strcmp(word, "plot_solution")) {
+
+          ferr = fscanf(in,"%s",sim[0].solver.plot_solution);
+
+          int n;
+          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.plot_solution, sim[0].solver.plot_solution);
+
         }	else if (!strcmp(word, "model")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.model);
@@ -492,6 +501,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
     MPIBroadcast_character(sim[n].solver.input_mode         ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
     MPIBroadcast_character(sim[n].solver.output_mode        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
     MPIBroadcast_character(sim[n].solver.op_overwrite       ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
+    MPIBroadcast_character(sim[n].solver.plot_solution      ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
     MPIBroadcast_character(sim[n].solver.model              ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
     MPIBroadcast_character(sim[n].solver.ib_filename        ,_MAX_STRING_SIZE_,0,&(sim[n].mpi.world));
 

@@ -25,7 +25,7 @@
 #define __FUNCT__ "SolvePETSc"
 
 extern "C" int CalculateError (void*,void*); /*!< Calculate the error in the final solution */
-extern "C" int OutputSolution (void*,int);   /*!< Write solutions to file */
+int OutputSolution (void*,int,double);   /*!< Write solutions to file */
 extern "C" void ResetFilenameIndex(char*, int); /*!< Reset filename index */
 #ifdef with_librom
 extern "C" int CalculateROMDiff(void*,void*); /*!< Calculate the diff of PDE and ROM solutions */
@@ -712,7 +712,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
         }
         CalculateError(solver,mpi);
       }
-      OutputSolution(sim, nsims); 
+      OutputSolution(sim, nsims, context.waqt); 
     }
     /* calculate error if exact solution has been provided */
     for (int ns = 0; ns < nsims; ns++) {
@@ -826,7 +826,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
                                         &(sim[ns].mpi) );
         }
       }
-      OutputSolution(sim, nsims); 
+      OutputSolution(sim, nsims, waqt); 
   
     }
 

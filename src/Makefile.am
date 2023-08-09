@@ -11,6 +11,7 @@ SUBDIRS = \
   LimiterFunctions \
   PETScFunctions \
   PhysicalModels \
+  PlottingFunctions \
   MathFunctions \
   MPIFunctions \
 	ROM \
@@ -51,6 +52,7 @@ HyPar_LDADD = \
   FirstDerivative/libFirstDerivative.a \
   SecondDerivative/libSecondDerivative.a \
   TridiagLU/libTridiagLU.a \
+  PlottingFunctions/libPlottingFunctions.a \
   IOFunctions/libIOFunctions.a \
   MPIFunctions/libMPIFunctions.a \
   BandedMatrix/libBandedMatrix.a \

@@ -190,6 +190,9 @@ typedef struct main_parameters {
      (input - \b solver.inp )*/
   char op_overwrite  [_MAX_STRING_SIZE_];
 
+  /*! plot solutions during simulation? */
+  char plot_solution[_MAX_STRING_SIZE_];
+
   /*! filename index for files written every few iterations */
   char *filename_index;
   /*! length of filename_index - should be sufficient for the number of files expected to be written */
@@ -455,6 +458,12 @@ typedef struct main_parameters {
 
   int StageBoundaryBuffer_size; /*!< size of #HyPar::StageBoundaryBuffer */
   double *StageBoundaryBuffer; /*!< Array to perform reduction */
+#endif
+
+#ifdef with_python
+  void* py_plt_func; /*!< Pointer to plotting function */
+  void* py_plt_func_args; /*!< Pointer to plotting function arguments */
+  char plotfilename_extn[_MAX_STRING_SIZE_]; /*!< plot figure filename extension */
 #endif
 
 } HyPar;

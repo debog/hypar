@@ -15,6 +15,10 @@
 #include <mpivars.h>
 #include <simulation_object.h>
 
+#ifdef with_python
+#include <Python.h>
+#endif
+
 /* Function declarations */
 int  ApplyBoundaryConditions     (void*,void*,double*,double*,double);
 int  ApplyIBConditions           (void*,void*,double*,double);
@@ -451,6 +455,32 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
       fprintf(stderr,"Should be \"serial\" or \"parallel\".    \n");
       return(1);
     }
+
+    /* Solution plotting function */
+    solver->py_plt_func = NULL;
+    solver->py_plt_func_args = NULL;
+    strcpy(solver->plotfilename_extn,".png");
+#ifdef with_python
+    {
+      char python_plotting_fname[_MAX_STRING_SIZE_] = "plotSolution";
+      PyObject* py_plot_name = PyUnicode_DecodeFSDefault(python_plotting_fname);
+      PyObject* py_plot_module = PyImport_Import(py_plot_name);
+      Py_DECREF(py_plot_name);
+      if (py_plot_module) {
+        if (!mpi->rank) printf("Loaded Python module for plotting.\n");
+        solver->py_plt_func = PyObject_GetAttrString(py_plot_module, "plotSolution");
+        if (!solver->py_plt_func) {
+          if (!mpi->rank) {
+            printf("Unable to load plotBinarySolution function from Python module.\n");
+          }
+        }
+      } else {
+        if (!mpi->rank) {
+          printf("Unable to load Python module for plotting.\n");
+        }
+      }
+    }
+#endif
 
   }
 
