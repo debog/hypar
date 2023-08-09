@@ -135,10 +135,24 @@
 #ifdef with_petsc
 #include <petscinterface.h>
 #endif
+
+#ifdef with_python
+#include <Python.h>
+#ifdef with_python_numpy
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include <numpy/arrayobject.h>
+#endif
+#endif
+
 #include <mpivars_cpp.h>
 #include <simulation_library.h>
 
 static const char help[] = "HyPar - A finite-difference algorithm for solving hyperbolic-parabolic PDEs";
+
+#ifdef with_python
+static void initializePython(int);
+static void initializePythonPlotting(int);
+#endif
 
 /*!
  * \brief Main driver
@@ -173,6 +187,11 @@ int main(int argc, char **argv)
 #ifdef with_petsc
   PetscInitialize(&argc,&argv,(char*)0,help);
   if (!rank) printf("Compiled with PETSc time integration.\n");
+#endif
+
+#ifdef with_python
+  initializePython(rank);
+  initializePythonPlotting(rank);
 #endif
 
   gettimeofday(&main_start,NULL);
@@ -382,6 +401,10 @@ int main(int argc, char **argv)
   delete sim;
   if (!rank) printf("Finished.\n");
 
+#ifdef with_python
+  Py_Finalize();
+#endif
+
 #ifdef with_petsc
   PetscFinalize();
 #endif
@@ -393,3 +416,30 @@ int main(int argc, char **argv)
 
   return(0);
 }
+
+#ifdef with_python
+/*! Initialize Python interpreter */
+void initializePython(int a_rank /*!< MPI rank */)
+{
+  Py_Initialize();
+  if (!a_rank) printf("Initialized Python.\n");
+  PyRun_SimpleString("import os");
+  PyRun_SimpleString("hypar_dir = os.environ.get('HYPAR_DIR')");
+  return;
+}
+
+/*! Initialize Python plotting stuff */
+void initializePythonPlotting(int a_rank /*!< MPI rank */)
+{
+  /* load plotting tools and scripts */
+  PyRun_SimpleString("hypar_dir_plt_py = hypar_dir + '/src/PlottingFunctions'");
+  PyRun_SimpleString("import sys");
+  PyRun_SimpleString("sys.path.append(hypar_dir_plt_py)");
+  if (!a_rank) {
+    PyRun_SimpleString
+      ("print('Added plotting script directory (%s) to Python path.' % hypar_dir_plt_py)");
+  }
+  return;
+}
+
+#endif

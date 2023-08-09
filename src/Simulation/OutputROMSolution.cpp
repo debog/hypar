@@ -10,19 +10,20 @@
 #include <string.h>
 #include <math.h>
 #include <basic.h>
-#include <common.h>
+#include <common_cpp.h>
 #include <arrayfunctions.h>
-#include <io.h>
-#include <timeintegration.h>
-#include <mpivars.h>
+#include <io_cpp.h>
+#include <plotfuncs.h>
+#include <mpivars_cpp.h>
 #include <simulation_object.h>
 
 /* Function declarations */
 void IncrementFilenameIndex(char*,int);
 
 /*! Write out the ROM solution to file */
-int OutputROMSolution(  void  *s,   /*!< Array of simulation objects of type #SimulationObject */
-                        int   nsims /*!< Number of simulation objects */ )
+int OutputROMSolution(  void*   s,      /*!< Array of simulation objects of type #SimulationObject */
+                        int     nsims,  /*!< Number of simulation objects */
+                        double  a_time  /*!< Current simulation time */)
 {
   SimulationObject* simobj = (SimulationObject*) s;
   int ns;
@@ -55,6 +56,20 @@ int OutputROMSolution(  void  *s,   /*!< Array of simulation objects of type #Si
                 solver,
                 mpi,
                 fname_root );
+
+    if (!strcmp(solver->plot_solution, "yes")) {
+      PlotArray(   solver->ndims,
+                   solver->nvars,
+                   solver->dim_global,
+                   solver->dim_local,
+                   solver->ghosts,
+                   solver->x,
+                   solver->u,
+                   a_time,
+                   solver,
+                   mpi,
+                   fname_root );
+    }
 
     /* increment the index string, if required */
     if ((!strcmp(solver->output_mode,"serial")) && (!strcmp(solver->op_overwrite,"no"))) {

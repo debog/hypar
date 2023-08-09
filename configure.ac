@@ -23,6 +23,7 @@ AC_ARG_WITH([lapack_dir],AC_HELP_STRING([--with-lapack-dir],[Specify path where 
 AC_ARG_WITH([scalapack_dir],AC_HELP_STRING([--with-scalapack-dir],[Specify path where ScaLAPACK libraries are installed.]))
 AC_ARG_ENABLE([fftw],AC_HELP_STRING([--enable-fftw],[Enable FFTW]))
 AC_ARG_WITH([fftw_dir],AC_HELP_STRING([--with-fftw-dir],[Specify path where FFTW libraries are installed.]))
+AC_ARG_ENABLE([python],AS_HELP_STRING([--enable-python],[Enable Python features (environment variables PYTHON_LIB_PATH, PYTHON_BIN_PATH, PYTHON_INCLUDE_PATH, NUMPY_INCLUDE_PATH, and PYTHON_LIB_NAME must be defined).]))
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -242,6 +243,43 @@ else
   fi
 fi
 
+AM_CONDITIONAL([ENABLE_PYTHON], [test "x$enable_python" = "xyes"])
+if test "x$enable_python" = "xyes"; then
+  if test "x$PYTHON_INCLUDE_PATH" != "x"; then
+    AC_MSG_NOTICE([Environment variable PYTHON_INCLUDE_PATH found (${PYTHON_INCLUDE_PATH}).])
+    if test "x$PYTHON_LIB_PATH" != "x"; then
+      AC_MSG_NOTICE([Environment variable PYTHON_LIB_PATH found (${PYTHON_LIB_PATH}).])
+      if test "x$PYTHON_LIB_NAME" != "x"; then
+        AC_MSG_NOTICE([Environment variable PYTHON_LIB_NAME found (${PYTHON_LIB_NAME}).])
+        if test "x$PYTHON_BIN_PATH" != "x"; then
+          AC_MSG_NOTICE([Environment variable PYTHON_BIN_PATH found (${PYTHON_BIN_PATH}).])
+          AC_MSG_NOTICE([Compiling with Python features.])
+          CFLAGS="$CFLAGS -Dwith_python -I${PYTHON_INCLUDE_PATH}"
+          CXXFLAGS="$CXXFLAGS -Dwith_python -I${PYTHON_INCLUDE_PATH}"
+          LDFLAGS="$LDFLAGS -Wl,-rpath,$PYTHON_LIB_PATH -L$PYTHON_LIB_PATH"
+          LIBS="$LIBS -${PYTHON_LIB_NAME}"
+          if test "x$NUMPY_INCLUDE_PATH" != "x"; then
+            AC_MSG_NOTICE([Environment variable NUMPY_INCLUDE_PATH found (${NUMPY_INCLUDE_PATH}).])
+            AC_MSG_NOTICE([Compiling with Python-numpy features.])
+            CFLAGS="$CFLAGS -Dwith_python_numpy -I${NUMPY_INCLUDE_PATH}"
+            CXXFLAGS="$CXXFLAGS -Dwith_python_numpy -I${NUMPY_INCLUDE_PATH}"
+          else
+            AC_MSG_NOTICE([Environment variable NUMPY_INCLUDE_PATH not found. Skipping Python-numpy features.])
+          fi
+        else
+          AC_MSG_NOTICE([Environment variable PYTHON_BIN_PATH not found. Skipping Python features.])
+        fi
+      else
+        AC_MSG_NOTICE([Environment variable PYTHON_LIB_NAME not found. Skipping Python features.])
+      fi
+    else
+      AC_MSG_NOTICE([Environment variable PYTHON_LIB_PATH not found. Skipping Python features.])
+    fi
+  else
+    AC_MSG_NOTICE([Environment variable PYTHON_INCLUDE_PATH not found. Skipping Python features.])
+  fi
+fi
+
 AC_PROG_RANLIB
 AC_PROG_INSTALL
 AC_CONFIG_FILES([
@@ -276,6 +314,7 @@ AC_CONFIG_FILES([
    src/PhysicalModels/ShallowWater1D/Makefile
    src/PhysicalModels/ShallowWater2D/Makefile
    src/PhysicalModels/Vlasov/Makefile
+ src/PlottingFunctions/Makefile
  src/ROM/Makefile
  src/SecondDerivative/Makefile
  src/Simulation/Makefile
