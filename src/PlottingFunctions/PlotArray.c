@@ -1,4 +1,4 @@
-/*! @file PlotArray.cpp
+/*! @file PlotArray.c
     @author Debojyoti Ghosh
     @brief Plot a vector field, stored as an array, and save to file
 
@@ -79,7 +79,8 @@ int PlotArraySerial(int     a_ndims,      /*!< Number of spatial dimensions */
   HyPar         *solver = (HyPar*)       a_s;
   MPIVariables  *mpi    = (MPIVariables*)a_m;
 
-  int size_global_x(0), size_global_u(0);
+  int size_global_x = 0;
+  int size_global_u = 0;
 
   /* root process: allocate global output arrays */
   double *ug, *xg;

@@ -57,8 +57,6 @@ int NavierStokes2DParabolicFunction(
   int ndims  = solver->ndims;
   int size   = (imax+2*ghosts)*(jmax+2*ghosts)*nvars;
 
-  printf("Parabolic Function is called: Re = %f\n", physics->Re);
-
   _ArraySetValue_(par,size,0.0);
   if (physics->Re <= 0) return(0); /* inviscid flow */
   solver->count_par++;

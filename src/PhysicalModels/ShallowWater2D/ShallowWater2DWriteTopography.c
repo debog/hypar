@@ -8,15 +8,15 @@
 #include <common.h>
 #include <arrayfunctions.h>
 #include <io.h>
+#include <plotfuncs.h>
 #include <mpivars.h>
 #include <hypar.h>
 #include <physicalmodels/shallowwater2d.h>
 
 /*! Write out the topography data to file */
-int ShallowWater2DWriteTopography(
-                                    void* s, /*!< Solver object of type #HyPar */
-                                    void *m  /*!< MPI object of type #MPIVariables */
-                                 )
+int ShallowWater2DWriteTopography(  void*   s,  /*!< Solver object of type #HyPar */
+                                    void*   m,  /*!< MPI object of type #MPIVariables */
+                                    double  a_t /*!< Current simulation time */ )
 {
   HyPar           *solver = (HyPar*)          s;
   MPIVariables    *mpi    = (MPIVariables*)   m;
@@ -34,16 +34,30 @@ int ShallowWater2DWriteTopography(
       strcat(fname_root, "_");
     }
 
-    IERR WriteArray(  solver->ndims,
-                      1,
-                      solver->dim_global,
-                      solver->dim_local,
-                      solver->ghosts,
-                      solver->x,
-                      params->b,
-                      solver,
-                      mpi,
-                      fname_root ); CHECKERR(ierr);
+    WriteArray(  solver->ndims,
+                 1,
+                 solver->dim_global,
+                 solver->dim_local,
+                 solver->ghosts,
+                 solver->x,
+                 params->b,
+                 solver,
+                 mpi,
+                 fname_root );
+
+    if (!strcmp(solver->plot_solution, "yes")) {
+      PlotArray( solver->ndims,
+                 1,
+                 solver->dim_global,
+                 solver->dim_local,
+                 solver->ghosts,
+                 solver->x,
+                 params->b,
+                 a_t,
+                 solver,
+                 mpi,
+                 fname_root );
+    }
 
   }
 

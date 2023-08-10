@@ -101,7 +101,8 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
         for (int ns = 0; ns < nsims; ns++) {
           if (sim[ns].solver.PhysicsOutput) {
             sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
-                                          &(sim[ns].mpi) );
+                                          &(sim[ns].mpi),
+                                          TS.waqt );
           }
         }
         OutputSolution(sim, nsims, TS.waqt); 
@@ -141,7 +142,8 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
         for (int ns = 0; ns < nsims; ns++) {
           if (sim[ns].solver.PhysicsOutput) {
             sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
-                                          &(sim[ns].mpi) );
+                                          &(sim[ns].mpi),
+                                          TS.waqt );
           }
         }
         OutputSolution(sim, nsims, TS.waqt); 
@@ -171,7 +173,8 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     for (int ns = 0; ns < nsims; ns++) {
       if (sim[ns].solver.PhysicsOutput) {
         sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
-                                      &(sim[ns].mpi) );
+                                      &(sim[ns].mpi),
+                                      t_final );
       }
     }
     OutputSolution(sim, nsims, t_final); 
@@ -278,7 +281,8 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
       for (int ns = 0; ns < nsims; ns++) {
         if (sim[ns].solver.PhysicsOutput) {
           sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
-                                        &(sim[ns].mpi) );
+                                        &(sim[ns].mpi),
+                                        waqt );
         }
       }
       OutputSolution(sim, nsims, waqt); 

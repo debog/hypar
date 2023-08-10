@@ -28,7 +28,7 @@ int    ShallowWater1DSourceUpwindLLF   (double*,double*,double*,double*,int,void
 int    ShallowWater1DSourceUpwindRoe   (double*,double*,double*,double*,int,void*,double);
 
 int    ShallowWater1DModifiedSolution  (double*,double*,int,void*,void*,double);
-int    ShallowWater1DWriteTopography   (void*,void*);
+int    ShallowWater1DWriteTopography   (void*,void*,double);
 
 /*! Function to initialize the 1D shallow water equations (#ShallowWater1D) module: 
     Sets the default parameters, read in and set physics-related parameters, 

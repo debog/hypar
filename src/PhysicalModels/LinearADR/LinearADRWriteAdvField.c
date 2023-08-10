@@ -9,14 +9,15 @@
 #include <arrayfunctions.h>
 #include <mathfunctions.h>
 #include <io.h>
+#include <plotfuncs.h>
 #include <mpivars.h>
 #include <hypar.h>
 #include <physicalmodels/linearadr.h>
 
 /*! Write out the advection field to file */
-int LinearADRWriteAdvField( void* s, /*!< Solver object of type #HyPar */
-                            void* m  /*!< MPI object of type #MPIVariables */
-                          )
+int LinearADRWriteAdvField( void*   s,    /*!< Solver object of type #HyPar */
+                            void*   m,    /*!< MPI object of type #MPIVariables */
+                            double  a_t   /*!< Current simulation time */ )
 {
   HyPar         *solver = (HyPar*)          s;
   MPIVariables  *mpi    = (MPIVariables*)   m;
@@ -33,15 +34,28 @@ int LinearADRWriteAdvField( void* s, /*!< Solver object of type #HyPar */
     }
 
     int adv_nvar = solver->ndims * solver->nvars;
-    IERR WriteArray(  solver->ndims,
-                      adv_nvar,
-                      solver->dim_global,
-                      solver->dim_local,
-                      solver->ghosts,
-                      solver->x,
-                      param->a,
-                      solver,mpi,
-                      fname_root ); CHECKERR(ierr);
+    WriteArray(  solver->ndims,
+                 adv_nvar,
+                 solver->dim_global,
+                 solver->dim_local,
+                 solver->ghosts,
+                 solver->x,
+                 param->a,
+                 solver,mpi,
+                 fname_root );
+
+    if (!strcmp(solver->plot_solution, "yes")) {
+      PlotArray( solver->ndims,
+                 adv_nvar,
+                 solver->dim_global,
+                 solver->dim_local,
+                 solver->ghosts,
+                 solver->x,
+                 param->a,
+                 a_t,
+                 solver,mpi,
+                 fname_root );
+    }
 
   }
 

@@ -261,9 +261,9 @@ static int WriteSurfaceData(  void*               m,              /*!< MPI objec
 /*! Calculate the aerodynamic forces on the immersed body surface and write them
     to file
 */
-int NavierStokes3DIBForces( void *s, /*!< Solver object of type #HyPar */
-                            void *m  /*!< MPI object of type #MPIVariables */
-                          )
+int NavierStokes3DIBForces( void*   s,  /*!< Solver object of type #HyPar */
+                            void*   m,  /*!< MPI object of type #MPIVariables */
+                            double  a_t /*!< Current simulation time */ )
 {
   HyPar             *solver  = (HyPar*)          s;
   MPIVariables      *mpi     = (MPIVariables*)   m; 

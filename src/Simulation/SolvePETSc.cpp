@@ -708,7 +708,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
         HyPar* solver = &(sim[ns].solver);
         MPIVariables* mpi = &(sim[ns].mpi);
         if (solver->PhysicsOutput) {
-          solver->PhysicsOutput(solver,mpi);
+          solver->PhysicsOutput(solver,mpi, context.waqt);
         }
         CalculateError(solver,mpi);
       }
@@ -823,7 +823,8 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
       for (int ns = 0; ns < nsims; ns++) {
         if (sim[ns].solver.PhysicsOutput) {
           sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
-                                        &(sim[ns].mpi) );
+                                        &(sim[ns].mpi),
+                                        waqr );
         }
       }
       OutputSolution(sim, nsims, waqt); 

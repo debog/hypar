@@ -1,6 +1,6 @@
 #ifdef with_librom
 
-/*! @file OutputROMSolution.c
+/*! @file OutputROMSolution.cpp
     @author Debojyoti Ghosh
     @brief Write out the solution to file
 */
@@ -13,7 +13,7 @@
 #include <common_cpp.h>
 #include <arrayfunctions.h>
 #include <io_cpp.h>
-#include <plotfuncs.h>
+#include <plotfuncs_cpp.h>
 #include <mpivars_cpp.h>
 #include <simulation_object.h>
 
@@ -33,8 +33,7 @@ int OutputROMSolution(  void*   s,      /*!< Array of simulation objects of type
     HyPar*        solver = &(simobj[ns].solver);
     MPIVariables* mpi    = &(simobj[ns].mpi);
     
-    /* if WriteOutput() is NULL, then return */
-    if (!solver->WriteOutput) continue;
+    if ((!solver->WriteOutput) && (strcmp(solver->plot_solution,"yes"))) continue;
   
     char fname_root[_MAX_STRING_SIZE_];
     strcpy(fname_root, solver->op_rom_fname_root);

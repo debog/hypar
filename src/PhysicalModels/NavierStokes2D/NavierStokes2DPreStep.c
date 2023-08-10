@@ -3,8 +3,6 @@
     @author Debojyoti Ghosh
 */
 
-#include <time.h>
-
 #include <arrayfunctions.h>
 #include <mathfunctions.h>
 #include <matmult_native.h>
@@ -58,8 +56,6 @@ int NavierStokes2DPreStep(
   _ArrayCopy1D_(u,param->solution,(solver->npoints_local_wghosts*_MODEL_NVARS_));
 
   int done = 0; _ArraySetValue_(index,ndims,0);
-  clock_t cpu_start, cpu_end;
-  cpu_start = clock();
   while (!done) {
     _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
 
@@ -89,10 +85,6 @@ int NavierStokes2DPreStep(
 
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
-  cpu_end = clock();
-
-  printf("NavierStokes2DPreStep:\n");
-  printf("  CPU time = %8.6lf\n", (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC);
 
   return(0);
 }

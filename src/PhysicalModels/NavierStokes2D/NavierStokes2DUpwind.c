@@ -2,8 +2,6 @@
     @author Debojyoti Ghosh
     @brief Contains functions to compute the upwind flux at grid interfaces for the 2D Navier Stokes equations.
 */
-#include <time.h>
-
 #include <stdlib.h>
 #include <math.h>
 #include <basic.h>
@@ -448,9 +446,6 @@ int NavierStokes2DUpwindRusanov(
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
 
   done = 0; int index_outer[2] = {0,0}; int index_inter[2];
-
-  clock_t cpu_start, cpu_end;
-  cpu_start = clock();
   while (!done) {
     index_inter[0] = index_outer[0]; index_inter[1] = index_outer[1];
     for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
@@ -491,8 +486,6 @@ int NavierStokes2DUpwindRusanov(
     }
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds_outer,index_outer,done);
   }
-  cpu_end = clock();
-  printf("NavierStokes2DUpWindRusanov CPU time = %8.6lf dir = %d\n", (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC, dir);
 
   return(0);
 }

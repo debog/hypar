@@ -1,3 +1,3 @@
 noinst_LIBRARIES = libPlottingFunctions.a
 libPlottingFunctions_a_SOURCES = \
-  PlotArray.cpp
+  PlotArray.c

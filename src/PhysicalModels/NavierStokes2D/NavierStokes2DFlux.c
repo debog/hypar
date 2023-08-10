@@ -3,8 +3,6 @@
     @brief Functions to compute the hyperbolic flux for 2D Navier-Stokes equations
 */
 
-#include <time.h>
-
 #include <stdlib.h>
 #include <arrayfunctions.h>
 #include <mathfunctions.h>
@@ -39,9 +37,6 @@ int NavierStokes2DFlux(
   /* set offset such that index is compatible with ghost point arrangement */
   _ArraySetValue_(offset,_MODEL_NDIMS_,-ghosts);
 
-  clock_t cpu_start, cpu_end;
-
-  cpu_start = clock();
   int done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
@@ -50,8 +45,6 @@ int NavierStokes2DFlux(
     _NavierStokes2DSetFlux_((f+_MODEL_NVARS_*p),rho,vx,vy,e,P,dir);
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }
-  cpu_end = clock();
-  printf("NavierStokes2DFlux CPU time = %.6f\n", (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC);
 
   return(0);
 }

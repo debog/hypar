@@ -8,8 +8,6 @@
 #include <mpivars.h>
 #include <hypar.h>
 
-#include <time.h>
-
 /*!
     This function computes the modified solution for the well-balanced treatment of the
     gravitational source terms. The modified solution vector is given by
@@ -57,9 +55,6 @@ int NavierStokes2DModifiedSolution(
   int done = 0; _ArraySetValue_(index,ndims,0);
   double inv_gamma_m1 = 1.0 / (param->gamma-1.0);
 
-  double cpu_time = 0.0;
-  clock_t cpu_start, cpu_end;
-  cpu_start = clock();
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double rho, uvel, vvel, E, P;
@@ -70,9 +65,6 @@ int NavierStokes2DModifiedSolution(
     uC[_MODEL_NVARS_*p+3] = (P*inv_gamma_m1)*(1.0/param->grav_field_g[p]) + (0.5*rho*(uvel*uvel+vvel*vvel))*param->grav_field_f[p];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
-  cpu_end = clock();
-  cpu_time += (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC;
-  printf("NavierStokes2DModifiedSolution CPU time = %8.6lf\n", cpu_time);
 
   return(0);
 }
