@@ -12,6 +12,10 @@
 #include <io_cpp.h>
 #include <std_vec_ops.h>
 
+#ifdef with_python
+#include <Python.h>
+#endif
+
 extern "C" void IncrementFilenameIndex(char*,int);
 
 /*! Compute the number, coefficients, and dimensions of all the sparse
@@ -392,5 +396,35 @@ int SparseGridsSimulation::InitializeSolversBarebones( SimulationObject *sim /*!
 
   }
 
-  return(0);
+  /* Solution plotting function */
+  solver->py_plt_func = NULL;
+  solver->py_plt_func_args = NULL;
+  strcpy(solver->plotfilename_extn,".png");
+#ifdef with_python
+  {
+    char python_plotting_fname[_MAX_STRING_SIZE_] = "plotSolution";
+    PyObject* py_plot_name = PyUnicode_DecodeFSDefault(python_plotting_fname);
+    PyObject* py_plot_module = PyImport_Import(py_plot_name);
+    Py_DECREF(py_plot_name);
+    if (py_plot_module) {
+      solver->py_plt_func = PyObject_GetAttrString(py_plot_module, "plotSolution");
+      if (!solver->py_plt_func) {
+        if (!mpi->rank) {
+          printf("Unable to load plotSolution function from Python module.\n");
+        }
+      } else {
+        if (!mpi->rank) {
+          printf("Loaded Python module for plotting.\n");
+          printf("Loaded plotSolution function from Python module.\n");
+        }
+      }
+    } else {
+      if (!mpi->rank) {
+        printf("Unable to load Python module for plotting.\n");
+      }
+    }
+  }
+#endif
+
+  return 0;
 }

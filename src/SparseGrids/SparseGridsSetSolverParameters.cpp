@@ -59,6 +59,7 @@ int SparseGridsSimulation::SetSolverParameters( SimulationObject&       a_dst_si
   a_dst_sim.mpi.N_IORanks = a_src_sim.mpi.N_IORanks;
 
   strcpy(a_dst_sim.solver.op_overwrite, a_src_sim.solver.op_overwrite);
+  strcpy(a_dst_sim.solver.plot_solution, a_src_sim.solver.plot_solution);
   strcpy(a_dst_sim.solver.model, a_src_sim.solver.model);
   strcpy(a_dst_sim.solver.ib_filename, a_src_sim.solver.ib_filename);
 
