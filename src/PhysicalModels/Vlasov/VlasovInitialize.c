@@ -25,7 +25,7 @@ int VlasovAdvection (double*,double*,int,void*,double);
 int VlasovUpwind (double*,double*,double*,double*,
                   double*,double*,int,void*,double);
 /*! Write E-field and potential to file */
-int VlasovWriteEFieldAndPotential(void*, void*);
+int VlasovWriteEFieldAndPotential(void*, void*,double);
 
 int VlasovPreStep(double*,void*,void*,double);
 int VlasovPostStage(double*,void*,void*,double);

@@ -5,12 +5,10 @@
 #include <stdlib.h>
 #include <basic.h>
 #include <arrayfunctions.h>
+#include <arrayfunctions_gpu.h>
 #include <physicalmodels/navierstokes2d.h>
 #include <mpivars.h>
 #include <hypar.h>
-
-#include <arrayfunctions_gpu.h>
-#include <time.h>
 
 static int NavierStokes2DSourceFunction (double*,double*,double*,void*,void*,double,int);
 static int NavierStokes2DSourceUpwind   (double*,double*,double*,double*,int,void*,double);
@@ -67,8 +65,6 @@ int NavierStokes2DSource(
 
   /* Along X-direction */
   if (param->grav_x != 0.0) {
-    printf("ALONG X-DIRECTION\n");
-
     /* set interface dimensions */
     _ArrayCopy1D_(dim,dim_interface,ndims); dim_interface[_XDIR_]++;
     /* calculate the split source function exp(-phi/RT) */
@@ -102,8 +98,6 @@ int NavierStokes2DSource(
 
   /* Along Y-direction */
   if (param->grav_y != 0.0) {
-    printf("ALONG Y-DIRECTION\n");
-
     /* set interface dimensions */
     _ArrayCopy1D_(dim,dim_interface,ndims); dim_interface[_YDIR_]++;
     /* calculate the split source function exp(-phi/RT) */
@@ -180,9 +174,6 @@ int NavierStokes2DSourceFunction(
   _ArraySetValue_(offset,ndims,-ghosts);
 
   int done = 0; _ArraySetValue_(index,ndims,0);
-  double cpu_time = 0.0;
-  clock_t cpu_start, cpu_end;
-  cpu_start = clock();
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     (f+_MODEL_NVARS_*p)[0] = 0.0;
@@ -191,9 +182,6 @@ int NavierStokes2DSourceFunction(
     (f+_MODEL_NVARS_*p)[3] = param->grav_field_g[p];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
-  cpu_end = clock();
-  cpu_time = (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC;
-  printf("NavierStokes2DSource CPU time = %.6f dir = %d\n", cpu_time, dir);
 
   return(0);
 }
@@ -231,9 +219,6 @@ int NavierStokes2DSourceUpwind(
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
-  double cpu_time = 0.0;
-  clock_t cpu_start, cpu_end;
-  cpu_start = clock();
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
     for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
@@ -243,9 +228,6 @@ int NavierStokes2DSourceUpwind(
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
-  cpu_end = clock();
-  cpu_time = (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC;
-  printf("NavierStokes2DSourceUpwind CPU time = %.6f dir = %d\n", cpu_time, dir);
 
   return(0);
 }

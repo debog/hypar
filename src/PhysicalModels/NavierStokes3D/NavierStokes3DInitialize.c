@@ -47,7 +47,7 @@ int NavierStokes3DIBAdiabatic  (void*,void*,double*,double);
 int NavierStokes3DIBIsothermal (void*,void*,double*,double);
 
 int NavierStokes3DPreStep           (double*,void*,void*,double);
-int NavierStokes3DIBForces          (void*,void*);
+int NavierStokes3DIBForces          (void*,void*,double);
 
 #if defined(HAVE_CUDA)
 int gpuNavierStokes3DInitialize          (void*,void*);

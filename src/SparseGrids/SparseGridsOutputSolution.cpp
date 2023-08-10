@@ -15,7 +15,8 @@ void SparseGridsSimulation::OutputSolution(double a_time /*!< simulation time */
     for (int ns = 0; ns < m_nsims_sg; ns++) {
       if (m_sims_sg[ns].solver.PhysicsOutput) {
         m_sims_sg[ns].solver.PhysicsOutput( &(m_sims_sg[ns].solver),
-                                            &(m_sims_sg[ns].mpi) );
+                                            &(m_sims_sg[ns].mpi),
+                                            a_time );
       }
     }
     ::OutputSolution((void*)m_sims_sg.data(), m_nsims_sg, a_time);

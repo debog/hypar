@@ -95,7 +95,7 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
     for (int ns = 0; ns < nsims; ns++) {
       HyPar* solver = &(sim[ns].solver);
       MPIVariables* mpi = &(sim[ns].mpi);
-      if (solver->PhysicsOutput) solver->PhysicsOutput(solver,mpi);
+      if (solver->PhysicsOutput) solver->PhysicsOutput(solver,mpi,waqt);
     }
     OutputSolution(sim, nsims,waqt);
 #ifdef with_librom

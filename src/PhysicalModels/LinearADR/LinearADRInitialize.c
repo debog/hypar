@@ -24,7 +24,7 @@ int    LinearADRUpwind            (double*,double*,double*,double*,
                                    double*,double*,int,void*,double);
 int    LinearADRCenteredFlux      (double*,double*,double*,double*,
                                    double*,double*,int,void*,double);
-int    LinearADRWriteAdvField     (void*,void*);
+int    LinearADRWriteAdvField     (void*,void*,double);
 
 int    LinearADRAdvectionJacobian (double*,double*,void*,int,int,int);
 int    LinearADRDiffusionJacobian (double*,double*,void*,int,int);
