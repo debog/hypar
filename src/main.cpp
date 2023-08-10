@@ -35,6 +35,8 @@
     solve over non-Cartesian geometries.
   + Can be <B>compiled with libROM</B> (https://www.librom.net/), if available, where
     it can be used with the reduced order modeling tools implemented in libROM.
+  + Can be <B>compiled with Python</B> (https://www.python.org/), if available, to enable
+    features like in-situ plotting of solution.
 
   HyPar has been developed to be scalable, and apart from the usual functionalities to
   solve a system of PDEs on distributed architectures, it provides scalable file I/O
@@ -77,6 +79,7 @@
   + \--with-mpi-dir: Specify path where mpicc is installed, if not in standard path.
   + \--enable-omp: Enable OpenMP threads.
   + \--enable-cuda: Enable CUDA if NVidia GPU present.
+  + \--enable-python: Enable Python interface (environment variables \b PYTHON_LIB_PATH, \b PYTHON_BIN_PATH, \b PYTHON_INCLUDE_PATH, \b NUMPY_INCLUDE_PATH, and \b PYTHON_LIB_NAME must be defined).
   + \--with-cuda-dir: Specify path where CUDA is installed, if not in standard path.
   + \--enable-scalapack: Enable ScaLAPACK (this will make available a tridiagonal solver using ScaLAPACK).
   + \--enable-fftw: Enable FFTW (this will make available features that use the FFTW library).
@@ -87,8 +90,12 @@
   + \--with-fortran-lib: Specify path where FORTRAN libraries are installed (for ScaLAPACK) (relevant only if \--enable-scalapack 
     is specified).
 
-  \b Note:  Limited parts of the code have been implemented on CUDA. See \b Examples for currently available
-            CUDA-enabled simulations.
+  \b Notes:
+
+  + Limited parts of the code have been implemented on CUDA. See \b Examples for currently available
+    CUDA-enabled simulations.
+  + Interfacing with Python and the features it enables are a work-in-progress. It is based on the approach 
+    in PythonFOAM (https://github.com/argonne-lcf/PythonFOAM).
 
   Compiling with other scientific computing libraries
   ---------------------------------------------------
