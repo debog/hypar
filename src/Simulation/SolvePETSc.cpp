@@ -29,7 +29,7 @@ int OutputSolution (void*,int,double);   /*!< Write solutions to file */
 extern "C" void ResetFilenameIndex(char*, int); /*!< Reset filename index */
 #ifdef with_librom
 extern "C" int CalculateROMDiff(void*,void*); /*!< Calculate the diff of PDE and ROM solutions */
-extern "C" int OutputROMSolution(void*,int);   /*!< Write ROM solutions to file */
+int OutputROMSolution(void*,int,double);   /*!< Write ROM solutions to file */
 #endif
 
 /*! \brief Integrate in time with PETSc
@@ -754,7 +754,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
           }
         }
         /* write the ROM solution to file */
-        OutputROMSolution(sim, nsims); 
+        OutputROMSolution(sim, nsims, waqt); 
   
       }
 
@@ -824,7 +824,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
         if (sim[ns].solver.PhysicsOutput) {
           sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
                                         &(sim[ns].mpi),
-                                        waqr );
+                                        waqt );
         }
       }
       OutputSolution(sim, nsims, waqt); 

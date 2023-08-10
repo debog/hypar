@@ -199,6 +199,8 @@ typedef struct main_parameters {
   int  index_length;
   /*! solution filename extension */
   char solnfilename_extn[_MAX_STRING_SIZE_];
+  /*! plot figure filename extension */
+  char plotfilename_extn[_MAX_STRING_SIZE_]; 
 
   /*! output filename root */
   char op_fname_root[_MAX_STRING_SIZE_];
@@ -463,7 +465,6 @@ typedef struct main_parameters {
 #ifdef with_python
   void* py_plt_func; /*!< Pointer to plotting function */
   void* py_plt_func_args; /*!< Pointer to plotting function arguments */
-  char plotfilename_extn[_MAX_STRING_SIZE_]; /*!< plot figure filename extension */
 #endif
 
 } HyPar;
