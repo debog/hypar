@@ -18,7 +18,7 @@
 #include <simulation_object.h>
 
 /* Function declarations */
-void IncrementFilenameIndex(char*,int);
+extern "C" void IncrementFilenameIndex(char*,int);
 
 /*! Write out the ROM solution to file */
 int OutputROMSolution(  void*   s,      /*!< Array of simulation objects of type #SimulationObject */

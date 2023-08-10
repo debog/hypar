@@ -25,7 +25,7 @@ int OutputSolution(void*,int,double);   /*!< Write solutions to file */
 extern "C" void ResetFilenameIndex(char*, int); /*!< Reset filename index */
 #ifdef with_librom
 extern "C" int CalculateROMDiff(void*,void*); /*!< Calculate the diff of PDE and ROM solutions */
-extern "C" int OutputROMSolution(void*,int);   /*!< Write ROM solutions to file */
+int OutputROMSolution(void*,int,double);   /*!< Write ROM solutions to file */
 #endif
 
 /*! This function integrates the semi-discrete ODE (obtained from discretizing the 
@@ -212,7 +212,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
           }
         }
         /* write the ROM solution to file */
-        OutputROMSolution(sim, nsims); 
+        OutputROMSolution(sim, nsims,waqt); 
   
       }
 
