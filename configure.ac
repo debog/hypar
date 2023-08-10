@@ -271,7 +271,7 @@ if test "x$enable_python" = "xyes"; then
           CFLAGS="$CFLAGS -Dwith_python -I${PYTHON_INCLUDE_PATH}"
           CXXFLAGS="$CXXFLAGS -Dwith_python -I${PYTHON_INCLUDE_PATH}"
           LDFLAGS="$LDFLAGS -Wl,-rpath,$PYTHON_LIB_PATH -L$PYTHON_LIB_PATH"
-          LIBS="$LIBS -${PYTHON_LIB_NAME}"
+          LIBS="$LIBS -${PYTHON_LIB_NAME} -lutil"
           if test "x$NUMPY_INCLUDE_PATH" != "x"; then
             AC_MSG_NOTICE([Environment variable NUMPY_INCLUDE_PATH found (${NUMPY_INCLUDE_PATH}).])
             AC_MSG_NOTICE([Compiling with Python-numpy features.])
