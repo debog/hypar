@@ -79,7 +79,7 @@
   + \--with-mpi-dir: Specify path where mpicc is installed, if not in standard path.
   + \--enable-omp: Enable OpenMP threads.
   + \--enable-cuda: Enable CUDA if NVidia GPU present.
-  + \--enable-python: Enable Python interface (environment variables \b PYTHON_LIB_PATH, \b PYTHON_BIN_PATH, \b PYTHON_INCLUDE_PATH, \b NUMPY_INCLUDE_PATH, and \b PYTHON_LIB_NAME must be defined).
+  + \--enable-python: Enable Python interface.
   + \--with-cuda-dir: Specify path where CUDA is installed, if not in standard path.
   + \--enable-scalapack: Enable ScaLAPACK (this will make available a tridiagonal solver using ScaLAPACK).
   + \--enable-fftw: Enable FFTW (this will make available features that use the FFTW library; *needs MPI*).
@@ -95,7 +95,13 @@
   + Limited parts of the code have been implemented on CUDA. See \b Examples for currently available
     CUDA-enabled simulations.
   + Interfacing with Python and the features it enables are a work-in-progress. It is based on the approach 
-    in PythonFOAM (https://github.com/argonne-lcf/PythonFOAM).
+    in PythonFOAM (https://github.com/argonne-lcf/PythonFOAM). The following environment variables must be 
+    consistently defined:
+    + \b PYTHON_LIB_PATH - location of Python libraries
+    + \b PYTHON_BIN_PATH - location of Python binary
+    + \b PYTHON_INCLUDE_PATH - location of Python headers
+    + \b NUMPY_INCLUDE_PATH - location of numpy headers (for eg., /path/to/python3.8/dist-packages/numpy/core/include)
+    + \b PYTHON_LIB_NAME - name of the Python library (for eg., lpython3.8)
 
   Compiling with other scientific computing libraries
   ---------------------------------------------------
