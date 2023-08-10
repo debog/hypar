@@ -467,11 +467,15 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
       PyObject* py_plot_module = PyImport_Import(py_plot_name);
       Py_DECREF(py_plot_name);
       if (py_plot_module) {
-        if (!mpi->rank) printf("Loaded Python module for plotting.\n");
         solver->py_plt_func = PyObject_GetAttrString(py_plot_module, "plotSolution");
         if (!solver->py_plt_func) {
           if (!mpi->rank) {
-            printf("Unable to load plotBinarySolution function from Python module.\n");
+            printf("Unable to load plotSolution function from Python module.\n");
+          }
+        } else {
+          if (!mpi->rank) {
+            printf("Loaded Python module for plotting.\n");
+            printf("Loaded plotSolution function from Python module.\n");
           }
         }
       } else {
