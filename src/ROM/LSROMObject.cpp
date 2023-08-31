@@ -389,12 +389,12 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
       if (m_solve_phi) {
         m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
-        if (m_energy_criteria > 0){
-          m_options_phi[m_curr_win]->setSingularValueTol(m_energy_criteria);
+        if (m_phi_energy_criteria > 0){
+          m_options_phi[m_curr_win]->setSingularValueTol(m_phi_energy_criteria);
         }
 
         const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
-        m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisName_phi));
+        m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisFileName_phi));
 
         if (mpi->ip[1] == 0) {
           ArrayCopynD(1,
