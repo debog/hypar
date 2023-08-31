@@ -108,7 +108,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_parametric_id = a_parametric_id;
 
   m_num_window_samples = INT_MAX;
-  m_energy_criteria = -1;
+  m_f_energy_criteria = -1;
+  m_phi_energy_criteria = -1;
 	m_nsets = 1;
 
   char dirname_c_str[_MAX_STRING_SIZE_] = "LS";
@@ -143,8 +144,10 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
             ferr = fscanf(in,"%d", &m_rdim_phi); if (ferr != 1) return;
           } else if (std::string(word) == "ls_solve_phi") {
             ferr = fscanf(in,"%s", solve_phi); if (ferr != 1) return;
-          } else if (std::string(word) == "ls_energy_criteria") {
-            ferr = fscanf(in,"%le", &m_energy_criteria); if (ferr != 1) return;
+          } else if (std::string(word) == "ls_f_energy_criteria") {
+            ferr = fscanf(in,"%le", &m_f_energy_criteria); if (ferr != 1) return;
+          } else if (std::string(word) == "ls_phi_energy_criteria") {
+            ferr = fscanf(in,"%le", &m_phi_energy_criteria); if (ferr != 1) return;
           } else if (std::string(word) == "ls_c_err_snap") {
             ferr = fscanf(in,"%s", c_err_snap); if (ferr != 1) return;
           } else if (std::string(word) == "ls_nsets") {
@@ -165,7 +168,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
     /* print useful stuff to screen */
     printf("LSROMObject details:\n");
     printf("  number of samples per window:   %d\n", m_num_window_samples);
-    printf("  SVD energy criteria:   %e\n", m_energy_criteria);
+    printf("  SVD energy criteria of f:   %e\n", m_f_energy_criteria);
+    printf("  SVD energy criteria of phi:   %e\n", m_phi_energy_criteria);
     printf("  potential latent space dimension:  %d\n", m_rdim_phi);
     printf("  directory name for LS objects: %s\n", dirname_c_str);
     printf("  write snapshot matrix to file:  %s\n", write_snapshot_mat);
@@ -188,7 +192,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   MPI_Bcast(write_snapshot_mat,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(direct_comp_hyperbolic,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(solve_phi,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
-  MPI_Bcast(&m_energy_criteria,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+  MPI_Bcast(&m_f_energy_criteria,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+  MPI_Bcast(&m_phi_energy_criteria,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
   MPI_Bcast(c_err_snap,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(&m_nsets,1,MPI_INT,0,MPI_COMM_WORLD);
 #endif
@@ -264,8 +269,8 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
   if (m_tic == 0) {
 
     m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
-    if (m_energy_criteria > 0){
-      m_options[m_curr_win]->setSingularValueTol(m_energy_criteria);
+    if (m_f_energy_criteria > 0){
+      m_options[m_curr_win]->setSingularValueTol(m_f_energy_criteria);
     }
 
     const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
@@ -286,8 +291,8 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 
     if (m_solve_phi) {
       m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
-      if (m_energy_criteria > 0){
-        m_options_phi[m_curr_win]->setSingularValueTol(m_energy_criteria);
+      if (m_phi_energy_criteria > 0){
+        m_options_phi[m_curr_win]->setSingularValueTol(m_phi_energy_criteria);
       }
       const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
       m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisFileName_phi));
@@ -375,8 +380,8 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       m_curr_win++;
 
       m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
-      if (m_energy_criteria > 0){
-        m_options[m_curr_win]->setSingularValueTol(m_energy_criteria);
+      if (m_f_energy_criteria > 0){
+        m_options[m_curr_win]->setSingularValueTol(m_f_energy_criteria);
       }
       const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
       m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
@@ -2793,9 +2798,9 @@ void LSROMObject::online(void* a_s)
     const std::string basisFileName = basisName + "_" + std::to_string(sampleWindow);
 	  CAROM::BasisReader reader(basisFileName);
     const CAROM::Matrix* spatialbasis;
-    if (m_energy_criteria > 0)
+    if (m_f_energy_criteria > 0)
     {
-      spatialbasis = reader.getSpatialBasis(0.0, 1-m_energy_criteria);
+      spatialbasis = reader.getSpatialBasis(0.0, 1-m_f_energy_criteria);
     }
     else
     {
@@ -2826,7 +2831,7 @@ void LSROMObject::online(void* a_s)
     numColumnRB = m_basis[sampleWindow]->numColumns();
     if (!m_rank) printf("spatial basis dimension is %d x %d\n", numRowRB,
                         numColumnRB);
-    if (m_energy_criteria > 0) m_rdim = numColumnRB;
+    if (m_f_energy_criteria > 0) m_rdim = numColumnRB;
     m_rdims.push_back(m_rdim);
     if (!m_rank) {
       std::cout << "----------------------------------------\n";
