@@ -111,6 +111,9 @@ class DMDROMObject : public ROMObject
     /*! Online stage */
     virtual void online(void* );
 
+    /* Clean up allocation related to LSROM */
+    virtual void cleanup(void* );
+
   protected:
 
     std::vector<CAROM::DMD*> m_dmd; /*!< Vector of DMD objects */

@@ -155,6 +155,9 @@ class libROMInterface
     /*! Read final solution */
     void readFinal(void* a_s);
 
+    /* Clean up allocation related to ROMObject */
+    void cleanup(void* a_s);
+
   protected:
 
     bool m_is_defined;  /*!< Boolean to show if this object is defined */

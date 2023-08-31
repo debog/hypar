@@ -749,6 +749,24 @@ int LSROMObject::TimeExplicitRKInitialize()
   c[1] = c[2] = 0.5; c[3] = 1.0;
   b[0] = 1.0/6.0; b[1] = 1.0/3.0; b[2] = 1.0/3.0; b[3] = 1.0/6.0;
 
+  // Need to delete A, b and c
+
+  return 0;
+}
+
+void LSROMObject::cleanup(void* a_s)
+{
+
+  TimeCleanup();
+}
+
+int LSROMObject::TimeCleanup()
+{
+  // Delete A, b and c
+  free(A);
+  free(b);
+  free(c);
+
   return 0;
 }
 

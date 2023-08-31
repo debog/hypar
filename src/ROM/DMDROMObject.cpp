@@ -353,4 +353,8 @@ void DMDROMObject::online(void* a_s)
 {
 }
 
+void DMDROMObject::cleanup(void* a_s)
+{
+}
+
 #endif

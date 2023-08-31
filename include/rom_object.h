@@ -54,6 +54,8 @@ class ROMObject
     virtual void merge(void*) = 0;
     /*! Online stage */
     virtual void online(void*) = 0;
+    /* Clean up allocation related to ROMObject */
+    virtual void cleanup(void*) = 0;
 
   protected:
 

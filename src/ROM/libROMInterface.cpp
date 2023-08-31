@@ -680,4 +680,13 @@ void libROMInterface::readFinal( void* a_s  /*!< Array of simulation objects of
   return;
 }
 
+/*! Clean up */
+void libROMInterface::cleanup( void* a_s  /*!< Array of simulation objects of
+                                               type #SimulationObject */ )
+{
+  for (int i = 0; i < m_rom.size(); i++) {
+    m_rom[i]->cleanup(a_s);
+  }
+}
+
 #endif

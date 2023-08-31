@@ -146,6 +146,18 @@ class LSROMObject : public ROMObject
 
     /*! Online stage */
     virtual void online(void* );
+
+    /* Read Time Window Paramters */
+    void ReadTimeWindows(void*);
+
+    /* Read Time interval for each time window */
+    void ReadTimeIntervals(void*);
+
+    /* Clean up allocation related to LSROM */
+    virtual void cleanup(void*);
+
+    /* Clean up allocation related to time integration */
+    int TimeCleanup();
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
@@ -247,6 +259,7 @@ class LSROMObject : public ROMObject
     std::ofstream outfile_twp;
     std::string outputPath = ".";
     const char *twpfile = "twp.csv";
+    const char *twintervalfile = "twinterval.csv";
     int m_numwindows, m_numwindows_phi;
 
   private:
