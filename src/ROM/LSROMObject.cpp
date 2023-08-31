@@ -604,6 +604,7 @@ void LSROMObject::train(void* a_s)
         }
       }
     }
+    projectInitialSolution(*(m_snapshots[0]->getColumn(0)),a_s);
   } else {
     printf("ERROR in LSROMObject::train(): m_generator is of size zero!");
   }
