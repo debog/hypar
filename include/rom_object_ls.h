@@ -186,7 +186,8 @@ class LSROMObject : public ROMObject
     bool m_solve_phi;  /*!< Solve potential or not */
     bool m_c_err_snap;  /*!< Compute error of each snapshot*/
 
-    double m_energy_criteria;
+    double m_f_energy_criteria;
+    double m_phi_energy_criteria;
 
     std::string m_dirname; /*!< Subdirectory where LS objects are written to or read from */
 
