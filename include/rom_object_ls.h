@@ -46,10 +46,61 @@ class LSROMObject : public ROMObject
     /*! Destructor */
     virtual ~LSROMObject()
     {
-//    for (int i = 0; i < m_ls.size(); i++) delete m_ls[i];
-//    m_ls.clear();
+//    for (int i = 0; i < m_projected_init.size(); i++) delete m_projected_init[i];
+//    m_projected_init.clear();
+      for (int i = 0; i < m_snapshots.size(); i++) delete m_snapshots[i];
+      m_snapshots.clear();
+      for (int i = 0; i < m_basis.size(); i++) delete m_basis[i];
+      m_basis.clear();
+      for (int i = 0; i < m_romhyperb.size(); i++) delete m_romhyperb[i];
+      m_romhyperb.clear();
+      for (int i = 0; i < m_romcoef.size(); i++) delete m_romcoef[i];
+      m_romcoef.clear();
+
+      for (int i = 0; i < m_projected_init_phi.size(); i++) delete m_projected_init_phi[i];
+      m_projected_init_phi.clear();
+      for (int i = 0; i < m_snapshots_phi.size(); i++) delete m_snapshots_phi[i];
+      m_snapshots_phi.clear();
+      for (int i = 0; i < m_basis_phi.size(); i++) delete m_basis_phi[i];
+      m_basis_phi.clear();
+      for (int i = 0; i < m_romrhs_phi.size(); i++) delete m_romrhs_phi[i];
+      m_romrhs_phi.clear();
+      for (int i = 0; i < m_romlaplace_phi.size(); i++) delete m_romlaplace_phi[i];
+      m_romlaplace_phi.clear();
+
+      for (int i = 0; i < m_options_e.size(); i++) delete m_options_e[i];
+      m_options_e.clear();
+      for (int i = 0; i < m_generator_e.size(); i++) delete m_generator_e[i];
+      m_generator_e.clear();
+      for (int i = 0; i < m_projected_init_e.size(); i++) delete m_projected_init_e[i];
+      m_projected_init_e.clear();
+      for (int i = 0; i < m_snapshots_e.size(); i++) delete m_snapshots_e[i];
+      m_snapshots_e.clear();
+      for (int i = 0; i < m_basis_e.size(); i++) delete m_basis_e[i];
+      m_basis_e.clear();
+
+      for (int i = 0; i < m_romhyperb_x.size(); i++) delete m_romhyperb_x[i];
+      m_romhyperb_x.clear();
+      for (int i = 0; i < m_romhyperb_v.size(); i++) {
+				for (int j = 0; j < m_romhyperb_v[i].size(); j++) {
+					delete m_romhyperb_v[i][j];
+				}
+				m_romhyperb_v[i].clear();
+			}
+			m_romhyperb_v.clear();
+
+      /* Delete allocation used in time integration */
+      free(A);
+      free(b);
+      free(c);
+      for (int i = 0; i < m_U.size(); i++) delete m_U[i];
+      m_U.clear();
+      for (int i = 0; i < m_Udot.size(); i++) delete m_Udot[i];
+      m_Udot.clear();
+
       m_intervals.clear();
       m_ls_is_trained.clear();
+			printf("Calling LSROMObject desctructor\n");
     }
 
     /*! Project initial solution for prediction */
@@ -158,6 +209,7 @@ class LSROMObject : public ROMObject
 
     /* Clean up allocation related to time integration */
     int TimeCleanup();
+
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
