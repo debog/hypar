@@ -82,12 +82,12 @@ class LSROMObject : public ROMObject
       for (int i = 0; i < m_romhyperb_x.size(); i++) delete m_romhyperb_x[i];
       m_romhyperb_x.clear();
       for (int i = 0; i < m_romhyperb_v.size(); i++) {
-				for (int j = 0; j < m_romhyperb_v[i].size(); j++) {
-					delete m_romhyperb_v[i][j];
-				}
-				m_romhyperb_v[i].clear();
-			}
-			m_romhyperb_v.clear();
+        for (int j = 0; j < m_romhyperb_v[i].size(); j++) {
+          delete m_romhyperb_v[i][j];
+        }
+        m_romhyperb_v[i].clear();
+      }
+      m_romhyperb_v.clear();
 
       /* Delete allocation used in time integration */
       free(A);
@@ -267,10 +267,11 @@ class LSROMObject : public ROMObject
 
     /* parameters for RK, similar as in timeintegration_struct.h */
     int nstages; /*!< number of stages */
-    double *A, /*!< Stage computation coefficients (Butcher tableau form),
+    double *A=0; /*!< Stage computation coefficients (Butcher tableau form),
                    saved as a 1D-array in row-major form */
-           *b, /*!< Step completion coefficients (Butcher tableau form) */
-           *c; /*!< Stage time coefficients (Butcher tableau form) */
+
+    double *b=0; /*!< Step completion coefficients (Butcher tableau form) */
+    double *c=0; /*!< Stage time coefficients (Butcher tableau form) */
     /*! Arrays to store stage values for a multi-stage time-integration method */
     std::vector<CAROM::Vector*> m_U;
 
