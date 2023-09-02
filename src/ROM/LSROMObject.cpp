@@ -82,6 +82,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_romhyperb.clear();
   m_snap.clear();
   m_basis.clear();
+  m_romcoef.clear();
 
   /* precomputation idea */
   m_options_phi.clear();
@@ -241,14 +242,16 @@ void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U, /*!< solution vec
 
     m_working = ProjectToRB(m_fomwork, m_basis[i], m_rdims[i]);
     MPISum_double(m_projected_init[i]->getData(), m_working->getData(), m_rdims[i], &mpi->world);
-  if (!m_rank) {
-    std::cout << "Checking projected initial: ";
-    for (int j = 0; j < m_rdims[i]; j++) {
-          std::cout << m_projected_init[i]->item(j) << " ";
+    if (!m_rank) {
+      std::cout << "Checking projected initial: ";
+      for (int j = 0; j < m_rdims[i]; j++) {
+            std::cout << m_projected_init[i]->item(j) << " ";
+      }
+      std::cout << std::endl;
     }
-    std::cout << std::endl;
+    delete m_working;
   }
-  }
+  delete m_fomwork;
 }
 
 /*! take a sample (solution snapshot) */
@@ -722,15 +725,13 @@ int LSROMObject::TimeInitialize(int a_rdim)
 {
   /* Currenty assuming one window only */
   int i;
-  /* initialize arrays to NULL, then allocate as necessary */
-  m_U.clear();
-  m_Udot.clear();
 
   /* explicit Runge-Kutta methods */
   for (i = 0; i < nstages; i++) {
     m_U.push_back(new CAROM::Vector(a_rdim, false));
     m_Udot.push_back(new CAROM::Vector(a_rdim, false));
   }
+
   return 0;
 }
 
@@ -749,14 +750,11 @@ int LSROMObject::TimeExplicitRKInitialize()
   c[1] = c[2] = 0.5; c[3] = 1.0;
   b[0] = 1.0/6.0; b[1] = 1.0/3.0; b[2] = 1.0/3.0; b[3] = 1.0/6.0;
 
-  // Need to delete A, b and c
-
   return 0;
 }
 
 void LSROMObject::cleanup(void* a_s)
 {
-
   TimeCleanup();
 }
 
@@ -766,6 +764,10 @@ int LSROMObject::TimeCleanup()
   free(A);
   free(b);
   free(c);
+  for (int i = 0; i < m_U.size(); i++) delete m_U[i];
+  m_U.clear();
+  for (int i = 0; i < m_Udot.size(); i++) delete m_Udot[i];
+  m_Udot.clear();
 
   return 0;
 }
@@ -782,30 +784,33 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   Vlasov *param  = (Vlasov*) solver->physics;
   MPIVariables *mpi = (MPIVariables *) param->m;
 
-  std::vector<int> index(sim[0].solver.ndims);
-  std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
-  std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
-
   int ns, stage, i;
   int num_rows = m_basis[idx]->numRows();
 
-  CAROM::Vector* m_fomwork;
-  CAROM::Vector* m_rhswork;
-  CAROM::Vector* m_romwork;
+  CAROM::Vector* m_fomwork = nullptr;
+  CAROM::Vector* m_rhswork = nullptr;
+  if (m_direct_comp_hyperbolic) {
+    m_fomwork = new CAROM::Vector(num_rows,false);
+    m_rhswork = new CAROM::Vector(num_rows,false);
+	}
 
-  m_fomwork = new CAROM::Vector(num_rows,false);
-  m_rhswork = new CAROM::Vector(num_rows,false);
-  m_romwork = new CAROM::Vector(m_rdims[idx],false);
-
-  CAROM::Vector* m_tmprhs;
-  CAROM::Vector* m_tmpsol;
-  CAROM::Vector* m_e;
-  CAROM::Vector* m_contract1;
-  CAROM::Vector* m_contract2;
+  CAROM::Vector* m_contract1 = nullptr;
+  CAROM::Vector* m_contract2 = nullptr;
+  CAROM::Vector* m_tmprhs = nullptr;
+  CAROM::Vector* m_tmpsol = nullptr;
+  CAROM::Vector* m_e = nullptr;
   if (m_solve_phi) {
     m_contract1 = new CAROM::Vector(m_rdims_phi[idx],false);
     m_contract2 = new CAROM::Vector(m_rdims[idx],false);
   }
+
+  std::vector<int> index(sim[0].solver.ndims);
+  std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+
+  CAROM::Vector* m_romwork;
+  m_romwork = new CAROM::Vector(m_rdims[idx],false);
+
 
     /* Calculate stage values */
   for (stage = 0; stage < nstages; stage++) {
@@ -848,7 +853,6 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
                               &(sim[0].solver),
                               &(sim[0].mpi),
                               0);
-
 
 
       ArrayCopynD(sim[0].solver.ndims,
@@ -1013,15 +1017,20 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
     }
     std::cout << std::endl;
   }
-  delete m_fomwork;
-  delete m_rhswork;
+
   delete m_romwork;
+
+  if (m_direct_comp_hyperbolic) {
+		if (m_fomwork != nullptr) delete m_fomwork;
+		if (m_rhswork != nullptr) delete m_rhswork;
+	}
+
   if (m_solve_phi) {
-    delete m_tmprhs;
-    delete m_tmpsol;
-    delete m_e;
-    delete m_contract1;
-    delete m_contract2;
+    if (m_tmprhs != nullptr) delete m_tmprhs;
+    if (m_tmpsol != nullptr) delete m_tmpsol;
+    if (m_e != nullptr) delete m_e;
+    if (m_contract1 != nullptr) delete m_contract1;
+    if (m_contract2 != nullptr) delete m_contract2;
   }
   return 0;
 }
@@ -2608,6 +2617,7 @@ void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis, i
   if (!m_rank) printf("m_romhyperb_x %d %d\n",m_romhyperb_x[idx]->numRows(),m_romhyperb_x[idx]->numColumns());
 
   delete phi_hyper_x;
+  delete m_working;
 
   return;
 }
@@ -2714,6 +2724,7 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
 //  }
 //  }
   }
+  delete m_working;
   return;
 }
 
