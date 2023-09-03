@@ -34,6 +34,8 @@ class LSROMObject : public ROMObject
   public:
     /*! Constructor */
     LSROMObject(  const int, 
+                  const int,
+                  const int,
                   const double, 
                   const int, 
                   const int,
