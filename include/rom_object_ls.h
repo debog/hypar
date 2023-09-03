@@ -102,6 +102,8 @@ class LSROMObject : public ROMObject
 
       m_intervals.clear();
       m_ls_is_trained.clear();
+      if (m_dir_fomwork != nullptr) delete m_dir_fomwork;
+      if (m_dir_rhswork != nullptr) delete m_dir_rhswork;
 			printf("Calling LSROMObject desctructor\n");
     }
 
@@ -225,6 +227,11 @@ class LSROMObject : public ROMObject
     CAROM::Vector* m_romhycoef; /*!< Vector of rom coefficients */
     CAROM::Vector* m_recon; /*!< Vector of rom coefficients */
 
+    CAROM::Vector* m_dir_fomwork = nullptr;
+    CAROM::Vector* m_dir_rhswork = nullptr;
+    std::vector<double> dir_vec_wghosts;
+    std::vector<double> dir_rhs_wghosts;
+
     std::vector<bool> m_ls_is_trained; /*!< Flag to indicate if LS is trained */
     std::vector<Interval> m_intervals; /*!< Time intervals for each LS object */
 
@@ -232,6 +239,8 @@ class LSROMObject : public ROMObject
     int m_nproc;  /*!< Number of MPI ranks */
 
     int     m_vec_size; /*!< Local size of solution vector */
+    int     m_vec_size_wg; /*!< Local size of solution vector */
+    int     m_nvars; /*!< Local size of solution vector */
     double  m_dt;       /*!< Time step size */
     double  m_t_final;  /*!< Final time */
     int     m_rdim;     /*!< Latent space dimension */

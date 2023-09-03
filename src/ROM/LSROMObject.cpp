@@ -210,15 +210,27 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_c_err_snap = (std::string(c_err_snap) == "true");
 
   if (m_num_window_samples <= m_rdim) {
-    printf("ERROR:LSROMObject::LSROMObject() - m_num_window_samples <= m_rdim!!");
+    printf("ERROR:LSROMObject::LSROMObject() - m_num_window_samples <= m_rdim!!\n");
   }
 
   if (m_rdim_phi > m_rdim) {
-    printf("ERROR:LSROMObject::LSROMObject() - m_rdim_phi > m_rdim!!");
+    printf("ERROR:LSROMObject::LSROMObject() - m_rdim_phi > m_rdim!!\n");
   }
 
   m_tic = 0;
   m_curr_win = 0;
+  m_recon = new CAROM::Vector(m_vec_size, false);
+
+  if (m_direct_comp_hyperbolic) {
+    m_dir_fomwork = new CAROM::Vector(m_vec_size,false);
+    m_dir_rhswork = new CAROM::Vector(m_vec_size,false);
+		printf("checking m_vec_size_wg %d %d %d \n",m_vec_size,m_vec_size_wg,m_nvars);
+    dir_vec_wghosts.resize(m_vec_size_wg * m_nvars);
+    dir_rhs_wghosts.resize(m_vec_size_wg * m_nvars);
+
+    std::vector<double> dir_vec_wghosts(m_vec_size_wg*m_nvars);
+    std::vector<double> dir_rhs_wghosts(m_vec_size_wg*m_nvars);
+	}
 }
 
 void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U, /*!< solution vector */
