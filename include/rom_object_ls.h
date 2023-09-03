@@ -91,6 +91,17 @@ class LSROMObject : public ROMObject
       }
       m_romhyperb_v.clear();
 
+      for (int i = 0; i < m_fullscale.size(); i++) delete m_fullscale[i];
+      m_fullscale.clear();
+      for (int i = 0; i < m_contract1.size(); i++) delete m_contract1[i];
+      m_contract1.clear();
+      for (int i = 0; i < m_contract2.size(); i++) delete m_contract2[i];
+      m_contract2.clear();
+      for (int i = 0; i < m_tmprhs.size(); i++) delete m_tmprhs[i];
+      m_tmprhs.clear();
+      for (int i = 0; i < m_tmpsol.size(); i++) delete m_tmpsol[i];
+      m_tmpsol.clear();
+
       /* Delete allocation used in time integration */
       free(A);
       free(b);
@@ -313,6 +324,10 @@ class LSROMObject : public ROMObject
     int m_sampling_freq;       /*!< Time step size */
 
     std::vector<CAROM::Matrix*> m_fullscale;
+    std::vector<CAROM::Vector*> m_contract1;
+    std::vector<CAROM::Vector*> m_contract2;
+    std::vector<CAROM::Vector*> m_tmprhs;
+    std::vector<CAROM::Vector*> m_tmpsol;
     CAROM::Matrix* m_matrix;
 
     int m_parametric_id; /*!< frequency (iterations) of writing ROM solution to file */

@@ -892,17 +892,17 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
 //    }
     }
     else if (m_solve_phi) {
-      m_tmprhs = m_romrhs_phi[idx]->mult(m_U[stage]);
-      m_tmpsol = m_romlaplace_phi[idx]->mult(m_tmprhs);
+      m_romrhs_phi[idx]->mult(*m_U[stage], *m_tmprhs[idx]);
+      m_romlaplace_phi[idx]->mult(*m_tmprhs[idx], *m_tmpsol[idx]);
 
-      m_romwork = m_romhyperb_x[idx]->mult(m_U[stage]);
+      m_romhyperb_x[idx]->mult(*m_U[stage], *m_romwork);
 
 //    /* Tensor contraction */
       for (int k = 0; k < m_rdims[idx]; k++) {
-        m_contract1 = m_romhyperb_v[idx][k]->mult(m_U[stage]);
-        m_contract2->item(k) = m_contract1->inner_product(m_tmpsol);
+        m_romhyperb_v[idx][k]->mult(*m_U[stage], *m_contract1[idx]);
+        m_contract2[idx]->item(k) = m_contract1[idx]->inner_product(m_tmpsol[idx]);
       }
-      m_Udot[stage] = m_romwork->plus(m_contract2);
+      m_romwork->plus(*m_contract2[idx], *m_Udot[stage]);
 //
 //    m_e = m_basis_e->mult(m_tmpsol);
 
@@ -2897,63 +2897,68 @@ void LSROMObject::online(void* a_s)
       m_romhyperb.push_back(new CAROM::Matrix(m_rdims[sampleWindow], m_rdims[sampleWindow], false));
       ConstructROMHy(a_s, m_basis[sampleWindow], sampleWindow);
     }
-  }
 
-  if (m_solve_phi) {
-	  CAROM::BasisReader reader_phi(basisName_phi);
-    const CAROM::Matrix* spatialbasis_phi;
-    if (m_energy_criteria > 0)
-    {
-      spatialbasis_phi = reader_phi.getSpatialBasis(0.0, 1-m_energy_criteria);
-    }
-    else
-    {
-      spatialbasis_phi = reader_phi.getSpatialBasis(0.0, m_rdim);
-    }
-
-    const CAROM::Vector* singularphi;
-    if (!m_rank) {
-      singularphi = reader_phi.getSingularValues(0);
-      std::cout << "----------------\n";
-      std::cout << "Singular Values of potential: ";
-      for (int i = 0; i < singularphi->dim(); i++) {
-            std::cout << (singularphi->item(i)) << " ";
+    if (m_solve_phi) {
+      const std::string basisFileName_phi = basisName_phi + "_" + std::to_string(sampleWindow);
+      CAROM::BasisReader reader_phi(basisFileName_phi);
+      const CAROM::Matrix* spatialbasis_phi;
+      if (m_phi_energy_criteria > 0)
+      {
+        spatialbasis_phi = reader_phi.getSpatialBasis(0.0, 1-m_phi_energy_criteria);
       }
-      std::cout << "\n";
-      std::cout << std::endl;
-    }
+      else
+      {
+        spatialbasis_phi = reader_phi.getSpatialBasis(0.0, m_rdim);
+      }
 
-    m_basis_phi.push_back(new CAROM::Matrix(
-                                spatialbasis_phi->getData(),
-                                spatialbasis_phi->numRows(),
-                                spatialbasis_phi->numColumns(),
-                                false,
-                                true));
-	  int numRowRB_phi, numColumnRB_phi;
-    numRowRB_phi = m_basis_phi[0]->numRows();
-    numColumnRB_phi = m_basis_phi[0]->numColumns();
-    if (!m_rank) printf("spatial basis dimension is %d x %d\n", numRowRB_phi,
-                        numColumnRB_phi);
-    if (m_energy_criteria > 0) m_rdim_phi = numColumnRB_phi;
-    m_rdims_phi.push_back(m_rdim_phi);
-    if (!m_rank) {
-      std::cout << "----------------------------------------\n";
-      std::cout << "Time window #" << 0 << ": # Potential POD basis : " << m_rdims_phi[0];
-      std::cout << std::endl;
-    }
-    m_projected_init_phi.push_back(new CAROM::Vector(m_rdims_phi[0], false));
-    m_romrhs_phi.push_back(new CAROM::Matrix(m_rdims_phi[0], m_rdims[0], false));
-    ConstructPotentialROMRhs(a_s, m_basis[0], m_basis_phi[0], 0);
+      const CAROM::Vector* singularphi;
+      singularphi = reader_phi.getSingularValues(0.0, 1-m_phi_energy_criteria);
+      if (!m_rank) {
+        std::cout << "----------------\n";
+        std::cout << "Singular Values of potential: ";
+        for (int i = 0; i < singularphi->dim(); i++) {
+              std::cout << (singularphi->item(i)) << " ";
+        }
+        std::cout << "\n";
+        std::cout << std::endl;
+      }
 
-    m_romlaplace_phi.push_back(new CAROM::Matrix(m_rdims_phi[0], m_rdims_phi[0], false));
-    ConstructPotentialROMLaplace(a_s, m_basis_phi[0], 0);
-    m_basis_e.push_back(new CAROM::Matrix(m_basis_phi[0]->numRows(),
-                        m_rdims_phi[0], false));
-    ConstructEBasis(a_s, 0);
-    m_romhyperb_x.push_back(new CAROM::Matrix(m_rdims[0], m_rdims[0], false));
-    ConstructROMHy_x(a_s, m_basis[0], 0);
-    m_romhyperb_v.push_back(std::vector<CAROM::Matrix*>());
-    ConstructROMHy_v(a_s, m_basis[0], m_basis_e[0], 0);
+      m_basis_phi.push_back(new CAROM::Matrix(
+                                  spatialbasis_phi->getData(),
+                                  spatialbasis_phi->numRows(),
+                                  spatialbasis_phi->numColumns(),
+                                  false,
+                                  true));
+      int numRowRB_phi, numColumnRB_phi;
+      numRowRB_phi = m_basis_phi[sampleWindow]->numRows();
+      numColumnRB_phi = m_basis_phi[sampleWindow]->numColumns();
+      if (!m_rank) printf("spatial basis dimension is %d x %d\n", numRowRB_phi,
+                          numColumnRB_phi);
+      if (m_phi_energy_criteria > 0) m_rdim_phi = numColumnRB_phi;
+      m_rdims_phi.push_back(m_rdim_phi);
+      if (!m_rank) {
+        std::cout << "----------------------------------------\n";
+        std::cout << "Time window #" << sampleWindow << ": # Potential POD basis : " << m_rdims_phi[sampleWindow];
+        std::cout << std::endl;
+      }
+      m_projected_init_phi.push_back(new CAROM::Vector(m_rdims_phi[sampleWindow], false));
+      m_romrhs_phi.push_back(new CAROM::Matrix(m_rdims_phi[sampleWindow], m_rdims[sampleWindow], false));
+      ConstructPotentialROMRhs(a_s, m_basis[sampleWindow], m_basis_phi[sampleWindow], sampleWindow);
+      m_romlaplace_phi.push_back(new CAROM::Matrix(m_rdims_phi[sampleWindow], m_rdims_phi[sampleWindow], false));
+      ConstructPotentialROMLaplace(a_s, m_basis_phi[sampleWindow], sampleWindow);
+      m_basis_e.push_back(new CAROM::Matrix(m_basis_phi[sampleWindow]->numRows(),
+                          m_rdims_phi[sampleWindow], false));
+      ConstructEBasis(a_s, sampleWindow);
+      m_romhyperb_x.push_back(new CAROM::Matrix(m_rdims[sampleWindow], m_rdims[sampleWindow], false));
+      ConstructROMHy_x(a_s, m_basis[sampleWindow], sampleWindow);
+      m_romhyperb_v.push_back(std::vector<CAROM::Matrix*>());
+      ConstructROMHy_v(a_s, m_basis[sampleWindow], m_basis_e[sampleWindow], sampleWindow);
+
+      m_contract1.push_back(new CAROM::Vector(m_rdims_phi[sampleWindow],false));
+      m_contract2.push_back(new CAROM::Vector(m_rdims[sampleWindow],false));
+      m_tmprhs.push_back(new CAROM::Vector(m_rdims[sampleWindow],false));
+      m_tmpsol.push_back(new CAROM::Vector(m_rdims_phi[sampleWindow],false));
+    }
   }
 
 }
