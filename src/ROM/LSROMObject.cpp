@@ -62,8 +62,9 @@ extern "C" int HyperbolicFunction_1dir(double*,double*,void*,void*,double,int,
                                        double*,double*,int,void*,double),int);
 
 LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
-                            const int     a_vec_size_wg,             /*!< time step size */
-                            const int     a_nvars,             /*!< time step size */
+                            const int     a_vec_size_wg,    /*!< vector size with ghosts point */
+                            const int     a_vec_size_x,     /*!< vector size in x-direction */
+                            const int     a_nvars,          /*!< number of variables */
                             const double  a_dt,             /*!< time step size */
                             const int     a_sampling_freq,  /*!< sampling frequency */
                             const int     a_rdim,           /*!< latent space dimension */
