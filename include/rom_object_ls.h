@@ -125,11 +125,11 @@ class LSROMObject : public ROMObject
     virtual void takeSample( const CAROM::Vector&, const double, void* );
 
     /*! train the LS object */
-    virtual void train(void* );
+    virtual void train( void* );
 
     /*! compute prediction at given time */
     virtual 
-    const CAROM::Vector* predict(const double, void* );
+    const CAROM::Vector* predict( const double, void* );
 
     /*! save LS object to file */
     virtual void save(const std::string& a_fname_root /*!< Filename root*/) const;
@@ -141,88 +141,89 @@ class LSROMObject : public ROMObject
     void copyToHyPar( const CAROM::Vector&, void*, int ) const;
 
     /*! Write out libROM field */
-    void OutputlibROMfield(double*, SimulationObject&, char*);
+    void OutputlibROMfield( double*, SimulationObject&, char* );
 
     /*! Check the LS object */
-    virtual void check(void* );
+    virtual void check( void* );
 
     /*! Reconstruct libROM field from coefficient */
-    CAROM::Vector* ReconlibROMfield(const CAROM::Vector*, const CAROM::Matrix*, const int );
+    CAROM::Vector* ReconlibROMfield( const CAROM::Vector*, const CAROM::Matrix*, const int );
 
     /*! Project a libROM field onto reduced space*/
-    CAROM::Vector* ProjectToRB(CAROM::Vector*, const CAROM::Matrix*, const int );
+    CAROM::Vector* ProjectToRB( CAROM::Vector*, const CAROM::Matrix*, const int );
 
     /*! Initialize the time integration for LSROM */
-    int TimeInitialize (int);
+    int TimeInitialize ( int );
     /* RK Time integration for LSROM */
-    int TimeExplicitRKInitialize();
+    int TimeExplicitRKInitialize( );
 
-    int TimeRK(const double, void*, int);
+    int TimeRK( const double, void*, int );
 
     /* Construct reduced hyperbolic operator */
-    void ConstructROMHy(void*, const CAROM::Matrix*,int);
+    void ConstructROMHy( void*, const CAROM::Matrix*, int );
 
     /* Dump ROM basis */
-    void OutputROMBasis(void*, const CAROM::Matrix*,int);
+    void OutputROMBasis( void*, const CAROM::Matrix*, int );
 
-    int CalSnapROMDiff(void*, void*, double*, double*, char*);
+    int CalSnapROMDiff( void*, void*, double*, double*, char* );
 
-    void CheckSolProjError(void*,int);
+    void CheckSolProjError( void*, int );
 
-    void CheckHyProjError(void*,int);
+    void CheckHyProjError( void*, int );
 
     /* Construct reduced rhs operator for potential */
-    void ConstructPotentialROMRhs(void*, const CAROM::Matrix*, const CAROM::Matrix*, int);
+    void ConstructPotentialROMRhs( void*, const CAROM::Matrix*, const CAROM::Matrix*, int );
 
     /* Construct reduced laplace operator for potential */
-    void ConstructPotentialROMLaplace(void*, const CAROM::Matrix*, int);
+    void ConstructPotentialROMLaplace( void*, const CAROM::Matrix*, int );
 
-    void CheckPotentialProjError(void*,int);
+    void CheckPotentialProjError( void*, int );
 
-    void CheckLaplaceProjError(void*,int);
+    void CheckLaplaceProjError( void*, int );
 
-    void CheckRhsProjError(void*,int);
+    void CheckRhsProjError( void*, int );
 
-    int CalSnapROMDiff_phi(void*, void*, double*, double*, char*);
+    int CalSnapROMDiff_phi( void*, void*, double*, double*, char* );
 
     /*! Project initial solution for phi */
     void projectInitialSolution_phi(  CAROM::Vector& );
 
     /*! Evaluate Rhs */
-    void EvaluatePotentialRhs(void*, CAROM::Vector*, double*);
+    void EvaluatePotentialRhs( void*, CAROM::Vector*, double* );
 
-    void CheckEProjError(void*,int);
+    void CheckEProjError( void*, int );
 
     /* Dump ROM basis phi */
-    void OutputROMBasisPhi(void*, const CAROM::Matrix*,int);
+    void OutputROMBasisPhi( void*, const CAROM::Matrix*, int );
 
-    void ConstructEBasis(void*,int);
+    void ConstructEBasis( void*, int );
 
     /* Construct reduced hyperbolic operator in x direction */
-    void ConstructROMHy_x(void*, const CAROM::Matrix*,int);
+    void ConstructROMHy_x( void*, const CAROM::Matrix*, int );
 
     /* Construct reduced hyperbolic tensor in v direction */
-    void ConstructROMHy_v(void*, const CAROM::Matrix*, const CAROM::Matrix*,int);
+    void ConstructROMHy_v( void*, const CAROM::Matrix*, const CAROM::Matrix*, int );
 
     /*! Write Snapshot matrix */
-    virtual void writeSnapshot(void* );
+    virtual void writeSnapshot( void* );
 
     /*! Merge stage */
-    virtual void merge(void* );
+    virtual void merge( void* );
 
     /*! Online stage */
-    virtual void online(void* );
+    virtual void online( void* );
 
     /* Read Time Window Paramters */
-    void ReadTimeWindows(void*);
+    void ReadTimeWindows( void* );
 
     /* Read Time interval for each time window */
-    void ReadTimeIntervals(void*);
+    void ReadTimeIntervals( void* );
 
     /* Clean up allocation related to LSROM */
-    virtual void cleanup(void*);
+    virtual void cleanup( void* );
 
     /* Clean up allocation related to time integration */
+    int TimeCleanup( );
     int TimeCleanup();
 
   protected:
