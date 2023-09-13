@@ -224,7 +224,8 @@ class LSROMObject : public ROMObject
 
     /* Clean up allocation related to time integration */
     int TimeCleanup( );
-    int TimeCleanup();
+
+    void FindMaxEBasis( void*, int );
 
   protected:
 
@@ -237,7 +238,8 @@ class LSROMObject : public ROMObject
     const CAROM::Vector* m_S; /*!< Vector of Singular value */
     std::vector<CAROM::Vector*> m_romcoef; /*!< Vector of rom coefficients */
     CAROM::Vector* m_romhycoef; /*!< Vector of rom coefficients */
-    CAROM::Vector* m_recon; /*!< Vector of rom coefficients */
+    CAROM::Vector* m_recon; /*!< Vector of rom approximated solution to f */
+    CAROM::Vector* m_recon_E; /*!< Vector of rom approximated solution to E */
 
     CAROM::Vector* m_dir_fomwork = nullptr;
     CAROM::Vector* m_dir_rhswork = nullptr;
@@ -328,7 +330,8 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::Vector*> m_contract1;
     std::vector<CAROM::Vector*> m_contract2;
     std::vector<CAROM::Vector*> m_tmprhs;
-    std::vector<CAROM::Vector*> m_tmpsol;
+    std::vector<CAROM::Vector*> m_tmpsol; // later change it to m_romEcoef
+    std::vector<CAROM::Vector*> m_romMaxE; // later change it to m_romEcoef
     CAROM::Matrix* m_matrix;
 
     int m_parametric_id; /*!< frequency (iterations) of writing ROM solution to file */
