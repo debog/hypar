@@ -15,6 +15,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <timeintegration.h>
 
 /*! Define the libROM interface
   
@@ -162,6 +163,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
   
     m_rom.clear();
     m_U.clear();
+    m_U_stages.clear();
     if (m_comp_mode == _ROM_COMP_MODE_MONOLITHIC_) {
       for (int ns = 0; ns < m_nsims; ns++) {
         if (m_rom_type == _ROM_TYPE_DMD_) {
@@ -201,12 +203,22 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
         }
       }
     }
+    if (!strcmp(sim[0].solver.time_scheme,_RK_)) {
+  
+      /* explicit Runge-Kutta methods */
+      ExplicitRKParameters  *params = (ExplicitRKParameters*)  sim[0].solver.msti;
+      int nstages = params->nstages;
+      for (int i = 0; i < nstages; i++) {
+        m_U_stages.push_back(new CAROM::Vector(m_vec_size[0],true));
+      }
+    }
 
   } else {
 
     m_rom.clear();
     m_U.clear();
     m_ncomps.clear();
+    m_U_stages.clear();
 
   }
 
@@ -220,17 +232,21 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 /*! Take a sample for training */
 void libROMInterface::takeSample( void* a_s,        /*!< Array of simulation objects of 
                                                          type #SimulationObject */
-                                  const double a_t  /*!< Current simulation time */ )
+                                  const double a_t,  /*!< Current simulation time */ 
+                                  void  *ts     /*!< Time integration object of type #TimeIntegration */
+                                  )
 {
+  TimeIntegration*  TS  = (TimeIntegration*) ts;
   if (m_U.size() != m_rom.size()) {
     printf( "ERROR in libROMInterface::takeSample(): m_U.size != m_rom.size() on rank %d!!\n",
             m_rank );
   }
 
   copyFromHyPar( m_U, a_s );
+  copyFromHyPar_stages( m_U_stages, a_s, ts );
   gettimeofday(&m_train_start, NULL);
   for (int i = 0; i < m_rom.size(); i++) {
-    m_rom[i]->takeSample( *(m_U[i]), a_t, a_s );
+    m_rom[i]->takeSample( *(m_U[i]), m_U_stages, a_t, a_s );
   }
   gettimeofday(&m_train_end, NULL);
 
@@ -687,6 +703,42 @@ void libROMInterface::cleanup( void* a_s  /*!< Array of simulation objects of
   for (int i = 0; i < m_rom.size(); i++) {
     m_rom[i]->cleanup(a_s);
   }
+}
+
+/*! Copy HyPar mulit-stage solution to the work vectors a_U_stages. Note that the HyPar solution has ghost
+ * points but the work vectors a_U_stages is a serialized vector of the solution without ghost
+ * points */
+void libROMInterface::copyFromHyPar_stages(  std::vector<CAROM::Vector*>& a_U_stages,  /*!< work vector */
+                                             void* a_s,   /*!< Array of simulation objects of 
+                                                          type #SimulationObject */ 
+                                             void* ts  )
+{
+  const SimulationObject* sim = (const SimulationObject*) a_s;
+  TimeIntegration*  TS  = (TimeIntegration*) ts;
+
+  if (!strcmp(sim[0].solver.time_scheme,_RK_)) {
+  
+    /* explicit Runge-Kutta methods */
+    ExplicitRKParameters  *params = (ExplicitRKParameters*)  sim[0].solver.msti;
+    int nstages = params->nstages;
+    std::vector<int> index(sim[0].solver.ndims);
+
+    for (int i = 0; i < nstages; i++) {
+
+      double* vec = a_U_stages[i]->getData();
+      const double* u =  TS->U[i];
+
+      ArrayCopynD(  sim[0].solver.ndims,
+                    u,
+                    vec,
+                    sim[0].solver.dim_local,
+                    sim[0].solver.ghosts,
+                    0,
+                    index.data(),
+                    sim[0].solver.nvars );
+    }
+  }
+  return;
 }
 
 #endif

@@ -273,6 +273,7 @@ void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U, /*!< solution vec
 
 /*! take a sample (solution snapshot) */
 void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
+                               const std::vector<CAROM::Vector*>& a_U_stages, /*!< solution vector */
                                const double a_time, /*!< sample time */
                                void* a_s )
 {
