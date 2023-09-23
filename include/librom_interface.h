@@ -93,6 +93,8 @@ class libROMInterface
       m_rom.clear();
       for (int i = 0; i < m_U.size(); i++) delete m_U[i];
       m_U.clear();
+      for (int i = 0; i < m_U_stages.size(); i++) delete m_U_stages[i];
+      m_U_stages.clear();
     }
 
     /*! return the sampling frequency */
@@ -111,7 +113,7 @@ class libROMInterface
     inline int file_op_iter() const { return m_file_op_iter; }
 
     /*! Take a sample for training */
-    void takeSample( void* a_s, const double a_t );
+    void takeSample( void* a_s, const double a_t, void* ts);
 
     /*! Project initial solution for prediction */
     void projectInitialSolution( void* a_s );
@@ -130,6 +132,9 @@ class libROMInterface
 
     /*! Copy HyPar solution to the work vectors m_U */
     void copyFromHyPar( std::vector<CAROM::Vector*>&, void* );
+
+    /*! Copy HyPar multi-stages to the work vectors m_U_stages */
+    void copyFromHyPar_stages( std::vector<CAROM::Vector*>&, void*, void* );
 
     /*! Copy a vector to HyPar */
     void copyToHyPar( const CAROM::Vector&, void*, int ) const;
@@ -181,6 +186,7 @@ class libROMInterface
 
     std::vector<ROMObject*> m_rom; /*!< ROM objects */
     std::vector<CAROM::Vector*> m_U; /*!< Work vectors */
+    std::vector<CAROM::Vector*> m_U_stages; /*!< Work vectors */
 
     mutable struct timeval m_train_start; /*<! Training start time */
     mutable struct timeval m_train_end; /*<! Training end time */
