@@ -1324,6 +1324,9 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis, int
   CAROM::Matrix* m_working;
   m_working = new CAROM::Matrix(m_rdims[idx], m_rdims[idx], false);
 
+  CAROM::Vector* phi_hyper_work;
+  phi_hyper_work = new CAROM::Vector(num_rows,false);
+
   CAROM::Vector phi_hyper_col(num_rows,false);
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
@@ -1331,8 +1334,9 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis, int
   for (int j = 0; j < m_rdims[idx]; j++){
     /* Extend reduced basis \phi_j with ghost points */
     std::vector<int> index(sim[0].solver.ndims);
+    a_rombasis->getColumn(j, *phi_hyper_work);
     ArrayCopynD(sim[0].solver.ndims,
-                a_rombasis->getColumn(j)->getData(),
+                phi_hyper_work->getData(),
                 vec_wghosts.data(),
                 sim[0].solver.dim_local,
                 0,
@@ -1368,7 +1372,8 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis, int
     }
 
     char buffer[] = "hyperbasis";  // Creates a modifiable buffer and copies the string literal
-    OutputlibROMfield(phi_hyper->getColumn(j)->getData(),
+    phi_hyper->getColumn(j, *phi_hyper_work);
+    OutputlibROMfield(phi_hyper_work->getData(),
                       sim[0],
                       buffer);
     /* increment the index string, if required */
@@ -1378,7 +1383,7 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis, int
   }
 
   // construct hyper_ROM = phi^T phi_hyper
-  m_working = a_rombasis->getFirstNColumns(m_rdims[idx])->transposeMult(phi_hyper);
+  a_rombasis->transposeMult(*phi_hyper, *m_working);
   MPISum_double(m_romhyperb[idx]->getData(), m_working->getData(), m_rdims[idx]*m_rdims[idx], &mpi->world);
   if (!m_rank){
     printf("phi %d %d\n",a_rombasis->numRows(),a_rombasis->numColumns());
@@ -1389,6 +1394,7 @@ void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis, int
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
   delete phi_hyper;
+  delete phi_hyper_work;
 
   return;
 }
