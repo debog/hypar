@@ -1405,11 +1405,16 @@ void LSROMObject::OutputROMBasis(void* a_s, const CAROM::Matrix* a_rombasis, int
   /* m_rdim is written out */
   SimulationObject* sim = (SimulationObject*) a_s;
 
+  int num_rows = a_rombasis->numRows();
+  CAROM::Vector* m_output;
+  m_output = new CAROM::Vector(num_rows,false);
+
   for (int j = 0; j < m_rdims[idx]; j++){
     char buffer[] = "basis";  // Creates a modifiable buffer and copies the string literal
     char fbuffer[100];
     sprintf(fbuffer, "%s_%d",buffer,idx);
-    OutputlibROMfield(a_rombasis->getColumn(j)->getData(),
+    a_rombasis->getColumn(j, *m_output);
+    OutputlibROMfield(m_output->getData(),
                       sim[0],
                       fbuffer);
     /* increment the index string, if required */
@@ -1420,6 +1425,8 @@ void LSROMObject::OutputROMBasis(void* a_s, const CAROM::Matrix* a_rombasis, int
 
   ::ResetFilenameIndex( sim[0].solver.filename_index,
                         sim[0].solver.index_length );
+
+	delete m_output;
   return;
 }
 
