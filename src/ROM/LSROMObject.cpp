@@ -3075,4 +3075,36 @@ void LSROMObject::ReadTimeIntervals(void* a_s)
   // check if size of m_intervals is equal to number of windows
 }
 
+/*! Evale max |basis_E| */
+void LSROMObject::FindMaxEBasis(void* a_s, int idx)
+{
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  int num_rows = m_basis_e[idx]->numRows();
+
+  CAROM::Vector* m_work_e;
+  m_work_e = new CAROM::Vector(num_rows,false);
+
+  double sum = 0, global_sum = 0;
+
+  for (int j = 0; j < m_rdims_phi[idx]; j++){
+
+    m_basis_e[idx]->getColumn(j, *m_work_e);
+    for (int i = 0; i < num_rows; i++) {
+      (*m_work_e)(i) = std::fabs((*m_work_e)(i));
+    }
+    sum = ArrayMaxnD (solver->nvars,1,solver->dim_local,
+                      0,solver->index,m_work_e->getData());
+    global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
+    if (!m_rank) printf("Checking max |E_basis| %f\n",global_sum);
+
+    (*m_romMaxE[idx])(j) = global_sum;
+
+  }
+  delete m_work_e;
+}
+
 #endif
