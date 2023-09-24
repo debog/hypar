@@ -476,6 +476,9 @@ void LSROMObject::train(void* a_s)
    * 2. reduced hyperbolic operator (constructHyperbolic)
    * 3. Initial condition (projectInitialCondition) */
 
+  /* Unlike m_dmd[i]->train(m_rdim), in LS-ROM, there is no m_ls object
+     but m_generator, m_options, m_spatialbasis, m_projected_init */
+
   SimulationObject* sim = (SimulationObject*) a_s;
   HyPar  *solver = (HyPar*) &(sim[0].solver);
   Vlasov *param  = (Vlasov*) solver->physics;
@@ -503,10 +506,11 @@ void LSROMObject::train(void* a_s)
 
         /* IMPORTANT!!! m_generator[i]->getSnapshotMatrix() is modified after
          * getSingularValues or (computeSVD) is called, hence need to make a copy of snapshots */
-        /* Does everytime invoking getSpatialBasis() do computeSVD again? */
-        m_snapshots.push_back(new CAROM::Matrix(*m_generator[i]->getSnapshotMatrix()));
+        /* Does everytime invoke getSpatialBasis() do computeSVD again? */
 
+        m_snapshots.push_back(new CAROM::Matrix(*m_generator[i]->getSnapshotMatrix()));
         m_rdims.push_back(m_rdim);
+
         if (m_generator[i]->getSnapshotMatrix()->numColumns() < m_rdims[i]) {
           throw std::runtime_error("# of snapshots is less than m_rdim");
         }
