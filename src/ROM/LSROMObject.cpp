@@ -2630,17 +2630,24 @@ void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis, i
   /* Compute F(\Phi), where \Phi is the reduced basis matrix */
   CAROM::Matrix* phi_hyper_x;
   phi_hyper_x = new CAROM::Matrix(num_rows, m_rdims[idx], false);
+
   CAROM::Vector phi_hyper_col(num_rows,false);
+
   CAROM::Matrix* m_working;
   m_working = new CAROM::Matrix(m_rdims[idx], m_rdims[idx], false);
+
+  CAROM::Vector* phi_hyper_work;
+  phi_hyper_work = new CAROM::Vector(num_rows,false);
 
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
   std::vector<int> index(sim[0].solver.ndims);
 
   for (int j = 0; j < m_rdims[idx]; j++){
+    *phi_hyper_work = 0;
+    a_rombasis->getColumn(j, *phi_hyper_work);
     ArrayCopynD(sim[0].solver.ndims,
-                a_rombasis->getColumn(j)->getData(),
+                phi_hyper_work->getData(),
                 vec_wghosts.data(),
                 sim[0].solver.dim_local,
                 0,
@@ -2682,7 +2689,7 @@ void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis, i
   }
 
   // construct hyper_ROM = phi^T phi_hyper
-  m_working = a_rombasis->getFirstNColumns(m_rdims[idx])->transposeMult(phi_hyper_x);
+  a_rombasis->transposeMult(*phi_hyper_x, *m_working);
   MPISum_double(m_romhyperb_x[idx]->getData(),m_working->getData(),m_rdims[idx]*m_rdims[idx],&mpi->world);
   if (!m_rank) {
     printf("m_romhyperb_x %d %d\n",m_romhyperb_x[idx]->numRows(),m_romhyperb_x[idx]->numColumns());
@@ -2697,6 +2704,7 @@ void LSROMObject::ConstructROMHy_x(void* a_s, const CAROM::Matrix* a_rombasis, i
   if (!m_rank) printf("m_romhyperb_x %d %d\n",m_romhyperb_x[idx]->numRows(),m_romhyperb_x[idx]->numColumns());
 
   delete phi_hyper_x;
+  delete phi_hyper_work;
   delete m_working;
 
   return;
@@ -2714,9 +2722,16 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
   int num_cols = a_rombasis->numColumns();
 
   /* Compute F(\Phi), where \Phi is the reduced basis matrix */
-  CAROM::Vector phi_hyper_col(num_rows,false);
+  CAROM::Vector phi_hyper_col(num_rows, false);
   CAROM::Matrix* m_working;
+
   m_working = new CAROM::Matrix(m_rdims_phi[idx], m_rdims[idx], false);
+
+  CAROM::Vector* phi_hyper_work;
+  phi_hyper_work = new CAROM::Vector(num_rows, false);
+
+  CAROM::Vector* phi_hyper_work1;
+  phi_hyper_work1 = new CAROM::Vector(a_rombasis_phi->numRows(), false);
 
   std::vector<int> index(sim[0].solver.ndims);
   std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
@@ -2730,8 +2745,10 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
     for (int j = 0; j < m_rdims_phi[idx]; j++) {
 
       for (int k = 0; k < m_rdims[idx]; k++) {
+        *phi_hyper_work = 0;
+    		a_rombasis->getColumn(k, *phi_hyper_work);
         ArrayCopynD(sim[0].solver.ndims,
-                    a_rombasis->getColumn(k)->getData(),
+                    phi_hyper_work->getData(),
                     vec_wghosts.data(),
                     sim[0].solver.dim_local,
                     0,
@@ -2740,6 +2757,8 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
                     sim[0].solver.nvars);
 
         if (mpi->ip[1] == 0) {
+          *phi_hyper_work1 = 0;
+    			a_rombasis_phi->getColumn(j, *phi_hyper_work1);
           ArrayCopynD(1,
                       a_rombasis_phi->getColumn(j)->getData(),
                       vec_wo_ghosts.data(),
@@ -2805,6 +2824,8 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
 //  }
   }
   delete m_working;
+  delete phi_hyper_work;
+  delete phi_hyper_work1;
   return;
 }
 
