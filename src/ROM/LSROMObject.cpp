@@ -770,6 +770,19 @@ int LSROMObject::TimeInitialize(int a_rdim)
   /* Currenty assuming one window only */
   int i;
 
+  /* Delete any previously allocated memory to avoid leaks */
+  for (i = 0; i < m_U.size(); i++) {
+    delete m_U[i];
+  }
+  for (i = 0; i < m_Udot.size(); i++) {
+    delete m_Udot[i];
+  }
+
+  /* Clear the vectors */
+  m_U.clear();
+  m_Udot.clear();
+
+
   /* explicit Runge-Kutta methods */
   for (i = 0; i < nstages; i++) {
     m_U.push_back(new CAROM::Vector(a_rdim, false));
