@@ -1107,13 +1107,15 @@ void LSROMObject::OutputlibROMfield(double* vec_data, SimulationObject& a_s, cha
 
 CAROM::Vector* LSROMObject::ReconlibROMfield(const CAROM::Vector* a_romcoef, const CAROM::Matrix* a_rombasis, const int a_rdim){
 
-  return a_rombasis->getFirstNColumns(a_rdim)->mult(a_romcoef);
+//return a_rombasis->getFirstNColumns(a_rdim)->mult(a_romcoef);
+  return a_rombasis->mult(a_romcoef);
 }
 
 CAROM::Vector* LSROMObject::ProjectToRB(CAROM::Vector* a_field, const CAROM::Matrix* a_rombasis, const int a_rdim){
   /* a_field is a serialized solution without ghost points */
 
-  return a_rombasis->getFirstNColumns(a_rdim)->transposeMult(a_field);
+//return a_rombasis->getFirstNColumns(a_rdim)->transposeMult(a_field);
+  return a_rombasis->transposeMult(a_field);
 }
 
 /*! Check LS objects */
