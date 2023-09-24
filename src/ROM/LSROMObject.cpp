@@ -1584,7 +1584,7 @@ void LSROMObject::CheckSolProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
 
-    recon_init = m_basis[idx]->getFirstNColumns(m_rdims[idx])->mult(m_projected_init[idx]);
+    m_basis[idx]->mult(*m_projected_init[idx], *recon_init);
     ArrayCopynD(sim[0].solver.ndims,
                 recon_init->getData(),
                 snapproj_wghosts.data(),
@@ -1675,10 +1675,10 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
 
     /* Check 1 */
     /* Project snapshot onto reduced space and reconstruct */
-    m_working = m_basis[idx]->getFirstNColumns(m_rdims[idx])->transposeMult(phi_colwork);
+    m_basis[idx]->transposeMult(*phi_colwork, *m_working);
     MPISum_double(m_projected_init[idx]->getData(),m_working->getData(),m_rdims[idx],&mpi->world);
 
-    recon_init = m_basis[idx]->getFirstNColumns(m_rdims[idx])->mult(m_projected_init[idx]);
+    m_basis[idx]->mult(*m_projected_init[idx], *recon_init);
     ArrayCopynD(sim[0].solver.ndims,
                 recon_init->getData(),
                 snapproj_wghosts.data(),
@@ -1700,7 +1700,7 @@ void LSROMObject::CheckHyProjError(void* a_s, int idx)
     m_working = ProjectToRB(m_snapshots[idx]->getColumn(j), m_basis[idx], m_rdims[idx]);
     MPISum_double(m_projected_init[idx]->getData(),m_working->getData(), m_rdims[idx], &mpi->world);
     m_working=m_romhyperb[idx]->mult(m_projected_init[idx]);
-    recon_init = m_basis[idx]->getFirstNColumns(m_rdims[idx])->mult(m_working);
+    m_basis[idx]->mult(*m_working, *recon_init);
     ArrayCopynD(sim[0].solver.ndims,
                 recon_init->getData(),
                 snapproj_wghosts.data(),
@@ -1781,8 +1781,9 @@ void LSROMObject::ConstructPotentialROMRhs(void* a_s,
                         sim[0].solver.index_length );
 
   // construct rhs = basis_phi^T integral_basis_f
-  m_working = a_rombasis_phi->getFirstNColumns(m_rdims_phi[idx])->transposeMult(integral_basis_f);
+  a_rombasis_phi->transposeMult(*integral_basis_f, *m_working);
   MPISum_double(m_romrhs_phi[idx]->getData(),m_working->getData(),m_rdims_phi[idx]*m_rdims[idx],&mpi->world);
+
   if (!m_rank) {
     printf("f %d %d\n",a_rombasis_f->numRows(),a_rombasis_f->numColumns());
     printf("integral_basis_f %d %d\n",integral_basis_f->numRows(),integral_basis_f->numColumns());
@@ -1829,13 +1830,20 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
   /* Integrate f reduced basis over velocity */
   CAROM::Matrix* laplace_phi;
   laplace_phi = new CAROM::Matrix(num_rows, m_rdims_phi[idx], false);
+
   CAROM::Vector laplace_col(num_rows,false);
+
   CAROM::Matrix* m_working;
   m_working = new CAROM::Matrix(m_rdims_phi[idx], m_rdims_phi[idx], false);
 
+  CAROM::Vector* m_work_lap;
+  m_work_lap = new CAROM::Vector(num_rows,false);
+
   for (int j = 0; j < m_rdims_phi[idx]; j++){
+		*m_work_lap = 0;
+    a_rombasis_phi->getColumn(j, *m_work_lap);
     ArrayCopynD(1,
-                a_rombasis_phi->getColumn(j)->getData(),
+                m_work_lap->getData(),
                 vec_wghosts.data(),
                 sim[0].solver.dim_local,
                 0,
@@ -1870,7 +1878,7 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
   }
 
   // construct rhs = basis_phi^T integral_basis_f
-  m_working = a_rombasis_phi->getFirstNColumns(m_rdims_phi[idx])->transposeMult(laplace_phi);
+  a_rombasis_phi->transposeMult(*laplace_phi, *m_working);
   MPISum_double(m_romlaplace_phi[idx]->getData(),m_working->getData(),m_rdims_phi[idx]*m_rdims_phi[idx],&mpi->world);
   if (!m_rank) {
     printf("m_romlaplace_phi %d %d\n",m_romlaplace_phi[idx]->numRows(),m_romlaplace_phi[idx]->numColumns());
@@ -1934,7 +1942,7 @@ void LSROMObject::CheckPotentialProjError(void* a_s, int idx)
       }
       std::cout << std::endl;
     }
-    recon_caromvec= m_basis_phi[idx]->getFirstNColumns(m_rdims_phi[idx])->mult(m_projected_init_phi[idx]);
+    m_basis_phi[idx]->mult(*m_projected_init_phi[idx], *recon_caromvec);
     ArrayCopynD(1,
                 recon_caromvec->getData(),
                 snapproj_wghosts.data(),
