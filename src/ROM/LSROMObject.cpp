@@ -645,6 +645,8 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
   HyPar  *solver = (HyPar*) &(sim[0].solver);
   Vlasov *param  = (Vlasov*) solver->physics;
   MPIVariables *mpi = (MPIVariables *) param->m;
+  double sum = 0, global_sum = 0;
+  double app_sum = 0;
 
   for (int i = 0; i < m_rdims.size(); i++) {
     if (   ( (a_t >= m_intervals[i].first) || (std::abs(a_t - m_intervals[i].first < 1e-8)))
@@ -727,7 +729,27 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
                             sim[0].solver.rom_diff_norms[2]);
       }
       m_snap[i]++;
-      return ReconlibROMfield(m_romcoef[i], m_basis[i], m_rdims[i]);
+
+      m_basis[i]->mult(*m_romcoef[i], *m_recon);
+
+      if (m_solve_phi) {
+        m_basis_e[i]->mult(*m_tmpsol[i], *m_recon_E);
+        for (int j = 0; j < m_recon_E->dim(); j++) {
+          (*m_recon_E)(j) = std::fabs((*m_recon_E)(j));
+        }
+        sum = ArrayMaxnD (solver->nvars,1,solver->dim_local,
+                          0,solver->index,m_recon_E->getData());
+        global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
+        if (!m_rank) printf("Checking max |E| %f\n",global_sum);
+        for (int j = 0; j < m_tmpsol[i]->dim(); j++) {
+          (*m_tmpsol[i])(j) = std::fabs((*m_tmpsol[i])(j));
+        }
+        app_sum = m_tmpsol[i]->inner_product(m_romMaxE[i]);
+        if (!m_rank) printf("Checking approximated max |E| %f\n",app_sum);
+
+      }
+//    return ReconlibROMfield(m_romcoef[i], m_basis[i], m_rdims[i]);
+      return m_recon;
     }
   }
   printf("ERROR in LSROMObject::predict(): m_generator is of size zero or interval not found!");
