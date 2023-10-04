@@ -438,6 +438,9 @@ void initializePython(int a_rank /*!< MPI rank */)
   if (!a_rank) printf("Initialized Python.\n");
   PyRun_SimpleString("import os");
   PyRun_SimpleString("hypar_dir = os.environ.get('HYPAR_DIR')");
+#ifndef serial
+  MPI_Barrier(MPI_COMM_WORLD);
+#endif
   return;
 }
 
@@ -452,6 +455,9 @@ void initializePythonPlotting(int a_rank /*!< MPI rank */)
     PyRun_SimpleString
       ("print('Added plotting script directory (%s) to Python path.' % hypar_dir_plt_py)");
   }
+#ifndef serial
+  MPI_Barrier(MPI_COMM_WORLD);
+#endif
   return;
 }
 
