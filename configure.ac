@@ -200,8 +200,8 @@ if test "x$enable_scalapack" = "xyes" ; then
   LIBS="$LIBS -lscalapack -lblas -llapack"
 fi
 
-if test "x$enable_serial" = "x"; then
-  if test "x$enable_fftw" = "xyes" ; then
+if test "x$enable_fftw" = "xyes" ; then
+  if test "x$enable_serial" = "x"; then
     AC_MSG_NOTICE([Compiling with FFTW support.])
     CFLAGS="$CFLAGS -Dfftw"
     CXXFLAGS="$CXXFLAGS -Dfftw"
@@ -211,6 +211,8 @@ if test "x$enable_serial" = "x"; then
       LDFLAGS="$LDFLAGS -Wl,-rpath,$with_fftw_dir/lib -L$with_fftw_dir/lib"
     fi
     LIBS="$LIBS -lfftw3_mpi -lfftw3 -lm"
+  else
+    AC_MSG_WARN([Cannot enable FFTW when compiling in serial (--enable-serial)])
   fi
 fi
 
