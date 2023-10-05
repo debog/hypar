@@ -14,7 +14,11 @@
 #include <hypar.h>
 
 #ifdef fftw
+#ifdef serial
+#include <fftw3.h>
+#else
 #include <fftw3-mpi.h>
+#endif
 #endif
 
 /*! Compute the maximum CFL number */
@@ -162,7 +166,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
 #ifdef serial
     fprintf(stderr,"Error in VlasovInitialize(): Using FFTW requires MPI to be enabled.\n");
     return(1);
-#endif
+#else
 
     if (physics->ndims_x > 1) {
       fprintf(stderr,"Error in VlasovInitialize():\n");
@@ -220,6 +224,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
                                                   mpi->comm[0],
                                                   FFTW_BACKWARD,
                                                   FFTW_ESTIMATE);
+#endif
 #else
   fprintf(stderr,"Error in VlasovInitialize():\n");
   fprintf(stderr,"  Self-consistent electric field requires FFTW library.\n");

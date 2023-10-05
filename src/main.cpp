@@ -82,11 +82,11 @@
   + \--enable-python: Enable Python interface.
   + \--with-cuda-dir: Specify path where CUDA is installed, if not in standard path.
   + \--enable-scalapack: Enable ScaLAPACK (this will make available a tridiagonal solver using ScaLAPACK).
-  + \--enable-fftw: Enable FFTW (this will make available features that use the FFTW library).
+  + \--enable-fftw: Enable FFTW (this will make available features that use the FFTW library; *needs MPI*).
   + \--with-blas-dir: Specify path where BLAS is installed (relevant only if \--enable-scalapack is specified).
   + \--with-lapack-dir: Specify path where LAPACK is installed (relevant only if \--enable-scalapack is specified).
   + \--with-scalapack-dir: Specify path where ScaLAPACK is installed (relevant only if \--enable-scalapack is specified).
-  + \--with-fftw-dir: Specify path where FFTW is installed (relevant only if \--enable-fftw is specified).
+  + \--with-fftw-dir: Specify path where FFTW is installed (relevant only if \--enable-fftw is specified). Note that the FFTW library should be compiled with MPI.
   + \--with-fortran-lib: Specify path where FORTRAN libraries are installed (for ScaLAPACK) (relevant only if \--enable-scalapack 
     is specified).
 
