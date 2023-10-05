@@ -76,6 +76,7 @@
 
   The configure options can include options such as BLAS/LAPACK location, MPI directory, etc. Type "./configure --help"
   to see a full list. The options specific to HyPar are:
+  + \--enable-serial: Compile a serial version without MPI.
   + \--with-mpi-dir: Specify path where mpicc is installed, if not in standard path.
   + \--enable-omp: Enable OpenMP threads.
   + \--enable-cuda: Enable CUDA if NVidia GPU present.
@@ -94,7 +95,9 @@
 
   + Limited parts of the code have been implemented on CUDA. See \b Examples for currently available
     CUDA-enabled simulations.
-  + Interfacing with Python and the features it enables are a work-in-progress. It is based on the approach 
+  + Interfacing with Python and the features it enables are a work-in-progress. It is not very robust; for example
+    it may result in inexplicable segmentation faults depending on the Python version and the MPI library. It should
+    work okay when compiled with OpenMPI and when compiled without any MPI (serial). It is based on the approach 
     in PythonFOAM (https://github.com/argonne-lcf/PythonFOAM). The following environment variables must be 
     consistently defined:
     + \b PYTHON_LIB_PATH - location of Python libraries

@@ -2073,6 +2073,8 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = with_petsc \
                          with_librom \
+                         with_python \
+                         with_python_numpy \
                          compute_rhs_operators \
                          HAVE_CUDA \
                          debug
