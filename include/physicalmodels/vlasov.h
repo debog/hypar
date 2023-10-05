@@ -24,7 +24,11 @@
 #include <stdbool.h>
 
 #ifdef fftw
+#ifdef serial
+#include <fftw3.h>
+#else
 #include <fftw3-mpi.h>
+#endif
 #endif
 
 /*! \def _VLASOV_ 

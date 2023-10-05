@@ -67,49 +67,53 @@ if test "x$enable_omp" = "xyes" ; then
   CXXFLAGS="$CXXFLAGS -Dwith_omp"
 fi
 
-if test "x$with_mpi_dir" != "x" ; then
-  AC_MSG_CHECKING([for ${MPI_CC} in $with_mpi_dir/bin/])
-  if test -e $with_mpi_dir/bin/${MPI_CC} ; then
-    AC_MSG_RESULT([yes])
-    MPICC=$with_mpi_dir/bin/${MPI_CC}
-    MPI_DIR=$with_mpi_dir
-  else
-    AC_MSG_RESULT([no])
-  fi
-  AC_MSG_CHECKING([for ${MPI_CXX} in $with_mpi_dir/bin/])
-  if test -e $with_mpi_dir/bin/${MPI_CXX} ; then
-    AC_MSG_RESULT([yes])
-    MPICXX=$with_mpi_dir/bin/${MPI_CXX}
-  else
-    AC_MSG_RESULT([no])
-  fi
-else
-  if test "x$MPI_DIR" != "x" ; then
-    AC_MSG_NOTICE([Found environment variable MPI_DIR=${MPI_DIR}.])
-    AC_MSG_CHECKING([for ${MPI_CC} in ${MPI_DIR}/bin/])
-    if test -e ${MPI_DIR}/bin/${MPI_CC} ; then
+if test "x$enable_serial" = "x"; then
+
+  if test "x$with_mpi_dir" != "x" ; then
+    AC_MSG_CHECKING([for ${MPI_CC} in $with_mpi_dir/bin/])
+    if test -e $with_mpi_dir/bin/${MPI_CC} ; then
       AC_MSG_RESULT([yes])
-      MPICC=${MPI_DIR}/bin/${MPI_CC}
+      MPICC=$with_mpi_dir/bin/${MPI_CC}
+      MPI_DIR=$with_mpi_dir
     else
       AC_MSG_RESULT([no])
     fi
-    AC_MSG_CHECKING([for ${MPI_CXX} in ${MPI_DIR}/bin/])
-    if test -e ${MPI_DIR}/bin/${MPI_CXX} ; then
+    AC_MSG_CHECKING([for ${MPI_CXX} in $with_mpi_dir/bin/])
+    if test -e $with_mpi_dir/bin/${MPI_CXX} ; then
       AC_MSG_RESULT([yes])
-      MPICXX=${MPI_DIR}/bin/${MPI_CXX}
+      MPICXX=$with_mpi_dir/bin/${MPI_CXX}
     else
       AC_MSG_RESULT([no])
     fi
+  else
+    if test "x$MPI_DIR" != "x" ; then
+      AC_MSG_NOTICE([Found environment variable MPI_DIR=${MPI_DIR}.])
+      AC_MSG_CHECKING([for ${MPI_CC} in ${MPI_DIR}/bin/])
+      if test -e ${MPI_DIR}/bin/${MPI_CC} ; then
+        AC_MSG_RESULT([yes])
+        MPICC=${MPI_DIR}/bin/${MPI_CC}
+      else
+        AC_MSG_RESULT([no])
+      fi
+      AC_MSG_CHECKING([for ${MPI_CXX} in ${MPI_DIR}/bin/])
+      if test -e ${MPI_DIR}/bin/${MPI_CXX} ; then
+        AC_MSG_RESULT([yes])
+        MPICXX=${MPI_DIR}/bin/${MPI_CXX}
+      else
+        AC_MSG_RESULT([no])
+      fi
+    fi
   fi
-fi
 
-if test "x$MPICC" = "x" ; then
-  AC_CHECK_PROG(MPICC,${MPI_CC},${MPI_CC})
-fi
-if test "x$MPICXX" = "x" ; then
-  AC_CHECK_PROG(MPICXX,${MPI_CXX},${MPI_CXX})
-fi
+  if test "x$MPICC" = "x" ; then
+    AC_CHECK_PROG(MPICC,${MPI_CC},${MPI_CC})
+  fi
+  if test "x$MPICXX" = "x" ; then
+    AC_CHECK_PROG(MPICXX,${MPI_CXX},${MPI_CXX})
+  fi
 
+fi
+  
 AM_CONDITIONAL([ENABLE_CUDA], [test "x$enable_cuda" = "xyes"])
 if test "x$enable_cuda" = "xyes"; then
   AC_MSG_NOTICE([Compiling with CUDA support.])
@@ -159,19 +163,25 @@ if test "x$enable_cuda" = "xyes"; then
 
   AC_SUBST(CUDA_CFLAGS)
 fi
+  
+if test "x$enable_serial" = "x"; then
 
-if test "x$MPICC" = "x" ; then
-  AC_MSG_WARN([Cannot find ${MPI_CC}. Will compile with gcc. Use --with-mpi-dir to specify the location of ${MPI_CC}.])
-  CFLAGS="$CFLAGS -Dserial"
-else
-  CC=$MPICC
-fi
+  if test "x$MPICC" = "x" ; then
+    AC_MSG_WARN([Cannot find ${MPI_CC}. Will compile with gcc. Use --with-mpi-dir to specify the location of ${MPI_CC}.])
+    CFLAGS="$CFLAGS -Dserial"
+    flag_serial="yes"
+  else
+    CC=$MPICC
+  fi
 
-if test "x$MPICXX" = "x" ; then
-  AC_MSG_WARN([Cannot find ${MPI_CXX}. Will compile with gcc. Use --with-mpi-dir to specify the location of ${MPI_CXX}.])
-  CXXFLAGS="$CXXFLAGS -Dserial"
-else
-  CXX=$MPICXX
+  if test "x$MPICXX" = "x" ; then
+    AC_MSG_WARN([Cannot find ${MPI_CXX}. Will compile with gcc. Use --with-mpi-dir to specify the location of ${MPI_CXX}.])
+    CXXFLAGS="$CXXFLAGS -Dserial"
+    flag_serial="yes"
+  else
+    CXX=$MPICXX
+  fi
+
 fi
 
 if test "x$enable_scalapack" = "xyes" ; then
@@ -190,16 +200,18 @@ if test "x$enable_scalapack" = "xyes" ; then
   LIBS="$LIBS -lscalapack -lblas -llapack"
 fi
 
-if test "x$enable_fftw" = "xyes" ; then
-  AC_MSG_NOTICE([Compiling with FFTW support.])
-  CFLAGS="$CFLAGS -Dfftw"
-  CXXFLAGS="$CXXFLAGS -Dfftw"
-  if test "x$with_fftw_dir" != "x" ; then
-    CFLAGS="$CFLAGS -I$with_fftw_dir/include"
-    CXXFLAGS="$CXXFLAGS -I$with_fftw_dir/include"
-    LDFLAGS="$LDFLAGS -Wl,-rpath,$with_fftw_dir/lib -L$with_fftw_dir/lib"
+if test "x$enable_serial" = "x"; then
+  if test "x$enable_fftw" = "xyes" ; then
+    AC_MSG_NOTICE([Compiling with FFTW support.])
+    CFLAGS="$CFLAGS -Dfftw"
+    CXXFLAGS="$CXXFLAGS -Dfftw"
+    if test "x$with_fftw_dir" != "x" ; then
+      CFLAGS="$CFLAGS -I$with_fftw_dir/include"
+      CXXFLAGS="$CXXFLAGS -I$with_fftw_dir/include"
+      LDFLAGS="$LDFLAGS -Wl,-rpath,$with_fftw_dir/lib -L$with_fftw_dir/lib"
+    fi
+    LIBS="$LIBS -lfftw3_mpi -lfftw3 -lm"
   fi
-  LIBS="$LIBS -lfftw3_mpi -lfftw3 -lm"
 fi
 
 if test "x$PETSC_DIR" = "x"; then
