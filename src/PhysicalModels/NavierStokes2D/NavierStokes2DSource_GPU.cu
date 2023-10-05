@@ -267,8 +267,6 @@ int gpuNavierStokes2DSourceFunction(
   cpu_end = clock();
   cpu_time += (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC;
 
-  printf("NavierStokes2DSourceFunction GPU time = %.6f dir = %d\n", cpu_time, dir);
-
   return(0);
 }
 
@@ -315,8 +313,6 @@ int gpuNavierStokes2DSourceUpwind(
   cudaDeviceSynchronize();
   cpu_end = clock();
   cpu_time += (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC;
-
-  printf("NavierStokes2DSourceUpwind GPU time = %.6f dir = %d\n", cpu_time, dir);
 
   return(0);
 }

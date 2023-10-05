@@ -322,7 +322,7 @@ int NavierStokes2DInitialize(
    * the dissipation terms in the general form                      */
 #if defined(HAVE_CUDA) && defined(CUDA_VAR_ORDERDING_AOS)
   if (solver->use_gpu) {
-    solver->ParabolicFunction = NavierStokes2DParabolicFunction;
+    solver->ParabolicFunction = gpuNavierStokes2DParabolicFunction;
   } else {
 #endif
     solver->ParabolicFunction = NavierStokes2DParabolicFunction;

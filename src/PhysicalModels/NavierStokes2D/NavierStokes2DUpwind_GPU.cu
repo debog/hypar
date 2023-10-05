@@ -124,7 +124,6 @@ extern "C" int gpuNavierStokes2DUpwindRusanov(
     cpu_end = clock();
     cpu_time += (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC;
 
-    printf("NavierStokes2DUpwindRusanov GPU time = %.6f dir = %d\n", cpu_time, dir);
     return (0);
 }
 

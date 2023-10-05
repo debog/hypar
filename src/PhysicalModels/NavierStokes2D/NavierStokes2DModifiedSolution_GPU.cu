@@ -88,8 +88,6 @@ extern "C" int gpuNavierStokes2DModifiedSolution(
     cpu_end = clock();
     cpu_time += (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC;
 
-    printf("NavierStokes2DModifiedSolution GPU time = %.6f\n", cpu_time);
-
     return(0);
 }
 

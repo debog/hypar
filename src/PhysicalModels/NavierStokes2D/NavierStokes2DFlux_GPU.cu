@@ -67,8 +67,6 @@ extern "C" int gpuNavierStokes2DFlux(
   cpu_end = clock();
   cpu_time += (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC;
 
-  printf("NavierStokes2DFlux GPU time = %.6f\n", cpu_time);
-
   return(0);
 }
 
