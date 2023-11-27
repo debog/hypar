@@ -21,6 +21,7 @@
 #include <rom_object.h>
 #include <simulation_object.h>
 #include <fstream>
+#include <sys/time.h>
 
 #ifndef serial
 #include <mpi.h>
@@ -344,6 +345,10 @@ class LSROMObject : public ROMObject
     const char *twpfile = "twp.csv";
     const char *twintervalfile = "twinterval.csv";
     int m_numwindows, m_numwindows_phi;
+
+    struct timeval m_tensor_start; /*<! Construct start time */
+    struct timeval m_tensor_end; /*<! Construct end time */
+    double m_tensor_wctime; /*!< Wallclock time for constructing tensor */
 
   private:
 };

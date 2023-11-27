@@ -233,6 +233,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
     std::vector<double> dir_vec_wghosts(m_vec_size_wg*m_nvars);
     std::vector<double> dir_rhs_wghosts(m_vec_size_wg*m_nvars);
 	}
+  
+  m_tensor_wctime = 0;
 }
 
 void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U, /*!< solution vector */
@@ -2740,6 +2742,7 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
   std::vector<double> vec_wo_ghosts1(param->npts_local_x);
   std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
 
+  gettimeofday(&m_tensor_start, NULL);
   for (int i = 0; i < m_rdims[idx]; i++) {
 
     m_romhyperb_v[idx].push_back(new CAROM::Matrix(m_rdims_phi[idx], m_rdims[idx], false));
@@ -2824,6 +2827,26 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
 //  }
 //  }
   }
+  gettimeofday(&m_tensor_end, NULL);
+  long long walltime;
+  walltime = (  (m_tensor_end.tv_sec*1000000 + m_tensor_end.tv_usec)
+              - (m_tensor_start.tv_sec*1000000 + m_tensor_start.tv_usec) );
+  m_tensor_wctime += (double) walltime / 1000000.0;
+
+  if (!m_rank) {
+    printf( "Tensor construction wallclock time: %f (seconds).\n",
+            (double) walltime / 1000000.0);
+  }
+
+#ifndef serial
+  MPI_Allreduce(  MPI_IN_PLACE,
+                  &m_tensor_wctime,
+                  1,
+                  MPI_DOUBLE,
+                  MPI_MAX,
+                  MPI_COMM_WORLD );
+#endif
+
   delete m_working;
   delete phi_hyper_work;
   delete phi_hyper_work1;
@@ -3045,6 +3068,10 @@ void LSROMObject::online(void* a_s)
       m_tmprhs.push_back(new CAROM::Vector(m_rdims[sampleWindow],false));
       m_tmpsol.push_back(new CAROM::Vector(m_rdims_phi[sampleWindow],false));
     }
+  }
+  if (!m_rank) {
+    printf( "Total tensor construction wallclock time: %f (seconds).\n",
+            m_tensor_wctime );
   }
 
 }
