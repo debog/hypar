@@ -45,6 +45,7 @@
     Note: other keywords in this file may be read by other functions.
    
 */
+extern "C" int  SetEFieldSelfConsistent(double*,void*,double);
 extern "C" int  TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
 extern "C" int  CalculateROMDiff(void*,void*);
 extern "C" void ResetFilenameIndex(char*, int); /*!< Reset filename index */
@@ -123,6 +124,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   char write_snapshot_mat[_MAX_STRING_SIZE_] = "false";
   char direct_comp_hyperbolic[_MAX_STRING_SIZE_] = "false";
   char solve_phi[_MAX_STRING_SIZE_] = "false";
+  char solve_phi_basis_poisson[_MAX_STRING_SIZE_] = "false";
   char c_err_snap[_MAX_STRING_SIZE_] = "false";
 
   if (!m_rank) {
@@ -151,6 +153,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
             ferr = fscanf(in,"%d", &m_rdim_phi); if (ferr != 1) return;
           } else if (std::string(word) == "ls_solve_phi") {
             ferr = fscanf(in,"%s", solve_phi); if (ferr != 1) return;
+          } else if (std::string(word) == "ls_solve_phi_basis_poisson") {
+            ferr = fscanf(in,"%s", solve_phi_basis_poisson); if (ferr != 1) return;
           } else if (std::string(word) == "ls_f_energy_criteria") {
             ferr = fscanf(in,"%le", &m_f_energy_criteria); if (ferr != 1) return;
           } else if (std::string(word) == "ls_phi_energy_criteria") {
@@ -181,7 +185,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
     printf("  directory name for LS objects: %s\n", dirname_c_str);
     printf("  write snapshot matrix to file:  %s\n", write_snapshot_mat);
     printf("  directly compute hyperbolic term:  %s\n", direct_comp_hyperbolic);
-    printf("  solve potential:  %s\n", solve_phi);
+    printf("  solve reduced potential:  %s\n", solve_phi);
+    printf("  construct potential basis with Poisson:  %s\n", solve_phi_basis_poisson);
     printf("  compute error for each snapshot:  %s\n", c_err_snap);
     printf("  number of parametric snapshot sets:   %d\n", m_nsets);
     if (m_sim_idx >= 0) {
@@ -199,6 +204,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   MPI_Bcast(write_snapshot_mat,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(direct_comp_hyperbolic,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(solve_phi,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+  MPI_Bcast(solve_phi_basis_poisson,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(&m_f_energy_criteria,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
   MPI_Bcast(&m_phi_energy_criteria,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
   MPI_Bcast(c_err_snap,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
@@ -209,6 +215,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_write_snapshot_mat = (std::string(write_snapshot_mat) == "true");
   m_direct_comp_hyperbolic = (std::string(direct_comp_hyperbolic) == "true");
   m_solve_phi = (std::string(solve_phi) == "true");
+  m_solve_poisson = (std::string(solve_phi_basis_poisson) == "true");
   m_c_err_snap = (std::string(c_err_snap) == "true");
 
   if (m_num_window_samples <= m_rdim) {
@@ -235,6 +242,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
 	}
   
   m_tensor_wctime = 0;
+  m_phi_wctime = 0;
+
 }
 
 void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U, /*!< solution vector */
@@ -3179,4 +3188,110 @@ void LSROMObject::FindMaxEBasis(void* a_s, int idx)
   delete m_work_e;
 }
 
+/*! Compute potential reduced basis by solving Poisson problem */
+void LSROMObject::CompPhiBasisPoisson(void* a_s, const CAROM::Matrix* a_rombasis, int idx)
+{
+  SimulationObject* sim     = (SimulationObject*) a_s;
+  HyPar             *solver = (HyPar*) &(sim[0].solver);
+  Vlasov            *param  = (Vlasov*) solver->physics;
+  MPIVariables      *mpi    = (MPIVariables *) param->m;
+
+  int num_rows = a_rombasis->numRows();
+
+  CAROM::Vector* phi_hyper_work; // Working array for getting distribution basis
+  phi_hyper_work = new CAROM::Vector(num_rows, false);
+
+  CAROM::Matrix* m_working; // Working array for the potential basis matrix
+  m_working      = new CAROM::Matrix(param->npts_local_x, m_rdims[idx], false);
+
+  std::vector < int  > index(solver->ndims);
+  std::vector <double> vec_wo_ghosts(param->npts_local_x);
+  std::vector <double> vec_wghosts(solver->npoints_local_wghosts*solver->nvars);
+
+  gettimeofday(&m_phi_start, NULL); // Start timing
+
+  for (int i = 0; i < m_rdims[idx]; i++) {
+
+    *phi_hyper_work = 0;
+    a_rombasis->getColumn(i, *phi_hyper_work);
+    ArrayCopynD(solver->ndims,
+                phi_hyper_work->getData(),
+                vec_wghosts.data(),
+                solver->dim_local,
+                0,
+                solver->ghosts,
+                index.data(),
+                solver->nvars);
+
+    solver->ApplyBoundaryConditions(solver,mpi,vec_wghosts.data(),NULL,0);
+    solver->ApplyIBConditions(solver,mpi,vec_wghosts.data(),0);
+    MPIExchangeBoundariesnD(  solver->ndims,
+                              solver->nvars,
+                              solver->dim_local,
+                              solver->ghosts,
+                              mpi,
+                              vec_wghosts.data());
+
+    /* Solve for phi reduced basis */
+    SetEFieldSelfConsistent(vec_wghosts.data(), solver, 0.0);
+
+    /* Copy phi reduced basis to dummy variable vec_wo_ghosts */
+    if (mpi->ip[1] == 0) {
+      ArrayCopynD(1,
+                  param->potential,
+                  vec_wo_ghosts.data(),
+                  solver->dim_local,
+                  solver->ghosts,
+                  0,
+                  index.data(),
+                  solver->nvars);
+    }
+    else {
+      vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
+    }
+
+    for (int j=0; j < param->npts_local_x; j++){
+      (*m_working)(j,i) = vec_wo_ghosts[j];
+    }
+
+  }
+  m_basis_phi.push_back(new CAROM::Matrix(
+                                m_working->getData(),
+                                m_working->numRows(),
+                                m_working->numColumns(),
+                                false,
+                                true));
+
+  gettimeofday(&m_phi_end, NULL); // end timing
+  long long walltime;
+  walltime = (  (m_phi_end.tv_sec*1000000 + m_phi_end.tv_usec)
+              - (m_phi_start.tv_sec*1000000 + m_phi_start.tv_usec) );
+  m_phi_wctime += (double) walltime / 1000000.0;
+
+  if (!m_rank) {
+    printf( "Potential reduced basis construction wallclock time: %f (seconds).\n",
+            (double) walltime / 1000000.0);
+  }
+
+#ifndef serial
+  MPI_Allreduce(  MPI_IN_PLACE,
+                  &m_phi_wctime,
+                  1,
+                  MPI_DOUBLE,
+                  MPI_MAX,
+                  MPI_COMM_WORLD );
 #endif
+
+  size_t vectorSize = m_basis_phi.size();
+
+  if (vectorSize != idx+1) {
+      // Vector size not matches with windows size
+      std::cerr << "Error: Vector size is wrong!" << std::endl;
+      return;
+  }
+
+  delete m_working;
+  delete phi_hyper_work;
+
+  return;
+}
