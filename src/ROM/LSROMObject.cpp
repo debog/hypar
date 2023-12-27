@@ -3263,9 +3263,6 @@ void LSROMObject::FindMaxEBasis(void* a_s, int idx)
   for (int j = 0; j < m_rdims_phi[idx]; j++){
 
     m_basis_e[idx]->getColumn(j, *m_work_e);
-    for (int i = 0; i < num_rows; i++) {
-      (*m_work_e)(i) = std::fabs((*m_work_e)(i));
-    }
     sum = ArrayMaxnD (solver->nvars,1,solver->dim_local,
                       0,solver->index,m_work_e->getData());
     global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
