@@ -3125,7 +3125,56 @@ void LSROMObject::online(void* a_s)
 
 }
 
-void LSROMObject::ReadTimeWindows(void* a_s)
+void LSROMObject::ReadTimeWindows()
+{
+  if (!m_rank) std::cout << "Reading time window from file " << std::string(twfile) << std::endl;
+
+  std::ifstream ifs(std::string(twfile).c_str());
+
+  if (!ifs.is_open())
+  {
+    std::cout << "Error: invalid file" << std::endl;
+  }
+
+  std::string line, word;
+  int count = 0;
+  while (getline(ifs, line))
+  {
+    if (count >= numWindows)
+    {
+      std::cout << "Error reading CSV file. Read more than " << numWindows << " lines" << std::endl;
+      ifs.close();
+    }
+
+    std::stringstream s(line);
+    std::vector<std::string> row;
+
+    while (getline(s, word, ','))
+      row.push_back(word);
+
+    if (row.size() != 1)
+    {
+      std::cout << "Error: CSV file does not specify exactly 1 parameter" << std::endl;
+      ifs.close();
+    }
+
+    twep.push_back(stod(row[0]));
+
+    if (!m_rank) std::cout << "Using time window " << count << " with end time " << twep[count] << std::endl;
+    count++;
+  }
+
+  ifs.close();
+
+  if (count != numWindows)
+  {
+    std::cout << "Error reading CSV file. Read " << count << " lines but expected " << numWindows << std::endl;
+  }
+
+  m_numwindows = count;
+  if ((m_solve_phi) && (!m_solve_poisson)) m_numwindows_phi = m_numwindows;
+
+}
 {
   if (!m_rank) std::cout << "Reading time window parameters from file " << std::string(twpfile) << std::endl;
   std::ifstream ifs(std::string(twpfile).c_str());
