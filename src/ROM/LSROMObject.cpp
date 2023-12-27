@@ -2596,10 +2596,14 @@ void LSROMObject::ConstructEBasis(void* a_s,int idx)
   int num_rows = m_basis_phi[idx]->numRows();
   double* vec_noghosts = (double*) calloc(num_rows, sizeof(double));
 
+  CAROM::Vector* m_work_e;
+  m_work_e = new CAROM::Vector(num_rows,false);
+
   for (int j = 0; j < m_rdims_phi[idx]; j++){
 
+    m_basis_phi[idx]->getColumn(j, *m_work_e);
     ArrayCopynD(1,
-                m_basis_phi[idx]->getColumn(j)->getData(),
+                m_work_e->getData(),
                 basis_vec_wghosts.data(),
                 sim[0].solver.dim_local,
                 0,
