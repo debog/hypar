@@ -368,7 +368,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 //  OutputlibROMfield(m_generator[m_curr_win]->getSnapshotMatrix()->getColumn(0)->getData(),
 //                    sim[0],
 //                    buffer);
-    if (m_solve_phi) {
+    if ((m_solve_phi) && (!m_solve_poisson)) {
       if (mpi->ip[1] == 0) {
           ArrayCopynD(1,
                       param->potential,
@@ -420,7 +420,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
 
       bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
-      if (m_solve_phi) {
+      if ((m_solve_phi) && (!m_solve_poisson)) {
         m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
         if (m_phi_energy_criteria > 0){
           m_options_phi[m_curr_win]->setSingularValueTol(m_phi_energy_criteria);
@@ -564,7 +564,7 @@ void LSROMObject::train(void* a_s)
           CheckHyProjError(a_s,i);
         }
 
-        if (m_solve_phi) {
+        if ((m_solve_phi) && (!m_solve_poisson)) {
           m_snapshots_phi.push_back(new CAROM::Matrix(
                                     *m_generator_phi[i]->getSnapshotMatrix())),
           m_rdims_phi.push_back(m_rdim_phi);
@@ -629,7 +629,7 @@ void LSROMObject::train(void* a_s)
         std::cout << "\n";
         std::cout << std::endl;
       }
-      if (m_solve_phi) {
+      if ((m_solve_phi) && (!m_solve_poisson)) {
         if (!m_rank) {
           std::cout << "----------------\n";
           std::cout << "Singular Values for potential: ";
@@ -945,15 +945,25 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
 //    }
     }
     else if (m_solve_phi) {
+      if ((!m_solve_poisson)) {
       m_romrhs_phi[idx]->mult(*m_U[stage], *m_tmprhs[idx]);
+//      m_romlaplace_phi[idx]->mult(*m_tmprhs[idx], *m_tmpsol[idx]);
       m_romlaplace_phi[idx]->mult(*m_tmprhs[idx], *m_tmpsol[idx]);
+      } 
+//    else {
+//      m_tmpsol[idx] = m_U[stage];
+//    }
 
       m_romhyperb_x[idx]->mult(*m_U[stage], *m_romwork);
 
 //    /* Tensor contraction */
       for (int k = 0; k < m_rdims[idx]; k++) {
         m_romhyperb_v[idx][k]->mult(*m_U[stage], *m_contract1[idx]);
+        if ((!m_solve_poisson)) {
         m_contract2[idx]->item(k) = m_contract1[idx]->inner_product(m_tmpsol[idx]);
+        } else {
+          m_contract2[idx]->item(k) = m_contract1[idx]->inner_product(m_U[stage]);
+        }
       }
       m_romwork->plus(*m_contract2[idx], *m_Udot[stage]);
 //
@@ -2874,7 +2884,7 @@ void LSROMObject::writeSnapshot(void* a_s)
     }
   }
 
-  if (m_solve_phi) {
+  if ((m_solve_phi) && (!m_solve_poisson)) {
     if (m_generator_phi.size() > 0) {
       for (int i = 0; i < m_generator_phi.size(); i++) {
         m_generator_phi[i]->writeSnapshot();
@@ -2928,13 +2938,15 @@ void LSROMObject::merge(void* a_s)
     delete options;
   }
 
-  if (m_solve_phi) {
+    if ((m_solve_phi) && (!m_solve_poisson)) 
+    {
+      const std::string basisFileName_phi = basisName_phi + "_" + std::to_string(sampleWindow);
 	  CAROM::Options* options_phi = new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV);
-	  CAROM::BasisGenerator* generator_phi = new CAROM::BasisGenerator(*options_phi, isIncremental, basisName_phi);
+      CAROM::BasisGenerator* generator_phi = new CAROM::BasisGenerator(*options_phi, isIncremental, basisFileName_phi);
     for (int paramID=0; paramID<m_nsets; ++paramID)
     {
       std::string snapshot_filename = basisName_phi + std::to_string(
-                                      paramID) + "_" + std::to_string(0)
+                                        paramID) + "_" + std::to_string(sampleWindow)
 	                                    + "_snapshot";
       generator_phi->loadSamples(snapshot_filename,"snapshot");
     }
@@ -2942,7 +2954,7 @@ void LSROMObject::merge(void* a_s)
     delete generator_phi;
     delete options_phi;
   }
-
+  }
 	return;
 }
 
@@ -3016,10 +3028,14 @@ void LSROMObject::online(void* a_s)
       ConstructROMHy(a_s, m_basis[sampleWindow], sampleWindow);
     }
 
+    /* Consider tensorial approach */
     if (m_solve_phi) {
+      if (!m_solve_poisson) {
+        /* Potential reduced basis from potential snapshots */
       const std::string basisFileName_phi = basisName_phi + "_" + std::to_string(sampleWindow);
       CAROM::BasisReader reader_phi(basisFileName_phi);
       const CAROM::Matrix* spatialbasis_phi;
+
       if (m_phi_energy_criteria > 0)
       {
         spatialbasis_phi = reader_phi.getSpatialBasis(0.0, 1-m_phi_energy_criteria);
@@ -3047,6 +3063,12 @@ void LSROMObject::online(void* a_s)
                                   spatialbasis_phi->numColumns(),
                                   false,
                                   true));
+      }
+      else {
+        /* Potential reduced basis from solving Poisson problem */
+        CompPhiBasisPoisson(a_s, m_basis[sampleWindow], sampleWindow);
+      }
+
       int numRowRB_phi, numColumnRB_phi;
       numRowRB_phi = m_basis_phi[sampleWindow]->numRows();
       numColumnRB_phi = m_basis_phi[sampleWindow]->numColumns();
@@ -3054,21 +3076,30 @@ void LSROMObject::online(void* a_s)
                           numColumnRB_phi);
       if (m_phi_energy_criteria > 0) m_rdim_phi = numColumnRB_phi;
       m_rdims_phi.push_back(m_rdim_phi);
+
       if (!m_rank) {
         std::cout << "----------------------------------------\n";
         std::cout << "Time window #" << sampleWindow << ": # Potential POD basis : " << m_rdims_phi[sampleWindow];
         std::cout << std::endl;
       }
+
       m_projected_init_phi.push_back(new CAROM::Vector(m_rdims_phi[sampleWindow], false));
+
       m_romrhs_phi.push_back(new CAROM::Matrix(m_rdims_phi[sampleWindow], m_rdims[sampleWindow], false));
       ConstructPotentialROMRhs(a_s, m_basis[sampleWindow], m_basis_phi[sampleWindow], sampleWindow);
+
       m_romlaplace_phi.push_back(new CAROM::Matrix(m_rdims_phi[sampleWindow], m_rdims_phi[sampleWindow], false));
       ConstructPotentialROMLaplace(a_s, m_basis_phi[sampleWindow], sampleWindow);
+
       m_basis_e.push_back(new CAROM::Matrix(m_basis_phi[sampleWindow]->numRows(),
                           m_rdims_phi[sampleWindow], false));
       ConstructEBasis(a_s, sampleWindow);
+      m_romMaxE.push_back(new CAROM::Vector(m_rdims_phi[sampleWindow], false));
+      FindMaxEBasis(a_s, sampleWindow);
+
       m_romhyperb_x.push_back(new CAROM::Matrix(m_rdims[sampleWindow], m_rdims[sampleWindow], false));
       ConstructROMHy_x(a_s, m_basis[sampleWindow], sampleWindow);
+
       m_romhyperb_v.push_back(std::vector<CAROM::Matrix*>());
       ConstructROMHy_v(a_s, m_basis[sampleWindow], m_basis_e[sampleWindow], sampleWindow);
 
@@ -3076,6 +3107,8 @@ void LSROMObject::online(void* a_s)
       m_contract2.push_back(new CAROM::Vector(m_rdims[sampleWindow],false));
       m_tmprhs.push_back(new CAROM::Vector(m_rdims[sampleWindow],false));
       m_tmpsol.push_back(new CAROM::Vector(m_rdims_phi[sampleWindow],false));
+
+      m_recon_E = new CAROM::Vector(param->npts_local_x_wghosts, false);
     }
   }
   if (!m_rank) {
