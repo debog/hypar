@@ -3328,3 +3328,18 @@ void LSROMObject::CompPhiBasisPoisson(void* a_s, const CAROM::Matrix* a_rombasis
 
   return;
 }
+
+int LSROMObject::countNumLines(std::string file_name)
+{
+    std::ifstream file;
+    file.open(file_name);
+    std::string line;
+    int count = 0;
+    while(getline(file, line)) {
+        count++;
+    }
+    file.close();
+    return count;
+}
+
+#endif
