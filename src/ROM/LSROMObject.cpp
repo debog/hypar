@@ -2798,6 +2798,8 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
         else {
           vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
         }
+        // Need to do the following since in HpyerbolicFunction_1dir, it assumes
+        // mpi->ip[1] > 0 has the same copy as to the mpi->ip[1] =0
         MPISum_double(vec_wo_ghosts1.data(),vec_wo_ghosts.data(),param->npts_local_x,&mpi->comm[1]);
 
         memset(param->e_field, 0, sizeof(double) * param->npts_local_x_wghosts);
@@ -2837,7 +2839,8 @@ void LSROMObject::ConstructROMHy_v(void* a_s, const CAROM::Matrix* a_rombasis, c
                     index.data(),
                     sim[0].solver.nvars);
 
-        (*m_working)(j, k) = a_rombasis->getColumn(i)->inner_product(phi_hyper_col);
+    		a_rombasis->getColumn(i, *phi_hyper_work);
+        (*m_working)(j, k) = phi_hyper_work->inner_product(phi_hyper_col);
       }
     }
     MPISum_double(m_romhyperb_v[idx][i]->getData(),m_working->getData(),m_rdims_phi[idx]*m_rdims[idx],&mpi->world);
