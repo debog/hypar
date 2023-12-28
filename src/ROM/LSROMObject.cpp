@@ -2926,7 +2926,9 @@ void LSROMObject::merge(void* a_s)
   Vlasov *param  = (Vlasov*) solver->physics;
   MPIVariables *mpi = (MPIVariables *) param->m;
 
-  ReadTimeWindows(a_s);
+//ReadTimeWindows(a_s);
+
+  m_numwindows = countNumLines("./" + std::string(twintervalfile));
 
   for (int sampleWindow = 0; sampleWindow < m_numwindows; ++sampleWindow)
   {
@@ -2944,29 +2946,28 @@ void LSROMObject::merge(void* a_s)
     generator->endSamples(); // save the merged basis f
     delete generator;
     delete options;
-  }
 
     if ((m_solve_phi) && (!m_solve_poisson)) 
     {
       const std::string basisFileName_phi = basisName_phi + "_" + std::to_string(sampleWindow);
-	  CAROM::Options* options_phi = new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV);
+      CAROM::Options* options_phi = new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV);
       CAROM::BasisGenerator* generator_phi = new CAROM::BasisGenerator(*options_phi, isIncremental, basisFileName_phi);
-    for (int paramID=0; paramID<m_nsets; ++paramID)
-    {
-      std::string snapshot_filename = basisName_phi + std::to_string(
+      for (int paramID=0; paramID<m_nsets; ++paramID)
+      {
+        std::string snapshot_filename = basisName_phi + std::to_string(
                                         paramID) + "_" + std::to_string(sampleWindow)
-	                                    + "_snapshot";
-      generator_phi->loadSamples(snapshot_filename,"snapshot");
+                                        + "_snapshot";
+        generator_phi->loadSamples(snapshot_filename,"snapshot");
+      }
+      generator_phi->endSamples(); // save the merged basis f
+      delete generator_phi;
+      delete options_phi;
     }
-    generator_phi->endSamples(); // save the merged basis f
-    delete generator_phi;
-    delete options_phi;
-  }
   }
 	return;
 }
 
-/*! Merge */
+/*! Online */
 void LSROMObject::online(void* a_s)
 {
   SimulationObject* sim = (SimulationObject*) a_s;
