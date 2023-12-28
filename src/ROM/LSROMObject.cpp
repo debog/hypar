@@ -119,6 +119,10 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_phi_energy_criteria = -1;
 	m_nsets = 1;
 
+  numWindows = 0;
+  endWindow = false;
+  windowindex = 0;
+
   char dirname_c_str[_MAX_STRING_SIZE_] = "LS";
   char write_snapshot_mat[_MAX_STRING_SIZE_] = "false";
   char direct_comp_hyperbolic[_MAX_STRING_SIZE_] = "false";
@@ -142,6 +146,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   	      ferr = fscanf(in,"%s",word); if (ferr != 1) return;
           if (std::string(word) == "ls_num_win_samples") {
             ferr = fscanf(in,"%d", &m_num_window_samples); if (ferr != 1) return;
+          } else if (std::string(word) == "ls_nwins") {
+            ferr = fscanf(in,"%d", &numWindows); if (ferr != 1) return;
           } else if (std::string(word) == "ls_dirname") {
             ferr = fscanf(in,"%s", dirname_c_str); if (ferr != 1) return;
           } else if (std::string(word) == "ls_write_snapshot_mat") {
@@ -178,6 +184,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
     /* print useful stuff to screen */
     printf("LSROMObject details:\n");
     printf("  number of samples per window:   %d\n", m_num_window_samples);
+    printf("  number of windows:   %d\n", numWindows);
     printf("  SVD energy criteria of f:   %e\n", m_f_energy_criteria);
     printf("  SVD energy criteria of phi:   %e\n", m_phi_energy_criteria);
     printf("  potential latent space dimension:  %d\n", m_rdim_phi);
@@ -199,6 +206,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
 #ifndef serial
   MPI_Bcast(&m_rdim_phi,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(&m_num_window_samples,1,MPI_INT,0,MPI_COMM_WORLD);
+  MPI_Bcast(&numWindows,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(dirname_c_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(write_snapshot_mat,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(direct_comp_hyperbolic,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
@@ -243,6 +251,12 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_tensor_wctime = 0;
   m_phi_wctime = 0;
 
+  if (m_num_window_samples == 0 &&  numWindows == 0)
+  {
+    std::cout << "nwinsamp and nwin cannot both be set zero" << std::endl;
+    exit(0);
+  }
+  if (m_num_window_samples == 0) ReadTimeWindows(); 
 }
 
 void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U, /*!< solution vector */
@@ -2903,10 +2917,10 @@ void LSROMObject::writeSnapshot(void* a_s)
     }
   }
 
-  outfile_twp.open(outputPath + "/" + std::string(twpfile));
-  outfile_twp << m_generator.size();
-  if (m_solve_phi) outfile_twp << ", " << m_generator_phi.size();
-  outfile_twp.close();
+//outfile_twp.open(outputPath + "/" + std::string(twpfile));
+//outfile_twp << m_generator.size();
+//if ((m_solve_phi) && (!m_solve_poisson)) outfile_twp << ", " << m_generator_phi.size();
+//outfile_twp.close();
 
   outfile_twp.open(outputPath + "/" + std::string(twintervalfile));
   int precision = 16;
@@ -2975,14 +2989,19 @@ void LSROMObject::online(void* a_s)
   Vlasov *param  = (Vlasov*) solver->physics;
   MPIVariables *mpi = (MPIVariables *) param->m;
 
-  ReadTimeWindows(a_s);
-  ReadTimeIntervals(a_s);
+  numWindows = countNumLines("./" + std::string(twintervalfile));
+  ReadTimeWindowParameters(); // Set m_num_window_samples
+  ReadTimeIntervals(a_s); // Set m_intervals
 
+  /* Looping through time windows */
   for (int sampleWindow = 0; sampleWindow < m_numwindows; ++sampleWindow)
   {
+    /* Setup basis file name */
     const std::string basisFileName = basisName + "_" + std::to_string(sampleWindow);
 	  CAROM::BasisReader reader(basisFileName);
     const CAROM::Matrix* spatialbasis;
+
+    /* Read and truncate */
     if (m_f_energy_criteria > 0)
     {
       spatialbasis = reader.getSpatialBasis(0.0, 1-m_f_energy_criteria);
@@ -2992,25 +3011,29 @@ void LSROMObject::online(void* a_s)
       spatialbasis = reader.getSpatialBasis(0.0, m_rdim);
     }
 
-    const CAROM::Vector* singularf;
+    /* Get singular values */
+//  const CAROM::Vector* singularf;
+    CAROM::Vector* singularf = reader.getSingularValues(0.0, 1-m_f_energy_criteria);
     if (!m_rank) {
-      singularf = reader.getSingularValues(0);
       std::cout << "----------------\n";
       std::cout << "Time window #" << sampleWindow << ": Singular values of f: ";
       for (int i = 0; i < singularf->dim(); i++) {
             std::cout << (singularf->item(i)) << " ";
       }
+//    for (int i = 0; i < reader.getSingularValues(0,m_f_energy_criteria)->dim(); i++) {
+//          std::cout << (reader.getSingularValues(0,m_f_energy_criteria)->item(i)) << " ";
+//    }
       std::cout << "\n";
       std::cout << std::endl;
     }
 
+    /* Save basis matrix */
     m_basis.push_back(new CAROM::Matrix(
                                 spatialbasis->getData(),
                                 spatialbasis->numRows(),
                                 spatialbasis->numColumns(),
                                 false,
                                 true));
-
 	  int numRowRB, numColumnRB;
     numRowRB = m_basis[sampleWindow]->numRows();
     numColumnRB = m_basis[sampleWindow]->numColumns();
@@ -3018,16 +3041,21 @@ void LSROMObject::online(void* a_s)
                         numColumnRB);
     if (m_f_energy_criteria > 0) m_rdim = numColumnRB;
     m_rdims.push_back(m_rdim);
+
+    OutputROMBasis(a_s, m_basis[sampleWindow], sampleWindow);
     if (!m_rank) {
       std::cout << "----------------------------------------\n";
       std::cout << "Time window #" << sampleWindow << ": # f POD basis : " << m_rdims[sampleWindow];
       std::cout << std::endl;
     }
+
     if (sampleWindow > 0) {
+      /* Construct fullscale matrix from previous to current window */
       m_fullscale.push_back(new CAROM::Matrix(m_rdims[sampleWindow], m_rdims[sampleWindow-1], false));
       m_matrix = m_basis[sampleWindow]->transposeMult(m_basis[sampleWindow-1]);
       MPISum_double(m_fullscale[sampleWindow-1]->getData(), m_matrix->getData(), m_rdims[sampleWindow-1]*m_rdims[sampleWindow], &mpi->world);
     }
+
     m_projected_init.push_back(new CAROM::Vector(m_rdims[sampleWindow], false));
     m_romcoef.push_back(new CAROM::Vector(m_rdims[sampleWindow], false));
     m_snap.push_back(0);
@@ -3041,37 +3069,36 @@ void LSROMObject::online(void* a_s)
     if (m_solve_phi) {
       if (!m_solve_poisson) {
         /* Potential reduced basis from potential snapshots */
-      const std::string basisFileName_phi = basisName_phi + "_" + std::to_string(sampleWindow);
-      CAROM::BasisReader reader_phi(basisFileName_phi);
-      const CAROM::Matrix* spatialbasis_phi;
+        const std::string basisFileName_phi = basisName_phi + "_" + std::to_string(sampleWindow);
+        CAROM::BasisReader reader_phi(basisFileName_phi);
+        const CAROM::Matrix* spatialbasis_phi;
 
-      if (m_phi_energy_criteria > 0)
-      {
-        spatialbasis_phi = reader_phi.getSpatialBasis(0.0, 1-m_phi_energy_criteria);
-      }
-      else
-      {
-        spatialbasis_phi = reader_phi.getSpatialBasis(0.0, m_rdim);
-      }
-
-      const CAROM::Vector* singularphi;
-      singularphi = reader_phi.getSingularValues(0.0, 1-m_phi_energy_criteria);
-      if (!m_rank) {
-        std::cout << "----------------\n";
-        std::cout << "Singular Values of potential: ";
-        for (int i = 0; i < singularphi->dim(); i++) {
-              std::cout << (singularphi->item(i)) << " ";
+        if (m_phi_energy_criteria > 0)
+        {
+          spatialbasis_phi = reader_phi.getSpatialBasis(0.0, 1-m_phi_energy_criteria);
         }
-        std::cout << "\n";
-        std::cout << std::endl;
-      }
-
-      m_basis_phi.push_back(new CAROM::Matrix(
-                                  spatialbasis_phi->getData(),
-                                  spatialbasis_phi->numRows(),
-                                  spatialbasis_phi->numColumns(),
-                                  false,
-                                  true));
+        else
+        {
+          spatialbasis_phi = reader_phi.getSpatialBasis(0.0, m_rdim);
+        }
+  
+        const CAROM::Vector* singularphi;
+        singularphi = reader_phi.getSingularValues(0.0, 1-m_phi_energy_criteria);
+        if (!m_rank) {
+          std::cout << "----------------\n";
+          std::cout << "Singular Values of potential: ";
+          for (int i = 0; i < singularphi->dim(); i++) {
+                std::cout << (singularphi->item(i)) << " ";
+          }
+          std::cout << "\n";
+          std::cout << std::endl;
+        }
+        m_basis_phi.push_back(new CAROM::Matrix(
+                                    spatialbasis_phi->getData(),
+                                    spatialbasis_phi->numRows(),
+                                    spatialbasis_phi->numColumns(),
+                                    false,
+                                    true));
       }
       else {
         /* Potential reduced basis from solving Poisson problem */
@@ -3081,7 +3108,9 @@ void LSROMObject::online(void* a_s)
       int numRowRB_phi, numColumnRB_phi;
       numRowRB_phi = m_basis_phi[sampleWindow]->numRows();
       numColumnRB_phi = m_basis_phi[sampleWindow]->numColumns();
-      if (!m_rank) printf("spatial basis dimension is %d x %d\n", numRowRB_phi,
+
+      if (!m_rank) printf("spatial basis dimension is %d x %d\n",
+                          numRowRB_phi,
                           numColumnRB_phi);
       if (m_phi_energy_criteria > 0) m_rdim_phi = numColumnRB_phi;
       m_rdims_phi.push_back(m_rdim_phi);
