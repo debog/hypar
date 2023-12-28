@@ -65,7 +65,6 @@ extern "C" int HyperbolicFunction_1dir(double*,double*,void*,void*,double,int,
 
 LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
                             const int     a_vec_size_wg,    /*!< vector size with ghosts point */
-                            const int     a_vec_size_x,     /*!< vector size in x-direction */
                             const int     a_nvars,          /*!< number of variables */
                             const double  a_dt,             /*!< time step size */
                             const int     a_sampling_freq,  /*!< sampling frequency */
@@ -783,10 +782,12 @@ int LSROMObject::TimeInitialize(int a_rdim)
   int i;
 
   /* Delete any previously allocated memory to avoid leaks */
-  for (i = 0; i < m_U.size(); i++) {
+  for (i = 0; i < m_U.size(); i++)
+  {
     delete m_U[i];
   }
-  for (i = 0; i < m_Udot.size(); i++) {
+  for (i = 0; i < m_Udot.size(); i++)
+  {
     delete m_Udot[i];
   }
 
@@ -794,9 +795,9 @@ int LSROMObject::TimeInitialize(int a_rdim)
   m_U.clear();
   m_Udot.clear();
 
-
   /* explicit Runge-Kutta methods */
-  for (i = 0; i < nstages; i++) {
+  for (i = 0; i < nstages; i++)
+  {
     m_U.push_back(new CAROM::Vector(a_rdim, false));
     m_Udot.push_back(new CAROM::Vector(a_rdim, false));
   }
