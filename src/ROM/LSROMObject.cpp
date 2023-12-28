@@ -302,11 +302,246 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                                const double a_time, /*!< sample time */
                                void* a_s )
 {
-  SimulationObject* sim = (SimulationObject*) a_s;
+  SimulationObject* sim   = (SimulationObject*) a_s;
+  HyPar           *solver = (HyPar*) &(sim[0].solver);
+  Vlasov          *param  = (Vlasov*) solver->physics;
+  MPIVariables       *mpi = (MPIVariables *) param->m;
 
-  HyPar  *solver = (HyPar*) &(sim[0].solver);
-  Vlasov *param  = (Vlasov*) solver->physics;
-  MPIVariables *mpi = (MPIVariables *) param->m;
+  std::vector<double> vec_wo_ghosts(param->npts_local_x, 0.0);
+  std::vector<double> vec_x_wghosts(param->npts_local_x_wghosts);
+  std::vector<int> index(sim[0].solver.ndims);
+
+  if (m_tic == 0)
+  {
+    m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
+    if (m_f_energy_criteria > 0) m_options[m_curr_win]->setSingularValueTol(m_f_energy_criteria);
+
+    const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
+    m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
+    m_intervals.push_back( Interval(a_time, m_t_final) );
+    m_ls_is_trained.push_back(false);
+    m_snap.push_back(0);
+
+    if (!m_rank)
+    {
+      printf( "LSROMObject::takeSample() - creating new generator object for sim. domain %d, var %d, t=%f (total: %d).\n",
+              m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
+    }
+    bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+
+    if ((m_solve_phi) && (!m_solve_poisson)) 
+    {
+      m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+      if (m_phi_energy_criteria > 0) m_options_phi[m_curr_win]->setSingularValueTol(m_phi_energy_criteria);
+
+      const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
+      m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisFileName_phi));
+
+      // Need to force only mpi->ip[1] =0 holds the potential data 
+      // to compute the SVD correctly
+      if (mpi->ip[1] == 0) 
+      {
+        ArrayCopynD(1,
+                    param->potential,
+                    vec_wo_ghosts.data(),
+                    sim[0].solver.dim_local,
+                    sim[0].solver.ghosts,
+                    0,
+                    index.data(),
+                    sim[0].solver.nvars);
+      } 
+      else 
+      {
+        vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
+      }
+      bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+
+      m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+      m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
+
+      if (mpi->ip[1] == 0)
+      {
+        ArrayCopynD(1,
+                    param->e_field,
+                    vec_wo_ghosts.data(),
+                    sim[0].solver.dim_local,
+                    sim[0].solver.ghosts,
+                    0,
+                    index.data(),
+                    sim[0].solver.nvars);
+      }
+      else
+      {
+        vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
+      }
+
+      proc_maxe = ArrayMaxnD (solver->nvars,1,solver->dim_local,
+                              0,solver->index,vec_wo_ghosts.data());
+      real_maxe = 0; MPIMax_double(&real_maxe,&proc_maxe,1,&mpi->world);
+
+      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+    }
+  }
+  else
+  {
+    bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+    if ((m_solve_phi) && (!m_solve_poisson)) 
+    {
+      if (mpi->ip[1] == 0) 
+      {
+        ArrayCopynD(1,
+                    param->potential,
+                    vec_wo_ghosts.data(),
+                    sim[0].solver.dim_local,
+                    sim[0].solver.ghosts,
+                    0,
+                    index.data(),
+                    sim[0].solver.nvars);
+      }
+      else
+      {
+        vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
+      }
+      bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+
+      if (mpi->ip[1] == 0)
+      {
+        ArrayCopynD(1,
+                    param->e_field,
+                    vec_wo_ghosts.data(),
+                    sim[0].solver.dim_local,
+                    sim[0].solver.ghosts,
+                    0,
+                    index.data(),
+                    sim[0].solver.nvars);
+      }
+      else
+      {
+        vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
+      }
+
+      proc_maxe = ArrayMaxnD (solver->nvars,1,solver->dim_local,
+                              0,solver->index,vec_wo_ghosts.data());
+      real_maxe = 0; MPIMax_double(&real_maxe,&proc_maxe,1,&mpi->world);
+
+      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+    }
+
+    if (numWindows > 0)
+    {
+      if (indicatorType == "time")
+      {
+        endWindow = (((a_time >= twep[m_curr_win]) || (std::fabs(a_time - twep[m_curr_win]) < 1e-8)) && m_curr_win < numWindows-1);
+      }
+      else if (indicatorType == "maxE")
+      {
+        endWindow = (((real_maxe >= twep[m_curr_win]) || (std::fabs(real_maxe - twep[m_curr_win]) < 1e-8)) && m_curr_win < numWindows-1);
+      }
+    }
+    else
+    {
+      endWindow = (m_generator[m_curr_win]->getNumSamples() >= m_num_window_samples);
+    }
+
+//  if (m_tic%m_num_window_samples == 0) {
+    if (endWindow) 
+    {
+      m_intervals[m_curr_win].second = a_time;
+
+      int ncol = m_generator[m_curr_win]->getSnapshotMatrix()->numColumns();
+      if (!m_rank)
+      {
+        printf( "LSROMObject::train() - training LS object %d for sim. domain %d, var %d with %d samples.\n",
+                m_curr_win, m_sim_idx, m_var_idx, ncol );
+      }
+      m_ls_is_trained[m_curr_win] = false;
+      m_snap.push_back(0);
+
+      m_curr_win++;
+
+      m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
+
+      if (m_f_energy_criteria > 0) m_options[m_curr_win]->setSingularValueTol(m_f_energy_criteria);
+
+      const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
+      m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
+
+      bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+
+      if ((m_solve_phi) && (!m_solve_poisson))
+      {
+        m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+        if (m_phi_energy_criteria > 0) m_options_phi[m_curr_win]->setSingularValueTol(m_phi_energy_criteria);
+
+        const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
+        m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisFileName_phi));
+
+        if (mpi->ip[1] == 0)
+        {
+          ArrayCopynD(1,
+                      param->potential,
+                      vec_wo_ghosts.data(),
+                      sim[0].solver.dim_local,
+                      sim[0].solver.ghosts,
+                      0,
+                      index.data(),
+                      sim[0].solver.nvars);
+        }
+        else
+        {
+          vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
+        }
+        bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+
+        m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+        m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
+
+        if (mpi->ip[1] == 0)
+        {
+          ArrayCopynD(1,
+                      param->e_field,
+                      vec_wo_ghosts.data(),
+                      sim[0].solver.dim_local,
+                      sim[0].solver.ghosts,
+                      0,
+                      index.data(),
+                      sim[0].solver.nvars);
+        } else
+        {
+          vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
+        }
+        bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+      }
+
+      m_ls_is_trained.push_back(false);
+      m_intervals.push_back( Interval(a_time, m_t_final) );
+
+      if (!m_rank)
+      {
+        printf( "LSROMObject::takeSample() - creating new generator object for sim. domain %d, var %d, t=%f (total: %d).\n",
+                m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
+      }
+    }
+  }
+  if (!m_rank)
+  {
+    printf("checking m_tic %d\n",m_tic);
+  }
+
+  m_tic++;
+  return;
+}
+
+/*! take a sample (solution snapshot) */
+void LSROMObject::takeSample_old(  const CAROM::Vector& a_U, /*!< solution vector */
+                               const std::vector<CAROM::Vector*>& a_U_stages, /*!< solution vector */
+                               const double a_time, /*!< sample time */
+                               void* a_s )
+{
+  SimulationObject* sim   = (SimulationObject*) a_s;
+  HyPar           *solver = (HyPar*) &(sim[0].solver);
+  Vlasov          *param  = (Vlasov*) solver->physics;
+  MPIVariables       *mpi = (MPIVariables *) param->m;
 
   std::vector<double> vec_wo_ghosts(param->npts_local_x, 0.0);
   std::vector<double> vec_x_wghosts(param->npts_local_x_wghosts);
@@ -330,18 +565,24 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
               m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
     }
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+
+    
 //  char buffer[] = "sample";  // Creates a modifiable buffer and copies the string literal
 //  OutputlibROMfield(m_generator[m_curr_win]->getSnapshotMatrix()->getColumn(0)->getData(),
 //                    sim[0],
 //                    buffer);
 
-    if (m_solve_phi) {
+    if ((m_solve_phi) && (!m_solve_poisson)) {
       m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
       if (m_phi_energy_criteria > 0){
         m_options_phi[m_curr_win]->setSingularValueTol(m_phi_energy_criteria);
       }
+
       const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
       m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisFileName_phi));
+
+      // Need to force only mpi->ip[1] =0 holds the potential data 
+      // to compute the SVD correctly
       if (mpi->ip[1] == 0) {
           ArrayCopynD(1,
                       param->potential,
@@ -376,6 +617,10 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     }
   } else {
 
+//  for (size_t i = 0; i < a_U_stages.size(); i++) {
+//    printf("checking how many a_u %d\n",i);
+//    bool addSample = m_generator[m_curr_win]->takeSample( a_U_stages[i]->getData(), a_time, m_dt );
+//  }
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 //  char buffer[] = "sample";  // Creates a modifiable buffer and copies the string literal
 //  OutputlibROMfield(m_generator[m_curr_win]->getSnapshotMatrix()->getColumn(0)->getData(),
@@ -432,6 +677,10 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
       m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
 
+//    for (size_t i = 0; i < a_U_stages.size(); i++) {
+//      printf("checking how many a_u %d\n",i);
+//      bool addSample = m_generator[m_curr_win]->takeSample( a_U_stages[i]->getData(), a_time, m_dt );
+//    }
       bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
       if ((m_solve_phi) && (!m_solve_poisson)) {
         m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
