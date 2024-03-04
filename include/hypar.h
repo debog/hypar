@@ -400,6 +400,8 @@ typedef struct main_parameters {
   double rom_diff_norms[3]; 
   /*! output filename root for ROM solution file */
   char op_rom_fname_root[_MAX_STRING_SIZE_];
+  /*! Arrays to store stage values for a multi-stage time-integration method */
+  double **u_rom_stages;
 #endif
 
   /*! flag to globally switch on/off non-linear interpolation */
