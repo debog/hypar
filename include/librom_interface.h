@@ -113,7 +113,7 @@ class libROMInterface
     inline int file_op_iter() const { return m_file_op_iter; }
 
     /*! Take a sample for training */
-    void takeSample( void* a_s, const double a_t, void* ts);
+    void takeSample( void* a_s, const double a_t, const int a_nstep, void* ts);
 
     /*! Project initial solution for prediction */
     void projectInitialSolution( void* a_s );
