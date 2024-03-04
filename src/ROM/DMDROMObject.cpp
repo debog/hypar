@@ -126,6 +126,7 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
 void DMDROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                                 const std::vector<CAROM::Vector*>& a_U_stages, /*!< solution vector */
                                 const double a_time, /*!< sample time */ 
+                                const int a_nstep, /*!< total number of time steps */
                                 void* a_s )
 {
   if (m_tic == 0) {
