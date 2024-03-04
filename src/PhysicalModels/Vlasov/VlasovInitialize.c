@@ -145,7 +145,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
      note that number of electric field components is the number of
      spatial dimensions */
   physics->e_field = (double*) calloc(  physics->npts_local_x_wghosts
-                                      * physics->ndims_x, 
+                                      * physics->ndims_x,
                                         sizeof(double)  );
   physics->potential = (double*) calloc(  physics->npts_local_x_wghosts
                                       * physics->ndims_x, 
@@ -189,14 +189,14 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   
     physics->phys_buffer = fftw_alloc_complex(physics->alloc_local);
     physics->fourier_buffer = fftw_alloc_complex(physics->alloc_local);
-  
+
     physics->plan_forward = fftw_mpi_plan_dft_1d(dim_global[0],
                                                  physics->phys_buffer,
                                                  physics->fourier_buffer,
                                                  mpi->comm[0],
                                                  FFTW_FORWARD,
                                                  FFTW_ESTIMATE);
-  
+
     physics->plan_backward = fftw_mpi_plan_dft_1d(dim_global[0],
                                                   physics->fourier_buffer,
                                                   physics->phys_buffer,
