@@ -123,7 +123,10 @@ class LSROMObject : public ROMObject
     virtual void projectInitialSolution(  CAROM::Vector&, void* );
 
     /*! take a sample (solution snapshot) */
-    virtual void takeSample( const CAROM::Vector&, const std::vector<CAROM::Vector*>&, const double, void* );
+    virtual void takeSample( const CAROM::Vector&, const std::vector<CAROM::Vector*>&, const double, const int, void* );
+    
+    /*! take a sample (solution snapshot) */
+    void takeSample_old( const CAROM::Vector&, const std::vector<CAROM::Vector*>&, const double, void* );
 
     /*! train the LS object */
     virtual void train( void* );

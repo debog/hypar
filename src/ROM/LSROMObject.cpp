@@ -300,6 +300,7 @@ void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U, /*!< solution vec
 void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                                const std::vector<CAROM::Vector*>& a_U_stages, /*!< solution vector */
                                const double a_time, /*!< sample time */
+                               const int a_nstep, /*!< total number of time steps */
                                void* a_s )
 {
   SimulationObject* sim   = (SimulationObject*) a_s;
