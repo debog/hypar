@@ -2842,7 +2842,7 @@ void LSROMObject::OutputROMBasisPhi(void* a_s, const CAROM::Matrix* a_rombasis, 
 }
 
 /*! Construct E basis from phi basis */
-void LSROMObject::ConstructEBasis(void* a_s,int idx)
+void LSROMObject::ConstructEBasis(void* a_s, int idx)
 {
   if (!m_rank) {
     std::cout << "------------------------------------------------\n";
