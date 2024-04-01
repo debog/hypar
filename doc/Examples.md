@@ -1335,7 +1335,7 @@ Domain:
 
 
 Initial solution: 
-\f$f\left(x,v\right) = \frac{4}{\pi T}\left(1+\frac{1}{10}\cos\left(2k\pi\frac{x}{L}\right)\right)\left[\exp\left(-\frac{\left(v-2\right)^2}{2T}\right) + \exp\left(-\frac{\left(v+2\right)^2}{2T}\right)\right]\f$, \f$k=1,T=1,L=2\pi\f$.
+\f$f\left(x,v\right) = \frac{8}{\sqrt{2 \pi T}}\left(1+\frac{1}{10}\cos\left(2k\pi\frac{x}{L}\right)\right)\left[\exp\left(-\frac{\left(v-2\right)^2}{2T}\right) + \exp\left(-\frac{\left(v+2\right)^2}{2T}\right)\right]\f$, \f$k=1,T=1,L=2\pi\f$.
 
 Self-consistent electric field is computed by solving the Poisson equation
 in a periodic domain using Fourier transforms. This examples *requires* HyPar
