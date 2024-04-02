@@ -138,7 +138,7 @@
 
   Testing and Baselines
   ---------------------
-  + A set of baselines are available at: https://bitbucket.org/deboghosh/hypar_baselines
+  + A set of baselines are available at: https://gitlab.com/debojyoti.ghosh/hypar_baselines
     These were obtained using the master branch of the main HyPar repo.
   + The script Extras/generate_baselines.sh can be used to clone this baselines repo and
     regenerate the solutions.

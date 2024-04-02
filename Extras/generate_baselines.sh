@@ -6,7 +6,7 @@
 #
 # This script generates baseline solutions for HyPar. A set of baseline
 # solutions is available at: 
-# https://deboghosh@bitbucket.org/deboghosh/hypar_baselines.git
+# https://gitlab.com/debojyoti.ghosh/hypar_baselines
 # These are generated using the master branch of the main HyPar repo.
 # In general, these baselines should be used. If you know what you
 # are doing, modify this script to generate a new set of baselines,
@@ -23,7 +23,7 @@ root_dir=$PWD
 
 # Details about HyPar (repo and branch that we want to
 # generate baselines from)
-hypar_repo="https://deboghosh@bitbucket.org/deboghosh/hypar.git"
+hypar_repo="https://github.com/debog/hypar.git"
 hypar_branch="master"
 # other HyPar-related stuff
 hypar_dir="hypar"
@@ -36,7 +36,7 @@ export MPI_EXEC="mpiexec"
 export HYPAR_EXEC_OTHER_ARGS=""
 
 # HyPar baselines repo to update
-hypar_baselines_repo="git@bitbucket.org:deboghosh/hypar_baselines.git"
+hypar_baselines_repo="git@gitlab.com:debojyoti.ghosh/hypar_baselines.git"
 hypar_baselines_branch="master"
 hypar_baselines_dir="baselines"
 

@@ -7,7 +7,7 @@
 # This script tests a given repo and branch of HyPar (edit the variables
 # hypar_repo and hypar_branch below to the ones you want to test) against
 # a set of baselines available as:
-# https://deboghosh@bitbucket.org/deboghosh/hypar_baselines.git
+# https://gitlab.com/debojyoti.ghosh/hypar_baselines
 # The variables hypar_baselines_repo and hypar_baselines_branch can
 # be changed below to test against a different set of baselines.
 #
@@ -22,7 +22,7 @@ root_dir=$PWD
 
 # some details about HyPar (repo and branch that we want to test)
 # change these to test a particular version of HyPar
-hypar_repo="https://deboghosh@bitbucket.org/deboghosh/hypar.git"
+hypar_repo="https://gitlab.com/debojyoti.ghosh/hypar.git"
 hypar_branch="master"
 # other HyPar-related stuff
 hypar_dir="hypar"
@@ -37,7 +37,7 @@ export HYPAR_EXEC_OTHER_ARGS=""
 # some details about HyPar baselines
 # (baseline solutions maintained on the public repository)
 # do not change these, unless you know what you are doing
-hypar_baselines_repo="https://deboghosh@bitbucket.org/deboghosh/hypar_baselines.git"
+hypar_baselines_repo="https://gitlab.com/debojyoti.ghosh/hypar_baselines.git"
 hypar_baselines_branch="master"
 hypar_baselines_dir="baselines"
 
