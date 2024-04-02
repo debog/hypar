@@ -14,11 +14,11 @@
   -------------------------------------------------------------------------------
 
   HyPar is a finite-difference algorithm to solve hyperbolic-parabolic partial differential
-  equations (with source terms) on Cartesian grids. It is a unified framework that can handle 
-  systems of PDEs with arbitrary number of spatial dimensions and solution components. It 
-  provides the spatial discretization and time integration functions, functions to read and 
-  write solutions from/to files, as well as functions required to solve the system on parallel 
-  (MPI) platforms. The physical models define the physics-specific functions such as the exact 
+  equations (with source terms) on Cartesian grids. It is a unified framework that can handle
+  systems of PDEs with arbitrary number of spatial dimensions and solution components. It
+  provides the spatial discretization and time integration functions, functions to read and
+  write solutions from/to files, as well as functions required to solve the system on parallel
+  (MPI) platforms. The physical models define the physics-specific functions such as the exact
   forms of the hyperbolic flux, parabolic flux, source terms, upwinding functions, etc.
 
   Features
@@ -27,9 +27,9 @@
   + Allows arbitrary number of <B>spatial dimensions</B> and <B>vector components per grid point</B>.
   + Solves the PDEs over <B>Cartesian</B> grids.
   + Can use <B>sparse grids</B> for faster computations on high-dimensional problems
-  + Written entirely in C/C++ and uses the MPICH library. It can use OpenMP threads and CUDA 
+  + Written entirely in C/C++ and uses the MPICH library. It can use OpenMP threads and CUDA
     on NVidia GPUs, but these are works-in-progress.
-  + Can be <B>compiled with PETSc</B> (https://petsc.org/release/), if available, where 
+  + Can be <B>compiled with PETSc</B> (https://petsc.org/release/), if available, where
     it can use PETSc's time integration module TS (https://petsc.org/release/src/ts/).
   + For 3-dimensional simulations, the <B>immersed boundaries</B> can be used to
     solve over non-Cartesian geometries.
@@ -45,14 +45,17 @@
 
   Download
   --------
-  The code is available at: https://bitbucket.org/deboghosh/hypar <br>
+  The code is available at:
+  + https://github.com/debog/hypar
+  + https://gitlab.com/debojyoti.ghosh/hypar
 
-  It can be cloned using git as follows:
-  + git clone git@bitbucket.org:deboghosh/hypar.git (if you have a Bitbucket account)
-  + git clone https://bitbucket.org/deboghosh/hypar.git (if you don't have a Bitbucket account)
+  Follow the instructions on these pages to clone using git. For example,
+  + git clone git@gitlab.com:debojyoti.ghosh/hypar.git
+  + git clone https://github.com/debog/hypar.git
 
-  Bitbucket also allows downloading the package as a tarball, see 
-  https://bitbucket.org/deboghosh/hypar/downloads.
+  Both these platforms allow downloading the package as a zip/tarball, for example
+  + https://github.com/debog/hypar/archive/refs/heads/master.zip
+  + https://gitlab.com/debojyoti.ghosh/hypar/-/archive/master/hypar-master.zip
 
   Documentation
   -------------
@@ -63,7 +66,7 @@
   ---------
 
   To compile HyPar, follow these steps in the root directory:
-  
+
         autoreconf -i
         [CFLAGS="..."] [CXXFLAGS="..."] ./configure [options]
         make
@@ -88,7 +91,7 @@
   + \--with-lapack-dir: Specify path where LAPACK is installed (relevant only if \--enable-scalapack is specified).
   + \--with-scalapack-dir: Specify path where ScaLAPACK is installed (relevant only if \--enable-scalapack is specified).
   + \--with-fftw-dir: Specify path where FFTW is installed (relevant only if \--enable-fftw is specified). Note that the FFTW library should be compiled with MPI.
-  + \--with-fortran-lib: Specify path where FORTRAN libraries are installed (for ScaLAPACK) (relevant only if \--enable-scalapack 
+  + \--with-fortran-lib: Specify path where FORTRAN libraries are installed (for ScaLAPACK) (relevant only if \--enable-scalapack
     is specified).
 
   \b Notes:
@@ -97,8 +100,8 @@
     CUDA-enabled simulations.
   + Interfacing with Python and the features it enables are a work-in-progress. It is not very robust; for example
     it may result in inexplicable segmentation faults depending on the Python version and the MPI library. It should
-    work okay when compiled with OpenMPI and when compiled without any MPI (serial). It is based on the approach 
-    in PythonFOAM (https://github.com/argonne-lcf/PythonFOAM). The following environment variables must be 
+    work okay when compiled with OpenMPI and when compiled without any MPI (serial). It is based on the approach
+    in PythonFOAM (https://github.com/argonne-lcf/PythonFOAM). The following environment variables must be
     consistently defined:
     + \b PYTHON_LIB_PATH - location of Python libraries
     + \b PYTHON_BIN_PATH - location of Python binary
@@ -123,7 +126,7 @@
 
   Notes
   -----
-  + This package has been tested using the GNU C and C++ compilers. The configuration script is designed to look for these 
+  + This package has been tested using the GNU C and C++ compilers. The configuration script is designed to look for these
     compilers only.
   + Feel free to contact me about anything regarding this (doubts/difficulties/suggestions).
   + Feel free to use and modify the code in any way.
@@ -305,42 +308,42 @@ int main(int argc, char **argv)
     printf("Error: Simulation::ReadInputs() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
-  
+
   /* Initialize and allocate arrays */
   ierr = sim->Initialize();
   if (ierr) {
     printf("Error: Simulation::Initialize() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
-  
+
   /* read and set grid & initial solution */
   ierr = sim->InitialSolution();
   if (ierr) {
     printf("Error: Simulation::InitialSolution() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
-  
+
   /* Initialize domain boundaries */
   ierr = sim->InitializeBoundaries();
   if (ierr) {
     printf("Error: Simulation::InitializeBoundaries() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
-  
+
   /* Initialize immersed boundaries */
   ierr = sim->InitializeImmersedBoundaries();
   if (ierr) {
     printf("Error: Simulation::InitializeImmersedBoundaries() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
-  
+
   /* Initialize solvers */
   ierr = sim->InitializeSolvers();
   if (ierr) {
     printf("Error: Simulation::InitializeSolvers() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
-  
+
   /* Initialize physics */
   ierr = sim->InitializePhysics();
   if (ierr) {
@@ -361,9 +364,9 @@ int main(int argc, char **argv)
     printf("Error: Simulation::InitializationWrapup() returned with status %d on process %d.\n",ierr,rank);
     return(ierr);
   }
-  
+
   /* Initializations complete */
-  
+
   /* Run the solver */
 #ifndef serial
   MPI_Barrier(MPI_COMM_WORLD);
@@ -385,7 +388,7 @@ int main(int argc, char **argv)
       return(ierr);
     }
   }
-#else 
+#else
   /* Use native time-integration */
   ierr = sim->Solve();
   if (ierr) {
@@ -401,11 +404,11 @@ int main(int argc, char **argv)
 
   /* calculate solver and total runtimes */
   long long walltime;
-  walltime = (  (main_end.tv_sec * 1000000   + main_end.tv_usec  ) 
+  walltime = (  (main_end.tv_sec * 1000000   + main_end.tv_usec  )
               - (main_start.tv_sec * 1000000 + main_start.tv_usec));
   double main_runtime = (double) walltime / 1000000.0;
   ierr = MPIMax_double(&main_runtime,&main_runtime,1,&world); if(ierr) return(ierr);
-  walltime = (  (solve_end.tv_sec * 1000000   + solve_end.tv_usec  ) 
+  walltime = (  (solve_end.tv_sec * 1000000   + solve_end.tv_usec  )
               - (solve_start.tv_sec * 1000000 + solve_start.tv_usec));
   double solver_runtime = (double) walltime / 1000000.0;
   ierr = MPIMax_double(&solver_runtime,&solver_runtime,1,&world); if(ierr) return(ierr);
