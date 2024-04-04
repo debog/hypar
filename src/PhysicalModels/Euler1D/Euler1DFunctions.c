@@ -7,10 +7,10 @@
 #include <basic.h>
 #include <physicalmodels/euler1d.h>
 
-/*! Compute the Roe-averaged state for the 1D Euler equations. This function 
-    just calls the macro #_Euler1DRoeAverage_ and is not used by any 
-    functions within the 1D Euler module. However, it's necessary to define it 
-    and provide it to the the solver object (#HyPar) so that it can then send it 
+/*! Compute the Roe-averaged state for the 1D Euler equations. This function
+    just calls the macro #_Euler1DRoeAverage_ and is not used by any
+    functions within the 1D Euler module. However, it's necessary to define it
+    and provide it to the the solver object (#HyPar) so that it can then send it
     to interpolation functions for a characteristic-based reconstruction.
 */
 int Euler1DRoeAverage(

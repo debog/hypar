@@ -6,9 +6,9 @@
 
 int main()
 {
-  
+
   const double  gamma  = 1.4;
-	int           NI,NJ,NK,ndims;
+  int           NI,NJ,NK,ndims;
   char          ip_file_type[50];
   FILE          *in;
 
@@ -57,19 +57,19 @@ int main()
   double xs = -2.0; /* location of initial shock */
   double Ms = 3.0;  /* shock Mach number */
 
-	int i,j,k;
-	double *x, *y, *z;
+  int i,j,k;
+  double *x, *y, *z;
   double dx, dy, dz;
 
- 	x   = (double*) calloc (NI, sizeof(double));
-	y   = (double*) calloc (NJ, sizeof(double));
-	z   = (double*) calloc (NK, sizeof(double));
+   x   = (double*) calloc (NI, sizeof(double));
+  y   = (double*) calloc (NJ, sizeof(double));
+  z   = (double*) calloc (NK, sizeof(double));
 
   dx = Lx / ((double)(NI-1));
   for (i=0; i<NI; i++) x[i] = xmin + i*dx;
   dy = Ly / ((double)(NJ-1));
   for (j=0; j<NJ; j++) y[j] = ymin + j*dy;
-	dz = 0.5 * (dx +dy);
+  dz = 0.5 * (dx +dy);
   for (k = 0; k < NK; k++) z[k] = (k-NK/2) * dz;
 
 
@@ -79,7 +79,7 @@ int main()
   double u_inf    = 0.0; //- Ms * sqrt(gamma*p_inf/rho_inf);
   double v_inf    = 0.0;
   double w_inf    = 0.0;
-  
+
   /* post-shock conditions */
   double rho_ps   = rho_inf * ((gamma+1.0)*Ms*Ms) / ((gamma-1.0)*Ms*Ms+2.0);
   double p_ps     = p_inf * (2.0*gamma*Ms*Ms-(gamma-1.0)) / (gamma+1.0);
@@ -106,10 +106,10 @@ int main()
   printf("p2/p1      = %1.16E\n",p_ps/p_inf);
   printf("rho2/rho1  = %1.16E\n",rho_ps/rho_inf);
 
-	double *U = (double*) calloc (5*NI*NJ*NK, sizeof(double));
-	for (i = 0; i < NI; i++){
-  	for (j = 0; j < NJ; j++){
-  	  for (k = 0; k < NK; k++){
+  double *U = (double*) calloc (5*NI*NJ*NK, sizeof(double));
+  for (i = 0; i < NI; i++){
+    for (j = 0; j < NJ; j++){
+      for (k = 0; k < NK; k++){
         int p = i + NI*j + NI*NJ*k;
 
         double rho, u, v, w, P;
@@ -133,71 +133,71 @@ int main()
         U[5*p+3] = rho*w;
         U[5*p+4] = P/(gamma-1.0) + 0.5*rho*(u*u+v*v+w*w);
       }
-	  }
-	}
+    }
+  }
 
   FILE *out;
   if (!strcmp(ip_file_type,"ascii")) {
 
     printf("Writing ASCII initial solution file initial.inp\n");
-  	out = fopen("initial.inp","w");
+    out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
     fprintf(out,"\n");
     for (j = 0; j < NJ; j++)  fprintf(out,"%1.16E ",y[j]);
     fprintf(out,"\n");
     for (k = 0; k < NK; k++)  fprintf(out,"%1.16E ",z[k]);
     fprintf(out,"\n");
-    for (k = 0; k < NK; k++)	{
-      for (j = 0; j < NJ; j++)	{
-	      for (i = 0; i < NI; i++)	{
+    for (k = 0; k < NK; k++)  {
+      for (j = 0; j < NJ; j++)  {
+        for (i = 0; i < NI; i++)  {
           int p = i + NK*j + NI*NJ*k;
           fprintf(out,"%1.16E ",U[5*p+0]);
         }
       }
     }
     fprintf(out,"\n");
-    for (k = 0; k < NK; k++)	{
-      for (j = 0; j < NJ; j++)	{
-	      for (i = 0; i < NI; i++)	{
+    for (k = 0; k < NK; k++)  {
+      for (j = 0; j < NJ; j++)  {
+        for (i = 0; i < NI; i++)  {
           int p = i + NK*j + NI*NJ*k;
           fprintf(out,"%1.16E ",U[5*p+1]);
         }
       }
     }
     fprintf(out,"\n");
-    for (k = 0; k < NK; k++)	{
-      for (j = 0; j < NJ; j++)	{
-	      for (i = 0; i < NI; i++)	{
+    for (k = 0; k < NK; k++)  {
+      for (j = 0; j < NJ; j++)  {
+        for (i = 0; i < NI; i++)  {
           int p = i + NK*j + NI*NJ*k;
           fprintf(out,"%1.16E ",U[5*p+2]);
         }
       }
     }
     fprintf(out,"\n");
-    for (k = 0; k < NK; k++)	{
-      for (j = 0; j < NJ; j++)	{
-	      for (i = 0; i < NI; i++)	{
+    for (k = 0; k < NK; k++)  {
+      for (j = 0; j < NJ; j++)  {
+        for (i = 0; i < NI; i++)  {
           int p = i + NK*j + NI*NJ*k;
           fprintf(out,"%1.16E ",U[5*p+3]);
         }
       }
     }
     fprintf(out,"\n");
-    for (k = 0; k < NK; k++)	{
-      for (j = 0; j < NJ; j++)	{
-	      for (i = 0; i < NI; i++)	{
+    for (k = 0; k < NK; k++)  {
+      for (j = 0; j < NJ; j++)  {
+        for (i = 0; i < NI; i++)  {
           int p = i + NK*j + NI*NJ*k;
           fprintf(out,"%1.16E ",U[5*p+4]);
         }
       }
     }
     fprintf(out,"\n");
-	  fclose(out);
+    fclose(out);
 
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
 
     printf("Writing binary initial solution file initial.inp\n");
-  	out = fopen("initial.inp","wb");
+    out = fopen("initial.inp","wb");
     fwrite(x,sizeof(double),NI,out);
     fwrite(y,sizeof(double),NJ,out);
     fwrite(z,sizeof(double),NK,out);
@@ -206,10 +206,10 @@ int main()
 
   }
 
-	free(x);
-	free(y);
-	free(z);
-	free(U);
+  free(x);
+  free(y);
+  free(z);
+  free(U);
 
-	return(0);
+  return(0);
 }

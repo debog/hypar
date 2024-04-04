@@ -1,8 +1,8 @@
 /*
 
-  This code calculates the kinetic energy as 
+  This code calculates the kinetic energy as
   a function of time. It reads in the solution
-  files (assuming they are not overwritten and 
+  files (assuming they are not overwritten and
   are available as op_xxxxx.bin).
 
 */
@@ -54,14 +54,14 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "dt"               ))  fscanf(inputs,"%lf",&dt           );
-   			else if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
-   			else if (!strcmp(word, "file_op_iter"     ))  fscanf(inputs,"%d" ,&file_op_iter  );
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "dt"               ))  fscanf(inputs,"%lf",&dt           );
+         else if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
+         else if (!strcmp(word, "file_op_iter"     ))  fscanf(inputs,"%d" ,&file_op_iter  );
       }
     }
     fclose(inputs);

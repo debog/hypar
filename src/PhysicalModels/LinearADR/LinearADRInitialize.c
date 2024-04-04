@@ -29,7 +29,7 @@ int    LinearADRWriteAdvField     (void*,void*,double);
 int    LinearADRAdvectionJacobian (double*,double*,void*,int,int,int);
 int    LinearADRDiffusionJacobian (double*,double*,void*,int,int);
 
-/*! Initialize the linear advection-diffusion-reaction physics module - 
+/*! Initialize the linear advection-diffusion-reaction physics module -
     allocate and set physics-related parameters, read physics-related inputs
     from file, and set the physics-related function pointers in #HyPar
 
@@ -52,7 +52,7 @@ int    LinearADRDiffusionJacobian (double*,double*,void*,int,int);
     diffusion          | double[]     | #LinearADR::d                 | 0
     centered_flux      | char[]       | #LinearADR::centered_flux     | "no"
 
-    \b Note: 
+    \b Note:
     + "physics.inp" is \b optional; if absent, default values will be used.
     + Please do *not* specify both "advection" and "advection_filename"!
 */
@@ -60,7 +60,7 @@ int LinearADRInitialize(void *s, /*!< Solver object of type #HyPar */
                         void *m  /*!< Object of type #MPIVariables containing MPI-related info */ )
 {
   HyPar         *solver  = (HyPar*)         s;
-  MPIVariables  *mpi     = (MPIVariables*)  m; 
+  MPIVariables  *mpi     = (MPIVariables*)  m;
   LinearADR     *physics = (LinearADR*)     solver->physics;
   int           i,ferr;
 
@@ -93,9 +93,9 @@ int LinearADRInitialize(void *s, /*!< Solver object of type #HyPar */
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")) {
-	      while (strcmp(word, "end")) {
+        while (strcmp(word, "end")) {
 
-		      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
 
           if (!strcmp(word, "advection_filename")) {
             if (physics->constant_advection != -1) {
@@ -128,7 +128,7 @@ int LinearADRInitialize(void *s, /*!< Solver object of type #HyPar */
             for (i=0; i<solver->ndims*solver->nvars; i++) ferr = fscanf(in,"%lf",&physics->d[i]);
             if (ferr != 1) return(1);
           } else if (!strcmp(word, "centered_flux")) {
-            ferr = fscanf(in, "%s", physics->centered_flux); 
+            ferr = fscanf(in, "%s", physics->centered_flux);
             if (ferr != 1) return(ferr);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
@@ -138,12 +138,12 @@ int LinearADRInitialize(void *s, /*!< Solver object of type #HyPar */
           }
         }
 
-	    } else {
+      } else {
 
-    	  fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+        fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
         return(1);
 
-	    }
+      }
     }
 
     fclose(in);

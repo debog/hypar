@@ -19,8 +19,8 @@
       \sigma_i &= \frac {x_i - x_{\rm start}} {x_{\rm end} - x_{\rm start}}
     \f}
     where \f$i\f$ is the grid index along the spatial dimension of the sponge, \f${\bf U}_{\rm ref}\f$
-    is the specified state to which the solution is relaxed, and \f$x_i\f$, \f$x_{\rm start}\f$, and 
-    \f$x_{\rm end}\f$ are the spatial coordinates of the grid point, sponge start, and sponge end, 
+    is the specified state to which the solution is relaxed, and \f$x_i\f$, \f$x_{\rm start}\f$, and
+    \f$x_{\rm end}\f$ are the spatial coordinates of the grid point, sponge start, and sponge end,
     respectively, along the spatial dimension of the sponge.
 */
 int BCSpongeSource(
@@ -45,7 +45,7 @@ int BCSpongeSource(
   if (boundary->on_this_proc) {
     int bounds[ndims], indexb[ndims];
     _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
-    _ArraySetValue_(indexb,ndims,0); 
+    _ArraySetValue_(indexb,ndims,0);
     int done = 0;
     while (!done) {
       int i = indexb[dim] + boundary->is[dim];
@@ -66,7 +66,7 @@ int BCSpongeSource(
   return(0);
 }
 
-/*! Dummy function to ensure consistency with the overall boundary condition 
+/*! Dummy function to ensure consistency with the overall boundary condition
     implementation. The actual sponge boundary condition is implemented by
     BCSpongeSource()
 */

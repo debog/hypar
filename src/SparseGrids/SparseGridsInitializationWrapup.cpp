@@ -57,5 +57,5 @@ int SparseGridsSimulation::InitializationWrapup()
 
   }
 
-  return 0; 
+  return 0;
 }

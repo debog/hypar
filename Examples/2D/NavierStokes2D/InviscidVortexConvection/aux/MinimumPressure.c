@@ -1,9 +1,9 @@
 /*
  * This code extracts the minimum pressure and density at
- * the vortex core as a function of time for an unsteady 
+ * the vortex core as a function of time for an unsteady
  * simulation.
- * Output files have to be binary, and they can't be 
- * overwritten; i.e., it needs files named as 
+ * Output files have to be binary, and they can't be
+ * overwritten; i.e., it needs files named as
  * op_xxxxx.bin
 */
 
@@ -54,15 +54,15 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "dt"               ))  fscanf(inputs,"%lf",&dt           );
-   			else if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
-   			else if (!strcmp(word, "file_op_iter"     ))  fscanf(inputs,"%d" ,&file_op_iter  );
-   			else if (!strcmp(word, "restart_iter"     ))  fscanf(inputs,"%d" ,&restart_iter  );
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "dt"               ))  fscanf(inputs,"%lf",&dt           );
+         else if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
+         else if (!strcmp(word, "file_op_iter"     ))  fscanf(inputs,"%d" ,&file_op_iter  );
+         else if (!strcmp(word, "restart_iter"     ))  fscanf(inputs,"%d" ,&restart_iter  );
       }
     }
     fclose(inputs);
@@ -134,7 +134,7 @@ int main()
         p = 0.4 * (e - 0.5*rho*(u*u+v*v));
 
         if (!q) { min_p = p; min_rho = rho; }
-        
+
         if (rho < min_rho) min_rho = rho;
         if (p   < min_p  ) min_p   = p;
       }

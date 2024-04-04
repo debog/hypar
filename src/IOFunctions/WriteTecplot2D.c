@@ -8,22 +8,22 @@
 #include <basic.h>
 #include <arrayfunctions.h>
 
-/*! Write a vector field and its associated grid to a 2D Tecplot file. This 
-    file can then be visualized using Tecplot (http://www.tecplot.org) 
+/*! Write a vector field and its associated grid to a 2D Tecplot file. This
+    file can then be visualized using Tecplot (http://www.tecplot.org)
     (if available).\n
     \n
     Note: It's essentially a text file, and apart from the first two lines
-    with Tecplot specific headers, the data is written out in the same 
+    with Tecplot specific headers, the data is written out in the same
     format as WriteText().
 */
 int WriteTecplot2D(
                     int ndims,  /*!< Number of spatial dimensions */
                     int nvars,  /*!< Number of variables at each grid point */
-                    int *dim,   /*!< Integer array with the number of grid points 
+                    int *dim,   /*!< Integer array with the number of grid points
                                      in each spatial dimension as its entries */
                     double *x,  /*!< Array of spatial coordinates representing a
                                      Cartesian grid (no ghost points) */
-                    double *u,  /*!< Array containing the vector field to write 
+                    double *u,  /*!< Array containing the vector field to write
                                    (no ghost points) */
                     char *f,    /*!< Filename */
                     int *index  /*!< Preallocated integer array of size ndims */

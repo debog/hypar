@@ -10,10 +10,10 @@
 #include <mpivars.h>
 #include <immersedboundaries.h>
 
-/*! Function to read a 3D surface from a STL file. See 
+/*! Function to read a 3D surface from a STL file. See
     https://en.wikipedia.org/wiki/STL_(file_format)
-    for details of the STL file format. 
-    \b Notes: 
+    for details of the STL file format.
+    \b Notes:
     + This function only reads ASCII STL files.
     + The body read from this file is distributed to
       all MPI ranks.
@@ -50,7 +50,7 @@ int IBReadBodySTL(
     else {
 
       int   nfacets = 0;
-	    char  word[_MAX_STRING_SIZE_];
+      char  word[_MAX_STRING_SIZE_];
       /* Count number of facets in STL file */
       ierr = fscanf(in,"%s",word);
       if (!strcmp(word, "solid")) {
@@ -82,8 +82,8 @@ int IBReadBodySTL(
               ierr = fscanf(in,"%lf",&t1);
               ierr = fscanf(in,"%lf",&t2);
               ierr = fscanf(in,"%lf",&t3);
-              (*body)->surface[n].nx = t1; 
-              (*body)->surface[n].ny = t2; 
+              (*body)->surface[n].nx = t1;
+              (*body)->surface[n].ny = t2;
               (*body)->surface[n].nz = t3;
             }
             ierr = fscanf(in,"%s",word);
@@ -104,8 +104,8 @@ int IBReadBodySTL(
                   ierr = fscanf(in,"%lf",&t1);
                   ierr = fscanf(in,"%lf",&t2);
                   ierr = fscanf(in,"%lf",&t3);
-                  (*body)->surface[n].x1 = t1; 
-                  (*body)->surface[n].y1 = t2; 
+                  (*body)->surface[n].x1 = t1;
+                  (*body)->surface[n].y1 = t2;
                   (*body)->surface[n].z1 = t3;
                 }
                 ierr = fscanf(in,"%s",word);
@@ -116,8 +116,8 @@ int IBReadBodySTL(
                   ierr = fscanf(in,"%lf",&t1);
                   ierr = fscanf(in,"%lf",&t2);
                   ierr = fscanf(in,"%lf",&t3);
-                  (*body)->surface[n].x2 = t1; 
-                  (*body)->surface[n].y2 = t2; 
+                  (*body)->surface[n].x2 = t1;
+                  (*body)->surface[n].y2 = t2;
                   (*body)->surface[n].z2 = t3;
                 }
                 ierr = fscanf(in,"%s",word);
@@ -128,8 +128,8 @@ int IBReadBodySTL(
                   ierr = fscanf(in,"%lf",&t1);
                   ierr = fscanf(in,"%lf",&t2);
                   ierr = fscanf(in,"%lf",&t3);
-                  (*body)->surface[n].x3 = t1; 
-                  (*body)->surface[n].y3 = t2; 
+                  (*body)->surface[n].x3 = t1;
+                  (*body)->surface[n].y3 = t2;
                   (*body)->surface[n].z3 = t3;
                 }
               }

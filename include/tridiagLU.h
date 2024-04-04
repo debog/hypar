@@ -6,12 +6,12 @@
 #ifndef _TRIDIAGLU_H_
 #define _TRIDIAGLU_H_
 
-/* 
+/*
 
-  Parallel direct solver for tridiagonal systems 
+  Parallel direct solver for tridiagonal systems
 
   tridiagLU  (a,b,c,x,n,ns,r,m) - Parallel tridiagonal solver
-    
+
     Solves the tridiagonal system in parallel by reordering the
     points such that the first point of each subdomain is placed
     at the end.
@@ -27,10 +27,10 @@
   tridiagLUGS(a,b,c,x,n,ns,r,m) - Tridiagonal solver based on
                                   "gather and solve"
 
-    Each of the "ns" systems is gathered on one processor, 
+    Each of the "ns" systems is gathered on one processor,
     solved in serial, and the solution scattered back. The
-    parallelism lies in solving the "ns" different systems 
-    by multiple processors (i.e., each processor solves 
+    parallelism lies in solving the "ns" different systems
+    by multiple processors (i.e., each processor solves
     ~ns/nproc number of systems in serial).
 
   Arguments:-
@@ -48,8 +48,8 @@
                                             stage2_time
                                             stage3_time
                                             stage4_time
-                        ** Note that these are process-specific. Calling 
-                           function needs to do something to add/average 
+                        ** Note that these are process-specific. Calling
+                           function needs to do something to add/average
                            them to get some global value.
                         ** Can be NULL if runtimes are not needed.
     m                   MPI_Comm*       MPI Communicator
@@ -88,7 +88,7 @@ typedef struct _tridiagLU_ {
   /*! Choice of solver for solving the reduced system. May be #_TRIDIAG_JACOBI_
       or #_TRIDIAG_GS_.
   */
-  char reducedsolvetype[50]; 
+  char reducedsolvetype[50];
 
   int     evaluate_norm;  /*!< calculate norm at each iteration? (relevant only for iterative solvers) */
   int     maxiter;        /*!< maximum number of iterations (relevant only for iterative solvers)      */

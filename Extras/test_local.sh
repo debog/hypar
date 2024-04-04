@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #################################################################
-# 
+#
 # README:
-# 
+#
 # This script tests a local copy of HyPar (edit the variable
 # hypar_dir to the location of the code you want to test) against
 # a set of baselines available as:
@@ -20,7 +20,7 @@
 clear
 root_dir=$PWD
 
-# HyPar location 
+# HyPar location
 hypar_dir="/path/to/hypar"
 # other HyPar-related stuff
 hypar_exec="HyPar"
@@ -194,7 +194,7 @@ for f in *; do
               echo " "
             else
               ((n_pass+=1))
-              echo "                        **passed**" 
+              echo "                        **passed**"
               echo "                        **passed**" >> $report_file
             fi
           else

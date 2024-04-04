@@ -11,7 +11,7 @@ int Numa3DCalculateStandardAtmosphere_1(void *p,double z,double *ExnerP,double *
   double g      = physics->g;
 
   /* reference quantities at zero altitude */
-  double P0, T0; 
+  double P0, T0;
   P0   = physics->Pref;
   T0   = physics->Tref;
 
@@ -36,7 +36,7 @@ int Numa3DCalculateStandardAtmosphere_2(void *p,double z,double *ExnerP,double *
   double g      = physics->g;
 
   /* reference quantities at zero altitude */
-  double P0, T0; 
+  double P0, T0;
   P0 = physics->Pref;
   T0 = physics->Tref;
 

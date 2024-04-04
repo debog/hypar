@@ -2,10 +2,10 @@
 
   Fokker-Planck Model for Power Systems
 
-Reference: 
+Reference:
 + Wang P., Tartakovsky A.M., Abhyankar S., Smith B.F.,
   Huang Z., "Probabilistic Density Function Method for
-  Stochastic ODEs of Power Systems with Uncertain 
+  Stochastic ODEs of Power Systems with Uncertain
   Power Input", Preprint
 
   dp    d[mu(x,y)p]    d[nu(x,y)p]        d^2 p
@@ -16,7 +16,7 @@ Reference:
   nu(x,y) = (1/2H)[Pm - Pmax sin(x) - D(y-1)]
   f(t)    = (1/2H)^2 (l^2 q)/(lr+1) (1 - exp[-(r+1/l)t])
 
-  where 
+  where
     r = D/2H
 
            [ EV/g1; t < tf
@@ -24,7 +24,7 @@ Reference:
            [ EV/g2; tcl < t
 
   Physical Parameters:
-    
+
     O_s   Synchronous Speed
     H     Inertia constant
     D     Damping constant

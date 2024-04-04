@@ -5,7 +5,7 @@
 # README:
 #
 # This script generates baseline solutions for HyPar. A set of baseline
-# solutions is available at: 
+# solutions is available at:
 # https://gitlab.com/debojyoti.ghosh/hypar_baselines
 # These are generated using the master branch of the main HyPar repo.
 # In general, these baselines should be used. If you know what you

@@ -1,6 +1,6 @@
 /*
 
-  This code extracts the marginal PDFs from the 4D 
+  This code extracts the marginal PDFs from the 4D
   PDF output and writes them to text files.
   (Note: output file must be binary.)
 
@@ -60,15 +60,15 @@ int MarginalPDF(char *filename,int overwrite)
   FILE *in;
   in = fopen(filename,"rb");
   if (!in) return(1);
-  
+
   printf("Processing file %s.\n",filename);
   int ndims, nvars, dims[4];
   double *U,*x;
-  
+
   /* read the file headers */
   fread(&ndims,sizeof(int),1,in);
   fread(&nvars,sizeof(int),1,in);
-  
+
   /* some checks */
   if (ndims != 4) {
     printf("Error: ndims in %s not equal to 2!\n",filename);
@@ -78,7 +78,7 @@ int MarginalPDF(char *filename,int overwrite)
     printf("Error: nvars in %s not equal to 1!\n",filename);
     return(-1);
   }
-  
+
   /* read dimensions */
   fread(dims,sizeof(int),ndims,in);
   printf("Dimensions: %d x %d x %d x %d\n",dims[0],dims[1],dims[2],dims[3]);
@@ -88,7 +88,7 @@ int MarginalPDF(char *filename,int overwrite)
   int sizeu = dims[0] * dims[1] * dims[2] * dims[3];
   x = (double*) calloc (sizex,sizeof(double));
   U = (double*) calloc (sizeu,sizeof(double));
-  
+
   /* read grid and solution */
   fread(x,sizeof(double),sizex,in);
   fread(U,sizeof(double),sizeu,in);
@@ -116,7 +116,7 @@ int MarginalPDF(char *filename,int overwrite)
     txtfileo1[4] = txtfileo2[4] = 'a';
     txtfileo1[5] = txtfileo2[5] = 't';
   }
-  
+
   /* variables for the 1D solution */
   double *U1d, integral;
   int    i[4], j;
@@ -124,7 +124,7 @@ int MarginalPDF(char *filename,int overwrite)
   double *T2 = T1 + dims[0];
   double *O1 = T2 + dims[1];
   double *O2 = O1 + dims[2];
-  
+
   /* calculate integral of the 4D PDF */
   integral = 0.0;
   for (i[0]=0; i[0]<dims[0]; i[0]++) {
@@ -154,11 +154,11 @@ int MarginalPDF(char *filename,int overwrite)
     }
   }
   printf("\tIntegral of 4D PDF: %1.16E\n",integral);
-  
+
   /* Theta1 */
   printf("\tExtracting marginal PDF for theta1.\n");
   U1d = (double*) calloc (dims[0],sizeof(double));
-  
+
   for (i[0]=0; i[0]<dims[0]; i[0]++) {
 
     U1d[i[0]] = 0.0;
@@ -188,7 +188,7 @@ int MarginalPDF(char *filename,int overwrite)
       }
     }
   }
-  
+
   /* calculating integral of marginal PDF */
   integral = 0;
   for (j=0; j<dims[0]; j++) {
@@ -199,7 +199,7 @@ int MarginalPDF(char *filename,int overwrite)
     integral += U1d[j] * dx;
   }
   printf("\tIntegral of marginal PDF for theta1: %1.16E\n",integral);
-  
+
   /* write to file */
   printf("\tWriting file %s.\n",txtfilet1);
   WriteText(dims[0],T1,U1d,txtfilet1);
@@ -210,7 +210,7 @@ int MarginalPDF(char *filename,int overwrite)
   /* Theta2 */
   printf("\tExtracting marginal PDF for theta2.\n");
   U1d = (double*) calloc (dims[1],sizeof(double));
-  
+
   for (i[1]=0; i[1]<dims[1]; i[1]++) {
 
     U1d[i[1]] = 0.0;
@@ -240,7 +240,7 @@ int MarginalPDF(char *filename,int overwrite)
       }
     }
   }
-  
+
   /* calculating integral of marginal PDF */
   integral = 0;
   for (j=0; j<dims[1]; j++) {
@@ -251,7 +251,7 @@ int MarginalPDF(char *filename,int overwrite)
     integral += U1d[j] * dx;
   }
   printf("\tIntegral of marginal PDF for theta2: %1.16E\n",integral);
-  
+
   /* write to file */
   printf("\tWriting file %s.\n",txtfilet2);
   WriteText(dims[1],T2,U1d,txtfilet2);
@@ -262,7 +262,7 @@ int MarginalPDF(char *filename,int overwrite)
   /* Omega1 */
   printf("\tExtracting marginal PDF for omega1.\n");
   U1d = (double*) calloc (dims[2],sizeof(double));
-  
+
   for (i[2]=0; i[2]<dims[2]; i[2]++) {
 
     U1d[i[2]] = 0.0;
@@ -292,7 +292,7 @@ int MarginalPDF(char *filename,int overwrite)
       }
     }
   }
-  
+
   /* calculating integral of marginal PDF */
   integral = 0;
   for (j=0; j<dims[2]; j++) {
@@ -303,7 +303,7 @@ int MarginalPDF(char *filename,int overwrite)
     integral += U1d[j] * dx;
   }
   printf("\tIntegral of marginal PDF for omega1: %1.16E\n",integral);
-  
+
   /* write to file */
   printf("\tWriting file %s.\n",txtfileo1);
   WriteText(dims[2],O1,U1d,txtfileo1);
@@ -314,7 +314,7 @@ int MarginalPDF(char *filename,int overwrite)
   /* Omega2 */
   printf("\tExtracting marginal PDF for omega2.\n");
   U1d = (double*) calloc (dims[3],sizeof(double));
-  
+
   for (i[3]=0; i[3]<dims[3]; i[3]++) {
 
     U1d[i[3]] = 0.0;
@@ -344,7 +344,7 @@ int MarginalPDF(char *filename,int overwrite)
       }
     }
   }
-  
+
   /* calculating integral of marginal PDF */
   integral = 0;
   for (j=0; j<dims[3]; j++) {
@@ -355,7 +355,7 @@ int MarginalPDF(char *filename,int overwrite)
     integral += U1d[j] * dx;
   }
   printf("\tIntegral of marginal PDF for omega2: %1.16E\n",integral);
-  
+
   /* write to file */
   printf("\tWriting file %s.\n",txtfileo2);
   WriteText(dims[3],O2,U1d,txtfileo2);
@@ -376,13 +376,13 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
-   			else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,op_overwrite  );
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
+         else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,op_overwrite  );
       }
     }
     fclose(inputs);

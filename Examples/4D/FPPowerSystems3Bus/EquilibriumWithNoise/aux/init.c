@@ -86,7 +86,7 @@ int main()
     printf("Error: ndims is not 4 in solver.inp. this code is to generate 4D initial conditions\n");
     return(0);
   }
-	printf("Grid:\t\t\t%d X %d X %d X %d\n",N[0],N[1],N[2],N[3]);
+  printf("Grid:\t\t\t%d X %d X %d X %d\n",N[0],N[1],N[2],N[3]);
   /* check if ip_file_type is binary */
   if (strcmp(ip_file_type,"binary") && strcmp(ip_file_type,"bin")) {
     printf("Error: ip_file_type needs to be bin or binary.\n");
@@ -105,7 +105,7 @@ int main()
   double E2           = 1.0491099265981;
   double Eref         = 1.05623172878954;
   double omegaB       = 2*pi*60.0;
-  
+
   double sigma[2][2];
   sigma[0][0]  = 0.0125;
   sigma[0][1]  = 0.0;
@@ -121,7 +121,7 @@ int main()
   double gamma        = 0.25;
 
   double G[9], B[9];
-  
+
   G[0*3+0] = 0.276805493111691;
   G[0*3+1] = 0.213024867595501;
   G[0*3+2] = 0.209205876527443;
@@ -131,7 +131,7 @@ int main()
   G[2*3+0] = 0.209205876527443;
   G[2*3+1] = 0.286592141665044;
   G[2*3+2] = 0.844559256324453;
-  
+
   B[0*3+0] = -2.36794416971567;
   B[0*3+1] =  1.08817493992579;
   B[0*3+2] =  1.22601259339234;
@@ -170,8 +170,8 @@ int main()
     char word[500];
     ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      while (strcmp(word, "end")){
+        ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
         if      (!strcmp(word,"Pm1_avg"   ))  {ferr=fscanf(in,"%lf",&Pm1_avg   ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"Pm2_avg"   ))  {ferr=fscanf(in,"%lf",&Pm2_avg   ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"Pmref_avg" ))  {ferr=fscanf(in,"%lf",&Pmref_avg ) ;if(ferr!=1)return(1);}
@@ -230,10 +230,10 @@ int main()
           ferr=fscanf(in,"%lf",&x0[3]); if(ferr!=1)return(1);
         }
       }
-	  } else {
-    	fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+    } else {
+      fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
       return(1);
-	  }
+    }
     fclose(in);
   }
 
@@ -263,14 +263,14 @@ int main()
 
   /* allocate and generate the grid */
   printf("Generating grid.\n");
-	double dx[4];
+  double dx[4];
   dx[0] = (xmax[0]-xmin[0]) / ((double)(N[0]));
   dx[1] = (xmax[1]-xmin[1]) / ((double)(N[1]));
   dx[2] = (xmax[2]-xmin[2]) / ((double)(N[2]));
   dx[3] = (xmax[3]-xmin[3]) / ((double)(N[3]));
-	double *x;
+  double *x;
   int sizex = N[0] + N[1] + N[2] + N[3];
-	x = (double*) calloc (sizex, sizeof(double));
+  x = (double*) calloc (sizex, sizeof(double));
   offset = 0;
   for (n = 0; n < 4; n++) {
     for (i = 0; i < N[n]; i++) x[i+offset] = xmin[n] + i*dx[n];
@@ -327,12 +327,12 @@ int main()
   fprintf(out,"\tPm1_avg            %1.16E\n",Pm1_avg);
   fprintf(out,"\tPm2_avg            %1.16E\n",Pm2_avg);
   fprintf(out,"\tPmref_avg          %1.16E\n",Pmref_avg);
-  fprintf(out,"\tH1                 %1.16E\n",H1);       
-  fprintf(out,"\tH2                 %1.16E\n",H2);       
-  fprintf(out,"\tHref               %1.16E\n",Href);       
-  fprintf(out,"\tE1                 %1.16E\n",E1);       
-  fprintf(out,"\tE2                 %1.16E\n",E2);       
-  fprintf(out,"\tEref               %1.16E\n",Eref);       
+  fprintf(out,"\tH1                 %1.16E\n",H1);
+  fprintf(out,"\tH2                 %1.16E\n",H2);
+  fprintf(out,"\tHref               %1.16E\n",Href);
+  fprintf(out,"\tE1                 %1.16E\n",E1);
+  fprintf(out,"\tE2                 %1.16E\n",E2);
+  fprintf(out,"\tEref               %1.16E\n",Eref);
   fprintf(out,"\tomegaB             %1.16E\n",omegaB);
   fprintf(out,"\tgamma              %1.16E\n",gamma);
   fprintf(out,"\n");
@@ -362,8 +362,8 @@ int main()
   /* Generate the solution and place the Dirac */
   printf("Generating solution.\n");
   int sizeu = N[0] * N[1] * N[2] * N[3];
-	double *u;
-	u = (double*) calloc (sizeu, sizeof(double));
+  double *u;
+  u = (double*) calloc (sizeu, sizeof(double));
   for (i = 0; i < sizeu; i++) u[i] = 0.0;
   /* Placing Dirac */
   printf("Placing Dirac at grid cell (%d, %d, %d, %d).\n",i0[0],i0[1],i0[2],i0[3]);
@@ -373,13 +373,13 @@ int main()
 
   /* writing to file */
   printf("Writing to file.\n");
-	out = fopen("initial.inp","wb");
+  out = fopen("initial.inp","wb");
   fwrite(x,sizeof(double),sizex,out);
   fwrite(u,sizeof(double),sizeu,out);
-	fclose(out);
+  fclose(out);
 
-	free(x);
-	free(u);
+  free(x);
+  free(u);
 
-	return(0);
+  return(0);
 }

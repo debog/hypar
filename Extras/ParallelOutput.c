@@ -1,11 +1,11 @@
-/* 
+/*
   This code stitches the solution written out in parallel mode into
   a single file.
 
   The input files are the solution files written out in parallel mode:
   op.bin.xxxx
 
-  For unsteady output, the code will write out binary files containing 
+  For unsteady output, the code will write out binary files containing
   global solution at each output time step (one file for each time step)
   op_xxxxx.bin
 
@@ -59,7 +59,7 @@ void GetStringFromInteger(int a,char *A,int width)
 {
   int i;
   for (i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0'); 
+    char digit = (char) (a%10 + '0');
     a /= 10;
     A[width-1-i] = digit;
   }
@@ -132,7 +132,7 @@ int MPIPartition1D(int nglobal,int nproc,int rank)
   return(nlocal);
 }
 
-int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie) 
+int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie)
 {
   int i;
   int ip[ndims];
@@ -162,17 +162,17 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(0);
   } else {
-	  char word[_MAX_STRING_SIZE_];
+    char word[_MAX_STRING_SIZE_];
     fscanf(in,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(in,"%s",word);
+      while (strcmp(word, "end")){
+        fscanf(in,"%s",word);
         if (!strcmp(word, "ndims")) {
           fscanf(in,"%d",&ndims);
           dim_global = (int*) calloc (ndims,sizeof(int));
           dim_local  = (int*) calloc (ndims,sizeof(int));
           iproc      = (int*) calloc (ndims,sizeof(int));
-        }	else if (!strcmp(word, "nvars")) {
+        }  else if (!strcmp(word, "nvars")) {
           fscanf(in,"%d",&nvars);
         } else if (!strcmp(word, "size")) {
           int i;
@@ -196,18 +196,18 @@ int main()
         }
       }
     } else {
-  	  fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
+      fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
       return(0);
     }
     fclose(in);
 
     /* Print to screen the inputs read */
-	  printf("\tNo. of dimensions                          : %d\n",ndims);
-	  printf("\tNo. of variables                           : %d\n",nvars);
-	  printf("\tDomain size                                : ");
+    printf("\tNo. of dimensions                          : %d\n",ndims);
+    printf("\tNo. of variables                           : %d\n",nvars);
+    printf("\tDomain size                                : ");
     for (i=0; i<ndims; i++) printf ("%d ",dim_global[i]);
     printf("\n");
-	  printf("\tProcesses along each dimension             : ");
+    printf("\tProcesses along each dimension             : ");
     for (i=0; i<ndims; i++) printf ("%d ",iproc[i]);
     printf("\n");
     printf("\tSolution output  mode                      : %s\n",output_mode  );
@@ -230,7 +230,7 @@ int main()
     if (!inps[IORank]) {
       printf("Error: Could not open %s for reading.\n",filename);
       return(0);
-    }    
+    }
   }
 
   int nproc = 1;
@@ -304,7 +304,7 @@ int main()
           free(Ul);
         }
       }
-     
+
       /* write global grid and solution to file */
       printf("Writing solution file %s.\n",out_filename);
       FILE *out;
@@ -340,7 +340,7 @@ int main()
         else fseek(inps[IORank],-sizeof(char),SEEK_CUR);
       }
     }
-    
+
   } else {
     /* for steady solution */
     char out_filename[_MAX_STRING_SIZE_];
@@ -402,7 +402,7 @@ int main()
         free(Ul);
       }
     }
-     
+
     /* write global grid and solution to file */
     printf("Writing solution file %s.\n",out_filename);
     FILE *out;
@@ -429,7 +429,7 @@ int main()
     /* free global grid and solution arrays and increment filename */
     free(Xg);
     free(Ug);
-    
+
   }
 
   /* close the files for each IO group */

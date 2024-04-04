@@ -33,9 +33,9 @@ int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
   int *dim    = solver->dim_local;
   int ghosts  = solver->ghosts;
 
-  int index_outer[ndims], 
-      index_inter[ndims], 
-      bounds_outer[ndims], 
+  int index_outer[ndims],
+      index_inter[ndims],
+      bounds_outer[ndims],
       bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
@@ -86,7 +86,7 @@ int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
         fI[p] = fL[p];
       } else if (all_negative) {
         fI[p] = fR[p];
-      } else { 
+      } else {
         fI[p] = 0.5 * (fL[p] + fR[p] - maxabs_eig * (uR[p] - uL[p]));
       }
 

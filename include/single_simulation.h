@@ -54,10 +54,10 @@ class SingleSimulation : public Simulation
     inline int ReadInputs()
     {
       int retval = ::ReadInputs(  (void*) m_sim,
-                                  _NSIMS_, 
+                                  _NSIMS_,
                                   m_rank );
       ::WriteInputs( (void*) m_sim,
-                     _NSIMS_, 
+                     _NSIMS_,
                      m_rank );
       return retval;
     }
@@ -145,7 +145,7 @@ class SingleSimulation : public Simulation
 
 #ifndef serial
     /*! Create duplicate MPI communicators */
-    inline int mpiCommDup() 
+    inline int mpiCommDup()
     {
       MPI_Comm_dup(MPI_COMM_WORLD, &(m_sim->mpi.world));
       return 0;

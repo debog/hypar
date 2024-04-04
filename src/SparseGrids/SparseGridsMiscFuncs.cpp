@@ -234,13 +234,13 @@ int SparseGridsSimulation::InitializeBarebones( SimulationObject *simobj /*!< si
                               mpi->ie  );
   CHECKERR(ierr);
 
-  /* create sub-communicators for parallel computations 
+  /* create sub-communicators for parallel computations
    * along grid lines in each dimension */
    IERR MPICreateCommunicators(m_ndims,&(simobj->mpi)); CHECKERR(ierr);
 
   /* initialize periodic BC flags to zero */
   for (int i=0; i<solver->ndims; i++) mpi->bcperiodic[i] = 0;
-  
+
   /* create communication groups */
   IERR MPICreateIOGroups(&(simobj->mpi)); CHECKERR(ierr);
 
@@ -257,8 +257,8 @@ int SparseGridsSimulation::InitializeBarebones( SimulationObject *simobj /*!< si
 
 #endif
 
-  solver->npoints_global 
-    = solver->npoints_local 
+  solver->npoints_global
+    = solver->npoints_local
     = solver->npoints_local_wghosts
     = 1;
   for (int i=0; i<m_ndims; i++) {
@@ -292,7 +292,7 @@ int SparseGridsSimulation::InitializeBarebones( SimulationObject *simobj /*!< si
   for (int i=0; i<m_ndims; i++) size += (solver->dim_local[i]+2*solver->ghosts);
   solver->x     = (double*) calloc (size,sizeof(double));
   solver->dxinv = (double*) calloc (size,sizeof(double));
-    
+
   /* allocate MPI send/receive buffer arrays */
   int bufdim[solver->ndims], maxbuf = 0;
   for (int d = 0; d < solver->ndims; d++) {
@@ -318,7 +318,7 @@ int SparseGridsSimulation::InitializeBarebones( SimulationObject *simobj /*!< si
   return(0);
 }
 
-/*! This function initializes all some function pointers needed by a 
+/*! This function initializes all some function pointers needed by a
  *  barebones simulation object.
 */
 int SparseGridsSimulation::InitializeSolversBarebones( SimulationObject *sim /*!< simulation objects of type #SimulationObject*/)
@@ -345,7 +345,7 @@ int SparseGridsSimulation::InitializeSolversBarebones( SimulationObject *sim /*!
   solver->flag_nonlinearinterp  = 0;
   solver->time_integrator = NULL;
   solver->msti = NULL;
-  
+
   /* Solution output function */
   solver->WriteOutput    = NULL; /* default - no output */
   solver->filename_index = NULL;
@@ -376,7 +376,7 @@ int SparseGridsSimulation::InitializeSolversBarebones( SimulationObject *sim /*!
     if ((!strcmp(solver->op_overwrite,"no")) && solver->restart_iter) {
       /* if it's a restart run, fast-forward the filename */
       int t;
-      for (t=0; t<solver->restart_iter; t++) 
+      for (t=0; t<solver->restart_iter; t++)
         if ((t+1)%solver->file_op_iter == 0) IncrementFilenameIndex(solver->filename_index,solver->index_length);
     }
   } else if (!strcmp(solver->output_mode,"parallel")) {

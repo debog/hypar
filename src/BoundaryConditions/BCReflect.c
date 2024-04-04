@@ -7,7 +7,7 @@
 #include <arrayfunctions.h>
 #include <boundaryconditions.h>
 
-/*! Applies the reflection boundary condition: The values at the physical 
+/*! Applies the reflection boundary condition: The values at the physical
     boundary ghost points are set to the negative of the interior values
     adjacent to the boundary.
 */

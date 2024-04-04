@@ -12,7 +12,7 @@
 
 /*! Initialize the explicit Runge-Kutta time integrator: Depending on the specific
     explicit Runge-Kutta (ERK) method chosen, this function allocates memory for the
-    Butcher tableaux and sets their coefficients. 
+    Butcher tableaux and sets their coefficients.
 */
 int TimeExplicitRKInitialize(
                               char *class,  /*!< Name of time integrator class; must match #_RK_ */

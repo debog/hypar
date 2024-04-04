@@ -10,7 +10,7 @@
 #include <mathfunctions.h>
 
 /*! Is the input number an integer power of 2? */
-static int isPowerOfTwo(int x) 
+static int isPowerOfTwo(int x)
 {
   if (x == 0)  return 0;
 
@@ -22,7 +22,7 @@ static int isPowerOfTwo(int x)
 }
 
 /*! Coarsen along a given dimension - the source and destination must have the same sizes
- *  along all other dimensions. 
+ *  along all other dimensions.
  *
  *  Note that the arrays must *not* have any ghost points!
  *
@@ -82,10 +82,10 @@ static int coarsen1D( const int* const    a_dim_src, /*!< Grid size of source da
 //    return 1;
 //  }
 
-  /* create bounds for the transverse loop, i.e., to loop over 
+  /* create bounds for the transverse loop, i.e., to loop over
    * all 1D lines along dimension "a_dir" */
   int bounds_transverse[a_ndims];
-  _ArrayCopy1D_(a_dim_src, bounds_transverse, a_ndims); 
+  _ArrayCopy1D_(a_dim_src, bounds_transverse, a_ndims);
   bounds_transverse[a_dir] =  1;
 
   int index_transverse[a_ndims], done = 0;
@@ -135,10 +135,10 @@ static int coarsen1D( const int* const    a_dim_src, /*!< Grid size of source da
 
       for (int v = 0; v < a_nvars; v++) {
         double val =    c0 * a_u_src[p_m3*a_nvars+v]
-                      + c1 * a_u_src[p_m2*a_nvars+v] 
-                      + c2 * a_u_src[p_m1*a_nvars+v] 
-                      + c3 * a_u_src[p_p1*a_nvars+v] 
-                      + c4 * a_u_src[p_p2*a_nvars+v] 
+                      + c1 * a_u_src[p_m2*a_nvars+v]
+                      + c2 * a_u_src[p_m1*a_nvars+v]
+                      + c3 * a_u_src[p_p1*a_nvars+v]
+                      + c4 * a_u_src[p_p2*a_nvars+v]
                       + c5 * a_u_src[p_p3*a_nvars+v];
         a_u_dst[p*a_nvars+v] = val;
       }
@@ -146,14 +146,14 @@ static int coarsen1D( const int* const    a_dim_src, /*!< Grid size of source da
     }
 
     _ArrayIncrementIndex_(a_ndims, bounds_transverse, index_transverse, done);
-  
+
   }
 
   return 0;
 }
 
 /*! Refine along a given dimension - the source and destination must have the same sizes
- *  along all other dimensions. 
+ *  along all other dimensions.
  *
  *  Note that the arrays must *not* have any ghost points!
  *
@@ -194,19 +194,19 @@ static int refine1D(const int* const     a_dim_src, /*!< Grid size of source dat
     return 1;
   }
 
-  /* create bounds for the transverse loop, i.e., to loop over 
+  /* create bounds for the transverse loop, i.e., to loop over
    * all 1D lines along dimension "a_dir" */
   int bounds_transverse[a_ndims];
-  _ArrayCopy1D_(a_dim_src, bounds_transverse, a_ndims); 
+  _ArrayCopy1D_(a_dim_src, bounds_transverse, a_ndims);
   bounds_transverse[a_dir] =  1;
 
   int index_transverse[a_ndims], done = 0;
   _ArraySetValue_(index_transverse, a_ndims, 0);
   while (!done) {
 
-    int index_dst [a_ndims], 
-        index_src0[a_ndims], 
-        index_src1[a_ndims], 
+    int index_dst [a_ndims],
+        index_src0[a_ndims],
+        index_src1[a_ndims],
         index_src2[a_ndims],
         index_src3[a_ndims],
         index_src4[a_ndims],
@@ -295,23 +295,23 @@ static int refine1D(const int* const     a_dim_src, /*!< Grid size of source dat
     }
 
     _ArrayIncrementIndex_(a_ndims, bounds_transverse, index_transverse, done);
-  
+
   }
 
   return 0;
 }
 
-/*! Interpolate n-dimensional data from one grid to another of a desired resolution. 
-    Note that along each dimension, the ratio of the number of grid points 
-    in the source grid and that in the destination grid must be an integer 
+/*! Interpolate n-dimensional data from one grid to another of a desired resolution.
+    Note that along each dimension, the ratio of the number of grid points
+    in the source grid and that in the destination grid must be an integer
     power of 2 (negative or positive).
 
     The source data *must* be global. It will get deallocated at the end
     of this function. It *must* have the appropriate number of ghost points.
 
-    The incoming pointer for destination data must be NULL. After this function 
-    is executed, it will point to a chunk of memory with the interpolated solution. 
-    This is the *global* solution. It will have the specified number of ghost 
+    The incoming pointer for destination data must be NULL. After this function
+    is executed, it will point to a chunk of memory with the interpolated solution.
+    This is the *global* solution. It will have the specified number of ghost
     points appropriately filled.
 */
 int InterpolateGlobalnDVar( const int* const  a_dim_dst, /*!< grid dimensions to interpolate to */
@@ -352,8 +352,8 @@ int InterpolateGlobalnDVar( const int* const  a_dim_dst, /*!< grid dimensions to
 
     if (dim_from[dir] == dim_to[dir]) continue;
 
-    double fac = (dim_to[dir] > dim_from[dir] ? 
-                      (double)dim_to[dir]/(double)dim_from[dir] 
+    double fac = (dim_to[dir] > dim_from[dir] ?
+                      (double)dim_to[dir]/(double)dim_from[dir]
                     : (double)dim_from[dir]/(double)dim_to[dir] );
 
     if (!isPowerOfTwo((int)fac)) {
@@ -374,31 +374,31 @@ int InterpolateGlobalnDVar( const int* const  a_dim_dst, /*!< grid dimensions to
       u_to = (double*) calloc (size, sizeof(double));
     }
 
-    fillGhostCells( dim_from, 
-                    a_ghosts, 
-                    u_from, 
-                    a_nvars, 
-                    a_ndims, 
+    fillGhostCells( dim_from,
+                    a_ghosts,
+                    u_from,
+                    a_nvars,
+                    a_ndims,
                     a_periodic );
 
     if (dim_to[dir] < dim_from[dir]) {
-      int retval = coarsen1D( dim_from, 
-                              dim_to, 
-                              u_from, 
-                              u_to, 
-                              dir, 
-                              a_nvars, 
-                              a_ghosts, 
+      int retval = coarsen1D( dim_from,
+                              dim_to,
+                              u_from,
+                              u_to,
+                              dir,
+                              a_nvars,
+                              a_ghosts,
                               a_ndims );
       if (retval) return retval;
     } else {
-      int retval = refine1D(  dim_from, 
-                              dim_to, 
-                              u_from, 
-                              u_to, 
-                              dir, 
-                              a_nvars, 
-                              a_ghosts, 
+      int retval = refine1D(  dim_from,
+                              dim_to,
+                              u_from,
+                              u_to,
+                              dir,
+                              a_nvars,
+                              a_ghosts,
                               a_ndims );
       if (retval) return retval;
     }
@@ -409,7 +409,7 @@ int InterpolateGlobalnDVar( const int* const  a_dim_dst, /*!< grid dimensions to
   for (int d = 0; d < a_ndims; d++) {
     if (dim_to[d] != a_dim_dst[d]) {
       fprintf(stderr,"Error in InterpolateGlobalnDVar() - \n");
-      fprintf(stderr,"  dim_to[%d] (%d) != a_dim_dst[%d] (%d)!\n", 
+      fprintf(stderr,"  dim_to[%d] (%d) != a_dim_dst[%d] (%d)!\n",
               d, dim_to[d], d, a_dim_dst[d]);
       return 1;
     }

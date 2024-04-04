@@ -9,7 +9,7 @@
 #include <mpivars.h>
 #include <hypar.h>
 
-/*! Evaluate the parabolic term using a "1.5"-stage finite-difference spatial discretization: 
+/*! Evaluate the parabolic term using a "1.5"-stage finite-difference spatial discretization:
     The parabolic term is assumed to be of the form:
     \f{equation}{
       {\bf P}\left({\bf u}\right) = \sum_{d1=0}^{D-1}\sum_{d2=0}^{D-1} \frac {\partial^2 h_{d1,d2}\left(\bf u\right)} {\partial x_{d1} \partial x_{d2}},
@@ -21,7 +21,7 @@
     \f}
     where \f$\mathcal{D}\f$ denotes the finite-difference approximation to the first derivative.
     + When \f$d = d1 = d2\f$, the operator \f$\mathcal{D}^2_d\left[\cdot\right] = \mathcal{D}_{d}\mathcal{D}_{d}\left[\cdot\right]\f$ is computed in one step as the finite-difference approximation to the  second derivative (Laplacian) \f$\mathcal{L}_d\left[\cdot\right]\f$ using #HyPar::SecondDerivativePar.
-    + When \f$d1 \ne d2 \f$, each of the first derivative approximations are \f$\mathcal{D}_{d1}\f$ and \f$\mathcal{D}_{d2}\f$ are computed separately, and thus the 
+    + When \f$d1 \ne d2 \f$, each of the first derivative approximations are \f$\mathcal{D}_{d1}\f$ and \f$\mathcal{D}_{d2}\f$ are computed separately, and thus the
       cross-derivative is evaluated in two steps using #HyPar::FirstDerivativePar.
 
     \b Note: this form of the parabolic term \b does \b allow for cross-derivatives (\f$ d1 \ne d2 \f$).

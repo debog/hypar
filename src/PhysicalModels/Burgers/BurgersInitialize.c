@@ -18,7 +18,7 @@ int    BurgersAdvection  (double*,double*,int,void*,double);
 int    BurgersUpwind     (double*,double*,double*,double*,
                           double*,double*,int,void*,double);
 
-/*! Initialize the nonlinear Burgers physics module - 
+/*! Initialize the nonlinear Burgers physics module -
     allocate and set physics-related parameters, read physics-related inputs
     from file, and set the physics-related function pointers in #HyPar
 */
@@ -27,7 +27,7 @@ int BurgersInitialize(void *s, /*!< Solver object of type #HyPar */
                      )
 {
   HyPar         *solver  = (HyPar*)        s;
-  MPIVariables  *mpi     = (MPIVariables*) m; 
+  MPIVariables  *mpi     = (MPIVariables*) m;
   Burgers       *physics = (Burgers*)      solver->physics;
   int           i, ferr;
 
@@ -42,8 +42,8 @@ int BurgersInitialize(void *s, /*!< Solver object of type #HyPar */
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
-	      while (strcmp(word, "end")){
-		      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+        while (strcmp(word, "end")){
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
             ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
@@ -52,10 +52,10 @@ int BurgersInitialize(void *s, /*!< Solver object of type #HyPar */
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
-	    } else {
-    	  fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+      } else {
+        fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
         return(1);
-	    }
+      }
     }
     fclose(in);
   }

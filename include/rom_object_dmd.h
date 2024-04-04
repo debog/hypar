@@ -39,10 +39,10 @@ class DMDROMObject : public ROMObject
   public:
 
     /*! Constructor */
-    DMDROMObject( const int, 
-                  const double, 
-                  const int, 
-                  const int, 
+    DMDROMObject( const int,
+                  const double,
+                  const int,
+                  const int,
                   const int,
                   const int,
                   const int a_var_idx = -1);
@@ -80,11 +80,11 @@ class DMDROMObject : public ROMObject
     virtual void train();
 
     /*! compute prediction at given time */
-    virtual 
+    virtual
     const CAROM::Vector* const predict(const double a_t /*!< time at which to predict solution */ ) const
     {
       for (int i = 0; i < m_dmd.size(); i++) {
-        if (   (a_t >= m_intervals[i].first) 
+        if (   (a_t >= m_intervals[i].first)
             && (  (a_t < m_intervals[i].second) || (m_intervals[i].second < 0)  ) ){
           return m_dmd[i]->predict(a_t);
         }

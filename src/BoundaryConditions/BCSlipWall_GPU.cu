@@ -149,7 +149,7 @@ void BCSlipWallU_dim3_kernel(
     dimensional Euler and Navier-Stokes systems (#Euler2D, #NavierStokes2D, #NavierStokes3D).
     It is used for simulating inviscid walls or symmetric boundaries. The pressure, density,
     and tangential velocity at the ghost points are extrapolated from the interior, while the
-    normal velocity at the ghost points is set such that the interpolated value at the boundary 
+    normal velocity at the ghost points is set such that the interpolated value at the boundary
     face is equal to the specified wall velocity.
 
     \sa BCSlipWallU()
@@ -209,7 +209,7 @@ extern "C" int gpuBCSlipWallU(
   return 0;
 }
 
-#else 
+#else
 
 /*! Kernel for 3D implementation of gpuBCSlipWallU() */
 __global__
@@ -286,7 +286,7 @@ void BCSlipWallU_dim3_kernel(
     dimensional Euler and Navier-Stokes systems (#Euler2D, #NavierStokes2D, #NavierStokes3D).
     It is used for simulating inviscid walls or symmetric boundaries. The pressure, density,
     and tangential velocity at the ghost points are extrapolated from the interior, while the
-    normal velocity at the ghost points is set such that the interpolated value at the boundary 
+    normal velocity at the ghost points is set such that the interpolated value at the boundary
     face is equal to the specified wall velocity.
 
     \sa BCSlipWallU()

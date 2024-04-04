@@ -9,7 +9,7 @@
 #include <mpivars.h>
 #include <hypar.h>
 
-/*! Evaluate the parabolic term using a conservative finite-difference spatial discretization: 
+/*! Evaluate the parabolic term using a conservative finite-difference spatial discretization:
     The parabolic term is assumed to be of the form:
     \f{equation}{
       {\bf P}\left({\bf u}\right) = \sum_{d=0}^{D-1} \frac {\partial^2 {\bf g}_d\left(\bf u\right)} {\partial x_d^2},
@@ -70,7 +70,7 @@ int ParabolicFunctionNC1Stage(
     while (!done) {
       _ArrayIndex1D_(ndims,dim,index,ghosts,p);
       for (v=0; v<nvars; v++)
-        par[nvars*p+v] += (   dxinv[offset+ghosts+index[d]]*dxinv[offset+ghosts+index[d]] 
+        par[nvars*p+v] += (   dxinv[offset+ghosts+index[d]]*dxinv[offset+ghosts+index[d]]
                             * Deriv2[nvars*p+v] );
       _ArrayIncrementIndex_(ndims,dim,index,done);
     }

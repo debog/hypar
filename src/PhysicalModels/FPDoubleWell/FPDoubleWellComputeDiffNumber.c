@@ -19,8 +19,8 @@ double FPDoubleWellComputeDiffNumber(void *s,void *m,double dt,double t)
   for (d = 0; d < ndims; d++) {
     for (i = 0; i < dim[d]; i++) {
       for (v = 0; v < nvars; v++) {
-        double local_diffno =   0.5 * params->q * dt 
-                              * dxinv[offset+ghosts+i] 
+        double local_diffno =   0.5 * params->q * dt
+                              * dxinv[offset+ghosts+i]
                               * dxinv[offset+ghosts+i];
         if (local_diffno > max_diffno) max_diffno = local_diffno;
       }

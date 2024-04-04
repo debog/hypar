@@ -9,7 +9,7 @@
 #include <mpivars.h>
 #include <hypar.h>
 
-/*! Compute the interpolation coefficients of a nonlinear interpolation method, based on 
+/*! Compute the interpolation coefficients of a nonlinear interpolation method, based on
     the smoothness of the flux function of the solution passed as an argument. This function
     is provided separately so that these coefficients can be pre-computed and stored for
     future use.
@@ -20,8 +20,8 @@
     evaluated. Some scenarios are as follows:
     + For explicit time integration, it will be computed every time the hyperbolic flux term
       is being computed.
-    + For implicit time integration, consistency or linearization  may require that the 
-      coefficients be computed and "frozen" at the beginning of each stage. Thus, this function 
+    + For implicit time integration, consistency or linearization  may require that the
+      coefficients be computed and "frozen" at the beginning of each stage. Thus, this function
       can be called at the beginning of each time integration stage, while HyperbolicFunction()
       is called with the argument \b LimFlag = 0.
 */

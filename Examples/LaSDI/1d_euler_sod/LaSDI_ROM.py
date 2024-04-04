@@ -165,7 +165,7 @@ FOM_err, FOM_time, FOM_totaltime = hyparutils.readHyParErrFile(test_sim_path, nd
 t_arr = np.linspace(0, t_final, int(niter/op_write_iter)+1)
 
 start = time.time()
-FOM_recon = LaSDI_model.generate_ROM( solution_snapshots_FOM[0], 
+FOM_recon = LaSDI_model.generate_ROM( solution_snapshots_FOM[0],
                                       P,
                                       t_arr )
 LaSDI_time = time.time()-start

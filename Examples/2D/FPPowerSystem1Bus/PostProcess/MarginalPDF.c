@@ -1,6 +1,6 @@
 /*
 
-  This code extracts the marginal PDFs from the 2D 
+  This code extracts the marginal PDFs from the 2D
   PDF output and writes them to text files.
   (Note: output file must be binary.)
 
@@ -65,13 +65,13 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
-   			else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,op_overwrite  );
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
+         else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,op_overwrite  );
       }
     }
     fclose(inputs);

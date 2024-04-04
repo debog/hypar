@@ -1,14 +1,14 @@
 #!/bin/bash
 
 #################################################################
-# 
+#
 # Bash script to run a spatial convergence test on a smooth 1D Burgers
 # equation problem - evolution of a sine wave.
 #
 # ** Please copy this script to a new location before using it! **
 # It will create test directories at the location it is run from.
 #
-# The exact solution is available in analytical form for the 
+# The exact solution is available in analytical form for the
 # example being simulated.
 #################################################################
 
@@ -16,7 +16,7 @@ clear
 
 # Please adjust the variables below as needed.
 
-# HyPar location 
+# HyPar location
 hypar_dir="/g/g92/ghosh5/Codes/hypar"
 # HyPar binary name
 hypar_exec="HyPar"
@@ -50,7 +50,7 @@ echo ""
 
 # command to launch MPI jobs (mpiexec, srun, etc.)
 mpicmd="mpiexec"
-# other necessary args for launching MPI jobs, 
+# other necessary args for launching MPI jobs,
 # eg., queue/allocation specifications
 mpiargs=""
 
@@ -114,7 +114,7 @@ echo "equation (1D):"
 echo "Grid sizes varying from $num_pts_coarsest to $MAX_NUM_PTS:"
 echo "Spatial discretization (hyperbolic): ${p_hyp_scheme}"
 echo "Spatial discretization (parabolic): ${p_par_scheme}"
-echo "Time integration: ${p_ts} (${p_tstype})" 
+echo "Time integration: ${p_ts} (${p_tstype})"
 echo "--"
 echo ""
 

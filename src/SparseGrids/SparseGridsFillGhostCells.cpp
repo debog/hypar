@@ -10,7 +10,7 @@
     a global one (not one that is partitioned among MPI ranks). This is not a
     parallel operation (it will execute independently on multiple MPI ranks, if
     called by multiple processes).
-  
+
     For periodicity along any dimension, the ghost cells are filled appropriately
     from the other side of the domain. Otherwise, the interior data is extrapolated
     by a 4th order polynomial (assuming uniform grid spacing).
@@ -37,7 +37,7 @@ void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< gr
     _ArraySetValue_(index, m_ndims, 0);
 
     if (m_is_periodic[d]) {
-      
+
       /* periodic case */
 
       int done = 0;
@@ -46,7 +46,7 @@ void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< gr
         {
           /* low end - face = 1 */
 
-          int p_gpt = 0, 
+          int p_gpt = 0,
               p_int = 0;
 
           int index_gpt[m_ndims];
@@ -65,7 +65,7 @@ void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< gr
         {
           /* high end - face = -1 */
 
-          int p_gpt = 0, 
+          int p_gpt = 0,
               p_int = 0;
 
           int index_gpt[m_ndims];
@@ -94,7 +94,7 @@ void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< gr
         {
           /* low end - face = 1 */
 
-          int p_gpt = 0, 
+          int p_gpt = 0,
               p_int_0 = 0,
               p_int_1 = 0,
               p_int_2 = 0,
@@ -124,12 +124,12 @@ void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< gr
           double c3 = (alpha*(-1.0 + alpha*alpha))/6.0;
 
           for (int v = 0; v < a_nvars; v++) {
-    
+
             a_u[p_gpt*a_nvars+v] =    c0 * a_u[p_int_0*a_nvars+v]
                                     + c1 * a_u[p_int_1*a_nvars+v]
                                     + c2 * a_u[p_int_2*a_nvars+v]
                                     + c3 * a_u[p_int_3*a_nvars+v];
-    
+
           }
 
         }
@@ -137,7 +137,7 @@ void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< gr
         {
           /* high end - face = -1 */
 
-          int p_gpt = 0, 
+          int p_gpt = 0,
               p_int_0 = 0,
               p_int_1 = 0,
               p_int_2 = 0,
@@ -167,12 +167,12 @@ void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< gr
           double c3 = (alpha*(-1.0 + alpha*alpha))/6.0;
 
           for (int v = 0; v < a_nvars; v++) {
-    
+
             a_u[p_gpt*a_nvars+v] =    c0 * a_u[p_int_0*a_nvars+v]
                                     + c1 * a_u[p_int_1*a_nvars+v]
                                     + c2 * a_u[p_int_2*a_nvars+v]
                                     + c3 * a_u[p_int_3*a_nvars+v];
-    
+
           }
 
         }

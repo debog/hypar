@@ -8,7 +8,7 @@
 #include <mpivars.h>
 #include <hypar.h>
 
-/*! Computes the maximum diffusion number over the domain. Note that the 
+/*! Computes the maximum diffusion number over the domain. Note that the
  * diffusion number is computed over the local domain on this processor only.
 */
 double LinearADRComputeDiffNumber( void   *s, /*!< Solver object of type #HyPar */

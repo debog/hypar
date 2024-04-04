@@ -16,7 +16,7 @@
 */
 
 /*! \brief Structure defining a simulation
- * 
+ *
  * This structure contains an object of type #HyPar
  * and an object of type #MPIVariables.
 */
@@ -24,7 +24,7 @@ typedef struct simulation_object {
 
   MPIVariables  mpi;          /*!< MPI-related variables */
   HyPar         solver;       /*!< Solver-related variables */
-  int           is_barebones; /*!< Indicate whether this simulation object 
+  int           is_barebones; /*!< Indicate whether this simulation object
                                    is only a barebones one */
 
 } SimulationObject;

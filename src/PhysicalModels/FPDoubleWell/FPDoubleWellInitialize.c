@@ -19,7 +19,7 @@ int    FPDoubleWellPrintStep         (void*,void*,double);
 int FPDoubleWellInitialize(void *s,void *m)
 {
   HyPar         *solver  = (HyPar*)         s;
-  MPIVariables  *mpi     = (MPIVariables*)  m; 
+  MPIVariables  *mpi     = (MPIVariables*)  m;
   FPDoubleWell  *physics = (FPDoubleWell*)  solver->physics;
   int           ferr     = 0;
   _DECLARE_IERR_;
@@ -47,8 +47,8 @@ int FPDoubleWellInitialize(void *s,void *m)
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
-	      while (strcmp(word, "end")){
-		      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+        while (strcmp(word, "end")){
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "q")) {
             /* read diffusion coefficient */
             ferr = fscanf(in,"%lf",&physics->q);
@@ -60,10 +60,10 @@ int FPDoubleWellInitialize(void *s,void *m)
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
-	    } else {
-    	  fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+      } else {
+        fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
         return(1);
-	    }
+      }
     }
     fclose(in);
   }
@@ -92,7 +92,7 @@ int FPDoubleWellInitialize(void *s,void *m)
   /* Calculate and print the PDF integral of the initial solution */
   IERR FPDoubleWellPostStep(solver->u,solver,mpi,0.0,0);CHECKERR(ierr);
   IERR FPDoubleWellPrintStep(solver,mpi,0.0);           CHECKERR(ierr);
-  
+
   count++;
   return(0);
 }

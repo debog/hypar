@@ -59,15 +59,15 @@ if not os.path.exists(plt_dir_name):
       os.makedirs(plt_dir_name)
 
 if solver_inp_data['op_overwrite'] == 'no':
-  
+
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   op_write_iter = int(solver_inp_data['file_op_iter'][0])
   dt_snapshots = op_write_iter*dt
   n_snapshots = int(niter/op_write_iter) + 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -77,26 +77,26 @@ if solver_inp_data['op_overwrite'] == 'no':
   print('  final time = ', t_final)
   print('  snapshot dt = ', dt_snapshots)
   print('  expected number of snapshots = ', n_snapshots)
-  
+
   '''
   Load simulation data (solution snapshots)
   '''
-  x,solution_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                          nsims, 
-                                                          n_snapshots, 
-                                                          ndims, 
-                                                          nvars, 
+  x,solution_snapshots = hyparutils.getSolutionSnapshots( sim_path,
+                                                          nsims,
+                                                          n_snapshots,
+                                                          ndims,
+                                                          nvars,
                                                           size )
   solution_snapshots = np.float32(solution_snapshots)
   n_snapshots = solution_snapshots.shape[0]
   print('  number of snapshots = ', n_snapshots)
-  
+
   for var in range(nvars):
     for i in range(n_snapshots):
       fig = plt.figure(figsize=figsize)
       ax = plt.axes()
-      ax.set( xlim=(np.min(x), np.max(x)), 
-              ylim=(np.min(solution_snapshots[:,var::nvars]), 
+      ax.set( xlim=(np.min(x), np.max(x)),
+              ylim=(np.min(solution_snapshots[:,var::nvars]),
                     np.max(solution_snapshots[:,var::nvars]) ) )
       for s in range(nsims):
           solution_snapshots_sim = solution_snapshots[s*n_snapshots:(s+1)*n_snapshots]
@@ -113,32 +113,32 @@ else:
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   n_snapshots = 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
   print('  grid size = ', size)
   print('  final time = ', t_final)
   print('  number of snapshots = ', n_snapshots)
-  
+
   '''
   Load simulation data (solution snapshots)
   '''
-  x,solution_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                          nsims, 
-                                                          n_snapshots, 
-                                                          ndims, 
-                                                          nvars, 
+  x,solution_snapshots = hyparutils.getSolutionSnapshots( sim_path,
+                                                          nsims,
+                                                          n_snapshots,
+                                                          ndims,
+                                                          nvars,
                                                           size )
   solution_snapshots = np.float32(solution_snapshots)
-  
+
   for var in range(nvars):
     fig = plt.figure(figsize=figsize)
     ax = plt.axes()
-    ax.set( xlim=(np.min(x), np.max(x)), 
-            ylim=(np.min(solution_snapshots[:,var::nvars]), 
+    ax.set( xlim=(np.min(x), np.max(x)),
+            ylim=(np.min(solution_snapshots[:,var::nvars]),
                   np.max(solution_snapshots[:,var::nvars]) ) )
     for s in range(nsims):
         solution_snapshots_sim = solution_snapshots[s*n_snapshots:(s+1)*n_snapshots]

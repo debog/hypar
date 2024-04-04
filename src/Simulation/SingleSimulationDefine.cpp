@@ -8,7 +8,7 @@
 
 /*! Define the single simulation object */
 int SingleSimulation::define( int a_rank, /*!< MPI rank of this process */
-                              int a_nproc /*!< Total number of MPI ranks */ 
+                              int a_nproc /*!< Total number of MPI ranks */
                             )
 {
   if (m_is_defined) {

@@ -25,10 +25,10 @@ def readHyParInpFile(fname: str):
           begin = True
   except:
     print('File ', fname, ' is absent.')
-        
+
   return input_data
 
-def readHyParErrFile( path: str, 
+def readHyParErrFile( path: str,
                       ndims: int):
 
   fname = path + '/errors.dat'
@@ -52,9 +52,9 @@ Input arguments:
 
 Returns a tuple with the grid x and the solution u.
 '''
-def readOpFile( fname: str, 
-                a_ndims: int, 
-                a_nvars: int, 
+def readOpFile( fname: str,
+                a_ndims: int,
+                a_nvars: int,
                 a_size: np.array):
   with open(fname, "rb") as f_op:
     ndims = np.fromfile(f_op, dtype=np.int32, count=1)[0]
@@ -91,12 +91,12 @@ Input arguments:
 (Optional)
   op_root     : filename root for output files
 '''
-def getSimulationSnapshots( path: str, 
+def getSimulationSnapshots( path: str,
                             nsims: int,
-                            sim_idx: int, 
-                            n_op_files: int, 
-                            ndims: int, 
-                            nvars: int, 
+                            sim_idx: int,
+                            n_op_files: int,
+                            ndims: int,
+                            nvars: int,
                             size: np.ndarray,
                             op_root: str ='op'):
   ndof = nvars * np.prod(size)
@@ -154,11 +154,11 @@ Input arguments:
 NOTE: for nsims > 1, the grid size for each simulation domain
 must be exactly the same!
 '''
-def getSolutionSnapshots( path: str, 
-                          nsims: int, 
-                          n_op_files: int, 
-                          ndims: int, 
-                          nvars: int, 
+def getSolutionSnapshots( path: str,
+                          nsims: int,
+                          n_op_files: int,
+                          ndims: int,
+                          nvars: int,
                           size: np.ndarray,
                           op_root: str ='op' ):
   if nsims > 1:

@@ -17,7 +17,7 @@
     dimensional Euler/Navier-Stokes systems (#Euler2D, #NavierStokes2D, #NavierStokes3D).
     \n\n
     Note: the Dirichlet boundary condition (#_DIRICHLET_) could be used as well for
-    supersonic inflow; however the specified Dirichlet state should be in terms of the 
+    supersonic inflow; however the specified Dirichlet state should be in terms of the
     conserved variables, while the specified supersonic inflow state here is in terms of
     the flow variables.
 */
@@ -47,7 +47,7 @@ int BCSupersonicInflowU(
       int done = 0;
       while (!done) {
         int p1; _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
-        
+
         /* set the ghost point values */
         double rho_gpt, uvel_gpt, vvel_gpt, energy_gpt, pressure_gpt;
         rho_gpt      = boundary->FlowDensity;
@@ -79,7 +79,7 @@ int BCSupersonicInflowU(
       int done = 0;
       while (!done) {
         int p1; _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
-        
+
         /* set the ghost point values */
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
         rho_gpt      = boundary->FlowDensity;
@@ -88,7 +88,7 @@ int BCSupersonicInflowU(
         vvel_gpt     = boundary->FlowVelocity[1];
         wvel_gpt     = boundary->FlowVelocity[2];
         energy_gpt   = inv_gamma_m1*pressure_gpt
-                       + 0.5 * rho_gpt 
+                       + 0.5 * rho_gpt
                        * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt + wvel_gpt*wvel_gpt);
 
         phi[nvars*p1+0] = rho_gpt;

@@ -9,7 +9,7 @@
 #include <sparse_grids_simulation.h>
 
 /*! Interpolate data from one grid to another. Note that along each dimension,
-    the ratio of the number of grid points in the source grid and that in the 
+    the ratio of the number of grid points in the source grid and that in the
     destination grid must be an integer power of 2 (negative or positive).
 */
 void SparseGridsSimulation::interpolate(  SimulationObject* const       a_dst,  /*!< Destination object */
@@ -28,7 +28,7 @@ void SparseGridsSimulation::interpolate(  SimulationObject* const       a_dst,  
   }
 
   double *ug_dst = NULL;
-  interpolate(dim_dst, &ug_dst, a_src); 
+  interpolate(dim_dst, &ug_dst, a_src);
 
   /* partition the destination */
   MPIPartitionArraynDwGhosts( m_ndims,
@@ -38,7 +38,7 @@ void SparseGridsSimulation::interpolate(  SimulationObject* const       a_dst,  
                               a_dst->solver.dim_global,
                               a_dst->solver.dim_local,
                               a_dst->solver.ghosts,
-                              nvars); 
+                              nvars);
 
   if (!m_rank) {
     free(ug_dst);
@@ -47,9 +47,9 @@ void SparseGridsSimulation::interpolate(  SimulationObject* const       a_dst,  
   return;
 }
 
-/*! Interpolate data from one grid to another of a desired resolution. 
-    Note that along each dimension, the ratio of the number of grid points 
-    in the source grid and that in the destination grid must be an integer 
+/*! Interpolate data from one grid to another of a desired resolution.
+    Note that along each dimension, the ratio of the number of grid points
+    in the source grid and that in the destination grid must be an integer
     power of 2 (negative or positive).
 
     The incoming pointer must be NULL. After this function is executed, it

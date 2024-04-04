@@ -15,9 +15,9 @@
 
 /*!
   Create a list of computational points for each simulation
-  domain: This is a list of all the 
+  domain: This is a list of all the
   grid points on which the PDE is solved. Thus, it is the total
-  number of grid points minus the ghost points and blanked out 
+  number of grid points minus the ghost points and blanked out
   points.
 
   Note: this list is local, not global.
@@ -26,13 +26,13 @@ int PetscCreatePointList(void *obj /*!< Object of type #PETScContext */)
 {
   PETScContext* ctxt = (PETScContext*) obj;
   SimulationObject* sim = (SimulationObject*) ctxt->simobj;
-  
+
   int nsims = ctxt->nsims;
   int ndims = sim[0].solver.ndims;
 
   /* count the number of computational points */
-  ctxt->npoints = 0; 
-  ctxt->ndofs = 0; 
+  ctxt->npoints = 0;
+  ctxt->ndofs = 0;
   ctxt->offsets = (int*) calloc(nsims, sizeof(int));
   for (int ns = 0; ns < nsims; ns++) {
     ctxt->npoints += sim[ns].solver.npoints_local;

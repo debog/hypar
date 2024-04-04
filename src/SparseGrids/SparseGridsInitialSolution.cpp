@@ -9,9 +9,9 @@
 extern "C" int VolumeIntegral (double*,double*,void*,void*);
 
 /*! Reads in the initial solution for the full grid, saves it in the full
-    grid object.  Then interpolates (coarsens) the grid coordinates to all 
+    grid object.  Then interpolates (coarsens) the grid coordinates to all
     the sparge grids. The solution is not yet interpolated because boundary
-    information is not yet available. It is done in 
+    information is not yet available. It is done in
     SparseGridsSimulation::InitializationWrapup().
 */
 int SparseGridsSimulation::InitialSolution()
@@ -42,7 +42,7 @@ int SparseGridsSimulation::InitialSolution()
       int offset = 0;
       for (int d = 0; d < m_ndims; d++) {
         for (int i = 0; i < dim_local[d]; i++) {
-          solver->dxinv[i+offset+ghosts] 
+          solver->dxinv[i+offset+ghosts]
             = 2.0 / (   solver->x[i+1+offset+ghosts]
                       - solver->x[i-1+offset+ghosts]  );
         }
@@ -87,5 +87,5 @@ int SparseGridsSimulation::InitialSolution()
 
   }
 
-  return 0; 
+  return 0;
 }

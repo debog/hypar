@@ -164,7 +164,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
 
       while (strcmp(word, "end")) {
 
-	      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+        ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
 
         if (!strcmp(word, "ndims")) {
 
@@ -243,7 +243,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
             }
           }
 
-			  } else if (!strcmp(word, "ghost")) {
+        } else if (!strcmp(word, "ghost")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.ghosts));
 
@@ -271,91 +271,91 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.time_scheme, sim[0].solver.time_scheme);
 
-        }	else if (!strcmp(word, "time_scheme_type" )) {
+        }  else if (!strcmp(word, "time_scheme_type" )) {
 
           ferr = fscanf(in,"%s",sim[0].solver.time_scheme_type);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.time_scheme_type, sim[0].solver.time_scheme_type);
 
-        }	else if (!strcmp(word, "hyp_space_scheme")) {
+        }  else if (!strcmp(word, "hyp_space_scheme")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.spatial_scheme_hyp);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.spatial_scheme_hyp, sim[0].solver.spatial_scheme_hyp);
 
-        }	else if (!strcmp(word, "hyp_flux_split")) {
+        }  else if (!strcmp(word, "hyp_flux_split")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.SplitHyperbolicFlux);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.SplitHyperbolicFlux, sim[0].solver.SplitHyperbolicFlux);
 
-        }	else if (!strcmp(word, "hyp_interp_type")) {
+        }  else if (!strcmp(word, "hyp_interp_type")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.interp_type);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.interp_type, sim[0].solver.interp_type);
 
-        }	else if (!strcmp(word, "par_space_type")) {
+        }  else if (!strcmp(word, "par_space_type")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.spatial_type_par);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.spatial_type_par, sim[0].solver.spatial_type_par);
 
-        }	else if (!strcmp(word, "par_space_scheme")) {
+        }  else if (!strcmp(word, "par_space_scheme")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.spatial_scheme_par);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.spatial_scheme_par, sim[0].solver.spatial_scheme_par);
 
-        }	else if (!strcmp(word, "dt")) {
+        }  else if (!strcmp(word, "dt")) {
 
           ferr = fscanf(in,"%lf",&(sim[0].solver.dt));
 
           int n;
           for (n = 1; n < nsims; n++) sim[n].solver.dt = sim[0].solver.dt;
 
-        }	else if (!strcmp(word, "conservation_check" )) {
+        }  else if (!strcmp(word, "conservation_check" )) {
 
           ferr = fscanf(in,"%s",sim[0].solver.ConservationCheck);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.ConservationCheck, sim[0].solver.ConservationCheck);
 
-        }	else if (!strcmp(word, "screen_op_iter")) {
+        }  else if (!strcmp(word, "screen_op_iter")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.screen_op_iter));
 
           int n;
           for (n = 1; n < nsims; n++) sim[n].solver.screen_op_iter = sim[0].solver.screen_op_iter;
 
-        }	else if (!strcmp(word, "file_op_iter")) {
+        }  else if (!strcmp(word, "file_op_iter")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.file_op_iter));
 
           int n;
           for (n = 1; n < nsims; n++) sim[n].solver.file_op_iter = sim[0].solver.file_op_iter;
 
-        }	else if (!strcmp(word, "op_file_format")) {
+        }  else if (!strcmp(word, "op_file_format")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.op_file_format);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.op_file_format, sim[0].solver.op_file_format);
 
-        }	else if (!strcmp(word, "ip_file_type")) {
+        }  else if (!strcmp(word, "ip_file_type")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.ip_file_type);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.ip_file_type, sim[0].solver.ip_file_type);
 
-        }	else if (!strcmp(word, "input_mode")) {
+        }  else if (!strcmp(word, "input_mode")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.input_mode);
           if (strcmp(sim[0].solver.input_mode,"serial")) ferr = fscanf(in,"%d",&(sim[0].mpi.N_IORanks));
@@ -366,7 +366,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
             if (strcmp(sim[n].solver.input_mode,"serial")) sim[n].mpi.N_IORanks = sim[0].mpi.N_IORanks;
           }
 
- 		  	} else if (!strcmp(word, "output_mode"))  {
+         } else if (!strcmp(word, "output_mode"))  {
 
           ferr = fscanf(in,"%s",sim[0].solver.output_mode);
           if (strcmp(sim[0].solver.output_mode,"serial")) ferr = fscanf(in,"%d",&(sim[0].mpi.N_IORanks));
@@ -391,14 +391,14 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.plot_solution, sim[0].solver.plot_solution);
 
-        }	else if (!strcmp(word, "model")) {
+        }  else if (!strcmp(word, "model")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.model);
 
           int n;
           for (n = 1; n < nsims; n++) strcpy(sim[n].solver.model, sim[0].solver.model);
 
-        }	else if (!strcmp(word, "immersed_body")) {
+        }  else if (!strcmp(word, "immersed_body")) {
 
           ferr = fscanf(in,"%s",sim[0].solver.ib_filename);
 
@@ -434,7 +434,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
 
     } else {
 
- 		  fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
+       fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
       return(1);
 
     }

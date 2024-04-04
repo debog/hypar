@@ -9,7 +9,7 @@
 
 /*!
   Create subcommunicators from MPI_WORLD, where each subcommunicator contains
-  MPI ranks along a spatial dimension. Consider a two-dimensional problem, 
+  MPI ranks along a spatial dimension. Consider a two-dimensional problem,
   partitioned on 21 MPI ranks as follows:
   @image html mpi_ranks.png
   @image latex mpi_ranks.eps width=0.9\textwidth
@@ -26,7 +26,7 @@
   + 5,12,19
   + 6,13,20
 
-  These subcommunicators are useful for parallel computations along 
+  These subcommunicators are useful for parallel computations along
   grid lines. For example, a compact finite-difference scheme solves
   implicit systems along grid lines in every spatial dimension. Thus,
   the subcommunicator may be passed on to the parallel systems solver
@@ -50,7 +50,7 @@ int MPICreateCommunicators(
     ip    = (int*) calloc (ndims-1,sizeof(int));
     iproc = (int*) calloc (ndims-1,sizeof(int));
     for (n=0; n<ndims; n++) {
-      int tick=0; 
+      int tick=0;
       for (i=0; i<ndims; i++) {
         if (i != n) {
           ip[tick]    = mpi->ip[i];
@@ -58,7 +58,7 @@ int MPICreateCommunicators(
           tick++;
         }
       }
-      _ArrayIndex1D_(ndims-1,iproc,ip,0,color); 
+      _ArrayIndex1D_(ndims-1,iproc,ip,0,color);
       key   = mpi->ip[n];
       MPI_Comm_split(mpi->world,color,key,&mpi->comm[n]);
     }

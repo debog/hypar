@@ -10,11 +10,11 @@
 #include <physicalmodels/navierstokes2d.h>
 #include <physicalmodels/navierstokes3d.h>
 
-/*! Applies the no-slip wall boundary conditions: Used to simulate viscous walls. 
-    The density and pressure at the physical boundary ghost points are extrapolated 
-    from the interior, while the velocities are set such that the interpolated 
-    velocity at the boundary face is the specified wall velocity. This boundary 
-    condition is specific to the two and three dimensional Navier-Stokes systems 
+/*! Applies the no-slip wall boundary conditions: Used to simulate viscous walls.
+    The density and pressure at the physical boundary ghost points are extrapolated
+    from the interior, while the velocities are set such that the interpolated
+    velocity at the boundary face is the specified wall velocity. This boundary
+    condition is specific to the two and three dimensional Navier-Stokes systems
     (#NavierStokes2D, #NavierStokes3D).
 */
 int BCNoslipWallU(
@@ -54,7 +54,7 @@ int BCNoslipWallU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         double rho, uvel, vvel, energy, pressure;
         double rho_gpt, uvel_gpt, vvel_gpt, energy_gpt, pressure_gpt;
@@ -96,7 +96,7 @@ int BCNoslipWallU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         double rho, uvel, vvel, wvel, energy, pressure;
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
@@ -108,7 +108,7 @@ int BCNoslipWallU(
         vvel_gpt = 2.0*boundary->FlowVelocity[1] - vvel;
         wvel_gpt = 2.0*boundary->FlowVelocity[2] - wvel;
         energy_gpt = inv_gamma_m1*pressure_gpt
-                    + 0.5 * rho_gpt 
+                    + 0.5 * rho_gpt
                     * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt + wvel_gpt*wvel_gpt);
 
         phi[nvars*p1+0] = rho_gpt;

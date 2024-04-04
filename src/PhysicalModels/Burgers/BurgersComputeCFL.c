@@ -37,7 +37,7 @@ double BurgersComputeCFL( void    *s, /*!< Solver object of type #HyPar */
       for (dir=0; dir<ndims; dir++) {
         double dxinv;
         _GetCoordinate_(dir,index[dir],dim,ghosts,solver->dxinv,dxinv); /* 1/dx */
-        double local_cfl = u[nvars*p+v]*dt*dxinv; 
+        double local_cfl = u[nvars*p+v]*dt*dxinv;
         if (local_cfl > max_cfl) max_cfl = local_cfl;
       }
     }

@@ -18,9 +18,9 @@
 int VlasovWriteSpatialField( void   *s,         /*!< Solver object of type #HyPar */
                              void   *m,         /*!< MPI object of type #MPIVariables */
                              double *a_field,   /*!< Vector field to write */
-                             char   *fname_root /*!< Filename root (extension is added automatically). 
-                                                      For unsteady output, a numerical index is added 
-                                                      that is the same as for the solution 
+                             char   *fname_root /*!< Filename root (extension is added automatically).
+                                                      For unsteady output, a numerical index is added
+                                                      that is the same as for the solution
                                                       output files. */
                             )
 {
@@ -46,7 +46,7 @@ int VlasovWriteSpatialField( void   *s,         /*!< Solver object of type #HyPa
   }
   strcat(filename,".dat");
 
-  int d, 
+  int d,
       ghosts = solver->ghosts,
       ndims_x = param->ndims_x;
 

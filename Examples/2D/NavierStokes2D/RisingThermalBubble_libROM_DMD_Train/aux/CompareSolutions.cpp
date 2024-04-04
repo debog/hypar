@@ -3,10 +3,10 @@
  * solutions that are specified by their filename prefix, i.e.
  * "op_", as the L1, L2, and Linf norm of this difference.
  *
- * The solutions must all be in the binary format. The difference is 
+ * The solutions must all be in the binary format. The difference is
  * written out in the binary format as well.
  *
- * If the size of the two solutions differ, they must differ by an 
+ * If the size of the two solutions differ, they must differ by an
  * integer power of 2 along each dimension.
  * 6th-order central interpolation is used to interpolate the
  * reference solution onto the grid of the solution.
@@ -69,11 +69,11 @@
   }
 
 int ArrayCopynD(int                 ndims,
-                const double* const x,   
-                double* const       y,   
+                const double* const x,
+                double* const       y,
                 const int* const    dim,
-                int                 g1,  
-                int                 g2,  
+                int                 g1,
+                int                 g2,
                 int                 nvars )
 {
   if (!y) {
@@ -89,7 +89,7 @@ int ArrayCopynD(int                 ndims,
   _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p1, p2;
-    _ArrayIndex1D_(ndims,dim,index,g1,p1); 
+    _ArrayIndex1D_(ndims,dim,index,g1,p1);
     _ArrayIndex1D_(ndims,dim,index,g2,p2);
     _ArrayCopy1D_((x+p1*nvars),(y+p2*nvars),nvars);
     _ArrayIncrementIndex_(ndims,dim,index,done);
@@ -98,7 +98,7 @@ int ArrayCopynD(int                 ndims,
 }
 
 double ArrayMaxnD(int    nvars,
-                  int    ndims, 
+                  int    ndims,
                   int    *dim,
                   int    ghosts,
                   int    *index,
@@ -108,7 +108,7 @@ double ArrayMaxnD(int    nvars,
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1D_(ndims,dim,index,ghosts,p);
-    int v; 
+    int v;
     for (v=0; v<nvars; v++) {
       double term = ( x[p*nvars+v]>0 ? x[p*nvars+v] : -x[p*nvars+v] );
       if (term > sum) sum = term;
@@ -169,7 +169,7 @@ void fillGhostCells( const int* const a_dim,
     _ArraySetValue_(index, a_ndims, 0);
 
     if (a_periodic[d]) {
-      
+
       /* periodic case */
 
       int done = 0;
@@ -178,7 +178,7 @@ void fillGhostCells( const int* const a_dim,
         {
           /* low end - face = 1 */
 
-          int p_gpt = 0, 
+          int p_gpt = 0,
               p_int = 0;
 
           int index_gpt[a_ndims];
@@ -197,7 +197,7 @@ void fillGhostCells( const int* const a_dim,
         {
           /* high end - face = -1 */
 
-          int p_gpt = 0, 
+          int p_gpt = 0,
               p_int = 0;
 
           int index_gpt[a_ndims];
@@ -226,7 +226,7 @@ void fillGhostCells( const int* const a_dim,
         {
           /* low end - face = 1 */
 
-          int p_gpt = 0, 
+          int p_gpt = 0,
               p_int_0 = 0,
               p_int_1 = 0,
               p_int_2 = 0,
@@ -256,12 +256,12 @@ void fillGhostCells( const int* const a_dim,
           double c3 = (alpha*(-1.0 + alpha*alpha))/6.0;
 
           for (int v = 0; v < a_nvars; v++) {
-    
+
             a_u[p_gpt*a_nvars+v] =    c0 * a_u[p_int_0*a_nvars+v]
                                     + c1 * a_u[p_int_1*a_nvars+v]
                                     + c2 * a_u[p_int_2*a_nvars+v]
                                     + c3 * a_u[p_int_3*a_nvars+v];
-    
+
           }
 
         }
@@ -269,7 +269,7 @@ void fillGhostCells( const int* const a_dim,
         {
           /* high end - face = -1 */
 
-          int p_gpt = 0, 
+          int p_gpt = 0,
               p_int_0 = 0,
               p_int_1 = 0,
               p_int_2 = 0,
@@ -299,12 +299,12 @@ void fillGhostCells( const int* const a_dim,
           double c3 = (alpha*(-1.0 + alpha*alpha))/6.0;
 
           for (int v = 0; v < a_nvars; v++) {
-    
+
             a_u[p_gpt*a_nvars+v] =    c0 * a_u[p_int_0*a_nvars+v]
                                     + c1 * a_u[p_int_1*a_nvars+v]
                                     + c2 * a_u[p_int_2*a_nvars+v]
                                     + c3 * a_u[p_int_3*a_nvars+v];
-    
+
           }
 
         }
@@ -320,7 +320,7 @@ void fillGhostCells( const int* const a_dim,
   return;
 }
 
-int isPowerOfTwo(int x) 
+int isPowerOfTwo(int x)
 {
   if (x == 0)  return 0;
 
@@ -335,9 +335,9 @@ int coarsen1D( const int* const    a_dim_src,
                const int* const    a_dim_dst,
                const double* const a_u_src,
                double* const       a_u_dst,
-               const int           a_dir,  
+               const int           a_dir,
                const int           a_nvars,
-               const int           a_ngpt, 
+               const int           a_ngpt,
                const int           a_ndims )
 {
   for (int d = 0; d < a_ndims; d++) {
@@ -383,10 +383,10 @@ int coarsen1D( const int* const    a_dim_src,
 //    return 1;
 //  }
 
-  /* create bounds for the transverse loop, i.e., to loop over 
+  /* create bounds for the transverse loop, i.e., to loop over
    * all 1D lines along dimension "a_dir" */
   int bounds_transverse[a_ndims];
-  _ArrayCopy1D_(a_dim_src, bounds_transverse, a_ndims); 
+  _ArrayCopy1D_(a_dim_src, bounds_transverse, a_ndims);
   bounds_transverse[a_dir] =  1;
 
   int index_transverse[a_ndims], done = 0;
@@ -436,10 +436,10 @@ int coarsen1D( const int* const    a_dim_src,
 
       for (int v = 0; v < a_nvars; v++) {
         double val =    c0 * a_u_src[p_m3*a_nvars+v]
-                      + c1 * a_u_src[p_m2*a_nvars+v] 
-                      + c2 * a_u_src[p_m1*a_nvars+v] 
-                      + c3 * a_u_src[p_p1*a_nvars+v] 
-                      + c4 * a_u_src[p_p2*a_nvars+v] 
+                      + c1 * a_u_src[p_m2*a_nvars+v]
+                      + c2 * a_u_src[p_m1*a_nvars+v]
+                      + c3 * a_u_src[p_p1*a_nvars+v]
+                      + c4 * a_u_src[p_p2*a_nvars+v]
                       + c5 * a_u_src[p_p3*a_nvars+v];
         a_u_dst[p*a_nvars+v] = val;
       }
@@ -447,7 +447,7 @@ int coarsen1D( const int* const    a_dim_src,
     }
 
     _ArrayIncrementIndex_(a_ndims, bounds_transverse, index_transverse, done);
-  
+
   }
 
   return 0;
@@ -455,11 +455,11 @@ int coarsen1D( const int* const    a_dim_src,
 
 int refine1D(const int* const     a_dim_src,
              const int* const     a_dim_dst,
-             const double* const  a_u_src,  
-             double* const        a_u_dst,  
-             const int            a_dir,  
+             const double* const  a_u_src,
+             double* const        a_u_dst,
+             const int            a_dir,
              const int            a_nvars,
-             const int            a_ngpt,   
+             const int            a_ngpt,
              const int            a_ndims )
 {
   for (int d = 0; d < a_ndims; d++) {
@@ -486,19 +486,19 @@ int refine1D(const int* const     a_dim_src,
     return 1;
   }
 
-  /* create bounds for the transverse loop, i.e., to loop over 
+  /* create bounds for the transverse loop, i.e., to loop over
    * all 1D lines along dimension "a_dir" */
   int bounds_transverse[a_ndims];
-  _ArrayCopy1D_(a_dim_src, bounds_transverse, a_ndims); 
+  _ArrayCopy1D_(a_dim_src, bounds_transverse, a_ndims);
   bounds_transverse[a_dir] =  1;
 
   int index_transverse[a_ndims], done = 0;
   _ArraySetValue_(index_transverse, a_ndims, 0);
   while (!done) {
 
-    int index_dst [a_ndims], 
-        index_src0[a_ndims], 
-        index_src1[a_ndims], 
+    int index_dst [a_ndims],
+        index_src0[a_ndims],
+        index_src1[a_ndims],
         index_src2[a_ndims],
         index_src3[a_ndims],
         index_src4[a_ndims],
@@ -587,7 +587,7 @@ int refine1D(const int* const     a_dim_src,
     }
 
     _ArrayIncrementIndex_(a_ndims, bounds_transverse, index_transverse, done);
-  
+
   }
 
   return 0;
@@ -598,7 +598,7 @@ int InterpolateGlobalnDVar( const int* const    a_dim_dst,
                             const int* const    a_dim_src,
                             const double* const a_u_src,
                             const int           a_nvars,
-                            const int           a_ndims,  
+                            const int           a_ndims,
                             const int* const    a_periodic )
 {
   static const int ghosts = 3;
@@ -632,8 +632,8 @@ int InterpolateGlobalnDVar( const int* const    a_dim_dst,
 
     if (dim_from[dir] == dim_to[dir]) continue;
 
-    double fac = (dim_to[dir] > dim_from[dir] ? 
-                      (double)dim_to[dir]/(double)dim_from[dir] 
+    double fac = (dim_to[dir] > dim_from[dir] ?
+                      (double)dim_to[dir]/(double)dim_from[dir]
                     : (double)dim_from[dir]/(double)dim_to[dir] );
 
     if (!isPowerOfTwo((int)fac)) {
@@ -654,31 +654,31 @@ int InterpolateGlobalnDVar( const int* const    a_dim_dst,
       u_to = (double*) calloc (size, sizeof(double));
     }
 
-    fillGhostCells( dim_from, 
-                    ghosts, 
-                    u_from, 
-                    a_nvars, 
-                    a_ndims, 
+    fillGhostCells( dim_from,
+                    ghosts,
+                    u_from,
+                    a_nvars,
+                    a_ndims,
                     a_periodic );
 
     if (dim_to[dir] < dim_from[dir]) {
-      int retval = coarsen1D( dim_from, 
-                              dim_to, 
-                              u_from, 
-                              u_to, 
-                              dir, 
-                              a_nvars, 
-                              ghosts, 
+      int retval = coarsen1D( dim_from,
+                              dim_to,
+                              u_from,
+                              u_to,
+                              dir,
+                              a_nvars,
+                              ghosts,
                               a_ndims );
       if (retval) return retval;
     } else {
-      int retval = refine1D(  dim_from, 
-                              dim_to, 
-                              u_from, 
-                              u_to, 
-                              dir, 
-                              a_nvars, 
-                              ghosts, 
+      int retval = refine1D(  dim_from,
+                              dim_to,
+                              u_from,
+                              u_to,
+                              dir,
+                              a_nvars,
+                              ghosts,
                               a_ndims );
       if (retval) return retval;
     }
@@ -689,7 +689,7 @@ int InterpolateGlobalnDVar( const int* const    a_dim_dst,
   for (int d = 0; d < a_ndims; d++) {
     if (dim_to[d] != a_dim_dst[d]) {
       fprintf(stderr,"Error in InterpolateGlobalnDVar() - \n");
-      fprintf(stderr,"  dim_to[%d] (%d) != a_dim_dst[%d] (%d)!\n", 
+      fprintf(stderr,"  dim_to[%d] (%d) != a_dim_dst[%d] (%d)!\n",
               d, dim_to[d], d, a_dim_dst[d]);
       return 1;
     }
@@ -895,8 +895,8 @@ int ComputeDiffNorm(  SolObj* const a_s1,
     a_diff_norm[2] = sum;
   }
 
-  if (    (solution_norm[0] > tolerance) 
-      &&  (solution_norm[1] > tolerance) 
+  if (    (solution_norm[0] > tolerance)
+      &&  (solution_norm[1] > tolerance)
       &&  (solution_norm[2] > tolerance) ) {
     a_diff_norm[0] /= solution_norm[0];
     a_diff_norm[1] /= solution_norm[1];
@@ -1030,16 +1030,16 @@ int main()
     fprintf(stderr,"Error: File \"compare.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if (!strcmp(word, "op_fname_root_1")) {
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if (!strcmp(word, "op_fname_root_1")) {
           fscanf(inputs,"%s" ,op_fname_root_1);
-   			} else if (!strcmp(word, "op_fname_root_2")) {
+         } else if (!strcmp(word, "op_fname_root_2")) {
           fscanf(inputs,"%s" ,op_fname_root_2);
-   			} else if (!strcmp(word, "diff_fname_root")) {
+         } else if (!strcmp(word, "diff_fname_root")) {
           fscanf(inputs,"%s" ,diff_fname_root);
         }
       }
@@ -1049,7 +1049,7 @@ int main()
   printf("Prefix 1: %s\n", op_fname_root_1);
   printf("Prefix 2: %s\n", op_fname_root_2);
   printf("Diff Prefix: %s\n", diff_fname_root);
- 
+
 
   int n_iter, file_op_iter = 1;
   double dt;
@@ -1060,27 +1060,27 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if (!strcmp(word, "op_file_format")) {
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if (!strcmp(word, "op_file_format")) {
           fscanf(inputs,"%s" ,op_file_format);
         } else if (!strcmp(word, "op_overwrite")) {
           fscanf(inputs,"%s" ,overwrite);
-        }	else if (!strcmp(word, "n_iter")) {
+        }  else if (!strcmp(word, "n_iter")) {
           fscanf(inputs,"%d" ,&n_iter);
-        }	else if (!strcmp(word, "file_op_iter")) {
+        }  else if (!strcmp(word, "file_op_iter")) {
           fscanf(inputs,"%d" ,&file_op_iter);
-        }	else if (!strcmp(word, "dt")) {
+        }  else if (!strcmp(word, "dt")) {
           fscanf(inputs,"%f" ,&dt);
         }
       }
     }
     fclose(inputs);
   }
-  
+
   if (strcmp(op_file_format,"binary") && strcmp(op_file_format,"bin")) {
     printf("Error: solution output needs to be in binary files.\n");
     return(0);
@@ -1103,22 +1103,22 @@ int main()
       /* set filename */
       char counter_str[6];
       sprintf(counter_str, "%05d", counter);
-      std::string filename1 = std::string(op_fname_root_1) 
+      std::string filename1 = std::string(op_fname_root_1)
                               + "_"
-                              + std::string(counter_str) 
+                              + std::string(counter_str)
                               + op_fname_extn;
       std::string filename2 = std::string(op_fname_root_2)
                               + "_"
-                              + std::string(counter_str) 
+                              + std::string(counter_str)
                               + op_fname_extn;
       std::string diff_name = std::string(diff_fname_root)
                               + "_"
-                              + std::string(counter_str) 
+                              + std::string(counter_str)
                               + op_fname_extn;
       std::vector<double> diff_norm_arr;
       int err = ComputeDiff(filename1, filename2, diff_name, diff_norm_arr);
       if (err) {
-        printf("No more files with prefix %s,%s found.\n", 
+        printf("No more files with prefix %s,%s found.\n",
                 op_fname_root_1,
                 op_fname_root_2);
         break;
@@ -1141,7 +1141,7 @@ int main()
     std::vector<double> diff_norm_arr;
     int err = ComputeDiff(filename1, filename2, diff_name, diff_norm_arr);
     if (err) {
-      printf("Unable to read one or both of specified files (prefix: %s, %s)\n", 
+      printf("Unable to read one or both of specified files (prefix: %s, %s)\n",
               op_fname_root_1,
               op_fname_root_2);
     }

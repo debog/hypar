@@ -18,8 +18,8 @@ int Euler2DUpwindRoe(double *fI,double *fL,double *fR,double *uL,double *uR,doub
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
-                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
+                L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_],
                 modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}; int index_inter[2];
@@ -53,7 +53,7 @@ int Euler2DUpwindRoe(double *fI,double *fL,double *fR,double *uL,double *uR,doub
       MatMult4(_MODEL_NVARS_,DL,D,L);
       MatMult4(_MODEL_NVARS_,modA,R,DL);
       MatVecMult4(_MODEL_NVARS_,udiss,modA,udiff);
-      
+
       fI[_MODEL_NVARS_*p+0] = 0.5 * (fL[_MODEL_NVARS_*p+0]+fR[_MODEL_NVARS_*p+0]) - udiss[0];
       fI[_MODEL_NVARS_*p+1] = 0.5 * (fL[_MODEL_NVARS_*p+1]+fR[_MODEL_NVARS_*p+1]) - udiss[1];
       fI[_MODEL_NVARS_*p+2] = 0.5 * (fL[_MODEL_NVARS_*p+2]+fR[_MODEL_NVARS_*p+2]) - udiss[2];
@@ -76,7 +76,7 @@ int Euler2DUpwindRF(double *fI,double *fL,double *fR,double *uL,double *uR,doubl
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}, index_inter[2];
@@ -84,7 +84,7 @@ int Euler2DUpwindRF(double *fI,double *fL,double *fR,double *uL,double *uR,doubl
     index_inter[0] = index_outer[0]; index_inter[1] = index_outer[1];
     for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
       int p; _ArrayIndex1D2_(_MODEL_NDIMS_,bounds_inter,index_inter,0,p);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
 
       /* Roe-Fixed upwinding scheme */
@@ -147,7 +147,7 @@ int Euler2DUpwindLLF(double *fI,double *fL,double *fR,double *uL,double *uR,doub
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
   bounds_inter[0] = dim[0]; bounds_inter[1] = dim[1]; bounds_inter[dir]++;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; int index_outer[2] = {0,0}, index_inter[2];
@@ -155,7 +155,7 @@ int Euler2DUpwindLLF(double *fI,double *fL,double *fR,double *uL,double *uR,doub
     index_inter[0] = index_outer[0]; index_inter[1] = index_outer[1];
     for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
       int p; _ArrayIndex1D2_(_MODEL_NDIMS_,bounds_inter,index_inter,0,p);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
 
       /* Local Lax-Friedrich upwinding scheme */
@@ -231,7 +231,7 @@ int Euler2DUpwindSWFS(double *fI,double *fL,double *fR,double *uL,double *uR,dou
       double rho,vx,vy,e,P,c,gamma=param->gamma,term,Mach,lp[_MODEL_NVARS_],lm[_MODEL_NVARS_];
 
       /* Steger Warming flux splitting */
-      _Euler2DRoeAverage_(uavg,(uL+_MODEL_NVARS_*p),(uR+_MODEL_NVARS_*p),param); 
+      _Euler2DRoeAverage_(uavg,(uL+_MODEL_NVARS_*p),(uR+_MODEL_NVARS_*p),param);
       _Euler2DGetFlowVar_(uavg,rho,vx,vy,e,P,param);
       Mach = (dir==_XDIR_ ? vx : vy) / sqrt(gamma*P/rho);
 
@@ -256,8 +256,8 @@ int Euler2DUpwindSWFS(double *fI,double *fL,double *fR,double *uL,double *uR,dou
         fp[0] = term * (2.0*(gamma-1.0)*lp[0] + lp[2] + lp[3]);
         fp[1] = term * (2.0*(gamma-1.0)*lp[0]*vx + lp[2]*(vx+c*kx) + lp[3]*(vx-c*kx));
         fp[2] = term * (2.0*(gamma-1.0)*lp[0]*vy + lp[2]*(vy+c*ky) + lp[3]*(vy-c*ky));
-        fp[3] = term * ((gamma-1.0)*lp[0]*(vx*vx+vy*vy) + 0.5*lp[2]*((vx+c*kx)*(vx+c*kx) + (vy+c*ky)*(vy+c*ky)) 
-                        + 0.5*lp[3]*((vx-c*kx)*(vx-c*kx) + (vy-c*ky)*(vy-c*ky)) 
+        fp[3] = term * ((gamma-1.0)*lp[0]*(vx*vx+vy*vy) + 0.5*lp[2]*((vx+c*kx)*(vx+c*kx) + (vy+c*ky)*(vy+c*ky))
+                        + 0.5*lp[3]*((vx-c*kx)*(vx-c*kx) + (vy-c*ky)*(vy-c*ky))
                         + ((3.0-gamma)*(lp[2]+lp[3])*c*c)/(2.0*(gamma-1.0)) );
 
         _Euler2DGetFlowVar_((uR+_MODEL_NVARS_*p),rho,vx,vy,e,P,param);
@@ -271,8 +271,8 @@ int Euler2DUpwindSWFS(double *fI,double *fL,double *fR,double *uL,double *uR,dou
         fm[0] = term * (2.0*(gamma-1.0)*lm[0] + lm[2] + lm[3]);
         fm[1] = term * (2.0*(gamma-1.0)*lm[0]*vx + lm[2]*(vx+c*kx) + lm[3]*(vx-c*kx));
         fm[2] = term * (2.0*(gamma-1.0)*lm[0]*vy + lm[2]*(vy+c*ky) + lm[3]*(vy-c*ky));
-        fm[3] = term * ((gamma-1.0)*lm[0]*(vx*vx+vy*vy) + 0.5*lm[2]*((vx+c*kx)*(vx+c*kx) + (vy+c*ky)*(vy+c*ky)) 
-                        + 0.5*lm[3]*((vx-c*kx)*(vx-c*kx) + (vy-c*ky)*(vy-c*ky)) 
+        fm[3] = term * ((gamma-1.0)*lm[0]*(vx*vx+vy*vy) + 0.5*lm[2]*((vx+c*kx)*(vx+c*kx) + (vy+c*ky)*(vy+c*ky))
+                        + 0.5*lm[3]*((vx-c*kx)*(vx-c*kx) + (vy-c*ky)*(vy-c*ky))
                         + ((3.0-gamma)*(lm[2]+lm[3])*c*c)/(2.0*(gamma-1.0)) );
 
         _ArrayAdd1D_((fI+_MODEL_NVARS_*p),fp,fm,_MODEL_NVARS_);

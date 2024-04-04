@@ -2,21 +2,21 @@
  * This code extracts a (n-1)-dimensional slice perpendicular
  * to a specified dimension ("dimension being eliminated") at
  * a specified (non-dimensional) position along this dimension
- * from a n-dimensional solution (in binary format) and writes 
+ * from a n-dimensional solution (in binary format) and writes
  * it out to a binary file.
- 
+
   NOTE: if the specified position does not coincide with a grid
   point, a linear interpolation is used.
 
   NOTE: make sure to make a subdirectory called "slices"
   before using it.
 
-  NOTE: the (n-1)D solution files (in binary format) are 
+  NOTE: the (n-1)D solution files (in binary format) are
   also named op.bin or op_xxxxx.bin so that the codes
   hypar/Extras/BinaryToText.c and hypar/Extras/BinaryToTecplot.c
   can be used to convert them to text/tecplot format.
   (A copy of solver.inp needs to be made in the "slices" subdirectory
-  with "ndims" reduced by 1, and the appropriate component of "size" 
+  with "ndims" reduced by 1, and the appropriate component of "size"
   and "iproc" removed such that they have (n-1) components.)
 */
 
@@ -152,7 +152,7 @@ int ExtractSlice(char *f, int slicedim, double slicepos)
   for (d=0; d<ndims; d++) printf("%d ",dims[d]);
   printf("\n");
   printf("Nvars     : %d\n",nvars);
-  
+
   /* allocate grid and solution arrays */
   int sizex = 0;      for (d=0; d<ndims; d++) sizex += dims[d];
   long sizeu = nvars; for (d=0; d<ndims; d++) sizeu *= dims[d];
@@ -240,11 +240,11 @@ int ExtractSlice(char *f, int slicedim, double slicepos)
   /* set filename */
   char slicefilename[100] = "slices/";
   strcat(slicefilename,f);
-  
+
   /* write slice file */
   printf("Writing slice file %s.\n",slicefilename);
   WriteBinary(ndims-1,nvars,sdims,Sx,SU,slicefilename);
-  
+
   /* clean up */
   free(U);
   free(x);
@@ -265,15 +265,15 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "dt"               ))  fscanf(inputs,"%lf",&dt           );
-   			else if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
-   			else if (!strcmp(word, "file_op_iter"     ))  fscanf(inputs,"%d" ,&file_op_iter  );
-   			else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite      );
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "dt"               ))  fscanf(inputs,"%lf",&dt           );
+         else if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
+         else if (!strcmp(word, "file_op_iter"     ))  fscanf(inputs,"%d" ,&file_op_iter  );
+         else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite      );
       }
     }
     fclose(inputs);
@@ -295,10 +295,10 @@ int main()
     strcpy(filename,"op_00000.bin");
     while(1) {
       int flag = ExtractSlice(filename,slicedim,slicepos);
-      if (flag) { 
+      if (flag) {
         printf("No more files found. Exiting.\n");
         break;
-      } 
+      }
       IncrementFilename(filename);
     }
   } else if (!strcmp(overwrite,"yes")) {

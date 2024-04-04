@@ -7,9 +7,9 @@
 #include <immersedboundaries.h>
 
 /*!
-  Identify the "mode", i.e., whether the simulation is a true 3D simulation, 
+  Identify the "mode", i.e., whether the simulation is a true 3D simulation,
   or a 2D simulation being run in 3D. If extent of the immersed body is larger
-  than the grid along a particular axis (say, x), then we assume that the 
+  than the grid along a particular axis (say, x), then we assume that the
   intention is to simulate a 2D case around a 2D body in the plane normal
   to that axis ( y-z plane ).
 
@@ -18,7 +18,7 @@
   sticks out of the computational domain at both ends.
 
   If the immersed body is completely contained within the computational domain, or
-  sticks out only on one end along a particular dimension, we assume it's a 3D 
+  sticks out only on one end along a particular dimension, we assume it's a 3D
   simulation.
 */
 int IBIdentifyMode(

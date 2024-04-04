@@ -9,7 +9,7 @@
 
 /*! Clean up allocations for the GLM-GEE (#_GLM_GEE_) time integration
     method: This function frees the arrays used to store the Butcher
-    tableaux 
+    tableaux
 */
 int TimeGLMGEECleanup(void *s /*!< Object of type #GLMGEEParameters*/)
 {

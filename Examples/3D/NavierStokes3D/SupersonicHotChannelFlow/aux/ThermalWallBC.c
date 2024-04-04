@@ -1,4 +1,4 @@
-/* 
+/*
  * This code generates the temperature field and writes it out
  * in the format that HyPar wants.
  *
@@ -7,7 +7,7 @@
  * For parallel runs, the data is split in this code.
  *
  * NOTE: To compile this file, you need to include hypar/Extras
- * in the include path, i.e., 
+ * in the include path, i.e.,
  *   gcc -I/path/to/hypar/Extras/ ThermalWallBC.c -lm -o <exec_name>
  */
 
@@ -21,7 +21,7 @@
 /*
  * Main function
 */
-int main() 
+int main()
 {
   const double GAMMA = 1.4;
   int ierr, i, j, k;
@@ -72,7 +72,7 @@ int main()
   double  xc = 0.2;
 
   for (i = 0; i < dims_global[0]; i++) {
-    for (j = 0; j < dims_global[1]; j++) { 
+    for (j = 0; j < dims_global[1]; j++) {
       for (k = 0; k < dims_global[2]; k++) {
 
         int p = i + dims_global[0]*j + dims_global[0]*dims_global[1]*k;
@@ -90,7 +90,7 @@ int main()
   ierr = WriteToFile(ndims, T_global, iproc, dims_global, bc_dim, -1, "temperature_ymax_bc.dat", time_levels);
   if (ierr) return(ierr);
 
-  free(T_global);  
+  free(T_global);
   free(x);
   free(y);
   free(z);

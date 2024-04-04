@@ -86,7 +86,7 @@ class SparseGridsSimulation : public Simulation
     inline int ReadInputs()
     {
       int retval = ::ReadInputs(  (void*) m_sim_fg,
-                                  1, 
+                                  1,
                                   m_rank );
       return retval;
     }
@@ -133,7 +133,7 @@ class SparseGridsSimulation : public Simulation
     {
       for (int ns = 0; ns < m_sims_sg.size(); ns++) {
         int retval = ::InitializePhysicsData( (void*) &(m_sims_sg[ns]),
-                                              -1, 
+                                              -1,
                                               m_nsims_sg,
                                               m_sim_fg->solver.dim_global);
         if (retval) {
@@ -177,7 +177,7 @@ class SparseGridsSimulation : public Simulation
 
 #ifndef serial
     /*! Create duplicate MPI communicators */
-    inline int mpiCommDup() 
+    inline int mpiCommDup()
     {
       if (!m_sim_fg) {
         fprintf(stderr, "Error in SparseGridsSimulation::mpiCommDup()\n");
@@ -217,12 +217,12 @@ class SparseGridsSimulation : public Simulation
           m_nproc;        /*!< Total number of MPI ranks */
 
     /*! Order of interpolation between grids (input - \b sparse_grids.inp ) */
-    int   m_interp_order; 
+    int   m_interp_order;
 
     std::vector<bool> m_is_periodic; /*!< Periodicity along each dimension */
 
     /*! Write out the sparse grid solutions to file? (input - \b sparse_grids.inp ) */
-    int m_write_sg_solutions; 
+    int m_write_sg_solutions;
 
     /*! Print and write out the sparse grid errors? (input - \b sparse_grids.inp ) */
     int m_print_sg_errors;
@@ -275,29 +275,29 @@ class SparseGridsSimulation : public Simulation
     void CombinationTechnique(SimulationObject* const);
 
     /*! Interpolate data from one simulation object to another */
-    void interpolate( SimulationObject* const, 
+    void interpolate( SimulationObject* const,
                       const SimulationObject* const);
 
     /*! Interpolate data from a simulation to a global C-array */
     void interpolate( const GridDimensions&,
-                      double** const, 
+                      double** const,
                       const SimulationObject* const);
 
     /*! Interpolate data from one simulation object to another */
-    void interpolateGrid( SimulationObject* const, 
+    void interpolateGrid( SimulationObject* const,
                           const SimulationObject* const);
 
     /*! Coarsen along a given dimension */
     void coarsenGrid1D( const GridDimensions&,
                         const GridDimensions&,
-                        const double* const, 
+                        const double* const,
                         double* const,
                         int );
 
     /*! Refine along a given dimension */
     void refineGrid1D( const GridDimensions&,
                        const GridDimensions&,
-                       const double* const, 
+                       const double* const,
                        double* const,
                        int );
 
@@ -314,7 +314,7 @@ class SparseGridsSimulation : public Simulation
     void computeError( SimulationObject&, double* const);
 
     /*! Checks if an integer is a power of 2 */
-    inline bool isPowerOfTwo(int x) 
+    inline bool isPowerOfTwo(int x)
     {
       if (x == 0)  return false;
 

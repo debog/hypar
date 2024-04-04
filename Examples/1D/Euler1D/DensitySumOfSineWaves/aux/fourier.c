@@ -32,7 +32,7 @@ int main()
 
   FILE   *solution;
   double *u;
-  
+
   u = (double*) calloc (NI, sizeof(double));
   solution = fopen("op_exact.dat","r");
   if (solution) {
@@ -49,7 +49,7 @@ int main()
     fourier_analysis(NI,0,u,0);
   } else printf("Error: exact solution file not found.\n");
   free(u);
-  
+
   u = (double*) calloc (NI, sizeof(double));
   solution = fopen("op.dat","r");
   if (solution) {
@@ -72,51 +72,51 @@ int main()
 
 void fourier_analysis(int N, int G, double *u, int flag)
 {
-	double PI = 4.0*atan(1.0);
-	int i;
-	fftw_complex *in, *out;
-	fftw_plan p;
+  double PI = 4.0*atan(1.0);
+  int i;
+  fftw_complex *in, *out;
+  fftw_plan p;
 
-	in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N));
-	out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N));
-	p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+  in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N));
+  out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N));
+  p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
 
-	for (i = 0; i < N; i++){
-		in[i][0] = u[i+G];
-		in[i][1] = 0;
-	}
+  for (i = 0; i < N; i++){
+    in[i][0] = u[i+G];
+    in[i][1] = 0;
+  }
 
-	fftw_execute(p);
-	for (i = 0; i < N; i++){
-		out[i][0] /= (N);
-		out[i][1] /= (N);
-	}
+  fftw_execute(p);
+  for (i = 0; i < N; i++){
+    out[i][0] /= (N);
+    out[i][1] /= (N);
+  }
 
-	FILE *out_file;
-	if (!flag) out_file = fopen("spectrum_exact.dat","w");
-	else       out_file = fopen("spectrum_final.dat","w");
-	for (i = 1; i < N; i++){
-		double term = 0;
-		double phase = 0;
-		double xx, yy;
-		xx = absolute(out[i][0]);
-		yy = absolute(out[i][1]);
+  FILE *out_file;
+  if (!flag) out_file = fopen("spectrum_exact.dat","w");
+  else       out_file = fopen("spectrum_final.dat","w");
+  for (i = 1; i < N; i++){
+    double term = 0;
+    double phase = 0;
+    double xx, yy;
+    xx = absolute(out[i][0]);
+    yy = absolute(out[i][1]);
 
-		double small = 1e-5;
-		if (xx < small){
-			if (yy < small)	phase = 0;
-			else		phase = PI/2.0;
-		}else{
-			phase = atan2(yy,xx);
-		}
-		
-		term += (out[i][0]*out[i][0]     +  out[i][1]*out[i][1]);
-		term += (out[N-i][0]*out[N-i][0] +  out[N-i][1]*out[N-i][1]);
-		fprintf(out_file,"%5d  %1.16E  %1.16E\n",i,term,phase);
-	}
-	fclose(out_file);
+    double small = 1e-5;
+    if (xx < small){
+      if (yy < small)  phase = 0;
+      else    phase = PI/2.0;
+    }else{
+      phase = atan2(yy,xx);
+    }
 
-	fftw_destroy_plan(p);
-	fftw_free(in);
-	fftw_free(out);
+    term += (out[i][0]*out[i][0]     +  out[i][1]*out[i][1]);
+    term += (out[N-i][0]*out[N-i][0] +  out[N-i][1]*out[N-i][1]);
+    fprintf(out_file,"%5d  %1.16E  %1.16E\n",i,term,phase);
+  }
+  fclose(out_file);
+
+  fftw_destroy_plan(p);
+  fftw_free(in);
+  fftw_free(out);
 }

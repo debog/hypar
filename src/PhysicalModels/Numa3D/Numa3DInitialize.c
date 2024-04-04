@@ -24,7 +24,7 @@ void   Numa3DCalculateStandardAtmosphere_2(void*,double,double*,double*,double*,
 int Numa3DInitialize(void *s,void *m)
 {
   HyPar           *solver  = (HyPar*)         s;
-  MPIVariables    *mpi     = (MPIVariables*)  m; 
+  MPIVariables    *mpi     = (MPIVariables*)  m;
   Numa3D          *physics = (Numa3D*)        solver->physics;
   int             ferr     = 0;
 
@@ -40,7 +40,7 @@ int Numa3DInitialize(void *s,void *m)
   }
 
   /* default values */
-  physics->gamma  = 1.4; 
+  physics->gamma  = 1.4;
   physics->R      = 287.058;        /* J kg^{-1} K^{-1} */
   physics->Omega  = 7.2921150E-05;  /* rad s^{-1}       */
   physics->g      = 9.8;            /* m s^{-2}         */
@@ -63,9 +63,9 @@ int Numa3DInitialize(void *s,void *m)
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
-	      while (strcmp(word, "end")){
-		      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-          if (!strcmp(word, "gamma")) { 
+        while (strcmp(word, "end")){
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          if (!strcmp(word, "gamma")) {
             ferr = fscanf(in,"%lf",&physics->gamma); if (ferr != 1) return(1);
           } else if (!strcmp(word,"R")) {
             ferr = fscanf(in,"%lf",&physics->R); if (ferr != 1) return(1);
@@ -88,10 +88,10 @@ int Numa3DInitialize(void *s,void *m)
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
-	    } else {
-    	  fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+      } else {
+        fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
         return(1);
-	    }
+      }
     }
     fclose(in);
   }
@@ -121,7 +121,7 @@ int Numa3DInitialize(void *s,void *m)
   CHECKERR(ierr);
 
   /* initializing physical model-specific functions */
-  if (!strcmp(solver->SplitHyperbolicFlux,"yes")) 
+  if (!strcmp(solver->SplitHyperbolicFlux,"yes"))
     solver->dFFunction    = Numa3DStiffFlux;
   else solver->dFFunction = NULL;
   solver->FFunction       = Numa3DFlux;
@@ -129,7 +129,7 @@ int Numa3DInitialize(void *s,void *m)
   solver->SFunction       = Numa3DSource;
   if (!strcmp(physics->upwind,_RUSANOV_UPWINDING_)) {
     solver->Upwind        = Numa3DRusanovFlux;
-    if (!strcmp(solver->SplitHyperbolicFlux,"yes")) 
+    if (!strcmp(solver->SplitHyperbolicFlux,"yes"))
       solver->UpwinddF    = Numa3DRusanovLinearFlux;
     else solver->UpwinddF = NULL;
   } else {

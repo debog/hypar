@@ -95,7 +95,7 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
     if (solver->use_gpu) {
 
       if (!strcmp(solver->spatial_type_par,_NC_2STAGE_)) {
-  
+
         solver->ParabolicFunction = ParabolicFunctionNC2Stage;
 
         if (!strcmp(solver->spatial_scheme_par,_FOURTH_ORDER_CENTRAL_)) {
@@ -105,14 +105,14 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
                   ns, solver->spatial_scheme_par);
           return 1;
         }
-  
+
       }
 
     } else {
 #endif
 
       if (!strcmp(solver->spatial_type_par,_NC_1STAGE_)) {
-  
+
         solver->ParabolicFunction = ParabolicFunctionNC1Stage;
         if (!strcmp(solver->spatial_scheme_par,_SECOND_ORDER_CENTRAL_)) {
           solver->SecondDerivativePar      = SecondDerivativeSecondOrderCentral;
@@ -124,9 +124,9 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
           fprintf(stderr,"spatial scheme of type %s for the parabolic terms.\n",
                   solver->spatial_type_par);
         }
-  
+
       } else if (!strcmp(solver->spatial_type_par,_NC_2STAGE_)) {
-  
+
         solver->ParabolicFunction = ParabolicFunctionNC2Stage;
         if (!strcmp(solver->spatial_scheme_par,_SECOND_ORDER_CENTRAL_)) {
           solver->FirstDerivativePar       = FirstDerivativeFirstOrder;
@@ -145,9 +145,9 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
           fprintf(stderr,"spatial scheme of type %s for the parabolic terms.\n",
                 solver->spatial_type_par);
         }
-  
+
       } else if (!strcmp(solver->spatial_type_par,_NC_1_5STAGE_)) {
-  
+
         solver->ParabolicFunction = ParabolicFunctionNC1_5Stage;
         if (!strcmp(solver->spatial_scheme_par,_SECOND_ORDER_CENTRAL_)) {
           solver->FirstDerivativePar       = FirstDerivativeSecondOrderCentral;
@@ -161,9 +161,9 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
           fprintf(stderr,"spatial scheme of type %s for the parabolic terms.\n",
                 solver->spatial_type_par);
         }
-  
+
       } else if (!strcmp(solver->spatial_type_par,_CONS_1STAGE_)) {
-  
+
         solver->ParabolicFunction = ParabolicFunctionCons1Stage;
         if (!strcmp(solver->spatial_scheme_par,_SECOND_ORDER_CENTRAL_)) {
           solver->InterpolateInterfacesPar = Interp2PrimSecondOrder;
@@ -173,14 +173,14 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
           fprintf(stderr,"spatial scheme of type %s for the parabolic terms.\n",
                 solver->spatial_type_par);
         }
-  
+
       } else {
-  
+
         fprintf(stderr,"Error (domain %d): %s is not a supported ",
                 ns, solver->spatial_type_par);
         fprintf(stderr,"spatial discretization type for the parabolic terms.\n");
         return(1);
-  
+
       }
 
 #if defined(HAVE_CUDA)
@@ -204,7 +204,7 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
     if (solver->use_gpu) {
 
       if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_WENO_)) {
-  
+
         /* Fifth order WENO scheme */
         if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
           fprintf(stderr,
@@ -217,7 +217,7 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         solver->interp = (WENOParameters*) calloc(1,sizeof(WENOParameters));
         IERR WENOInitialize(solver,mpi,solver->spatial_scheme_hyp,solver->interp_type); CHECKERR(ierr);
         solver->flag_nonlinearinterp = !(((WENOParameters*)solver->interp)->no_limiting);
-  
+
       } else {
 
         fprintf(stderr,
@@ -230,25 +230,25 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
 #endif
 
       if (!strcmp(solver->spatial_scheme_hyp,_FIRST_ORDER_UPWIND_)) {
-  
+
         /* First order upwind scheme */
         if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
           solver->InterpolateInterfacesHyp = Interp1PrimFirstOrderUpwindChar;
         } else {
           solver->InterpolateInterfacesHyp = Interp1PrimFirstOrderUpwind;
         }
-  
+
       } else if (!strcmp(solver->spatial_scheme_hyp,_SECOND_ORDER_CENTRAL_)) {
-  
+
         /* Second order central scheme */
         if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
           solver->InterpolateInterfacesHyp = Interp1PrimSecondOrderCentralChar;
         } else {
           solver->InterpolateInterfacesHyp = Interp1PrimSecondOrderCentral;
         }
-  
+
       } else if (!strcmp(solver->spatial_scheme_hyp,_SECOND_ORDER_MUSCL_)) {
-  
+
         /* Second order MUSCL scheme */
         if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
           solver->InterpolateInterfacesHyp = Interp1PrimSecondOrderMUSCLChar;
@@ -257,9 +257,9 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         }
         solver->interp = (MUSCLParameters*) calloc(1,sizeof(MUSCLParameters));
         IERR MUSCLInitialize(solver,mpi); CHECKERR(ierr);
-  
+
       } else if (!strcmp(solver->spatial_scheme_hyp,_THIRD_ORDER_MUSCL_)) {
-  
+
         /* Third order MUSCL scheme */
         if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
           solver->InterpolateInterfacesHyp = Interp1PrimThirdOrderMUSCLChar;
@@ -268,27 +268,27 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         }
         solver->interp = (MUSCLParameters*) calloc(1,sizeof(MUSCLParameters));
         IERR MUSCLInitialize(solver,mpi); CHECKERR(ierr);
-  
+
       } else if (!strcmp(solver->spatial_scheme_hyp,_FOURTH_ORDER_CENTRAL_)) {
-  
+
         /* Fourth order central scheme */
         if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
           solver->InterpolateInterfacesHyp = Interp1PrimFourthOrderCentralChar;
         } else {
           solver->InterpolateInterfacesHyp = Interp1PrimFourthOrderCentral;
         }
-  
+
       } else if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_UPWIND_)) {
-  
+
         /* Fifth order upwind scheme */
         if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
           solver->InterpolateInterfacesHyp = Interp1PrimFifthOrderUpwindChar;
         } else {
           solver->InterpolateInterfacesHyp = Interp1PrimFifthOrderUpwind;
         }
-  
+
       } else if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_COMPACT_UPWIND_)) {
-  
+
         /* Fifth order compact upwind scheme */
         if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
           solver->InterpolateInterfacesHyp = Interp1PrimFifthOrderCompactUpwindChar;
@@ -299,9 +299,9 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         IERR CompactSchemeInitialize(solver,mpi,solver->interp_type);
         solver->lusolver = (TridiagLU*) calloc (1,sizeof(TridiagLU));
         IERR tridiagLUInit(solver->lusolver,&mpi->world);CHECKERR(ierr);
-  
+
       } else if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_WENO_)) {
-  
+
         /* Fifth order WENO scheme */
         if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
           solver->InterpolateInterfacesHyp = Interp1PrimFifthOrderWENOChar;
@@ -311,9 +311,9 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         solver->interp = (WENOParameters*) calloc(1,sizeof(WENOParameters));
         IERR WENOInitialize(solver,mpi,solver->spatial_scheme_hyp,solver->interp_type); CHECKERR(ierr);
         solver->flag_nonlinearinterp = !(((WENOParameters*)solver->interp)->no_limiting);
-  
+
       } else if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-  
+
         /* Fifth order CRWENO scheme */
         if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
           solver->InterpolateInterfacesHyp = Interp1PrimFifthOrderCRWENOChar;
@@ -327,9 +327,9 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         IERR CompactSchemeInitialize(solver,mpi,solver->interp_type);
         solver->lusolver = (TridiagLU*) calloc (1,sizeof(TridiagLU));
         IERR tridiagLUInit(solver->lusolver,&mpi->world);CHECKERR(ierr);
-  
+
       } else if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_HCWENO_)) {
-  
+
         /* Fifth order HCWENO scheme */
         if ((solver->nvars > 1) && (!strcmp(solver->interp_type,_CHARACTERISTIC_))) {
           solver->InterpolateInterfacesHyp = Interp1PrimFifthOrderHCWENOChar;
@@ -343,7 +343,7 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         IERR CompactSchemeInitialize(solver,mpi,solver->interp_type);
         solver->lusolver = (TridiagLU*) calloc (1,sizeof(TridiagLU));
         IERR tridiagLUInit(solver->lusolver,&mpi->world);CHECKERR(ierr);
-  
+
       } else {
 
         fprintf(stderr,"Error (domain %d): %s is a not a supported spatial interpolation scheme.\n",

@@ -17,23 +17,23 @@
   by one time step of size #HyPar::dt using the \f$s\f$-stage General Linear Method with
   Global Error Estimation (GLM-GEE), given by
   \f{align}{
-    {\bf U}^{\left(i\right)} &= c_{i0}{\bf u}_n + \sum_{j=1}^{r-1} c_{ij} \tilde{\bf u}_n^j 
+    {\bf U}^{\left(i\right)} &= c_{i0}{\bf u}_n + \sum_{j=1}^{r-1} c_{ij} \tilde{\bf u}_n^j
                                + \Delta t \sum_{j=1}^{i-1} a_{ij} {\bf F}\left({\bf U}^{\left(j\right)}\right), i=1,\cdots,s\\
-    {\bf u}_{n+1} &= d_{00} {\bf u}_n + \sum_{j=1}^{r-1} d_{0j} \tilde{\bf u}_n^j 
+    {\bf u}_{n+1} &= d_{00} {\bf u}_n + \sum_{j=1}^{r-1} d_{0j} \tilde{\bf u}_n^j
                       + \Delta t \sum_{j=1}^s b_{0j} {\bf F}\left({\bf U}^{\left(j\right)}\right), \\
-    \tilde{\bf u}_{n+1}^i &= d_{i0} {\bf u}_n + \sum_{j=1}^{r-1} d_{ij} \tilde{\bf u}_n^j 
+    \tilde{\bf u}_{n+1}^i &= d_{i0} {\bf u}_n + \sum_{j=1}^{r-1} d_{ij} \tilde{\bf u}_n^j
                       + \Delta t \sum_{j=1}^s b_{ij} {\bf F}\left({\bf U}^{\left(j\right)}\right), i=1,\cdots,r-1
   \f}
-  where the superscripts in parentheses represent stages, the subscripts represent the time level, the 
+  where the superscripts in parentheses represent stages, the subscripts represent the time level, the
   superscripts without parentheses represent auxiliary solutions, \f$\Delta t\f$ is the
   time step size #HyPar::dt, \f$\tilde{\bf u}^i, i=1,\cdots,r-1\f$ are the auxiliary solutions,
-  and \f${\bf F}\left({\bf u}\right)\f$ is computed by #TimeIntegration::RHSFunction. The coefficients 
+  and \f${\bf F}\left({\bf u}\right)\f$ is computed by #TimeIntegration::RHSFunction. The coefficients
   defining this methods are:
   + \f$a_{ij}, i=1,\cdots,s, j=1,\cdots,s\f$ (#GLMGEEParameters::A)
   + \f$b_{ij}, i=0,\cdots,r-1, j=1,\cdots,s\f$ (#GLMGEEParameters::B)
   + \f$c_{ij}, i=1,\cdots,s, j=0,\cdots,r-1\f$ (#GLMGEEParameters::C)
   + \f$d_{ij}, i=0,\cdots,r-1, j=0,\cdots,r-1\f$ (#GLMGEEParameters::D)
-  
+
   where \f$s\f$ is the number of stages (#GLMGEEParameters::nstages) and \f$r\f$ is the number of auxiliary solutions
   propagated with the solution (#GLMGEEParameters::r).
 
@@ -53,13 +53,13 @@ int TimeGLMGEE(void *ts /*!< Object of type #TimeIntegration */)
   int    s  = params->nstages;
   int    r  = params->r;
   double dt = TS->dt;
-  double  *A =params->A, 
-          *B =params->B, 
-          *C=params->C, 
-          *D=params->D, 
+  double  *A =params->A,
+          *B =params->B,
+          *C=params->C,
+          *D=params->D,
           *c=params->c,
-          **U = TS->U, 
-          **Udot = TS->Udot, 
+          **U = TS->U,
+          **Udot = TS->Udot,
           **Uaux = &TS->U[r];
 
   /* Calculate stage values */
@@ -75,17 +75,17 @@ int TimeGLMGEE(void *ts /*!< Object of type #TimeIntegration */)
     }
 
     for (i=1;i<r;i++) _ArrayAXPY_(Uaux[i-1], C[j*r+i]   , U[0], TS->u_size_total);
-    for (i=0;i<j;i++) _ArrayAXPY_(Udot[i]  , dt*A[j*s+i], U[0], TS->u_size_total); 
+    for (i=0;i<j;i++) _ArrayAXPY_(Udot[i]  , dt*A[j*s+i], U[0], TS->u_size_total);
 
     for (ns = 0; ns < nsims; ns++) {
-      if (sim[ns].solver.PreStage) { 
+      if (sim[ns].solver.PreStage) {
         fprintf(stderr,"Call to solver->PreStage() commented out in TimeGLMGEE()!\n");
         return 1;
 //        IERR sim[ns].solver.PreStage( stage,
 //                                      (U),
 //                                      &(sim[ns].solver),
 //                                      &(sim[ns].mpi),
-//                                      stagetime ); CHECKERR(ierr); 
+//                                      stagetime ); CHECKERR(ierr);
       }
     }
 
@@ -98,11 +98,11 @@ int TimeGLMGEE(void *ts /*!< Object of type #TimeIntegration */)
     }
 
     for (ns = 0; ns < nsims; ns++) {
-      if (sim[ns].solver.PostStage) { 
+      if (sim[ns].solver.PostStage) {
         IERR sim[ns].solver.PostStage(  (U[j] + TS->u_offsets[ns]),
                                         &(sim[ns].solver),
                                         &(sim[ns].mpi),
-                                        stagetime); CHECKERR(ierr); 
+                                        stagetime); CHECKERR(ierr);
       }
     }
 
@@ -140,7 +140,7 @@ int TimeGLMGEE(void *ts /*!< Object of type #TimeIntegration */)
     }
 
   }
-    
+
   for (ns = 0; ns < nsims; ns++) {
     _ArrayCopy1D_(  (U[0] + TS->u_offsets[ns]),
                     sim[ns].solver.u,

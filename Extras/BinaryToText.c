@@ -9,10 +9,10 @@
  *
  * If this input file doesn't exist, then it will
  * try to find and convert HyPar solution files.
- * For this to happen, it needs to be run at the 
- * same location where the input files for the 
- * simulation exist. It needs to read in stuff from 
- * solver.inp and check the existence of 
+ * For this to happen, it needs to be run at the
+ * same location where the input files for the
+ * simulation exist. It needs to read in stuff from
+ * solver.inp and check the existence of
  * sparse_grids.inp.
 */
 
@@ -256,13 +256,13 @@ int main()
       fprintf(stderr,"Error: File %s not found.\n", input_fname_solver);
       return 1;
     } else {
-  	  char word[100];
+      char word[100];
       fscanf(inputs,"%s",word);
       if (!strcmp(word, "begin")){
-  	    while (strcmp(word, "end")){
-  		    fscanf(inputs,"%s",word);
-     			if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
-     			else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite      );
+        while (strcmp(word, "end")){
+          fscanf(inputs,"%s",word);
+           if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
+           else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite      );
         }
       }
       fclose(inputs);

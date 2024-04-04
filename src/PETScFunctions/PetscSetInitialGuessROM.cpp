@@ -31,10 +31,10 @@ PetscErrorCode PetscSetInitialGuessROM( SNES  snes, /*!< Nonlinear solver object
   } else {
     stage_time += context->dt;
   }
-        
+
   ((libROMInterface*)context->rom_interface)->predict(sim, stage_time);
   if (!context->rank) {
-    printf(  "libROM: Predicted ROM intial guess (time %1.4e), wallclock time: %f.\n", 
+    printf(  "libROM: Predicted ROM intial guess (time %1.4e), wallclock time: %f.\n",
              stage_time, ((libROMInterface*)context->rom_interface)->predictWallclockTime() );
   }
 

@@ -87,7 +87,7 @@ int FPPowerSystem3BusDriftFunction(
   double theta2 = x[1];
   double Omega1 = x[2];
   double Omega2 = x[3];
-  
+
   double omegaB     = params->omegaB;
   double Pm1_avg    = params->Pm1_avg;
   double Pm2_avg    = params->Pm2_avg;
@@ -96,7 +96,7 @@ int FPPowerSystem3BusDriftFunction(
   double H2         = params->H2;
   double Href       = params->Href;
   double gamma      = params->gamma;
-  
+
   double Pe1, Pe2, Peref;
   ComputeElectricalPower(theta1,theta2,params,&Pe1,&Pe2,&Peref);
 
@@ -119,7 +119,7 @@ int FPPowerSystem3BusDissipationFunction(
                                           int     dir2,   /*!< Second spatial dimension for the dissipation coefficient */
                                           void    *p,     /*!< Object of type #FPPowerSystem3Bus */
                                           double  t,      /*!< Current simulation time */
-                                          double  *dissp  /*!< Matrix of size ndims*ndims to hold the dissipation 
+                                          double  *dissp  /*!< Matrix of size ndims*ndims to hold the dissipation
                                                                coefficients (row-major format)*/
                                         )
 {

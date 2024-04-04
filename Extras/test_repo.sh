@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #################################################################
-# 
+#
 # README:
-# 
+#
 # This script tests a given repo and branch of HyPar (edit the variables
 # hypar_repo and hypar_branch below to the ones you want to test) against
 # a set of baselines available as:
@@ -208,7 +208,7 @@ for f in *; do
               echo " "
             else
               ((n_pass+=1))
-              echo "                        **passed**" 
+              echo "                        **passed**"
               echo "                        **passed**" >> $report_file
             fi
           else

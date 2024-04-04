@@ -21,7 +21,7 @@
   is expressed as follows (for the purpose of IMEX time integration):
   \f{eqnarray}{
     \frac {d{\bf U}}{dt} &=& {\bf F}\left({\bf U}\right) + {\bf G}\left({\bf U}\right), \\
-    \Rightarrow \dot{\bf U} - {\bf G}\left({\bf U}\right) &=& {\bf F}\left({\bf U}\right), 
+    \Rightarrow \dot{\bf U} - {\bf G}\left({\bf U}\right) &=& {\bf F}\left({\bf U}\right),
   \f}
   where \f${\bf F}\f$ is non-stiff and integrated in time explicitly, and \f${\bf G}\f$
   is stiff and integrated in time implicitly, and \f${\bf U}\f$ represents the entire
@@ -69,13 +69,13 @@ PetscErrorCode PetscIFunctionIMEX(  TS        ts,     /*!< The time integration 
 
     HyPar* solver = &(sim[ns].solver);
     MPIVariables* mpi = &(sim[ns].mpi);
-  
+
     solver->count_IFunction++;
 
     int size = solver->npoints_local_wghosts;
     double *u = solver->u;
     double *rhs = solver->rhs;
-  
+
     /* copy solution from PETSc vector */
     TransferVecFromPETSc(u,Y,context,ns,context->offsets[ns]);
     /* apply boundary conditions and exchange data over MPI interfaces */
@@ -86,50 +86,50 @@ PetscErrorCode PetscIFunctionIMEX(  TS        ts,     /*!< The time integration 
                               solver->ghosts,
                               mpi,
                               u );
-  
+
     /* initialize right-hand side to zero */
     _ArraySetValue_(rhs,size*solver->nvars,0.0);
-  
+
     /* Evaluate hyperbolic, parabolic and source terms  and the RHS */
     if ((!strcmp(solver->SplitHyperbolicFlux,"yes")) && solver->flag_fdf_specified) {
       if (context->flag_hyperbolic_f == _IMPLICIT_) {
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->FdFFunction,solver->UpwindFdF); 
+        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->FdFFunction,solver->UpwindFdF);
         _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
-      } 
+      }
       if (context->flag_hyperbolic_df == _IMPLICIT_) {
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF); 
+        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF);
         _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
       }
     } else if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
       if (context->flag_hyperbolic_f == _IMPLICIT_) {
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->FFunction,solver->Upwind);  
+        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->FFunction,solver->Upwind);
         _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF); 
+        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF);
         _ArrayAXPY_(solver->hyp, 1.0,rhs,size*solver->nvars);
-      } 
+      }
       if (context->flag_hyperbolic_df == _IMPLICIT_) {
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF); 
+        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF);
         _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
       }
     } else {
       if (context->flag_hyperbolic == _IMPLICIT_) {
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->FFunction,solver->Upwind);  
+        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->FFunction,solver->Upwind);
         _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
       }
     }
     if (context->flag_parabolic == _IMPLICIT_) {
-      solver->ParabolicFunction (solver->par,u,solver,mpi,t);        
+      solver->ParabolicFunction (solver->par,u,solver,mpi,t);
       _ArrayAXPY_(solver->par, 1.0,rhs,size*solver->nvars);
     }
     if (context->flag_source == _IMPLICIT_) {
-      solver->SourceFunction    (solver->source,u,solver,mpi,t);     
+      solver->SourceFunction    (solver->source,u,solver,mpi,t);
       _ArrayAXPY_(solver->source, 1.0,rhs,size*solver->nvars);
     }
-  
+
     /* save a copy of the solution and RHS for use in IJacobian */
     _ArrayCopy1D_(u  ,solver->uref  ,(size*solver->nvars));
     _ArrayCopy1D_(rhs,solver->rhsref,(size*solver->nvars));
-  
+
     /* Transfer RHS to PETSc vector */
     TransferVecToPETSc(rhs,F,context,ns,context->offsets[ns]);
 

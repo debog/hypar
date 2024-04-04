@@ -69,8 +69,8 @@ int WENOInitialize(
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
-	      while (strcmp(word, "end")){
-		      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+        while (strcmp(word, "end")){
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if      (!strcmp(word,"mapped"     )) { ferr = fscanf(in,"%d" ,&weno->mapped     ); if (ferr != 1) return(1); }
           else if (!strcmp(word,"borges"     )) { ferr = fscanf(in,"%d" ,&weno->borges     ); if (ferr != 1) return(1); }
           else if (!strcmp(word,"yc"         )) { ferr = fscanf(in,"%d" ,&weno->yc         ); if (ferr != 1) return(1); }
@@ -87,10 +87,10 @@ int WENOInitialize(
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
-	    } else {
-    	  fprintf(stderr,"Error: Illegal format in file \"weno.inp\".\n");
+      } else {
+        fprintf(stderr,"Error: Illegal format in file \"weno.inp\".\n");
         return(1);
-	    }
+      }
       fclose(in);
     }
   }
@@ -171,10 +171,10 @@ int WENOInitialize(
   double* tmp_w1 = (double*) calloc (4*total_size,sizeof(double));
   double* tmp_w2 = (double*) calloc (4*total_size,sizeof(double));
   double* tmp_w3 = (double*) calloc (4*total_size,sizeof(double));
-  for (d=0; d<ndims; d++) WENOFifthOrderInitializeWeights(  tmp_w1, 
-                                                            tmp_w2, 
-                                                            tmp_w3, 
-                                                            weno->offset, 
+  for (d=0; d<ndims; d++) WENOFifthOrderInitializeWeights(  tmp_w1,
+                                                            tmp_w2,
+                                                            tmp_w3,
+                                                            weno->offset,
                                                             d,
                                                             solver,
                                                             mpi);

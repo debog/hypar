@@ -9,8 +9,8 @@ double absolute(double x)
 }
 
 int main(){
-  
-	int NI,ndims;
+
+  int NI,ndims;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");
 
@@ -36,30 +36,30 @@ int main(){
     printf("ndims is not 1 in solver.inp. this code is to generate 1D initial conditions\n");
     return(0);
   }
-	printf("Grid:\t\t\t%d\n",NI);
+  printf("Grid:\t\t\t%d\n",NI);
 
-	int i;
-	double dx = 4.0 / ((double)NI-1);
+  int i;
+  double dx = 4.0 / ((double)NI-1);
 
-	double *x, *u;
-	x = (double*) calloc (NI, sizeof(double));
-	u = (double*) calloc (NI, sizeof(double));
+  double *x, *u;
+  x = (double*) calloc (NI, sizeof(double));
+  u = (double*) calloc (NI, sizeof(double));
 
-	for (i = 0; i < NI; i++){
-		x[i] = -1.0 + i*dx;
+  for (i = 0; i < NI; i++){
+    x[i] = -1.0 + i*dx;
     if      (x[i] < -0.8)  u[i] = 0.0;
     else if (x[i] < -0.6)  u[i] = exp(-log(2.0)*(x[i]+0.7)*(x[i]+0.7)/0.0009);
     else                   u[i] = 0.0;
-	}
+  }
 
   FILE *out;
 
   if (!strcmp(ip_file_type,"ascii")) {
     printf("Writing ASCII initial solution file initial.inp\n");
-  	out = fopen("initial.inp","w");
+    out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
     fprintf(out,"\n");
-	  for (i = 0; i < NI; i++)	fprintf(out,"%lf ",u[i]);						
+    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);
     fprintf(out,"\n");
     fclose(out);
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
@@ -70,8 +70,8 @@ int main(){
     fclose(out);
   }
 
-	free(x);
-	free(u);
+  free(x);
+  free(u);
 
-	return(0);
+  return(0);
 }

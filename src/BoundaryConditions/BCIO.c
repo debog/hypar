@@ -11,7 +11,7 @@
 #include <mpivars.h>
 
 /*! Read in the turbulent inflow data: The turbulent inflow data needs to be provided
-    as a binary file. For parallel runs, only rank 0 reads the file, and then 
+    as a binary file. For parallel runs, only rank 0 reads the file, and then
     distributes the data to the other processors.
     \n\n
     This function needs to be better documented.
@@ -25,7 +25,7 @@ int BCReadTurbulentInflowData(void *b,void *m,int ndims,int nvars,int *DomainSiz
   int     *inflow_size  = NULL;
   double  *inflow_data  = NULL;
   double  *buffer       = NULL;
-  
+
   int dim = boundary->dim;
   int face= boundary->face;
   int d;
@@ -131,7 +131,7 @@ int BCReadTurbulentInflowData(void *b,void *m,int ndims,int nvars,int *DomainSiz
     fprintf(stderr,"Error in BCReadTurbulentInflowData(): Serial code should not be here!.\n");
 #endif
   }
-  
+
   boundary->UnsteadyDirichletSize = inflow_size;
   boundary->UnsteadyDirichletData = inflow_data;
 
@@ -139,7 +139,7 @@ int BCReadTurbulentInflowData(void *b,void *m,int ndims,int nvars,int *DomainSiz
 }
 
 /*! Read in the temperature data: The temperature data needs to be provided
-    as a binary file. For parallel runs, only rank 0 reads the file, and then 
+    as a binary file. For parallel runs, only rank 0 reads the file, and then
     distributes the data to the other processors.
     \n\n
     This function needs to be better documented.
@@ -155,7 +155,7 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
   double  *temperature_field_data  = NULL;
   double  *time_buffer = NULL;
   double  *data_buffer = NULL;
-  
+
   int dim = boundary->dim;
   int face= boundary->face;
   int d;
@@ -291,7 +291,7 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
 #endif
 
   }
-  
+
   boundary->UnsteadyTemperatureSize = temperature_field_size;
   boundary->UnsteadyTimeLevels      = time_level_data;
   boundary->UnsteadyTemperatureData = temperature_field_data;

@@ -19,7 +19,7 @@
 
 /*! Calculates the L1, L2, & Linf norms of the diff between the PDE
  * solution and the predicted solution by libROM.
- * error in the solution if the exact solution is 
+ * error in the solution if the exact solution is
 */
 int CalculateROMDiff( void *s, /*!< Solver object of type #HyPar */
                       void *m  /*!< MPI object of type #MPIVariables */ )
@@ -98,10 +98,10 @@ int CalculateROMDiff( void *s, /*!< Solver object of type #HyPar */
   global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
   solver->rom_diff_norms[2] = global_sum;
 
-  /* decide whether to normalize and report relative diff norms, 
+  /* decide whether to normalize and report relative diff norms,
     or report absolute diff norms. */
-  if (    (solution_norm[0] > tolerance) 
-      &&  (solution_norm[1] > tolerance) 
+  if (    (solution_norm[0] > tolerance)
+      &&  (solution_norm[1] > tolerance)
       &&  (solution_norm[2] > tolerance) ) {
     solver->rom_diff_norms[0] /= solution_norm[0];
     solver->rom_diff_norms[1] /= solution_norm[1];

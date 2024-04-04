@@ -9,7 +9,7 @@ void GetStringFromInteger(int a, char *A, int width)
 {
   int i;
   for (i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0'); 
+    char digit = (char) (a%10 + '0');
     a /= 10;
     A[width-1-i] = digit;
   }
@@ -22,11 +22,11 @@ int main()
 
   const double pi = 4.0*atan(1.0);
 
-	int *NI, ns, ndims, nsims, niter;
+  int *NI, ns, ndims, nsims, niter;
   char ip_file_type[50];
   double adv, dt;
   FILE *in;
-  
+
   /* default values */
   nsims = 1;
   strcpy(ip_file_type,"ascii");
@@ -125,26 +125,26 @@ int main()
     }
     strcat(fname, ".inp");
 
-  	int i;
-  	double dx = 1.0 / ((double)N);
-  
-  	double *x, *u;
-  	x = (double*) calloc (N, sizeof(double));
-  	u = (double*) calloc (N, sizeof(double));
-  
-  	for (i = 0; i < N; i++){
-  		x[i] = i*dx;
-  		u[i] = sin(2*pi*x[i]);
-  	}
-  
+    int i;
+    double dx = 1.0 / ((double)N);
+
+    double *x, *u;
+    x = (double*) calloc (N, sizeof(double));
+    u = (double*) calloc (N, sizeof(double));
+
+    for (i = 0; i < N; i++){
+      x[i] = i*dx;
+      u[i] = sin(2*pi*x[i]);
+    }
+
     FILE *out;
-  
+
     if (!strcmp(ip_file_type,"ascii")) {
       printf("Writing ASCII initial solution file %s\n", fname);
-    	out = fopen(fname,"w");
+      out = fopen(fname,"w");
       for (i = 0; i < N; i++)  fprintf(out,"%lf ",x[i]);
       fprintf(out,"\n");
-  	  for (i = 0; i < N; i++)	fprintf(out,"%lf ",u[i]);						
+      for (i = 0; i < N; i++)  fprintf(out,"%lf ",u[i]);
       fprintf(out,"\n");
       fclose(out);
     } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
@@ -155,8 +155,8 @@ int main()
       fclose(out);
     }
 
-  	free(x);
-  	free(u);
+    free(x);
+    free(u);
   }
 
   for (ns = 0; ns < nsims; ns++) {
@@ -172,26 +172,26 @@ int main()
     }
     strcat(fname, ".inp");
 
-  	int i;
-  	double dx = 1.0 / ((double)N);
-  
-  	double *x, *u;
-  	x = (double*) calloc (N, sizeof(double));
-  	u = (double*) calloc (N, sizeof(double));
-  
-  	for (i = 0; i < N; i++){
-  		x[i] = i*dx;
-  		u[i] = sin(2*pi*(x[i]-adv*tf));
-  	}
-  
+    int i;
+    double dx = 1.0 / ((double)N);
+
+    double *x, *u;
+    x = (double*) calloc (N, sizeof(double));
+    u = (double*) calloc (N, sizeof(double));
+
+    for (i = 0; i < N; i++){
+      x[i] = i*dx;
+      u[i] = sin(2*pi*(x[i]-adv*tf));
+    }
+
     FILE *out;
-  
+
     if (!strcmp(ip_file_type,"ascii")) {
       printf("Writing ASCII exact solution file %s\n", fname);
-    	out = fopen(fname,"w");
+      out = fopen(fname,"w");
       for (i = 0; i < N; i++)  fprintf(out,"%lf ",x[i]);
       fprintf(out,"\n");
-  	  for (i = 0; i < N; i++)	fprintf(out,"%lf ",u[i]);						
+      for (i = 0; i < N; i++)  fprintf(out,"%lf ",u[i]);
       fprintf(out,"\n");
       fclose(out);
     } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
@@ -202,11 +202,11 @@ int main()
       fclose(out);
     }
 
-  	free(x);
-  	free(u);
+    free(x);
+    free(u);
   }
 
   free(NI);
 
-	return(0);
+  return(0);
 }

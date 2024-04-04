@@ -5,10 +5,10 @@
 
 #include <sparse_grids_simulation.h>
 
-/*! Define the sparse grids simulation object - here, only the 
-    full grid simulation object #SparseGridsSimulation::m_sim_fg 
-    is created. 
-  
+/*! Define the sparse grids simulation object - here, only the
+    full grid simulation object #SparseGridsSimulation::m_sim_fg
+    is created.
+
     This function also reads sparse grids inputs from the file
     \b sparse_grids.inp. Rank 0 reads in the inputs and broadcasts
     them to all the processors.\n\n
@@ -28,10 +28,10 @@
     interp_order       | int          | #SparseGridsSimulation::m_interp_order        | 6
     write_sg_solution  | char[]       | #SparseGridsSimulation::m_write_sg_solutions  | "no" (0)
     write_sg_errors    | char[]       | #SparseGridsSimulation::m_print_sg_errors     | "no" (0)
-   
+
 */
 int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
-                                    int a_nproc /*!< Total number of MPI ranks */ 
+                                    int a_nproc /*!< Total number of MPI ranks */
                                  )
 {
   m_rank = a_rank;
@@ -70,7 +70,7 @@ int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
 
         while (std::string(word) != "end") {
 
-  	      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
 
           if (std::string(word) == "log2_imin") {
 

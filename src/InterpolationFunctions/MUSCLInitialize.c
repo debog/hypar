@@ -12,7 +12,7 @@
 #include <hypar.h>
 
 /*!
-    Initialize the 2nd or 3rd order MUSCL scheme. 
+    Initialize the 2nd or 3rd order MUSCL scheme.
 */
 int MUSCLInitialize(
                       void *s,  /*!< Solver object of type #HyPar */
@@ -37,8 +37,8 @@ int MUSCLInitialize(
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
-	      while (strcmp(word, "end")){
-		      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+        while (strcmp(word, "end")){
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if      (!strcmp(word,"epsilon")) { ferr = fscanf(in,"%lf",&muscl->eps);         if (ferr != 1) return(1); }
           else if (!strcmp(word,"limiter")) { ferr = fscanf(in,"%s" ,muscl->limiter_type); if (ferr != 1) return(1); }
           else if (strcmp(word,"end")) {
@@ -48,10 +48,10 @@ int MUSCLInitialize(
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
-	    } else {
-    	  fprintf(stderr,"Error: Illegal format in file \"muscl.inp\".\n");
+      } else {
+        fprintf(stderr,"Error: Illegal format in file \"muscl.inp\".\n");
         return(1);
-	    }
+      }
       fclose(in);
     }
   }
@@ -69,11 +69,11 @@ int MUSCLInitialize(
     muscl->LimiterFunction = LimiterSuperBee;
   } else {
     if (!mpi->rank) {
-      fprintf(stderr, "Warning: %s is an invalid limiter type. Using default (Generalized MinMod).\n", 
+      fprintf(stderr, "Warning: %s is an invalid limiter type. Using default (Generalized MinMod).\n",
               muscl->limiter_type);
     }
     muscl->LimiterFunction = LimiterGeneralizedMinMod;
   }
-  
+
   return(0);
 }

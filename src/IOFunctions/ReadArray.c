@@ -17,7 +17,7 @@ static int ReadArrayParallel  (int,int,int*,int*,int,void*,void*,double*,double*
 static int ReadArrayMPI_IO    (int,int,int*,int*,int,void*,void*,double*,double*,char*,int*);
 #endif
 
-/*! Read in a vector field from file: wrapper function that calls 
+/*! Read in a vector field from file: wrapper function that calls
     the appropriate function depending on input mode (#HyPar::input_mode).\n\n
     The mode and type of input are specified through #HyPar::input_mode and
     #HyPar::ip_file_type. A vector field is read from file and stored in an array.
@@ -81,7 +81,7 @@ int ReadArray(
         /* fill right boundary along this dimension */
         for (i = dim[d]+ghosts; i < dim[d]+2*ghosts; i++) {
           int delta = i - (dim[d]+ghosts-1);
-          X[i] =  X[dim[d]+ghosts-1] 
+          X[i] =  X[dim[d]+ghosts-1]
                   + ((double) delta) * (X[dim[d]+ghosts-1]-X[dim[d]+ghosts-2]);
         }
       }
@@ -293,13 +293,13 @@ int ReadArraySerial(
 #ifndef serial
 
 /*! Read in a vector field in a parallel fashion: The number of MPI ranks participating in file I/O
-    is specified as an input (#MPIVariables::N_IORanks). All the MPI ranks are divided into that many 
-    I/O groups, with one rank in each group as the "leader" that does the file reading and writing. 
-    For reading in the solution, the leader of an I/O group reads its own file and distributes the 
-    solution to the processors in its group. The number of I/O group is typically specified as the 
-    number of I/O nodes available on the HPC platform, given the number of compute nodes the code is 
-    running on. This is a good balance between all the processors serially reading from the same file, 
-    and having as many files (with the local solution) as the number of processors. This approach has 
+    is specified as an input (#MPIVariables::N_IORanks). All the MPI ranks are divided into that many
+    I/O groups, with one rank in each group as the "leader" that does the file reading and writing.
+    For reading in the solution, the leader of an I/O group reads its own file and distributes the
+    solution to the processors in its group. The number of I/O group is typically specified as the
+    number of I/O nodes available on the HPC platform, given the number of compute nodes the code is
+    running on. This is a good balance between all the processors serially reading from the same file,
+    and having as many files (with the local solution) as the number of processors. This approach has
     been observed to be very scalable (up to ~ 100,000 - 1,000,000 processors).
     \n
     + Supports only binary format.
@@ -320,7 +320,7 @@ int ReadArraySerial(
      x0, x1, ..., x{ndims-1} represent the spatial dimensions (for a 3D problem, x0 = x, x1 = y, x2 = z),\n
      u0, u1, ..., u{nvars-1} are each component of the vector u at a grid point,\n
      N = dim_local[0]*dim_local[1]*...*dim_local[ndims-1] is the total number of points,\n
-     and p = i0 + dim_local[0]*( i1 + dim_local[1]*( i2 + dim_local[2]*( ... + dim_global[ndims-2]*i{ndims-1} ))) 
+     and p = i0 + dim_local[0]*( i1 + dim_local[1]*( i2 + dim_local[2]*( ... + dim_global[ndims-2]*i{ndims-1} )))
      (see #_ArrayIndexnD_)\n
      with i0, i1, i2, etc representing grid indices along each spatial dimension, i.e.,\n
      0 <= i0 < dim_local[0]-1\n
@@ -330,7 +330,7 @@ int ReadArraySerial(
    }\n
    for each rank in the IO group corresponding to the file being read.
    + The above block represents the local grid and vector field for each rank
-   + Each file should contain as many such blocks of data as there are members in the 
+   + Each file should contain as many such blocks of data as there are members in the
      corresponding IO group.
    + The ranks that belong to a particular IO group are given as p, where
      #MPIVariables::GroupStartRank <= p < #MPIVariables::GroupEndRank
@@ -460,9 +460,9 @@ int ReadArrayParallel(
 
     /* copy the solution */
     int index[ndims];
-    IERR ArrayCopynD(ndims,(buffer+sizex),u,dim_local,0,ghosts,index,nvars); 
+    IERR ArrayCopynD(ndims,(buffer+sizex),u,dim_local,0,ghosts,index,nvars);
     CHECKERR(ierr);
-  
+
     /* free buffers */
     free(buffer);
   }
@@ -472,14 +472,14 @@ int ReadArrayParallel(
 }
 
 /*! Read in an array in a parallel fashion using MPI-IO: Similar to ReadArrayParallel(),
-    except that the I/O leaders read from the same file using the MPI I/O routines, by 
+    except that the I/O leaders read from the same file using the MPI I/O routines, by
     calculating their respective offsets and reading the correct chunk of data from that
-    offset. The MPI-IO functions (part of MPICH) are constantly being developed to be 
+    offset. The MPI-IO functions (part of MPICH) are constantly being developed to be
     scalable on the latest and greatest HPC platforms.
     \n
     + Supports only binary format.
 
-   There should be as one file named as <fname_root>_mpi.inp. It should contain the 
+   There should be as one file named as <fname_root>_mpi.inp. It should contain the
    following data:
    \n
    {\n
@@ -576,7 +576,7 @@ int ReadArrayMPI_IO(
         size = nvars; for (d=0; d<ndims; d++) size *= (ie[d]-is[d]);
         offset += size;
       }
-    
+
       /* open the file */
       MPI_Status  status;
       MPI_File    in;
@@ -637,7 +637,7 @@ int ReadArrayMPI_IO(
 
     /* copy the solution */
     int index[ndims];
-    IERR ArrayCopynD(ndims,(buffer+sizex),u,dim_local,0,ghosts,index,nvars); 
+    IERR ArrayCopynD(ndims,(buffer+sizex),u,dim_local,0,ghosts,index,nvars);
     CHECKERR(ierr);
 
     /* free buffers */

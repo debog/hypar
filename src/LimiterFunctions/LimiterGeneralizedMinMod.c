@@ -9,11 +9,11 @@
 /*! Generalized MinMod limiter
 
     Reference:
-    + Van Leer, B. (1979), "Towards the ultimate conservative difference scheme V. 
+    + Van Leer, B. (1979), "Towards the ultimate conservative difference scheme V.
       A second order sequel to Godunov's method", J. Comput. Phys., 32: 101–136,
       doi:10.1016/0021-9991(79)90145-1
 */
-double LimiterGeneralizedMinMod ( 
+double LimiterGeneralizedMinMod (
                                   double r /*!< Input slope ratio */
                                 )
 {

@@ -102,7 +102,7 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
 
     } else {
 
-      fprintf(stderr,"ERROR in TimeInitialize(): %s is not yet implemented on GPUs.\n", 
+      fprintf(stderr,"ERROR in TimeInitialize(): %s is not yet implemented on GPUs.\n",
               sim[0].solver.time_scheme );
       return 1;
 
@@ -112,7 +112,7 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
 #endif
 
     if (!strcmp(sim[0].solver.time_scheme,_RK_)) {
-  
+
       /* explicit Runge-Kutta methods */
       ExplicitRKParameters  *params = (ExplicitRKParameters*)  sim[0].solver.msti;
       int nstages = params->nstages;
@@ -122,22 +122,22 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
         TS->U[i]    = (double*) calloc (TS->u_size_total,sizeof(double));
         TS->Udot[i] = (double*) calloc (TS->u_size_total,sizeof(double));
       }
-  
+
       TS->BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
       for (i=0; i<nstages; i++) {
         TS->BoundaryFlux[i] = (double*) calloc (TS->bf_size_total,sizeof(double));
       }
-  
+
     } else if (!strcmp(sim[0].solver.time_scheme,_FORWARD_EULER_)) {
-  
+
       int nstages = 1;
       TS->BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
       for (i=0; i<nstages; i++) {
         TS->BoundaryFlux[i] = (double*) calloc (TS->bf_size_total,sizeof(double));
       }
-  
+
     } else if (!strcmp(sim[0].solver.time_scheme,_GLM_GEE_)) {
-  
+
       /* General Linear Methods with Global Error Estimate */
       GLMGEEParameters *params = (GLMGEEParameters*) sim[0].solver.msti;
       int nstages = params->nstages;
@@ -146,13 +146,13 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
       TS->Udot  = (double**) calloc (nstages,sizeof(double*));
       for (i=0; i<2*r-1; i++)   TS->U[i]    = (double*) calloc (TS->u_size_total,sizeof(double));
       for (i=0; i<nstages; i++) TS->Udot[i] = (double*) calloc (TS->u_size_total,sizeof(double));
-  
+
       TS->BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
       for (i=0; i<nstages; i++) {
         TS->BoundaryFlux[i] = (double*) calloc (TS->bf_size_total,sizeof(double));
       }
-  
-  
+
+
       if (!strcmp(params->ee_mode,_GLM_GEE_YYT_)) {
         for (ns = 0; ns < nsims; ns++) {
           for (i=0; i<r-1; i++) {

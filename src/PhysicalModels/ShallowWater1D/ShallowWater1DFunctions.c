@@ -7,10 +7,10 @@
 #include <basic.h>
 #include <physicalmodels/shallowwater1d.h>
 
-/*! Compute the Roe-averaged state for the 1D shallow water equations. This function 
-    just calls the macro #_ShallowWater1DRoeAverage_ and is not used by any 
-    functions within the 1D shallow water module. However, it's necessary to define it 
-    and provide it to the the solver object (#HyPar) so that it can then send it 
+/*! Compute the Roe-averaged state for the 1D shallow water equations. This function
+    just calls the macro #_ShallowWater1DRoeAverage_ and is not used by any
+    functions within the 1D shallow water module. However, it's necessary to define it
+    and provide it to the the solver object (#HyPar) so that it can then send it
     to interpolation functions for a characteristic-based reconstruction.
 */
 int ShallowWater1DRoeAverage(

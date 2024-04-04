@@ -16,7 +16,7 @@
 #undef __FUNCT__
 #define __FUNCT__ "TransferVecToPETSc"
 
-/*! Copy data to a PETSc vector (used by PETSc time integrators, and with no 
+/*! Copy data to a PETSc vector (used by PETSc time integrators, and with no
     ghost points) from a HyPar::u array (with ghost points).
 
     \sa TransferVecFromPETSc()
@@ -69,7 +69,7 @@ int TransferMatToPETSc( void *J,    /*!< Matrix of type #BandedMatrix */
         }
       }
     }
-    MatSetValuesBlocked(A,1,&M->nrow[i],M->nbands,&colind[0],&val[0][0],INSERT_VALUES); 
+    MatSetValuesBlocked(A,1,&M->nrow[i],M->nbands,&colind[0],&val[0][0],INSERT_VALUES);
   }
 
   MatAssemblyBegin(A,MAT_FINAL_ASSEMBLY);

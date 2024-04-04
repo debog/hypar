@@ -19,13 +19,13 @@
 
   For the partitioning of the flux into its stiff (acoustic) and non-stiff (convective)
   components, refer to:
-  + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows 
-    with Characteristic-Based Flux Partitioning, SIAM Journal on Scientific Computing, 
+  + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
+    with Characteristic-Based Flux Partitioning, SIAM Journal on Scientific Computing,
     38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369
 
   For the treatment of gravitational source terms, refer to:
-  + Xing, Y., Shu, C.-W., "High Order Well-Balanced WENO Scheme for the Gas Dynamics 
-    Equations Under Gravitational Fields", Journal of Scientific Computing, 54, 2013, 
+  + Xing, Y., Shu, C.-W., "High Order Well-Balanced WENO Scheme for the Gas Dynamics
+    Equations Under Gravitational Fields", Journal of Scientific Computing, 54, 2013,
     pp. 645-662. http://dx.doi.org/10.1007/s10915-012-9585-8
 */
 /*
@@ -44,7 +44,7 @@
 #include <math.h>
 #include <matops.h>
 
-/*! \def _EULER_1D_ 
+/*! \def _EULER_1D_
     1D Euler equations
 */
 #define _EULER_1D_  "euler1d"
@@ -100,7 +100,7 @@
 
 /*! \def _Euler1DSetStiffFlux_
     Set the stiff flux vector given the flow variables (density,
-    velocity, pressure). The stiff flux vector is defines as the 
+    velocity, pressure). The stiff flux vector is defines as the
     part of the total flux that represents the two acoustic waves.
     This is used in a characteristic-based split-flux method for
     implicit-explicit time-integration. The stiff flux is integrated
@@ -108,8 +108,8 @@
     \sa #_Euler1DSetStiffJac_, #_Euler1DSetLinearizedStiffFlux_
 
     Reference:
-    + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows 
-      with Characteristic-Based Flux Partitioning, SIAM Journal on Scientific Computing, 
+    + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
+      with Characteristic-Based Flux Partitioning, SIAM Journal on Scientific Computing,
       38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369
 */
 #define _Euler1DSetStiffFlux_(f,rho,v,e,P,gamma) \
@@ -127,8 +127,8 @@
     \sa #_Euler1DSetStiffJac_
 
     Reference:
-    + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows 
-      with Characteristic-Based Flux Partitioning, SIAM Journal on Scientific Computing, 
+    + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
+      with Characteristic-Based Flux Partitioning, SIAM Journal on Scientific Computing,
       38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369
 */
 #define _Euler1DSetLinearizedStiffFlux_(f,u,J) \
@@ -142,8 +142,8 @@
     the row-major format.
 
     Reference:
-    + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows 
-      with Characteristic-Based Flux Partitioning, SIAM Journal on Scientific Computing, 
+    + Ghosh, D., Constantinescu, E. M., Semi-Implicit Time Integration of Atmospheric Flows
+      with Characteristic-Based Flux Partitioning, SIAM Journal on Scientific Computing,
       38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369
 */
 #define _Euler1DSetStiffJac_(J,rho,v,e,P,gamma) \
@@ -201,7 +201,7 @@
 /*! \def _Euler1DEigenvalues_
     Compute the eigenvalues, given the conserved solution vector. The
     eigenvalues are returned as a 3x3 matrix stored in row-major format.
-    It is a diagonal matrix with the eigenvalues as diagonal elements. 
+    It is a diagonal matrix with the eigenvalues as diagonal elements.
     Admittedly, it is a wasteful way of storing the eigenvalues.
 */
 #define _Euler1DEigenvalues_(u,D,p,dir) \
@@ -262,20 +262,20 @@
 
 /*! \def Euler1D
     \brief Structure containing variables and parameters specific to the 1D Euler equations.
- *  This structure contains the physical parameters, variables, and function pointers 
+ *  This structure contains the physical parameters, variables, and function pointers
  *  specific to the 1D Euler equations.
 */
 
 /*! \brief Structure containing variables and parameters specific to the 1D Euler equations.
- *  This structure contains the physical parameters, variables, and function pointers 
+ *  This structure contains the physical parameters, variables, and function pointers
  *  specific to the 1D Euler equations.
 */
 typedef struct euler1d_parameters {
   double  gamma;        /*!< Ratio of heat capacities (\f$\gamma\f$) */
   double  grav;         /*!< acceleration due to gravity */
 
-  /*! type of gravitational field 
-      (0 is isothermal with constant potential, 
+  /*! type of gravitational field
+      (0 is isothermal with constant potential,
        1 is isothermal with sinusoidal potential)\n
       See:
         + Xing, Y., Shu, C.-W., "High Order Well-Balanced WENO Scheme
@@ -283,14 +283,14 @@ typedef struct euler1d_parameters {
           Journal of Scientific Computing, 54, 2013, pp. 645-662.
           http://dx.doi.org/10.1007/s10915-012-9585-8
   */
-  int     grav_type;    
+  int     grav_type;
 
   double  *grav_field;  /*!< Array to store the gravity potential field */
   double  *fast_jac;    /*!< Array to store the linearized fast-waves Jacobian over the whole domain */
   double  *solution;    /*!< Array to store the reference solution for linearization */
   char    upw_choice[_MAX_STRING_SIZE_]; /*!< Choice of upwinding scheme.\sa #_ROE_,#_LLF_,#_RF_,#_SWFS_ */
 
-  /*! Function pointer to the function that computes the "upwinding" step in source term computation. To 
+  /*! Function pointer to the function that computes the "upwinding" step in source term computation. To
       understand the implementation of the gravitational source terms, see:
         + Xing, Y., Shu, C.-W., "High Order Well-Balanced WENO Scheme
           for the Gas Dynamics Equations Under Gravitational Fields",

@@ -1,5 +1,5 @@
 /*! @file FirstDerivativeSecondOrderNoGhosts.c
-    @author Ping-Hsuan Tsai 
+    @author Ping-Hsuan Tsai
     @brief Second order finite-difference approximation to first derivative
 */
 
@@ -22,7 +22,7 @@ typedef MPIVariables  MPIContext;
 #include <omp.h>
 #endif
 
-/*! Computes the second-order finite-difference approximation to the first derivative 
+/*! Computes the second-order finite-difference approximation to the first derivative
     (\b Note: not divided by the grid spacing):
     \f{equation}{
       \left(\partial f\right)_i = \left\{ \begin{array}{ll} \frac{1}{2}\left(-3f_i+4f_{i+1}-f_{i+2}\right) & i = -g \\ \frac{1}{2}\left( f_{i+1} - f_{i-1} \right) & -g+1 \leq i \leq N+g-2 \\ \frac{1}{2}\left( f_{i-2} -4f_{i-1}+3f_i \right) & i = N+g-1 \end{array}\right.
@@ -31,19 +31,19 @@ typedef MPIVariables  MPIContext;
     \n\n
     Notes:
     + The first derivative is computed at the grid points or the cell centers.
-    + \b Df and \b f are serialized 1D arrays containing the function and its computed 
-      derivatives on a multi-dimensional grid. The derivative along the specified dimension 
+    + \b Df and \b f are serialized 1D arrays containing the function and its computed
+      derivatives on a multi-dimensional grid. The derivative along the specified dimension
       \b dir is computed by looping through all grid lines along \b dir.
     + \b Df and \b f must have the same number of ghost points.
-    + Biased stencils are used at the physical boundaries and ghost point values of f are not used. So this 
+    + Biased stencils are used at the physical boundaries and ghost point values of f are not used. So this
       function can be used when the ghost values at physical boundaries are not filled. The ghost values at
       internal (MPI) boundaries are still needed.
 */
 int FirstDerivativeSecondOrderCentralNoGhosts(  double  *Df,    /*!< Array to hold the computed first derivative (with ghost points) */
-                                                double  *f,     /*!< Array containing the grid point function values whose first 
+                                                double  *f,     /*!< Array containing the grid point function values whose first
                                                                      derivative is to be computed (with ghost points) */
                                                 int     dir,    /*!< The spatial dimension along which the derivative is computed */
-                                                int     bias,   /*!< Forward or backward differencing for non-central 
+                                                int     bias,   /*!< Forward or backward differencing for non-central
                                                                      finite-difference schemes (-1: backward, 1: forward)*/
                                                 int     ndims,  /*!< Number of spatial/coordinate dimensions */
                                                 int     *dim,   /*!< Local dimensions */

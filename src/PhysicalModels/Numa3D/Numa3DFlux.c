@@ -36,7 +36,7 @@ int Numa3DFlux(double *f,double *u,int dir,void *s,double t)
 
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
-  
+
   return(0);
 }
 
@@ -72,6 +72,6 @@ int Numa3DStiffFlux(double *f,double *u,int dir,void *s,double t)
 
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
-  
+
   return(0);
 }

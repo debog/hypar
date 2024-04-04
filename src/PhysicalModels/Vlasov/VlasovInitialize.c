@@ -36,7 +36,7 @@ int VlasovPostStage(double*,void*,void*,double);
 
 int VlasovEField(double*, void*, double);
 
-/*! Initialize the Vlasov physics module - 
+/*! Initialize the Vlasov physics module -
     allocate and set physics-related parameters, read physics-related inputs
     from file, and set the physics-related function pointers in #HyPar
 */
@@ -45,7 +45,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
                     )
 {
   HyPar        *solver    = (HyPar*)        s;
-  MPIVariables *mpi       = (MPIVariables*) m; 
+  MPIVariables *mpi       = (MPIVariables*) m;
   Vlasov       *physics   = (Vlasov*)       solver->physics;
 
   int *dim_global = solver->dim_global;
@@ -152,12 +152,12 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
                                       * physics->ndims_x,
                                         sizeof(double)  );
   physics->potential = (double*) calloc(  physics->npts_local_x_wghosts
-                                      * physics->ndims_x, 
+                                      * physics->ndims_x,
                                         sizeof(double)  );
-  
+
   /* Put the mpi object in the params for access in other functions */
   physics->m = m;
-  
+
   if (physics->self_consistent_electric_field) {
 #ifdef fftw
     /* If using FFTW, make sure MPI is enabled
@@ -176,7 +176,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
 
     /* Create a scratch buffer for moving between real and complex values */
     physics->sum_buffer = (double*) calloc(dim_local[0], sizeof(double));
-  
+
     /* Initialize FFTW and set up data buffers used for the transforms */
     fftw_mpi_init();
     physics->alloc_local = fftw_mpi_local_size_1d(dim_global[0], mpi->comm[0],
@@ -190,7 +190,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
       fprintf(stderr,"Decompose the spatial dimension so that the degrees of freedom are evenly divided.\n");
       return(1);
     }
-  
+
     physics->phys_buffer_e = fftw_alloc_complex(physics->alloc_local);
     physics->fourier_buffer_e = fftw_alloc_complex(physics->alloc_local);
 

@@ -1,6 +1,6 @@
 '''
 Python script to create plots of atmoshpheric flow variables
-of a HyPar simulation of the rising thermal bubble case. 
+of a HyPar simulation of the rising thermal bubble case.
 This particular file is for the
 3D Navier-Stokes/Euler physics, where the solution vector
 components are (rho, rho*u, rho*v, rho*w, e).
@@ -119,7 +119,7 @@ def convertVar( u_conserved: np.ndarray,
                       rho0,
                       p0,
                       p_exner,
-                      theta0*np.ones(rho.shape)], 
+                      theta0*np.ones(rho.shape)],
                     axis=0)
   return retval
 
@@ -128,17 +128,17 @@ def plotData( data_3d: np.ndarray,
               y3d: np.ndarray,
               z3d: np.ndarray,
               fig_filename,
-              varname, 
+              varname,
               t_solution ):
 
   # For ease of visualization, switch y and z. In the simulation,
-  # y is the vertical axis, but that makes things difficult for a 
+  # y is the vertical axis, but that makes things difficult for a
   # 3D plot!
   data_3d = np.transpose(data_3d,[0,2,1])
 
   fig = plt.figure(figsize=figsize)
   ax = fig.add_subplot(111, projection='3d')
-  
+
   kw1 =  {'vmin': data_3d.min(),
           'vmax': data_3d.max(),
           'levels': np.linspace((data_3d.min()+0.1*(data_3d.max()-data_3d.min())),
@@ -158,22 +158,22 @@ def plotData( data_3d: np.ndarray,
           'cmap' : colormap,
         }
 
-  plot_contour1= ax.contour(  x3d[:, 0, :], 
-                              data_3d[:,int(slice_loc*data_3d.shape[1]),:], 
-                              z3d[:, 0, :], 
+  plot_contour1= ax.contour(  x3d[:, 0, :],
+                              data_3d[:,int(slice_loc*data_3d.shape[1]),:],
+                              z3d[:, 0, :],
                               zdir='y', offset=y.max()/2, **kw1 )
-  plot_contour2= ax.contourf( data_3d[int(slice_loc*data_3d.shape[0]), :, :], 
-                              y3d[0, :, :], 
-                              z3d[0, :, :], 
+  plot_contour2= ax.contourf( data_3d[int(slice_loc*data_3d.shape[0]), :, :],
+                              y3d[0, :, :],
+                              z3d[0, :, :],
                               zdir='x', offset=x.max()/2, **kw2 )
   cb = fig.colorbar(plot_contour2, ax=ax)
   cb.ax.set_yticklabels(["{:.2f}".format(i) for i in cb.get_ticks()])
-  
+
   ax.set_xlabel("x (m)")
   ax.set_ylabel("z (m)")
   ax.set_zlabel("y (m)")
   ax.set_title("{:}, t={:.1f}".format(varname, t_solution))
-  
+
   ax.set_xlim(np.min(x3d), np.max(x3d))
   ax.set_ylim(np.min(y3d), np.max(y3d))
   ax.set_zlim(np.min(z3d), np.max(z3d))
@@ -181,7 +181,7 @@ def plotData( data_3d: np.ndarray,
   # Set distance and angle view
   ax.view_init(10, 210)
   ax.dist = 9
-  
+
   plt.tight_layout()
   print('Saving %s' % fig_filename)
   plt.savefig(fig_filename)
@@ -195,11 +195,11 @@ if solver_inp_data['op_overwrite'] == 'no':
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   op_write_iter = int(solver_inp_data['file_op_iter'][0])
   dt_snapshots = op_write_iter*dt
   n_snapshots = int(niter/op_write_iter) + 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -212,7 +212,7 @@ if solver_inp_data['op_overwrite'] == 'no':
 
   for i in range(n_snapshots):
     for sim in range(nsims):
-    
+
       '''
       Load simulation data (solution snapshots)
       '''
@@ -231,10 +231,10 @@ if solver_inp_data['op_overwrite'] == 'no':
       y = grid[size[0]:(size[0]+size[1])]
       z = grid[(size[0]+size[1]):]
       y3d, x3d, z3d = np.meshgrid(x,y,z)
-  
+
       u_cons_3d = np.transpose(solution.reshape(size[2],size[1],size[0],nvars))
       u_prim_3d = convertVar(u_cons_3d, y3d)
-  
+
       theta = u_prim_3d[5,:,:,:]
       if nsims > 1:
         plt_fname = plt_dir_name+'/fig_theta_'+f'{s:02d}'+'_'+f'{i:05d}'+'.png'
@@ -247,7 +247,7 @@ else:
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -255,7 +255,7 @@ else:
   print('  final time = ', t_final)
 
   for sim in range(nsims):
-  
+
     '''
     Load simulation data (solution snapshots)
     '''

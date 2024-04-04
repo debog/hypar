@@ -11,10 +11,10 @@
 #include <physicalmodels/euler1d.h>
 #include <hypar.h>
 
-/*! Compute the "upwind" source term in the balanced formulation introduced in the 
+/*! Compute the "upwind" source term in the balanced formulation introduced in the
     reference below. The "upwind" state is just the arithmetic average of the left
     and right states.
-    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations 
+    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations
                   Under Gravitational Fields", J. Sci. Comput., 54, 2013, pp. 645--662,
                   http://dx.doi.org/10.1007/s10915-012-9585-8.
 */
@@ -45,7 +45,7 @@ int Euler1DSourceUpwindLLF(
     for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
       int p;  _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
       /* Local Lax-Friedrich upwinding scheme */
-      for (k = 0; k < _MODEL_NVARS_; k++) 
+      for (k = 0; k < _MODEL_NVARS_; k++)
         (fI+_MODEL_NVARS_*p)[k] = 0.5 * ((fL+_MODEL_NVARS_*p)[k] + (fR+_MODEL_NVARS_*p)[k]);
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
@@ -54,10 +54,10 @@ int Euler1DSourceUpwindLLF(
   return(0);
 }
 
-/*! Compute the "upwind" source term in the balanced formulation introduced in the 
+/*! Compute the "upwind" source term in the balanced formulation introduced in the
     reference below. The "upwind" state is just the arithmetic average of the left
     and right states.
-    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations 
+    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations
                   Under Gravitational Fields", J. Sci. Comput., 54, 2013, pp. 645--662,
                   http://dx.doi.org/10.1007/s10915-012-9585-8.
 */
@@ -88,7 +88,7 @@ int Euler1DSourceUpwindRoe(
     for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
       int p;  _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
       /* Local Lax-Friedrich upwinding scheme */
-      for (k = 0; k < _MODEL_NVARS_; k++) 
+      for (k = 0; k < _MODEL_NVARS_; k++)
         (fI+_MODEL_NVARS_*p)[k] = 0.5 * ((fL+_MODEL_NVARS_*p)[k] + (fR+_MODEL_NVARS_*p)[k]);
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);

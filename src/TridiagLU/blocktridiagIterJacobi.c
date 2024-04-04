@@ -13,25 +13,25 @@
 #include <matops.h>
 
 /*!
-  Solve block tridiagonal (non-periodic) systems of equations using point Jacobi iterations: 
-  This function can solve multiple independent systems with one call. The systems need not share 
-  the same left- or right-hand-sides. The initial guess is taken as the solution of 
+  Solve block tridiagonal (non-periodic) systems of equations using point Jacobi iterations:
+  This function can solve multiple independent systems with one call. The systems need not share
+  the same left- or right-hand-sides. The initial guess is taken as the solution of
   \f{equation}{
     {\rm diag}\left[{\bf b}\right]{\bf x} = {\bf r}
   \f}
-  where \f${\bf b}\f$ represents the diagonal elements of the tridiagonal system, and 
+  where \f${\bf b}\f$ represents the diagonal elements of the tridiagonal system, and
   \f${\bf r}\f$ is the right-hand-side, stored in \f${\bf x}\f$ at the start of this
   function.
 
   Array layout: The arguments \a a, \a b, and \a c are local 1D arrays (containing
   this processor's part of the subdiagonal, diagonal, and superdiagonal)
   of size (\a n X \a ns X \a bs^2), and \a x is a local 1D array (containing this
-  processor's part of the right-hand-side, and will contain the solution on exit) 
+  processor's part of the right-hand-side, and will contain the solution on exit)
   of size (\a n X \a ns X \a bs), where \a n is the local size of the system, \a ns is
   the number of independent systems to solve, and \a bs is the block size. The ordering
   of the elements in these arrays is as follows:
   + Each block is stored in the row-major format.
-  + Blocks of the same row for each of the independent systems are stored adjacent to each 
+  + Blocks of the same row for each of the independent systems are stored adjacent to each
     other.
 
   For example, consider the following systems:
@@ -56,20 +56,20 @@
     R_i^k = \left[\begin{array}{c} r_{0,i}^k \\ r_{1,i}^k \end{array} \right]
   \f}
   Note that in the code, \f$X\f$ and \f$R\f$ are the same array \a x.
-  
+
   Then, the array \a b must be a 1D array with the following layout of elements:\n
   [\n
   b_{00,0}^0, b_{01,0}^0, b_{10,0}^0, b_{11,0}^0, b_{00,0}^1, b_{01,0}^1, b_{10,0}^1, b_{11,0}^1,
   b_{00,0}^2, b_{01,0}^2, b_{10,0}^2, b_{11,0}^2, \n
-  b_{00,1}^0, b_{01,1}^0, b_{10,1}^0, b_{11,1}^0, b_{00,1}^1, b_{01,1}^1, b_{10,1}^1, b_{11,1}^1, 
+  b_{00,1}^0, b_{01,1}^0, b_{10,1}^0, b_{11,1}^0, b_{00,1}^1, b_{01,1}^1, b_{10,1}^1, b_{11,1}^1,
   b_{00,1}^2, b_{01,1}^2, b_{10,1}^2, b_{11,1}^2, \n
   ..., \n
-  b_{00,n-1}^0, b_{01,n-1}^0, b_{10,n-1}^0, b_{11,n-1}^0, b_{00,n-1}^1, b_{01,n-1}^1, b_{10,n-1}^1, b_{11,n-1}^1, 
+  b_{00,n-1}^0, b_{01,n-1}^0, b_{10,n-1}^0, b_{11,n-1}^0, b_{00,n-1}^1, b_{01,n-1}^1, b_{10,n-1}^1, b_{11,n-1}^1,
   b_{00,n-1}^2, b_{01,n-1}^2, b_{10,n-1}^2, b_{11,n-1}^2\n
   ]\n
-  The arrays \a a and \a c are stored similarly. 
-  
-  The array corresponding to a vector (the solution and the right-hand-side \a x) must be a 1D array with the following 
+  The arrays \a a and \a c are stored similarly.
+
+  The array corresponding to a vector (the solution and the right-hand-side \a x) must be a 1D array with the following
   layout of elements:\n
   [\n
   x_{0,0}^0, x_{1,0}^0, x_{0,0}^1, x_{1,0}^1,x_{0,0}^2, x_{1,0}^2,\n
@@ -81,8 +81,8 @@
 
   Notes:
   + This function does *not* preserve the sub-diagonal, diagonal, super-diagonal elements
-    and the right-hand-sides. 
-  + The input array \a x contains the right-hand-side on entering the function, and the 
+    and the right-hand-sides.
+  + The input array \a x contains the right-hand-side on entering the function, and the
     solution on exiting it.
 */
 int blocktridiagIterJacobi(
@@ -156,8 +156,8 @@ int blocktridiagIterJacobi(
   while(1) {
 
     /* evaluate break conditions */
-    if (    (iter >= context->maxiter) 
-        ||  (iter && context->evaluate_norm && (global_norm < context->atol)) 
+    if (    (iter >= context->maxiter)
+        ||  (iter && context->evaluate_norm && (global_norm < context->atol))
         ||  (iter && context->evaluate_norm && (global_norm/norm0 < context->rtol))  ) {
       break;
     }
@@ -243,15 +243,15 @@ int blocktridiagIterJacobi(
     if (n > 1) {
       for (d=0; d<ns; d++) {
         double xt[bs],binv[bs2];
-        
-        i = 0;    
+
+        i = 0;
         for (j=0; j<bs; j++) xt[j] = rhs[(i*ns+d)*bs+j];
         _MatVecMultiplySubtract_(xt,a+(i*ns+d)*bs2,recvbufL+d*bs,bs);
         _MatVecMultiplySubtract_(xt,c+(i*ns+d)*bs2,x+(d+ns*(i+1))*bs,bs);
         _MatrixInvert_(b+(i*ns+d)*bs2,binv,bs);
         _MatVecMultiply_(binv,xt,x+(i*ns+d)*bs,bs);
 
-        i = n-1;  
+        i = n-1;
         for (j=0; j<bs; j++) xt[j] = rhs[(i*ns+d)*bs+j];
         _MatVecMultiplySubtract_(xt,a+(i*ns+d)*bs2,x+(d+ns*(i-1))*bs,bs);
         _MatVecMultiplySubtract_(xt,c+(i*ns+d)*bs2,recvbufR+d*bs,bs);

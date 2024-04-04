@@ -53,7 +53,7 @@ double VlasovAdvectionCoeff(int*  idx, /*!< grid index */
     _ArrayCopy1D_(idx, idx_x, ndims_x);
     int p; _ArrayIndex1D_(ndims_x, dim_x, idx_x, ghosts, p);
     retval = param->e_field[ndims_x*p+(dir-ndims_x)];
-    
+
   }
 
   return retval;

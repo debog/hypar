@@ -15,7 +15,7 @@
     shallow water equations (#ShallowWater1D, #ShallowWater2D).
     It is used for simulating inviscid walls or symmetric boundaries. The height,
     and tangential velocity at the ghost points are extrapolated from the interior, while the
-    normal velocity at the ghost points is set such that the interpolated value at the boundary 
+    normal velocity at the ghost points is set such that the interpolated value at the boundary
     face is equal to the specified wall velocity.
 */
 int BCSWSlipWallU(
@@ -50,7 +50,7 @@ int BCSWSlipWallU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         double h, uvel;
         double h_gpt, uvel_gpt;
@@ -82,7 +82,7 @@ int BCSWSlipWallU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         double h, uvel, vvel;
         double h_gpt, uvel_gpt, vvel_gpt;

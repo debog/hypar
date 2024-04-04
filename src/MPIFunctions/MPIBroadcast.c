@@ -1,5 +1,5 @@
 /*! @file MPIBroadcast.c
-    @brief Functions to broadcast over all MPI ranks 
+    @brief Functions to broadcast over all MPI ranks
     @author Debojyoti Ghosh
 */
 

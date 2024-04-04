@@ -8,7 +8,7 @@
 #include <physicalmodels/shallowwater1d.h>
 
 /*! Function to compute the flux Jacobian of the 1D shallow water equations, given the
-    solution at a grid point. The Jacobian is square matrix of size nvar=2, and 
+    solution at a grid point. The Jacobian is square matrix of size nvar=2, and
     is returned as a 1D array (double) of 4 elements in row-major format.
 */
 int ShallowWater1DJacobian(
@@ -17,13 +17,13 @@ int ShallowWater1DJacobian(
                     void    *p,   /*!< object containing the physics-related parameters */
                     int     dir,  /*!< dimension (x/y/z) (not used, since this is 1D system) */
                     int     nvars,/*!< number of vector components */
-                    int     upw   /*!< 0 -> send back complete Jacobian, 
-                                       1 -> send back Jacobian of right(+)-moving flux, 
+                    int     upw   /*!< 0 -> send back complete Jacobian,
+                                       1 -> send back Jacobian of right(+)-moving flux,
                                       -1 -> send back Jacobian of left(-)-moving flux */
                    )
 {
   ShallowWater1D  *param = (ShallowWater1D*) p;
-  static double   R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double   R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                   L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */

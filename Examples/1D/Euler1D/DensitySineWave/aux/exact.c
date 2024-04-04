@@ -14,8 +14,8 @@
 
 
 int main() {
-  
-	int     NI,ndims,niter;
+
+  int     NI,ndims,niter;
   double  dt, pi = 4.0*atan(1.0), gamma = 1.4;
   FILE    *in, *out;
 
@@ -47,10 +47,10 @@ int main() {
     printf("ndims is not 1 in solver.inp. Make sure the correct solver.inp is being used.\n");
     return(0);
   }
-	printf("Grid: %d\n", NI);
+  printf("Grid: %d\n", NI);
 
-	int i;
-	double dx = 1.0 / ((double)NI);
+  int i;
+  double dx = 1.0 / ((double)NI);
   double tf = ((double)niter) * dt;
   printf("Final Time: %lf\n",tf);
 
@@ -59,52 +59,52 @@ int main() {
   U     = 1.0;
   P     = 1.0/gamma;
 
-	double *x, *rho,*rhou,*e;
-	x    = (double*) calloc (NI, sizeof(double));
-	rho  = (double*) calloc (NI, sizeof(double));
-	rhou = (double*) calloc (NI, sizeof(double));
-	e    = (double*) calloc (NI, sizeof(double));
+  double *x, *rho,*rhou,*e;
+  x    = (double*) calloc (NI, sizeof(double));
+  rho  = (double*) calloc (NI, sizeof(double));
+  rhou = (double*) calloc (NI, sizeof(double));
+  e    = (double*) calloc (NI, sizeof(double));
 
-	for (i = 0; i < NI; i++){
-		x[i] = i*dx;
+  for (i = 0; i < NI; i++){
+    x[i] = i*dx;
     double DRHO = 0.1*sin(2*pi*(x[i]-U*tf));
     rho[i]  = RHO + DRHO;
     rhou[i] = rho[i]*U;
     e[i]    = P/(gamma-1.0) + 0.5*rho[i]*U*U;
-	}
-	out = fopen("exact.inp","w");
+  }
+  out = fopen("exact.inp","w");
   for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",rho[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rho[i]);
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",rhou[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rhou[i]);
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",e[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",e[i]);
   fprintf(out,"\n");
-	fclose(out);
+  fclose(out);
 
-	for (i = 0; i < NI; i++){
-		x[i] = i*dx;
+  for (i = 0; i < NI; i++){
+    x[i] = i*dx;
     double DRHO = 0.1*sin(2*pi*x[i]);
     rho[i]  = RHO + DRHO;
     rhou[i] = rho[i]*U;
     e[i]    = P/(gamma-1.0) + 0.5*rho[i]*U*U;
-	}
-	out = fopen("initial.inp","w");
+  }
+  out = fopen("initial.inp","w");
   for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",rho[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rho[i]);
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",rhou[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rhou[i]);
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",e[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",e[i]);
   fprintf(out,"\n");
-	fclose(out);
+  fclose(out);
 
-	free(x);
-	free(rho);
-	free(rhou);
-	free(e);
+  free(x);
+  free(rho);
+  free(rhou);
+  free(e);
 
-	return(0);
+  return(0);
 }

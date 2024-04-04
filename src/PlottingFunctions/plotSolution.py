@@ -30,8 +30,8 @@ def plotSolution( a_ndims:  int,
       try:
         fig = plt.figure(figsize=figsize)
         ax = plt.axes()
-        ax.set( xlim=(np.min(a_x), np.max(a_x)), 
-                ylim=(np.min(a_U[var::a_nvars]), 
+        ax.set( xlim=(np.min(a_x), np.max(a_x)),
+                ylim=(np.min(a_U[var::a_nvars]),
                       np.max(a_U[var::a_nvars]) ) )
         ax.plot(a_x, a_U[var::a_nvars], lw=2)
         ax.set_title('var {:}, t={:.3}'.format(var,a_time))
@@ -62,7 +62,7 @@ def plotSolution( a_ndims:  int,
       try:
         fig = plt.figure(figsize=figsize)
         ax = plt.axes()
-        ax.set( xlim=(np.min(x), np.max(x)), 
+        ax.set( xlim=(np.min(x), np.max(x)),
                 ylim=(np.min(y), np.max(y)) )
         sol2d = np.transpose(a_U.reshape(a_size[1],a_size[0],a_nvars))
         plot = ax.pcolor(x2d, y2d, sol2d[var,:,:], cmap=colormap)

@@ -1,6 +1,6 @@
 '''
 Python script to create plots of atmoshpheric flow variables
-of a HyPar simulation of the rising thermal bubble case. 
+of a HyPar simulation of the rising thermal bubble case.
 This particular file is for the
 3D Navier-Stokes/Euler physics, where the solution vector
 components are (rho, rho*u, rho*v, e).
@@ -120,7 +120,7 @@ def convertVar( u_conserved: np.ndarray,
                       rho0,
                       p0,
                       p_exner,
-                      theta0*np.ones(rho.shape)], 
+                      theta0*np.ones(rho.shape)],
                     axis=0)
   return retval
 
@@ -130,11 +130,11 @@ def plotData( data_fom_3d: np.ndarray,
               y3d: np.ndarray,
               z3d: np.ndarray,
               fig_filename,
-              varname, 
+              varname,
               t_solution ):
 
   # For ease of visualization, switch y and z. In the simulation,
-  # y is the vertical axis, but that makes things difficult for a 
+  # y is the vertical axis, but that makes things difficult for a
   # 3D plot!
   data_fom_3d = np.transpose(data_fom_3d,[0,2,1])
   data_rom_3d = np.transpose(data_rom_3d,[0,2,1])
@@ -166,13 +166,13 @@ def plotData( data_fom_3d: np.ndarray,
           'cmap' : colormap,
         }
   ax = fig.add_subplot(fig_nv, fig_nh, 1, projection='3d')
-  plot_contour1= ax.contour(  x3d[:, 0, :], 
-                              data_fom_3d[:,int(slice_loc*data_fom_3d.shape[1]),:], 
-                              z3d[:, 0, :], 
+  plot_contour1= ax.contour(  x3d[:, 0, :],
+                              data_fom_3d[:,int(slice_loc*data_fom_3d.shape[1]),:],
+                              z3d[:, 0, :],
                               zdir='y', offset=y.max()/2, **kw1 )
-  plot_contour2= ax.contourf( data_fom_3d[int(slice_loc*data_fom_3d.shape[0]), :, :], 
-                              y3d[0, :, :], 
-                              z3d[0, :, :], 
+  plot_contour2= ax.contourf( data_fom_3d[int(slice_loc*data_fom_3d.shape[0]), :, :],
+                              y3d[0, :, :],
+                              z3d[0, :, :],
                               zdir='x', offset=x.max()/2, **kw2 )
   cb = fig.colorbar(plot_contour2, ax=ax)
   cb.ax.set_yticklabels(["{:.2f}".format(i) for i in cb.get_ticks()])
@@ -186,7 +186,7 @@ def plotData( data_fom_3d: np.ndarray,
   ax.set_zlim(np.min(z3d), np.max(z3d))
   ax.view_init(10, 210)
   ax.dist = 9
-  
+
   kw1 =  {'vmin': data_rom_3d.min(),
           'vmax': data_rom_3d.max(),
           'levels': np.linspace((data_rom_3d.min()+0.1*(data_rom_3d.max()-data_rom_3d.min())),
@@ -206,13 +206,13 @@ def plotData( data_fom_3d: np.ndarray,
           'cmap' : colormap,
         }
   ax = fig.add_subplot(fig_nv, fig_nh, 2, projection='3d')
-  plot_contour1= ax.contour(  x3d[:, 0, :], 
-                              data_rom_3d[:,int(slice_loc*data_rom_3d.shape[1]),:], 
-                              z3d[:, 0, :], 
+  plot_contour1= ax.contour(  x3d[:, 0, :],
+                              data_rom_3d[:,int(slice_loc*data_rom_3d.shape[1]),:],
+                              z3d[:, 0, :],
                               zdir='y', offset=y.max()/2, **kw1 )
-  plot_contour2= ax.contourf( data_rom_3d[int(slice_loc*data_rom_3d.shape[0]), :, :], 
-                              y3d[0, :, :], 
-                              z3d[0, :, :], 
+  plot_contour2= ax.contourf( data_rom_3d[int(slice_loc*data_rom_3d.shape[0]), :, :],
+                              y3d[0, :, :],
+                              z3d[0, :, :],
                               zdir='x', offset=x.max()/2, **kw2 )
   cb = fig.colorbar(plot_contour2, ax=ax)
   cb.ax.set_yticklabels(["{:.2f}".format(i) for i in cb.get_ticks()])
@@ -225,7 +225,7 @@ def plotData( data_fom_3d: np.ndarray,
   ax.set_zlim(np.min(z3d), np.max(z3d))
   ax.view_init(10, 210)
   ax.dist = 9
-  
+
   kw1 =  {'vmin': data_del_3d.min(),
           'vmax': data_del_3d.max(),
           'levels': np.linspace((data_del_3d.min()+0.1*(data_del_3d.max()-data_del_3d.min())),
@@ -245,28 +245,28 @@ def plotData( data_fom_3d: np.ndarray,
           'cmap' : colormap,
         }
   ax = fig.add_subplot(fig_nv, fig_nh, 3, projection='3d')
-  plot_contour1= ax.contour(  x3d[:, 0, :], 
-                              data_del_3d[:,int(slice_loc*data_del_3d.shape[1]),:], 
-                              z3d[:, 0, :], 
+  plot_contour1= ax.contour(  x3d[:, 0, :],
+                              data_del_3d[:,int(slice_loc*data_del_3d.shape[1]),:],
+                              z3d[:, 0, :],
                               zdir='y', offset=y.max()/2, **kw1 )
-  plot_contour2= ax.contourf( data_del_3d[int(slice_loc*data_del_3d.shape[0]), :, :], 
-                              y3d[0, :, :], 
-                              z3d[0, :, :], 
+  plot_contour2= ax.contourf( data_del_3d[int(slice_loc*data_del_3d.shape[0]), :, :],
+                              y3d[0, :, :],
+                              z3d[0, :, :],
                               zdir='x', offset=x.max()/2, **kw2 )
   cb = fig.colorbar(plot_contour2, ax=ax)
   cb.ax.set_yticklabels(["{:.1e}".format(i) for i in cb.get_ticks()])
   ax.set_xlabel("x (m)")
   ax.set_ylabel("z (m)")
   ax.set_zlabel("y (m)")
-  ax.set_title("Diff {:}, t={:.1f}, norm={:.3e}".format(varname, 
-                                                      t_solution, 
+  ax.set_title("Diff {:}, t={:.1f}, norm={:.3e}".format(varname,
+                                                      t_solution,
                                                       diff_norm))
   ax.set_xlim(np.min(x3d), np.max(x3d))
   ax.set_ylim(np.min(y3d), np.max(y3d))
   ax.set_zlim(np.min(z3d), np.max(z3d))
   ax.view_init(10, 210)
   ax.dist = 9
-  
+
   plt.tight_layout()
   print('Saving %s' % fig_filename)
   plt.savefig(fig_filename)
@@ -280,11 +280,11 @@ if solver_inp_data['op_overwrite'] == 'no':
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   op_write_iter = int(solver_inp_data['file_op_iter'][0])
   dt_snapshots = op_write_iter*dt
   n_snapshots = int(niter/op_write_iter) + 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -297,7 +297,7 @@ if solver_inp_data['op_overwrite'] == 'no':
 
   for i in range(n_snapshots):
     for sim in range(nsims):
-    
+
       '''
       Load simulation data (solution snapshots)
       '''
@@ -328,24 +328,24 @@ if solver_inp_data['op_overwrite'] == 'no':
       y = grid[size[0]:(size[0]+size[1])]
       z = grid[(size[0]+size[1]):]
       y3d, x3d, z3d = np.meshgrid(x,y,z)
-  
+
       u_fom_cons_3d = np.transpose(solution_fom.reshape(size[2],size[1],size[0],nvars))
       u_fom_prim_3d = convertVar(u_fom_cons_3d, y3d)
-  
+
       u_rom_cons_3d = np.transpose(solution_rom.reshape(size[2],size[1],size[0],nvars))
       u_rom_prim_3d = convertVar(u_rom_cons_3d, y3d)
-  
+
       theta_fom = u_fom_prim_3d[5,:,:,:]
       theta_rom = u_rom_prim_3d[5,:,:,:]
       if nsims > 1:
         plt_fname = plt_dir_name+'/fig_theta_'+f'{s:02d}'+'_'+f'{i:05d}'+'.png'
       else:
         plt_fname = plt_dir_name+'/fig_theta_'+f'{i:05d}'+'.png'
-      plotData( theta_fom, 
-                theta_rom, 
-                x3d, y3d, z3d, 
-                plt_fname, 
-                'theta', 
+      plotData( theta_fom,
+                theta_rom,
+                x3d, y3d, z3d,
+                plt_fname,
+                'theta',
                 i*dt_snapshots)
 
 else:
@@ -353,7 +353,7 @@ else:
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -361,7 +361,7 @@ else:
   print('  final time = ', t_final)
 
   for sim in range(nsims):
-  
+
     '''
     Load simulation data (solution snapshots)
     '''
@@ -405,9 +405,9 @@ else:
       plt_fname = plt_dir_name+'/fig_theta_'+f'{s:02d}'+'.png'
     else:
         plt_fname = plt_dir_name+'/fig_theta.png'
-    plotData( theta_fom, 
-              theta_rom, 
-              x3d, y3d, z3d, 
-              plt_fname, 'theta', 
+    plotData( theta_fom,
+              theta_rom,
+              x3d, y3d, z3d,
+              plt_fname, 'theta',
               t_final )
 

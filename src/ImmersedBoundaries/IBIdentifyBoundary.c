@@ -22,57 +22,57 @@ static int CountBoundaryPoints(
                                                      grid points outside. */
                               )
 {
-  static int dim[_IB_NDIMS_], indexC[_IB_NDIMS_], indexN[_IB_NDIMS_], 
+  static int dim[_IB_NDIMS_], indexC[_IB_NDIMS_], indexN[_IB_NDIMS_],
              i, j, k, p, q, count;
   dim[0] = imax;
   dim[1] = jmax;
   dim[2] = kmax;
 
   count = 0;
-	for (i = 0; i < imax; i++) {
-		for (j = 0; j < jmax; j++) {
-			for (k = 0; k < kmax; k++) {
+  for (i = 0; i < imax; i++) {
+    for (j = 0; j < jmax; j++) {
+      for (k = 0; k < kmax; k++) {
         indexC[0] = i;
         indexC[1] = j;
         indexC[2] = k;
-				_ArrayIndex1D_(_IB_NDIMS_,dim,indexC,ghosts,p);
+        _ArrayIndex1D_(_IB_NDIMS_,dim,indexC,ghosts,p);
         /* if this point is inside the body (0), find out if any */
         /* of the neighboring points are outside (1)              */
-				if (!blank[p]){
+        if (!blank[p]){
 
           int g, flag = 0;
-					for (g = 1; g <= ghosts; g++){
+          for (g = 1; g <= ghosts; g++){
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[0] += g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[0] -= g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[1] += g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[1] -= g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[2] += g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[2] -= g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
-					}
+          }
           if (flag)   count++;
-				}
-			}
-		}
-	}
+        }
+      }
+    }
+  }
   return(count);
 }
 
@@ -89,52 +89,52 @@ static int SetBoundaryPoints(
                             )
 {
   IBNode *boundary = (IBNode*) b;
-  static int dim[_IB_NDIMS_], indexC[_IB_NDIMS_], indexN[_IB_NDIMS_], 
+  static int dim[_IB_NDIMS_], indexC[_IB_NDIMS_], indexN[_IB_NDIMS_],
              i, j, k, p, q, count;
   dim[0] = imax;
   dim[1] = jmax;
   dim[2] = kmax;
 
   count = 0;
-	for (i = 0; i < imax; i++) {
-		for (j = 0; j < jmax; j++) {
-			for (k = 0; k < kmax; k++) {
+  for (i = 0; i < imax; i++) {
+    for (j = 0; j < jmax; j++) {
+      for (k = 0; k < kmax; k++) {
         indexC[0] = i;
         indexC[1] = j;
         indexC[2] = k;
-				_ArrayIndex1D_(_IB_NDIMS_,dim,indexC,ghosts,p);
+        _ArrayIndex1D_(_IB_NDIMS_,dim,indexC,ghosts,p);
         /* if this point is inside the body (0), find out if any */
         /* of the neighboring points are outside (1)              */
-				if (!blank[p]){
+        if (!blank[p]){
 
           int g, flag = 0;
-					for (g = 1; g <= ghosts; g++){
+          for (g = 1; g <= ghosts; g++){
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[0] += g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[0] -= g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[1] += g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[1] -= g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[2] += g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
             _ArrayCopy1D_(indexC,indexN,_IB_NDIMS_); indexN[2] -= g;
             _ArrayIndex1D_(_IB_NDIMS_,dim,indexN,ghosts,q);
-						if (blank[q])	flag = 1;
+            if (blank[q])  flag = 1;
 
-					}
+          }
           if (flag) {
             boundary[count].i = i;
             boundary[count].j = j;
@@ -142,10 +142,10 @@ static int SetBoundaryPoints(
             boundary[count].p = p;
             count++;
           }
-				}
-			}
-		}
-	}
+        }
+      }
+    }
+  }
   return(count);
 }
 

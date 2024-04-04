@@ -15,7 +15,7 @@
 #undef __FUNCT__
 #define __FUNCT__ "TransferVecFromPETSc"
 
-/*! Copy data from a PETSc vector (used by PETSc time integrators, and with no 
+/*! Copy data from a PETSc vector (used by PETSc time integrators, and with no
     ghost points) to a HyPar::u array (with ghost points).
 
     \sa TransferVecToPETSc()

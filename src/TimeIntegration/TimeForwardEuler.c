@@ -19,7 +19,7 @@
     {\bf u}^{n+1} = {\bf u}^n + \Delta t {\bf F}\left( {\bf u}^n \right)
   \f}
   where the superscript represents the time level, \f$\Delta t\f$ is the
-  time step size #HyPar::dt, and \f${\bf F}\left({\bf u}\right)\f$ is 
+  time step size #HyPar::dt, and \f${\bf F}\left({\bf u}\right)\f$ is
   computed by #TimeIntegration::RHSFunction.
 */
 int TimeForwardEuler(
@@ -37,14 +37,14 @@ int TimeForwardEuler(
     MPIVariables* mpi = &(sim[ns].mpi);
 
     double* rhs = TS->rhs + TS->u_offsets[ns];
-  
+
     /* Evaluate right-hand side */
     IERR TS->RHSFunction( rhs,
                           solver->u,
                           solver,
                           mpi,
                           TS->waqt  );   CHECKERR(ierr);
-  
+
     /* update solution */
     _ArrayAXPY_(  rhs,
                   TS->dt,

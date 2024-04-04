@@ -12,7 +12,7 @@
 #ifndef _PETSC_INTERFACE_H_
 
 /*! \def MatMult
- * Matrix-Matrix multiplication: \a A = \a X \a Y, where \a A, \a X, \a Y 
+ * Matrix-Matrix multiplication: \a A = \a X \a Y, where \a A, \a X, \a Y
  * are square matrices of size \a N, saved as 1D arrays in row-major format.
 */
 #define MatMult(N,A,X,Y) \

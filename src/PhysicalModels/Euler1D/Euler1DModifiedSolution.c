@@ -10,14 +10,14 @@
 #include <hypar.h>
 
 /*! Compute the modified solution for the upwinding step in a balanced conservative
-    finite-difference algorithm for the 1D Euler equations with gravitational sources. 
+    finite-difference algorithm for the 1D Euler equations with gravitational sources.
     If no gravitational forces exist, the modified solution is identical to the solution.
     \n\n
-  Refer to 
-  + Xing, Y., Shu, C.-W., "High Order Well-Balanced WENO Scheme 
-    for the Gas Dynamics Equations Under Gravitational Fields", 
+  Refer to
+  + Xing, Y., Shu, C.-W., "High Order Well-Balanced WENO Scheme
+    for the Gas Dynamics Equations Under Gravitational Fields",
     Journal of Scientific Computing, 54, 2013, pp. 645-662,
-    http://dx.doi.org/10.1007/s10915-012-9585-8. See Eq. (3.8) on 
+    http://dx.doi.org/10.1007/s10915-012-9585-8. See Eq. (3.8) on
     Page 651 on why this modification is needed.
 */
 int Euler1DModifiedSolution(

@@ -8,7 +8,7 @@
 
 /*!
   Given a 1D array of a given global size \a nglobal, and the total number
-  of MPI ranks \a nproc on which it will be partitioned, this function 
+  of MPI ranks \a nproc on which it will be partitioned, this function
   computes the size of the local part of the 1D array on \a rank.
 */
 int MPIPartition1D(

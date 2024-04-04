@@ -8,10 +8,10 @@
 #include <timeintegration_cpp.h>
 #include <sparse_grids_simulation.h>
 
-/*! This function integrates the semi-discrete ODE (obtained from discretizing the 
-    PDE in space) using natively implemented time integration methods. It initializes 
-    the time integration object, iterates the simulation for the required number of 
-    time steps, and calculates the errors. After the specified number of iterations, 
+/*! This function integrates the semi-discrete ODE (obtained from discretizing the
+    PDE in space) using natively implemented time integration methods. It initializes
+    the time integration object, iterates the simulation for the required number of
+    time steps, and calculates the errors. After the specified number of iterations,
     it writes out some information to the screen and the solution to a file.
 */
 int SparseGridsSimulation::Solve()
@@ -22,7 +22,7 @@ int SparseGridsSimulation::Solve()
   if (m_write_sg_solutions == 1) {
     for (int ns = 0; ns < m_nsims_sg; ns++) {
       if (m_sims_sg[ns].solver.flag_ib) {
-  
+
         char fname_root[_MAX_STRING_SIZE_] = "iblank_sg";
         if (m_nsims_sg > 1) {
           char index[_MAX_STRING_SIZE_];
@@ -30,7 +30,7 @@ int SparseGridsSimulation::Solve()
           strcat(fname_root, "_");
           strcat(fname_root, index);
         }
-  
+
         WriteArray( m_sims_sg[ns].solver.ndims,
                     1,
                     m_sims_sg[ns].solver.dim_global,
@@ -88,9 +88,9 @@ int SparseGridsSimulation::Solve()
     tic++;
 
     /* Write intermediate solution to file */
-    if ((TS.iter+1)%m_sims_sg[0].solver.file_op_iter == 0) { 
+    if ((TS.iter+1)%m_sims_sg[0].solver.file_op_iter == 0) {
       OutputSolution(TS.waqt);
-      tic = 0; 
+      tic = 0;
     }
 
   }

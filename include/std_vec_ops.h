@@ -96,7 +96,7 @@ namespace StdVecOps {
                         a_vec.size() );
     return;
   }
-                          
+
   /*! Compute norm between two vectors */
   inline
   double compute2Norm(  const std::vector<double>& a_a, /*!< input vector */
@@ -111,7 +111,7 @@ namespace StdVecOps {
 
     return retval;
   }
-                          
+
 }
 
 #endif

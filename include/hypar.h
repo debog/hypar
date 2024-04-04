@@ -28,11 +28,11 @@ typedef struct main_parameters {
   /*! Number of variables or DoFs at a grid point (input - \b solver.inp ) */
   int     nvars;
 
-  /*! Global dimensions: array of size #HyPar::ndims containing the global grid size 
+  /*! Global dimensions: array of size #HyPar::ndims containing the global grid size
    * in each spatial/coordinate dimension  (input - \b solver.inp )*/
   int     *dim_global;
 
-  /*! Local dimensions: array of size #HyPar::ndims containing the local grid size 
+  /*! Local dimensions: array of size #HyPar::ndims containing the local grid size
    * in each spatial/coordinate dimension (computed, based on the number of processors) */
   int     *dim_local;
 
@@ -40,14 +40,14 @@ typedef struct main_parameters {
   int     npoints_global;
 
   int     npoints_local, /*!< Local number of grid points (product of all the elements of dim_local) */
-          npoints_local_wghosts; /*!< Local number of grid points with ghost points 
+          npoints_local_wghosts; /*!< Local number of grid points with ghost points
                                       (product of the [elements of dim_local + 2*#HyPar::ghosts]) */
 
   int ndof_nodes; /*!< Total number of degrees of freedom considering cell corners (no ghosts)*/
   int ndof_cells_wghosts; /*!< Total number of degrees of freedom considering cell centered (with ghosts)*/
   int size_x;     /*!< the size of #HyPar::x array */
 
-  /*! Number of ghost points at the boundary - it's the same along all dimensions 
+  /*! Number of ghost points at the boundary - it's the same along all dimensions
    * (input - \b solver.inp ) */
   int     ghosts;
 
@@ -200,7 +200,7 @@ typedef struct main_parameters {
   /*! solution filename extension */
   char solnfilename_extn[_MAX_STRING_SIZE_];
   /*! plot figure filename extension */
-  char plotfilename_extn[_MAX_STRING_SIZE_]; 
+  char plotfilename_extn[_MAX_STRING_SIZE_];
 
   /*! output filename root */
   char op_fname_root[_MAX_STRING_SIZE_];
@@ -219,11 +219,11 @@ typedef struct main_parameters {
   /*! Pointer to the function to integrate the solution in time, assigned in InitializeSolvers() */
   int (*TimeIntegrate)            (void*);
 
-  /*! Pointer to the function to interpolate a function at the grid interfaces from 
+  /*! Pointer to the function to interpolate a function at the grid interfaces from
    * the cell-centered values for the hyperbolic flux, assigned in InitializeSolvers() */
   int (*InterpolateInterfacesHyp) (double*,double*,double*,double*,int,int,void*,void*,int);
 
-  /*! Pointer to the function to pre-calculate the nonlinear interpolation coefficients for 
+  /*! Pointer to the function to pre-calculate the nonlinear interpolation coefficients for
    * the hyperbolic flux interpolation, assigned in InitializeSolvers() */
   int (*NonlinearInterp)    (double*,void*,void*,double,
                              int(*)(double*,double*,int,void*,double));
@@ -238,7 +238,7 @@ typedef struct main_parameters {
      assigned in InitializeSolvers()*/
   int (*InterpolateInterfacesPar) (double*,double*,int,void*,void*);
 
-  /*! Pointer to the function to calculate the cell-centered first derivative of a given function, 
+  /*! Pointer to the function to calculate the cell-centered first derivative of a given function,
    * for the evaluation of the parabolic term; assigned in InitializeSolvers()*/
   int (*FirstDerivativePar)       (double*,double*,int,int,void*,void*);
 
@@ -271,7 +271,7 @@ typedef struct main_parameters {
   /*! Pointer to the function to calculate the diffusion number (assigned in the physical model initialization called from InitializePhysics()) */
   double (*ComputeDiffNumber)  (void*,void*,double,double);
 
-  /*! Pointer to the function to calculate the hyperbolic flux function 
+  /*! Pointer to the function to calculate the hyperbolic flux function
    * (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*FFunction)          (double*,double*,int,void*,double);
   /*! If hyperbolic flux is split as \f$f\left(u\right) = \left[f\left(u\right)-df\left(u\right)\right] + df\left(u\right)\f$
@@ -289,8 +289,8 @@ typedef struct main_parameters {
       is being partitioned. \sa #HyPar::SplitHyperbolicFlux, HyPar::dFFunction(), HyPar::FdFFunction() */
   int flag_fdf_specified;
 
-  /*! Pointer to the function to calculate the upwind interface flux, given the left- and 
-   * right-biased fluxes (assigned in the physical model initialization called from 
+  /*! Pointer to the function to calculate the upwind interface flux, given the left- and
+   * right-biased fluxes (assigned in the physical model initialization called from
    * InitializePhysics()) */
   int    (*Upwind)             (double*,double*,double*,double*,double*,double*,int,void*,double);
   /*! Pointer to the function to calculate the upwind interface split flux \f$df\left(u\right)\f$, given the left- and right-biased
@@ -312,21 +312,21 @@ typedef struct main_parameters {
   /*! Pointer to the function to calculate the parabolic function with cross-derivatives (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*HFunction)          (double*,double*,int,int,void*,double);
 
-  /*! Pointer to the function to calculate the source function 
+  /*! Pointer to the function to calculate the source function
    * (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*SFunction)          (double*,double*,void*,void*,double);
 
-  /*! Pointer to the function to calculate the modified solution for upwinding 
+  /*! Pointer to the function to calculate the modified solution for upwinding
    * (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*UFunction)          (double*,double*,int,void*,void*,double);
 
   /*! Pointer to the function to calculate the flux Jacobian for a given solution state (assigned in the physical model initialization called from InitializePhysics()). The
-      advective flux Jacobian is the Jacobian of the analytical (*not* spatially discretized) advective flux for a given solution state (for example, at a grid point). 
+      advective flux Jacobian is the Jacobian of the analytical (*not* spatially discretized) advective flux for a given solution state (for example, at a grid point).
       The size is (#HyPar::nvars)^2 and the matrix is stored as  a 1D array in row-major format. */
   int    (*JFunction)          (double*,double*,void*,int,int,int);
 
-  /*! Pointer to the function to calculate the diffusion term Jacobian for a given solution state (assigned in the physical model initialization called from InitializePhysics()). 
-      The diffusion Jacobian is the Jacobian of the analytical (*not* spatially discretized) diffusion term for a given solution state (for example, at a grid point). 
+  /*! Pointer to the function to calculate the diffusion term Jacobian for a given solution state (assigned in the physical model initialization called from InitializePhysics()).
+      The diffusion Jacobian is the Jacobian of the analytical (*not* spatially discretized) diffusion term for a given solution state (for example, at a grid point).
       The size is (#HyPar::nvars)^2 and the matrix is stored as  a 1D array in row-major format. */
   int    (*KFunction)          (double*,double*,void*,int,int);
 
@@ -334,7 +334,7 @@ typedef struct main_parameters {
   int    (*PreStage)           (int,double**,void*,void*,double);
   /*! Pointer to the function to do some post-time-integration-stage computations, if required (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*PostStage)          (double*,void*,void*,double);
-  /*! Pointer to the function to do some pre-time-integration-step computations, if required 
+  /*! Pointer to the function to do some pre-time-integration-step computations, if required
    * (assigned in the physical model initialization called from InitializePhysics()) */
   int    (*PreStep)            (double*,void*,void*,double);
   /*! Pointer to the function to do some post-time-integration-step computations, if required (assigned in the physical model initialization called from InitializePhysics()) */
@@ -402,7 +402,7 @@ typedef struct main_parameters {
 #ifdef with_librom
   double* u_rom_predicted; /*!< Solution predicted using a ROM */
   /*! L1, L2, Linf norms of the diff between PDE and ROM solutions */
-  double rom_diff_norms[3]; 
+  double rom_diff_norms[3];
   /*! output filename root for ROM solution file */
   char op_rom_fname_root[_MAX_STRING_SIZE_];
 #endif

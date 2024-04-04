@@ -49,7 +49,7 @@ int ShallowWater1DSource(
 
   /* set interface dimensions */
   _ArrayCopy1D_(dim,dim_interface,ndims); dim_interface[_XDIR_]++;
-  
+
   /* calculate the first source function */
   IERR ShallowWater1DSourceFunction1(SourceC,u,x,solver,mpi,t); CHECKERR(ierr);
   /* calculate the left and right interface source terms */
@@ -99,7 +99,7 @@ int ShallowWater1DSource(
   return(0);
 }
 
-/*! Compute the first source function that is then "discretized" in a way similar to 
+/*! Compute the first source function that is then "discretized" in a way similar to
     the hyperbolic flux function for the balanced formulation introduced in the reference below.
     The source term is reformulated and "discretized" in a similar fashion as the hyperbolic
     flux to ensure that the hydrostatic balance is maintained to machine precision.
@@ -143,7 +143,7 @@ int ShallowWater1DSourceFunction1(
   return(0);
 }
 
-/*! Compute the second source function that is then "discretized" in a way similar to 
+/*! Compute the second source function that is then "discretized" in a way similar to
     the hyperbolic flux function for the balanced formulation introduced in the reference below.
     The source term is reformulated and "discretized" in a similar fashion as the hyperbolic
     flux to ensure that the hydrostatic balance is maintained to machine precision.

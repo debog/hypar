@@ -31,22 +31,22 @@ extern "C" int MPICreateIOGroups       (void*);
  * coordinates) */
 extern "C" int MPIExchangeBoundaries1D (void*,double*,int,int,int,int);
 
-/*! Exchange boundary (ghost point) values for an n-dimensional array (like the 
+/*! Exchange boundary (ghost point) values for an n-dimensional array (like the
  * solution array) */
 extern "C" int MPIExchangeBoundariesnD (int,int,int*,int,void*,double*);
 
 /*! Gather local arrays into a global array for an essentially 1D array */
-extern "C" int MPIGatherArray1D           (void*,double*,double*,int,int,int,int); 
+extern "C" int MPIGatherArray1D           (void*,double*,double*,int,int,int,int);
 /*! Gather local arrays into a global array for an n-dimensional array */
 extern "C" int MPIGatherArraynD           (int,void*,double*,double*,int*,int*,int,int);
 /*! Gather local arrays into a global array for an n-dimensional array (with ghosts) */
 extern "C" int MPIGatherArraynDwGhosts    (int,void*,double*,double*,int*,int*,int,int);
 /*! Partition a global array into local arrays for an n-dimensional array */
-extern "C" int MPIPartitionArraynD        (int,void*,double*,double*,int*,int*,int,int); 
+extern "C" int MPIPartitionArraynD        (int,void*,double*,double*,int*,int*,int,int);
 /*! Partition a global array into local arrays for an n-dimensional array */
-extern "C" int MPIPartitionArraynDwGhosts (int,void*,double*,double*,int*,int*,int,int); 
+extern "C" int MPIPartitionArraynDwGhosts (int,void*,double*,double*,int*,int*,int,int);
 /*! Partition a global array into local arrays for an essentially 1D array */
-extern "C" int MPIPartitionArray1D        (void*,double*,double*,int,int,int,int); 
+extern "C" int MPIPartitionArray1D        (void*,double*,double*,int,int,int,int);
 
 /*! fetch data from an n-dimensional local array on another rank */
 extern "C" int MPIGetArrayDatanD       (double*,double*,int*,int*,int*,int*,int,int,int,void*);

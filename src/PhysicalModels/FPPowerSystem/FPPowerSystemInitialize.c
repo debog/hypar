@@ -20,7 +20,7 @@ int    FPPowerSystemPrintStep         (void*,void*,double);
 int FPPowerSystemInitialize(void *s,void *m)
 {
   HyPar           *solver  = (HyPar*)         s;
-  MPIVariables    *mpi     = (MPIVariables*)  m; 
+  MPIVariables    *mpi     = (MPIVariables*)  m;
   FPPowerSystem   *physics = (FPPowerSystem*) solver->physics;
   int             ferr;
   _DECLARE_IERR_;
@@ -61,8 +61,8 @@ int FPPowerSystemInitialize(void *s,void *m)
     char word[_MAX_STRING_SIZE_];
     ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      while (strcmp(word, "end")){
+        ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
         if      (!strcmp(word, "inertia")) {ferr=fscanf(in,"%lf",&physics->H  );if(ferr!=1)return(1);}
         else if (!strcmp(word, "omega_s")) {ferr=fscanf(in,"%lf",&physics->O_s);if(ferr!=1)return(1);}
         else if (!strcmp(word, "E"      )) {ferr=fscanf(in,"%lf",&physics->E  );if(ferr!=1)return(1);}
@@ -76,10 +76,10 @@ int FPPowerSystemInitialize(void *s,void *m)
         else if (!strcmp(word, "tf"     )) {ferr=fscanf(in,"%lf",&physics->tf );if(ferr!=1)return(1);}
         else if (!strcmp(word, "tcl"    )) {ferr=fscanf(in,"%lf",&physics->tcl);if(ferr!=1)return(1);}
       }
-	  } else {
-    	fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+    } else {
+      fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
       return(1);
-	  }
+    }
   }
   fclose(in);
 
@@ -103,7 +103,7 @@ int FPPowerSystemInitialize(void *s,void *m)
   /* Calculate and print the PDF integral of the initial solution */
   IERR FPPowerSystemPostStep(solver->u,solver,mpi,0.0,0);      CHECKERR(ierr);
   if (!mpi->rank) IERR FPPowerSystemPrintStep(solver,mpi,0.0); CHECKERR(ierr);
-  
+
   count++;
   return(0);
 }

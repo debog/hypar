@@ -39,6 +39,6 @@ int Numa2DSource(double *S,double *u,void *s,void *m,double t)
 
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
-  
+
   return(0);
 }

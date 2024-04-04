@@ -26,7 +26,7 @@
 
 */
 int EnsembleSimulation::define( int a_rank, /*!< MPI rank of this process */
-                                int a_nproc /*!< Total number of MPI ranks */ 
+                                int a_nproc /*!< Total number of MPI ranks */
                               )
 {
   if (m_is_defined) {
@@ -58,7 +58,7 @@ int EnsembleSimulation::define( int a_rank, /*!< MPI rank of this process */
 
         while (std::string(word) != "end") {
 
-  	      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
 
           if (std::string(word) == "nsims") {
             ferr = fscanf(in,"%d",&m_nsims); if (ferr != 1) return(1);

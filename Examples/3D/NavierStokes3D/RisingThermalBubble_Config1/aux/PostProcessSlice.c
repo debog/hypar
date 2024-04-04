@@ -1,7 +1,7 @@
 /*
   Rising Thermal Bubble:-
-  The code takes a binary solution file (that contains the 
-  conserved variable (rho, rho*u, rho*v, e) as its input 
+  The code takes a binary solution file (that contains the
+  conserved variable (rho, rho*u, rho*v, e) as its input
   and calculates the primitive atmospheric flow variables:
   rho, u, v, P, theta, pi, rho0, P0, theta0, pi0
   and writes them to a tecplot file.
@@ -162,7 +162,7 @@ int PostProcess(char *fname, char *oname, void *p, int flag)
   /* allocate primitive variable array (rho, u, v, w, P, theta, rho0, P0, pi0, theta0) */
   int evars = 5;
   double *Q = (double*) calloc ((nvars+evars)*imax*jmax,sizeof(double));
-    
+
   /* calculate primitive variables */
   int i, j;
   double *X           = x;
@@ -239,13 +239,13 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
-   			else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite      );
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
+         else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite      );
       }
     }
     fclose(inputs);
@@ -271,13 +271,13 @@ int main()
     fprintf(stderr,"Error: File \"physics.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "gamma"))    fscanf(inputs,"%lf",&params.gamma);
-   			else if (!strcmp(word, "gravity")) {
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "gamma"))    fscanf(inputs,"%lf",&params.gamma);
+         else if (!strcmp(word, "gravity")) {
           fscanf(inputs,"%lf",&params.grav_x);
           fscanf(inputs,"%lf",&params.grav_y);
         } else if (!strcmp(word,"p_ref"))   fscanf(inputs,"%lf",&params.P_ref);

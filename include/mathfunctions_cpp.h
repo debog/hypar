@@ -10,11 +10,11 @@
 extern "C" void FindInterval(double,double,double*,int,int*,int*);
 
 /*! Fill the ghost cells of a global n-dimensional array */
-extern "C" void fillGhostCells( const int* const, 
-                                const int, 
-                                double* const, 
-                                const int, 
-                                const int, 
+extern "C" void fillGhostCells( const int* const,
+                                const int,
+                                double* const,
+                                const int,
+                                const int,
                                 const int* const);
 
 /*! Function to compute trilinear interpolation coefficients */
@@ -30,12 +30,12 @@ extern "C" void TrilinearInterpCoeffs(  double,
                                         double*);
 
 /*! Interpolate an n-dimensional grid variable from one grid to another */
-extern "C" int InterpolateGlobalnDVar(const int* const, 
-                                      double** const, 
-                                      const int* const, 
-                                      double* const, 
-                                      const int, 
-                                      const int, 
+extern "C" int InterpolateGlobalnDVar(const int* const,
+                                      double** const,
+                                      const int* const,
+                                      double* const,
+                                      const int,
+                                      const int,
                                       const int,
                                       const int* const);
 

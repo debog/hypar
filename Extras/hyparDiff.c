@@ -98,9 +98,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
    * know is a pointer to our arguments structure. */
   struct arguments *arguments = state->input;
 
-  switch (key) 
+  switch (key)
   {
-    case 'a': 
+    case 'a':
       arguments->abs_tol = arg;
       break;
     case 'r':
@@ -116,14 +116,14 @@ parse_opt (int key, char *arg, struct argp_state *state)
     default:
       return ARGP_ERR_UNKNOWN;
   }
-  
+
   return 0;
 }
 
 static struct argp argp = { options, parse_opt, args_doc, doc };
 
 double ArrayMaxnD(int    nvars,
-                  int    ndims, 
+                  int    ndims,
                   int    *dim,
                   int    ghosts,
                   int    *index,
@@ -133,7 +133,7 @@ double ArrayMaxnD(int    nvars,
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1D_(ndims,dim,index,ghosts,p);
-    int v; 
+    int v;
     for (v=0; v<nvars; v++) {
       double term = ( x[p*nvars+v]>0 ? x[p*nvars+v] : -x[p*nvars+v] );
       if (term > sum) sum = term;
@@ -355,8 +355,8 @@ int ComputeDiffNorm(  SolObj* const a_s1,
     a_diff_norm_abs[2] = sum;
   }
 
-  if (    (solution_norm[0] > tolerance) 
-      &&  (solution_norm[1] > tolerance) 
+  if (    (solution_norm[0] > tolerance)
+      &&  (solution_norm[1] > tolerance)
       &&  (solution_norm[2] > tolerance) ) {
     a_diff_norm_rel[0] = a_diff_norm_abs[0] / solution_norm[0];
     a_diff_norm_rel[1] = a_diff_norm_abs[1] / solution_norm[1];
@@ -432,7 +432,7 @@ int main(int argc, char** argv)
     if (diff_norm_rel[2] > rel_tol) flag_ok = 0;
 
     if (!flag_ok) {
-    printf( "%s and %s differ.\n", 
+    printf( "%s and %s differ.\n",
             sol_fname, ref_fname );
       printf("Norms of the difference between the two solutions:\n");
       printf("  L1  : %1.6e (abs), %1.6e (rel)\n", diff_norm_abs[0], diff_norm_rel[0]);
@@ -443,7 +443,7 @@ int main(int argc, char** argv)
 
   } else {
 
-    printf( "%s and %s differ in size.\n", 
+    printf( "%s and %s differ in size.\n",
             sol_fname, ref_fname );
 
   }

@@ -40,7 +40,7 @@ int BCSupersonicOutflowU(
   if (ndims == 2) {
 
     /* create a fake physics object */
-    Euler2D physics; 
+    Euler2D physics;
     double gamma;
     gamma = physics.gamma = boundary->gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
@@ -59,7 +59,7 @@ int BCSupersonicOutflowU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         double rho, uvel, vvel, energy, pressure;
         double rho_gpt, uvel_gpt, vvel_gpt, energy_gpt, pressure_gpt;
@@ -102,7 +102,7 @@ int BCSupersonicOutflowU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         double rho, uvel, vvel, wvel, energy, pressure;
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
@@ -114,7 +114,7 @@ int BCSupersonicOutflowU(
         vvel_gpt      = vvel;
         wvel_gpt      = wvel;
         energy_gpt    = inv_gamma_m1*pressure_gpt
-                        + 0.5 * rho_gpt 
+                        + 0.5 * rho_gpt
                         * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt + wvel_gpt*wvel_gpt);
 
         phi[nvars*p1+0] = rho_gpt;

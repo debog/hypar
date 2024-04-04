@@ -43,7 +43,7 @@ int VlasovAdvection( double  *f,   /*!< Array to hold the computed flux (same si
   int offset[ndims];
   _ArraySetValue_(offset,ndims,-ghosts);
 
-  int done = 0; 
+  int done = 0;
   int index_wog[ndims];
   int index[ndims]; _ArraySetValue_(index,ndims,0);
   while (!done) {

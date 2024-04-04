@@ -171,8 +171,8 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
         return 1;
       }
       if (!strcmp(word, "begin")){
-	      while (strcmp(word, "end")){
-		      ferr = fscanf(in,"%s",word);
+        while (strcmp(word, "end")){
+          ferr = fscanf(in,"%s",word);
           if (ferr != 1) {
             fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
             return 1;
@@ -324,10 +324,10 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
-	    } else {
-    	  fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+      } else {
+        fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
         return(1);
-	    }
+      }
     }
     fclose(in);
   }

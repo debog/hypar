@@ -14,15 +14,15 @@
 
 /*! Roe's upwinding scheme.
     \f{equation}{
-      {\bf f}_{j+1/2} = \frac{1}{2}\left[ {\bf f}_{j+1/2}^L + {\bf f}_{j+1/2}^R 
+      {\bf f}_{j+1/2} = \frac{1}{2}\left[ {\bf f}_{j+1/2}^L + {\bf f}_{j+1/2}^R
                          - \left| A\left({\bf u}_{j+1/2}^L,{\bf u}_{j+1/2}^R\right) \right|
                            \left( {\bf u}_{j+1/2}^R - {\bf u}_{j+1/2}^L  \right)\right]
     \f}
     + Roe, P. L., “Approximate Riemann solvers, parameter vectors, and difference schemes,” Journal of
     Computational Physics, Vol. 43, No. 2, 1981, pp. 357–372, http://dx.doi.org/10.1016/0021-9991(81)90128-5.
-    
+
     This upwinding scheme is modified for the balanced discretization of the 1D Euler equations when there is a non-zero gravitational force. See the reference below. For flows without any gravitational forces, it reduces to its original form.
-    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations 
+    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations
                   Under Gravitational Fields", J. Sci. Comput., 54, 2013, pp. 645--662,
                   http://dx.doi.org/10.1007/s10915-012-9585-8.
 
@@ -51,7 +51,7 @@ int Euler1DUpwindRoe(
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_],
                 DL[_MODEL_NVARS_*_MODEL_NVARS_], modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
@@ -71,7 +71,7 @@ int Euler1DUpwindRoe(
       udiff[1] = 0.5 * (uR[_MODEL_NVARS_*p+1] - uL[_MODEL_NVARS_*p+1]);
       udiff[2] = 0.5 * (uR[_MODEL_NVARS_*p+2] - uL[_MODEL_NVARS_*p+2]);
 
-      _Euler1DRoeAverage_         (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param); 
+      _Euler1DRoeAverage_         (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
       _Euler1DEigenvalues_        (uavg,D,param,0);
       _Euler1DLeftEigenvectors_   (uavg,L,param,0);
       _Euler1DRightEigenvectors_  (uavg,R,param,0);
@@ -147,7 +147,7 @@ int Euler1DUpwindRF(
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
       double kappa = max(param->grav_field[pL],param->grav_field[pR]);
 
@@ -204,7 +204,7 @@ int Euler1DUpwindRF(
     + C.-W. Shu, and S. Osher, "Efficient implementation of essentially non-oscillatory schemes, II", J. Comput. Phys., 83 (1989), pp. 32–78, http://dx.doi.org/10.1016/0021-9991(89)90222-2.
 
     This upwinding scheme is modified for the balanced discretization of the 1D Euler equations when there is a non-zero gravitational force. See the reference below. For flows without any gravitational forces, it reduces to its original form.
-    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations 
+    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations
                   Under Gravitational Fields", J. Sci. Comput., 54, 2013, pp. 645--662,
                   http://dx.doi.org/10.1007/s10915-012-9585-8.
 
@@ -244,7 +244,7 @@ int Euler1DUpwindLLF(
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
       double kappa = max(param->grav_field[pL],param->grav_field[pR]);
 
@@ -284,7 +284,7 @@ int Euler1DUpwindLLF(
 }
 
 /*! Steger-Warming Flux-Splitting scheme
-    + Steger, J.L., Warming, R.F., "Flux vector splitting of the inviscid gasdynamic equations with 
+    + Steger, J.L., Warming, R.F., "Flux vector splitting of the inviscid gasdynamic equations with
       application to finite-difference methods", J. Comput. Phys., 40(2), 1981, pp. 263-293,
       http://dx.doi.org/10.1016/0021-9991(81)90210-2.
 
@@ -323,7 +323,7 @@ int Euler1DUpwindSWFS(
       double rho,v,e,P,c,gamma=param->gamma,term,Mach;
 
       /* Steger Warming flux splitting */
-      _Euler1DRoeAverage_(uavg,(uL+_MODEL_NVARS_*p),(uR+_MODEL_NVARS_*p),param); 
+      _Euler1DRoeAverage_(uavg,(uL+_MODEL_NVARS_*p),(uR+_MODEL_NVARS_*p),param);
       _Euler1DGetFlowVar_(uavg,rho,v,e,P,param);
       Mach = v/sqrt(gamma*P/rho);
 
@@ -366,11 +366,11 @@ int Euler1DUpwindSWFS(
 
 /*! Rusanov's upwinding scheme.
     \f{equation}{
-      {\bf f}_{j+1/2} = \frac{1}{2}\left[ {\bf f}_{j+1/2}^L + {\bf f}_{j+1/2}^R 
+      {\bf f}_{j+1/2} = \frac{1}{2}\left[ {\bf f}_{j+1/2}^L + {\bf f}_{j+1/2}^R
                          - \max_{j,j+1} \nu_j \left( {\bf u}_{j+1/2}^R - {\bf u}_{j+1/2}^L  \right)\right]
     \f}
     where \f$\nu = c + \left|u\right|\f$.
-    + Rusanov, V. V., "The calculation of the interaction of non-stationary shock waves and obstacles," USSR 
+    + Rusanov, V. V., "The calculation of the interaction of non-stationary shock waves and obstacles," USSR
     Computational Mathematics and Mathematical Physics, Vol. 1, No. 2, 1962, pp. 304–320
 */
 int Euler1DUpwindRusanov(
@@ -447,7 +447,7 @@ int Euler1DUpwindRusanov(
 }
 
 /*! The Roe upwinding scheme (#Euler1DUpwindRoe) for the partitioned hyperbolic flux that comprises
-    of the acoustic waves only (see #Euler1DStiffFlux, #_Euler1DSetStiffFlux_). Thus, only the 
+    of the acoustic waves only (see #Euler1DStiffFlux, #_Euler1DSetStiffFlux_). Thus, only the
     characteristic fields / eigen-modes corresponding to \f$ u\pm a\f$ are used.
 */
 int Euler1DUpwinddFRoe(
@@ -475,7 +475,7 @@ int Euler1DUpwinddFRoe(
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_],
                 DL[_MODEL_NVARS_*_MODEL_NVARS_], modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
@@ -495,13 +495,13 @@ int Euler1DUpwinddFRoe(
       udiff[1] = 0.5 * (uR[_MODEL_NVARS_*p+1] - uL[_MODEL_NVARS_*p+1]);
       udiff[2] = 0.5 * (uR[_MODEL_NVARS_*p+2] - uL[_MODEL_NVARS_*p+2]);
 
-      _Euler1DRoeAverage_         (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param); 
+      _Euler1DRoeAverage_         (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param);
       _Euler1DEigenvalues_        (uavg,D,param,0);
       _Euler1DLeftEigenvectors_   (uavg,L,param,0);
       _Euler1DRightEigenvectors_  (uavg,R,param,0);
 
       double kappa = max(param->grav_field[pL],param->grav_field[pR]);
-      k = 0; D[k] = 0.0; 
+      k = 0; D[k] = 0.0;
       k = 4; D[k] = kappa*absolute(D[k]);
       k = 8; D[k] = kappa*absolute(D[k]);
 
@@ -522,8 +522,8 @@ int Euler1DUpwinddFRoe(
   return(0);
 }
 
-/*! The characteristic-based Roe-fixed upwinding scheme (#Euler1DUpwindRF) for the partitioned hyperbolic flux 
-    that comprises of the acoustic waves only (see #Euler1DStiffFlux, #_Euler1DSetStiffFlux_). Thus, only the 
+/*! The characteristic-based Roe-fixed upwinding scheme (#Euler1DUpwindRF) for the partitioned hyperbolic flux
+    that comprises of the acoustic waves only (see #Euler1DStiffFlux, #_Euler1DSetStiffFlux_). Thus, only the
     characteristic fields / eigen-modes corresponding to \f$ u\pm a\f$ are used.
 
     Reference:
@@ -567,7 +567,7 @@ int Euler1DUpwinddFRF(
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
       double kappa = max(param->grav_field[pL],param->grav_field[pR]);
 
@@ -611,8 +611,8 @@ int Euler1DUpwinddFRF(
   return(0);
 }
 
-/*! The characteristic-based local Lax-Friedrich upwinding scheme (#Euler1DUpwindLLF) for the partitioned hyperbolic 
-    flux that comprises of the acoustic waves only (see #Euler1DStiffFlux, #_Euler1DSetStiffFlux_). Thus, only the 
+/*! The characteristic-based local Lax-Friedrich upwinding scheme (#Euler1DUpwindLLF) for the partitioned hyperbolic
+    flux that comprises of the acoustic waves only (see #Euler1DStiffFlux, #_Euler1DSetStiffFlux_). Thus, only the
     characteristic fields / eigen-modes corresponding to \f$ u\pm a\f$ are used.
 
     Reference:
@@ -656,7 +656,7 @@ int Euler1DUpwinddFLLF(
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
       double kappa = max(param->grav_field[pL],param->grav_field[pR]);
 

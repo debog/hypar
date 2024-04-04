@@ -59,7 +59,7 @@ extern "C" int gpuBCPeriodicU(
     void   * __restrict__ m,  /*!< MPI object of type #MPIVariables */
     int    ndims,             /*!< Number of spatial dimensions */
     int    nvars,             /*!< Number of variables/DoFs per grid point */
-    int    * __restrict__ size, /*!<  Integer array with the number of grid points in 
+    int    * __restrict__ size, /*!<  Integer array with the number of grid points in
                                       each spatial dimensions */
     int    ghosts,              /*!< Number of ghost points */
     double * __restrict__ phi,  /*!< The solution array on which to apply the boundary condition */
@@ -165,7 +165,7 @@ extern "C" int gpuBCPeriodicU(
     void   * __restrict__ m,  /*!< MPI object of type #MPIVariables */
     int    ndims,             /*!< Number of spatial dimensions */
     int    nvars,             /*!< Number of variables/DoFs per grid point */
-    int    * __restrict__ size, /*!<  Integer array with the number of grid points in 
+    int    * __restrict__ size, /*!<  Integer array with the number of grid points in
                                       each spatial dimensions */
     int    ghosts,              /*!< Number of ghost points */
     double * __restrict__ phi,  /*!< The solution array on which to apply the boundary condition */

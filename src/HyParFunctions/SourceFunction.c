@@ -70,7 +70,7 @@ int SourceFunction(
                         solver->dim_local,
                         solver->x,
                         u,
-                        source  ); 
+                        source  );
       }
     }
 #if defined(HAVE_CUDA)

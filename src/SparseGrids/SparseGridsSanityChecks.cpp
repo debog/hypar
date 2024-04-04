@@ -42,6 +42,6 @@ int SparseGridsSimulation::SanityChecks()
       return 1;
     }
   }
-  
+
   return 0;
 }

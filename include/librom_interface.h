@@ -37,7 +37,7 @@
     https://github.com/LLNL/libROM.
 */
 /*! \brief Class implementing interface with libROM
- 
+
     This class implements the interface between HyPar
     and libROM. For details on libROM, see:
     https://github.com/LLNL/libROM.

@@ -5,10 +5,10 @@
 
 
 int main()
-{  
+{
   const double pi = 4.0*atan(1.0);
 
-	int NI, NJ, ndims;
+  int NI, NJ, ndims;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");
 
@@ -75,77 +75,77 @@ int main()
     fprintf(stderr,"ndims is not 2 in solver.inp. this code is to generate 2D initial conditions\n");
     return(0);
   }
-	printf("Grid: %d, %d\n",NI,NJ);
+  printf("Grid: %d, %d\n",NI,NJ);
 
   int i,j;
-	double dx = 1.0 / ((double)NI);
-	double dy = 1.0 / ((double)NJ);
+  double dx = 1.0 / ((double)NI);
+  double dy = 1.0 / ((double)NJ);
 
   double *x, *y, *u, *a;
-	x = (double*) calloc (NI   , sizeof(double));
-	y = (double*) calloc (NJ   , sizeof(double));
-	u = (double*) calloc (NI*NJ, sizeof(double));
-	a = (double*) calloc (ndims*NI*NJ, sizeof(double));
+  x = (double*) calloc (NI   , sizeof(double));
+  y = (double*) calloc (NJ   , sizeof(double));
+  u = (double*) calloc (NI*NJ, sizeof(double));
+  a = (double*) calloc (ndims*NI*NJ, sizeof(double));
 
-	for (i = 0; i < NI; i++){
-  	for (j = 0; j < NJ; j++){
-	  	x[i] = i*dx;
-	  	y[j] = j*dy;
+  for (i = 0; i < NI; i++){
+    for (j = 0; j < NJ; j++){
+      x[i] = i*dx;
+      y[j] = j*dy;
       int p = NI*j + i;
 
-		  u[p] = cos(4*pi*y[j]);
+      u[p] = cos(4*pi*y[j]);
 
       a[ndims*p+0] = sin(4*pi*y[j]);
       a[ndims*p+1] = -cos(4*pi*x[i]);
-	  }
-	}
+    }
+  }
 
   FILE *out;
   if (!strcmp(ip_file_type,"ascii")) {
     printf("Writing ASCII initial solution file initial.inp\n");
-	  out = fopen("initial.inp","w");
+    out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
     fprintf(out,"\n");
     for (j = 0; j < NJ; j++)  fprintf(out,"%lf ",y[j]);
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%lf ",u[p]);
       }
     }
     fprintf(out,"\n");
-	  fclose(out);
+    fclose(out);
     printf("Writing ASCII advection field file %s\n", adv_filename);
-	  out = fopen(adv_filename,"w");
+    out = fopen(adv_filename,"w");
     for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
     fprintf(out,"\n");
     for (j = 0; j < NJ; j++)  fprintf(out,"%lf ",y[j]);
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%lf ",a[ndims*p+0]);
       }
     }
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%lf ",a[ndims*p+1]);
       }
     }
     fprintf(out,"\n");
-	  fclose(out);
+    fclose(out);
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
     printf("Writing binary initial solution file initial.inp\n");
-  	out = fopen("initial.inp","wb");
+    out = fopen("initial.inp","wb");
     fwrite(x,sizeof(double),NI,out);
     fwrite(y,sizeof(double),NJ,out);
     fwrite(u,sizeof(double),NI*NJ,out);
     fclose(out);
     printf("Writing binary advection field file %s\n", adv_filename);
-  	out = fopen(adv_filename,"wb");
+    out = fopen(adv_filename,"wb");
     fwrite(x,sizeof(double),NI,out);
     fwrite(y,sizeof(double),NJ,out);
     fwrite(a,sizeof(double),ndims*NI*NJ,out);
@@ -153,10 +153,10 @@ int main()
   }
 
 
-	free(x);
-	free(y);
-	free(u);
-	free(a);
+  free(x);
+  free(y);
+  free(u);
+  free(a);
 
-	return(0);
+  return(0);
 }

@@ -9,7 +9,7 @@
 #include <physicalmodels/navierstokes3d.h>
 
 /*! Function to compute the flux Jacobian of the 3D Navier-Stokes equations, given the
-    solution at a grid point. The Jacobian is square matrix of size nvar=5, and 
+    solution at a grid point. The Jacobian is square matrix of size nvar=5, and
     is returned as a 1D array (double) of 25 elements in row-major format.
 */
 int NavierStokes3DJacobian(
@@ -18,13 +18,13 @@ int NavierStokes3DJacobian(
                     void    *p,   /*!< object containing the physics-related parameters */
                     int     dir,  /*!< dimension (0 -> x, 1 -> y, 2 -> z) */
                     int     nvars,/*!< number of vector components */
-                    int     upw   /*!< 0 -> send back complete Jacobian, 
-                                       1 -> send back Jacobian of right(+)-moving flux, 
+                    int     upw   /*!< 0 -> send back complete Jacobian,
+                                       1 -> send back Jacobian of right(+)-moving flux,
                                       -1 -> send back Jacobian of left(-)-moving flux */
                    )
 {
   NavierStokes3D *param = (NavierStokes3D*) p;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */
@@ -45,9 +45,9 @@ int NavierStokes3DJacobian(
   return(0);
 }
 
-/*! Function to compute the Jacobian of the fast flux (representing the acoustic waves) 
-    of the 3D Navier-Stokes equations, given the solution at a grid point. The Jacobian 
-    is square matrix of size nvar=5, and is returned as a 1D array (double) of 25 elements 
+/*! Function to compute the Jacobian of the fast flux (representing the acoustic waves)
+    of the 3D Navier-Stokes equations, given the solution at a grid point. The Jacobian
+    is square matrix of size nvar=5, and is returned as a 1D array (double) of 25 elements
     in row-major format.
 */
 int NavierStokes3DStiffJacobian(
@@ -56,13 +56,13 @@ int NavierStokes3DStiffJacobian(
                           void    *p,   /*!< object containing the physics-related parameters */
                           int     dir,  /*!< dimension (0 -> x, 1 -> y, 2 -> z) */
                           int     nvars,/*!< number of vector components */
-                          int     upw   /*!< 0 -> send back complete Jacobian, 
-                                             1 -> send back Jacobian of right(+)-moving flux, 
+                          int     upw   /*!< 0 -> send back complete Jacobian,
+                                             1 -> send back Jacobian of right(+)-moving flux,
                                             -1 -> send back Jacobian of left(-)-moving flux */
                    )
 {
   NavierStokes3D *param = (NavierStokes3D*) p;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */

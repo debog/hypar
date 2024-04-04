@@ -15,14 +15,14 @@ fi
 AC_ARG_ENABLE([serial],AS_HELP_STRING([--enable-serial],[Enable serial mode]))
 AC_ARG_ENABLE([cuda],AS_HELP_STRING([--enable-cuda],[Enable CUDA]))
 AC_ARG_WITH([cuda_dir],AS_HELP_STRING([--with-cuda-dir],[Specify path where CUDA is installed.]))
-AC_ARG_WITH([mpi_dir],AC_HELP_STRING([--with-mpi-dir],[Specify path where MPI is installed.]))
+AC_ARG_WITH([mpi_dir],AS_HELP_STRING([--with-mpi-dir],[Specify path where MPI is installed.]))
 AC_ARG_ENABLE([omp],AS_HELP_STRING([--enable-omp],[Enable OpenMP threads]))
 AC_ARG_ENABLE([scalapack],AS_HELP_STRING([--enable-scalapack],[Enable ScaLAPACK]))
-AC_ARG_WITH([blas_dir],AC_HELP_STRING([--with-blas-dir],[Specify path where BLAS libraries are installed.]))
-AC_ARG_WITH([lapack_dir],AC_HELP_STRING([--with-lapack-dir],[Specify path where LAPACK libraries are installed.]))
-AC_ARG_WITH([scalapack_dir],AC_HELP_STRING([--with-scalapack-dir],[Specify path where ScaLAPACK libraries are installed.]))
-AC_ARG_ENABLE([fftw],AC_HELP_STRING([--enable-fftw],[Enable FFTW]))
-AC_ARG_WITH([fftw_dir],AC_HELP_STRING([--with-fftw-dir],[Specify path where FFTW libraries are installed.]))
+AC_ARG_WITH([blas_dir],AS_HELP_STRING([--with-blas-dir],[Specify path where BLAS libraries are installed.]))
+AC_ARG_WITH([lapack_dir],AS_HELP_STRING([--with-lapack-dir],[Specify path where LAPACK libraries are installed.]))
+AC_ARG_WITH([scalapack_dir],AS_HELP_STRING([--with-scalapack-dir],[Specify path where ScaLAPACK libraries are installed.]))
+AC_ARG_ENABLE([fftw],AS_HELP_STRING([--enable-fftw],[Enable FFTW]))
+AC_ARG_WITH([fftw_dir],AS_HELP_STRING([--with-fftw-dir],[Specify path where FFTW libraries are installed.]))
 AC_ARG_ENABLE([python],AS_HELP_STRING([--enable-python],[Enable Python features (environment variables PYTHON_LIB_PATH, PYTHON_BIN_PATH, PYTHON_INCLUDE_PATH, NUMPY_INCLUDE_PATH, and PYTHON_LIB_NAME must be defined).]))
 
 AC_PROG_CC
@@ -158,8 +158,11 @@ if test "x$enable_cuda" = "xyes"; then
 
   if test "x$enable_serial" != "xyes"; then
     MPI_DIR=$(which ${MPICC} | sed 's/\/bin\/mpicc//g')
-    AC_CHECK_FILE([$MPI_DIR/include/mpi.h], [], [AC_MSG_ERROR([mpi.h is not found])])
-    CUDA_CFLAGS="$CUDA_CFLAGS -I${MPI_DIR}/include -L${MPI_DIR}/lib -lmpi"
+    if test -e ${MPI_DIR}/include/mpi.h ; then
+      CUDA_CFLAGS="$CUDA_CFLAGS -I${MPI_DIR}/include -L${MPI_DIR}/lib -lmpi"
+    else 
+      CUDA_CFLAGS="$CUDA_CFLAGS -lmpi"
+    fi
   fi
 
   AC_SUBST(CUDA_CFLAGS)

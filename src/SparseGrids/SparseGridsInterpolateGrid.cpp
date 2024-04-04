@@ -10,7 +10,7 @@
 #include <sparse_grids_simulation.h>
 
 /*! Interpolate grid coordinates from one grid to another. Note that along each dimension,
-    the ratio of the number of grid points in the source grid and that in the 
+    the ratio of the number of grid points in the source grid and that in the
     destination grid must be an integer power of 2 (negative or positive).
 
     Since the source and destination grids may have different processor layouts,
@@ -66,8 +66,8 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
 
       if (dim_from[dir] == dim_to[dir]) continue;
 
-      double fac = (dim_to[dir] > dim_from[dir] ? 
-                        (double)dim_to[dir]/(double)dim_from[dir] 
+      double fac = (dim_to[dir] > dim_from[dir] ?
+                        (double)dim_to[dir]/(double)dim_from[dir]
                       : (double)dim_from[dir]/(double)dim_to[dir] );
       if (!isPowerOfTwo((int)fac)) {
         fprintf(stderr,"Error in SparseGridsSimulation::interpolate() - \n");
@@ -84,7 +84,7 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
       } else {
         refineGrid1D(dim_from, dim_to, x_from, x_to, dir);
       }
-  
+
     }
 
     /* dim_to should be equal to dim_dst now */
@@ -150,7 +150,7 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
         /* fill right boundary along this dimension */
         for (int i = dim[d]+ghosts; i < dim[d]+2*ghosts; i++) {
           int delta = i - (dim[d]+ghosts-1);
-          X[i] =  X[dim[d]+ghosts-1] 
+          X[i] =  X[dim[d]+ghosts-1]
                   + ((double) delta) * (X[dim[d]+ghosts-1]-X[dim[d]+ghosts-2]);
         }
       }
@@ -161,7 +161,7 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
 }
 
 /*! Coarsen along a given dimension - the source and destination must have the same sizes
- *  along all other dimensions. 
+ *  along all other dimensions.
  *
  *  Note that the grid must *not* have any ghost points!
 */
@@ -220,18 +220,18 @@ void SparseGridsSimulation::coarsenGrid1D(  const GridDimensions& a_dim_src,  /*
     } else {
 
       _ArrayCopy1D_(x_src, x_dst, a_dim_dst[d]);
-      
+
     }
 
     x_src += a_dim_src[d];
     x_dst += a_dim_dst[d];
   }
-  
+
   return;
 }
 
 /*! Refine along a given dimension - the source and destination must have the same sizes
- *  along all other dimensions. 
+ *  along all other dimensions.
  *
  *  Note that the grid must *not* have any ghost points!
 */
@@ -274,7 +274,7 @@ void SparseGridsSimulation::refineGrid1D( const GridDimensions& a_dim_src,  /*!<
   fprintf(stderr, "Error in SparseGridsSimulation::refineGrid1D() -\n");
   fprintf(stderr, "  NOT YET IMPLEMENTED! Why do you need this?\n");
   exit(1);
-  
+
   return;
 }
 

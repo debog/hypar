@@ -12,7 +12,7 @@
 #include <mpivars.h>
 
 /*! Applies the turbulent supersonic inflow boundary condition: The inflow consists
-    of a mean supersonic inflow on which turbulent flow fluctuations are added. This 
+    of a mean supersonic inflow on which turbulent flow fluctuations are added. This
     boundary condition is specific to the 3D Navier-Stokes system (#NavierStokes3D).
     \n\n
     Note: Some parts of the code may be hardcoded for use with the shock-turbulence
@@ -57,7 +57,7 @@ int BCTurbulentSupersonicInflowU(
       int done = 0;
       while (!done) {
         int p1; _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
-        
+
         /* set the ghost point values - mean flow */
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
         rho_gpt      = boundary->FlowDensity;
@@ -82,7 +82,7 @@ int BCTurbulentSupersonicInflowU(
 
         /* set the ghost point values */
         energy_gpt   = inv_gamma_m1*pressure_gpt
-                       + 0.5 * rho_gpt 
+                       + 0.5 * rho_gpt
                        * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt + wvel_gpt*wvel_gpt);
         phi[nvars*p1+0] = rho_gpt;
         phi[nvars*p1+1] = rho_gpt * uvel_gpt;

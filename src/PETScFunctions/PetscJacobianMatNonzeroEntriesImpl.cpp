@@ -19,10 +19,10 @@
   of the governing equations: The ODE, obtained after discretizing the governing PDE in space,
   is expressed as follows:
   \f{equation}{
-    \frac {d{\bf U}}{dt} = {\bf L}\left({\bf U}\right) 
-    \Rightarrow \frac {d{\bf U}}{dt} - {\bf L}\left({\bf U}\right) = 0, 
+    \frac {d{\bf U}}{dt} = {\bf L}\left({\bf U}\right)
+    \Rightarrow \frac {d{\bf U}}{dt} - {\bf L}\left({\bf U}\right) = 0,
   \f}
-  where \f${\bf L}\f$ is the spatially discretized right-hand-side, and \f${\bf U}\f$ 
+  where \f${\bf L}\f$ is the spatially discretized right-hand-side, and \f${\bf U}\f$
   represents the entire solution vector.
 
   The Jacobian is thus given by:
@@ -60,27 +60,27 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
         *points = context->points[ns],
         index[ndims],indexL[ndims],indexR[ndims],
         rows[nvars],cols[nvars];
-  
+
     std::vector<double> values(nvars*nvars, 1.0);
-  
+
     /* loop through all computational points */
     for (int n = 0; n < npoints; n++) {
 
       int *this_point = points + n*(ndims+1);
       int p = this_point[ndims];
       int index[ndims]; _ArrayCopy1D_(this_point,index,ndims);
-  
+
       for (int dir = 0; dir < ndims; dir++) {
-    
+
         int pg = (int) context->globalDOF[ns][p];
         /* diagonal element */
         for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pg + v; }
         MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
 
         for (int d = 1; d <= width; d++) {
-    
+
           /* left neighbor */
-          _ArrayCopy1D_(index,indexL,ndims); 
+          _ArrayCopy1D_(index,indexL,ndims);
           indexL[dir] -= d;
           int pL;  _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
           int pgL = (int) context->globalDOF[ns][pL];
@@ -88,8 +88,8 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgL + v; }
             MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
           }
-    
-          _ArrayCopy1D_(index,indexR,ndims); 
+
+          _ArrayCopy1D_(index,indexR,ndims);
           indexR[dir] += d;
           int pR;  _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
           int pgR = (int) context->globalDOF[ns][pR];
@@ -107,7 +107,7 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
 
   MatAssemblyBegin(Amat,MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd  (Amat,MAT_FINAL_ASSEMBLY);
-  
+
   PetscFunctionReturn(0);
 }
 

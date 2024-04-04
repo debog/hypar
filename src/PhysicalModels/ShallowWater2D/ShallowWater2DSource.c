@@ -13,10 +13,10 @@
 static int ShallowWater2DSourceFunction1  (double*,double*,double*,void*,void*,double,int);
 static int ShallowWater2DSourceFunction2  (double*,double*,double*,void*,void*,double,int);
 
-/*! Compute the source terms for the 2D shallow water equations. 
-    + The topography gradient source term is computed according to the balanced 
-      formulation introduced in the reference below. The source term is reformulated 
-      and "discretized" in a similar fashion as the hyperbolic flux to ensure that 
+/*! Compute the source terms for the 2D shallow water equations.
+    + The topography gradient source term is computed according to the balanced
+      formulation introduced in the reference below. The source term is reformulated
+      and "discretized" in a similar fashion as the hyperbolic flux to ensure that
       the hydrostatic balance is maintained to machine precision.\n
       Xing, Y., Shu, C.-W., "High order finite difference WENO schemes with the
       exact conservation property for the shallow water equations", Journal of
@@ -24,7 +24,7 @@ static int ShallowWater2DSourceFunction2  (double*,double*,double*,void*,void*,d
       http://dx.doi.org/10.1016/j.jcp.2005.02.006
     + The Coriolis source term is added in a naive way -- a balanced formulation
       may be needed. The Coriolis source term is implemented as described in:\n
-      Zhu, Et. al., "Variational Data Assimilation with a Variable Resolution 
+      Zhu, Et. al., "Variational Data Assimilation with a Variable Resolution
       Finite-Element Shallow-Water Equations Model", Monthly Weather Review,
       122, 1994, pp. 946--965
       http://dx.doi.org/10.1175/1520-0493(1994)122%3C0946:VDAWAV%3E2.0.CO;2\n
@@ -56,7 +56,7 @@ int ShallowWater2DSource(
   int     index[ndims],index1[ndims],index2[ndims],dim_interface[ndims];
 
   /* Along X */
-  
+
   /* set interface dimensions */
   _ArrayCopy1D_(dim,dim_interface,ndims); dim_interface[_XDIR_]++;
 
@@ -171,7 +171,7 @@ int ShallowWater2DSource(
   return(0);
 }
 
-/*! Compute the first source function that is then "discretized" in a way similar to 
+/*! Compute the first source function that is then "discretized" in a way similar to
     the hyperbolic flux function for the balanced formulation introduced in the reference below.
     The source term is reformulated and "discretized" in a similar fashion as the hyperbolic
     flux to ensure that the hydrostatic balance is maintained to machine precision.
@@ -182,12 +182,12 @@ int ShallowWater2DSource(
    \n
    This function computes:
    \f{equation}{
-     {\bf S}_2 = 
+     {\bf S}_2 =
         \left\{
-          \begin{array}{cc} 
+          \begin{array}{cc}
             \left[ \begin{array}{c} 0 \\ \frac{1}{2}gb^2 \\ 0 \end{array}\right] & {\rm dir} = x \\
-            \left[ \begin{array}{c} 0 \\ 0 \\ \frac{1}{2}gb^2 \end{array}\right] & {\rm dir} = y 
-          \end{array} 
+            \left[ \begin{array}{c} 0 \\ 0 \\ \frac{1}{2}gb^2 \end{array}\right] & {\rm dir} = y
+          \end{array}
         \right.
    \f}
 */
@@ -228,7 +228,7 @@ int ShallowWater2DSourceFunction1(
   return(0);
 }
 
-/*! Compute the second source function that is then "discretized" in a way similar to 
+/*! Compute the second source function that is then "discretized" in a way similar to
     the hyperbolic flux function for the balanced formulation introduced in the reference below.
     The source term is reformulated and "discretized" in a similar fashion as the hyperbolic
     flux to ensure that the hydrostatic balance is maintained to machine precision.
@@ -239,12 +239,12 @@ int ShallowWater2DSourceFunction1(
    \n
    This function computes:
    \f{equation}{
-     {\bf S}_2 = 
+     {\bf S}_2 =
         \left\{
-          \begin{array}{cc} 
+          \begin{array}{cc}
             \left[ \begin{array}{c} 0 \\ b \\ 0 \end{array}\right] & {\rm dir} = x \\
-            \left[ \begin{array}{c} 0 \\ 0 \\ b \end{array}\right] & {\rm dir} = y 
-          \end{array} 
+            \left[ \begin{array}{c} 0 \\ 0 \\ b \end{array}\right] & {\rm dir} = y
+          \end{array}
         \right.
    \f}
 */

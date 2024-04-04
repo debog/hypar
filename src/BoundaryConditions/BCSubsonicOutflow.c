@@ -12,7 +12,7 @@
 #include <physicalmodels/navierstokes3d.h>
 
 /*! Applies the subsonic outflow boundary condition: The pressure at the physical boundary
-    ghost points is specified, while the density and velocity are extrapolated from the 
+    ghost points is specified, while the density and velocity are extrapolated from the
     interior. This boundary condition is specific to two and three dimensional Euler/
     Navier-Stokes systems (#Euler2D, #NavierStokes2D, #NavierStokes3D).
 */
@@ -35,7 +35,7 @@ int BCSubsonicOutflowU(
   if (ndims == 2) {
 
     /* create a fake physics object */
-    Euler2D physics; 
+    Euler2D physics;
     double gamma;
     gamma = physics.gamma = boundary->gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
@@ -54,7 +54,7 @@ int BCSubsonicOutflowU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         double rho, uvel, vvel, energy, pressure;
         double rho_gpt, uvel_gpt, vvel_gpt, energy_gpt, pressure_gpt;
@@ -98,7 +98,7 @@ int BCSubsonicOutflowU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         double rho, uvel, vvel, wvel, energy, pressure;
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
@@ -111,7 +111,7 @@ int BCSubsonicOutflowU(
         vvel_gpt = vvel;
         wvel_gpt = wvel;
         energy_gpt = inv_gamma_m1*pressure_gpt
-                    + 0.5 * rho_gpt 
+                    + 0.5 * rho_gpt
                     * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt + wvel_gpt*wvel_gpt);
 
         phi[nvars*p1+0] = rho_gpt;

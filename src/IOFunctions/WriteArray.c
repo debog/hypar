@@ -20,8 +20,8 @@ static int WriteArraySerial   (int,int,int*,int*,int,double*,double*,void*,void*
 static int WriteArrayParallel (int,int,int*,int*,int,double*,double*,void*,void*,char*);
 #endif
 
-/*! Write out a vector field, stored as an array, to file: wrapper function that calls 
-    the appropriate function depending on output mode (#HyPar::output_mode). The 
+/*! Write out a vector field, stored as an array, to file: wrapper function that calls
+    the appropriate function depending on output mode (#HyPar::output_mode). The
     output file format is determined by #HyPar::op_file_format
 */
 int WriteArray(
@@ -41,7 +41,7 @@ int WriteArray(
   HyPar         *solver = (HyPar*)       s;
   MPIVariables  *mpi    = (MPIVariables*)m;
   _DECLARE_IERR_;
-  
+
   /* if WriteOutput() is NULL, then return */
   if (!solver->WriteOutput) return(0);
 
@@ -56,21 +56,21 @@ int WriteArray(
                             solver,mpi,fname_root); CHECKERR(ierr);
   }
 #endif
-  
+
   return(0);
 }
 
 /*!
   Function to write out a vector field, stored as an array, and
-  its associated Cartesian grid to a file in serial mode. It will 
-  allocate the global domain on rank 0, so do not use for big 
-  problems for which the entire global domain will not fit on one 
+  its associated Cartesian grid to a file in serial mode. It will
+  allocate the global domain on rank 0, so do not use for big
+  problems for which the entire global domain will not fit on one
   node. This approach is also not very scalable.
   + Supports binary and ASCII formats (specified through
     #HyPar::op_file_format).
 
   \sa WriteBinary(), WriteText(), WriteTecplot2D(), WriteTecplot3D()
-*/ 
+*/
 int WriteArraySerial(
                       int     ndims,        /*!< Number of spatial dimensions */
                       int     nvars,        /*!< Number of variables per grid point */
@@ -148,15 +148,15 @@ int WriteArraySerial(
 
 /*! Write a vector field, stored as an array, and its associated Cartesian grid
     to a file in parallel. All the MPI ranks are divided into IO groups,
-    each with a group leader that writes out the data for the ranks in 
-    its group. The number of groups (and thus, the number of ranks 
+    each with a group leader that writes out the data for the ranks in
+    its group. The number of groups (and thus, the number of ranks
     participating in file I/O) is given by #MPIVariables::N_IORanks.
-    The group leader receives the local data from each rank in its 
+    The group leader receives the local data from each rank in its
     group, and writes it out to the corresponding file.
     + The data is written in binary format only.
     + The number of files written is equal to the number of IO groups
       (#MPIVariables::N_IORanks), and are named as <fname_root>.bin.nnnn
-      where "nnnn" is a string of format "%04d" representing n, 
+      where "nnnn" is a string of format "%04d" representing n,
       0 <= n < MPIVariables::N_IORanks.
     + Each file contains the following blocks of data:\n
       {\n
@@ -179,7 +179,7 @@ int WriteArraySerial(
       }\n
       for each rank in the corresponding group (i.e., there are #MPIVariables::nproc divided by
       #MPIVariables::N_IORanks such blocks in each file).
-    + To stitch all the local data in these files into the global solution, and write that out to 
+    + To stitch all the local data in these files into the global solution, and write that out to
       a binary file can be done by Extras/ParallelOutput.c.
     + If #HyPar::op_overwrite is set to 0, the vector field at the various simulation times are appended
       to each of the <fname_root>.bin.nnnn. The code Extras/ParallelOutput.c will take care of writing
@@ -187,7 +187,7 @@ int WriteArraySerial(
       that WriteArraySerial() would have written out if serial file output was chosen).
 
     This approach has been observed to be very scalable (with up to ~500,000 MPI ranks). The number of MPI
-    ranks participating in file I/O (#MPIVariables::N_IORanks) should be set to the number of I/O nodes 
+    ranks participating in file I/O (#MPIVariables::N_IORanks) should be set to the number of I/O nodes
     available on a HPC platform, given the number of compute nodes the simulation is running on.
 */
 #ifndef serial
@@ -251,7 +251,7 @@ int WriteArrayParallel(
 
     if (!strcmp(solver->op_overwrite,"no")) {
       if ((!count) && (!solver->restart_iter)) {
-        /* open a new file, since this function is being called the first time 
+        /* open a new file, since this function is being called the first time
            and this is not a restart run*/
         out = fopen(filename,"wb");
         if (!out) {

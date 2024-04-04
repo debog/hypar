@@ -1,6 +1,6 @@
 '''
 Python script to create plots of atmoshpheric flow variables
-of a HyPar simulation of the rising thermal bubble case. 
+of a HyPar simulation of the rising thermal bubble case.
 This particular file is for the
 2D Navier-Stokes/Euler physics, where the solution vector
 components are (rho, rho*u, rho*v, e).
@@ -110,7 +110,7 @@ def convertVar( u_conserved: np.ndarray,
                       rho0,
                       p0,
                       p_exner,
-                      theta0*np.ones(rho.shape)], 
+                      theta0*np.ones(rho.shape)],
                     axis=0)
   return retval
 
@@ -118,7 +118,7 @@ def plotData( data_2d: np.ndarray,
               x2d: np.ndarray,
               y2d: np.ndarray,
               fig_filename,
-              varname, 
+              varname,
               t_solution ):
 
   fig = plt.figure(figsize=figsize)
@@ -131,7 +131,7 @@ def plotData( data_2d: np.ndarray,
   ax.set_title("{:}, t={:.1f}".format(varname, t_solution))
   ax.set_xlim(np.min(x2d), np.max(x2d))
   ax.set_ylim(np.min(y2d), np.max(y2d))
-  
+
   print('Saving %s' % fig_filename)
   plt.savefig(fig_filename)
   plt.close()
@@ -144,11 +144,11 @@ if solver_inp_data['op_overwrite'] == 'no':
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   op_write_iter = int(solver_inp_data['file_op_iter'][0])
   dt_snapshots = op_write_iter*dt
   n_snapshots = int(niter/op_write_iter) + 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -161,7 +161,7 @@ if solver_inp_data['op_overwrite'] == 'no':
 
   for i in range(n_snapshots):
     for sim in range(nsims):
-    
+
       '''
       Load simulation data (solution snapshots)
       '''
@@ -180,19 +180,19 @@ if solver_inp_data['op_overwrite'] == 'no':
       x = grid[:size[0]]
       y = grid[size[0]:]
       y2d, x2d = np.meshgrid(y, x)
-  
+
       u_cons_2d = np.transpose(solution.reshape(size[1],size[0],nvars))
       u_prim_2d = convertVar(u_cons_2d, y2d)
-  
+
       theta = u_prim_2d[4,:,:]
       if nsims > 1:
         plt_fname = plt_dir_name+'/fig_theta_'+f'{s:03d}'+'_'+f'{i:05d}'+'.png'
       else:
         plt_fname = plt_dir_name+'/fig_theta_'+f'{i:05d}'+'.png'
-      plotData( theta, 
-                x2d, y2d, 
-                plt_fname, 
-                'theta', 
+      plotData( theta,
+                x2d, y2d,
+                plt_fname,
+                'theta',
                 i*dt_snapshots)
 
       uvel = u_prim_2d[1,:,:]
@@ -200,10 +200,10 @@ if solver_inp_data['op_overwrite'] == 'no':
         plt_fname = plt_dir_name+'/fig_uvel_'+f'{s:03d}'+'_'+f'{i:05d}'+'.png'
       else:
         plt_fname = plt_dir_name+'/fig_uvel_'+f'{i:05d}'+'.png'
-      plotData( uvel, 
-                x2d, y2d, 
-                plt_fname, 
-                'uvel', 
+      plotData( uvel,
+                x2d, y2d,
+                plt_fname,
+                'uvel',
                 i*dt_snapshots)
 
       vvel = u_prim_2d[2,:,:]
@@ -211,10 +211,10 @@ if solver_inp_data['op_overwrite'] == 'no':
         plt_fname = plt_dir_name+'/fig_vvel_'+f'{s:03d}'+'_'+f'{i:05d}'+'.png'
       else:
         plt_fname = plt_dir_name+'/fig_vvel_'+f'{i:05d}'+'.png'
-      plotData( vvel, 
-                x2d, y2d, 
-                plt_fname, 
-                'vvel', 
+      plotData( vvel,
+                x2d, y2d,
+                plt_fname,
+                'vvel',
                 i*dt_snapshots)
 
 else:
@@ -222,7 +222,7 @@ else:
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -230,7 +230,7 @@ else:
   print('  final time = ', t_final)
 
   for sim in range(nsims):
-  
+
     '''
     Load simulation data (solution snapshots)
     '''
@@ -258,9 +258,9 @@ else:
       plt_fname = plt_dir_name+'/fig_theta_'+f'{s:03d}'+'.png'
     else:
         plt_fname = plt_dir_name+'/fig_theta.png'
-    plotData( theta, 
+    plotData( theta,
               x2d, y2d,
-              plt_fname, 'theta', 
+              plt_fname, 'theta',
               t_final )
 
     uvel = u_prim_2d[1,:,:]
@@ -268,9 +268,9 @@ else:
       plt_fname = plt_dir_name+'/fig_uvel_'+f'{s:03d}'+'.png'
     else:
         plt_fname = plt_dir_name+'/fig_uvel.png'
-    plotData( uvel, 
+    plotData( uvel,
               x2d, y2d,
-              plt_fname, 'uvel', 
+              plt_fname, 'uvel',
               t_final )
 
     vvel = u_prim_2d[2,:,:]
@@ -278,8 +278,8 @@ else:
       plt_fname = plt_dir_name+'/fig_vvel_'+f'{s:03d}'+'.png'
     else:
         plt_fname = plt_dir_name+'/fig_vvel.png'
-    plotData( vvel, 
+    plotData( vvel,
               x2d, y2d,
-              plt_fname, 'vvel', 
+              plt_fname, 'vvel',
               t_final )
 

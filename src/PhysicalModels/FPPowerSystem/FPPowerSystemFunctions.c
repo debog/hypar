@@ -24,7 +24,7 @@ double FPPowerSystemDissipationFunction(int dir,void *p,double t)
   double dissp = 0;
   if (dir == 1) {
     double gamma = params->D / (2.0*params->H);
-    dissp =   (1.0/(2.0*params->H)) * (1.0/(2.0*params->H)) 
+    dissp =   (1.0/(2.0*params->H)) * (1.0/(2.0*params->H))
             * ((params->l*params->q*params->q)/(params->l*gamma+1.0))
             * (1.0 - exp(-(gamma+1.0/params->l)*t));
   }

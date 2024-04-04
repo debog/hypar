@@ -43,8 +43,8 @@ int    Euler1DSourceUpwindRoe   (double*,double*,double*,double*,int,void*,doubl
 int    Euler1DModifiedSolution  (double*,double*,int,void*,void*,double);
 int    Euler1DPreStep           (double*,void*,void*,double);
 
-/*! Function to initialize the 1D inviscid Euler equations (#Euler1D) module: 
-    Sets the default parameters, read in and set physics-related parameters, 
+/*! Function to initialize the 1D inviscid Euler equations (#Euler1D) module:
+    Sets the default parameters, read in and set physics-related parameters,
     and set the physics-related function pointers in #HyPar.
 
     This file reads the file "physics.inp" that must have the following format:
@@ -74,7 +74,7 @@ int Euler1DInitialize(
                      )
 {
   HyPar         *solver  = (HyPar*)         s;
-  MPIVariables  *mpi     = (MPIVariables*)  m; 
+  MPIVariables  *mpi     = (MPIVariables*)  m;
   Euler1D       *physics = (Euler1D*)       solver->physics;
   int           ferr, d;
 
@@ -90,7 +90,7 @@ int Euler1DInitialize(
   }
 
   /* default values */
-  physics->gamma      = 1.4; 
+  physics->gamma      = 1.4;
   physics->grav       = 0.0;
   physics->grav_type  = 0;
   strcpy(physics->upw_choice,"roe");
@@ -105,19 +105,19 @@ int Euler1DInitialize(
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
-	      while (strcmp(word, "end")){
-		      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-          if (!strcmp(word, "gamma")) { 
-            ferr = fscanf(in,"%lf",&physics->gamma); 
+        while (strcmp(word, "end")){
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          if (!strcmp(word, "gamma")) {
+            ferr = fscanf(in,"%lf",&physics->gamma);
             if (ferr != 1) return(1);
-          } else if (!strcmp(word, "gravity")) { 
-            ferr = fscanf(in,"%lf",&physics->grav); 
+          } else if (!strcmp(word, "gravity")) {
+            ferr = fscanf(in,"%lf",&physics->grav);
             if (ferr != 1) return(1);
-          } else if (!strcmp(word, "gravity_type")) { 
-            ferr = fscanf(in,"%d",&physics->grav_type); 
+          } else if (!strcmp(word, "gravity_type")) {
+            ferr = fscanf(in,"%d",&physics->grav_type);
             if (ferr != 1) return(1);
           } else if (!strcmp(word,"upwinding")) {
-            ferr = fscanf(in,"%s",physics->upw_choice); 
+            ferr = fscanf(in,"%s",physics->upw_choice);
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
@@ -126,10 +126,10 @@ int Euler1DInitialize(
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
-	    } else {
-    	  fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+      } else {
+        fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
         return(1);
-	    }
+      }
     }
     fclose(in);
   }
@@ -188,7 +188,7 @@ int Euler1DInitialize(
   solver->AveragingFunction     = Euler1DRoeAverage;
   solver->GetLeftEigenvectors   = Euler1DLeftEigenvectors;
   solver->GetRightEigenvectors  = Euler1DRightEigenvectors;
-   
+
   if      (!strcmp(physics->upw_choice,_LLF_ )) physics->SourceUpwind = Euler1DSourceUpwindLLF;
   else if (!strcmp(physics->upw_choice,_ROE_ )) physics->SourceUpwind = Euler1DSourceUpwindRoe;
 

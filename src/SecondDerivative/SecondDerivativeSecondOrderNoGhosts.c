@@ -26,13 +26,13 @@ typedef MPIVariables  MPIContext;
 
     \b Notes:
     + The second derivative is computed at the grid points or the cell centers.
-    + Though the array D2f must include the same number of ghost points as the array f (including 0), 
-      the second derivative is \b not computed at these locations. Thus, array elements corresponding 
+    + Though the array D2f must include the same number of ghost points as the array f (including 0),
+      the second derivative is \b not computed at these locations. Thus, array elements corresponding
       to the ghost points contain undefined values.
-    + \a D2f and \a f are serialized 1D arrays containing the function and its computed derivatives on 
+    + \a D2f and \a f are serialized 1D arrays containing the function and its computed derivatives on
       a multi-dimensional grid. The derivative along the specified dimension \b dir is computed by looping
       through all grid lines along \b dir.
-    + Biased stencils are used at the physical boundaries and ghost point values of f are not used. So this 
+    + Biased stencils are used at the physical boundaries and ghost point values of f are not used. So this
       function can be used when the ghost values at physical boundaries are not filled. The ghost values at
       internal (MPI) boundaries are still needed.
 */
@@ -109,6 +109,6 @@ int SecondDerivativeSecondOrderCentralNoGhosts( double*  D2f,   /*!< Array to ho
     }
   }
 
-  
+
   return 0;
 }

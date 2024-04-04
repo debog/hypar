@@ -11,14 +11,14 @@
 #include <mpivars.h>
 
 /*!
-    This function computes the pressure and density variation functions for 
+    This function computes the pressure and density variation functions for
     the hydrostatic balance of the type specified by the user (#NavierStokes3D:HB).
     The pressure and density in hydrostatic balance are given by
     \f{equation}{
       \rho = \rho_0\varrho\left(x,y\right),\ p = p_0\varphi\left(x,y\right)
     \f}
     where \f$\rho_0\f$ and \f$p_0\f$ are the reference density (#NavierStokes3D::rho0)
-    and pressure (#NavierStokes3D::p0). This function computes \f$\varrho\f$ 
+    and pressure (#NavierStokes3D::p0). This function computes \f$\varrho\f$
     (#NavierStokes3D::grav_field_f) and \f$\varphi\f$ (#NavierStokes3D::grav_field_g).
     For flows without gravity, \f$\varrho = \varphi = 1\f$.
     \n\n
@@ -63,7 +63,7 @@ int NavierStokes3DGravityField(
   double gy   = param->grav_y;
   double gz   = param->grav_z;
   double Nbv  = param->N_bv;
-  
+
   /* set the value of the gravity field */
   done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   if (param->HB == 1) {
@@ -110,12 +110,12 @@ int NavierStokes3DGravityField(
     }
   }
 
-  /* A sensible simulation will not specify peridic boundary conditions 
+  /* A sensible simulation will not specify peridic boundary conditions
    * along a direction in which gravity acts.
    * Gravity will be zero along the dimension periodic BCs are specified,
    * so the value of the gravity potential will be the same along those
    * grid lines.
-   * Thus, for both these cases, extrapolate the gravity field at the 
+   * Thus, for both these cases, extrapolate the gravity field at the
    * boundaries */
   int indexb[_MODEL_NDIMS_], indexi[_MODEL_NDIMS_];
   for (d = 0; d < _MODEL_NDIMS_; d++) {

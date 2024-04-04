@@ -70,7 +70,7 @@ PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
     double global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
     double norm = sqrt((global_sum/(double)solver->npoints_global));
     total_norm += norm;
-  
+
     if (!strcmp(solver->ConservationCheck,"yes")) {
       /* calculate volume integral of the solution at this time step */
       solver->VolumeIntegralFunction(solver->VolumeIntegral,solver->u,solver,mpi);
@@ -124,7 +124,7 @@ PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
       if (nsims == 1) printf("\n");
 
     }
-  
+
     /* print physics-specific info, if available */
     for( int ns = 0; ns < nsims; ns++) {
       if (sim[ns].solver.PrintStep) {
@@ -143,7 +143,7 @@ PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
   }
 
   /* Write intermediate solution to file */
-  if (iter%sim[0].solver.file_op_iter == 0) { 
+  if (iter%sim[0].solver.file_op_iter == 0) {
     for (int ns = 0; ns < nsims; ns++) {
       HyPar* solver = &(sim[ns].solver);
       MPIVariables* mpi = &(sim[ns].mpi);

@@ -1,6 +1,6 @@
 /*! @file LinearADRDiffusion.c
     @author Debojyoti Ghosh
-    @brief Function to evaluate the diffusion term in the 
+    @brief Function to evaluate the diffusion term in the
            linear advection-diffusion-reaction model
 */
 
@@ -13,11 +13,11 @@
 
 /*! Evaluate the diffusion term in the linear advection-diffusion-reaction model
     for a "pure Laplacian" type operator (no cross derivatives):\n
-  
-    Compute 
+
+    Compute
     \f{equation}
     \nu_d u
-    \f} 
+    \f}
     given \f$u\f$ and \f$d\f$ in the parabolic term
     \f{equation}{
     \sum_d \frac {\partial^2} {\partial x_d^2} \left( \nu_d u \right)
@@ -59,11 +59,11 @@ int LinearADRDiffusionG(  double  *f, /*!< Array to hold the computed diffusion 
 
 /*! Evaluate the diffusion term in the linear advection-diffusion-reaction model
     for a parabolic operator with no cross derivatives:\n
-  
-    Compute 
+
+    Compute
     \f{equation}
     \nu_d u
-    \f} 
+    \f}
     given \f$u\f$ and \f$d_1,d_2\f$ in the parabolic term
     \f{equation}{
     \sum_{d_1}\sum_{d_2} \frac {\partial^2} {\partial x_{d_1} \partial x_{d_2}} \left( \nu_d u \right)
@@ -75,7 +75,7 @@ int LinearADRDiffusionH(  double  *f,   /*!< Array to hold the computed diffusio
                           double  *u,   /*!< Array containing the solution */
                           int     dir1, /*!< First spatial dimension of the double derivative \f$d_1\f$ */
                           int     dir2, /*!< Second spatial dimension of the double derivative \f$d_2\f$ */
-                          void    *s,   /*!< Solver object of type #HyPar */ 
+                          void    *s,   /*!< Solver object of type #HyPar */
                           double  t     /*!< Current time */
                         )
 {

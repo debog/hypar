@@ -138,14 +138,14 @@ void gpuFillRecvBufRight_kernel(
   simulation, a 1D array is an array of data along one of the spatial dimensions, i.e. its an array
   storing a variable that varies in only one of the spatial dimension. For example, for a
   2D problem on a Cartesian grid (with spatial dimensions x and y), the array of x-coordinates is
-  a 1D array along x, and the array of y-coordinates is a 1D array along y. Thus, the size of the 
+  a 1D array along x, and the array of y-coordinates is a 1D array along y. Thus, the size of the
   1D array is equal to the size of the domain along the spatial dimension corresponding to that array.
 
   Consider a two-dimensional problem, partitioned on 21 MPI ranks as follows:
   @image html mpi_ranks.png
   @image latex mpi_ranks.eps width=0.9\textwidth
-  and consider rank 9. 
-  
+  and consider rank 9.
+
   If the argument \a dir is specified as 0, and thus we are dealing with a 1D array
   along dimension 0, then
   + Rank 9 will exchange data with ranks 8 and 10, and fill in its ghost points.
@@ -416,14 +416,14 @@ void gpuFillRecvBufRight_kernel(
   simulation, a 1D array is an array of data along one of the spatial dimensions, i.e. its an array
   storing a variable that varies in only one of the spatial dimension. For example, for a
   2D problem on a Cartesian grid (with spatial dimensions x and y), the array of x-coordinates is
-  a 1D array along x, and the array of y-coordinates is a 1D array along y. Thus, the size of the 
+  a 1D array along x, and the array of y-coordinates is a 1D array along y. Thus, the size of the
   1D array is equal to the size of the domain along the spatial dimension corresponding to that array.
 
   Consider a two-dimensional problem, partitioned on 21 MPI ranks as follows:
   @image html mpi_ranks.png
   @image latex mpi_ranks.eps width=0.9\textwidth
-  and consider rank 9. 
-  
+  and consider rank 9.
+
   If the argument \a dir is specified as 0, and thus we are dealing with a 1D array
   along dimension 0, then
   + Rank 9 will exchange data with ranks 8 and 10, and fill in its ghost points.

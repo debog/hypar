@@ -1,7 +1,7 @@
 /*
-  This code converts a binary solution file to file 
+  This code converts a binary solution file to file
   solution.inp in the same format as a binary initial.inp.
-  To use is as an initial solution (for example, in a 
+  To use is as an initial solution (for example, in a
   restart run), rename it to initial.inp and place it in
   the run directory.
   If input mode is parallel, use ParallelInput.c
@@ -22,12 +22,12 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
       }
     }
     fclose(inputs);
@@ -39,7 +39,7 @@ int main()
 
   printf("Enter filename (op_xxxxx.bin): ");
   scanf("%s",filename);
-  
+
   in = fopen(filename,"rb");
 
   if (!in) {

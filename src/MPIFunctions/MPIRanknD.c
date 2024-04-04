@@ -9,15 +9,15 @@
   number of MPI ranks along each spatial dimension.
 
   \b 1D \b Rank: This is the rank of the process in the communicator.\n
-  \b n-Dimensional \b Rank: This represents an integer array, where each element 
+  \b n-Dimensional \b Rank: This represents an integer array, where each element
   is the rank of the process along a spatial dimension.
 
-  Consider a 2D simulation running with 21 MPI ranks - 7 along the \a x direction, 
+  Consider a 2D simulation running with 21 MPI ranks - 7 along the \a x direction,
   and 3 along the \a y direction, as shown in the following figure:
   @image html nd_ranks.png
   @image latex nd_ranks.eps width=0.9\textwidth
-  The boldface number in the parentheses is the n-dimensional rank (n=2), while the 
-  number below it in normal typeface is the 1D rank, corresponding to the rank in 
+  The boldface number in the parentheses is the n-dimensional rank (n=2), while the
+  number below it in normal typeface is the 1D rank, corresponding to the rank in
   the MPI communicator.
 
   Note:

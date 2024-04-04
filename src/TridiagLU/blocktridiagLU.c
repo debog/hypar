@@ -14,26 +14,26 @@
 #include <matops.h>
 
 /*!
-  Solve block tridiagonal (non-periodic) systems of equations using parallel LU decomposition: 
-  This function can solve multiple independent systems with one call. The systems need not share 
+  Solve block tridiagonal (non-periodic) systems of equations using parallel LU decomposition:
+  This function can solve multiple independent systems with one call. The systems need not share
   the same left- or right-hand-sides. The iterative substructuring method is used in this
   function that can be briefly described through the following 4 stages:
-  + Stage 1: Parallel elimination of the tridiagonal blocks on each processor comprising all 
-    points of the subdomain except the 1st point (unless its the 1st global point, i.e., a 
+  + Stage 1: Parallel elimination of the tridiagonal blocks on each processor comprising all
+    points of the subdomain except the 1st point (unless its the 1st global point, i.e., a
     physical boundary)
-  + Stage 2: Elimination of the 1st row on each processor (except the 1st processor) using the 
+  + Stage 2: Elimination of the 1st row on each processor (except the 1st processor) using the
     last row of the previous processor.
   + Stage 3: Solution of the reduced tridiagonal system that represents the coupling of the
     system across the processors, using blocktridiagIterJacobi() in this implementation.
   + Stage 4: Backward-solve to obtain the final solution
 
   Specific details of the method implemented here are available in:
-  + Ghosh, D., Constantinescu, E. M., Brown, J., "Scalable Nonlinear Compact Schemes", 
+  + Ghosh, D., Constantinescu, E. M., Brown, J., "Scalable Nonlinear Compact Schemes",
     Technical Memorandum, ANL/MCS-TM-340, Argonne National Laboratory, April 2014,
     (http://debog.github.io/Files/2014_Ghosh_Consta_Brown_MCSTR340.pdf)
     (also available at http://debog.github.io/Files/2014_Ghosh_Consta_Brown_MCSTR340.pdf).
-  + Ghosh, D., Constantinescu, E. M., Brown, J., Efficient Implementation of Nonlinear 
-    Compact Schemes on Massively Parallel Platforms, SIAM Journal on Scientific Computing, 
+  + Ghosh, D., Constantinescu, E. M., Brown, J., Efficient Implementation of Nonlinear
+    Compact Schemes on Massively Parallel Platforms, SIAM Journal on Scientific Computing,
     37 (3), 2015, C354–C383 (http://dx.doi.org/10.1137/140989261).
 
   More references on this class of parallel tridiagonal solvers:
@@ -45,12 +45,12 @@
   Array layout: The arguments \a a, \a b, and \a c are local 1D arrays (containing
   this processor's part of the subdiagonal, diagonal, and superdiagonal)
   of size (\a n X \a ns X \a bs^2), and \a x is a local 1D array (containing this
-  processor's part of the right-hand-side, and will contain the solution on exit) 
+  processor's part of the right-hand-side, and will contain the solution on exit)
   of size (\a n X \a ns X \a bs), where \a n is the local size of the system, \a ns is
   the number of independent systems to solve, and \a bs is the block size. The ordering
   of the elements in these arrays is as follows:
   + Each block is stored in the row-major format.
-  + Blocks of the same row for each of the independent systems are stored adjacent to each 
+  + Blocks of the same row for each of the independent systems are stored adjacent to each
     other.
 
   For example, consider the following systems:
@@ -75,20 +75,20 @@
     R_i^k = \left[\begin{array}{c} r_{0,i}^k \\ r_{1,i}^k \end{array} \right]
   \f}
   Note that in the code, \f$X\f$ and \f$R\f$ are the same array \a x.
-  
+
   Then, the array \a b must be a 1D array with the following layout of elements:\n
   [\n
   b_{00,0}^0, b_{01,0}^0, b_{10,0}^0, b_{11,0}^0, b_{00,0}^1, b_{01,0}^1, b_{10,0}^1, b_{11,0}^1,
   b_{00,0}^2, b_{01,0}^2, b_{10,0}^2, b_{11,0}^2, \n
-  b_{00,1}^0, b_{01,1}^0, b_{10,1}^0, b_{11,1}^0, b_{00,1}^1, b_{01,1}^1, b_{10,1}^1, b_{11,1}^1, 
+  b_{00,1}^0, b_{01,1}^0, b_{10,1}^0, b_{11,1}^0, b_{00,1}^1, b_{01,1}^1, b_{10,1}^1, b_{11,1}^1,
   b_{00,1}^2, b_{01,1}^2, b_{10,1}^2, b_{11,1}^2, \n
   ..., \n
-  b_{00,n-1}^0, b_{01,n-1}^0, b_{10,n-1}^0, b_{11,n-1}^0, b_{00,n-1}^1, b_{01,n-1}^1, b_{10,n-1}^1, b_{11,n-1}^1, 
+  b_{00,n-1}^0, b_{01,n-1}^0, b_{10,n-1}^0, b_{11,n-1}^0, b_{00,n-1}^1, b_{01,n-1}^1, b_{10,n-1}^1, b_{11,n-1}^1,
   b_{00,n-1}^2, b_{01,n-1}^2, b_{10,n-1}^2, b_{11,n-1}^2\n
   ]\n
-  The arrays \a a and \a c are stored similarly. 
-  
-  The array corresponding to a vector (the solution and the right-hand-side \a x) must be a 1D array with the following 
+  The arrays \a a and \a c are stored similarly.
+
+  The array corresponding to a vector (the solution and the right-hand-side \a x) must be a 1D array with the following
   layout of elements:\n
   [\n
   x_{0,0}^0, x_{1,0}^0, x_{0,0}^1, x_{1,0}^1,x_{0,0}^2, x_{1,0}^2,\n
@@ -100,8 +100,8 @@
 
   Notes:
   + This function does *not* preserve the sub-diagonal, diagonal, super-diagonal elements
-    and the right-hand-sides. 
-  + The input array \a x contains the right-hand-side on entering the function, and the 
+    and the right-hand-sides.
+  + The input array \a x contains the right-hand-side on entering the function, and the
     solution on exiting it.
 */
 int blocktridiagLU(
@@ -187,8 +187,8 @@ int blocktridiagLU(
   recvbuf = (double*) calloc (size, sizeof(double));
   for (d=0; d<ns; d++) {
     for (i=0; i<bs2; i++) {
-      sendbuf[(0*ns+d)*bs2+i] = a[((n-1)*ns+d)*bs2+i]; 
-      sendbuf[(1*ns+d)*bs2+i] = b[((n-1)*ns+d)*bs2+i]; 
+      sendbuf[(0*ns+d)*bs2+i] = a[((n-1)*ns+d)*bs2+i];
+      sendbuf[(1*ns+d)*bs2+i] = b[((n-1)*ns+d)*bs2+i];
       sendbuf[(2*ns+d)*bs2+i] = c[((n-1)*ns+d)*bs2+i];
     }
     for (i=0; i<bs; i++) sendbuf[3*ns*bs2+d*bs+i] = x[((n-1)*ns+d)*bs+i];
@@ -205,9 +205,9 @@ int blocktridiagLU(
     for (d = 0; d < ns; d++) {
       double am1[bs2], bm1[bs2], cm1[bs2], xm1[bs];
       for (i=0; i<bs2; i++) {
-        am1[i] = recvbuf[(0*ns+d)*bs2+i]; 
-        bm1[i] = recvbuf[(1*ns+d)*bs2+i]; 
-        cm1[i] = recvbuf[(2*ns+d)*bs2+i]; 
+        am1[i] = recvbuf[(0*ns+d)*bs2+i];
+        bm1[i] = recvbuf[(1*ns+d)*bs2+i];
+        cm1[i] = recvbuf[(2*ns+d)*bs2+i];
       }
       for (i=0; i<bs; i++) xm1[i] = recvbuf[3*ns*bs2+d*bs+i];
       double factor[bs2], binv[bs2];
@@ -217,7 +217,7 @@ int blocktridiagLU(
       _MatrixZero_             (a+d*bs2,bs);
       _MatrixMultiplySubtract_ (a+d*bs2,factor,am1,bs);
       _MatVecMultiplySubtract_ (x+d*bs ,factor,xm1,bs);
-      
+
       _MatrixInvert_           (b+((n-1)*ns+d)*bs2,binv,bs); if (ierr) return(ierr);
       _MatrixMultiply_         (c+d*bs2,binv,factor,bs);
       _MatrixMultiplySubtract_ (b+d*bs2,factor,a+((n-1)*ns+d)*bs2,bs);

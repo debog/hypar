@@ -10,13 +10,13 @@
 #include <immersedboundaries.h>
 
 
-/*! Function to write a 3D surface from a STL file. See 
+/*! Function to write a 3D surface from a STL file. See
     https://en.wikipedia.org/wiki/STL_(file_format)
-    for details of the STL file format. 
-    \b Notes: 
+    for details of the STL file format.
+    \b Notes:
     + This function only writes ASCII STL files.
 
-    It is assumed that all MPI ranks have the body data. 
+    It is assumed that all MPI ranks have the body data.
     The MPI rank specified as the input \a rank will actually
     write the file.
 */

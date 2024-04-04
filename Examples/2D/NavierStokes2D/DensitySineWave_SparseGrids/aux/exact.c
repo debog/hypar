@@ -11,8 +11,8 @@ double power(double x,double a)
 int main(){
   const double pi     = 4.0*atan(1.0);
   const double GAMMA  = 1.4;
-  
-	int     NI,NJ,ndims,n_iter;
+
+  int     NI,NJ,ndims,n_iter;
   double  tf, dt;
   char    ip_file_type[50]; strcpy(ip_file_type,"ascii");
 
@@ -47,20 +47,20 @@ int main(){
   }
   printf("Grid:\t\t\t%d X %d\n",NI,NJ);
 
-	int i,j;
-	double dx = 1.0 / ((double)NI);
-	double dy = 1.0 / ((double)NJ);
+  int i,j;
+  double dx = 1.0 / ((double)NI);
+  double dy = 1.0 / ((double)NJ);
 
   tf = (double)n_iter * dt;
   printf("Final time: %lf\n", tf);
 
-	double *x, *y, *u0, *u1, *u2, *u3;
-	x   = (double*) calloc (NI   , sizeof(double));
-	y   = (double*) calloc (NJ   , sizeof(double));
-	u0  = (double*) calloc (NI*NJ, sizeof(double));
-	u1  = (double*) calloc (NI*NJ, sizeof(double));
-	u2  = (double*) calloc (NI*NJ, sizeof(double));
-	u3  = (double*) calloc (NI*NJ, sizeof(double));
+  double *x, *y, *u0, *u1, *u2, *u3;
+  x   = (double*) calloc (NI   , sizeof(double));
+  y   = (double*) calloc (NJ   , sizeof(double));
+  u0  = (double*) calloc (NI*NJ, sizeof(double));
+  u1  = (double*) calloc (NI*NJ, sizeof(double));
+  u2  = (double*) calloc (NI*NJ, sizeof(double));
+  u3  = (double*) calloc (NI*NJ, sizeof(double));
 
   double rho_inf = 1.0;
   double drho = 0.1;
@@ -69,10 +69,10 @@ int main(){
   double P_inf = 1.0/GAMMA;
 
   /* Initial solution */
-	for (i = 0; i < NI; i++) {
-  	for (j = 0; j < NJ; j++) {
-	  	x[i] = i*dx;
-	  	y[j] = j*dy;
+  for (i = 0; i < NI; i++) {
+    for (j = 0; j < NJ; j++) {
+      x[i] = i*dx;
+      y[j] = j*dy;
       int p = NJ*i + j;
       double rho, u, v, P;
       rho = rho_inf + drho * sin(2*pi*x[i]) * cos(2*pi*y[j]);
@@ -83,47 +83,47 @@ int main(){
       u1[p] = rho*u;
       u2[p] = rho*v;
       u3[p] = P/(GAMMA-1.0) + 0.5*rho*(u*u+v*v);
-	  }
-	}
+    }
+  }
   if (!strcmp(ip_file_type,"ascii")) {
     printf("Writing ASCII initial solution file initial.inp\n");
-  	out = fopen("initial.inp","w");
+    out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
     fprintf(out,"\n");
     for (j = 0; j < NJ; j++)  fprintf(out,"%lf ",y[j]);
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%lf ",u0[p]);
       }
     }
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%lf ",u1[p]);
       }
     }
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%lf ",u2[p]);
       }
     }
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%lf ",u3[p]);
       }
     }
     fprintf(out,"\n");
-	  fclose(out);
+    fclose(out);
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
     printf("Writing binary initial solution file initial.inp\n");
-  	out = fopen("initial.inp","wb");
+    out = fopen("initial.inp","wb");
     fwrite(x,sizeof(double),NI,out);
     fwrite(y,sizeof(double),NJ,out);
     double *U = (double*) calloc (4*NI*NJ,sizeof(double));
@@ -143,10 +143,10 @@ int main(){
   }
 
   /* Exact solution */
-	for (i = 0; i < NI; i++) {
-  	for (j = 0; j < NJ; j++) {
-	  	x[i] = i*dx;
-	  	y[j] = j*dy;
+  for (i = 0; i < NI; i++) {
+    for (j = 0; j < NJ; j++) {
+      x[i] = i*dx;
+      y[j] = j*dy;
       int p = NJ*i + j;
       double rho, u, v, P;
       rho = rho_inf + drho * sin(2*pi*(x[i]-u_inf*tf)) * cos(2*pi*(y[j]-v_inf*tf));
@@ -157,47 +157,47 @@ int main(){
       u1[p] = rho*u;
       u2[p] = rho*v;
       u3[p] = P/(GAMMA-1.0) + 0.5*rho*(u*u+v*v);
-	  }
-	}
+    }
+  }
   if (!strcmp(ip_file_type,"ascii")) {
     printf("Writing ASCII exact solution file exact.inp\n");
-  	out = fopen("exact.inp","w");
+    out = fopen("exact.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
     fprintf(out,"\n");
     for (j = 0; j < NJ; j++)  fprintf(out,"%lf ",y[j]);
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%lf ",u0[p]);
       }
     }
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%lf ",u1[p]);
       }
     }
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%lf ",u2[p]);
       }
     }
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%lf ",u3[p]);
       }
     }
     fprintf(out,"\n");
-	  fclose(out);
+    fclose(out);
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
     printf("Writing binary exact solution file exact.inp\n");
-  	out = fopen("exact.inp","wb");
+    out = fopen("exact.inp","wb");
     fwrite(x,sizeof(double),NI,out);
     fwrite(y,sizeof(double),NJ,out);
     double *U = (double*) calloc (4*NI*NJ,sizeof(double));
@@ -216,12 +216,12 @@ int main(){
     fclose(out);
   }
 
-	free(x);
-	free(y);
-	free(u0);
-	free(u1);
-	free(u2);
-	free(u3);
+  free(x);
+  free(y);
+  free(u0);
+  free(u1);
+  free(u2);
+  free(u3);
 
-	return(0);
+  return(0);
 }

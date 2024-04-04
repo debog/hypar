@@ -18,10 +18,10 @@
   of the governing equations: The ODE, obtained after discretizing the governing PDE in space,
   is expressed as follows:
   \f{equation}{
-    \frac {d{\bf U}}{dt} = {\bf L}\left({\bf U}\right) 
-    \Rightarrow \frac {d{\bf U}}{dt} - {\bf L}\left({\bf U}\right) = 0, 
+    \frac {d{\bf U}}{dt} = {\bf L}\left({\bf U}\right)
+    \Rightarrow \frac {d{\bf U}}{dt} - {\bf L}\left({\bf U}\right) = 0,
   \f}
-  where \f${\bf L}\f$ is the spatially discretized right-hand-side, and \f${\bf U}\f$ 
+  where \f${\bf L}\f$ is the spatially discretized right-hand-side, and \f${\bf U}\f$
   represents the entire solution vector.
 
   The Jacobian is thus given by:
@@ -37,14 +37,14 @@
     {\bf J} = \left[\alpha{\bf I} - \left(\mathcal{D}_{\rm hyp}\left\{\frac {\partial {\bf F}_{\rm hyp}} {\partial {\bf u}}\right\} + \mathcal{D}_{\rm par}\left\{\frac {\partial {\bf F}_{\rm par}} {\partial {\bf u}}\right\}\right)\right]
   \f}
   The preconditioning matrix is usually a close approximation of the actual Jacobian matrix, where the actual
-  Jacobian may be too expensive to evaluate and assemble. In this function, the preconditioning matrix is 
+  Jacobian may be too expensive to evaluate and assemble. In this function, the preconditioning matrix is
   the following approximation of the actual Jacobian:
   \f{equation}{
     {\bf J}_p = \left[\alpha{\bf I} - \left(\mathcal{D}^{\left(l\right)}_{\rm hyp}\left\{\frac {\partial {\bf F}_{\rm hyp}} {\partial {\bf u}}\right\} + \mathcal{D}^{\left(l\right)}_{\rm par}\left\{\frac {\partial {\bf F}_{\rm par}} {\partial {\bf u}}\right\}\right) \right] \approx {\bf J},
   \f}
   where \f$\mathcal{D}^{\left(l\right)}_{\rm hyp,par}\f$ represent lower order discretizations of the hyperbolic and parabolic terms. The matrix \f${\bf J}_p\f$
-  is provided to the preconditioner. 
-  
+  is provided to the preconditioner.
+
   Note that the specific physics model provides the following functions:
   + #HyPar::JFunction computes \f$\partial {\bf F}_{\rm hyp}/ \partial {\bf u}\f$ at a grid point.
   + #HyPar::KFunction computes \f$\partial {\bf F}_{\rm par}/ \partial {\bf u}\f$ at a grid point.
@@ -90,48 +90,48 @@ int PetscComputePreconMatImpl(  Mat Pmat,   /*!< Preconditioning matrix to const
         *points = context->points[ns],
         index[ndims],indexL[ndims],indexR[ndims],
         rows[nvars],cols[nvars];
-  
-    double *u = solver->u, 
+
+    double *u = solver->u,
            *iblank = solver->iblank,
            dxinv, values[nvars*nvars];
-  
+
     /* apply boundary conditions and exchange data over MPI interfaces */
     solver->ApplyBoundaryConditions(solver,mpi,u,NULL,context->waqt);
     MPIExchangeBoundariesnD(ndims,nvars,dim,ghosts,mpi,u);
-  
+
     /* loop through all computational points */
     for (int n = 0; n < npoints; n++) {
       int *this_point = points + n*(ndims+1);
       int p = this_point[ndims];
       int index[ndims]; _ArrayCopy1D_(this_point,index,ndims);
-  
+
       double iblank = solver->iblank[p];
-  
+
       /* compute the contributions from the hyperbolic flux derivatives along each dimension */
       if (solver->JFunction) {
         for (int dir = 0; dir < ndims; dir++) {
-    
+
           /* compute indices and global 1D indices for left and right neighbors */
           _ArrayCopy1D_(index,indexL,ndims); indexL[dir]--;
           int pL;  _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
-    
+
           _ArrayCopy1D_(index,indexR,ndims); indexR[dir]++;
           int pR;  _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
-    
+
           int pg, pgL, pgR;
           pg  = (int) context->globalDOF[ns][p];
           pgL = (int) context->globalDOF[ns][pL];
           pgR = (int) context->globalDOF[ns][pR];
-    
+
           /* Retrieve 1/delta-x at this grid point */
           _GetCoordinate_(dir,index[dir],dim,ghosts,solver->dxinv,dxinv);
-    
+
           /* diagonal element */
           for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pg + v; }
           solver->JFunction(values,(u+nvars*p),solver->physics,dir,nvars,0);
           _ArrayScale1D_(values,(dxinv*iblank),(nvars*nvars));
           MatSetValues(Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
-    
+
           /* left neighbor */
           if (pgL >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgL + v; }
@@ -139,7 +139,7 @@ int PetscComputePreconMatImpl(  Mat Pmat,   /*!< Preconditioning matrix to const
             _ArrayScale1D_(values,(-dxinv*iblank),(nvars*nvars));
             MatSetValues(Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
           }
-          
+
           /* right neighbor */
           if (pgR >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgR + v; }
@@ -153,28 +153,28 @@ int PetscComputePreconMatImpl(  Mat Pmat,   /*!< Preconditioning matrix to const
       /* compute the contributions from the parabolic term derivatives along each dimension */
       if (solver->KFunction) {
         for (int dir = 0; dir < ndims; dir++) {
-    
+
           /* compute indices and global 1D indices for left and right neighbors */
           _ArrayCopy1D_(index,indexL,ndims); indexL[dir]--;
           int pL;  _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
-    
+
           _ArrayCopy1D_(index,indexR,ndims); indexR[dir]++;
           int pR;  _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
-    
+
           int pg, pgL, pgR;
           pg  = (int) context->globalDOF[ns][p];
           pgL = (int) context->globalDOF[ns][pL];
           pgR = (int) context->globalDOF[ns][pR];
-    
+
           /* Retrieve 1/delta-x at this grid point */
           _GetCoordinate_(dir,index[dir],dim,ghosts,solver->dxinv,dxinv);
-   
+
           /* diagonal element */
           for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pg + v; }
           solver->KFunction(values,(u+nvars*p),solver->physics,dir,nvars);
           _ArrayScale1D_(values,(-2*dxinv*dxinv*iblank),(nvars*nvars));
           MatSetValues(Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
-    
+
           /* left neighbor */
           if (pgL >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgL + v; }
@@ -182,7 +182,7 @@ int PetscComputePreconMatImpl(  Mat Pmat,   /*!< Preconditioning matrix to const
             _ArrayScale1D_(values,(dxinv*dxinv*iblank),(nvars*nvars));
             MatSetValues(Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
           }
-          
+
           /* right neighbor */
           if (pgR >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgR + v; }
@@ -197,7 +197,7 @@ int PetscComputePreconMatImpl(  Mat Pmat,   /*!< Preconditioning matrix to const
 
   MatAssemblyBegin(Pmat,MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd  (Pmat,MAT_FINAL_ASSEMBLY);
-  
+
   MatShift(Pmat,context->shift);
   PetscFunctionReturn(0);
 }

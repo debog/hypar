@@ -10,10 +10,10 @@
 #include <physicalmodels/euler1d.h>
 #include <hypar.h>
 
-/*! Compute the left eigenvections for the 1D Euler equations. This function 
-    just calls the macro #_Euler1DLeftEigenvectors_ and is not used by any 
-    functions within the 1D Euler module. However, it's necessary to define it 
-    and provide it to the the solver object (#HyPar) so that it can then send it 
+/*! Compute the left eigenvections for the 1D Euler equations. This function
+    just calls the macro #_Euler1DLeftEigenvectors_ and is not used by any
+    functions within the 1D Euler module. However, it's necessary to define it
+    and provide it to the the solver object (#HyPar) so that it can then send it
     to interpolation functions for a characteristic-based reconstruction.
 */
 int Euler1DLeftEigenvectors(
@@ -29,15 +29,15 @@ int Euler1DLeftEigenvectors(
   return(0);
 }
 
-/*! Compute the right eigenvections for the 1D Euler equations. This function 
-    just calls the macro #_Euler1DRightEigenvectors_ and is not used by any 
-    functions within the 1D Euler module. However, it's necessary to define it 
-    and provide it to the the solver object (#HyPar) so that it can then send it 
+/*! Compute the right eigenvections for the 1D Euler equations. This function
+    just calls the macro #_Euler1DRightEigenvectors_ and is not used by any
+    functions within the 1D Euler module. However, it's necessary to define it
+    and provide it to the the solver object (#HyPar) so that it can then send it
     to interpolation functions for a characteristic-based reconstruction.
 */
 int Euler1DRightEigenvectors(
                               double  *u, /*!< Conserved solution at a grid point */
-                              double  *R, /*!< Array of size nvar^2 = 3^2 to save the matrix of 
+                              double  *R, /*!< Array of size nvar^2 = 3^2 to save the matrix of
                                                right eigenvectors in (row-major format). */
                               void    *p, /*!< Object of type #Euler1D with physics-related variables */
                               int     dir /*!< Spatial dimension (not used, since this is a 1D system) */

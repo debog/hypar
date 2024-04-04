@@ -15,8 +15,8 @@
 
 /*! Applies the thermal no-slip-wall boundary condition: This is specific to the 3D
     Navier-Stokes system (#NavierStokes3D).
-    It is used for simulating walls boundaries, where the temperature is specified. 
-    The density at the ghost points is extrapolated from the interior. The 
+    It is used for simulating walls boundaries, where the temperature is specified.
+    The density at the ghost points is extrapolated from the interior. The
     velocity at the ghost points is set such that the interpolated
     velocity at the boundary face is the specified wall velocity. The pressure at the ghost
     points is set by multiplying the extrapolated density by the specified temperature.
@@ -43,7 +43,7 @@ int BCThermalNoslipWallU(
   if (ndims == 3) {
 
     /* create a fake physics object */
-    double gamma; 
+    double gamma;
     gamma = boundary->gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
@@ -53,7 +53,7 @@ int BCThermalNoslipWallU(
       int     n_time_levels           = temperature_field_size[dim];
       double  *time_levels            = boundary->UnsteadyTimeLevels;
       double  *temperature_data       = boundary->UnsteadyTemperatureData;
-    
+
       int it = n_time_levels - 1;
       while ((time_levels[it] > waqt) && (it > 0))  it--;
 
@@ -78,7 +78,7 @@ int BCThermalNoslipWallU(
         index1[dim] = it;
         int q; _ArrayIndex1D_(ndims,temperature_field_size,index1,0,q);
         double temperature_b = temperature_data[q];
-        
+
         /* flow variables in the interior */
         double rho, uvel, vvel, wvel, energy, pressure;
         _NavierStokes3DGetFlowVar_((phi+nvars*p2),_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,gamma);
@@ -89,8 +89,8 @@ int BCThermalNoslipWallU(
         vvel_gpt = 2.0*boundary->FlowVelocity[1] - vvel;
         wvel_gpt = 2.0*boundary->FlowVelocity[2] - wvel;
         pressure_gpt = rho_gpt * temperature_b;
-        energy_gpt = inv_gamma_m1*pressure_gpt 
-                    + 0.5 * rho_gpt 
+        energy_gpt = inv_gamma_m1*pressure_gpt
+                    + 0.5 * rho_gpt
                     * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt + wvel_gpt*wvel_gpt);
 
         phi[nvars*p1+0] = rho_gpt;
