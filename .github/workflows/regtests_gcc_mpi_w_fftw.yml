@@ -1,0 +1,19 @@
+name: Tests - GCC + MPICH w/ FFTW-3.3.10
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: dependencies
+      run: source .github/workflows/dependencies/dependencies_mpich_fftw.sh
+    - name: configure
+      run: autoreconf -i && ./configure --enable-fftw --with-fftw-dir=/home/runner/work/hypar/fftw-3.3.10
+    - name: make
+      run: make -j4 && make install
+    - name: tests
+      run: cd ../ && export HYPAR_DIR=/home/runner/work/hypar/hypar && $HYPAR_DIR/.github/workflows/tests/test_mpi.sh
