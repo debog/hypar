@@ -1,4 +1,4 @@
-name: Linux GCC Serial
+name: Build - Linux GCC Serial
 
 on: [push, pull_request]
 

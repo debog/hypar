@@ -1,4 +1,4 @@
-name: Linux GCC + MPICH
+name: Build - Linux GCC + MPICH
 
 on: [push, pull_request]
 

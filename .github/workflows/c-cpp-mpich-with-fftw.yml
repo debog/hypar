@@ -1,4 +1,4 @@
-name: Linux GCC + MPICH w/ FFTW-3.3.10
+name: Build - Linux GCC + MPICH w/ FFTW-3.3.10
 
 on: [push, pull_request]
 
