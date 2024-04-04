@@ -87,7 +87,7 @@ int main()
 
   
   int nsims = 1;
-	int* NI;
+  int* NI;
   int ndims=1;
 
   FILE *in;
@@ -162,14 +162,14 @@ int main()
             params[ns].pL,
             params[ns].pR );
 
-	  double dx = 1.0 / ((double)(N-1));
+    double dx = 1.0 / ((double)(N-1));
 
-	  double *x, *u;
-	  x = (double*) calloc (N, sizeof(double));
-	  u = (double*) calloc (3*N, sizeof(double));
+    double *x, *u;
+    x = (double*) calloc (N, sizeof(double));
+    u = (double*) calloc (3*N, sizeof(double));
 
     for (int i = 0; i < N; i++){
-		  x[i] = i*dx;
+      x[i] = i*dx;
       double RHO,U,P;
       if (x[i] < 0.5) {
         RHO = params[ns].rhoL;
@@ -183,7 +183,7 @@ int main()
       u[3*i+0] = RHO;
       u[3*i+1] = RHO*U;
       u[3*i+2] = P/0.4 + 0.5*RHO*U*U;
-	  }
+    }
 
     char fname[_MAX_STRING_SIZE_] = "initial";
     if (nsims > 1) {
@@ -206,11 +206,11 @@ int main()
       fclose(out);
     }
 
-	  free(x);
-	  free(u);
+    free(x);
+    free(u);
   }
 
   free(params);
 
-	return(0);
+  return(0);
 }

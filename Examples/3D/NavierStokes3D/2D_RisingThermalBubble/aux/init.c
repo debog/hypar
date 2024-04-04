@@ -19,7 +19,7 @@ int main()
   double grav_z   = 0.0;
   int    HB       = 0;
   
-	int   NI,NJ,NK,ndims;
+  int   NI,NJ,NK,ndims;
   char  ip_file_type[50]; strcpy(ip_file_type,"ascii");
   FILE *in;
 
@@ -82,19 +82,19 @@ int main()
     printf("Error: gravity must be zero along x and z for this example.\n");
     return(0);
   }
-	printf("Grid:\t\t\t%d X %d X %d\n",NI,NJ,NK);
+  printf("Grid:\t\t\t%d X %d X %d\n",NI,NJ,NK);
   printf("Reference density and pressure: %lf, %lf.\n",rho_ref,p_ref);
 
-	int i,j,k;
-	double dx = 1000.0  / ((double)(NI-1));
-	double dy = 1000.0  / ((double)(NJ-1));
-	double dz = 100.0  / ((double)(NK));
+  int i,j,k;
+  double dx = 1000.0  / ((double)(NI-1));
+  double dy = 1000.0  / ((double)(NJ-1));
+  double dz = 100.0  / ((double)(NK));
 
-	double *x, *y, *z, *U;
-	x   = (double*) calloc (NI        , sizeof(double));
-	y   = (double*) calloc (NJ        , sizeof(double));
-	z   = (double*) calloc (NK        , sizeof(double));
-	U   = (double*) calloc (5*NI*NJ*NK, sizeof(double));
+  double *x, *y, *z, *U;
+  x   = (double*) calloc (NI        , sizeof(double));
+  y   = (double*) calloc (NJ        , sizeof(double));
+  z   = (double*) calloc (NK        , sizeof(double));
+  U   = (double*) calloc (5*NI*NJ*NK, sizeof(double));
 
   /* Initial perturbation center */
   double xc = 500;
@@ -107,11 +107,11 @@ int main()
   double rc = 250.0;
   double T_ref = p_ref / (R * rho_ref);
 
-	for (i = 0; i < NI; i++){
-  	for (j = 0; j < NJ; j++){
+  for (i = 0; i < NI; i++){
+    for (j = 0; j < NJ; j++){
       for (k = 0; k < NK; k++){
-	  	  x[i] = i*dx;
-	  	  y[j] = j*dy;
+        x[i] = i*dx;
+        y[j] = j*dy;
         z[k] = k*dz;
         int p = i + NI*j + NI*NJ*k;
 
@@ -130,8 +130,8 @@ int main()
         U[5*p+3] = 0.0;
         U[5*p+4] = E;
       }
-	  }
-	}
+    }
+  }
 
   FILE *out;
   if (!strcmp(ip_file_type,"ascii")) {
@@ -143,7 +143,7 @@ int main()
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
 
     printf("Writing binary initial solution file initial.inp\n");
-  	out = fopen("initial.inp","wb");
+    out = fopen("initial.inp","wb");
     fwrite(x,sizeof(double),NI,out);
     fwrite(y,sizeof(double),NJ,out);
     fwrite(z,sizeof(double),NK,out);
@@ -151,10 +151,10 @@ int main()
     fclose(out);
   }
 
-	free(x);
-	free(y);
-	free(z);
-	free(U);
+  free(x);
+  free(y);
+  free(z);
+  free(U);
 
-	return(0);
+  return(0);
 }

@@ -61,8 +61,8 @@ int FPPowerSystemInitialize(void *s,void *m)
     char word[_MAX_STRING_SIZE_];
     ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      while (strcmp(word, "end")){
+        ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
         if      (!strcmp(word, "inertia")) {ferr=fscanf(in,"%lf",&physics->H  );if(ferr!=1)return(1);}
         else if (!strcmp(word, "omega_s")) {ferr=fscanf(in,"%lf",&physics->O_s);if(ferr!=1)return(1);}
         else if (!strcmp(word, "E"      )) {ferr=fscanf(in,"%lf",&physics->E  );if(ferr!=1)return(1);}
@@ -76,10 +76,10 @@ int FPPowerSystemInitialize(void *s,void *m)
         else if (!strcmp(word, "tf"     )) {ferr=fscanf(in,"%lf",&physics->tf );if(ferr!=1)return(1);}
         else if (!strcmp(word, "tcl"    )) {ferr=fscanf(in,"%lf",&physics->tcl);if(ferr!=1)return(1);}
       }
-	  } else {
-    	fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+    } else {
+      fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
       return(1);
-	  }
+    }
   }
   fclose(in);
 

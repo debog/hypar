@@ -86,7 +86,7 @@ int main()
     printf("Error: ndims is not 4 in solver.inp. this code is to generate 4D initial conditions\n");
     return(0);
   }
-	printf("Grid:\t\t\t%d X %d X %d X %d\n",N[0],N[1],N[2],N[3]);
+  printf("Grid:\t\t\t%d X %d X %d X %d\n",N[0],N[1],N[2],N[3]);
   /* check if ip_file_type is binary */
   if (strcmp(ip_file_type,"binary") && strcmp(ip_file_type,"bin")) {
     printf("Error: ip_file_type needs to be bin or binary.\n");
@@ -170,8 +170,8 @@ int main()
     char word[500];
     ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      while (strcmp(word, "end")){
+        ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
         if      (!strcmp(word,"Pm1_avg"   ))  {ferr=fscanf(in,"%lf",&Pm1_avg   ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"Pm2_avg"   ))  {ferr=fscanf(in,"%lf",&Pm2_avg   ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"Pmref_avg" ))  {ferr=fscanf(in,"%lf",&Pmref_avg ) ;if(ferr!=1)return(1);}
@@ -230,10 +230,10 @@ int main()
           ferr=fscanf(in,"%lf",&x0[3]); if(ferr!=1)return(1);
         }
       }
-	  } else {
-    	fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+    } else {
+      fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
       return(1);
-	  }
+    }
     fclose(in);
   }
 
@@ -263,14 +263,14 @@ int main()
 
   /* allocate and generate the grid */
   printf("Generating grid.\n");
-	double dx[4];
+  double dx[4];
   dx[0] = (xmax[0]-xmin[0]) / ((double)(N[0]));
   dx[1] = (xmax[1]-xmin[1]) / ((double)(N[1]));
   dx[2] = (xmax[2]-xmin[2]) / ((double)(N[2]));
   dx[3] = (xmax[3]-xmin[3]) / ((double)(N[3]));
-	double *x;
+  double *x;
   int sizex = N[0] + N[1] + N[2] + N[3];
-	x = (double*) calloc (sizex, sizeof(double));
+  x = (double*) calloc (sizex, sizeof(double));
   offset = 0;
   for (n = 0; n < 4; n++) {
     for (i = 0; i < N[n]; i++) x[i+offset] = xmin[n] + i*dx[n];
@@ -362,8 +362,8 @@ int main()
   /* Generate the solution and place the Dirac */
   printf("Generating solution.\n");
   int sizeu = N[0] * N[1] * N[2] * N[3];
-	double *u;
-	u = (double*) calloc (sizeu, sizeof(double));
+  double *u;
+  u = (double*) calloc (sizeu, sizeof(double));
   for (i = 0; i < sizeu; i++) u[i] = 0.0;
   /* Placing Dirac */
   printf("Placing Dirac at grid cell (%d, %d, %d, %d).\n",i0[0],i0[1],i0[2],i0[3]);
@@ -373,13 +373,13 @@ int main()
 
   /* writing to file */
   printf("Writing to file.\n");
-	out = fopen("initial.inp","wb");
+  out = fopen("initial.inp","wb");
   fwrite(x,sizeof(double),sizex,out);
   fwrite(u,sizeof(double),sizeu,out);
-	fclose(out);
+  fclose(out);
 
-	free(x);
-	free(u);
+  free(x);
+  free(u);
 
-	return(0);
+  return(0);
 }

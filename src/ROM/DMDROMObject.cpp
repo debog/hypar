@@ -72,7 +72,7 @@ DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
 
       if (std::string(word) == "begin") {
         while (std::string(word) != "end") {
-  	      ferr = fscanf(in,"%s",word); if (ferr != 1) return;
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return;
           if (std::string(word) == "dmd_num_win_samples") {
             ferr = fscanf(in,"%d", &m_num_window_samples); if (ferr != 1) return;
           } else if (std::string(word) == "dmd_dirname") {

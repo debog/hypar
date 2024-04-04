@@ -7,7 +7,7 @@
 int main(){
   
   double pi = 4.0*atan(1.0);
-	int NI,ndims,niter;
+  int NI,ndims,niter;
   double nu, dt,final_time;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");
@@ -35,10 +35,10 @@ int main(){
     printf("ndims is not 1 in solver.inp. this code is to generate 1D initial conditions\n");
     return(0);
   }
-	printf("Grid:\t\t\t%d\n",NI);
+  printf("Grid:\t\t\t%d\n",NI);
 
   final_time = (double)niter * dt;
-	printf("Final Time:\t\t\t%lf\n",final_time);
+  printf("Final Time:\t\t\t%lf\n",final_time);
 
   printf("Reading file \"physics.inp\"...\n");
   in = fopen("physics.inp","r");
@@ -56,27 +56,27 @@ int main(){
     } else printf("Error: Illegal format in solver.inp. Crash and burn!\n");
   }
   fclose(in);
-	printf("Diffusion Coeff:\t\t\t%lf\n",nu);
+  printf("Diffusion Coeff:\t\t\t%lf\n",nu);
 
-	int i;
-	double dx = 1.0 / ((double)NI);
+  int i;
+  double dx = 1.0 / ((double)NI);
 
-	double *x, *u;
-	x = (double*) calloc (NI, sizeof(double));
-	u = (double*) calloc (NI, sizeof(double));
+  double *x, *u;
+  x = (double*) calloc (NI, sizeof(double));
+  u = (double*) calloc (NI, sizeof(double));
   /* set grid */
-	for (i = 0; i < NI; i++) x[i] = i*dx;
+  for (i = 0; i < NI; i++) x[i] = i*dx;
 
   /* Initial  solution */
-	for (i = 0; i < NI; i++) u[i] = sin(2*pi*x[i]);
+  for (i = 0; i < NI; i++) u[i] = sin(2*pi*x[i]);
   if (!strcmp(ip_file_type,"ascii")) {
     printf("Writing ASCII initial solution file initial.inp\n");
-	  out = fopen("initial.inp","w");
+    out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
     fprintf(out,"\n");
-	  for (i = 0; i < NI; i++)	fprintf(out,"%lf ",u[i]);						
+    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);            
     fprintf(out,"\n");
-	  fclose(out);
+    fclose(out);
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
     printf("Writing binary initial solution file initial.inp\n");
     out = fopen("initial.inp","wb");
@@ -86,15 +86,15 @@ int main(){
   }
 
   /* Exact solution */
-	for (i = 0; i < NI; i++) u[i] = exp(-nu*4*pi*pi*final_time)*sin(2*pi*x[i]);
+  for (i = 0; i < NI; i++) u[i] = exp(-nu*4*pi*pi*final_time)*sin(2*pi*x[i]);
   if (!strcmp(ip_file_type,"ascii")) {
     printf("Writing ASCII exact solution file exact.inp\n");
-	  out = fopen("exact.inp","w");
+    out = fopen("exact.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
     fprintf(out,"\n");
-	  for (i = 0; i < NI; i++)	fprintf(out,"%lf ",u[i]);						
+    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);            
     fprintf(out,"\n");
-	  fclose(out);
+    fclose(out);
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
     printf("Writing binary exact solution file exact.inp\n");
     out = fopen("exact.inp","wb");
@@ -103,8 +103,8 @@ int main(){
     fclose(out);
   }
 
-	free(x);
-	free(u);
+  free(x);
+  free(u);
 
-	return(0);
+  return(0);
 }

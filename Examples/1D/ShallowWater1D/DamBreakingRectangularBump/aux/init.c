@@ -25,7 +25,7 @@ double absolute(double x)
 }
 
 int main() {
-	int     NI,ndims;
+  int     NI,ndims;
   FILE    *in, *out;
   char    ip_file_type[50]; 
 
@@ -55,47 +55,47 @@ int main() {
     printf("ndims is not 1 in solver.inp. Make sure the correct solver.inp is being used.\n");
     return(0);
   }
-	printf("Grid: %d\n", NI);
+  printf("Grid: %d\n", NI);
 
-	int i;
+  int i;
   double length = 1500.0;
-	double dx = length / ((double)NI);
+  double dx = length / ((double)NI);
 
-	double *x,*h,*hu,*b;
-	x  = (double*) calloc (NI, sizeof(double));
-	h  = (double*) calloc (NI, sizeof(double));
-	hu = (double*) calloc (NI, sizeof(double));
-	b  = (double*) calloc (NI, sizeof(double));
+  double *x,*h,*hu,*b;
+  x  = (double*) calloc (NI, sizeof(double));
+  h  = (double*) calloc (NI, sizeof(double));
+  hu = (double*) calloc (NI, sizeof(double));
+  b  = (double*) calloc (NI, sizeof(double));
 
-	for (i = 0; i < NI; i++){
-		x[i] = i*dx;
+  for (i = 0; i < NI; i++){
+    x[i] = i*dx;
     if ( absolute(x[i]-750.0) <= 1500.0/8.0 ) b[i] = 8.0;
     else                                      b[i] = 0.0;
     if (x[i] <= 750.0)  h[i] = 20.0-b[i];
     else                h[i] = 15.0-b[i];
     hu[i] = 0;
-	}
+  }
 
   if (!strcmp(ip_file_type,"ascii")) {
     printf("Writing ASCII initial solution file initial.inp\n");
-	  out = fopen("initial.inp","w");
+    out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
     fprintf(out,"\n");
-	  for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",h[i]);						
+    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",h[i]);            
     fprintf(out,"\n");
-	  for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",hu[i]);						
+    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",hu[i]);            
     fprintf(out,"\n");
-	  fclose(out);
+    fclose(out);
     printf("Writing ASCII topography file topography.inp\n");
-	  out = fopen("topography.inp","w");
+    out = fopen("topography.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
     fprintf(out,"\n");
-	  for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",b[i]);						
+    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",b[i]);            
     fprintf(out,"\n");
-	  fclose(out);
+    fclose(out);
   } else {
     printf("Writing binary initial solution file initial.inp\n");
-	  out = fopen("initial.inp","wb");
+    out = fopen("initial.inp","wb");
     fwrite(x,sizeof(double),NI,out);
     double *U = (double*) calloc (2*NI,sizeof(double));
     for (i=0; i < NI; i++) {
@@ -104,18 +104,18 @@ int main() {
     }
     fwrite(U,sizeof(double),2*NI,out);
     free(U);
-	  fclose(out);
+    fclose(out);
     printf("Writing binary topography file topography.inp\n");
-	  out = fopen("topography.inp","wb");
+    out = fopen("topography.inp","wb");
     fwrite(x,sizeof(double),NI,out);
     fwrite(b,sizeof(double),NI,out);
-	  fclose(out);
+    fclose(out);
   }
 
-	free(x);
-	free(h);
-	free(hu);
-	free(b);
+  free(x);
+  free(h);
+  free(hu);
+  free(b);
 
-	return(0);
+  return(0);
 }

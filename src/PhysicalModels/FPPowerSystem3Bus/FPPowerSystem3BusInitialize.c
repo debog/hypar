@@ -103,8 +103,8 @@ int FPPowerSystem3BusInitialize(
     char word[_MAX_STRING_SIZE_];
     ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      while (strcmp(word, "end")){
+        ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
         if      (!strcmp(word,"Pm1_avg"   ))  {ferr=fscanf(in,"%lf",&physics->Pm1_avg   ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"Pm2_avg"   ))  {ferr=fscanf(in,"%lf",&physics->Pm2_avg   ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"Pmref_avg" ))  {ferr=fscanf(in,"%lf",&physics->Pmref_avg ) ;if(ferr!=1)return(1);}
@@ -148,10 +148,10 @@ int FPPowerSystem3BusInitialize(
           ferr=fscanf(in,"%lf",&physics->B[2*3+2]) ;if(ferr!=1)return(1);
         }
       }
-	  } else {
-    	if (!mpi->rank) fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+    } else {
+      if (!mpi->rank) fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
       return(1);
-	  }
+    }
   }
   fclose(in);
 

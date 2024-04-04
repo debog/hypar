@@ -70,7 +70,7 @@ int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
 
         while (std::string(word) != "end") {
 
-  	      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
 
           if (std::string(word) == "log2_imin") {
 

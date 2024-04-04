@@ -31,7 +31,7 @@ int main()
   /* value of pi */
   double pi = 4.0*atan(1.0);
 
-	int NI, NJ, ndims, niter;
+  int NI, NJ, ndims, niter;
   double dt;
 
   FILE *in;
@@ -81,31 +81,31 @@ int main()
     fprintf(stderr,"ndims is not 2 in solver.inp. this code is to generate 2D initial conditions\n");
     return(0);
   }
-	printf("Grid: %d, %d\n",NI,NJ);
+  printf("Grid: %d, %d\n",NI,NJ);
 
   double tf = ((double)niter) * dt;
   printf("Final Time: %lf\n",tf);
 
   int i,j;
-	double dx = 1.0 / ((double)NI);
-	double dy = 1.0 / ((double)NJ);
+  double dx = 1.0 / ((double)NI);
+  double dy = 1.0 / ((double)NJ);
 
   /* initial solution */
   {
 
     double *x, *y, *u;
-  	x = (double*) calloc (NI   , sizeof(double));
-  	y = (double*) calloc (NJ   , sizeof(double));
-  	u = (double*) calloc (NI*NJ, sizeof(double));
+    x = (double*) calloc (NI   , sizeof(double));
+    y = (double*) calloc (NJ   , sizeof(double));
+    u = (double*) calloc (NI*NJ, sizeof(double));
   
-  	for (i = 0; i < NI; i++){
-    	for (j = 0; j < NJ; j++){
-  	  	x[i] = i*dx;
-  	  	y[j] = j*dy;
+    for (i = 0; i < NI; i++){
+      for (j = 0; j < NJ; j++){
+        x[i] = i*dx;
+        y[j] = j*dy;
         int p = NJ*i + j;
-  		  u[p] = sin(2*pi*x[i]) / (2*ts*pi);
-  	  }
-  	}
+        u[p] = sin(2*pi*x[i]) / (2*ts*pi);
+      }
+    }
   
     FILE *out;
     if (!strcmp(ip_file_type,"ascii")) {
@@ -115,19 +115,19 @@ int main()
       fprintf(out,"\n");
       for (j = 0; j < NJ; j++)  fprintf(out,"%1.16e ",y[j]);
       fprintf(out,"\n");
-      for (j = 0; j < NJ; j++)	{
-  	    for (i = 0; i < NI; i++)	{
+      for (j = 0; j < NJ; j++)  {
+        for (i = 0; i < NI; i++)  {
           int p = NJ*i + j;
           fprintf(out,"%1.16e ",u[p]);
         }
       }
       fprintf(out,"\n");
-  	  fclose(out);
+      fclose(out);
   
     } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
   
       printf("Writing binary exact solution file initial.inp\n");
-    	out = fopen("initial.inp","wb");
+      out = fopen("initial.inp","wb");
       fwrite(x,sizeof(double),NI,out);
       fwrite(y,sizeof(double),NJ,out);
       double *U = (double*) calloc (NI*NJ,sizeof(double));
@@ -144,9 +144,9 @@ int main()
   
     }
   
-  	free(x);
-  	free(y);
-  	free(u);
+    free(x);
+    free(y);
+    free(u);
 
   }
 
@@ -154,31 +154,31 @@ int main()
   if (tf < ts) {
 
     double *x, *y, *u;
-  	x = (double*) calloc (NI   , sizeof(double));
-  	y = (double*) calloc (NJ   , sizeof(double));
-  	u = (double*) calloc (NI*NJ, sizeof(double));
+    x = (double*) calloc (NI   , sizeof(double));
+    y = (double*) calloc (NJ   , sizeof(double));
+    u = (double*) calloc (NI*NJ, sizeof(double));
   
-  	for (i = 0; i < NI; i++){
-    	for (j = 0; j < NJ; j++){
-  	  	x[i] = i*dx;
-  	  	y[j] = j*dy;
+    for (i = 0; i < NI; i++){
+      for (j = 0; j < NJ; j++){
+        x[i] = i*dx;
+        y[j] = j*dy;
         int p = NJ*i + j;
-  		  u[p] = sin(2*pi*x[i]) / (2*ts*pi);
-  	  }
-  	}
+        u[p] = sin(2*pi*x[i]) / (2*ts*pi);
+      }
+    }
   
     int k;
     printf("Computing exact solution iteratively...\n");
     for (k = 0; k < MAX_ITER; k++) {
       double maxres = 0;
-	    for (i = 0; i < NI; i++){
-    	  for (j = 0; j < NJ; j++){
+      for (i = 0; i < NI; i++){
+        for (j = 0; j < NJ; j++){
           int p = NJ*i + j;
           double new_u =  sin(2.0*pi*(x[i]-u[p]*tf)) / (ts*2.0*pi);
           double res = sqrt((new_u-u[p])*(new_u-u[p]));
           if (res > maxres) maxres = res;
           u[p] = new_u;
-	      }
+        }
       }
       printf("  iter=%6d, max res=%1.6e\n", k, maxres);
       if (maxres < tolerance) break;
@@ -192,19 +192,19 @@ int main()
       fprintf(out,"\n");
       for (j = 0; j < NJ; j++)  fprintf(out,"%1.16e ",y[j]);
       fprintf(out,"\n");
-      for (j = 0; j < NJ; j++)	{
-  	    for (i = 0; i < NI; i++)	{
+      for (j = 0; j < NJ; j++)  {
+        for (i = 0; i < NI; i++)  {
           int p = NJ*i + j;
           fprintf(out,"%1.16e ",u[p]);
         }
       }
       fprintf(out,"\n");
-  	  fclose(out);
+      fclose(out);
   
     } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
   
       printf("Writing binary exact solution file exact.inp\n");
-    	out = fopen("exact.inp","wb");
+      out = fopen("exact.inp","wb");
       fwrite(x,sizeof(double),NI,out);
       fwrite(y,sizeof(double),NJ,out);
       double *U = (double*) calloc (NI*NJ,sizeof(double));
@@ -221,9 +221,9 @@ int main()
   
     }
   
-  	free(x);
-  	free(y);
-  	free(u);
+    free(x);
+    free(y);
+    free(u);
 
   } else {
 
@@ -232,5 +232,5 @@ int main()
 
   }
 
-	return(0);
+  return(0);
 }

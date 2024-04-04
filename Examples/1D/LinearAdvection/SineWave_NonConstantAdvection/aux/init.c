@@ -8,7 +8,7 @@ int main()
 {
   const double pi = 4.0*atan(1.0);
 
-	int NI, ndims;
+  int NI, ndims;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");
 
@@ -72,40 +72,40 @@ int main()
     printf("ndims is not 1 in solver.inp. this code is to generate 1D initial conditions\n");
     return(0);
   }
-	printf("Grid:\t\t\t%d\n",NI);
+  printf("Grid:\t\t\t%d\n",NI);
 
-	int i;
-	double dx = 1.0 / ((double)NI);
+  int i;
+  double dx = 1.0 / ((double)NI);
 
-	double *x, *u, *a;
-	x = (double*) calloc (NI, sizeof(double));
-	u = (double*) calloc (NI, sizeof(double));
-	a = (double*) calloc (NI, sizeof(double));
+  double *x, *u, *a;
+  x = (double*) calloc (NI, sizeof(double));
+  u = (double*) calloc (NI, sizeof(double));
+  a = (double*) calloc (NI, sizeof(double));
 
-	for (i = 0; i < NI; i++){
-  	x[i] = (i+0.5)*dx;
-		u[i] = sin(2*pi*x[i]);
-		a[i] = 1.0+0.5*sin(2*pi*x[i])*sin(2*pi*x[i]);
-	}
+  for (i = 0; i < NI; i++){
+    x[i] = (i+0.5)*dx;
+    u[i] = sin(2*pi*x[i]);
+    a[i] = 1.0+0.5*sin(2*pi*x[i])*sin(2*pi*x[i]);
+  }
 
   FILE *out;
   strcat(adv_filename, ".inp");
 
   if (!strcmp(ip_file_type,"ascii")) {
     printf("Writing ASCII initial solution file initial.inp\n");
-  	out = fopen("initial.inp","w");
+    out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
     fprintf(out,"\n");
-	  for (i = 0; i < NI; i++)	fprintf(out,"%lf ",u[i]);						
+    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);            
     fprintf(out,"\n");
     fclose(out);
     printf("Writing ASCII advection field file %s\n", adv_filename);
-	  out = fopen(adv_filename,"w");
+    out = fopen(adv_filename,"w");
     for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
     fprintf(out,"\n");
-	  for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",a[i]);						
+    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",a[i]);            
     fprintf(out,"\n");
-	  fclose(out);
+    fclose(out);
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
     printf("Writing binary initial solution file initial.inp\n");
     out = fopen("initial.inp","wb");
@@ -113,15 +113,15 @@ int main()
     fwrite(u,sizeof(double),NI,out);
     fclose(out);
     printf("Writing binary advection field file %s\n", adv_filename);
-	  out = fopen(adv_filename,"wb");
+    out = fopen(adv_filename,"wb");
     fwrite(x,sizeof(double),NI,out);
     fwrite(a,sizeof(double),NI,out);
-	  fclose(out);
+    fclose(out);
   }
 
-	free(x);
-	free(u);
-	free(a);
+  free(x);
+  free(u);
+  free(a);
 
-	return(0);
+  return(0);
 }

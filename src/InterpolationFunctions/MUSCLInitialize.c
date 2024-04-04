@@ -37,8 +37,8 @@ int MUSCLInitialize(
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
-	      while (strcmp(word, "end")){
-		      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+        while (strcmp(word, "end")){
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if      (!strcmp(word,"epsilon")) { ferr = fscanf(in,"%lf",&muscl->eps);         if (ferr != 1) return(1); }
           else if (!strcmp(word,"limiter")) { ferr = fscanf(in,"%s" ,muscl->limiter_type); if (ferr != 1) return(1); }
           else if (strcmp(word,"end")) {
@@ -48,10 +48,10 @@ int MUSCLInitialize(
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
-	    } else {
-    	  fprintf(stderr,"Error: Illegal format in file \"muscl.inp\".\n");
+      } else {
+        fprintf(stderr,"Error: Illegal format in file \"muscl.inp\".\n");
         return(1);
-	    }
+      }
       fclose(in);
     }
   }

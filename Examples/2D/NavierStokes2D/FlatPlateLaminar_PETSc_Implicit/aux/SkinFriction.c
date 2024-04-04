@@ -20,12 +20,12 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "op_file_format"))  fscanf(inputs,"%s" ,op_file_format);
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "op_file_format"))  fscanf(inputs,"%s" ,op_file_format);
       }
     }
     fclose(inputs);
@@ -40,13 +40,13 @@ int main()
     fprintf(stderr,"Error: File \"physics.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "Re"))   fscanf(inputs,"%lf",&Re_inf);
-   			else if (!strcmp(word, "Minf")) fscanf(inputs,"%lf",&M_inf);
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "Re"))   fscanf(inputs,"%lf",&Re_inf);
+         else if (!strcmp(word, "Minf")) fscanf(inputs,"%lf",&M_inf);
       }
     }
     fclose(inputs);

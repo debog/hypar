@@ -37,16 +37,16 @@
     normal. \sa https://en.wikipedia.org/wiki/STL_(file_format)
 */
 typedef struct _facet_3d_{
-	double x1, /*!< x-coordinate of vertex 1 */
+  double x1, /*!< x-coordinate of vertex 1 */
          x2, /*!< x-coordinate of vertex 2 */ 
          x3, /*!< x-coordinate of vertex 3 */
-	       y1, /*!< y-coordinate of vertex 1 */
+         y1, /*!< y-coordinate of vertex 1 */
          y2, /*!< y-coordinate of vertex 2 */ 
          y3, /*!< y-coordinate of vertex 3 */
-	       z1, /*!< z-coordinate of vertex 1 */
+         z1, /*!< z-coordinate of vertex 1 */
          z2, /*!< z-coordinate of vertex 2 */ 
          z3, /*!< z-coordinate of vertex 3 */
-	       nx, /*!< x-component of surface normal */
+         nx, /*!< x-component of surface normal */
          ny, /*!< y-component of surface normal */
          nz; /*!< z-component of surface normal */
 } Facet3D;

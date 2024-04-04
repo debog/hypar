@@ -11,7 +11,7 @@ double raiseto(double x,double a)
 
 int main() 
 {
-	int NI,ndims,niter;
+  int NI,ndims,niter;
   double dt, pi = 4.0*atan(1.0), gamma = 1.4;
   FILE *in, *out;
 
@@ -47,13 +47,13 @@ int main()
     printf("ndims is not 1 in solver.inp. Make sure the correct solver.inp file is present.\n");
     return(0);
   }
-	printf("Grid: %d\n",NI);
+  printf("Grid: %d\n",NI);
   printf("Input maximum wavenumber (typically NI/2): ");
   int limit; scanf("%d",&limit);
   printf("Max wavenumber: %d\n",limit);
 
-	int i,k;
-	double dx = 1.0 / ((double)NI);
+  int i,k;
+  double dx = 1.0 / ((double)NI);
   double tf = ((double)niter) * dt;
   printf("Final Time: %lf\n",tf);
 
@@ -66,14 +66,14 @@ int main()
 //    phi[k] = pi/2.0;;
   }
 
-	double *x, *rho,*rhou,*e;
-	x    = (double*) calloc (NI, sizeof(double));
-	rho  = (double*) calloc (NI, sizeof(double));
-	rhou = (double*) calloc (NI, sizeof(double));
-	e    = (double*) calloc (NI, sizeof(double));
+  double *x, *rho,*rhou,*e;
+  x    = (double*) calloc (NI, sizeof(double));
+  rho  = (double*) calloc (NI, sizeof(double));
+  rhou = (double*) calloc (NI, sizeof(double));
+  e    = (double*) calloc (NI, sizeof(double));
 
-	for (i = 0; i < NI; i++){
-		x[i] = -0.5 + i*dx;
+  for (i = 0; i < NI; i++){
+    x[i] = -0.5 + i*dx;
     double RHO,U,P,drho=0;
     for (k=1; k<=limit; k++) {
       double Ak = factor * raiseto(((double)k),-5.0/6.0);
@@ -86,28 +86,28 @@ int main()
     rhou[i] = RHO*U;
     e[i]    = P/0.4 + 0.5*RHO*U*U;
     printf("%d: %f\n",i,rho[i]);
-	}
-	out = fopen("exact.inp","w");
+  }
+  out = fopen("exact.inp","w");
   for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",rho[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rho[i]);            
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",rhou[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rhou[i]);            
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",e[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",e[i]);            
   fprintf(out,"\n");
-	fclose(out);
-	free(x);
-	free(rho);
-	free(rhou);
-	free(e);
+  fclose(out);
+  free(x);
+  free(rho);
+  free(rhou);
+  free(e);
 
-	x    = (double*) calloc (NI, sizeof(double));
-	rho  = (double*) calloc (NI, sizeof(double));
-	rhou = (double*) calloc (NI, sizeof(double));
-	e    = (double*) calloc (NI, sizeof(double));
-	for (i = 0; i < NI; i++){
-		x[i] = -0.5 + i*dx;
+  x    = (double*) calloc (NI, sizeof(double));
+  rho  = (double*) calloc (NI, sizeof(double));
+  rhou = (double*) calloc (NI, sizeof(double));
+  e    = (double*) calloc (NI, sizeof(double));
+  for (i = 0; i < NI; i++){
+    x[i] = -0.5 + i*dx;
     double RHO,U,P,drho=0;
     for (k=1; k<=limit; k++) {
       double Ak = factor * raiseto(((double)k),-5.0/6.0);
@@ -119,22 +119,22 @@ int main()
     rho[i]  = RHO;
     rhou[i] = RHO*U;
     e[i]    = P/0.4 + 0.5*RHO*U*U;
-	}
-	out = fopen("initial.inp","w");
+  }
+  out = fopen("initial.inp","w");
   for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",rho[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rho[i]);            
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",rhou[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rhou[i]);            
   fprintf(out,"\n");
-	for (i = 0; i < NI; i++)	fprintf(out,"%1.16E ",e[i]);						
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",e[i]);            
   fprintf(out,"\n");
-	fclose(out);
-	free(x);
-	free(rho);
-	free(rhou);
-	free(e);
+  fclose(out);
+  free(x);
+  free(rho);
+  free(rhou);
+  free(e);
 
   free(phi);
-	return(0);
+  return(0);
 }

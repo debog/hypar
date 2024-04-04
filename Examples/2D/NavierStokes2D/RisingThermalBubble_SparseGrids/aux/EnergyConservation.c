@@ -151,15 +151,15 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
         else if (!strcmp(word, "dt"               ))  fscanf(inputs,"%lf",&dt);
         else if (!strcmp(word, "file_op_iter"     ))  fscanf(inputs,"%d" ,&file_op_iter);
-   			else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite);
+         else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite);
       }
     }
     fclose(inputs);
@@ -185,13 +185,13 @@ int main()
     fprintf(stderr,"Error: File \"physics.inp\" not found.\n");
     return(1);
   } else {
-	  char word[100];
+    char word[100];
     fscanf(inputs,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(inputs,"%s",word);
-   			if      (!strcmp(word, "gamma"))    fscanf(inputs,"%lf",&params.gamma);
-   			else if (!strcmp(word, "gravity")) {
+      while (strcmp(word, "end")){
+        fscanf(inputs,"%s",word);
+         if      (!strcmp(word, "gamma"))    fscanf(inputs,"%lf",&params.gamma);
+         else if (!strcmp(word, "gravity")) {
           fscanf(inputs,"%lf",&params.grav_x);
           fscanf(inputs,"%lf",&params.grav_y);
         }

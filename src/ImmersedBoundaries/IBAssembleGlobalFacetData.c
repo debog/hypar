@@ -54,47 +54,47 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
   MPI_Status status;
 #endif
 
-	if (!mpi->rank) {
+  if (!mpi->rank) {
 
     int nfacets_global = IB->body->nfacets;
 
     /* allocate arrays for whole domain */
-		*global_var = (double*) calloc (nfacets_global*nvars, sizeof(double));
+    *global_var = (double*) calloc (nfacets_global*nvars, sizeof(double));
     _ArraySetValue_((*global_var), (nfacets_global*nvars), 0.0);
 
     /* check array - to avoid double counting of facets */
-		int *check = (int*) calloc (nfacets_global, sizeof(int));
+    int *check = (int*) calloc (nfacets_global, sizeof(int));
     _ArraySetValue_(check, nfacets_global, 0);
 
     /* local data */
-		for (int n = 0; n < nfacets_local; n++) {
+    for (int n = 0; n < nfacets_local; n++) {
       _ArrayAXPY_((local_var+n), 1.0, ((*global_var)+fmap[n].index), nvars);
-		  check[fmap[n].index]++;
-		}
+      check[fmap[n].index]++;
+    }
 
 #ifndef serial
-		for (int proc = 1; proc < mpi->nproc; proc++) {
+    for (int proc = 1; proc < mpi->nproc; proc++) {
 
-			int nf_incoming;
-			MPI_Recv(&nf_incoming, 1, MPI_INT, proc, 98927, MPI_COMM_WORLD, &status);
+      int nf_incoming;
+      MPI_Recv(&nf_incoming, 1, MPI_INT, proc, 98927, MPI_COMM_WORLD, &status);
 
       if (nf_incoming > 0) {
 
-			  int    *indices_incoming = (int*)    calloc(nf_incoming, sizeof(int));
-			  double *var_incoming     = (double*) calloc(nf_incoming*nvars, sizeof(double));
+        int    *indices_incoming = (int*)    calloc(nf_incoming, sizeof(int));
+        double *var_incoming     = (double*) calloc(nf_incoming*nvars, sizeof(double));
 
-			  MPI_Recv(indices_incoming, nf_incoming, MPI_INT, proc, 98928, mpi->world, &status);
-			  MPI_Recv(var_incoming, nf_incoming*nvars, MPI_DOUBLE, proc, 98929, mpi->world, &status);
+        MPI_Recv(indices_incoming, nf_incoming, MPI_INT, proc, 98928, mpi->world, &status);
+        MPI_Recv(var_incoming, nf_incoming*nvars, MPI_DOUBLE, proc, 98929, mpi->world, &status);
 
-			  for (int n = 0; n < nf_incoming; n++) {
+        for (int n = 0; n < nf_incoming; n++) {
           _ArrayAXPY_((var_incoming+n), 1.0, ((*global_var)+indices_incoming[n]), nvars);
-				  check[indices_incoming[n]]++;
-			  }
+          check[indices_incoming[n]]++;
+        }
         
         free(indices_incoming);
         free(var_incoming);
       }
-		}
+    }
 #endif
 
     for (int n = 0; n < nfacets_global; n++) {
@@ -107,25 +107,25 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
       }
     }
 
-	} else {
+  } else {
 
 #ifndef serial
 
-		MPI_Send(&nfacets_local, 1, MPI_INT, 0, 98927, MPI_COMM_WORLD);
+    MPI_Send(&nfacets_local, 1, MPI_INT, 0, 98927, MPI_COMM_WORLD);
 
     if (nfacets_local > 0) {
 
       int i, *indices = (int*) calloc (nfacets_local, sizeof(int));
       for (i = 0; i < nfacets_local; i++) indices[i] = fmap[i].index;
 
-		  MPI_Send(indices, nfacets_local, MPI_INT, 0, 98928, mpi->world);
-		  MPI_Send(local_var, nfacets_local*nvars, MPI_DOUBLE, 0, 98929, mpi->world);
+      MPI_Send(indices, nfacets_local, MPI_INT, 0, 98928, mpi->world);
+      MPI_Send(local_var, nfacets_local*nvars, MPI_DOUBLE, 0, 98929, mpi->world);
 
       free(indices);
     }
 #endif
 
-	}
+  }
 
   return 0;
 }

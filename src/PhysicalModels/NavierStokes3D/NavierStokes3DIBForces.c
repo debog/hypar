@@ -186,12 +186,12 @@ static int WriteSurfaceData(  void*               m,              /*!< MPI objec
   }
 
   /* Rank 0 writes the file */
-	if (!mpi->rank) {
+  if (!mpi->rank) {
 
     int nfacets_global = IB->body->nfacets;
     const Facet3D* const facets = IB->body->surface;
 
-		FILE *out;
+    FILE *out;
     out = fopen(filename,"w");
     fprintf(out,"TITLE = \"Surface data created by HyPar.\"\n");
     fprintf(out,"VARIABLES = \"X\", \"Y\", \"Z\", ");
@@ -206,7 +206,7 @@ static int WriteSurfaceData(  void*               m,              /*!< MPI objec
     fprintf(out,"\n");
     fprintf(out,"ZONE N = %d, E = %d, DATAPACKING = POINT, ZONETYPE = FETRIANGLE\n",3*nfacets_global,nfacets_global);
 
-		for (int n = 0; n < nfacets_global; n++) {
+    for (int n = 0; n < nfacets_global; n++) {
       fprintf(  out, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
                 facets[n].x1,
                 facets[n].y1,
@@ -243,10 +243,10 @@ static int WriteSurfaceData(  void*               m,              /*!< MPI objec
                 shear_g[4*n+_YDIR_],
                 shear_g[4*n+_ZDIR_],
                 shear_g[4*n+_ZDIR_+1] );
-		}
-		for (int n = 0; n < nfacets_global; n++) fprintf(out,"%d %d %d\n",3*n+1,3*n+2,3*n+3);
-		fclose(out);
-	}
+    }
+    for (int n = 0; n < nfacets_global; n++) fprintf(out,"%d %d %d\n",3*n+1,3*n+2,3*n+3);
+    fclose(out);
+  }
 
   if (p_surface_g) free(p_surface_g);
   if (T_surface_g) free(T_surface_g);

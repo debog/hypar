@@ -95,8 +95,8 @@ int main()
     fprintf(out,"\n");
     for (j = 0; j < NJ; j++)  fprintf(out,"%1.16e ",v[j]);
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-       for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+       for (i = 0; i < NI; i++)  {
           int p = NJ*i + j;
           fprintf(out,"%1.16e ", f[p]);
        }

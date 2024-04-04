@@ -22,36 +22,36 @@ void fourierTransform(  const long N,
                         double* const uu,
                         fftw_complex* const uhat )
 {
-	long i,j,k;
+  long i,j,k;
   long N3 = N*N*N;
 
-	fftw_complex *u = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));	
-	fftw_plan transform_u;
-	transform_u = fftw_plan_dft_3d(N, N, N, u, uhat, -1, FFTW_MEASURE);
+  fftw_complex *u = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
+  fftw_plan transform_u;
+  transform_u = fftw_plan_dft_3d(N, N, N, u, uhat, -1, FFTW_MEASURE);
 
-	for (i = 0; i < N; i++){
-		for (j = 0; j < N; j++){
-			for (k = 0; k < N; k++){
-				u[k+N*(j+N*i)][0] = uu[k+N*(j+N*i)];
-				u[k+N*(j+N*i)][1] = 0;
-			}
-		}
-	}
+  for (i = 0; i < N; i++){
+    for (j = 0; j < N; j++){
+      for (k = 0; k < N; k++){
+        u[k+N*(j+N*i)][0] = uu[k+N*(j+N*i)];
+        u[k+N*(j+N*i)][1] = 0;
+      }
+    }
+  }
 
-	fftw_execute(transform_u);
+  fftw_execute(transform_u);
 
-	fftw_free(u);
+  fftw_free(u);
 
-	for (i = 0; i < N; i++){
-		for (j = 0; j < N; j++){
-			for (k = 0; k < N; k++){
-				uhat[k+N*(j+N*i)][0] /= ((double)N3);
-				uhat[k+N*(j+N*i)][1] /= ((double)N3);
-			}
-		}
-	}
+  for (i = 0; i < N; i++){
+    for (j = 0; j < N; j++){
+      for (k = 0; k < N; k++){
+        uhat[k+N*(j+N*i)][0] /= ((double)N3);
+        uhat[k+N*(j+N*i)][1] /= ((double)N3);
+      }
+    }
+  }
 
-	fftw_destroy_plan(transform_u);
+  fftw_destroy_plan(transform_u);
   return;
 }
 
@@ -60,47 +60,47 @@ void energySpectrum(const long N,
                     const fftw_complex* const vhat,
                     const fftw_complex* const what )
 {
-	long i,j,k;
+  long i,j,k;
   long N3 = N*N*N;
-	double kk = sqrt(3 * (N/2)*(N/2));
-	int kkmax = (int) kk;
+  double kk = sqrt(3 * (N/2)*(N/2));
+  int kkmax = (int) kk;
 
-	double *freq = (double*) calloc(kkmax+1, sizeof(double));
-	double *Eng = (double*) calloc(kkmax+1, sizeof(double));
+  double *freq = (double*) calloc(kkmax+1, sizeof(double));
+  double *Eng = (double*) calloc(kkmax+1, sizeof(double));
 
-	double total_energy = 0.0;
-	for (i = 0; i < N; i++){
-		for (j = 0; j < N; j++){
-			for (k = 0; k < N; k++){
+  double total_energy = 0.0;
+  for (i = 0; i < N; i++){
+    for (j = 0; j < N; j++){
+      for (k = 0; k < N; k++){
         long p = k+N*(j+N*i);
-				long isq, jsq, ksq;
-				if (i > N/2)	isq = (i-N) * (i-N);
-				else		isq = i*i;
-				if (j > N/2)	jsq = (j-N) * (j-N);
-				else		jsq = j*j;
-				if (k > N/2)	ksq = (k-N) * (k-N);
-				else		ksq = k*k;
-				double kk = sqrt(isq + jsq + ksq);
-				freq[(int)kk] = kk;
-				Eng[(int)kk] = Eng[(int)kk] 
-					+ 0.5 * ( (uhat[p][0]*uhat[p][0] + uhat[p][1]*uhat[p][1])
-					        + (vhat[p][0]*vhat[p][0] + vhat[p][1]*vhat[p][1])
-					        + (what[p][0]*what[p][0] + what[p][1]*what[p][1]) );
-				total_energy = total_energy 
-					+ 0.5 * ( (uhat[p][0]*uhat[p][0] + uhat[p][1]*uhat[p][1])
-					        + (vhat[p][0]*vhat[p][0] + vhat[p][1]*vhat[p][1])
-					        + (what[p][0]*what[p][0] + what[p][1]*what[p][1]) );
-			}
-		}
-	}
-	printf("Total Energy: %1.16E\n",total_energy);
+        long isq, jsq, ksq;
+        if (i > N/2)  isq = (i-N) * (i-N);
+        else    isq = i*i;
+        if (j > N/2)  jsq = (j-N) * (j-N);
+        else    jsq = j*j;
+        if (k > N/2)  ksq = (k-N) * (k-N);
+        else    ksq = k*k;
+        double kk = sqrt(isq + jsq + ksq);
+        freq[(int)kk] = kk;
+        Eng[(int)kk] = Eng[(int)kk] 
+          + 0.5 * ( (uhat[p][0]*uhat[p][0] + uhat[p][1]*uhat[p][1])
+                  + (vhat[p][0]*vhat[p][0] + vhat[p][1]*vhat[p][1])
+                  + (what[p][0]*what[p][0] + what[p][1]*what[p][1]) );
+        total_energy = total_energy 
+          + 0.5 * ( (uhat[p][0]*uhat[p][0] + uhat[p][1]*uhat[p][1])
+                  + (vhat[p][0]*vhat[p][0] + vhat[p][1]*vhat[p][1])
+                  + (what[p][0]*what[p][0] + what[p][1]*what[p][1]) );
+      }
+    }
+  }
+  printf("Total Energy: %1.16E\n",total_energy);
 
-	FILE *out;
-	out = fopen("spectrum.dat","w");
-	for (i = 1; i < kkmax; i++) fprintf(out,"%1.16E\t%1.16E\n",freq[i],Eng[i]/total_energy);
-	fclose(out);
-	free(freq);
-	free(Eng);
+  FILE *out;
+  out = fopen("spectrum.dat","w");
+  for (i = 1; i < kkmax; i++) fprintf(out,"%1.16E\t%1.16E\n",freq[i],Eng[i]/total_energy);
+  fclose(out);
+  free(freq);
+  free(Eng);
 
   return;
 }
@@ -184,17 +184,17 @@ int main()
     free(z);
     free(U);
 
-	  double rms_velocity = 0;
-	  for (i = 0; i < N; i++) {
-	  	for (j = 0; j < N; j++) {
-	  		for (k = 0; k < N; k++) {
+    double rms_velocity = 0;
+    for (i = 0; i < N; i++) {
+      for (j = 0; j < N; j++) {
+        for (k = 0; k < N; k++) {
           long p = k+N*(j+N*i);
-	  			rms_velocity +=  (u[p]*u[p] + v[p]*v[p] + w[p]*w[p]);
-	  		}
-	  	}
-	  }
-	  rms_velocity = sqrt(rms_velocity / (3*((double)N3)));
-	  printf("RMS velocity (component-wise): %1.16E\n",rms_velocity);
+          rms_velocity +=  (u[p]*u[p] + v[p]*v[p] + w[p]*w[p]);
+        }
+      }
+    }
+    rms_velocity = sqrt(rms_velocity / (3*((double)N3)));
+    printf("RMS velocity (component-wise): %1.16E\n",rms_velocity);
 
     /* calculate the divergence of velocity */
     double pi = 4.0*atan(1.0);
@@ -262,26 +262,26 @@ int main()
     printf("Taylor microscales: %1.16E, %1.16E, %1.16E\n",
            TaylorMicroscale[0],TaylorMicroscale[1],TaylorMicroscale[2]);
 
-	  fftw_complex *uhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));	
+    fftw_complex *uhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
     printf("Computing Fourier transform (u).\n");
     fourierTransform( N, u, uhat );
     free(u);
 
-	  fftw_complex *vhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));	
+    fftw_complex *vhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
     printf("Computing Fourier transform (v).\n");
     fourierTransform( N, v, vhat );
     free(v);
 
-	  fftw_complex *what = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));	
+    fftw_complex *what = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
     printf("Computing Fourier transform (w).\n");
     fourierTransform( N, w, what );
     free(w);
 
     energySpectrum(N, uhat, vhat, what);
 
-	  fftw_free(uhat);
-	  fftw_free(vhat);
-	  fftw_free(what);
+    fftw_free(uhat);
+    fftw_free(vhat);
+    fftw_free(what);
 
   } else {
 

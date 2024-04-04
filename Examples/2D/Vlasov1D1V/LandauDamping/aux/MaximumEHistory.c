@@ -93,18 +93,18 @@ int main()
 
   } else {
 
-	  char word[100];
+    char word[100];
     fscanf(in,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(in,"%s",word);
+      while (strcmp(word, "end")){
+        fscanf(in,"%s",word);
         if (!strcmp(word, "ndims")) fscanf(in,"%d",&ndims);
         else if (!strcmp(word, "size")) {
           fscanf(in,"%d",&NI);
           fscanf(in,"%d",&NJ);
-   			} else if (!strcmp(word, "dt"))  fscanf(in,"%lf",&dt);
-   			else if (!strcmp(word, "file_op_iter")) fscanf(in,"%d",&file_op_iter);
-   			else if (!strcmp(word, "restart_iter")) fscanf(in,"%d",&restart_iter);
+         } else if (!strcmp(word, "dt"))  fscanf(in,"%lf",&dt);
+         else if (!strcmp(word, "file_op_iter")) fscanf(in,"%d",&file_op_iter);
+         else if (!strcmp(word, "restart_iter")) fscanf(in,"%d",&restart_iter);
       }
     }
     fclose(in);

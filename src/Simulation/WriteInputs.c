@@ -35,7 +35,7 @@ int WriteInputs ( void  *s,     /*!< Array of simulation objects of type #Simula
         printf("\n");
       }
 #ifndef serial
-	    printf("  Processes along each dimension:\n");
+      printf("  Processes along each dimension:\n");
       for (int n = 0; n < nsims; n++) {
         printf("    domain %3d - ", n);
         for (int i=0; i<sim[n].solver.ndims; i++) printf ("%d ",sim[n].mpi.iproc[i]);
@@ -49,21 +49,21 @@ int WriteInputs ( void  *s,     /*!< Array of simulation objects of type #Simula
         printf("\n");
       }
     } else {
-	    printf("  Domain size                                : ");
+      printf("  Domain size                                : ");
       for (int i=0; i<sim[0].solver.ndims; i++) printf ("%d ",sim[0].solver.dim_global[i]);
       printf("\n");
 #ifndef serial
-	    printf("  Processes along each dimension             : ");
+      printf("  Processes along each dimension             : ");
       for (int i=0; i<sim[0].solver.ndims; i++) printf ("%d ",sim[0].mpi.iproc[i]);
       printf("\n");
 #endif
-	    printf("  Exact solution domain size                 : ");
+      printf("  Exact solution domain size                 : ");
       for (int i=0; i<sim[0].solver.ndims; i++) printf ("%d ",sim[0].solver.dim_global_ex[i]);
       printf("\n");
     }
-	  printf("  No. of ghosts pts                          : %d\n"     ,sim[0].solver.ghosts              );
-	  printf("  No. of iter.                               : %d\n"     ,sim[0].solver.n_iter              );
-	  printf("  Restart iteration                          : %d\n"     ,sim[0].solver.restart_iter        );
+    printf("  No. of ghosts pts                          : %d\n"     ,sim[0].solver.ghosts              );
+    printf("  No. of iter.                               : %d\n"     ,sim[0].solver.n_iter              );
+    printf("  Restart iteration                          : %d\n"     ,sim[0].solver.restart_iter        );
 #ifdef with_petsc
     if (sim[0].solver.use_petscTS)
       printf("  Time integration scheme                    : PETSc \n"                            );

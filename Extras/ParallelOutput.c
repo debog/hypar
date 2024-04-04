@@ -162,17 +162,17 @@ int main()
     fprintf(stderr,"Error: File \"solver.inp\" not found.\n");
     return(0);
   } else {
-	  char word[_MAX_STRING_SIZE_];
+    char word[_MAX_STRING_SIZE_];
     fscanf(in,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(in,"%s",word);
+      while (strcmp(word, "end")){
+        fscanf(in,"%s",word);
         if (!strcmp(word, "ndims")) {
           fscanf(in,"%d",&ndims);
           dim_global = (int*) calloc (ndims,sizeof(int));
           dim_local  = (int*) calloc (ndims,sizeof(int));
           iproc      = (int*) calloc (ndims,sizeof(int));
-        }	else if (!strcmp(word, "nvars")) {
+        }  else if (!strcmp(word, "nvars")) {
           fscanf(in,"%d",&nvars);
         } else if (!strcmp(word, "size")) {
           int i;
@@ -196,18 +196,18 @@ int main()
         }
       }
     } else {
-  	  fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
+      fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
       return(0);
     }
     fclose(in);
 
     /* Print to screen the inputs read */
-	  printf("\tNo. of dimensions                          : %d\n",ndims);
-	  printf("\tNo. of variables                           : %d\n",nvars);
-	  printf("\tDomain size                                : ");
+    printf("\tNo. of dimensions                          : %d\n",ndims);
+    printf("\tNo. of variables                           : %d\n",nvars);
+    printf("\tDomain size                                : ");
     for (i=0; i<ndims; i++) printf ("%d ",dim_global[i]);
     printf("\n");
-	  printf("\tProcesses along each dimension             : ");
+    printf("\tProcesses along each dimension             : ");
     for (i=0; i<ndims; i++) printf ("%d ",iproc[i]);
     printf("\n");
     printf("\tSolution output  mode                      : %s\n",output_mode  );

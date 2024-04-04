@@ -82,7 +82,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 
       if (std::string(word) == "begin") {
         while (std::string(word) != "end") {
-  	      ferr = fscanf(in,"%s",word); if (ferr != 1) return;
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return;
           if (std::string(word) == "rdim") {
             ferr = fscanf(in,"%d", &m_rdim); if (ferr != 1) return;
           } else if (std::string(word) == "sampling_frequency") {

@@ -73,8 +73,8 @@ int ShallowWater2DInitialize(
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
-	      while (strcmp(word, "end")){
-		      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+        while (strcmp(word, "end")){
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "gravity")) { 
             ferr = fscanf(in,"%lf",&physics->g); 
             if (ferr != 1) return(1);
@@ -100,10 +100,10 @@ int ShallowWater2DInitialize(
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
-	    } else {
-    	  fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+      } else {
+        fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
         return(1);
-	    }
+      }
     }
     fclose(in);
   }

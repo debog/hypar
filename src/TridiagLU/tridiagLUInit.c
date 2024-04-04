@@ -69,14 +69,14 @@ int tridiagLUInit(
       char word[100];
       ierr = fscanf(in,"%s",word); if (ierr != 1) return(1);
       if (!strcmp(word, "begin")) {
-	      while (strcmp(word, "end")) {
-		      ierr = fscanf(in,"%s",word); if (ierr != 1) return(1);
-     			if      (!strcmp(word, "evaluate_norm"   ))	ierr = fscanf(in,"%d" ,&t->evaluate_norm  );
-     			else if (!strcmp(word, "maxiter"         ))	ierr = fscanf(in,"%d" ,&t->maxiter        );
-   	  		else if (!strcmp(word, "atol"            ))	ierr = fscanf(in,"%lf",&t->atol           );
-   		  	else if (!strcmp(word, "rtol"            ))	ierr = fscanf(in,"%lf",&t->rtol           );
-   			  else if (!strcmp(word, "verbose"         ))	ierr = fscanf(in,"%d" ,&t->verbose        );
-   			  else if (!strcmp(word, "reducedsolvetype"))	ierr = fscanf(in,"%s" ,t->reducedsolvetype);
+        while (strcmp(word, "end")) {
+          ierr = fscanf(in,"%s",word); if (ierr != 1) return(1);
+           if      (!strcmp(word, "evaluate_norm"   ))  ierr = fscanf(in,"%d" ,&t->evaluate_norm  );
+           else if (!strcmp(word, "maxiter"         ))  ierr = fscanf(in,"%d" ,&t->maxiter        );
+           else if (!strcmp(word, "atol"            ))  ierr = fscanf(in,"%lf",&t->atol           );
+           else if (!strcmp(word, "rtol"            ))  ierr = fscanf(in,"%lf",&t->rtol           );
+           else if (!strcmp(word, "verbose"         ))  ierr = fscanf(in,"%d" ,&t->verbose        );
+           else if (!strcmp(word, "reducedsolvetype"))  ierr = fscanf(in,"%s" ,t->reducedsolvetype);
           else if (strcmp(word,"end")) {
             char useless[100];
             ierr = fscanf(in,"%s",useless);
@@ -85,7 +85,7 @@ int tridiagLUInit(
           if (ierr != 1) return(1);
         }
       } else {
-   		  fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
+         fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
         return(1);
       }
       fclose(in);

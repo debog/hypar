@@ -93,9 +93,9 @@ int LinearADRInitialize(void *s, /*!< Solver object of type #HyPar */
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")) {
-	      while (strcmp(word, "end")) {
+        while (strcmp(word, "end")) {
 
-		      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
 
           if (!strcmp(word, "advection_filename")) {
             if (physics->constant_advection != -1) {
@@ -138,12 +138,12 @@ int LinearADRInitialize(void *s, /*!< Solver object of type #HyPar */
           }
         }
 
-	    } else {
+      } else {
 
-    	  fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+        fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
         return(1);
 
-	    }
+      }
     }
 
     fclose(in);

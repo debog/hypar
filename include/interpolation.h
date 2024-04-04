@@ -192,12 +192,12 @@ int MUSCLInitialize(void*,void*);
  * This structure contains the variables/parameters needed by the WENO-type scheme (#_FIFTH_ORDER_WENO_, #_FIFTH_ORDER_CRWENO_, #_FIFTH_ORDER_HCWENO_).
 */
 typedef struct parameters_weno {
-  int     mapped;		    /*!< Use mapped weights? (Henrick, Aslam, J. Comput. Phys., 2005) */
-  int     borges;		    /*!< Use Borges' implementation of weights? (Borges, et. al, J. Comput. Phys., 2008) */
-  int     yc;		        /*!< Use Yamaleev-Carpenter implementation of weights? (Yamaleev, Carpenter, J. Comput. Phys., 2009) */
+  int     mapped;        /*!< Use mapped weights? (Henrick, Aslam, J. Comput. Phys., 2005) */
+  int     borges;        /*!< Use Borges' implementation of weights? (Borges, et. al, J. Comput. Phys., 2008) */
+  int     yc;            /*!< Use Yamaleev-Carpenter implementation of weights? (Yamaleev, Carpenter, J. Comput. Phys., 2009) */
   int     no_limiting;  /*!< Remove limiting -> 5th order polynomial interpolation (freeze the WENO weights to the optimal coefficients)  */
-  double  eps;		      /*!< epsilon parameter */
-  double	p;			      /*!< p parameter */
+  double  eps;          /*!< epsilon parameter */
+  double  p;            /*!< p parameter */
   double  tol;          /*!< a general tolerance parameter */
 
   /* hybrid compact-WENO scheme related parameters

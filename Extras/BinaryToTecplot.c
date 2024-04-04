@@ -328,13 +328,13 @@ int main()
       fprintf(stderr,"Error: File %s not found.\n", input_fname_solver);
       return 1;
     } else {
-  	  char word[100];
+      char word[100];
       fscanf(inputs,"%s",word);
       if (!strcmp(word, "begin")){
-  	    while (strcmp(word, "end")){
-  		    fscanf(inputs,"%s",word);
-     			if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
-     			else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite      );
+        while (strcmp(word, "end")){
+          fscanf(inputs,"%s",word);
+           if (!strcmp(word, "op_file_format"   ))  fscanf(inputs,"%s" ,op_file_format);
+           else if (!strcmp(word, "op_overwrite"     ))  fscanf(inputs,"%s" ,overwrite      );
         }
       }
       fclose(inputs);

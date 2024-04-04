@@ -57,11 +57,11 @@
 static const double PI = 4 * atan(1.0);
 
 double raiseto(double x, double a) {
-	return exp(a*log(x));
+  return exp(a*log(x));
 }
 
 double magnitude(double a, double b) {
-	return sqrt(a*a + b*b);
+  return sqrt(a*a + b*b);
 }
 
 void velocityComponent( const int N,
@@ -70,87 +70,87 @@ void velocityComponent( const int N,
                         const double u0,
                         double* const uvel )
 {
-	long N3 = N*N*N;
-	long i,j,k;
+  long N3 = N*N*N;
+  long i,j,k;
 
-	double kk = sqrt(3 * (N/2)*(N/2));
-	int kkmax = (int) kk;
+  double kk = sqrt(3 * (N/2)*(N/2));
+  int kkmax = (int) kk;
 
-	fftw_complex *uhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));	
-	fftw_complex *u = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));	
+  fftw_complex *uhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
+  fftw_complex *u = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
 
-	fftw_plan inv_trans_u;
-	inv_trans_u = fftw_plan_dft_3d(N, N, N, uhat, u, 1, FFTW_MEASURE);
+  fftw_plan inv_trans_u;
+  inv_trans_u = fftw_plan_dft_3d(N, N, N, uhat, u, 1, FFTW_MEASURE);
 
   /* Specifying the velocities in Fourier space */
   for (i=0; i<N3; i++) uhat[i][0] = uhat[i][1] = 0.0;
 
-	for (i = 1; i < N/2; i++){
-		for (j = 0; j < N/2; j++){
-			for (k = 0; k < N/2; k++){
-				double kk   = sqrt(i*i + j*j + k*k);
-				double th1  = 2*PI * ((double)rand())/((double)RAND_MAX);
-				double th2  = 2*PI * ((double)rand())/((double)RAND_MAX);
-				double phi1 = 2*PI * ((double)rand())/((double)RAND_MAX);
+  for (i = 1; i < N/2; i++){
+    for (j = 0; j < N/2; j++){
+      for (k = 0; k < N/2; k++){
+        double kk   = sqrt(i*i + j*j + k*k);
+        double th1  = 2*PI * ((double)rand())/((double)RAND_MAX);
+        double th2  = 2*PI * ((double)rand())/((double)RAND_MAX);
+        double phi1 = 2*PI * ((double)rand())/((double)RAND_MAX);
 
-				double E = 16.0 * sqrt(2.0/PI) * (u0*u0/kp) * raiseto(kk/kp, 4.0) 
+        double E = 16.0 * sqrt(2.0/PI) * (u0*u0/kp) * raiseto(kk/kp, 4.0) 
                         * exp(-2.0*(kk/kp)*(kk/kp));
-				double alfa_real = sqrt(E/(4*PI*kk*kk))*cos(th1)*cos(phi1);
-				double alfa_imag = sqrt(E/(4*PI*kk*kk))*sin(th1)*cos(phi1);
-				double beta_real = sqrt(E/(4*PI*kk*kk))*cos(th2)*sin(phi1);
-				double beta_imag = sqrt(E/(4*PI*kk*kk))*sin(th2)*sin(phi1);
+        double alfa_real = sqrt(E/(4*PI*kk*kk))*cos(th1)*cos(phi1);
+        double alfa_imag = sqrt(E/(4*PI*kk*kk))*sin(th1)*cos(phi1);
+        double beta_real = sqrt(E/(4*PI*kk*kk))*cos(th2)*sin(phi1);
+        double beta_imag = sqrt(E/(4*PI*kk*kk))*sin(th2)*sin(phi1);
 
         if (dir == 0) {
-				  uhat[k+N*(j+N*i)][0] = (alfa_real*kk*j+beta_real*i*k)/(kk*sqrt(i*i+j*j));
-				  uhat[k+N*(j+N*i)][1] = (alfa_imag*kk*j+beta_imag*i*k)/(kk*sqrt(i*i+j*j));
+          uhat[k+N*(j+N*i)][0] = (alfa_real*kk*j+beta_real*i*k)/(kk*sqrt(i*i+j*j));
+          uhat[k+N*(j+N*i)][1] = (alfa_imag*kk*j+beta_imag*i*k)/(kk*sqrt(i*i+j*j));
         } else if (dir == 1) {
-				  uhat[k+N*(j+N*i)][0] = (beta_real*j*k-alfa_real*kk*i)/(kk*sqrt(i*i+j*j));
-				  uhat[k+N*(j+N*i)][1] = (beta_imag*j*k-alfa_imag*kk*i)/(kk*sqrt(i*i+j*j));
+          uhat[k+N*(j+N*i)][0] = (beta_real*j*k-alfa_real*kk*i)/(kk*sqrt(i*i+j*j));
+          uhat[k+N*(j+N*i)][1] = (beta_imag*j*k-alfa_imag*kk*i)/(kk*sqrt(i*i+j*j));
         } else {
-				  uhat[k+N*(j+N*i)][0] = -(beta_real*sqrt(i*i+j*j))/kk;
-				  uhat[k+N*(j+N*i)][1] = -(beta_imag*sqrt(i*i+j*j))/kk;
+          uhat[k+N*(j+N*i)][0] = -(beta_real*sqrt(i*i+j*j))/kk;
+          uhat[k+N*(j+N*i)][1] = -(beta_imag*sqrt(i*i+j*j))/kk;
         }
 
-			}
-		}
-	}
-	for (i = 0; i < 1; i++){
-		for (k = 0; k < N/2; k++){
-			for (j = 1; j < N/2; j++){
-				double kk   = sqrt(i*i + j*j + k*k);
-				double th1  = 2*PI * ((double)rand())/((double)RAND_MAX);
-				double th2  = 2*PI * ((double)rand())/((double)RAND_MAX);
-				double phi1 = 2*PI * ((double)rand())/((double)RAND_MAX);
+      }
+    }
+  }
+  for (i = 0; i < 1; i++){
+    for (k = 0; k < N/2; k++){
+      for (j = 1; j < N/2; j++){
+        double kk   = sqrt(i*i + j*j + k*k);
+        double th1  = 2*PI * ((double)rand())/((double)RAND_MAX);
+        double th2  = 2*PI * ((double)rand())/((double)RAND_MAX);
+        double phi1 = 2*PI * ((double)rand())/((double)RAND_MAX);
 
-				double E = 16.0 * sqrt(2.0/PI) * (u0*u0/kp) * raiseto(kk/kp, 4.0) 
+        double E = 16.0 * sqrt(2.0/PI) * (u0*u0/kp) * raiseto(kk/kp, 4.0) 
                         * exp(-2.0*(kk/kp)*(kk/kp));
-				double alfa_real = sqrt(E/(4*PI*kk*kk))*cos(th1)*cos(phi1);
-				double alfa_imag = sqrt(E/(4*PI*kk*kk))*sin(th1)*cos(phi1);
-				double beta_real = sqrt(E/(4*PI*kk*kk))*cos(th2)*sin(phi1);
-				double beta_imag = sqrt(E/(4*PI*kk*kk))*sin(th2)*sin(phi1);
+        double alfa_real = sqrt(E/(4*PI*kk*kk))*cos(th1)*cos(phi1);
+        double alfa_imag = sqrt(E/(4*PI*kk*kk))*sin(th1)*cos(phi1);
+        double beta_real = sqrt(E/(4*PI*kk*kk))*cos(th2)*sin(phi1);
+        double beta_imag = sqrt(E/(4*PI*kk*kk))*sin(th2)*sin(phi1);
 
         if (dir == 0) {
-				  uhat[k+N*(j+N*i)][0] = (alfa_real*kk*j+beta_real*i*k)/(kk*sqrt(i*i+j*j));
-				  uhat[k+N*(j+N*i)][1] = (alfa_imag*kk*j+beta_imag*i*k)/(kk*sqrt(i*i+j*j));
+          uhat[k+N*(j+N*i)][0] = (alfa_real*kk*j+beta_real*i*k)/(kk*sqrt(i*i+j*j));
+          uhat[k+N*(j+N*i)][1] = (alfa_imag*kk*j+beta_imag*i*k)/(kk*sqrt(i*i+j*j));
         } else if (dir == 1) {
-				  uhat[k+N*(j+N*i)][0] = (beta_real*j*k-alfa_real*kk*i)/(kk*sqrt(i*i+j*j));
-				  uhat[k+N*(j+N*i)][1] = (beta_imag*j*k-alfa_imag*kk*i)/(kk*sqrt(i*i+j*j));
+          uhat[k+N*(j+N*i)][0] = (beta_real*j*k-alfa_real*kk*i)/(kk*sqrt(i*i+j*j));
+          uhat[k+N*(j+N*i)][1] = (beta_imag*j*k-alfa_imag*kk*i)/(kk*sqrt(i*i+j*j));
         } else {
-				  uhat[k+N*(j+N*i)][0] = -(beta_real*sqrt(i*i+j*j))/kk;
-				  uhat[k+N*(j+N*i)][1] = -(beta_imag*sqrt(i*i+j*j))/kk;
+          uhat[k+N*(j+N*i)][0] = -(beta_real*sqrt(i*i+j*j))/kk;
+          uhat[k+N*(j+N*i)][1] = -(beta_imag*sqrt(i*i+j*j))/kk;
         }
 
-			}
-		}
-	}
-	for (i = 0; i < 1; i++){
-		for (j = 0; j < 1; j++){
-			for (k = 0; k < N/2; k++){
-				uhat[k+N*(j+N*i)][0] = 0;
-				uhat[k+N*(j+N*i)][1] = 0;
-			}
-		}
-	}
+      }
+    }
+  }
+  for (i = 0; i < 1; i++){
+    for (j = 0; j < 1; j++){
+      for (k = 0; k < N/2; k++){
+        uhat[k+N*(j+N*i)][0] = 0;
+        uhat[k+N*(j+N*i)][1] = 0;
+      }
+    }
+  }
 
   /* The following is necessary to ensure that the inverse Fourier
      transform yields a real velocity field with zero imaginary
@@ -159,76 +159,76 @@ void velocityComponent( const int N,
   for (i=N/2+1; i<N; i++) {
     for (j=N/2+1; j<N; j++) {
       for (k=N/2+1; k<N; k++) {
-				uhat[k+N*(j+N*i)][0] =  uhat[(N-k)+N*((N-j)+N*(N-i))][0];
-				uhat[k+N*(j+N*i)][1] = -uhat[(N-k)+N*((N-j)+N*(N-i))][1];
+        uhat[k+N*(j+N*i)][0] =  uhat[(N-k)+N*((N-j)+N*(N-i))][0];
+        uhat[k+N*(j+N*i)][1] = -uhat[(N-k)+N*((N-j)+N*(N-i))][1];
       }
     }
   }
   for (i=N/2+1; i<N; i++) {
     for (j=N/2+1; j<N; j++) {
       for (k=0; k<1; k++) {
-				uhat[k+N*(j+N*i)][0] =  uhat[k+N*((N-j)+N*(N-i))][0];
-				uhat[k+N*(j+N*i)][1] = -uhat[k+N*((N-j)+N*(N-i))][1];
+        uhat[k+N*(j+N*i)][0] =  uhat[k+N*((N-j)+N*(N-i))][0];
+        uhat[k+N*(j+N*i)][1] = -uhat[k+N*((N-j)+N*(N-i))][1];
       }
     }
   }
   for (i=N/2+1; i<N; i++) {
     for (j=0; j<1; j++) {
       for (k=N/2+1; k<N; k++) {
-				uhat[k+N*(j+N*i)][0] =  uhat[(N-k)+N*(j+N*(N-i))][0];
-				uhat[k+N*(j+N*i)][1] = -uhat[(N-k)+N*(j+N*(N-i))][1];
+        uhat[k+N*(j+N*i)][0] =  uhat[(N-k)+N*(j+N*(N-i))][0];
+        uhat[k+N*(j+N*i)][1] = -uhat[(N-k)+N*(j+N*(N-i))][1];
       }
     }
   }
   for (i=0; i<1; i++) {
     for (j=N/2+1; j<N; j++) {
       for (k=N/2+1; k<N; k++) {
-				uhat[k+N*(j+N*i)][0] =  uhat[(N-k)+N*((N-j)+N*i)][0];
-				uhat[k+N*(j+N*i)][1] = -uhat[(N-k)+N*((N-j)+N*i)][1];
+        uhat[k+N*(j+N*i)][0] =  uhat[(N-k)+N*((N-j)+N*i)][0];
+        uhat[k+N*(j+N*i)][1] = -uhat[(N-k)+N*((N-j)+N*i)][1];
       }
     }
   }
   for (i=0; i<1; i++) {
     for (j=0; j<1; j++) {
       for (k=N/2+1; k<N; k++) {
-				uhat[k+N*(j+N*i)][0] =  uhat[(N-k)+N*(j+N*i)][0];
-				uhat[k+N*(j+N*i)][1] = -uhat[(N-k)+N*(j+N*i)][1];
+        uhat[k+N*(j+N*i)][0] =  uhat[(N-k)+N*(j+N*i)][0];
+        uhat[k+N*(j+N*i)][1] = -uhat[(N-k)+N*(j+N*i)][1];
       }
     }
   }
   for (i=0; i<1; i++) {
     for (j=N/2+1; j<N; j++) {
       for (k=0; k<1; k++) {
-				uhat[k+N*(j+N*i)][0] =  uhat[k+N*((N-j)+N*i)][0];
-				uhat[k+N*(j+N*i)][1] = -uhat[k+N*((N-j)+N*i)][1];
+        uhat[k+N*(j+N*i)][0] =  uhat[k+N*((N-j)+N*i)][0];
+        uhat[k+N*(j+N*i)][1] = -uhat[k+N*((N-j)+N*i)][1];
       }
     }
   }
   for (i=N/2+1; i<N; i++) {
     for (j=0; j<1; j++) {
       for (k=0; k<1; k++) {
-				uhat[k+N*(j+N*i)][0] =  uhat[k+N*(j+N*(N-i))][0];
-				uhat[k+N*(j+N*i)][1] = -uhat[k+N*(j+N*(N-i))][1];
+        uhat[k+N*(j+N*i)][0] =  uhat[k+N*(j+N*(N-i))][0];
+        uhat[k+N*(j+N*i)][1] = -uhat[k+N*(j+N*(N-i))][1];
       }
     }
   }
 
   /* Inverse Fourier transform */
-	fftw_execute(inv_trans_u);
-	fftw_free(uhat);
-	fftw_destroy_plan(inv_trans_u);
+  fftw_execute(inv_trans_u);
+  fftw_free(uhat);
+  fftw_destroy_plan(inv_trans_u);
 
   double imag_velocity = 0;
-	for (i = 0; i < N3; i++){
-		double uu = u[i][1];
-		imag_velocity += (uu*uu);
-	}
-	imag_velocity = sqrt(imag_velocity / ((double)N3));
-	printf("RMS of imaginary component of computed velocity: %1.6e\n",imag_velocity);
+  for (i = 0; i < N3; i++){
+    double uu = u[i][1];
+    imag_velocity += (uu*uu);
+  }
+  imag_velocity = sqrt(imag_velocity / ((double)N3));
+  printf("RMS of imaginary component of computed velocity: %1.6e\n",imag_velocity);
 
-	for (i = 0; i < N3; i++){
+  for (i = 0; i < N3; i++){
     uvel[i] = u[i][0];
-	}
+  }
 
   fftw_free(u);
 
@@ -240,12 +240,12 @@ void setVelocityField(const int N,
                       double* const vvel,
                       double* const wvel )
 {
-	double kp = 4.0;
-	double u0 = 0.3;
+  double kp = 4.0;
+  double u0 = 0.3;
 
-	long N3 = N*N*N;
-	long i,j,k;
-	double dx = 2*PI / ((double)N);
+  long N3 = N*N*N;
+  long i,j,k;
+  double dx = 2*PI / ((double)N);
 
   printf("Computing u-velocity field.\n");
   velocityComponent( N, 0, kp, u0, uvel ); 
@@ -254,35 +254,35 @@ void setVelocityField(const int N,
   printf("Computing w-velocity field.\n");
   velocityComponent( N, 2, kp, u0, wvel ); 
 
-	double rms_velocity = 0;
-	for (i = 0; i < N3; i++){
+  double rms_velocity = 0;
+  for (i = 0; i < N3; i++){
     double uu, vv, ww;
-		uu = uvel[i];
-		vv = vvel[i];
-		ww = wvel[i];
-		rms_velocity += (uu*uu + vv*vv + ww*ww);
-	}
-	rms_velocity = sqrt(rms_velocity / (3*((double)N3)));
+    uu = uvel[i];
+    vv = vvel[i];
+    ww = wvel[i];
+    rms_velocity += (uu*uu + vv*vv + ww*ww);
+  }
+  rms_velocity = sqrt(rms_velocity / (3*((double)N3)));
   
   /* scale the velocity components so that rms velocity matches u0 */
   double factor = u0 / rms_velocity;
   printf("Scaling factor = %1.16E\n",factor);
-	for (i = 0; i < N3; i++){
-		uvel[i] *= factor;
-		vvel[i] *= factor;
-		wvel[i] *= factor;
-	}
+  for (i = 0; i < N3; i++){
+    uvel[i] *= factor;
+    vvel[i] *= factor;
+    wvel[i] *= factor;
+  }
 
-	rms_velocity = 0;
-	for (i = 0; i < N3; i++){
+  rms_velocity = 0;
+  for (i = 0; i < N3; i++){
     double uu, vv, ww;
-		uu = uvel[i];
-		vv = vvel[i];
-		ww = wvel[i];
-		rms_velocity += (uu*uu + vv*vv + ww*ww);
-	}
-	rms_velocity = sqrt(rms_velocity / (3*((double)N3)));
-	printf("RMS velocity (component-wise): %1.16E\n",rms_velocity);
+    uu = uvel[i];
+    vv = vvel[i];
+    ww = wvel[i];
+    rms_velocity += (uu*uu + vv*vv + ww*ww);
+  }
+  rms_velocity = sqrt(rms_velocity / (3*((double)N3)));
+  printf("RMS velocity (component-wise): %1.16E\n",rms_velocity);
 
   /* calculate the divergence of velocity */
   double DivergenceNorm = 0;
@@ -416,7 +416,7 @@ int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int
 
 int main()
 {
-	FILE *out, *in;
+  FILE *out, *in;
   int NI, NJ, NK, ndims, nvars, size, bytes, N_IORanks, i, j, k;
   int *dim_global,*dim_local,*iproc;
   char ip_file_type[_MAX_STRING_SIZE_], input_mode[_MAX_STRING_SIZE_], fnameout[_MAX_STRING_SIZE_];
@@ -432,17 +432,17 @@ int main()
 
   } else {
 
-	  char word[_MAX_STRING_SIZE_];
+    char word[_MAX_STRING_SIZE_];
     fscanf(in,"%s",word);
     if (!strcmp(word, "begin")){
-	    while (strcmp(word, "end")){
-		    fscanf(in,"%s",word);
+      while (strcmp(word, "end")){
+        fscanf(in,"%s",word);
         if (!strcmp(word, "ndims")) {
           fscanf(in,"%d",&ndims);
           dim_global = (int*) calloc (ndims,sizeof(int));
           dim_local  = (int*) calloc (ndims,sizeof(int));
           iproc      = (int*) calloc (ndims,sizeof(int));
-        }	else if (!strcmp(word, "nvars")) {
+        }  else if (!strcmp(word, "nvars")) {
           fscanf(in,"%d",&nvars);
         } else if (!strcmp(word, "size")) {
           int i;
@@ -470,18 +470,18 @@ int main()
         }
       }
     } else {
-  	  fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
+      fprintf(stderr,"Error: Illegal format in file \"solver.inp\".\n");
       return 0;
     }
     fclose(in);
 
     /* Print to screen the inputs read */
-	  printf("\tNo. of dimensions                          : %d\n",ndims);
-	  printf("\tNo. of variables                           : %d\n",nvars);
-	  printf("\tDomain size                                : ");
+    printf("\tNo. of dimensions                          : %d\n",ndims);
+    printf("\tNo. of variables                           : %d\n",nvars);
+    printf("\tDomain size                                : ");
     for (i=0; i<ndims; i++) printf ("%d ",dim_global[i]);
     printf("\n");
-	  printf("\tProcesses along each dimension             : ");
+    printf("\tProcesses along each dimension             : ");
     for (i=0; i<ndims; i++) printf ("%d ",iproc[i]);
     printf("\n");
     printf("\tInitial solution file type                 : %s\n",ip_file_type);
@@ -505,15 +505,15 @@ int main()
   NI = dim_global[0];
   NJ = dim_global[1];
   NK = dim_global[2];
-	printf("Grid:  %d x %d x %d\n",NI,NJ,NK);
+  printf("Grid:  %d x %d x %d\n",NI,NJ,NK);
 
   if ((NI != NJ) || (NI != NK) || (NJ != NK)) { 
     printf("Error: NI,NJ,NK not equal. Bye!\n"); 
     return(0); 
   }
-	long N = NI;
+  long N = NI;
   long N3 = (long) N * (long) N * (long) N;
-	double dx = 2*PI / ((double)N);
+  double dx = 2*PI / ((double)N);
 
   /* Calculating the velocity components through a Fourier transform */
   double* u = (double*) calloc (N3, sizeof(double));
@@ -524,15 +524,15 @@ int main()
   printf("Generating grid.\n");
   double *Xg = (double*) calloc (NI+NJ+NK, sizeof(double));
   double *x = Xg, *y = Xg+NI, *z = Xg+NI+NJ;
-	for (i = 0; i < NI; i++){
-  	for (j = 0; j < NJ; j++){
-  	  for (k = 0; k < NK; k++){
-  	  	x[i] = i*dx;
-	    	y[j] = j*dx;
-	    	z[k] = k*dx;
+  for (i = 0; i < NI; i++){
+    for (j = 0; j < NJ; j++){
+      for (k = 0; k < NK; k++){
+        x[i] = i*dx;
+        y[j] = j*dx;
+        z[k] = k*dx;
       }
-	  }
-	}
+    }
+  }
 
   int nproc = 1;
   for (i=0; i<ndims; i++) nproc *= iproc[i];
@@ -584,9 +584,9 @@ int main()
 
         double rho, uvel, vvel, wvel, P, E;
         rho = 1.0;
-				uvel = u[kg+N*(jg+N*ig)];
-				vvel = v[kg+N*(jg+N*ig)];
-				wvel = w[kg+N*(jg+N*ig)];
+        uvel = u[kg+N*(jg+N*ig)];
+        vvel = v[kg+N*(jg+N*ig)];
+        wvel = w[kg+N*(jg+N*ig)];
         P = 1.0/1.4;
         E = P/0.4 + 0.5*rho*(uvel*uvel+vvel*vvel+wvel*wvel);
 
@@ -620,5 +620,5 @@ int main()
   free(v);
   free(w);
 
-	return 0;
+  return 0;
 }

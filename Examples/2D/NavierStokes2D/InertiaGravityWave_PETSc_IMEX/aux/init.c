@@ -19,7 +19,7 @@ int main()
   int    HB       = 0;
   double BV       = 0.0;
   
-	int NI,NK,ndims;
+  int NI,NK,ndims;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");
 
@@ -79,7 +79,7 @@ int main()
   if (HB != 3) {
     printf("Error: Specify \"HB\" as 3 in physics.inp.\n");
   }
-	if (grav_x != 0.0) {
+  if (grav_x != 0.0) {
     printf("Error: Gravity force along x must be zero for HB = 3.\n");
     return(0);
   }
@@ -96,16 +96,16 @@ int main()
   double Lx = xmax - xmin;
   double Lz = zmax - zmin;
 
-	int i,k;
-	double dx = Lx / ((double)NI-1);
-	double dz = Lz / ((double)NK-1);
+  int i,k;
+  double dx = Lx / ((double)NI-1);
+  double dz = Lz / ((double)NK-1);
 
-	double *x, *z, *U;
+  double *x, *z, *U;
   FILE *out;
 
- 	x   = (double*) calloc (NI     , sizeof(double));
-	z   = (double*) calloc (NK     , sizeof(double));
-	U   = (double*) calloc (4*NI*NK, sizeof(double));
+   x   = (double*) calloc (NI     , sizeof(double));
+  z   = (double*) calloc (NK     , sizeof(double));
+  U   = (double*) calloc (4*NI*NK, sizeof(double));
 
   double inv_gamma_m1 = 1.0 / (gamma-1.0);
   double Cp = gamma * R * inv_gamma_m1;
@@ -120,10 +120,10 @@ int main()
   double xc = 100000;
   double uc = 20.0;
 
-	for (i = 0; i < NI; i++){
+  for (i = 0; i < NI; i++){
     for (k = 0; k < NK; k++){
-    	x[i] = xmin + i*dx;
-	   	z[k] = zmin + k*dz;
+      x[i] = xmin + i*dx;
+       z[k] = zmin + k*dz;
       int p = i + NI*k;
 
       /* temperature peturbation */
@@ -139,14 +139,14 @@ int main()
       U[4*p+2] = 0.0;
       U[4*p+3] = rho*E;
     }
-	}
+  }
 
   if (!strcmp(ip_file_type,"ascii")) {
     printf("ASCII not supported. Use binary format\n");
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
 
     printf("Writing binary initial solution file initial.inp\n");
-  	out = fopen("initial.inp","wb");
+    out = fopen("initial.inp","wb");
     fwrite(x,sizeof(double),NI,out);
     fwrite(z,sizeof(double),NK,out);
     fwrite(U,sizeof(double),4*NI*NK,out);
@@ -154,9 +154,9 @@ int main()
 
   }
 
-	free(x);
-	free(z);
-	free(U);
+  free(x);
+  free(z);
+  free(U);
 
-	return(0);
+  return(0);
 }

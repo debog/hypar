@@ -205,7 +205,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
           }
         }
       } else {
-    		if (!rank) fprintf(stderr,"Error: Illegal format in file \"time_method.inp\" (expected keyword \"begin\").\n");
+        if (!rank) fprintf(stderr,"Error: Illegal format in file \"time_method.inp\" (expected keyword \"begin\").\n");
         return(1);
       }
     

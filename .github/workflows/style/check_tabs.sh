@@ -21,7 +21,7 @@ find . -type d \( -name .git \
                     -a ! -name "*.lex.h" -a ! -name "*.lex.cpp" \) \
                \) \
     -exec grep -Iq . {} \; \
-    -exec sed -i 's/\t/\ \ \ \ /g' {} +
+    -exec sed -i 's/\t/\ \ /g' {} +
 
 gitdiff=`git diff`
 

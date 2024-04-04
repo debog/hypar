@@ -30,7 +30,7 @@ int main()
   double x0, y0;
 
   /* inputs to be read from solver.inp */
-	int NI,NJ,ndims;
+  int NI,NJ,ndims;
 
   /* reading grid inputs */
   printf("Reading file \"solver.inp\"...\n");
@@ -64,7 +64,7 @@ int main()
     printf("ndims is not 2 in solver.inp. this code is to generate 2D initial conditions\n");
     return(0);
   }
-	printf("Grid:\t\t\t%4d X %4d\n", NI, NJ);
+  printf("Grid:\t\t\t%4d X %4d\n", NI, NJ);
 
   /* reading physics inputs */
   printf("Reading file \"physics.inp\"...\n");
@@ -102,39 +102,39 @@ int main()
   y0 = omegaS;
   printf("Location of equilibrium: %1.16E %1.16E\n",x0,y0);
 
-	int i,j;
-	double dx = (xmax-xmin) / ((double)(NI-1));
-	double dy = (ymax-ymin) / ((double)(NJ-1));
+  int i,j;
+  double dx = (xmax-xmin) / ((double)(NI-1));
+  double dy = (ymax-ymin) / ((double)(NJ-1));
 
-	double *x, *y, *u;
-	x = (double*) calloc (NI   , sizeof(double));
-	y = (double*) calloc (NJ   , sizeof(double));
-	u = (double*) calloc (NI*NJ, sizeof(double));
+  double *x, *y, *u;
+  x = (double*) calloc (NI   , sizeof(double));
+  y = (double*) calloc (NJ   , sizeof(double));
+  u = (double*) calloc (NI*NJ, sizeof(double));
 
   /* Generating grid and zero initial solution */
-	for (i = 0; i < NI; i++){
-  	for (j = 0; j < NJ; j++){
-	  	x[i] = xmin + i*dx;
-	  	y[j] = ymin + j*dy;
+  for (i = 0; i < NI; i++){
+    for (j = 0; j < NJ; j++){
+      x[i] = xmin + i*dx;
+      y[j] = ymin + j*dy;
       int p = NJ*i + j;
       u[p] = 0;
-	  }
-	}
+    }
+  }
 
   /* Finding the nearest grid point to x0,y0 */
   printf("Finding nearest grid point to equilibrium.\n");
   double min_distance = sqrt((xmax-xmin)*(xmax-xmin)+(ymax-ymin)*(ymax-ymin));
   int imin = -1, jmin = -1;
-	for (i = 0; i < NI; i++){
-  	for (j = 0; j < NJ; j++){
+  for (i = 0; i < NI; i++){
+    for (j = 0; j < NJ; j++){
       double distance = sqrt((x[i]-x0)*(x[i]-x0) + (y[j]-y0)*(y[j]-y0));
       if (distance < min_distance) {
         min_distance = distance;
         imin = i;
         jmin = j;
       }
-	  }
-	}
+    }
+  }
   printf("Nearest grid point to equilibrium is (%d,%d) -> (%1.16E, %1.16E)\n",imin,jmin,x[imin],y[jmin]);
   if ((imin > -1) && (jmin > -1)) {
     /* corrected x0,y0 and Pm so that 
@@ -176,12 +176,12 @@ int main()
   
   /* calculating domain integral of initial PDF */
   double integral = 0;
-	for (i = 1; i < NI-1; i++){
-  	for (j = 1; j < NJ-1; j++){
+  for (i = 1; i < NI-1; i++){
+    for (j = 1; j < NJ-1; j++){
       int p = NJ*i + j;
       integral += (u[p] * (dx*dy));
-	  }
-	}
+    }
+  }
   printf("Integral = %1.16E\n",integral);
 
 
@@ -189,31 +189,31 @@ int main()
 
   if (!strcmp(ip_file_type,"ascii")) {
     printf("Writing ASCII initial solution file initial.inp\n");
-	  out = fopen("initial.inp","w");
+    out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
     fprintf(out,"\n");
     for (j = 0; j < NJ; j++)  fprintf(out,"%1.16E ",y[j]);
     fprintf(out,"\n");
-    for (j = 0; j < NJ; j++)	{
-	    for (i = 0; i < NI; i++)	{
+    for (j = 0; j < NJ; j++)  {
+      for (i = 0; i < NI; i++)  {
         int p = NJ*i + j;
         fprintf(out,"%1.16E ",u[p]);
       }
     }
     fprintf(out,"\n");
-	  fclose(out);
+    fclose(out);
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
     printf("Writing binary initial solution file initial.inp\n");
-  	out = fopen("initial.inp","wb");
+    out = fopen("initial.inp","wb");
     fwrite(x,sizeof(double),NI,out);
     fwrite(y,sizeof(double),NJ,out);
     fwrite(u,sizeof(double),NI*NJ,out);
     fclose(out);
   } 
 
-	free(x);
-	free(y);
-	free(u);
+  free(x);
+  free(y);
+  free(u);
 
-	return(0);
+  return(0);
 }

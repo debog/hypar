@@ -10,7 +10,7 @@ double raiseto(double x, double a)
 
 int main(){
   
-	int NI,NK,ndims;
+  int NI,NK,ndims;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");
 
@@ -38,7 +38,7 @@ int main(){
     printf("ndims is not 2 in solver.inp. this code is to generate 2D exact solution\n");
     return(0);
   }
-	printf("Grid:\t\t\t%d x %d\n", NI, NK);
+  printf("Grid:\t\t\t%d x %d\n", NI, NK);
 
   /* read in reference pressure and temperature */
   double P0    = 100000.0;
@@ -78,9 +78,9 @@ int main(){
   double Lx = xmax - xmin;
   double Lz = zmax - zmin;
 
-	int i,k;
-	double dx = Lx / ((double)NI-1);
-	double dz = Lz / ((double)NK-1);
+  int i,k;
+  double dx = Lx / ((double)NI-1);
+  double dz = Lz / ((double)NK-1);
 
   /* initial perturbation parameters */
   double pi = 4.0*atan(1.0);
@@ -91,17 +91,17 @@ int main(){
   double uc = 20.0;
   double BV = 0.01;
 
-	double *x, *z, *U;
+  double *x, *z, *U;
   FILE *out;
 
- 	x   = (double*) calloc (NI     , sizeof(double));
-	z   = (double*) calloc (NK     , sizeof(double));
-	U   = (double*) calloc (4*NI*NK, sizeof(double));
+   x   = (double*) calloc (NI     , sizeof(double));
+  z   = (double*) calloc (NK     , sizeof(double));
+  U   = (double*) calloc (4*NI*NK, sizeof(double));
 
-	for (i = 0; i < NI; i++){
+  for (i = 0; i < NI; i++){
     for (k = 0; k < NK; k++){
-    	x[i] = xmin + i*dx;
-	   	z[k] = zmin + k*dz;
+      x[i] = xmin + i*dx;
+       z[k] = zmin + k*dz;
       int p = i + NI*k;
 
       /* temperature peturbation */
@@ -120,14 +120,14 @@ int main(){
       U[4*p+2] = 0.0;
       U[4*p+3] = (rho*theta) - (rho_ref*theta_ref);
     }
-	}
+  }
 
   if (!strcmp(ip_file_type,"ascii")) {
     printf("ASCII not supported. Use binary format\n");
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
 
     printf("Writing binary initial solution file initial.inp\n");
-  	out = fopen("initial.inp","wb");
+    out = fopen("initial.inp","wb");
     fwrite(x,sizeof(double),NI,out);
     fwrite(z,sizeof(double),NK,out);
     fwrite(U,sizeof(double),4*NI*NK,out);
@@ -135,9 +135,9 @@ int main(){
 
   }
 
-	free(x);
-	free(z);
-	free(U);
+  free(x);
+  free(z);
+  free(U);
 
-	return(0);
+  return(0);
 }

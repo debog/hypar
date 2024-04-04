@@ -50,7 +50,7 @@ int IBReadBodySTL(
     else {
 
       int   nfacets = 0;
-	    char  word[_MAX_STRING_SIZE_];
+      char  word[_MAX_STRING_SIZE_];
       /* Count number of facets in STL file */
       ierr = fscanf(in,"%s",word);
       if (!strcmp(word, "solid")) {

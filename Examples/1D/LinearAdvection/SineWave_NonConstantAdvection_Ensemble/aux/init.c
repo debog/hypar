@@ -21,7 +21,7 @@ int main()
 {
   const double pi = 4.0*atan(1.0);
 
-	int *NI, ns, ndims, nsims;
+  int *NI, ns, ndims, nsims;
   FILE *in;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");
@@ -132,37 +132,37 @@ int main()
     strcat(fname, ".inp");
     strcat(adv_filename, ".inp");
 
-  	int i;
-  	double dx = 1.0 / ((double)N);
+    int i;
+    double dx = 1.0 / ((double)N);
   
-  	double *x, *u, *a;
-  	x = (double*) calloc (N, sizeof(double));
-  	u = (double*) calloc (N, sizeof(double));
-  	a = (double*) calloc (N, sizeof(double));
+    double *x, *u, *a;
+    x = (double*) calloc (N, sizeof(double));
+    u = (double*) calloc (N, sizeof(double));
+    a = (double*) calloc (N, sizeof(double));
   
-  	for (i = 0; i < N; i++) {
-  		x[i] = i*dx;
-  		u[i] = sin(2*pi*x[i]);
-  		a[i] = 1.0 + 0.5*sin(2*pi*x[i])*sin(2*pi*x[i]);
-  	}
+    for (i = 0; i < N; i++) {
+      x[i] = i*dx;
+      u[i] = sin(2*pi*x[i]);
+      a[i] = 1.0 + 0.5*sin(2*pi*x[i])*sin(2*pi*x[i]);
+    }
   
     FILE *out;
   
     if (!strcmp(ip_file_type,"ascii")) {
       printf("Writing ASCII initial solution file %s\n", fname);
-    	out = fopen(fname,"w");
+      out = fopen(fname,"w");
       for (i = 0; i < N; i++)  fprintf(out,"%lf ",x[i]);
       fprintf(out,"\n");
-  	  for (i = 0; i < N; i++)	fprintf(out,"%lf ",u[i]);						
+      for (i = 0; i < N; i++)  fprintf(out,"%lf ",u[i]);            
       fprintf(out,"\n");
       fclose(out);
       printf("Writing ASCII advection field file %s\n", adv_filename);
-  	  out = fopen(adv_filename,"w");
+      out = fopen(adv_filename,"w");
       for (i = 0; i < N; i++)  fprintf(out,"%1.16E ",x[i]);
       fprintf(out,"\n");
-  	  for (i = 0; i < N; i++)	fprintf(out,"%1.16E ",a[i]);						
+      for (i = 0; i < N; i++)  fprintf(out,"%1.16E ",a[i]);            
       fprintf(out,"\n");
-  	  fclose(out);
+      fclose(out);
     } else if (     (!strcmp(ip_file_type,"binary")) 
                 ||  (!strcmp(ip_file_type,"bin"))     ) {
       printf("Writing binary initial solution file %s\n", fname);
@@ -171,16 +171,16 @@ int main()
       fwrite(u,sizeof(double),N,out);
       fclose(out);
       printf("Writing binary advection field file %s\n", adv_filename);
-  	  out = fopen(adv_filename,"wb");
+      out = fopen(adv_filename,"wb");
       fwrite(x,sizeof(double),N,out);
       fwrite(a,sizeof(double),N,out);
-  	  fclose(out);
+      fclose(out);
     }
   
-  	free(x);
-  	free(u);
-  	free(a);
+    free(x);
+    free(u);
+    free(a);
   }
 
-	return 0;
+  return 0;
 }
