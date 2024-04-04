@@ -158,8 +158,11 @@ if test "x$enable_cuda" = "xyes"; then
 
   if test "x$enable_serial" != "xyes"; then
     MPI_DIR=$(which ${MPICC} | sed 's/\/bin\/mpicc//g')
-    AC_CHECK_FILE([$MPI_DIR/include/mpi.h], [], [AC_MSG_ERROR([mpi.h is not found])])
-    CUDA_CFLAGS="$CUDA_CFLAGS -I${MPI_DIR}/include -L${MPI_DIR}/lib -lmpi"
+    if test -e ${MPI_DIR}/include/mpi.h ; then
+      CUDA_CFLAGS="$CUDA_CFLAGS -I${MPI_DIR}/include -L${MPI_DIR}/lib -lmpi"
+    else 
+      CUDA_CFLAGS="$CUDA_CFLAGS -lmpi"
+    fi
   fi
 
   AC_SUBST(CUDA_CFLAGS)
