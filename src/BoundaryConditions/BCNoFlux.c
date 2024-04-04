@@ -11,12 +11,12 @@
 #include <physicalmodels/numa2d.h>
 #include <physicalmodels/numa3d.h>
 
-/*! Applies the no-flux boundary conditions: This boundary condition is specific 
-    to the NUMA 2D/3D (#Numa2D, #Numa3D). Used for simulating inviscid walls or 
+/*! Applies the no-flux boundary conditions: This boundary condition is specific
+    to the NUMA 2D/3D (#Numa2D, #Numa3D). Used for simulating inviscid walls or
     symmetry boundaries. It's equivalent to the slip-wall BC of the Euler/Navier-
     Stokes system.\n\n
-    The density, potential temperature, and tangential velocity are extrapolated, 
-    while the normal velocity at the ghost point is set to the negative of that in 
+    The density, potential temperature, and tangential velocity are extrapolated,
+    while the normal velocity at the ghost point is set to the negative of that in
     the interior (to enforce zero-normal velocity at the boundary face).
 */
 int BCNoFluxU(
@@ -49,7 +49,7 @@ int BCNoFluxU(
       else return(1);
       _ArrayIndex1DWO_  (ndims,size,indexb,boundary->is,ghosts,p1);
       _ArrayIndex1D_    (ndims,size,indexi,ghosts,p2);
-      
+
       if (nvars == 4) {
         phi[nvars*p1+0] = phi[nvars*p2+0];
         phi[nvars*p1+1] = (dim == _XDIR_ ? -phi[nvars*p2+1] : phi[nvars*p2+1] );

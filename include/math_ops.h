@@ -8,8 +8,8 @@
 
 #include <math.h>
 
-/*! \def min 
- *  Minimum of two numbers 
+/*! \def min
+ *  Minimum of two numbers
 */
 #define min(a,b) ((a)<(b)?(a):(b))
 /*! \def max
@@ -18,11 +18,11 @@
 #define max(a,b) ((a)>(b)?(a):(b))
 
 /*! \def min3
- *  Minimum of three numbers 
+ *  Minimum of three numbers
 */
 #define min3(a,b,c) min(min((a),(b)),min((b),(c)))
-/*! \def max3 
- *  Maximum of three numbers 
+/*! \def max3
+ *  Maximum of three numbers
 */
 #define max3(a,b,c) max(max((a),(b)),max((b),(c)))
 

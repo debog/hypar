@@ -105,7 +105,7 @@ int main()
   double E2           = 1.0491099265981;
   double Eref         = 1.05623172878954;
   double omegaB       = 2*pi*60.0;
-  
+
   double sigma[2][2];
   sigma[0][0]  = 0.0125;
   sigma[0][1]  = 0.0;
@@ -121,7 +121,7 @@ int main()
   double gamma        = 0.25;
 
   double G[9], B[9];
-  
+
   G[0*3+0] = 0.276805493111691;
   G[0*3+1] = 0.213024867595501;
   G[0*3+2] = 0.209205876527443;
@@ -131,7 +131,7 @@ int main()
   G[2*3+0] = 0.209205876527443;
   G[2*3+1] = 0.286592141665044;
   G[2*3+2] = 0.844559256324453;
-  
+
   B[0*3+0] = -2.36794416971567;
   B[0*3+1] =  1.08817493992579;
   B[0*3+2] =  1.22601259339234;
@@ -327,12 +327,12 @@ int main()
   fprintf(out,"\tPm1_avg            %1.16E\n",Pm1_avg);
   fprintf(out,"\tPm2_avg            %1.16E\n",Pm2_avg);
   fprintf(out,"\tPmref_avg          %1.16E\n",Pmref_avg);
-  fprintf(out,"\tH1                 %1.16E\n",H1);       
-  fprintf(out,"\tH2                 %1.16E\n",H2);       
-  fprintf(out,"\tHref               %1.16E\n",Href);       
-  fprintf(out,"\tE1                 %1.16E\n",E1);       
-  fprintf(out,"\tE2                 %1.16E\n",E2);       
-  fprintf(out,"\tEref               %1.16E\n",Eref);       
+  fprintf(out,"\tH1                 %1.16E\n",H1);
+  fprintf(out,"\tH2                 %1.16E\n",H2);
+  fprintf(out,"\tHref               %1.16E\n",Href);
+  fprintf(out,"\tE1                 %1.16E\n",E1);
+  fprintf(out,"\tE2                 %1.16E\n",E2);
+  fprintf(out,"\tEref               %1.16E\n",Eref);
   fprintf(out,"\tomegaB             %1.16E\n",omegaB);
   fprintf(out,"\tgamma              %1.16E\n",gamma);
   fprintf(out,"\n");

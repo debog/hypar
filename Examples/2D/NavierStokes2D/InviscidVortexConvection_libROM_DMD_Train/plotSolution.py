@@ -63,15 +63,15 @@ if not os.path.exists(plt_dir_name):
       os.makedirs(plt_dir_name)
 
 if solver_inp_data['op_overwrite'] == 'no':
-  
+
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   op_write_iter = int(solver_inp_data['file_op_iter'][0])
   dt_snapshots = op_write_iter*dt
   n_snapshots = int(niter/op_write_iter) + 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -81,23 +81,23 @@ if solver_inp_data['op_overwrite'] == 'no':
   print('  final time = ', t_final)
   print('  snapshot dt = ', dt_snapshots)
   print('  number of snapshots = ', n_snapshots)
-  
+
   '''
   Load simulation data (solution snapshots)
   '''
-  grid, sol_fom_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                              nsims, 
-                                                              n_snapshots, 
-                                                              ndims, 
-                                                              nvars, 
+  grid, sol_fom_snapshots = hyparutils.getSolutionSnapshots( sim_path,
+                                                              nsims,
+                                                              n_snapshots,
+                                                              ndims,
+                                                              nvars,
                                                               size )
   sol_fom_snapshots = np.float32(sol_fom_snapshots)
 
-  grid, sol_rom_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                              nsims, 
-                                                              n_snapshots, 
-                                                              ndims, 
-                                                              nvars, 
+  grid, sol_rom_snapshots = hyparutils.getSolutionSnapshots( sim_path,
+                                                              nsims,
+                                                              n_snapshots,
+                                                              ndims,
+                                                              nvars,
                                                               size,
                                                               op_root='op_rom')
   sol_rom_snapshots = np.float32(sol_rom_snapshots)
@@ -110,7 +110,7 @@ if solver_inp_data['op_overwrite'] == 'no':
   print(' y: ', np.min(y), np.max(y))
   print(' y.shape: ', y.shape)
   y2d, x2d = np.meshgrid(y, x)
-  
+
   for var in range(nvars):
     for i in range(n_snapshots):
       fig, axes = plt.subplots(fig_nv,fig_nh,figsize=figsize)
@@ -146,30 +146,30 @@ else:
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   n_snapshots = 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
   print('  grid size = ', size)
   print('  final time = ', t_final)
   print('  number of snapshots = ', n_snapshots)
-  
+
   '''
   Load simulation data (solution snapshots)
   '''
-  grid,sol_fom_snapshots = hyparutils.getSolutionSnapshots(  sim_path, 
-                                                              nsims, 
-                                                              n_snapshots, 
-                                                              ndims, 
-                                                              nvars, 
+  grid,sol_fom_snapshots = hyparutils.getSolutionSnapshots(  sim_path,
+                                                              nsims,
+                                                              n_snapshots,
+                                                              ndims,
+                                                              nvars,
                                                               size )
-  grid, sol_rom_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                              nsims, 
-                                                              n_snapshots, 
-                                                              ndims, 
-                                                              nvars, 
+  grid, sol_rom_snapshots = hyparutils.getSolutionSnapshots( sim_path,
+                                                              nsims,
+                                                              n_snapshots,
+                                                              ndims,
+                                                              nvars,
                                                               size,
                                                               op_root='op_rom')
   sol_rom_snapshots = np.float32(sol_rom_snapshots)
@@ -183,7 +183,7 @@ else:
   print(' y: ', np.min(y), np.max(y))
   print(' y.shape: ', y.shape)
   y2d, x2d = np.meshgrid(y, x)
-  
+
   for var in range(nvars):
     fig, axes = plt.subplots(fig_nv,fig_nh,figsize=figsize)
     for s in range(nsims):

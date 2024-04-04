@@ -77,12 +77,12 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
     /* Call any physics-specific pre-step function */
     if (solver->PreStep) solver->PreStep(solver->u,solver,mpi,waqt);
 
-    /* If using a non-linear scheme with ARKIMEX methods, 
+    /* If using a non-linear scheme with ARKIMEX methods,
        compute the non-linear finite-difference operator */
     if (!strcmp(time_scheme,TSARKIMEX)) {
-      solver->NonlinearInterp(solver->u,solver,mpi,waqt,solver->FFunction); 
+      solver->NonlinearInterp(solver->u,solver,mpi,waqt,solver->FFunction);
     }
-    
+
     /* set the step boundary flux integral value to zero */
     _ArraySetValue_(solver->StepBoundaryIntegral,2*solver->ndims*solver->nvars,0.0);
 
@@ -91,7 +91,7 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
   }
 
 
-  if (!iter) { 
+  if (!iter) {
     for (int ns = 0; ns < nsims; ns++) {
       HyPar* solver = &(sim[ns].solver);
       MPIVariables* mpi = &(sim[ns].mpi);
@@ -104,7 +104,7 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
   }
 
 #ifdef with_librom
-  if (      (context->rom_mode == _ROM_MODE_TRAIN_) 
+  if (      (context->rom_mode == _ROM_MODE_TRAIN_)
         &&  (iter%((libROMInterface*)context->rom_interface)->samplingFrequency() == 0)  ) {
     ((libROMInterface*)context->rom_interface)->takeSample( sim, waqt );
   }

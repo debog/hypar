@@ -17,7 +17,7 @@
 
 #undef  _MINIMUM_GHOSTS_
 /*! \def _MINIMUM_GHOSTS_
- * Minimum number of ghost points required for this interpolation 
+ * Minimum number of ghost points required for this interpolation
  * method.
 */
 #define _MINIMUM_GHOSTS_ 2
@@ -25,12 +25,12 @@
 /*! @brief 4th order central reconstruction (component-wise) on a uniform grid
 
     Computes the interpolated values of the first primitive of a function \f${\bf f}\left({\bf u}\right)\f$
-    at the interfaces from the cell-centered values of the function using the 4th order central scheme on a 
+    at the interfaces from the cell-centered values of the function using the 4th order central scheme on a
     uniform grid. The first primitive is defined as a function \f${\bf h}\left({\bf u}\right)\f$ that satisfies:
     \f{equation}{
       {\bf f}\left({\bf u}\left(x\right)\right) = \frac{1}{\Delta x} \int_{x-\Delta x/2}^{x+\Delta x/2} {\bf h}\left({\bf u}\left(\zeta\right)\right)d\zeta,
     \f}
-    where \f$x\f$ is the spatial coordinate along the dimension of the interpolation. This function computes the 4th order central numerical approximation 
+    where \f$x\f$ is the spatial coordinate along the dimension of the interpolation. This function computes the 4th order central numerical approximation
     \f$\hat{\bf f}_{j+1/2} \approx {\bf h}_{j+1/2}\f$ as:
     \f{equation}{
       \hat{\bf f}_{j+1/2} = -\frac{1}{12} {\bf f}_{j-1} + \frac{7}{12} {\bf f}_{j} + \frac{7}{12} {\bf f}_{j+1} - \frac{1}{12} {\bf f}_{j+2}.
@@ -47,10 +47,10 @@
 
     \b Function \b arguments:
 
-    Argument  | Type      | Explanation             
+    Argument  | Type      | Explanation
     --------- | --------- | ---------------------------------------------
     fI        | double*   | Array to hold the computed interpolant at the grid interfaces. This array must have the same layout as the solution, but with \b no \b ghost \b points. Its size should be the same as u in all dimensions, except dir (the dimension along which to interpolate) along which it should be larger by 1 (number of interfaces is 1 more than the number of interior cell centers).
-    fC        | double*   | Array with the cell-centered values of the flux function \f${\bf f}\left({\bf u}\right)\f$. This array must have the same layout and size as the solution, \b with \b ghost \b points. 
+    fC        | double*   | Array with the cell-centered values of the flux function \f${\bf f}\left({\bf u}\right)\f$. This array must have the same layout and size as the solution, \b with \b ghost \b points.
     u         | double*   | The solution array \f${\bf u}\f$ (with ghost points). If the interpolation is characteristic based, this is needed to compute the eigendecomposition. For a multidimensional problem, the layout is as follows: u is a contiguous 1D array of size (nvars*dim[0]*dim[1]*...*dim[D-1]) corresponding to the multi-dimensional solution, with the following ordering - nvars, dim[0], dim[1], ..., dim[D-1], where nvars is the number of solution components (#HyPar::nvars), dim is the local size (#HyPar::dim_local), D is the number of spatial dimensions.
     x         | double*   | The grid array (with ghost points). This is used only by non-uniform-grid interpolation methods. For multidimensional problems, the layout is as follows: x is a contiguous 1D array of size (dim[0]+dim[1]+...+dim[D-1]), with the spatial coordinates along dim[0] stored from 0,...,dim[0]-1, the spatial coordinates along dim[1] stored along dim[0],...,dim[0]+dim[1]-1, and so forth.
     upw       | int       | Upwinding direction: if positive, a left-biased interpolant will be computed; if negative, a right-biased interpolant will be computed. If the interpolation method is central, then this has no effect.
@@ -80,13 +80,13 @@ int Interp1PrimFourthOrderCentral(
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
-  int indexL[ndims], 
-      indexR[ndims], 
-      indexLL[ndims], 
-      indexRR[ndims], 
-      indexI[ndims], 
-      index_outer[ndims], 
-      bounds_outer[ndims], 
+  int indexL[ndims],
+      indexR[ndims],
+      indexLL[ndims],
+      indexRR[ndims],
+      indexI[ndims],
+      index_outer[ndims],
+      bounds_outer[ndims],
       bounds_inter[ndims];
 
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;

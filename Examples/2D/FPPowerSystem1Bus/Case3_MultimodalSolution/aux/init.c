@@ -45,7 +45,7 @@ int main()
           fscanf(in, "%s", ip_file_type);
         }
       }
-    } else { 
+    } else {
       printf("Error: Illegal format in solver.inp. Crash and burn!\n");
       return(0);
     }
@@ -78,7 +78,7 @@ int main()
         else if (!strcmp(word, "Pm_avg")) fscanf(in,"%lf",&Pm_avg);
         else if (!strcmp(word, "Pmax"  )) fscanf(in,"%lf",&Pmax  );
       }
-    } else { 
+    } else {
       printf("Error: Illegal format in physics.inp. Crash and burn!\n");
     }
   }
@@ -171,7 +171,7 @@ int main()
     fwrite(y,sizeof(double),NJ,out);
     fwrite(u,sizeof(double),NI*NJ,out);
     fclose(out);
-  } 
+  }
 
   free(x);
   free(y);

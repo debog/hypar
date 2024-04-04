@@ -16,7 +16,7 @@
     dimensional Euler and Navier-Stokes systems (#Euler2D, #NavierStokes2D, #NavierStokes3D).
     It is used for simulating inviscid walls or symmetric boundaries. The pressure, density,
     and tangential velocity at the ghost points are extrapolated from the interior, while the
-    normal velocity at the ghost points is set such that the interpolated value at the boundary 
+    normal velocity at the ghost points is set such that the interpolated value at the boundary
     face is equal to the specified wall velocity.
 */
 int BCSlipWallU(
@@ -38,8 +38,8 @@ int BCSlipWallU(
   if (ndims == 1) {
 
     /* create a fake physics object */
-    Euler1D physics; 
-    double gamma; 
+    Euler1D physics;
+    double gamma;
     gamma = physics.gamma = boundary->gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
@@ -57,7 +57,7 @@ int BCSlipWallU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         double rho, uvel, energy, pressure;
         double rho_gpt, uvel_gpt, energy_gpt, pressure_gpt;
@@ -66,7 +66,7 @@ int BCSlipWallU(
         rho_gpt = rho;
         pressure_gpt = pressure;
         uvel_gpt = 2.0*boundary->FlowVelocity[_XDIR_] - uvel;
-        energy_gpt = inv_gamma_m1*pressure_gpt 
+        energy_gpt = inv_gamma_m1*pressure_gpt
                     + 0.5 * rho_gpt * uvel_gpt*uvel_gpt;
 
         phi[nvars*p1+0] = rho_gpt;
@@ -80,8 +80,8 @@ int BCSlipWallU(
   } else if (ndims == 2) {
 
     /* create a fake physics object */
-    Euler2D physics; 
-    double gamma; 
+    Euler2D physics;
+    double gamma;
     gamma = physics.gamma = boundary->gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
@@ -99,7 +99,7 @@ int BCSlipWallU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         double rho, uvel, vvel, energy, pressure;
         double rho_gpt, uvel_gpt, vvel_gpt, energy_gpt, pressure_gpt;
@@ -117,7 +117,7 @@ int BCSlipWallU(
           uvel_gpt = 0.0;
           vvel_gpt = 0.0;
         }
-        energy_gpt = inv_gamma_m1*pressure_gpt 
+        energy_gpt = inv_gamma_m1*pressure_gpt
                     + 0.5 * rho_gpt * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt);
 
         phi[nvars*p1+0] = rho_gpt;
@@ -132,7 +132,7 @@ int BCSlipWallU(
   } else if (ndims == 3) {
 
     /* create a fake physics object */
-    double gamma; 
+    double gamma;
     gamma = boundary->gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
@@ -150,7 +150,7 @@ int BCSlipWallU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         double rho, uvel, vvel, wvel, energy, pressure;
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
@@ -175,8 +175,8 @@ int BCSlipWallU(
           vvel_gpt = 0.0;
           wvel_gpt = 0.0;
         }
-        energy_gpt = inv_gamma_m1*pressure_gpt 
-                    + 0.5 * rho_gpt 
+        energy_gpt = inv_gamma_m1*pressure_gpt
+                    + 0.5 * rho_gpt
                     * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt + wvel_gpt*wvel_gpt);
 
         phi[nvars*p1+0] = rho_gpt;

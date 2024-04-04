@@ -19,12 +19,12 @@
 
 /*! \class ROMObject
  *  \brief Base class defining a ROM object.
- *  This is the base class that defines a 
+ *  This is the base class that defines a
  *  ROM object.
 */
 /*! \brief Base class defining a ROM object.
  *
- *  This is the base class that defines a 
+ *  This is the base class that defines a
  *  ROM object.
 */
 class ROMObject

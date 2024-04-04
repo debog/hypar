@@ -9,7 +9,7 @@
 void GetStringFromInteger(int a, char *A, int width)
 {
   for (int i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0'); 
+    char digit = (char) (a%10 + '0');
     a /= 10;
     A[width-1-i] = digit;
   }
@@ -85,7 +85,7 @@ int main()
     }
   }
 
-  
+
   int nsims = 1;
   int* NI;
   int ndims=1;
@@ -155,7 +155,7 @@ int main()
   for (int ns = 0; ns < nsims; ns++) {
 
     int N = NI[ns];
-    
+
     printf( "(rhoL=%f, rhoR=%f, pL=%f, pR=%f)\n",
             params[ns].rhoL,
             params[ns].rhoR,

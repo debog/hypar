@@ -1,11 +1,11 @@
-/* 
+/*
   This code stitches the solution written out in parallel mode into
   a single file.
 
   The input files are the solution files written out in parallel mode:
   op.bin.xxxx
 
-  For unsteady output, the code will write out binary files containing 
+  For unsteady output, the code will write out binary files containing
   global solution at each output time step (one file for each time step)
   op_xxxxx.bin
 
@@ -59,7 +59,7 @@ void GetStringFromInteger(int a,char *A,int width)
 {
   int i;
   for (i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0'); 
+    char digit = (char) (a%10 + '0');
     a /= 10;
     A[width-1-i] = digit;
   }
@@ -132,7 +132,7 @@ int MPIPartition1D(int nglobal,int nproc,int rank)
   return(nlocal);
 }
 
-int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie) 
+int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie)
 {
   int i;
   int ip[ndims];
@@ -230,7 +230,7 @@ int main()
     if (!inps[IORank]) {
       printf("Error: Could not open %s for reading.\n",filename);
       return(0);
-    }    
+    }
   }
 
   int nproc = 1;
@@ -304,7 +304,7 @@ int main()
           free(Ul);
         }
       }
-     
+
       /* write global grid and solution to file */
       printf("Writing solution file %s.\n",out_filename);
       FILE *out;
@@ -340,7 +340,7 @@ int main()
         else fseek(inps[IORank],-sizeof(char),SEEK_CUR);
       }
     }
-    
+
   } else {
     /* for steady solution */
     char out_filename[_MAX_STRING_SIZE_];
@@ -402,7 +402,7 @@ int main()
         free(Ul);
       }
     }
-     
+
     /* write global grid and solution to file */
     printf("Writing solution file %s.\n",out_filename);
     FILE *out;
@@ -429,7 +429,7 @@ int main()
     /* free global grid and solution arrays and increment filename */
     free(Xg);
     free(Ug);
-    
+
   }
 
   /* close the files for each IO group */

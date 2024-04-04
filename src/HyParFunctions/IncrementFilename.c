@@ -6,8 +6,8 @@
 #include <stdio.h>
 
 ///*! Increment the output filename of the form op_nnnnn.dat by 1,
-//    i.e., the number represented by the string nnnnn is incremented 
-//    by 1. 
+//    i.e., the number represented by the string nnnnn is incremented
+//    by 1.
 //*/
 //void IncrementFilename(char *f /*!< filename */)
 //{

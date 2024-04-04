@@ -27,8 +27,8 @@ int VlasovPlotSpatialField( void*   s,         /*!< Solver object of type #HyPar
                             void*   m,         /*!< MPI object of type #MPIVariables */
                             double* a_field,   /*!< Vector field to write */
                             double  a_time,    /*!< Current simulation time */
-                            char*   fname_root /*!< Filename root (extension is added automatically). 
-                                                     For unsteady output, a numerical index is added 
+                            char*   fname_root /*!< Filename root (extension is added automatically).
+                                                     For unsteady output, a numerical index is added
                                                      that is the same as for the solution output files. */)
 {
   HyPar         *solver = (HyPar*)        s;
@@ -51,7 +51,7 @@ int VlasovPlotSpatialField( void*   s,         /*!< Solver object of type #HyPar
   }
   strcat(filename,".png");
 
-  int d, 
+  int d,
       ghosts = solver->ghosts,
       ndims_x = param->ndims_x;
 

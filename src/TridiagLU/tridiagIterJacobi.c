@@ -12,22 +12,22 @@
 #include <tridiagLU.h>
 
 /*!
-  Solve tridiagonal (non-periodic) systems of equations using point Jacobi iterations: 
-  This function can solve multiple independent systems with one call. The systems need not share 
-  the same left- or right-hand-sides. The initial guess is taken as the solution of 
+  Solve tridiagonal (non-periodic) systems of equations using point Jacobi iterations:
+  This function can solve multiple independent systems with one call. The systems need not share
+  the same left- or right-hand-sides. The initial guess is taken as the solution of
   \f{equation}{
     {\rm diag}\left[{\bf b}\right]{\bf x} = {\bf r}
   \f}
-  where \f${\bf b}\f$ represents the diagonal elements of the tridiagonal system, and 
+  where \f${\bf b}\f$ represents the diagonal elements of the tridiagonal system, and
   \f${\bf r}\f$ is the right-hand-side, stored in \f${\bf x}\f$ at the start of this
   function.
 
   Array layout: The arguments \a a, \a b, \a c, and \a x are local 1D arrays (containing
   this processor's part of the subdiagonal, diagonal, superdiagonal, and right-hand-side)
   of size (\a n X \a ns), where \a n is the local size of the system, and \a ns is
-  the number of independent systems to solve. The ordering of the elements in these arrays 
+  the number of independent systems to solve. The ordering of the elements in these arrays
   is as follows:
-  + Elements of the same row for each of the independent systems are stored adjacent to each 
+  + Elements of the same row for each of the independent systems are stored adjacent to each
     other.
 
   For example, consider the following systems:
@@ -45,7 +45,7 @@
     \ \ k= 1,\cdots,ns
   \f}
   and let \f$ ns = 3\f$. Note that in the code, \f$x\f$ and \f$r\f$ are the same array \a x.
-  
+
   Then, the array \a b must be a 1D array with the following layout of elements:\n
   [\n
   b_0^0, b_0^1, b_0^2, (diagonal element of the first row in each system) \n
@@ -53,12 +53,12 @@
   ..., \n
   b_{n-1}^0, b_{n-1}^1, b_{n-1}^2 (diagonal element of the last row in each system) \n
   ]\n
-  The arrays \a a, \a c, and \a x are stored similarly. 
-  
+  The arrays \a a, \a c, and \a x are stored similarly.
+
   Notes:
   + This function does *not* preserve the sub-diagonal, diagonal, super-diagonal elements
-    and the right-hand-sides. 
-  + The input array \a x contains the right-hand-side on entering the function, and the 
+    and the right-hand-sides.
+  + The input array \a x contains the right-hand-side on entering the function, and the
     solution on exiting it.
 */
 int tridiagIterJacobi(
@@ -137,8 +137,8 @@ int tridiagIterJacobi(
   while(1) {
 
     /* evaluate break conditions */
-    if (    (iter >= context->maxiter) 
-        ||  (iter && context->evaluate_norm && (global_norm < context->atol)) 
+    if (    (iter >= context->maxiter)
+        ||  (iter && context->evaluate_norm && (global_norm < context->atol))
         ||  (iter && context->evaluate_norm && (global_norm/norm0 < context->rtol))  ) {
       break;
     }

@@ -18,7 +18,7 @@ typedef HyPar         SolverContext;
 #include <omp.h>
 #endif
 
-/*! Computes the second-order finite-difference approximation to the first derivative 
+/*! Computes the second-order finite-difference approximation to the first derivative
     (\b Note: not divided by the grid spacing):
     \f{equation}{
       \left(\partial f\right)_i = \left\{ \begin{array}{ll} \frac{1}{2}\left(-3f_i+4f_{i+1}-f_{i+2}\right) & i = -g \\ \frac{1}{2}\left( f_{i+1} - f_{i-1} \right) & -g+1 \leq i \leq N+g-2 \\ \frac{1}{2}\left( f_{i-2} -4f_{i-1}+3f_i \right) & i = N+g-1 \end{array}\right.
@@ -35,10 +35,10 @@ typedef HyPar         SolverContext;
 */
 int FirstDerivativeSecondOrderCentral(
                                         double  *Df,  /*!< Array to hold the computed first derivative (with ghost points) */
-                                        double  *f,   /*!< Array containing the grid point function values whose first 
+                                        double  *f,   /*!< Array containing the grid point function values whose first
                                                            derivative is to be computed (with ghost points) */
                                         int     dir,  /*!< The spatial dimension along which the derivative is computed */
-                                        int     bias, /*!< Forward or backward differencing for non-central 
+                                        int     bias, /*!< Forward or backward differencing for non-central
                                                            finite-difference schemes (-1: backward, 1: forward)*/
                                         void    *s,   /*!< Solver object of type #SolverContext */
                                         void    *m    /*!< MPI object of type #MPIContext */
@@ -93,6 +93,6 @@ int FirstDerivativeSecondOrderCentral(
       for (v=0; v<nvars; v++)  Df[qC*nvars+v] = 0.5 * (3*f[qC*nvars+v]-4*f[qL*nvars+v]+f[qLL*nvars+v]);
     }
   }
-  
+
   return(0);
 }

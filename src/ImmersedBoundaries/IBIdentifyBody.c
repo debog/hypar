@@ -11,7 +11,7 @@
 #include <mpivars.h>
 
 /*!
-  Identify the grid points of the given grid that are 
+  Identify the grid points of the given grid that are
   inside a given body whose surface is defined as an
   unstructured triangulation. This function uses the
   ray-tracing method and is a copy of a FORTRAN function
@@ -31,20 +31,20 @@ int IBIdentifyBody(
   ImmersedBoundary  *IB     = (ImmersedBoundary*) ib;
   MPIVariables      *mpi    = (MPIVariables*) m;
   Body3D            *body   = IB->body;
-  double            *x      = X, 
-                    *y      = X+dim_g[0], 
+  double            *x      = X,
+                    *y      = X+dim_g[0],
                     *z      = X+dim_g[0]+dim_g[1],
                     eps     = IB->tolerance;
   int               itr_max = IB->itr_max,
                     i, j, k, n, v;
 
-  double xmax = body->xmax, 
-         xmin = body->xmin, 
-         ymax = body->ymax, 
-         ymin = body->ymin, 
-         zmax = body->zmax, 
+  double xmax = body->xmax,
+         xmin = body->xmin,
+         ymax = body->ymax,
+         ymin = body->ymin,
+         zmax = body->zmax,
          zmin = body->zmin;
-  
+
   double fac = 1.5;
   double Lx, Ly, Lz;
   Lx = (xmax - xmin);
@@ -68,8 +68,8 @@ int IBIdentifyBody(
   for (i = 0; i < dim_g[0]; i++) {
     for (j = 0; j < dim_g[1]; j++) {
       for (k = 0; k < dim_g[2]; k++) {
-        if (   ((x[i]-xmin)*(x[i]-xmax) < 0) 
-            && ((y[j]-ymin)*(y[j]-ymax) < 0) 
+        if (   ((x[i]-xmin)*(x[i]-xmax) < 0)
+            && ((y[j]-ymin)*(y[j]-ymax) < 0)
             && ((z[k]-zmin)*(z[k]-zmax) < 0)) {
           imin = min(i, imin);
           imax = max(i, imax);
@@ -94,7 +94,7 @@ int IBIdentifyBody(
     cof[3][n] = body->surface[n].z2 - body->surface[n].z3;
     double den = cof[0][n]*cof[3][n] - cof[1][n]*cof[2][n];
     if (absolute(den) > eps)  cof[4][n] = 1.0 / den;
-    else                      cof[4][n] = 0;    
+    else                      cof[4][n] = 0;
   }
 
   int count = 0;
@@ -124,10 +124,10 @@ int IBIdentifyBody(
         }
         return(1);
       }
-  
+
       if (itr > 0) {
         int ii, jj;
-  
+
         for (ii = 0; ii < itr; ii++) {
           for (jj = ii+1; jj < itr; jj++) {
             if (dist[jj] < dist[ii]) {
@@ -161,8 +161,8 @@ int IBIdentifyBody(
             /* this point is inside                      */
             /* check if (i,j,k) lies within this process */
             /* if so, set blank                          */
-            if (   ((i-mpi->is[0])*(i-mpi->ie[0]) <= 0) 
-                && ((j-mpi->is[1])*(j-mpi->ie[1]) <= 0) 
+            if (   ((i-mpi->is[0])*(i-mpi->ie[0]) <= 0)
+                && ((j-mpi->is[1])*(j-mpi->ie[1]) <= 0)
                 && ((k-mpi->is[2])*(k-mpi->ie[2]) <= 0)) {
               /* calculate local indices */
               int index[_IB_NDIMS_];

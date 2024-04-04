@@ -6,7 +6,7 @@
 double GAMMA  = 1.4;
 
 int main()
-{  
+{
   int NI,NJ,ndims;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");

@@ -9,7 +9,7 @@
 #include <mpivars.h>
 #include <immersedboundaries.h>
 
-/*! 
+/*!
   Compute the interpolation nodes and coefficients for immersed boundary points: For each
   immersed boundary point, do the following:
   + From the immersed boundary point, extend a probe in the direction defined by the outward
@@ -99,7 +99,7 @@ int IBInterpCoeffs(
       itip = i;
       jtip = j;
       ktip = k;
-      
+
       if (xtip > xb)  {
         double xx;
         _GetCoordinate_(0,itip,dim_l,ghosts,X,xx);
@@ -186,8 +186,8 @@ int IBInterpCoeffs(
       fprintf(stderr,"Error in IBInterpCoeffs() on rank %d - interior point not found for immersed boundary point (%d,%d,%d)!\n",
               mpi->rank, i, j, k);
       return(1);
-    }    
-  
+    }
+
     double tlx[2],tly[2],tlz[2];
     _GetCoordinate_(0,(itip-1),dim_l,ghosts,X,tlx[0]);
     _GetCoordinate_(0,(itip  ),dim_l,ghosts,X,tlx[1]);

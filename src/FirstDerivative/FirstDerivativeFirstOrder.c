@@ -19,7 +19,7 @@ typedef HyPar         SolverContext;
 #include <omp.h>
 #endif
 
-/*! Computes the first-order finite-difference approximation to the first derivative 
+/*! Computes the first-order finite-difference approximation to the first derivative
     (\b Note: not divided by the grid spacing):
     \f{equation}{
       \left(\partial f\right)_i = \left\{ \begin{array}{ll} f_{i+1} - f_i  & {\rm bias} = 1 \\ f_i - f_{i-1}  & {\rm bias} = -1 \end{array}\right.
@@ -36,10 +36,10 @@ typedef HyPar         SolverContext;
 */
 int FirstDerivativeFirstOrder(
                                 double  *Df,  /*!< Array to hold the computed first derivative (with ghost points) */
-                                double  *f,   /*!< Array containing the grid point function values whose first 
+                                double  *f,   /*!< Array containing the grid point function values whose first
                                                    derivative is to be computed (with ghost points) */
                                 int     dir,  /*!< The spatial dimension along which the derivative is computed */
-                                int     bias, /*!< Forward or backward differencing for non-central 
+                                int     bias, /*!< Forward or backward differencing for non-central
                                                    finite-difference schemes (-1: backward, 1: forward)*/
                                 void    *s,   /*!< Solver object of type #SolverContext */
                                 void    *m    /*!< MPI object of type #MPIContext */
@@ -92,6 +92,6 @@ int FirstDerivativeFirstOrder(
       for (v=0; v<nvars; v++)  Df[qC*nvars+v] = f[qC*nvars+v]-f[qL*nvars+v];
     }
   }
-  
+
   return(0);
 }

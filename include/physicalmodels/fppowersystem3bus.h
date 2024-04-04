@@ -26,7 +26,7 @@
   Reference: To be added soon.
 */
 
-/*! Fokker-Planck model for 3-Bus power system */ 
+/*! Fokker-Planck model for 3-Bus power system */
 #define _FP_POWER_SYSTEM_3BUS_  "fp-power-system-3bus"
 
 /* define ndims and nvars for this model */

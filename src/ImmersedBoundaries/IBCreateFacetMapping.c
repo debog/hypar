@@ -21,7 +21,7 @@ static inline int isInside(
 }
 
 /*! Given a point in the 3D space (xc, yc, zc), this function finds the
-    indices of the 8 grid points that define the grid cell the given 
+    indices of the 8 grid points that define the grid cell the given
     point is in, as well as the trilinear interpolation coefficients
     for each of the surrounding grid points.
 */
@@ -50,7 +50,7 @@ static int interpNodesCoeffs(
 
   int i, j, k, ic, jc, kc;
   ic = jc = kc = -1;
-  
+
   double  xmin = 0.5 * (x[ghosts-1]         + x[ghosts]),
           xmax = 0.5 * (x[dim[0]+ghosts-1]  + x[dim[0]+ghosts]),
           ymin = 0.5 * (y[ghosts-1]         + y[ghosts]),
@@ -66,7 +66,7 @@ static int interpNodesCoeffs(
   }
   if      (ic <= ghosts-1)        ic = ghosts;
   else if (ic >= dim[0]+ghosts-1) ic = dim[0]+ghosts-2;
-  
+
   for (j = 0; j < dim[1]+2*ghosts-1; j++) {
     if (isInside(yc,y[j],y[j+1])) {
       jc = j;
@@ -84,11 +84,11 @@ static int interpNodesCoeffs(
   }
   if      (kc <= ghosts-1)        kc = ghosts;
   else if (kc >= dim[2]+ghosts-1) kc = dim[2]+ghosts-2;
-  
+
   if      (!strcmp(mode,_IB_XY_))  { kc = ghosts; zc = 0.5*(zmin+zmax); }
   else if (!strcmp(mode,_IB_XZ_))  { jc = ghosts; yc = 0.5*(ymin+ymax); }
   else if (!strcmp(mode,_IB_YZ_))  { ic = ghosts; xc = 0.5*(xmin+xmax); }
-  
+
   if (ic == -1) {
     fprintf(stderr,"Error in interpNodesCoeffs() (in ImmersedBoundaries/IBCreateFacetMapping.c) on rank %d: ic = -1.\n", mpi->rank);
     return(1);
@@ -108,7 +108,7 @@ static int interpNodesCoeffs(
   if (ii) *ii = ic;
   if (jj) *jj = jc;
   if (kk) *kk = kc;
-  
+
   int pc[_IB_NNODES_], index[_IB_NDIMS_];
   index[0]=ic-1-ghosts; index[1]=jc-1-ghosts; index[2]=kc-1-ghosts; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[0]);
   index[0]=ic-ghosts  ; index[1]=jc-1-ghosts; index[2]=kc-1-ghosts; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[1]);
@@ -119,7 +119,7 @@ static int interpNodesCoeffs(
   index[0]=ic-1-ghosts; index[1]=jc-ghosts  ; index[2]=kc-ghosts  ; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[6]);
   index[0]=ic-ghosts  ; index[1]=jc-ghosts  ; index[2]=kc-ghosts  ; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[7]);
   _ArrayCopy1D_(pc,inodes,_IB_NNODES_);
-  
+
   double coeffs[_IB_NNODES_];
   TrilinearInterpCoeffs(x[ic-1],x[ic],y[jc-1],y[jc],z[kc-1],z[kc],xc,yc,zc,&coeffs[0]);
   _ArrayCopy1D_(coeffs,icoeffs,_IB_NNODES_);
@@ -131,7 +131,7 @@ static int interpNodesCoeffs(
   This function creates a "facet map", i.e., on each MPI rank, it does the following:
   + Makes a list of facets (defining the immersed body surface) that lie within the
     local computational domain of this MPI rank ("local facets").
-  + For each local facet, finds and stores the indices of the grid points that 
+  + For each local facet, finds and stores the indices of the grid points that
     surround it, as well as the trilinear interpolation coefficients.
   + For each local facet, finds a "near-surface" point, i.e., a point near the surface
     ("near" in terms of the local grid spacing) along the outward surface normal (i.e.,
@@ -154,8 +154,8 @@ int IBCreateFacetMapping(
   int               nfacets = body->nfacets, n, count, ierr;
   Facet3D           *facets = body->surface;
 
-  double  *x = X, 
-          *y = (x + dim[0] + 2*ghosts), 
+  double  *x = X,
+          *y = (x + dim[0] + 2*ghosts),
           *z = (y + dim[1] + 2*ghosts);
 
   double  xmin = 0.5 * (x[ghosts-1]         + x[ghosts]),
@@ -212,7 +212,7 @@ int IBCreateFacetMapping(
       if (flag == 1) {
         fmap[count].facet = facets + n;
         fmap[count].index = n;
-        
+
         fmap[count].xc = xc;
         fmap[count].yc = yc;
         fmap[count].zc = zc;
@@ -281,7 +281,7 @@ int IBCreateFacetMapping(
     }
 
     IB->nfacets_local = nfacets_local;
-    IB->fmap = fmap;  
+    IB->fmap = fmap;
 
   } else {
 

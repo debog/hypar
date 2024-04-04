@@ -21,7 +21,7 @@ int    Euler2DRightEigenvectors (double*,double*,void*,int);
 int Euler2DInitialize(void *s,void *m)
 {
   HyPar         *solver  = (HyPar*)          s;
-  MPIVariables  *mpi     = (MPIVariables*)   m; 
+  MPIVariables  *mpi     = (MPIVariables*)   m;
   Euler2D       *physics = (Euler2D*) solver->physics;
   int           ferr     = 0;
 
@@ -37,7 +37,7 @@ int Euler2DInitialize(void *s,void *m)
   }
 
   /* default values */
-  physics->gamma = 1.4; 
+  physics->gamma = 1.4;
   strcpy(physics->upw_choice,"roe");
 
   /* reading physical model specific inputs - all processes */
@@ -52,7 +52,7 @@ int Euler2DInitialize(void *s,void *m)
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
           ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-          if (!strcmp(word, "gamma")) { 
+          if (!strcmp(word, "gamma")) {
             ferr = fscanf(in,"%lf",&physics->gamma); if (ferr != 1) return(1);
           } else if (!strcmp(word,"upwinding")) {
             ferr = fscanf(in,"%s",physics->upw_choice); if (ferr != 1) return(1);

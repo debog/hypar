@@ -1,12 +1,12 @@
 /*
   Code to generate the initial solution for:
-  Case: Small Peturbation 
+  Case: Small Peturbation
   Model: ShallowWater2D
 
   Reference:
-  Xing, Y., Shu, C.-W., "High order finite difference WENO 
-  schemes with the exact conservation property for the shallow 
-  water equations", Journal of Computational Physics, 208, 2005, 
+  Xing, Y., Shu, C.-W., "High order finite difference WENO
+  schemes with the exact conservation property for the shallow
+  water equations", Journal of Computational Physics, 208, 2005,
   pp. 206-227. http://dx.doi.org/10.1016/j.jcp.2005.02.006
   Section 5.3
 
@@ -21,7 +21,7 @@
 
 int main(){
   int   NI = 100, NJ = 100, ndims = 2;
-  char  ip_file_type[50]; 
+  char  ip_file_type[50];
   strcpy(ip_file_type,"ascii");
 
   FILE *in;

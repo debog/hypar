@@ -2,7 +2,7 @@
 Python script to plot the solution of flow around a cylinder.
 
 - If op_overwrite is set to "no", a plot is generated
-  for each variable  and each simulation time for which the solution 
+  for each variable  and each simulation time for which the solution
   is available.
 - If op_overwrite is set to "yes", a single plot is
   created for for each variable (solution vector component).
@@ -81,15 +81,15 @@ if not os.path.exists(plt_dir_name):
       os.makedirs(plt_dir_name)
 
 if solver_inp_data['op_overwrite'] == 'no':
-  
+
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   op_write_iter = int(solver_inp_data['file_op_iter'][0])
   dt_snapshots = op_write_iter*dt
   n_snapshots = int(niter/op_write_iter) + 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -99,15 +99,15 @@ if solver_inp_data['op_overwrite'] == 'no':
   print('  final time = ', t_final)
   print('  snapshot dt = ', dt_snapshots)
   print('  number of snapshots = ', n_snapshots)
-  
+
   '''
   Load simulation data (solution snapshots)
   '''
-  grid, solution_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                              nsims, 
-                                                              n_snapshots, 
-                                                              ndims, 
-                                                              nvars, 
+  grid, solution_snapshots = hyparutils.getSolutionSnapshots( sim_path,
+                                                              nsims,
+                                                              n_snapshots,
+                                                              ndims,
+                                                              nvars,
                                                               size )
   solution_snapshots = np.float32(solution_snapshots)
   x = grid[:size[0]]
@@ -118,7 +118,7 @@ if solver_inp_data['op_overwrite'] == 'no':
   print(' x.shape: ', x.shape)
   print(' y: ', np.min(y), np.max(y))
   print(' y.shape: ', y.shape)
-  
+
   for i in range(n_snapshots):
     for s in range(nsims):
       solution_snapshots_sim = solution_snapshots[s*n_snapshots:(s+1)*n_snapshots]
@@ -168,7 +168,7 @@ if solver_inp_data['op_overwrite'] == 'no':
 
       fig = plt.figure(figsize=figsize)
       ax = plt.axes()
-      ax.set( xlim=(plt_xmin, plt_xmax), 
+      ax.set( xlim=(plt_xmin, plt_xmax),
               ylim=(plt_ymin, plt_ymax) )
       plot_rho = plt.pcolor(x2d, y2d, sol2d_rho, cmap=colormap)
       ax.set_title('Density, t={:.3}'.format(i*dt_snapshots))
@@ -182,7 +182,7 @@ if solver_inp_data['op_overwrite'] == 'no':
       plt.close()
       fig = plt.figure(figsize=figsize)
       ax = plt.axes()
-      ax.set( xlim=(plt_xmin, plt_xmax), 
+      ax.set( xlim=(plt_xmin, plt_xmax),
               ylim=(plt_ymin, plt_ymax) )
       plot_p = plt.pcolor(x2d, y2d, sol2d_p, cmap=colormap)
       ax.set_title('Pressure, t={:.3}'.format(i*dt_snapshots))
@@ -196,7 +196,7 @@ if solver_inp_data['op_overwrite'] == 'no':
       plt.close()
       fig = plt.figure(figsize=figsize)
       ax = plt.axes()
-      ax.set( xlim=(plt_xmin, plt_xmax), 
+      ax.set( xlim=(plt_xmin, plt_xmax),
               ylim=(plt_ymin, plt_ymax) )
       plot_vel_magn = plt.pcolor(x2d, y2d, sol2d_speed, cmap=colormap)
       ax.set_title('Velocity magnitude, t={:.3}'.format(i*dt_snapshots))
@@ -210,7 +210,7 @@ if solver_inp_data['op_overwrite'] == 'no':
       plt.close()
       fig = plt.figure(figsize=figsize)
       ax = plt.axes()
-      ax.set( xlim=(plt_xmin, plt_xmax), 
+      ax.set( xlim=(plt_xmin, plt_xmax),
               ylim=(plt_ymin, plt_ymax) )
       plot_u = plt.pcolor(x2d, y2d, sol2d_u, cmap=colormap)
       ax.set_title('x-Velocity, t={:.3}'.format(i*dt_snapshots))
@@ -224,7 +224,7 @@ if solver_inp_data['op_overwrite'] == 'no':
       plt.close()
       fig = plt.figure(figsize=figsize)
       ax = plt.axes()
-      ax.set( xlim=(plt_xmin, plt_xmax), 
+      ax.set( xlim=(plt_xmin, plt_xmax),
               ylim=(plt_ymin, plt_ymax) )
       plot_v = plt.pcolor(x2d, y2d, sol2d_v, cmap=colormap)
       ax.set_title('y-Velocity, t={:.3}'.format(i*dt_snapshots))
@@ -238,7 +238,7 @@ if solver_inp_data['op_overwrite'] == 'no':
       plt.close()
       fig = plt.figure(figsize=figsize)
       ax = plt.axes()
-      ax.set( xlim=(plt_xmin, plt_xmax), 
+      ax.set( xlim=(plt_xmin, plt_xmax),
               ylim=(plt_ymin, plt_ymax) )
       plot_p = plt.pcolor(x2d, y2d, sol2d_p, cmap='RdBu')
       plot_u_wake = plt.pcolor(x2d, y2d, sol2d_u_wake, cmap=colormap)
@@ -256,12 +256,12 @@ if solver_inp_data['op_overwrite'] == 'no':
       plt.close()
       #fig = plt.figure(figsize=vel_figsize)
       #ax = plt.axes()
-      #ax.set( xlim=(vel_plt_xmin, vel_plt_xmax), 
+      #ax.set( xlim=(vel_plt_xmin, vel_plt_xmax),
       #        ylim=(vel_plt_ymin, vel_plt_ymax) )
-      #plot = ax.streamplot( x2d.T, y2d.T, sol2d_u.T, sol2d_v.T, 
-      #                      color=sol2d_speed.T, 
+      #plot = ax.streamplot( x2d.T, y2d.T, sol2d_u.T, sol2d_v.T,
+      #                      color=sol2d_speed.T,
       #                      linewidth=linewidth,
-      #                      cmap=colormap, 
+      #                      cmap=colormap,
       #                      start_points=seed_points.T)
       #ax.plot(seed_points[0], seed_points[1], 'bo')
       #ax.set_title('Streamline(u,v), t={:.3}'.format(i*dt_snapshots))
@@ -278,24 +278,24 @@ else:
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   n_snapshots = 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
   print('  grid size = ', size)
   print('  final time = ', t_final)
   print('  number of snapshots = ', n_snapshots)
-  
+
   '''
   Load simulation data (solution snapshots)
   '''
-  grid,solution_snapshots = hyparutils.getSolutionSnapshots(  sim_path, 
-                                                              nsims, 
-                                                              n_snapshots, 
-                                                              ndims, 
-                                                              nvars, 
+  grid,solution_snapshots = hyparutils.getSolutionSnapshots(  sim_path,
+                                                              nsims,
+                                                              n_snapshots,
+                                                              ndims,
+                                                              nvars,
                                                               size )
   solution_snapshots = np.float32(solution_snapshots)
   x = grid[:size[0]]
@@ -308,7 +308,7 @@ else:
   print(' y.shape: ', y.shape)
   print(' z: ', np.min(z), np.max(z))
   print(' z.shape: ', z.shape)
-  
+
   for s in range(nsims):
     solution_snapshots_sim = solution_snapshots[s*n_snapshots:(s+1)*n_snapshots]
     sol3d = np.transpose(solution_snapshots_sim.reshape(size[2],size[1],size[0],nvars))
@@ -357,7 +357,7 @@ else:
 
     fig = plt.figure(figsize=figsize)
     ax = plt.axes()
-    ax.set( xlim=(plt_xmin, plt_xmax), 
+    ax.set( xlim=(plt_xmin, plt_xmax),
             ylim=(plt_ymin, plt_ymax) )
     plot_rho = plt.pcolor(x2d, y2d, sol2d_rho, cmap=colormap)
     ax.set_title('Density, t={:.3}'.format(t_final))
@@ -371,7 +371,7 @@ else:
     plt.close()
     fig = plt.figure(figsize=figsize)
     ax = plt.axes()
-    ax.set( xlim=(plt_xmin, plt_xmax), 
+    ax.set( xlim=(plt_xmin, plt_xmax),
             ylim=(plt_ymin, plt_ymax) )
     plot_p = plt.pcolor(x2d, y2d, sol2d_p, cmap=colormap)
     ax.set_title('Pressure, t={:.3}'.format(t_final))
@@ -385,7 +385,7 @@ else:
     plt.close()
     fig = plt.figure(figsize=figsize)
     ax = plt.axes()
-    ax.set( xlim=(plt_xmin, plt_xmax), 
+    ax.set( xlim=(plt_xmin, plt_xmax),
             ylim=(plt_ymin, plt_ymax) )
     plot_vel_magn = plt.pcolor(x2d, y2d, sol2d_speed, cmap=colormap)
     ax.set_title('Velocity magnitude, t={:.3}'.format(t_final))
@@ -399,7 +399,7 @@ else:
     plt.close()
     fig = plt.figure(figsize=figsize)
     ax = plt.axes()
-    ax.set( xlim=(plt_xmin, plt_xmax), 
+    ax.set( xlim=(plt_xmin, plt_xmax),
             ylim=(plt_ymin, plt_ymax) )
     plot_u = plt.pcolor(x2d, y2d, sol2d_u, cmap=colormap)
     ax.set_title('x-Velocity, t={:.3}'.format(t_final))
@@ -413,7 +413,7 @@ else:
     plt.close()
     fig = plt.figure(figsize=figsize)
     ax = plt.axes()
-    ax.set( xlim=(plt_xmin, plt_xmax), 
+    ax.set( xlim=(plt_xmin, plt_xmax),
             ylim=(plt_ymin, plt_ymax) )
     plot_v = plt.pcolor(x2d, y2d, sol2d_v, cmap=colormap)
     ax.set_title('y-Velocity, t={:.3}'.format(t_final))
@@ -427,7 +427,7 @@ else:
     plt.close()
     fig = plt.figure(figsize=figsize)
     ax = plt.axes()
-    ax.set( xlim=(plt_xmin, plt_xmax), 
+    ax.set( xlim=(plt_xmin, plt_xmax),
             ylim=(plt_ymin, plt_ymax) )
     plot_p = plt.pcolor(x2d, y2d, sol2d_p, cmap='RdBu')
     plot_u_wake = plt.pcolormesh(x2d, y2d, sol2d_u_wake, cmap=colormap)
@@ -445,12 +445,12 @@ else:
     plt.close()
     #fig = plt.figure(figsize=vel_figsize)
     #ax = plt.axes()
-    #ax.set( xlim=(vel_plt_xmin, vel_plt_xmax), 
+    #ax.set( xlim=(vel_plt_xmin, vel_plt_xmax),
     #        ylim=(vel_plt_ymin, vel_plt_ymax) )
-    #plot = ax.streamplot( x2d.T, y2d.T, sol2d_u.T, sol2d_v.T, 
-    #                      color=sol2d_speed.T, 
+    #plot = ax.streamplot( x2d.T, y2d.T, sol2d_u.T, sol2d_v.T,
+    #                      color=sol2d_speed.T,
     #                      linewidth=linewidth,
-    #                      cmap=colormap, 
+    #                      cmap=colormap,
     #                      start_points=seed_points.T)
     #ax.plot(seed_points[0], seed_points[1], 'bo')
     #ax.set_title('Streamline(u,v), t={:.3}'.format(t_final))

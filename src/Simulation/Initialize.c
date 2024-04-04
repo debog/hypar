@@ -144,9 +144,9 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
 #if defined(HAVE_CUDA)
     if (simobj[n].solver.use_gpu) {
       gpuMalloc((void**)&simobj[n].solver.gpu_dim_local, simobj[n].solver.ndims*sizeof(int));
-      gpuMemcpy(  simobj[n].solver.gpu_dim_local, 
-                  simobj[n].solver.dim_local, 
-                  simobj[n].solver.ndims*sizeof(int), 
+      gpuMemcpy(  simobj[n].solver.gpu_dim_local,
+                  simobj[n].solver.dim_local,
+                  simobj[n].solver.ndims*sizeof(int),
                   gpuMemcpyHostToDevice );
     }
 #endif
@@ -204,7 +204,7 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
       gpuMemset(simobj[n].solver.gpu_iblank, 0, size*sizeof(double));
     }
 #endif
-    
+
     /* grid */
     size = 0;
     for (i=0; i<simobj[n].solver.ndims; i++) {
@@ -221,9 +221,9 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
       gpuMemset(simobj[n].solver.gpu_dxinv, 0, size*sizeof(double));
     }
 #endif
-    
+
     /* cell-centered arrays needed to compute fluxes */
-    size = 1;  
+    size = 1;
     for (i=0; i<simobj[n].solver.ndims; i++) {
       size *= (simobj[n].solver.dim_local[i]+2*simobj[n].solver.ghosts);
     }
@@ -273,7 +273,7 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
 #if defined(HAVE_CUDA)
     }
 #endif
-    
+
     /* allocate MPI send/receive buffer arrays */
     int bufdim[simobj[n].solver.ndims], maxbuf = 0;
     for (d = 0; d < simobj[n].solver.ndims; d++) {
@@ -298,7 +298,7 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
       gpuMemset(simobj[n].mpi.gpu_recvbuf, 0, 2*simobj[n].solver.ndims*simobj[n].mpi.maxbuf*sizeof(double));
     }
 #endif
-    
+
     /* allocate the volume and boundary integral arrays */
     simobj[n].solver.VolumeIntegral        = (double*) calloc (simobj[n].solver.nvars  ,sizeof(double));
     simobj[n].solver.VolumeIntegralInitial = (double*) calloc (simobj[n].solver.nvars  ,sizeof(double));

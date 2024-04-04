@@ -151,7 +151,7 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
                 gpuMemcpyHostToDevice);
 
 #ifdef CUDA_VAR_ORDERDING_AOS
-      gpuMemcpy(simobj[n].solver.gpu_u, 
+      gpuMemcpy(simobj[n].solver.gpu_u,
                 simobj[n].solver.u,
                 simobj[n].solver.ndof_cells_wghosts*sizeof(double),
                 gpuMemcpyHostToDevice);
@@ -162,7 +162,7 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
           h_u[i+v*npoints_local_wghosts] = simobj[n].solver.u[i*nvars+v];
         }
       }
-      gpuMemcpy(simobj[n].solver.gpu_u, 
+      gpuMemcpy(simobj[n].solver.gpu_u,
                 h_u,
                 simobj[n].solver.ndof_cells_wghosts*sizeof(double),
                 gpuMemcpyHostToDevice);

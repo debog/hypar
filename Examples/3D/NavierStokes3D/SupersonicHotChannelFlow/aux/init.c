@@ -5,7 +5,7 @@
 
 int main()
 {
-  
+
   const double pi     = 4.0*atan(1.0);
   const double GAMMA  = 1.4;
 
@@ -50,8 +50,8 @@ int main()
   double Lx = 1.0,
          Ly = 0.2;
 
-  double  dx = Lx / ((double)NI-1), 
-          dy = Ly / ((double)NJ-1), 
+  double  dx = Lx / ((double)NI-1),
+          dy = Ly / ((double)NJ-1),
           dz = (dx < dy ? dx : dy);
 
   double  rho_inf = 1.0,

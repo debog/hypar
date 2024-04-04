@@ -1,6 +1,6 @@
 /*! @file LinearADRAdvection.c
     @author Debojyoti Ghosh
-    @brief Function to evaluate the advection term in the 
+    @brief Function to evaluate the advection term in the
            linear advection-diffusion-reaction model
 */
 
@@ -11,26 +11,26 @@
 #include <hypar.h>
 
 /*! Evaluate the advection term in the linear advection-diffusion-reaction model:\n
-  
-    Compute 
+
+    Compute
     \f{equation}
     a_d u
-    \f} 
+    \f}
     given \f$u\f$ and \f$d\f$ in the hyperbolic term
     \f{equation}{
     \sum_d \frac {\partial} {\partial x_d} \left( a_d u \right)
     \f}
 
     + If the advection field is spatially varying, then the advection speed
-      array (LinearADR::a) is expected to have the size (LinearADR::adv_arr_size): 
-      (number of grid points with ghosts - HyPar::npoints_local_wghosts) 
-      X (number of spatial dimensions - HyPar::ndims) 
+      array (LinearADR::a) is expected to have the size (LinearADR::adv_arr_size):
+      (number of grid points with ghosts - HyPar::npoints_local_wghosts)
+      X (number of spatial dimensions - HyPar::ndims)
       X (number of solution components - HyPar::nvars),
       with the innermost loop being the solution components and outermost loop
       being the grid points.
     + If the advection field is constant, then the advection speed
-      array (LinearADR::a) is expected to have the size (LinearADR::adv_arr_size): 
-      (number of spatial dimensions - HyPar::ndims) 
+      array (LinearADR::a) is expected to have the size (LinearADR::adv_arr_size):
+      (number of spatial dimensions - HyPar::ndims)
       X (number of solution components - HyPar::nvars),
       with the inner loop being the solution components.
 */
@@ -51,8 +51,8 @@ int LinearADRAdvection( double  *f, /*!< Array to hold the computed flux (same s
   int ndims   = solver->ndims;
   int nvars   = solver->nvars;
 
-  int index[ndims], 
-      bounds[ndims], 
+  int index[ndims],
+      bounds[ndims],
       offset[ndims];
 
   /* set bounds for array index to include ghost points */

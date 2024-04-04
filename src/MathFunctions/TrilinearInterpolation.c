@@ -21,7 +21,7 @@
 */
 void TrilinearInterpCoeffs(
                             double xmin,  /*!< x-coordinate of the lower-end */
-                            double xmax,  /*!< x-coordinate of the higher-end */  
+                            double xmax,  /*!< x-coordinate of the higher-end */
                             double ymin,  /*!< y-coordinate of the lower-end */
                             double ymax,  /*!< y-coordinate of the higher-end */
                             double zmin,  /*!< z-coordinate of the lower-end */

@@ -10,7 +10,7 @@
     = \sum_d \nu_d \frac {\partial^2 u} {\partial x_d^2}
     + k u
     \f}
-    where \f$a_d\f$ are the advection speeds, 
+    where \f$a_d\f$ are the advection speeds,
     \f$\nu_d\f$ are the diffusion coefficients, and
     \f$k\f$ is the reaction rate.\n
 */
@@ -23,15 +23,15 @@
 #include <basic.h>
 
 /*! \def LinearADR
-    \brief Structure containing variables and parameters specific 
+    \brief Structure containing variables and parameters specific
     to the linear advection-diffusion-reaction model.
- *  This structure contains the physical parameters, variables, and function pointers 
+ *  This structure contains the physical parameters, variables, and function pointers
  *  specific to the linear advection-diffusion-reaction equation.
 */
-/*! \brief Structure containing variables and parameters specific 
+/*! \brief Structure containing variables and parameters specific
  * to the linear advection-diffusion-reaction model.
  *
- *  This structure contains the physical parameters, variables, and function pointers 
+ *  This structure contains the physical parameters, variables, and function pointers
  *  specific to the linear advection-diffusion-reaction equation.
 */
 typedef struct linearadr_parameters {
@@ -47,10 +47,10 @@ typedef struct linearadr_parameters {
   int adv_arr_size;
 
   /*! advection speed for each variable along each dimension */
-  double *a;  
+  double *a;
 
   /*! diffusion coefficient for each variable along each dimension */
-  double *d;  
+  double *d;
 
   /*! turn off upwinding and just take arithmetic average of left
       and right biased fluxes? */

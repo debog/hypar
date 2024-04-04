@@ -9,7 +9,7 @@ double absolute(double x)
 }
 
 int main(){
-  
+
   int NI,ndims;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");
@@ -63,7 +63,7 @@ int main(){
     out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
     fprintf(out,"\n");
-    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);            
+    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);
     fprintf(out,"\n");
     fclose(out);
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {

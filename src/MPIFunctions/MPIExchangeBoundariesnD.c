@@ -9,9 +9,9 @@
 #include <mpivars.h>
 
 /*!
-  Exchange data across MPI ranks, and fill in ghost points for an n-dimensional array 
+  Exchange data across MPI ranks, and fill in ghost points for an n-dimensional array
   (where \a n is the total number of spatial dimensions). If any of the physical boundaries
-  are periodic, this function also exchanges data and fills in the ghost points for these 
+  are periodic, this function also exchanges data and fills in the ghost points for these
   boundaries.
 
   The n-dimensional array must be stored in the memory as a single-index array, with the following order of mapping:
@@ -27,13 +27,13 @@
   @image latex layout.eps width=0.9\textwidth
 
   The bold numbers in parentheses represent the 2D indices. The numbers below them are the indices of the array
-  that correspond to that 2D location. Thus, elements 40,41,42, and 43 in the array are the 1st, 2nd, 3rd, and 
+  that correspond to that 2D location. Thus, elements 40,41,42, and 43 in the array are the 1st, 2nd, 3rd, and
   4th vector components at location (1,3).
 
-  If \f${\bf i}\left[{\rm ndims}\right]\f$ is an integer array representing an n-dimensional index 
-  (for example, \f$\left(5,4\right)\f$ in 2D, \f$\left(3,5,2\right)\f$ in 3D), and the number of vector 
+  If \f${\bf i}\left[{\rm ndims}\right]\f$ is an integer array representing an n-dimensional index
+  (for example, \f$\left(5,4\right)\f$ in 2D, \f$\left(3,5,2\right)\f$ in 3D), and the number of vector
   components is \a nvars, then:
-  + #_ArrayIndex1D_ computes the index \f$p\f$ in the array corresponding to \f${\bf i}\f$. In the above example, 
+  + #_ArrayIndex1D_ computes the index \f$p\f$ in the array corresponding to \f${\bf i}\f$. In the above example,
     \f${\bf i} = \left(1,3\right) \rightarrow p = 10\f$.
   + \a var[nvars*p+v] accesses the \a v-th component of the n-dimensional array \a var at location \f${\bf i}\f$.
     In the above example, to access the 3rd vector component at location \f$\left(1,3\right)\f$, we have \f$p=10\f$,
@@ -51,7 +51,7 @@ int MPIExchangeBoundariesnD(
 #ifndef serial
   MPIVariables  *mpi = (MPIVariables*) m;
   int           d;
-  
+
   int *ip     = mpi->ip;
   int *iproc  = mpi->iproc;
   int *bcflag = mpi->bcperiodic;
@@ -63,12 +63,12 @@ int MPIExchangeBoundariesnD(
   /* each process has 2*ndims neighbors (except at non-periodic physical boundaries)  */
   /* calculate the rank of these neighbors (-1 -> none)                               */
   for (d = 0; d < ndims; d++) {
-    _ArrayCopy1D_(ip,nip,ndims); 
+    _ArrayCopy1D_(ip,nip,ndims);
     if (ip[d] == 0) nip[d] = iproc[d]-1;
     else            nip[d]--;
     if ((ip[d] == 0) && (!bcflag[d])) neighbor_rank[2*d]   = -1;
     else                              neighbor_rank[2*d]   = MPIRank1D(ndims,iproc,nip);
-    _ArrayCopy1D_(ip,nip,ndims); 
+    _ArrayCopy1D_(ip,nip,ndims);
     if (ip[d] == (iproc[d]-1)) nip[d] = 0;
     else                       nip[d]++;
     if ((ip[d] == (iproc[d]-1)) && (!bcflag[d]))  neighbor_rank[2*d+1] = -1;

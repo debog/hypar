@@ -13,12 +13,12 @@
 #include <hypar.h>
 
 /*! Apply no-slip adiabatic wall boundary conditions on the immersed boundary
-    points (grid points within the immersed body that are within 
-    stencil-width distance of interior points, i.e., points in the 
+    points (grid points within the immersed body that are within
+    stencil-width distance of interior points, i.e., points in the
     interior of the computational domain). */
 int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
                               void    *m, /*!< Solver object of type #HyPar */
-                              double  *u, /*!< Array with the solution vector */ 
+                              double  *u, /*!< Array with the solution vector */
                               double  t   /*!< Current simulation time */
                              )
 {
@@ -99,7 +99,7 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
     uvel_ib     = ramp_fac * uvel_ib_target     + (1.0-ramp_fac) * uvel_gpt;
     vvel_ib     = ramp_fac * vvel_ib_target     + (1.0-ramp_fac) * vvel_gpt;
     wvel_ib     = ramp_fac * wvel_ib_target     + (1.0-ramp_fac) * wvel_gpt;
-    energy_ib   = inv_gamma_m1*pressure_ib 
+    energy_ib   = inv_gamma_m1*pressure_ib
                   + 0.5*rho_ib*(uvel_ib*uvel_ib+vvel_ib*vvel_ib+wvel_ib*wvel_ib);
 
     u[_MODEL_NVARS_*node_index+0] = rho_ib;
@@ -113,12 +113,12 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
 }
 
 /*! Apply no-slip isothermal wall boundary conditions on the immersed boundary
-    points (grid points within the immersed body that are within 
-    stencil-width distance of interior points, i.e., points in the 
+    points (grid points within the immersed body that are within
+    stencil-width distance of interior points, i.e., points in the
     interior of the computational domain). */
 int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
                                 void    *m, /*!< Solver object of type #HyPar */
-                                double  *u, /*!< Array with the solution vector */ 
+                                double  *u, /*!< Array with the solution vector */
                                 double  t   /*!< Current simulation time */
                               )
 {
@@ -188,9 +188,9 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
                                 param->gamma );
     temperature_gpt = pressure_gpt / rho_gpt;
 
-    double  rho_ib_target, 
-            uvel_ib_target, vvel_ib_target, wvel_ib_target, 
-            pressure_ib_target, 
+    double  rho_ib_target,
+            uvel_ib_target, vvel_ib_target, wvel_ib_target,
+            pressure_ib_target,
             temperature_ib_target;
     temperature_ib_target = (1.0+factor)*param->T_ib_wall - factor * temperature;
     if (    (temperature_ib_target < param->T_ib_wall/param->ib_T_tol)
@@ -209,7 +209,7 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
     uvel_ib     = ramp_fac * uvel_ib_target     + (1.0-ramp_fac) * uvel_gpt;
     vvel_ib     = ramp_fac * vvel_ib_target     + (1.0-ramp_fac) * vvel_gpt;
     wvel_ib     = ramp_fac * wvel_ib_target     + (1.0-ramp_fac) * wvel_gpt;
-    energy_ib   = inv_gamma_m1*pressure_ib 
+    energy_ib   = inv_gamma_m1*pressure_ib
                   + 0.5*rho_ib*(uvel_ib*uvel_ib+vvel_ib*vvel_ib+wvel_ib*wvel_ib);
 
     u[_MODEL_NVARS_*node_index+0] = rho_ib;

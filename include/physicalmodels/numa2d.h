@@ -4,13 +4,13 @@
  *
  * References:
  *
- * F.X. Giraldo, M. Restelli, and M. Laeuter, "Semi-Implicit 
- * Formulations of the Euler Equations: Applications to 
- * Nonhydrostatic Atmospheric Modeling", SIAM J. Sci. Comp., 
+ * F.X. Giraldo, M. Restelli, and M. Laeuter, "Semi-Implicit
+ * Formulations of the Euler Equations: Applications to
+ * Nonhydrostatic Atmospheric Modeling", SIAM J. Sci. Comp.,
  * Vol. 32, 3394-3425 (2010)
  *
- * N. Ahmad and J. Lindeman, "Euler solutions using flux-based wave 
- * decomposition", Intl. J. Num. Method. Fluid., Vol. 54 (1), 
+ * N. Ahmad and J. Lindeman, "Euler solutions using flux-based wave
+ * decomposition", Intl. J. Num. Method. Fluid., Vol. 54 (1),
  * 47-72 (2007)
  *
 */

@@ -1,5 +1,5 @@
 /*! @file petscinterface_cpp.h
-    @brief Contains C++ function declarations for the PETSc time integration interface 
+    @brief Contains C++ function declarations for the PETSc time integration interface
     @author Debojyoti Ghosh
  */
 
@@ -24,11 +24,11 @@ PetscErrorCode PetscIFunctionIMEX   (TS,PetscReal,Vec,Vec,Vec,void*);
 PetscErrorCode PetscIFunctionImpl   (TS,PetscReal,Vec,Vec,Vec,void*);
 
 PetscErrorCode PetscIJacobianIMEX(TS,PetscReal,Vec,Vec,PetscReal,Mat,Mat,void*);
-PetscErrorCode PetscJacobianFunctionIMEX_JFNK       (Mat,Vec,Vec);             
+PetscErrorCode PetscJacobianFunctionIMEX_JFNK       (Mat,Vec,Vec);
 PetscErrorCode PetscJacobianFunctionIMEX_Linear     (Mat,Vec,Vec);
 
 PetscErrorCode PetscIJacobian(TS,PetscReal,Vec,Vec,PetscReal,Mat,Mat,void*);
-PetscErrorCode PetscJacobianFunction_JFNK  (Mat,Vec,Vec);             
+PetscErrorCode PetscJacobianFunction_JFNK  (Mat,Vec,Vec);
 PetscErrorCode PetscJacobianFunction_Linear(Mat,Vec,Vec);
 
 int PetscGlobalDOF(void*);

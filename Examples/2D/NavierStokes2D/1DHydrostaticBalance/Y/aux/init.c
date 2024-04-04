@@ -6,7 +6,7 @@
 int main(){
   double pi     = 4.0*atan(1.0);
   double GAMMA  = 1.4;
-  
+
   double eta = 0.0001;
   printf("Enter the perturbation constant (eta): ");
   scanf("%lf",&eta);

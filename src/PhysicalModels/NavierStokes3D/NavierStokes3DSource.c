@@ -88,7 +88,7 @@ int NavierStokes3DSource(
         _ArrayIndex1D_(_MODEL_NDIMS_,dim_interface,index2,0     ,p2);
 
         double dx_inverse; _GetCoordinate_(dir,index[dir],dim,ghosts,dxinv,dx_inverse);
-        double rho, vel[_MODEL_NDIMS_], e, P; 
+        double rho, vel[_MODEL_NDIMS_], e, P;
         _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vel[0],vel[1],vel[2],e,P,param->gamma);
         double term[_MODEL_NVARS_] = {0.0, rho*RT*(dir==_XDIR_), rho*RT*(dir==_YDIR_), rho*RT*(dir==_ZDIR_), rho*RT*vel[dir]};
         for (v=0; v<_MODEL_NVARS_; v++) {

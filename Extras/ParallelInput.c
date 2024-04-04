@@ -1,9 +1,9 @@
-/* This code generates the files for reading the initial 
+/* This code generates the files for reading the initial
  * (and exact, if available) solutions in parallel, from
- * the "initial.inp" and "exact.inp" files containing the 
+ * the "initial.inp" and "exact.inp" files containing the
  * initial and exact solutions of the complete domain
  *
- * The new files are "initial_par.inp.xxxx" and 
+ * The new files are "initial_par.inp.xxxx" and
  * "exact_par.inp.xxxx" (where xxxx corresponds to
  * the IO rank that the file is meant for).
  *
@@ -72,7 +72,7 @@ void GetStringFromInteger(int a,char *A,int width)
 {
   int i;
   for (i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0'); 
+    char digit = (char) (a%10 + '0');
     a /= 10;
     A[width-1-i] = digit;
   }
@@ -115,7 +115,7 @@ int MPIPartition1D(int nglobal,int nproc,int rank)
   return(nlocal);
 }
 
-int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie) 
+int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie)
 {
   int i;
   int ip[ndims];
@@ -294,7 +294,7 @@ void SplitDomain(char *fnamein, char *fnameout)
     fclose(out);
 
   }
-  
+
   free(Xg);
   free(Ug);
   free(dim_local);

@@ -59,10 +59,10 @@ class EnsembleSimulation : public Simulation
     inline int ReadInputs()
     {
       int retval = ::ReadInputs(  (void*) m_sims.data(),
-                                  m_nsims, 
+                                  m_nsims,
                                   m_rank );
       ::WriteInputs( (void*) m_sims.data(),
-                     m_nsims, 
+                     m_nsims,
                      m_rank );
       return retval;
     }
@@ -158,7 +158,7 @@ class EnsembleSimulation : public Simulation
 
 #ifndef serial
     /*! Create duplicate MPI communicators */
-    inline int mpiCommDup() 
+    inline int mpiCommDup()
     {
       for (int n = 0; n < m_nsims; n++) {
         MPI_Comm_dup(MPI_COMM_WORLD, &(m_sims[n].mpi.world));

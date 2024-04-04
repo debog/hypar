@@ -8,18 +8,18 @@
 #include <timeintegration.h>
 
 /*!
-  Return auxiliary solution: Some time integrators may have the concept of 
+  Return auxiliary solution: Some time integrators may have the concept of
   auxiliary solutions that they evolve along with the main solution #HyPar::u
   (these may be used for error estimation, for example). This function returns
   a pointer to such an auxiliary solution. Note that the auxiliary solution has
   the same dimensions and array layout as the main solution.
   + Call with the final argument \a n less than 0 to get the total number of
-    auxiliary solutions (this value will be stored in the argument \a N at 
+    auxiliary solutions (this value will be stored in the argument \a N at
     exit).
-  + Call with the final argument \a n less than or equal to zero to get the 
+  + Call with the final argument \a n less than or equal to zero to get the
     \a n-th auxiliary solution (the argument \a uaux will point to this at
-    exit). 
-    
+    exit).
+
   Note that auxiliary solutions are numbered in the C convention: 0,1,...,N-1.
 
   Time integration methods which use auxiliary solutions currently implemented:

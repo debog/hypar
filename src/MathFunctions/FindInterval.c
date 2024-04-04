@@ -5,13 +5,13 @@
 
 #include <mathfunctions.h>
 
-/*! Given an interval \f$\left[a,b\right], a\leq b\f$, find grid indices \a imin 
+/*! Given an interval \f$\left[a,b\right], a\leq b\f$, find grid indices \a imin
     and \a imax, such that
     \f{align}{
       imin &= \min\ i\ {\rm satisfying}\ x_i \geq a\\
       imax &= \max\ i\ {\rm satisfying}\  x_i \leq b
     \f}
-    where \f$\left\{x_i; 0\leq i < N , x_i < x_{i+1} \forall i \right\}\f$ 
+    where \f$\left\{x_i; 0\leq i < N , x_i < x_{i+1} \forall i \right\}\f$
     represents a 1-dimensional grid.
     \n\n
     Note: This function handles 1-dimensional intervals and grids only.

@@ -1,6 +1,6 @@
 /*
 
-  This code extracts the marginal PDFs from the 2D 
+  This code extracts the marginal PDFs from the 2D
   PDF output and writes them to text files.
   (Note: output file must be binary.)
 

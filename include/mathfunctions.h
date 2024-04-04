@@ -18,12 +18,12 @@ void fillGhostCells(const int* const, const int, double* const, const int, const
 void TrilinearInterpCoeffs(double,double,double,double,double,double,double,double,double,double*);
 
 /*! Interpolate an n-dimensional grid variable from one grid to another */
-int InterpolateGlobalnDVar( const int* const, 
-                            double** const, 
-                            const int* const, 
-                            double* const, 
-                            const int, 
-                            const int, 
+int InterpolateGlobalnDVar( const int* const,
+                            double** const,
+                            const int* const,
+                            double* const,
+                            const int,
+                            const int,
                             const int,
                             const int* const);
 

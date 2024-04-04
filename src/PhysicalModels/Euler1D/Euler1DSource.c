@@ -16,7 +16,7 @@ static int Euler1DSourceFunction(double*,double*,double*,void*,void*,double);
     is computed according to the balanced formulation introduced in the reference below.
     The source term is reformulated and "discretized" in a similar fashion as the hyperbolic
     flux to ensure that the hydrostatic balance is maintained to machine precision.
-    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations 
+    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations
                   Under Gravitational Fields", J. Sci. Comput., 54, 2013, pp. 645--662,
                   http://dx.doi.org/10.1007/s10915-012-9585-8.
 */
@@ -68,7 +68,7 @@ int Euler1DSource(
     double rho, vel, e, P; _Euler1DGetFlowVar_((u+_MODEL_NVARS_*p),rho,vel,e,P,param);
     double term[_MODEL_NVARS_] = {0.0, rho, rho*vel};
     for (v=0; v<_MODEL_NVARS_; v++) {
-      source[_MODEL_NVARS_*p+v] += (  (term[v]*(1.0/param->grav_field[p])) 
+      source[_MODEL_NVARS_*p+v] += (  (term[v]*(1.0/param->grav_field[p]))
                                     * (SourceI[_MODEL_NVARS_*p2+v]-SourceI[_MODEL_NVARS_*p1+v])*dx_inverse );
     }
     vel = P; /* useless statement to avoid compiler warning */
@@ -78,11 +78,11 @@ int Euler1DSource(
   return(0);
 }
 
-/*! Compute the gravitational source function that is then "discretized" in a way similar to 
+/*! Compute the gravitational source function that is then "discretized" in a way similar to
     the hyperbolic flux function for the balanced formulation introduced in the reference below.
     The source term is reformulated and "discretized" in a similar fashion as the hyperbolic
     flux to ensure that the hydrostatic balance is maintained to machine precision.
-    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations 
+    + Xing, Shu, "High Order Well-Balanced WENO Scheme for the Gas Dynamics Equations
                   Under Gravitational Fields", J. Sci. Comput., 54, 2013, pp. 645--662,
                   http://dx.doi.org/10.1007/s10915-012-9585-8.
 */

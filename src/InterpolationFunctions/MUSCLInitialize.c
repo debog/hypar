@@ -12,7 +12,7 @@
 #include <hypar.h>
 
 /*!
-    Initialize the 2nd or 3rd order MUSCL scheme. 
+    Initialize the 2nd or 3rd order MUSCL scheme.
 */
 int MUSCLInitialize(
                       void *s,  /*!< Solver object of type #HyPar */
@@ -69,11 +69,11 @@ int MUSCLInitialize(
     muscl->LimiterFunction = LimiterSuperBee;
   } else {
     if (!mpi->rank) {
-      fprintf(stderr, "Warning: %s is an invalid limiter type. Using default (Generalized MinMod).\n", 
+      fprintf(stderr, "Warning: %s is an invalid limiter type. Using default (Generalized MinMod).\n",
               muscl->limiter_type);
     }
     muscl->LimiterFunction = LimiterGeneralizedMinMod;
   }
-  
+
   return(0);
 }

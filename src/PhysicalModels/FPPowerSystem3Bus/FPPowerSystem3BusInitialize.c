@@ -30,7 +30,7 @@ int FPPowerSystem3BusInitialize(
                                )
 {
   HyPar               *solver  = (HyPar*)             s;
-  MPIVariables        *mpi     = (MPIVariables*)      m; 
+  MPIVariables        *mpi     = (MPIVariables*)      m;
   FPPowerSystem3Bus   *physics = (FPPowerSystem3Bus*) solver->physics;
   int                 ferr, N;
   _DECLARE_IERR_;
@@ -71,7 +71,7 @@ int FPPowerSystem3BusInitialize(
 
   physics->G   = (double*) calloc (3*3,sizeof(double));
   physics->B   = (double*) calloc (3*3,sizeof(double));
-  
+
   physics->G[0*3+0] = 0.276805493111691;
   physics->G[0*3+1] = 0.213024867595501;
   physics->G[0*3+2] = 0.209205876527443;
@@ -81,7 +81,7 @@ int FPPowerSystem3BusInitialize(
   physics->G[2*3+0] = 0.209205876527443;
   physics->G[2*3+1] = 0.286592141665044;
   physics->G[2*3+2] = 0.844559256324453;
-  
+
   physics->B[0*3+0] = -2.36794416971567;
   physics->B[0*3+1] =  1.08817493992579;
   physics->B[0*3+2] =  1.22601259339234;

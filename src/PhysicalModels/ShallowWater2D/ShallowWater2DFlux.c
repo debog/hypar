@@ -10,8 +10,8 @@
 
 /*! Compute the hyperbolic flux over the local domain.\n
     \f{equation}{
-      {\bf F}\left({\bf u}\right) 
-      = \left\{\begin{array}{cc} 
+      {\bf F}\left({\bf u}\right)
+      = \left\{\begin{array}{cc}
           \left[\begin{array}{c} hu \\ hu^2 + \frac{1}{2} gh^2 \\ huv \end{array}\right] & {\rm dir} = x \\
           \left[\begin{array}{c} hv \\ huv \\ hv^2 + \frac{1}{2} gh^2 \end{array}\right] & {\rm dir} = y \\
         \end{array}\right.

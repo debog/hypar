@@ -26,7 +26,7 @@
 /* Function declarations */
 static int PlotArraySerial   (int,int,int*,int*,int,double*,double*,double,void*,void*,char*);
 
-/*! Plot a vector field, stored as an array, and save figure to file: this is a 
+/*! Plot a vector field, stored as an array, and save figure to file: this is a
     wrapper function that calls PlotArraySerial(). */
 int PlotArray(int     a_ndims,      /*!< Number of spatial dimensions */
               int     a_nvars,      /*!< Number of variables per grid point */
@@ -57,12 +57,12 @@ int PlotArray(int     a_ndims,      /*!< Number of spatial dimensions */
 }
 
 /*! Function to plot a vector field, stored as an array, and
-    save the figure to a file. It will allocate the global domain on 
-    rank 0, so do not use for big problems for which the entire global 
-    domain will not fit on one node. This approach is also not very 
+    save the figure to a file. It will allocate the global domain on
+    rank 0, so do not use for big problems for which the entire global
+    domain will not fit on one node. This approach is also not very
     scalable.
     + Needs HyPar to be compiled with Python.
-*/ 
+*/
 int PlotArraySerial(int     a_ndims,      /*!< Number of spatial dimensions */
                     int     a_nvars,      /*!< Number of variables per grid point */
                     int*    a_dim_global, /*!< Integer array of size a_ndims with global grid size in each dimension */
@@ -111,7 +111,7 @@ int PlotArraySerial(int     a_ndims,      /*!< Number of spatial dimensions */
                     a_dim_global,
                     a_dim_local,
                     a_ghosts,
-                    a_nvars ); 
+                    a_nvars );
   int offset_global, offset_local;
   offset_global = offset_local = 0;
   for (int d=0; d<a_ndims; d++) {

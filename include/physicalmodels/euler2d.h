@@ -2,7 +2,7 @@
 
   2D Euler Equations for Inviscid, Compressible Flows
 
-    
+
   d   [ rho   ]   d   [   rho*u    ]    d  [   rho*v   ]
   --  [ rho*u ] + --  [rho*u*u + p ] +  -- [  rho*u*v  ] = 0
   dt  [ rho*v ]   dx  [   rho*u*v  ]    dy [rho*v*v + p]

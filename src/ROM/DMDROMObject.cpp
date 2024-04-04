@@ -8,9 +8,9 @@
 #include <basic.h>
 #include <rom_object_dmd.h>
 
-/*! Constructor 
+/*! Constructor
     This function will also look into the file
-    \b librom.inp for DMD-specific options. 
+    \b librom.inp for DMD-specific options.
     Rank 0 reads in the inputs and broadcasts
     them to all the processors.\n\n
     The format of \b librom.inp is as follows:\n
@@ -30,7 +30,7 @@
     dmd_write_snapshot_mat | bool         | #DMDROMObject::m_write_snapshot_mat           | false
 
     Note: other keywords in this file may be read by other functions.
-   
+
 */
 DMDROMObject::DMDROMObject( const int     a_vec_size, /*!< vector size */
                             const double  a_dt,       /*!< time step size */
@@ -147,7 +147,7 @@ void DMDROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector *
       m_intervals[m_curr_win].second = a_time;
       int ncol = m_dmd[m_curr_win]->getSnapshotMatrix()->numColumns();
       if (!m_rank) {
-        printf( "DMDROMObject::train() - training DMD object %d for sim. domain %d, var %d with %d samples.\n", 
+        printf( "DMDROMObject::train() - training DMD object %d for sim. domain %d, var %d with %d samples.\n",
                 m_curr_win, m_sim_idx, m_var_idx, ncol );
       }
 
@@ -204,7 +204,7 @@ void DMDROMObject::train()
       if (!m_dmd_is_trained[i]) {
         int ncol = m_dmd[i]->getSnapshotMatrix()->numColumns();
         if (!m_rank) {
-          printf( "DMDROMObject::train() - training DMD object %d for sim. domain %d, var %d with %d samples.\n", 
+          printf( "DMDROMObject::train() - training DMD object %d for sim. domain %d, var %d with %d samples.\n",
                   m_curr_win, m_sim_idx, m_var_idx, ncol );
         }
         if (m_write_snapshot_mat) {
@@ -263,7 +263,7 @@ void DMDROMObject::save(const std::string& a_fname_root /*!< Filename root */) c
     std::string fname = fname_root + std::string(idx_string);
     std::string summary_fname = summary_fname_root + std::string(idx_string);
     if (!m_rank) {
-      printf( "  Saving DMD object and summary (%s, %s).\n", 
+      printf( "  Saving DMD object and summary (%s, %s).\n",
               fname.c_str(), summary_fname.c_str() );
     }
     m_dmd[i]->save(fname);
@@ -322,7 +322,7 @@ void DMDROMObject::load(const std::string& a_fname_root /*!< Filename root */)
     sprintf(idx_string, "%04d", i);
     std::string fname = fname_root + std::string(idx_string);
     if (!m_rank) {
-      printf( "  Loading DMD object (%s), time window=[%1.2e,%1.2e].\n", 
+      printf( "  Loading DMD object (%s), time window=[%1.2e,%1.2e].\n",
               fname.c_str(),
               m_intervals[i].first, m_intervals[i].second );
     }

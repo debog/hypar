@@ -9,7 +9,7 @@ void GetStringFromInteger(int a, char *A, int width)
 {
   int i;
   for (i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0'); 
+    char digit = (char) (a%10 + '0');
     a /= 10;
     A[width-1-i] = digit;
   }
@@ -25,10 +25,10 @@ double power(double x,double a)
 int main(){
   const double pi     = 4.0*atan(1.0);
   const double GAMMA  = 1.4;
-  
+
   int     *NI, *NJ, ndims, ns, nsims, n_iter;
   double  tf, dt;
-  char    ip_file_type[50]; 
+  char    ip_file_type[50];
   FILE    *in, *out;
 
   /* default values */
@@ -105,7 +105,7 @@ int main(){
     int i,j;
     double dx = 10.0 / ((double)Ni);
     double dy = 10.0 / ((double)Nj);
-  
+
     double *x, *y, *u0, *u1, *u2, *u3;
     x   = (double*) calloc (Ni   , sizeof(double));
     y   = (double*) calloc (Nj   , sizeof(double));
@@ -113,12 +113,12 @@ int main(){
     u1  = (double*) calloc (Ni*Nj, sizeof(double));
     u2  = (double*) calloc (Ni*Nj, sizeof(double));
     u3  = (double*) calloc (Ni*Nj, sizeof(double));
-  
+
     double u_inf = 0.5;
     double v_inf = 0.0;
     double b = u_inf;
     double x0, y0;
-  
+
     {
       /* Initial solution */
       x0 = 5.0, y0 = 5.0;
@@ -127,13 +127,13 @@ int main(){
           x[i] = i*dx;
           y[j] = j*dy;
           int p = Nj*i + j;
-    
+
           double rx, ry;
           rx = (x[i] - x0);
           ry = (y[j] - y0);
           if (rx < -5)      { rx += 10; }
           else if (rx > 5)  { rx -= 10; }
-    
+
           double rsq = rx*rx + ry*ry;
           double rho, u, v, P;
           double du, dv;
@@ -214,7 +214,7 @@ int main(){
         free(U);
         fclose(out);
       }
-    } 
+    }
 
 
     {
@@ -227,13 +227,13 @@ int main(){
           x[i] = i*dx;
           y[j] = j*dy;
           int p = Nj*i + j;
-    
+
           double rx, ry;
           rx = (x[i] - x0);
           ry = (y[j] - y0);
           if (rx < -5)      { rx += 10; }
           else if (rx > 5)  { rx -= 10; }
-    
+
           double rsq = rx*rx + ry*ry;
           double rho, u, v, P;
           double du, dv;
@@ -249,7 +249,7 @@ int main(){
           u3[p] = P/(GAMMA-1.0) + 0.5*rho*(u*u+v*v);
         }
       }
-      
+
       char fname[_MAX_STRING_SIZE_] = "exact";
       if (nsims > 1) {
         char index[_MAX_STRING_SIZE_];

@@ -4,18 +4,18 @@
  *
  * References:
  *
- * F.X. Giraldo, M. Restelli, and M. Laeuter, "Semi-Implicit 
- * Formulations of the Euler Equations: Applications to 
- * Nonhydrostatic Atmospheric Modeling", SIAM J. Sci. Comp., 
+ * F.X. Giraldo, M. Restelli, and M. Laeuter, "Semi-Implicit
+ * Formulations of the Euler Equations: Applications to
+ * Nonhydrostatic Atmospheric Modeling", SIAM J. Sci. Comp.,
  * Vol. 32, 3394-3425 (2010)
  *
- * J.F. Kelly and F.X. Giraldo, "Continuous and Discontinuous 
- * Galerkin Methods for a Scalable 3D Nonhydrostatic Atmospheric 
- * Model:  limited-area mode", J. Comp. Phys., Vol. 231, 7988-8008 
+ * J.F. Kelly and F.X. Giraldo, "Continuous and Discontinuous
+ * Galerkin Methods for a Scalable 3D Nonhydrostatic Atmospheric
+ * Model:  limited-area mode", J. Comp. Phys., Vol. 231, 7988-8008
  * (2012)
  *
- * N. Ahmad and J. Lindeman, "Euler solutions using flux-based wave 
- * decomposition", Intl. J. Num. Method. Fluid., Vol. 54 (1), 
+ * N. Ahmad and J. Lindeman, "Euler solutions using flux-based wave
+ * decomposition", Intl. J. Num. Method. Fluid., Vol. 54 (1),
  * 47-72 (2007)
  *
 */

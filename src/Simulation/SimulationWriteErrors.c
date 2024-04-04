@@ -38,7 +38,7 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
       strcpy(cons_fname,"conservation");
       strcpy(fc_fname,"function_counts");
 #ifdef with_librom
-      char rom_diff_fname[_MAX_STRING_SIZE_]; 
+      char rom_diff_fname[_MAX_STRING_SIZE_];
       strcpy(rom_diff_fname,"pde_rom_diff");
 #endif
 
@@ -70,7 +70,7 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
       strcat(rom_diff_fname,".dat");
 #endif
 
-      FILE *out; 
+      FILE *out;
       /* write out solution errors and wall times to file */
       out = fopen(err_fname,"w");
       for (int d=0; d<sim[n].solver.ndims; d++) fprintf(out,"%4d ",sim[n].solver.dim_global[d]);

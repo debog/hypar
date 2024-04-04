@@ -4,7 +4,7 @@
   Model: ShallowWater2D
 
   References:
-  Zhu, Et. al., "Variational Data Assimilation with a Variable Resolution 
+  Zhu, Et. al., "Variational Data Assimilation with a Variable Resolution
   Finite-Element Shallow-Water Equations Model", Monthly Weather Review,
   122, 1994, pp. 946--965
   http://dx.doi.org/10.1175/1520-0493(1994)122%3C0946:VDAWAV%3E2.0.CO;2
@@ -38,7 +38,7 @@ double hfunction(double x,double y) {
 
 int main(){
   int   NI = 15, NJ = 12, ndims = 2;
-  char  ip_file_type[50]; 
+  char  ip_file_type[50];
   strcpy(ip_file_type,"ascii");
 
   FILE *in;

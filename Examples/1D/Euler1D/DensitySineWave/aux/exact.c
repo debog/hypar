@@ -14,7 +14,7 @@
 
 
 int main() {
-  
+
   int     NI,ndims,niter;
   double  dt, pi = 4.0*atan(1.0), gamma = 1.4;
   FILE    *in, *out;
@@ -75,11 +75,11 @@ int main() {
   out = fopen("exact.inp","w");
   for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
   fprintf(out,"\n");
-  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rho[i]);            
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rho[i]);
   fprintf(out,"\n");
-  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rhou[i]);            
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rhou[i]);
   fprintf(out,"\n");
-  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",e[i]);            
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",e[i]);
   fprintf(out,"\n");
   fclose(out);
 
@@ -93,11 +93,11 @@ int main() {
   out = fopen("initial.inp","w");
   for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
   fprintf(out,"\n");
-  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rho[i]);            
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rho[i]);
   fprintf(out,"\n");
-  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rhou[i]);            
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rhou[i]);
   fprintf(out,"\n");
-  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",e[i]);            
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",e[i]);
   fprintf(out,"\n");
   fclose(out);
 

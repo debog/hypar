@@ -11,7 +11,7 @@ double power(double x,double a)
 int main(){
   double pi     = 4.0*atan(1.0);
   double GAMMA  = 1.4;
-  
+
   int NI,NJ,ndims;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");

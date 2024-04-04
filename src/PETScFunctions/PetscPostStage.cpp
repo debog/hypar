@@ -16,7 +16,7 @@
 PetscErrorCode PetscPostStage(  TS        ts,         /*!< Time integrator of PETSc type TS */
                                 PetscReal stagetime,  /*!< Current stage time */
                                 PetscInt  stageindex, /*!< Stage */
-                                Vec       *Y          /*!< Stage solutions (all stages) - 
+                                Vec       *Y          /*!< Stage solutions (all stages) -
                                                            be careful what you access */ )
 {
   PETScContext* context(nullptr);
@@ -44,14 +44,14 @@ PetscErrorCode PetscPostStage(  TS        ts,         /*!< Time integrator of PE
 
     HyPar* solver = &(sim[ns].solver);
     MPIVariables* mpi = &(sim[ns].mpi);
-  
+
     /* get solution */
     TransferVecFromPETSc(solver->u,Y[stageindex],context,ns,context->offsets[ns]);
-  
+
     /* apply immersed boundaries */
     solver->ApplyIBConditions(solver,mpi,solver->u,stagetime);
-  
-    /* If using a non-linear scheme with ARKIMEX methods, 
+
+    /* If using a non-linear scheme with ARKIMEX methods,
        compute the non-linear finite-difference operator */
     if (!strcmp(time_scheme,TSARKIMEX)) {
       solver->NonlinearInterp(  solver->u,
@@ -60,12 +60,12 @@ PetscErrorCode PetscPostStage(  TS        ts,         /*!< Time integrator of PE
                                 (double)stagetime,
                                 solver->FFunction );
     }
-  
+
     /* Call any physics-specific post-stage function, if available */
     if (solver->PostStage) {
       solver->PostStage(solver->u,solver,mpi,stagetime);
     }
-  
+
     TransferVecToPETSc(solver->u,Y[stageindex],context,ns,context->offsets[ns]);
 
   }

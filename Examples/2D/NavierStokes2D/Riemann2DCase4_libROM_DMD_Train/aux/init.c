@@ -5,7 +5,7 @@
 
 
 int main(){
-  
+
   double GAMMA  = 1.4;
   int NI=101,NJ=101,ndims=2;
   char ip_file_type[50];

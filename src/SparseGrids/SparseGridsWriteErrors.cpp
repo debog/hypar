@@ -20,34 +20,34 @@ void SparseGridsSimulation::WriteErrors(double solver_runtime,  /*!< Measured ru
     /* Write sparse grids stuff, if asked for */
     if (m_print_sg_errors == 1) {
       for (int n = 0; n < m_nsims_sg; n++) {
-  
+
         char  err_fname[_MAX_STRING_SIZE_],
               cons_fname[_MAX_STRING_SIZE_],
               fc_fname[_MAX_STRING_SIZE_];
-  
+
         strcpy(err_fname, "errors");
         strcpy(cons_fname,"conservation");
         strcpy(fc_fname,  "function_counts");
-  
+
         if (m_nsims_sg > 1) {
-  
+
           strcat(err_fname,"_");
           strcat(cons_fname,"_");
           strcat(fc_fname,"_");
-  
+
           char index[_MAX_STRING_SIZE_];
           GetStringFromInteger(n, index, (int)log10(m_nsims_sg)+1);
-  
+
           strcat(err_fname,index);
           strcat(cons_fname,index);
           strcat(fc_fname,index);
         }
-  
+
         strcat(err_fname,".dat");
         strcat(cons_fname,".dat");
         strcat(fc_fname,".dat");
-  
-        FILE *out; 
+
+        FILE *out;
         /* write out solution errors and wall times to file */
         int d;
         out = fopen(err_fname,"w");
@@ -78,7 +78,7 @@ void SparseGridsSimulation::WriteErrors(double solver_runtime,  /*!< Measured ru
         fprintf(out,"%d\n",m_sims_sg[n].solver.count_IJacFunction);
   #endif
         fclose(out);
-  
+
         /* print solution errors, conservation errors, and wall times to screen */
         if (m_sims_sg[n].solver.error[0] >= 0) {
           printf("Computed errors for sparse grids domain %d:\n", n);
@@ -91,7 +91,7 @@ void SparseGridsSimulation::WriteErrors(double solver_runtime,  /*!< Measured ru
           for (d=0; d<m_sims_sg[n].solver.nvars; d++) printf("\t%1.16E\n",m_sims_sg[n].solver.ConservationError[d]);
           printf("\n");
         }
-  
+
       }
     }
 
@@ -101,7 +101,7 @@ void SparseGridsSimulation::WriteErrors(double solver_runtime,  /*!< Measured ru
       strcpy(err_fname,"errors_fg");
       strcat(err_fname,".dat");
 
-      FILE *out; 
+      FILE *out;
       /* write out solution errors and wall times to file */
       int d;
       out = fopen(err_fname,"w");

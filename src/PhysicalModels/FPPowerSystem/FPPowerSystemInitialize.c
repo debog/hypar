@@ -20,7 +20,7 @@ int    FPPowerSystemPrintStep         (void*,void*,double);
 int FPPowerSystemInitialize(void *s,void *m)
 {
   HyPar           *solver  = (HyPar*)         s;
-  MPIVariables    *mpi     = (MPIVariables*)  m; 
+  MPIVariables    *mpi     = (MPIVariables*)  m;
   FPPowerSystem   *physics = (FPPowerSystem*) solver->physics;
   int             ferr;
   _DECLARE_IERR_;
@@ -103,7 +103,7 @@ int FPPowerSystemInitialize(void *s,void *m)
   /* Calculate and print the PDF integral of the initial solution */
   IERR FPPowerSystemPostStep(solver->u,solver,mpi,0.0,0);      CHECKERR(ierr);
   if (!mpi->rank) IERR FPPowerSystemPrintStep(solver,mpi,0.0); CHECKERR(ierr);
-  
+
   count++;
   return(0);
 }

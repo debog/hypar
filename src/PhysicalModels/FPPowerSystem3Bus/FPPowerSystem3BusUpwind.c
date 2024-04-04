@@ -10,9 +10,9 @@
 
 int FPPowerSystem3BusDriftFunction(int,void*,double*,double,double*);
 
-/*! Compute the upwind flux at the interface, based on the drift velocity 
+/*! Compute the upwind flux at the interface, based on the drift velocity
     at that interface, from the left and right biased approximations to the
-    interface flux. The drift (advection) velocity is multiplied to the 
+    interface flux. The drift (advection) velocity is multiplied to the
     solution in this function to get the advective flux.
 */
 int FPPowerSystem3BusUpwind(
@@ -77,7 +77,7 @@ int FPPowerSystem3BusUpwind(
         x[3] = 0.5 * ( x1 + x2 );
       }
       FPPowerSystem3BusDriftFunction(dir,params,x,t,drift);
-      for (v = 0; v < nvars; v++)  
+      for (v = 0; v < nvars; v++)
         fI[nvars*p+v] = drift[dir] * (drift[dir] > 0 ? fL[nvars*p+v] : fR[nvars*p+v] );
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);

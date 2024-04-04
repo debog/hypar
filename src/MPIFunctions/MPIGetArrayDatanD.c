@@ -14,8 +14,8 @@
   array must be stored in the memory as a single-index array as described in the documentation of MPIExchangeBoundariesnD().
   The \a source rank sends to the \a dest rank a logically rectangular n-dimensional portion of its local copy of
   an array \a x. The extent of this logically rectangular portion is defined by \a limits.
-  + \a limits is an array of size 2x the number of spatial dimensions, with elements as: 
-    [ is[0], ie[0], is[1], ie[1], ..., is[ndims-1], ie[ndims-1] ], where is[n] is the starting index along 
+  + \a limits is an array of size 2x the number of spatial dimensions, with elements as:
+    [ is[0], ie[0], is[1], ie[1], ..., is[ndims-1], ie[ndims-1] ], where is[n] is the starting index along
     spatial dimension n, and ie[n] is the end index (+1) along spatial dimension n.
 */
 int MPIGetArrayDatanD(
@@ -23,7 +23,7 @@ int MPIGetArrayDatanD(
                         double  *x,       /*!< local array of which a part is needed */
                         int     *source,  /*!< MPI rank of the source */
                         int     *dest,    /*!< MPI rank of the destination */
-                        int     *limits,  /*!< Integer array (of size 2*ndims) with the start and end indices 
+                        int     *limits,  /*!< Integer array (of size 2*ndims) with the start and end indices
                                                along each spatial dimension of the desired portion of the array */
                         int     *dim,     /*!< Integer array whose elements are the local size of x in each spatial dimension */
                         int     ghosts,   /*!< Number of ghost points */

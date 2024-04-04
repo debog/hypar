@@ -4,7 +4,7 @@
 #include <string.h>
 
 int main(){
-  
+
   int NI=101,ndims=1;
   FILE *in;
   char ip_file_type[50];
@@ -23,7 +23,7 @@ int main(){
         else if (!strcmp(word, "size")) fscanf(in,"%d",&NI);
         else if (!strcmp(word, "ip_file_type")) fscanf(in,"%s",ip_file_type);
       }
-    } else { 
+    } else {
       printf("Error: Illegal format in solver.inp. Crash and burn!\n");
     }
   }
@@ -65,11 +65,11 @@ int main(){
     out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
     fprintf(out,"\n");
-    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",rho[i]);            
+    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",rho[i]);
     fprintf(out,"\n");
-    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",rhou[i]);            
+    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",rhou[i]);
     fprintf(out,"\n");
-    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",e[i]);            
+    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",e[i]);
     fprintf(out,"\n");
     fclose(out);
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {

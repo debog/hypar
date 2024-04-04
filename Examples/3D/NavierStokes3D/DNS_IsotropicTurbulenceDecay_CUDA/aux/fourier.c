@@ -1,15 +1,15 @@
 /*
   This code computes the energy spectrum of a 3D compressible flow
   solution.
- 
+
   + The grid dimensions must be the same in all three dimensions.
   + The solution must be in HyPar's binary solution format.
   + This code looks for "op.bin"; if the simulation was unsteady with
     multiple "op_<idx>.bin" files, create a symbolic link named "op.bin"
-    pointing to the specific "op_<idx>.bin" solution file for which the 
+    pointing to the specific "op_<idx>.bin" solution file for which the
     spectrum should be computed.
- 
-  This code requires the FFTW3 library (https://www.fftw.org/). Make sure 
+
+  This code requires the FFTW3 library (https://www.fftw.org/). Make sure
   the fftw3.h and libfftw3 are available in the include and linking paths.
 */
 
@@ -18,14 +18,14 @@
 #include <math.h>
 #include <fftw3.h>
 
-void fourierTransform(  const long N, 
+void fourierTransform(  const long N,
                         double* const uu,
                         fftw_complex* const uhat )
 {
   long i,j,k;
   long N3 = N*N*N;
 
-  fftw_complex *u = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
+  fftw_complex *u = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));
   fftw_plan transform_u;
   transform_u = fftw_plan_dft_3d(N, N, N, u, uhat, -1, FFTW_MEASURE);
 
@@ -82,11 +82,11 @@ void energySpectrum(const long N,
         else    ksq = k*k;
         double kk = sqrt(isq + jsq + ksq);
         freq[(int)kk] = kk;
-        Eng[(int)kk] = Eng[(int)kk] 
+        Eng[(int)kk] = Eng[(int)kk]
           + 0.5 * ( (uhat[p][0]*uhat[p][0] + uhat[p][1]*uhat[p][1])
                   + (vhat[p][0]*vhat[p][0] + vhat[p][1]*vhat[p][1])
                   + (what[p][0]*what[p][0] + what[p][1]*what[p][1]) );
-        total_energy = total_energy 
+        total_energy = total_energy
           + 0.5 * ( (uhat[p][0]*uhat[p][0] + uhat[p][1]*uhat[p][1])
                   + (vhat[p][0]*vhat[p][0] + vhat[p][1]*vhat[p][1])
                   + (what[p][0]*what[p][0] + what[p][1]*what[p][1]) );
@@ -262,17 +262,17 @@ int main()
     printf("Taylor microscales: %1.16E, %1.16E, %1.16E\n",
            TaylorMicroscale[0],TaylorMicroscale[1],TaylorMicroscale[2]);
 
-    fftw_complex *uhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
+    fftw_complex *uhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));
     printf("Computing Fourier transform (u).\n");
     fourierTransform( N, u, uhat );
     free(u);
 
-    fftw_complex *vhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
+    fftw_complex *vhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));
     printf("Computing Fourier transform (v).\n");
     fourierTransform( N, v, vhat );
     free(v);
 
-    fftw_complex *what = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
+    fftw_complex *what = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));
     printf("Computing Fourier transform (w).\n");
     fourierTransform( N, w, what );
     free(w);
@@ -288,6 +288,6 @@ int main()
     printf("Error: Unsupported output file type. Use binary output only!\n");
 
   }
- 
+
   return(0);
 }

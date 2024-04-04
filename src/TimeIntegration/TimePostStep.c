@@ -77,7 +77,7 @@ int TimePostStep(void *ts /*!< Object of type #TimeIntegration */)
   if (!sim[0].solver.use_gpu) {
 #endif
     for (ns = 0; ns < nsims; ns++) {
-  
+
       if (!strcmp(sim[ns].solver.ConservationCheck,"yes")) {
         /* calculate volume integral of the solution at this time step */
         IERR sim[ns].solver.VolumeIntegralFunction( sim[ns].solver.VolumeIntegral,
@@ -91,11 +91,11 @@ int TimePostStep(void *ts /*!< Object of type #TimeIntegration */)
         IERR sim[ns].solver.CalculateConservationError( &(sim[ns].solver),
                                                         &(sim[ns].mpi)); CHECKERR(ierr);
       }
-  
-      if (sim[ns].solver.PostStep) { 
+
+      if (sim[ns].solver.PostStep) {
         sim[ns].solver.PostStep(sim[ns].solver.u,&(sim[ns].solver),&(sim[ns].mpi),TS->waqt,TS->iter);
       }
-  
+
     }
 #if defined(HAVE_CUDA)
   }

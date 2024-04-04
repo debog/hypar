@@ -13,7 +13,7 @@
 #include <timeintegration.h>
 
 /*!
-  Clean up all allocations related to time integration 
+  Clean up all allocations related to time integration
 */
 int TimeCleanup(void *ts /*!< Object of type #TimeIntegration*/)
 {

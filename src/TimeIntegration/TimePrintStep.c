@@ -10,7 +10,7 @@
 #include <timeintegration.h>
 
 /*!
-  Print information to screen (also calls any physics-specific 
+  Print information to screen (also calls any physics-specific
   printing function, if defined).
 */
 int TimePrintStep(void *ts /*!< Object of type #TimeIntegration */)

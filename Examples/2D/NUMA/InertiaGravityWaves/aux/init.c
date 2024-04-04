@@ -9,7 +9,7 @@ double raiseto(double x, double a)
 }
 
 int main(){
-  
+
   int NI,NK,ndims;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");

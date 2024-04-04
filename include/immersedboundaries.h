@@ -25,26 +25,26 @@
 
 /*! \def Facet3D
     \brief Structure defining a facet.
-    
+
     A "facet" is the basic unit of a tessellated surface in 3D: It is a triangle
     in an unstructured triangulated surface, defined by its vertices and surface
     normal. \sa https://en.wikipedia.org/wiki/STL_(file_format)
 */
 /*!\brief Structure defining a facet.
-    
+
     A "facet" is the basic unit of a tessellated surface in 3D: It is a triangle
     in an unstructured triangulated surface, defined by its vertices and surface
     normal. \sa https://en.wikipedia.org/wiki/STL_(file_format)
 */
 typedef struct _facet_3d_{
   double x1, /*!< x-coordinate of vertex 1 */
-         x2, /*!< x-coordinate of vertex 2 */ 
+         x2, /*!< x-coordinate of vertex 2 */
          x3, /*!< x-coordinate of vertex 3 */
          y1, /*!< y-coordinate of vertex 1 */
-         y2, /*!< y-coordinate of vertex 2 */ 
+         y2, /*!< y-coordinate of vertex 2 */
          y3, /*!< y-coordinate of vertex 3 */
          z1, /*!< z-coordinate of vertex 1 */
-         z2, /*!< z-coordinate of vertex 2 */ 
+         z2, /*!< z-coordinate of vertex 2 */
          z3, /*!< z-coordinate of vertex 3 */
          nx, /*!< x-component of surface normal */
          ny, /*!< y-component of surface normal */
@@ -87,13 +87,13 @@ typedef struct _facet_map_{
 /*! \def Body3D
     \brief Structure defining a body.
 
-    A 3D body whose surface is represented as a collection 
+    A 3D body whose surface is represented as a collection
     of faces of type #Facet3D.
     \sa https://en.wikipedia.org/wiki/STL_(file_format)
 */
 /*! \brief Structure defining a body.
 
-    A 3D body whose surface is represented as a collection 
+    A 3D body whose surface is represented as a collection
     of faces of type #Facet3D.
     \sa https://en.wikipedia.org/wiki/STL_(file_format)
 */

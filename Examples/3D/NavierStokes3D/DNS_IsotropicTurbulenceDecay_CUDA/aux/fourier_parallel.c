@@ -1,20 +1,20 @@
 /*
   This code computes the energy spectrum of a 3D compressible flow
   solution.
- 
+
   + The grid dimensions must be the same in all three dimensions.
- 
+
   + The solution must be in HyPar's binary solution format written out
     through the parallel mode (op.bin.xxxx).
- 
-  For unsteady output, the code will write out text files containing 
+
+  For unsteady output, the code will write out text files containing
   energy spectrum at each output time step (one file for each time step).
   spectrum_xxxxx.dat
 
   For steady output, the code will write out one ASCII text containing
   the energy spectrum, spectrum.dat.
 
-  This code requires the FFTW3 library (https://www.fftw.org/). Make sure 
+  This code requires the FFTW3 library (https://www.fftw.org/). Make sure
   the fftw3.h and libfftw3 are available in the include and linking paths.
 */
 
@@ -60,14 +60,14 @@
     } \
   }
 
-void fourierTransform(  const long N, 
+void fourierTransform(  const long N,
                         double* const uu,
                         fftw_complex* const uhat )
 {
   long i,j,k;
   long N3 = N*N*N;
 
-  fftw_complex *u = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
+  fftw_complex *u = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));
   fftw_plan transform_u;
   transform_u = fftw_plan_dft_3d(N, N, N, u, uhat, -1, FFTW_MEASURE);
 
@@ -125,11 +125,11 @@ void energySpectrum(const long N,
         else    ksq = k*k;
         double kk = sqrt(isq + jsq + ksq);
         freq[(int)kk] = kk;
-        Eng[(int)kk] = Eng[(int)kk] 
+        Eng[(int)kk] = Eng[(int)kk]
           + 0.5 * ( (uhat[p][0]*uhat[p][0] + uhat[p][1]*uhat[p][1])
                   + (vhat[p][0]*vhat[p][0] + vhat[p][1]*vhat[p][1])
                   + (what[p][0]*what[p][0] + what[p][1]*what[p][1]) );
-        total_energy = total_energy 
+        total_energy = total_energy
           + 0.5 * ( (uhat[p][0]*uhat[p][0] + uhat[p][1]*uhat[p][1])
                   + (vhat[p][0]*vhat[p][0] + vhat[p][1]*vhat[p][1])
                   + (what[p][0]*what[p][0] + what[p][1]*what[p][1]) );
@@ -153,7 +153,7 @@ void GetStringFromInteger(int a,char *A,int width)
 {
   int i;
   for (i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0'); 
+    char digit = (char) (a%10 + '0');
     a /= 10;
     A[width-1-i] = digit;
   }
@@ -226,7 +226,7 @@ int MPIPartition1D(int nglobal,int nproc,int rank)
   return(nlocal);
 }
 
-int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie) 
+int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie)
 {
   int i;
   int ip[ndims];
@@ -330,17 +330,17 @@ void computeEnergySpectrum( const int NI,
   printf("  Taylor microscales: %1.16E, %1.16E, %1.16E\n",
          TaylorMicroscale[0],TaylorMicroscale[1],TaylorMicroscale[2]);
 
-  fftw_complex *uhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
+  fftw_complex *uhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));
   printf("  Computing Fourier transform (u).\n");
   fourierTransform( N, u, uhat );
   free(u);
 
-  fftw_complex *vhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
+  fftw_complex *vhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));
   printf("  Computing Fourier transform (v).\n");
   fourierTransform( N, v, vhat );
   free(v);
 
-  fftw_complex *what = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
+  fftw_complex *what = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));
   printf("  Computing Fourier transform (w).\n");
   fourierTransform( N, w, what );
   free(w);
@@ -444,7 +444,7 @@ int main()
     if (!inps[IORank]) {
       printf("Error: Could not open %s for reading.\n",filename);
       return(0);
-    }    
+    }
   }
 
   int nproc = 1;
@@ -517,7 +517,7 @@ int main()
           free(Ul);
         }
       }
-     
+
       /* compute kinetic energy spectrum */
       computeEnergySpectrum( dim_global[0], Ug, Vg, Wg, out_filename);
 
@@ -530,7 +530,7 @@ int main()
         else fseek(inps[IORank],-sizeof(char),SEEK_CUR);
       }
     }
-    
+
   } else {
 
     /* for steady solution */
@@ -589,7 +589,7 @@ int main()
         free(Ul);
       }
     }
-     
+
     /* compute kinetic energy spectrum */
     computeEnergySpectrum( dim_global[0], Ug, Vg, Wg, out_filename);
 

@@ -22,7 +22,7 @@ static int CountBoundaryPoints(
                                                      grid points outside. */
                               )
 {
-  static int dim[_IB_NDIMS_], indexC[_IB_NDIMS_], indexN[_IB_NDIMS_], 
+  static int dim[_IB_NDIMS_], indexC[_IB_NDIMS_], indexN[_IB_NDIMS_],
              i, j, k, p, q, count;
   dim[0] = imax;
   dim[1] = jmax;
@@ -89,7 +89,7 @@ static int SetBoundaryPoints(
                             )
 {
   IBNode *boundary = (IBNode*) b;
-  static int dim[_IB_NDIMS_], indexC[_IB_NDIMS_], indexN[_IB_NDIMS_], 
+  static int dim[_IB_NDIMS_], indexC[_IB_NDIMS_], indexN[_IB_NDIMS_],
              i, j, k, p, q, count;
   dim[0] = imax;
   dim[1] = jmax;

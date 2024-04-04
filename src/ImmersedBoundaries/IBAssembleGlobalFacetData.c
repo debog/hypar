@@ -12,7 +12,7 @@
 /*! Assemble any local data computed at immersed body surface (facet centroids)
  *  into a global array.
  *
- *  The local array *must* be of length 
+ *  The local array *must* be of length
  *  (#ImmersedBoundary::nfacets_local X nvars).
  *
  *  The global array must be NULL at input; it will have the size
@@ -26,7 +26,7 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
                               int                 nvars       /*!< Number of components in var */
                              )
 {
-  MPIVariables     *mpi = (MPIVariables*) m; 
+  MPIVariables     *mpi = (MPIVariables*) m;
   ImmersedBoundary *IB  = (ImmersedBoundary*) ib;
 
   if ((*global_var) != NULL) {
@@ -90,7 +90,7 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
           _ArrayAXPY_((var_incoming+n), 1.0, ((*global_var)+indices_incoming[n]), nvars);
           check[indices_incoming[n]]++;
         }
-        
+
         free(indices_incoming);
         free(var_incoming);
       }

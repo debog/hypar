@@ -6,7 +6,7 @@
 
 int main()
 {
-  
+
   const double  GAMMA  = 1.4;
   int           NI,NJ,NK,ndims;
   char          ip_file_type[50];
@@ -60,7 +60,7 @@ int main()
 
   double  u   = 0.1,
           v   = 0.0,
-          w   = 0.0, 
+          w   = 0.0,
           rho = 1.0,
           P   = 1.0/GAMMA;
 
@@ -75,21 +75,21 @@ int main()
 
   x[NI/8]   = -Lx/4;
   x[7*NI/8] = 3*Lx/4;
-  dx = Lx / ((double)(6*NI/8-1)); 
+  dx = Lx / ((double)(6*NI/8-1));
   for (i = NI/8  ; i < 7*NI/8; i++) x[i] = x[NI/8] + dx * (i-NI/8);
   for (i = 7*NI/8; i < NI    ; i++)  x[i] = x[i-1] + sf_x2 * (x[i-1] - x[i-2]);
   for (i = NI/8-1; i >= 0    ; i--) x[i] = x[i+1] - sf_x1 * (x[i+2] - x[i+1]);
 
   y[NJ/8]   = -Ly/2;
   y[7*NJ/8] =  Ly/2;
-  dy = Ly / ((double)(6*NJ/8-1)); 
+  dy = Ly / ((double)(6*NJ/8-1));
   for (j = NJ/8  ; j < 7*NJ/8; j++) y[j] = y[NJ/8] + dy * (j-NJ/8);
   for (j = 7*NJ/8; j < NJ    ; j++)  y[j] = y[j-1] + sf_y * (y[j-1] - y[j-2]);
   for (j = NJ/8-1; j >= 0    ; j--)  y[j] = y[j+1] - sf_y * (y[j+2] - y[j+1]);
 
   z[NK/8]   = -Lz/2;
   z[7*NK/8] =  Lz/2;
-  dz = Lz / ((double)(6*NK/8-1)); 
+  dz = Lz / ((double)(6*NK/8-1));
   for (k = NK/8  ; k < 7*NK/8; k++) z[k] = z[NK/8] + dz * (k-NK/8);
   for (k = 7*NK/8; k < NK    ; k++)  z[k] = z[k-1] + sf_z * (z[k-1] - z[k-2]);
   for (k = NK/8-1; k >= 0    ; k--)  z[k] = z[k+1] - sf_z * (z[k+2] - z[k+1]);

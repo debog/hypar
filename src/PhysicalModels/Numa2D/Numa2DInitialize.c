@@ -25,7 +25,7 @@ void   Numa2DCalculateStandardAtmosphere_2(void*,double,double*,double*,double*,
 int Numa2DInitialize(void *s,void *m)
 {
   HyPar           *solver  = (HyPar*)         s;
-  MPIVariables    *mpi     = (MPIVariables*)  m; 
+  MPIVariables    *mpi     = (MPIVariables*)  m;
   Numa2D          *physics = (Numa2D*)        solver->physics;
   int             ferr     = 0;
 
@@ -41,7 +41,7 @@ int Numa2DInitialize(void *s,void *m)
   }
 
   /* default values */
-  physics->gamma  = 1.4; 
+  physics->gamma  = 1.4;
   physics->R      = 287.058;        /* J kg^{-1} K^{-1} */
   physics->g      = 9.8;            /* m s^{-2}         */
   physics->mu     = 0.0;            /* m^2 s^{-1}       */
@@ -66,7 +66,7 @@ int Numa2DInitialize(void *s,void *m)
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
           ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-          if (!strcmp(word, "gamma")) { 
+          if (!strcmp(word, "gamma")) {
             ferr = fscanf(in,"%lf",&physics->gamma); if (ferr != 1) return(1);
           } else if (!strcmp(word,"R")) {
             ferr = fscanf(in,"%lf",&physics->R); if (ferr != 1) return(1);
@@ -122,7 +122,7 @@ int Numa2DInitialize(void *s,void *m)
   CHECKERR(ierr);
 
   /* initializing physical model-specific functions */
-  if (!strcmp(solver->SplitHyperbolicFlux,"yes")) 
+  if (!strcmp(solver->SplitHyperbolicFlux,"yes"))
     solver->dFFunction    = Numa2DStiffFlux;
   else solver->dFFunction = NULL;
   solver->FFunction       = Numa2DFlux;
@@ -130,7 +130,7 @@ int Numa2DInitialize(void *s,void *m)
   solver->SFunction       = Numa2DSource;
   if (!strcmp(physics->upwind,_RUSANOV_UPWINDING_)) {
     solver->Upwind        = Numa2DRusanovFlux;
-    if (!strcmp(solver->SplitHyperbolicFlux,"yes")) 
+    if (!strcmp(solver->SplitHyperbolicFlux,"yes"))
       solver->UpwinddF    = Numa2DRusanovLinearFlux;
     else solver->UpwinddF = NULL;
   } else {
@@ -144,7 +144,7 @@ int Numa2DInitialize(void *s,void *m)
   for (n = 0; n < solver->nBoundaryZones; n++)  boundary[n].gamma = physics->gamma;
 
   /* finally, hijack the main solver's dissipation function pointer
-   * to this model's own function, since it's difficult to express 
+   * to this model's own function, since it's difficult to express
    * the dissipation terms in the general form                      */
   solver->ParabolicFunction = Numa2DParabolicFunction;
 

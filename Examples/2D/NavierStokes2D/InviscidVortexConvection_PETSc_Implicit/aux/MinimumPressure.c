@@ -1,9 +1,9 @@
 /*
  * This code extracts the minimum pressure and density at
- * the vortex core as a function of time for an unsteady 
+ * the vortex core as a function of time for an unsteady
  * simulation.
- * Output files have to be binary, and they can't be 
- * overwritten; i.e., it needs files named as 
+ * Output files have to be binary, and they can't be
+ * overwritten; i.e., it needs files named as
  * op_xxxxx.bin
 */
 
@@ -134,7 +134,7 @@ int main()
         p = 0.4 * (e - 0.5*rho*(u*u+v*v));
 
         if (!q) { min_p = p; min_rho = rho; }
-        
+
         if (rho < min_rho) min_rho = rho;
         if (p   < min_p  ) min_p   = p;
       }

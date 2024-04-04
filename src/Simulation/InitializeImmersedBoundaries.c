@@ -81,17 +81,17 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
     }
     /* send the global grid to other ranks */
     MPIBroadcast_double(Xg,size,0,&mpi->world);
-  
+
     /* identify whether this is a 3D or "pseudo-2D" simulation */
     IBIdentifyMode(Xg,dim_global,solver->ib);
-  
+
     /* identify grid points inside the immersed body */
     int count_inside_body = 0;
     count = IBIdentifyBody(solver->ib,dim_global,dim_local,ghosts,mpi,Xg,solver->iblank);
     MPISum_integer(&count_inside_body,&count,1,&mpi->world);
     free(Xg);
 
-    /* At ghost points corresponding to the physical boundary, extrapolate from the interior 
+    /* At ghost points corresponding to the physical boundary, extrapolate from the interior
        (this should also work for bodies that are adjacent to physical boundaries). At interior
        (MPI) boundaries, exchange iblank across MPI ranks.
     */
@@ -125,12 +125,12 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
       }
     }
     MPIExchangeBoundariesnD(ndims,1,dim_local,ghosts,mpi,solver->iblank);
-  
+
     /* identify and create a list of immersed boundary points on each rank */
     int count_boundary_points = 0;
     count = IBIdentifyBoundary(solver->ib,mpi,dim_local,ghosts,solver->iblank);
     MPISum_integer(&count_boundary_points,&count,1,&mpi->world);
-  
+
     /* find the nearest facet for each immersed boundary point */
     double ld = 0, xmin, xmax, ymin, ymax, zmin, zmax;
     _GetCoordinate_(0,0             ,dim_local,ghosts,solver->x,xmin);
@@ -160,7 +160,7 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
               count, mpi->rank);
       return(count);
     }
-  
+
     /* Create facet mapping */;
     count = IBCreateFacetMapping(ib,mpi,solver->x,dim_local,ghosts);
     if (count) {
@@ -169,7 +169,7 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
               count, mpi->rank);
       return(count);
     }
-    
+
     /* Done */
     if (!mpi->rank) {
       double percentage;

@@ -84,7 +84,7 @@ int NavierStokes2DSource(
       _ArrayIndex1D_(ndims,dim_interface,index2,0     ,p2);
 
       double dx_inverse; _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,dxinv,dx_inverse);
-      double rho, uvel, vvel, e, P; 
+      double rho, uvel, vvel, e, P;
       _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,uvel,vvel,e,P,param->gamma);
       double term[_MODEL_NVARS_] = {0.0, rho*RT, 0.0, rho*RT*uvel};
       for (v=0; v<_MODEL_NVARS_; v++) {
@@ -118,7 +118,7 @@ int NavierStokes2DSource(
       _ArrayIndex1D_(ndims,dim_interface,index2,0     ,p2);
 
       double dy_inverse; _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,dxinv,dy_inverse);
-      double rho, uvel, vvel, e, P; 
+      double rho, uvel, vvel, e, P;
       _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,uvel,vvel,e,P,param->gamma);
       double term[_MODEL_NVARS_] = {0.0, 0.0, rho*RT, rho*RT*vvel};
       for (v=0; v<_MODEL_NVARS_; v++) {

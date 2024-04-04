@@ -9,7 +9,7 @@ void GetStringFromInteger(int a, char *A, int width)
 {
   int i;
   for (i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0'); 
+    char digit = (char) (a%10 + '0');
     a /= 10;
     A[width-1-i] = digit;
   }
@@ -70,7 +70,7 @@ int main()
     } else printf("Error: Illegal format in solver.inp. Crash and burn!\n");
   }
   fclose(in);
-    
+
   char fname[_MAX_STRING_SIZE_] = "initial";
   char adv_fname_root[_MAX_STRING_SIZE_] = "none";
   int flag = 0;
@@ -134,36 +134,36 @@ int main()
 
     int i;
     double dx = 1.0 / ((double)N);
-  
+
     double *x, *u, *a;
     x = (double*) calloc (N, sizeof(double));
     u = (double*) calloc (N, sizeof(double));
     a = (double*) calloc (N, sizeof(double));
-  
+
     for (i = 0; i < N; i++) {
       x[i] = i*dx;
       u[i] = sin(2*pi*x[i]);
       a[i] = 1.0 + 0.5*sin(2*pi*x[i])*sin(2*pi*x[i]);
     }
-  
+
     FILE *out;
-  
+
     if (!strcmp(ip_file_type,"ascii")) {
       printf("Writing ASCII initial solution file %s\n", fname);
       out = fopen(fname,"w");
       for (i = 0; i < N; i++)  fprintf(out,"%lf ",x[i]);
       fprintf(out,"\n");
-      for (i = 0; i < N; i++)  fprintf(out,"%lf ",u[i]);            
+      for (i = 0; i < N; i++)  fprintf(out,"%lf ",u[i]);
       fprintf(out,"\n");
       fclose(out);
       printf("Writing ASCII advection field file %s\n", adv_filename);
       out = fopen(adv_filename,"w");
       for (i = 0; i < N; i++)  fprintf(out,"%1.16E ",x[i]);
       fprintf(out,"\n");
-      for (i = 0; i < N; i++)  fprintf(out,"%1.16E ",a[i]);            
+      for (i = 0; i < N; i++)  fprintf(out,"%1.16E ",a[i]);
       fprintf(out,"\n");
       fclose(out);
-    } else if (     (!strcmp(ip_file_type,"binary")) 
+    } else if (     (!strcmp(ip_file_type,"binary"))
                 ||  (!strcmp(ip_file_type,"bin"))     ) {
       printf("Writing binary initial solution file %s\n", fname);
       out = fopen(fname,"wb");
@@ -176,7 +176,7 @@ int main()
       fwrite(a,sizeof(double),N,out);
       fclose(out);
     }
-  
+
     free(x);
     free(u);
     free(a);

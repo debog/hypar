@@ -7,7 +7,7 @@
 #include <physicalmodels/euler1d.h>
 #include <hypar.h>
 
-/*! 1D Euler-specific function called at the beginning of each time-step: For a simulation 
+/*! 1D Euler-specific function called at the beginning of each time-step: For a simulation
     that splits the hyperbolic flux into its acoustic and entropy components for implicit-
     explicit time-integration, this function computes the fast Jacobian at the beginning of
     a time step for the linearized formulation.

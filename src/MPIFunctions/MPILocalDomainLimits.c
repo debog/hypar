@@ -22,7 +22,7 @@ int MPILocalDomainLimits(
                           int   *dim_global,  /*!< Integer array with elements as global size in each spatial dimension */
                           int   *is,          /*!< Integer array whose elements will contain the starting index of the local domain on rank \a p */
                           int   *ie           /*!< Integer array whose elements will contain the ending index of the local domain on rank \a p */
-                        ) 
+                        )
 {
   MPIVariables *mpi = (MPIVariables*) m;
   int          i;

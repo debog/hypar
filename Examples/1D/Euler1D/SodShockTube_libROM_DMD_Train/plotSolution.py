@@ -1,5 +1,5 @@
 '''
-Python script to create an animation from the unsteady solution of a 
+Python script to create an animation from the unsteady solution of a
 HyPar simulation.
 - op_overwrite must be set to "no"
 - solution must be in binary format
@@ -55,15 +55,15 @@ if not os.path.exists(plt_dir_name):
       os.makedirs(plt_dir_name)
 
 if solver_inp_data['op_overwrite'] == 'no':
-  
+
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   op_write_iter = int(solver_inp_data['file_op_iter'][0])
   dt_snapshots = op_write_iter*dt
   n_snapshots = int(niter/op_write_iter) + 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -73,27 +73,27 @@ if solver_inp_data['op_overwrite'] == 'no':
   print('  final time = ', t_final)
   print('  snapshot dt = ', dt_snapshots)
   print('  number of snapshots = ', n_snapshots)
-  
+
   '''
   Load simulation data (solution snapshots)
   '''
-  x,sol_fom_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                          nsims, 
-                                                          n_snapshots, 
-                                                          ndims, 
-                                                          nvars, 
+  x,sol_fom_snapshots = hyparutils.getSolutionSnapshots( sim_path,
+                                                          nsims,
+                                                          n_snapshots,
+                                                          ndims,
+                                                          nvars,
                                                           size )
   sol_fom_snapshots = np.float32(sol_fom_snapshots)
-  
-  x,sol_rom_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                          nsims, 
-                                                          n_snapshots, 
-                                                          ndims, 
-                                                          nvars, 
+
+  x,sol_rom_snapshots = hyparutils.getSolutionSnapshots( sim_path,
+                                                          nsims,
+                                                          n_snapshots,
+                                                          ndims,
+                                                          nvars,
                                                           size,
                                                           op_root='op_rom')
   sol_rom_snapshots = np.float32(sol_rom_snapshots)
-  
+
   for var in range(nvars):
     for i in range(n_snapshots):
       for s in range(nsims):
@@ -107,8 +107,8 @@ if solver_inp_data['op_overwrite'] == 'no':
         # Plot solutions
         fig = plt.figure(figsize=figsize)
         ax = plt.axes()
-        ax.set( xlim=(np.min(x), np.max(x)), 
-                ylim=(np.min(sol_rom_snapshots[i,var::nvars]), 
+        ax.set( xlim=(np.min(x), np.max(x)),
+                ylim=(np.min(sol_rom_snapshots[i,var::nvars]),
                       np.max(sol_rom_snapshots[i,var::nvars]) ) )
         ax.plot(x, solution_fom_snapshots_sim[i, var::nvars], fom_plt_style,lw=2, label='FOM')
         ax.plot(x, solution_rom_snapshots_sim[i, var::nvars], rom_plt_style,lw=2, label='ROM')
@@ -124,8 +124,8 @@ if solver_inp_data['op_overwrite'] == 'no':
         # Plot diff
         fig = plt.figure(figsize=figsize)
         ax = plt.axes()
-        ax.set( xlim=(np.min(x), np.max(x)), 
-                ylim=(np.min(diff_fom_rom[:,var::nvars]), 
+        ax.set( xlim=(np.min(x), np.max(x)),
+                ylim=(np.min(diff_fom_rom[:,var::nvars]),
                       np.max(diff_fom_rom[:,var::nvars]) ) )
         ax.plot(x, diff_fom_rom[i, var::nvars], lw=2)
         ax.set_title('var {:}, t={:.3}'.format(var,i*dt_snapshots))
@@ -142,36 +142,36 @@ else:
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   n_snapshots = 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
   print('  grid size = ', size)
   print('  final time = ', t_final)
   print('  number of snapshots = ', n_snapshots)
-  
+
   '''
   Load simulation data (solution snapshots)
   '''
-  x,sol_fom_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                          nsims, 
-                                                          n_snapshots, 
-                                                          ndims, 
-                                                          nvars, 
+  x,sol_fom_snapshots = hyparutils.getSolutionSnapshots( sim_path,
+                                                          nsims,
+                                                          n_snapshots,
+                                                          ndims,
+                                                          nvars,
                                                           size )
   sol_fom_snapshots = np.float32(sol_fom_snapshots)
-  
-  x,sol_rom_snapshots = hyparutils.getSolutionSnapshots( sim_path, 
-                                                          nsims, 
-                                                          n_snapshots, 
-                                                          ndims, 
-                                                          nvars, 
+
+  x,sol_rom_snapshots = hyparutils.getSolutionSnapshots( sim_path,
+                                                          nsims,
+                                                          n_snapshots,
+                                                          ndims,
+                                                          nvars,
                                                           size,
                                                           op_root='op_rom')
   sol_rom_snapshots = np.float32(sol_rom_snapshots)
-  
+
   for var in range(nvars):
     for s in range(nsims):
       solution_fom_snapshots_sim = sol_fom_snapshots[s*n_snapshots:(s+1)*n_snapshots]
@@ -184,8 +184,8 @@ else:
       # Plot solutions
       fig = plt.figure(figsize=figsize)
       ax = plt.axes()
-      ax.set( xlim=(np.min(x), np.max(x)), 
-              ylim=(np.min(sol_rom_snapshots[0,var::nvars]), 
+      ax.set( xlim=(np.min(x), np.max(x)),
+              ylim=(np.min(sol_rom_snapshots[0,var::nvars]),
                     np.max(sol_rom_snapshots[0,var::nvars]) ) )
       ax.plot(x, solution_fom_snapshots_sim[0, var::nvars], fom_plt_style,lw=2, label='FOM')
       ax.plot(x, solution_rom_snapshots_sim[0, var::nvars], rom_plt_style,lw=2, label='ROM')
@@ -201,8 +201,8 @@ else:
       # Plot diff
       fig = plt.figure(figsize=figsize)
       ax = plt.axes()
-      ax.set( xlim=(np.min(x), np.max(x)), 
-              ylim=(np.min(diff_fom_rom[:,var::nvars]), 
+      ax.set( xlim=(np.min(x), np.max(x)),
+              ylim=(np.min(diff_fom_rom[:,var::nvars]),
                     np.max(diff_fom_rom[:,var::nvars]) ) )
       ax.plot(x, diff_fom_rom[0, var::nvars], lw=2)
       ax.set_title('var {:}, t={:.3}'.format(var,t_final))

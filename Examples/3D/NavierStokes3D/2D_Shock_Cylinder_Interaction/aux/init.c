@@ -6,7 +6,7 @@
 
 int main()
 {
-  
+
   const double  gamma  = 1.4;
   int           NI,NJ,NK,ndims;
   char          ip_file_type[50];
@@ -79,7 +79,7 @@ int main()
   double u_inf    = 0.0; //- Ms * sqrt(gamma*p_inf/rho_inf);
   double v_inf    = 0.0;
   double w_inf    = 0.0;
-  
+
   /* post-shock conditions */
   double rho_ps   = rho_inf * ((gamma+1.0)*Ms*Ms) / ((gamma-1.0)*Ms*Ms+2.0);
   double p_ps     = p_inf * (2.0*gamma*Ms*Ms-(gamma-1.0)) / (gamma+1.0);

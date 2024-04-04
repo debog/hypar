@@ -7,7 +7,7 @@
 #include <basic_gpu.h>
 #include <arrayfunctions_gpu.h>
 
-/*! Element-wise copy \a y = \a x, where \a x, \a y are 1-dimensional arrays 
+/*! Element-wise copy \a y = \a x, where \a x, \a y are 1-dimensional arrays
     of length \a size. \sa #_ArrayCopy1D_ */
 __global__
 void ArrayCopy1D_kernel(  const double* x,  /*!< copy-from array*/
@@ -38,7 +38,7 @@ void ArraySetValue_kernel(  double* x,      /*!< array*/
   1-dimensional arrays of length \a size. */
 __global__
 void ArrayAXPY_kernel(  const double* x,  /*!< x */
-                        double        a,  /*!< a */ 
+                        double        a,  /*!< a */
                         double*       y,  /*!< y */
                         int           n   /*!< size of array */ )
 {
@@ -93,7 +93,7 @@ void gpuSetDevice(int device /*!< device */)
 /*! GPU memory copy */
 void gpuMemcpy( void*               dest, /*!< destination */
                 const void*         src,  /*!< source */
-                size_t              count,/*!< count */ 
+                size_t              count,/*!< count */
                 enum gpuMemcpyKind  kind  /*!< kind of copy */ )
 {
     switch (kind) {
@@ -121,7 +121,7 @@ void gpuMalloc( void**  devPtr, /*!< pointer to memory */
     cudaMalloc(devPtr, size);
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess) {
-      fprintf(  stderr,"Error in gpuMalloc(): size=%d, error message=\"%s\"\n", size, 
+      fprintf(  stderr,"Error in gpuMalloc(): size=%d, error message=\"%s\"\n", size,
                 cudaGetErrorString(err) );
     }
     return;
@@ -129,7 +129,7 @@ void gpuMalloc( void**  devPtr, /*!< pointer to memory */
 
 /*! Set value */
 void gpuMemset( void*   devPtr, /*!< Pointer to memory */
-                int     value,  /*!< value to set */ 
+                int     value,  /*!< value to set */
                 size_t  count   /*!< size of data */ )
 {
     checkCuda( cudaMemset(devPtr, value, count) );
@@ -143,7 +143,7 @@ void gpuFree(void *devPtr /*!< Pointer to memory */)
     return;
 }
 
-/*! Element-wise copy \a y = \a x, where \a x, \a y are 1-dimensional arrays 
+/*! Element-wise copy \a y = \a x, where \a x, \a y are 1-dimensional arrays
     of length \a size. \sa #_ArrayCopy1D_, ArrayCopy1D_kernel() */
 void gpuArrayCopy1D(  const double* x,  /*!< copy-from array*/
                       double*       y,  /*!< copy-to array */
@@ -156,7 +156,7 @@ void gpuArrayCopy1D(  const double* x,  /*!< copy-from array*/
 }
 
 /*! Set all elements of a 1-dimensional array \a x (any datatype)
-    of length \a size to a scalar \a value. 
+    of length \a size to a scalar \a value.
     \sa #_ArraySetValue_, ArraySetValue_kernel() */
 void gpuArraySetValue(  double* devPtr, /*!< array*/
                         int     n,      /*!< size of array */
@@ -190,7 +190,7 @@ void gpuArrayAXPY(  const double*   x, /*!< x */
   Given two arrays: \a x of size \a n*bs, and \a a of size \a n, this function
   implements: \a x[i][j] *= \a a[i] where \a i = 1,...,\a n, j = 1,...,\a bs,
   and \a x is stored as a 1D array in row-major format, i.e., \a x[i][j] = \a x[i*bs+j]. */
-void gpuArrayBlockMultiply( double*       x,  /*!< x */ 
+void gpuArrayBlockMultiply( double*       x,  /*!< x */
                             const double* a,  /*!< a */
                             int           n,  /*!< size of array */
                             int           bs  /*!< block size */ )
@@ -203,12 +203,12 @@ void gpuArrayBlockMultiply( double*       x,  /*!< x */
 
 /*! Returns the sum-of-squares of the elements in an n-D array (useful for L_2 norm)
     \sa ArraySumSquarenD() */
-double gpuArraySumSquarenD(int nvars,  /*!< number of elements at one array location, 
+double gpuArraySumSquarenD(int nvars,  /*!< number of elements at one array location,
                                             can be > 1 for systems of equations */
                            int ndims,  /*!< number of dimensions */
                            int *dim,   /*!< integer array of size in each dimension */
                            int ghosts, /*!< number of ghost points in the array x */
-                           int *index, /*!< pre-allocated (by the calling function) 
+                           int *index, /*!< pre-allocated (by the calling function)
                                             integer array of size ndims */
                            double *x   /*!< the array */
                           )
@@ -221,7 +221,7 @@ double gpuArraySumSquarenD(int nvars,  /*!< number of elements at one array loca
 
 /*! Alternative implementation of #_ArrayCopy1D_ */
 void gpuArrayCopy1DNewScheme( const double* src,      /*!< source array */
-                              double*       dest,     /*!< destination array */ 
+                              double*       dest,     /*!< destination array */
                               int           npoints,  /*!< number of points */
                               int           nvars     /*!< number of components */ )
 {
@@ -234,7 +234,7 @@ void gpuArrayCopy1DNewScheme( const double* src,      /*!< source array */
 /*! Check if two arrays are equal, if not, report the difference  */
 /*! Check if two arrays are equal, if not, report the difference */
 void gpuArrayCheckEqual( const char*   msg,      /*!< message */
-                         const double* var_adj,  /*!< array */ 
+                         const double* var_adj,  /*!< array */
                          const double* var_sep,  /*!< array */
                          int           npoints   /*!< size of array */ )
 {

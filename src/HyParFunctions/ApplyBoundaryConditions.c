@@ -2,7 +2,7 @@
  *  @author Debojyoti Ghosh
  *  @brief Apply physical boundary conditions to domain.
  *
- *  Contains the function that applies the physical boundary conditions 
+ *  Contains the function that applies the physical boundary conditions
  *  to each boundary zone.
 */
 
@@ -13,16 +13,16 @@
 #include <boundaryconditions.h>
 #include <hypar.h>
 
-/*! 
+/*!
  * \brief Applies the boundary conditions specified for each boundary zone.
  *
- * The solver object (of type #HyPar) contains an oject of type #DomainBoundary 
+ * The solver object (of type #HyPar) contains an oject of type #DomainBoundary
  * that contains all the boundary information (dimension, extent, face, type, etc).
- * This function iterates through each of the boundary zones 
+ * This function iterates through each of the boundary zones
  * (#HyPar::boundary[#HyPar::nBoundaryZones]) and calls the corresponding boundary
  * condition function.
  * \n\n
- * The variable \a flag indicates if the array \a x is the solution, or a delta-solution 
+ * The variable \a flag indicates if the array \a x is the solution, or a delta-solution
  * (from implicit time-integration methods).
 */
 int ApplyBoundaryConditions(void    *s,     /*!< Object of type #HyPar containing solver-related variables */
@@ -30,7 +30,7 @@ int ApplyBoundaryConditions(void    *s,     /*!< Object of type #HyPar containin
                             double  *x,     /*!< The solution vector on which the boundary conditions are to be applied */
                             double  *xref,  /*!< Reference solution vector, if needed */
                             double  waqt    /*!< Current simulation time */
-                           ) 
+                           )
 {
   HyPar           *solver   = (HyPar*)          s;
   DomainBoundary  *boundary = (DomainBoundary*) solver->boundary;

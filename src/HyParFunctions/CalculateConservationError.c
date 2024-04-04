@@ -9,7 +9,7 @@
 #include <hypar.h>
 
 /*! Calculates the error (L2) in conservation by computing the difference between
-    the initial volume integral of the solution, and the sum of the current 
+    the initial volume integral of the solution, and the sum of the current
     volume integral and the time integral of the boundary flux from the start
     of the simulation to the current simulation time.
 */
@@ -28,12 +28,12 @@ int CalculateConservationError(
       base[v] = absolute(solver->VolumeIntegralInitial[v]);
     else base[v] = 1.0;
   }
-  
+
   for (v=0; v<nvars; v++) {
-    error =  (solver->VolumeIntegral[v]+solver->TotalBoundaryIntegral[v]-solver->VolumeIntegralInitial[v]) 
+    error =  (solver->VolumeIntegral[v]+solver->TotalBoundaryIntegral[v]-solver->VolumeIntegralInitial[v])
            * (solver->VolumeIntegral[v]+solver->TotalBoundaryIntegral[v]-solver->VolumeIntegralInitial[v]);
     solver->ConservationError[v] = sqrt(error)/base[v];
   }
-  
+
   return(0);
 }

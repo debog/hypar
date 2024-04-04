@@ -14,11 +14,11 @@
 
 /*!
   Initialize the GLM-GEE (#_GLM_GEE_) time integation method: This function
-  allocates the arrays to store the Butcher tableaux, and sets their 
+  allocates the arrays to store the Butcher tableaux, and sets their
   coefficients, as well as other parameters for the GLM-GEE methods.
 
   Reference:
-  + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted, 
+  + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted,
     2015 (http://arxiv.org/abs/1503.05166).
 */
 int TimeGLMGEEInitialize(
@@ -67,7 +67,7 @@ int TimeGLMGEEInitialize(
       fprintf(stderr,"multi-stage time integration scheme of class %s.\n",class);
       return(1);
     }
-  
+
     int s = params->nstages;
     int r = params->r;
 
@@ -81,7 +81,7 @@ int TimeGLMGEEInitialize(
     _ArraySetValue_(params->C_yyt,s*r,0.0);
     _ArraySetValue_(params->D_yyt,r*r,0.0);
     _ArraySetValue_(params->c_yyt,s  ,0.0);
-    
+
     params->A_yeps = (double*) calloc (s*s,sizeof(double));
     params->B_yeps = (double*) calloc (s*r,sizeof(double));
     params->C_yeps = (double*) calloc (s*r,sizeof(double));
@@ -92,7 +92,7 @@ int TimeGLMGEEInitialize(
     _ArraySetValue_(params->C_yeps,s*r,0.0);
     _ArraySetValue_(params->D_yeps,r*r,0.0);
     _ArraySetValue_(params->c_yeps,s  ,0.0);
-    
+
     if (!strcmp(type,_GLM_GEE_23_)) {
 
       params->A_yeps[1*s+0] = 1.0;
@@ -220,7 +220,7 @@ int TimeGLMGEEInitialize(
       params->A_yyt[4*s+1] = -15074384760342762939.0 / 137927286865289746282.0;
       params->A_yyt[4*s+2] = -62274678522253371016.0 / 125918573676298591413.0;
       params->A_yyt[4*s+3] =  13755475729852471739.0 /  79257927066651693390.0;
-      
+
       params->B_yyt[0*s+0] =  61546696837458703723.0 /  56982519523786160813.0;
       params->B_yyt[0*s+1] = -55810892792806293355.0 / 206957624151308356511.0;
       params->B_yyt[0*s+2] =  24061048952676379087.0 / 158739347956038723465.0;
@@ -311,24 +311,24 @@ int TimeGLMGEEInitialize(
 
       params->A_yeps[2*s+0] = -1.0;
       params->A_yeps[2*s+1] =  2.0;
-        
+
       params->A_yeps[3*s+0] =  1.0/6.0;
       params->A_yeps[3*s+1] =  2.0/3.0;
       params->A_yeps[3*s+2] =  1.0/6.0;
-        
+
       params->A_yeps[5*s+0] = -7.0/24.0;
       params->A_yeps[5*s+1] =  1.0/3.0;
       params->A_yeps[5*s+2] =  1.0/12.0;
       params->A_yeps[5*s+3] = -1.0/8.0;
       params->A_yeps[5*s+4] =  0.5;
-        
+
       params->A_yeps[6*s+0] =  7.0/6.0;
       params->A_yeps[6*s+1] = -4.0/3.0;
       params->A_yeps[6*s+2] = -1.0/3.0;
       params->A_yeps[6*s+3] =  0.5;
       params->A_yeps[6*s+4] = -1.0;
       params->A_yeps[6*s+5] =  2.0;
-      
+
       params->A_yeps[7*s+4] =  1.0/6.0;
       params->A_yeps[7*s+5] =  2.0/3.0;
       params->A_yeps[7*s+6] =  1.0/6.0;
@@ -454,9 +454,9 @@ int TimeGLMGEEInitialize(
         if (!strcmp(word,"begin")) {
           while (strcmp(word,"end")) {
             ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-            if (!strcmp(word,"ee_mode")) { 
-              ferr = fscanf(in,"%s",params->ee_mode); 
-              if (ferr != 1) return(1); 
+            if (!strcmp(word,"ee_mode")) {
+              ferr = fscanf(in,"%s",params->ee_mode);
+              if (ferr != 1) return(1);
             } else if (strcmp(word,"end")) {
               char useless[_MAX_STRING_SIZE_];
               ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);

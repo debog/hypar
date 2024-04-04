@@ -10,10 +10,10 @@
 #include <physicalmodels/navierstokes2d.h>
 #include <hypar.h>
 
-/*! Compute the left eigenvections for the 2D Navier Stokes equations. This function 
-    just calls the macro #_NavierStokes2DLeftEigenvectors_ and is not used by any 
-    functions within the 2D Navier Stokes module. However, it's necessary to define it 
-    and provide it to the the solver object (#HyPar) so that it can then send it 
+/*! Compute the left eigenvections for the 2D Navier Stokes equations. This function
+    just calls the macro #_NavierStokes2DLeftEigenvectors_ and is not used by any
+    functions within the 2D Navier Stokes module. However, it's necessary to define it
+    and provide it to the the solver object (#HyPar) so that it can then send it
     to interpolation functions for a characteristic-based reconstruction.
 */
 int NavierStokes2DLeftEigenvectors(
@@ -29,15 +29,15 @@ int NavierStokes2DLeftEigenvectors(
   return(0);
 }
 
-/*! Compute the right eigenvections for the 2D Navier Stokes equations. This function 
-    just calls the macro #_NavierStokes2DRightEigenvectors_ and is not used by any 
-    functions within the 2D Navier Stokes module. However, it's necessary to define it 
-    and provide it to the the solver object (#HyPar) so that it can then send it 
+/*! Compute the right eigenvections for the 2D Navier Stokes equations. This function
+    just calls the macro #_NavierStokes2DRightEigenvectors_ and is not used by any
+    functions within the 2D Navier Stokes module. However, it's necessary to define it
+    and provide it to the the solver object (#HyPar) so that it can then send it
     to interpolation functions for a characteristic-based reconstruction.
 */
 int NavierStokes2DRightEigenvectors(
                                       double  *u, /*!< Conserved solution at a grid point */
-                                      double  *R, /*!< Array of size nvar^2 = 4^2 to save the matrix of 
+                                      double  *R, /*!< Array of size nvar^2 = 4^2 to save the matrix of
                                                        right eigenvectors in (row-major format). */
                                       void    *p, /*!< Object of type #NavierStokes2D with physics-related variables */
                                       int     dir /*!< Spatial dimension (x or y) */

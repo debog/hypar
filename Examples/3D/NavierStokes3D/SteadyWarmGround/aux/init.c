@@ -1,5 +1,5 @@
 /*
-  This code generates the initial solution for a still 
+  This code generates the initial solution for a still
   atmosphere in hydrostatic balance
 */
 
@@ -23,7 +23,7 @@ int main()
   double grav_y   = 0.0;
   double grav_z   = 9.8;
   int    HB       = 0;
-  
+
   int   NI,NJ,NK,ndims;
   char  ip_file_type[50]; strcpy(ip_file_type,"ascii");
   FILE *in;

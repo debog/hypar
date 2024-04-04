@@ -96,14 +96,14 @@ int main()
     out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
     fprintf(out,"\n");
-    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);            
+    for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);
     fprintf(out,"\n");
     fclose(out);
     printf("Writing ASCII advection field file %s\n", adv_filename);
     out = fopen(adv_filename,"w");
     for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
     fprintf(out,"\n");
-    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",a[i]);            
+    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",a[i]);
     fprintf(out,"\n");
     fclose(out);
   } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {

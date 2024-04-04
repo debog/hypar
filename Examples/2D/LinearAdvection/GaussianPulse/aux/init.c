@@ -4,7 +4,7 @@
 #include <string.h>
 
 int main(){
-  
+
   int NI=100,NJ=50,ndims=2;
   char ip_file_type[50];
   strcpy(ip_file_type,"ascii");

@@ -27,7 +27,7 @@ int FPPowerSystemPostStep(double *u,void* s,void *m,double t,int iter)
     _ArrayIncrementIndex_(ndims,dim,index,done);
   }
   double local_integral = local_sum;
-  double global_integral = 0; 
+  double global_integral = 0;
   IERR MPISum_double(&global_integral,&local_integral,1,&mpi->world); CHECKERR(ierr);
   params->pdf_integral = global_integral;
 

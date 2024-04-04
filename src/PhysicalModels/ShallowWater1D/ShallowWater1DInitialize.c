@@ -30,8 +30,8 @@ int    ShallowWater1DSourceUpwindRoe   (double*,double*,double*,double*,int,void
 int    ShallowWater1DModifiedSolution  (double*,double*,int,void*,void*,double);
 int    ShallowWater1DWriteTopography   (void*,void*,double);
 
-/*! Function to initialize the 1D shallow water equations (#ShallowWater1D) module: 
-    Sets the default parameters, read in and set physics-related parameters, 
+/*! Function to initialize the 1D shallow water equations (#ShallowWater1D) module:
+    Sets the default parameters, read in and set physics-related parameters,
     and set the physics-related function pointers in #HyPar.
 */
 int ShallowWater1DInitialize(
@@ -40,7 +40,7 @@ int ShallowWater1DInitialize(
                      )
 {
   HyPar           *solver  = (HyPar*)         s;
-  MPIVariables    *mpi     = (MPIVariables*)  m; 
+  MPIVariables    *mpi     = (MPIVariables*)  m;
   ShallowWater1D  *physics = (ShallowWater1D*)       solver->physics;
   int             ferr, d;
 
@@ -56,7 +56,7 @@ int ShallowWater1DInitialize(
   }
 
   /* default values */
-  physics->g       = 1.0; 
+  physics->g       = 1.0;
   physics->bt_type = 0;
   strcpy(physics->upw_choice,"roe");
 
@@ -72,14 +72,14 @@ int ShallowWater1DInitialize(
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
           ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-          if (!strcmp(word, "gravity")) { 
-            ferr = fscanf(in,"%lf",&physics->g); 
+          if (!strcmp(word, "gravity")) {
+            ferr = fscanf(in,"%lf",&physics->g);
             if (ferr != 1) return(1);
-          } else if (!strcmp(word, "topography_type")) { 
-            ferr = fscanf(in,"%d",&physics->bt_type); 
+          } else if (!strcmp(word, "topography_type")) {
+            ferr = fscanf(in,"%d",&physics->bt_type);
             if (ferr != 1) return(1);
           } else if (!strcmp(word,"upwinding")) {
-            ferr = fscanf(in,"%s",physics->upw_choice); 
+            ferr = fscanf(in,"%s",physics->upw_choice);
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
@@ -119,7 +119,7 @@ int ShallowWater1DInitialize(
   solver->GetLeftEigenvectors   = ShallowWater1DLeftEigenvectors;
   solver->GetRightEigenvectors  = ShallowWater1DRightEigenvectors;
   solver->PhysicsOutput         = ShallowWater1DWriteTopography;
-   
+
   if      (!strcmp(physics->upw_choice,_LLF_ )) physics->SourceUpwind = ShallowWater1DSourceUpwindLLF;
   else if (!strcmp(physics->upw_choice,_ROE_ )) physics->SourceUpwind = ShallowWater1DSourceUpwindRoe;
 

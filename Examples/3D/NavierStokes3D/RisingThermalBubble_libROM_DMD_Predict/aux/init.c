@@ -1,5 +1,5 @@
 /*
-  This code generates the initial solution for the rising 
+  This code generates the initial solution for the rising
   thermal bubble case for the 3D Navier-Stokes equations.
 
   Note: this code allocates the global domain, so be careful
@@ -26,7 +26,7 @@ int main()
   double grav_y   = 9.8;
   double grav_z   = 0.0;
   int    HB       = 0;
-  
+
   int   NI,NJ,NK,ndims;
   char  ip_file_type[50]; strcpy(ip_file_type,"ascii");
   FILE *in;

@@ -1,6 +1,6 @@
 /*
 
-  This code generates the initial solution for the 
+  This code generates the initial solution for the
   3D rising thermal bubble case for the non-hydrostatic
   unified model of the atmosphere (NUMA).
 
@@ -18,7 +18,7 @@ double raiseto(double x, double a)
 
 int main()
 {
-  
+
   int     NI,NJ,NK,ndims;
   char    ip_file_type[50];
   FILE    *in;

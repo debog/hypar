@@ -8,10 +8,10 @@
 #include <sparse_grids_simulation.h>
 
 extern "C" void CombineSolutions( SimulationObject*,
-                                  double* const *const, 
-                                  const int, 
+                                  double* const *const,
+                                  const int,
                                   SimulationObject*,
-                                  double* const, 
+                                  double* const,
                                   const double* const );
 
 /*! Implements the combination technique where the solutions from all

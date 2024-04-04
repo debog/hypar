@@ -13,20 +13,20 @@
 
 #undef  _MINIMUM_GHOSTS_
 /*! \def _MINIMUM_GHOSTS_
- * Minimum number of ghost points required for this interpolation 
+ * Minimum number of ghost points required for this interpolation
  * method.
 */
 #define _MINIMUM_GHOSTS_ 1
 
 /*! @brief 2nd order component-wise interpolation of the 2nd primitive on a uniform grid
 
-    Computes the interpolated values of the second primitive of a function \f${\bf f}\left({\bf u}\right)\f$ 
-    at the interfaces from the cell-centered values of the function using the second order central method on 
+    Computes the interpolated values of the second primitive of a function \f${\bf f}\left({\bf u}\right)\f$
+    at the interfaces from the cell-centered values of the function using the second order central method on
     a uniform grid. The second primitive is defined as a function \f${\bf h}\left({\bf u}\right)\f$ that satisfies:
     \f{equation}{
       {\bf f}\left({\bf u}\left(x\right)\right) = \frac{1}{\Delta x^2} \int_{x-\Delta x/2}^{x+\Delta x/2} \left( \int_{\eta-\Delta x/2}^{\eta+\Delta x/2} {\bf h}\left({\bf u}\left(\zeta\right)\right) d\zeta \right) d\eta,
     \f}
-    where \f$x\f$ is the spatial coordinate along the dimension of the interpolation. This function the 2nd order central numerical approximation \f$\hat{\bf f}_{j+1/2} \approx {\bf h}_{j+1/2}\f$ as 
+    where \f$x\f$ is the spatial coordinate along the dimension of the interpolation. This function the 2nd order central numerical approximation \f$\hat{\bf f}_{j+1/2} \approx {\bf h}_{j+1/2}\f$ as
     \f$\hat{\bf f}_{j+1/2} \approx {\bf h}_{j+1/2}\f$ as:
     \f{equation}{
       \hat{\bf f}_{j+1/2} = \frac{1}{2}\left( {\bf f}_{j+1} - {\bf f}_j \right).
@@ -44,10 +44,10 @@
 
     \b Function \b arguments:
 
-    Argument  | Type      | Explanation             
+    Argument  | Type      | Explanation
     --------- | --------- | ---------------------------------------------
     fI        | double*   | Array to hold the computed interpolant at the grid interfaces. This array must have the same layout as the solution, but with \b no \b ghost \b points. Its size should be the same as u in all dimensions, except dir (the dimension along which to interpolate) along which it should be larger by 1 (number of interfaces is 1 more than the number of interior cell centers).
-    fC        | double*   | Array with the cell-centered values of the flux function \f${\bf f}\left({\bf u}\right)\f$. This array must have the same layout and size as the solution, \b with \b ghost \b points. 
+    fC        | double*   | Array with the cell-centered values of the flux function \f${\bf f}\left({\bf u}\right)\f$. This array must have the same layout and size as the solution, \b with \b ghost \b points.
     dir       | int       | Spatial dimension along which to interpolate (eg: 0 for 1D; 0 or 1 for 2D; 0,1 or 2 for 3D)
     s         | void*     | Solver object of type #HyPar: the following variables are needed - #HyPar::ghosts, #HyPar::ndims, #HyPar::nvars, #HyPar::dim_local.
     m         | void*     | MPI object of type #MPIVariables: this is needed only by compact interpolation method that need to solve a global implicit system across MPI ranks.
@@ -87,6 +87,6 @@ int Interp2PrimSecondOrder(
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
-  
+
   return(0);
 }

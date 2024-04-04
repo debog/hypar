@@ -21,7 +21,7 @@ int    FPPowerSystem1BusPrintStep         (void*,void*,double);
 int FPPowerSystem1BusInitialize(void *s,void *m)
 {
   HyPar               *solver  = (HyPar*)             s;
-  MPIVariables        *mpi     = (MPIVariables*)      m; 
+  MPIVariables        *mpi     = (MPIVariables*)      m;
   FPPowerSystem1Bus   *physics = (FPPowerSystem1Bus*) solver->physics;
   int                 ferr;
   _DECLARE_IERR_;

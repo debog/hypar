@@ -77,17 +77,17 @@ static int SetEFieldPrescribed( double* u,/*!< Conserved solution */
       _GetCoordinate_(d,index[d]-ghosts,dim_local,ghosts,solver->x,xvec[d]);
     }
 
-    int p; 
+    int p;
     _ArrayIndex1DWO_(ndims_x,dim_x,index,offset,ghosts,p);
     param->e_field[p*ndims_x+0] = 0.1 * cos(xvec[0]);
-      
+
     _ArrayIncrementIndex_(ndims_x,bounds,index,done);
   }
 
   return 0;
 }
 
-/*! Compute the self-consistent electric field over the local domain: The field 
+/*! Compute the self-consistent electric field over the local domain: The field
  * is solved from the solution values using a Poisson solve in Fourier space. */
 static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
                                    void*   s,/*!< Solver object of type #HyPar */
@@ -164,7 +164,7 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
     _ArrayIncrementIndex_(ndims,bounds_noghost,index,done);
   }
 
-  // Now we can add up globally using MPI reduction 
+  // Now we can add up globally using MPI reduction
   for (int i = 0; i < dim[0]; i++) {
     MPISum_double(&sum_buffer[i], &sum_buffer[i], 1, &mpi->comm[1]);
   }

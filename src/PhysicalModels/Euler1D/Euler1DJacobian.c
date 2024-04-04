@@ -8,7 +8,7 @@
 #include <physicalmodels/euler1d.h>
 
 /*! Function to compute the flux Jacobian of the 1D Euler equations, given the
-    solution at a grid point. The Jacobian is square matrix of size nvar=3, and 
+    solution at a grid point. The Jacobian is square matrix of size nvar=3, and
     is returned as a 1D array (double) of 9 elements in row-major format.
 */
 int Euler1DJacobian(double  *Jac, /*!< Jacobian matrix: 1D array of size nvar^2 = 9 */
@@ -16,12 +16,12 @@ int Euler1DJacobian(double  *Jac, /*!< Jacobian matrix: 1D array of size nvar^2 
                     void    *p,   /*!< object containing the physics-related parameters */
                     int     dir,  /*!< dimension (x/y/z) (not used, since this is 1D system) */
                     int     nvars,/*!< number of vector components */
-                    int     upw   /*!< 0 -> send back complete Jacobian, 
-                                       1 -> send back Jacobian of right(+)-moving flux, 
+                    int     upw   /*!< 0 -> send back complete Jacobian,
+                                       1 -> send back Jacobian of right(+)-moving flux,
                                       -1 -> send back Jacobian of left(-)-moving flux */ )
 {
   Euler1D       *param = (Euler1D*) p;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */
@@ -40,9 +40,9 @@ int Euler1DJacobian(double  *Jac, /*!< Jacobian matrix: 1D array of size nvar^2 
   return(0);
 }
 
-/*! Function to compute the Jacobian of the fast flux (representing the acoustic waves) 
-    of the 1D Euler equations, given the solution at a grid point (see #_Euler1DSetStiffFlux_, 
-    #_Euler1DSetStiffJac_). The Jacobian is square matrix of size nvar=3, and is returned as 
+/*! Function to compute the Jacobian of the fast flux (representing the acoustic waves)
+    of the 1D Euler equations, given the solution at a grid point (see #_Euler1DSetStiffFlux_,
+    #_Euler1DSetStiffJac_). The Jacobian is square matrix of size nvar=3, and is returned as
     a 1D array (double) of 9 elements in row-major format.
 */
 int Euler1DStiffJacobian( double  *Jac, /*!< Jacobian matrix: 1D array of size nvar^2 = 9 */
@@ -50,12 +50,12 @@ int Euler1DStiffJacobian( double  *Jac, /*!< Jacobian matrix: 1D array of size n
                           void    *p,   /*!< object containing the physics-related parameters */
                           int     dir,  /*!< dimension (x/y/z) (not used, since this is 1D system) */
                           int     nvars,/*!< number of vector components */
-                          int     upw   /*!< 0 -> send back complete Jacobian, 
-                                             1 -> send back Jacobian of right(+)-moving flux, 
+                          int     upw   /*!< 0 -> send back complete Jacobian,
+                                             1 -> send back Jacobian of right(+)-moving flux,
                                             -1 -> send back Jacobian of left(-)-moving flux */ )
 {
   Euler1D       *param = (Euler1D*) p;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */

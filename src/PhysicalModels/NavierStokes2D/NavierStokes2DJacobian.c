@@ -8,7 +8,7 @@
 #include <physicalmodels/navierstokes2d.h>
 
 /*! Function to compute the flux Jacobian of the 2D Navier-Stokes equations, given the
-    solution at a grid point. The Jacobian is square matrix of size nvar=4, and 
+    solution at a grid point. The Jacobian is square matrix of size nvar=4, and
     is returned as a 1D array (double) of 16 elements in row-major format.
 */
 int NavierStokes2DJacobian(
@@ -17,13 +17,13 @@ int NavierStokes2DJacobian(
                     void    *p,   /*!< object containing the physics-related parameters */
                     int     dir,  /*!< dimension (0 -> x, 1 -> y) */
                     int     nvars,/*!< number of vector components */
-                    int     upw   /*!< 0 -> send back complete Jacobian, 
-                                       1 -> send back Jacobian of right(+)-moving flux, 
+                    int     upw   /*!< 0 -> send back complete Jacobian,
+                                       1 -> send back Jacobian of right(+)-moving flux,
                                       -1 -> send back Jacobian of left(-)-moving flux */
                    )
 {
   NavierStokes2D *param = (NavierStokes2D*) p;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */
@@ -43,9 +43,9 @@ int NavierStokes2DJacobian(
   return(0);
 }
 
-/*! Function to compute the Jacobian of the fast flux (representing the acoustic waves) 
-    of the 2D Navier-Stokes equations, given the solution at a grid point. The Jacobian 
-    is square matrix of size nvar=4, and is returned as a 1D array (double) of 16 elements 
+/*! Function to compute the Jacobian of the fast flux (representing the acoustic waves)
+    of the 2D Navier-Stokes equations, given the solution at a grid point. The Jacobian
+    is square matrix of size nvar=4, and is returned as a 1D array (double) of 16 elements
     in row-major format.
 */
 int NavierStokes2DStiffJacobian(
@@ -54,13 +54,13 @@ int NavierStokes2DStiffJacobian(
                           void    *p,   /*!< object containing the physics-related parameters */
                           int     dir,  /*!< dimension (0 -> x, 1 -> y) */
                           int     nvars,/*!< number of vector components */
-                          int     upw   /*!< 0 -> send back complete Jacobian, 
-                                             1 -> send back Jacobian of right(+)-moving flux, 
+                          int     upw   /*!< 0 -> send back complete Jacobian,
+                                             1 -> send back Jacobian of right(+)-moving flux,
                                             -1 -> send back Jacobian of left(-)-moving flux */
                    )
 {
   NavierStokes2D *param = (NavierStokes2D*) p;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                 L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */

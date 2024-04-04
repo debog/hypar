@@ -1,7 +1,7 @@
 /*
   Rising Thermal Bubble:-
-  The code takes a binary solution file (that contains the 
-  conserved variable (rho, rho*u, rho*v, rho*w, e) as its input 
+  The code takes a binary solution file (that contains the
+  conserved variable (rho, rho*u, rho*v, rho*w, e) as its input
   and calculates the primitive atmospheric flow variables:
   rho, u, v, w, P, theta, pi, rho0, P0, theta0, pi0
   and writes them to a tecplot or text file.
@@ -206,7 +206,7 @@ int PostProcess(char *fname, char *oname, void *p, int flag)
   /* allocate primitive variable array (rho, u, v, w, P, theta, rho0, P0, pi0, theta0) */
   int evars = 5;
   double *Q = (double*) calloc ((nvars+evars)*imax*jmax*kmax,sizeof(double));
-    
+
   /* calculate primitive variables */
   int i, j, k;
   double *X           = x;

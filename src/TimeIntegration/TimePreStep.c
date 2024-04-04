@@ -38,7 +38,7 @@ int TimePreStep(void *ts /*!< Object of type #TimeIntegration */ )
 #if defined(HAVE_CUDA)
     if (solver->use_gpu) {
       u = solver->gpu_u;
-    } else{ 
+    } else{
 #endif
       u = solver->u;
 #if defined(HAVE_CUDA)

@@ -8,9 +8,9 @@
 
 /*
     These are not the actual viscous terms for compressible flows.
-    Reference: Giraldo, Restelli, "A study of spectral element and discontinuous 
-               Galerkin methods for the Navier–Stokes equations in nonhydrostatic 
-               mesoscale atmospheric modeling: Equation sets and test cases", 
+    Reference: Giraldo, Restelli, "A study of spectral element and discontinuous
+               Galerkin methods for the Navier–Stokes equations in nonhydrostatic
+               mesoscale atmospheric modeling: Equation sets and test cases",
                Journal of Computational Physics, 227 (2008), pp. 3849--3877
 */
 
@@ -33,10 +33,10 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
   if (physics->mu <= 0) return(0); /* inviscid flow */
   solver->count_par++;
 
-  double        mu        = physics->mu;        
+  double        mu        = physics->mu;
 
   /* allocate some arrays */
-  double *Q, *QDeriv, *FViscous, *FDeriv; 
+  double *Q, *QDeriv, *FViscous, *FDeriv;
   Q         = (double*) calloc (size,sizeof(double)); /* primitive variables                */
   QDeriv    = (double*) calloc (size,sizeof(double)); /* derivative of primitive variables  */
   FViscous  = (double*) calloc (size,sizeof(double)); /* viscous flux                       */
@@ -79,7 +79,7 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
     ux  = QDeriv[_MODEL_NVARS_*p+1] / dxinv;
     vx  = QDeriv[_MODEL_NVARS_*p+2] / dxinv;
     tx  = QDeriv[_MODEL_NVARS_*p+3] / dxinv;
-    
+
     FViscous[_MODEL_NVARS_*p+0] = 0.0;
     FViscous[_MODEL_NVARS_*p+1] = mu * rho * ux;
     FViscous[_MODEL_NVARS_*p+2] = mu * rho * vx;

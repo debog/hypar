@@ -29,7 +29,7 @@ export p_op_format="none"
 export p_ip_type="binary"
 export p_input_mode="serial"
 export p_output_mode="serial"
-export p_n_io= 
+export p_n_io=
 export p_op_overwrite="yes"
 export p_model="linear-advection-diffusion-reaction"
 

@@ -1,11 +1,11 @@
 /*
 
-  This code generates the initial solution for the 
+  This code generates the initial solution for the
   3D rising thermal bubble case for the non-hydrostatic
   unified model of the atmosphere (NUMA).
 
-  The initial solution is written for the local (MPI) 
-  sub-domains, and the number of files written 
+  The initial solution is written for the local (MPI)
+  sub-domains, and the number of files written
   depend on the number of I/O ranks. Although this
   code is serial, it will compute the decomposition
   of the global domain and generate the initial
@@ -54,7 +54,7 @@ void GetStringFromInteger(int a,char *A,int width)
 {
   int i;
   for (i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0'); 
+    char digit = (char) (a%10 + '0');
     a /= 10;
     A[width-1-i] = digit;
   }
@@ -97,7 +97,7 @@ int MPIPartition1D(int nglobal,int nproc,int rank)
   return(nlocal);
 }
 
-int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie) 
+int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie)
 {
   int i;
   int ip[ndims];

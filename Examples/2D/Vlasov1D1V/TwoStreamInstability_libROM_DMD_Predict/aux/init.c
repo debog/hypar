@@ -5,7 +5,7 @@
 
 
 int main()
-{  
+{
   double pi = 4.0 * atan(1.0);
   double two_pi = 8.0 * atan(1.0);
 

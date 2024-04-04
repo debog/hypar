@@ -50,8 +50,8 @@ int Euler1DFlux(
     \f{equation}{
       {\bf F}_F\left({\bf u}\right) = A_f\left({\bf u}\right){\bf u}
     \f}
-    where \f$A_f\left({\bf u}\right) \f$ is the fast Jacobian representing the 
-    acoustic waves only. A linearized formulation is used where the fast Jacobian 
+    where \f$A_f\left({\bf u}\right) \f$ is the fast Jacobian representing the
+    acoustic waves only. A linearized formulation is used where the fast Jacobian
     \f$A_f\f$ is computed for the solution at the beginning of each time step in
     #Euler1DPreStep.
     \sa #_Euler1DSetStiffFlux_, #_Euler1DSetLinearizedStiffFlux_, #_Euler1DSetStiffJac_

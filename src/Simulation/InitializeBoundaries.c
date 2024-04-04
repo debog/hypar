@@ -319,13 +319,13 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
     if (sim[0].solver.use_gpu) {
       for (nb = 0; nb < solver->nBoundaryZones; nb++) {
         _ArraySubtract1D_(bounds,boundary[nb].ie,boundary[nb].is,solver->ndims);
-  
+
         _ArrayProduct1D_(bounds,solver->ndims,boundary[nb].gpu_npoints_bounds);
         boundary[nb].gpu_npoints_local_wghosts = solver->npoints_local_wghosts;
-  
+
         _ArrayProduct1D_(bounds,solver->ndims,boundary[nb].gpu_npoints_bounds);
         boundary[nb].gpu_npoints_local_wghosts = solver->npoints_local_wghosts;
-  
+
         gpuMalloc((void**)&boundary[nb].gpu_is, solver->ndims*sizeof(int));
         gpuMalloc((void**)&boundary[nb].gpu_ie, solver->ndims*sizeof(int));
         gpuMalloc((void**)&boundary[nb].gpu_bounds, solver->ndims*sizeof(int));
@@ -335,9 +335,9 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
         if (   (!strcmp(boundary[nb].bctype,_SLIP_WALL_))
             || (!strcmp(boundary[nb].bctype,_NOSLIP_WALL_)) ) {
             gpuMalloc((void**)&boundary[nb].gpu_FlowVelocity, solver->ndims*sizeof(double));
-            gpuMemcpy(  boundary[nb].gpu_FlowVelocity, 
-                        boundary[nb].FlowVelocity, 
-                        solver->ndims*sizeof(double), 
+            gpuMemcpy(  boundary[nb].gpu_FlowVelocity,
+                        boundary[nb].FlowVelocity,
+                        solver->ndims*sizeof(double),
                         gpuMemcpyHostToDevice);
         }
       }

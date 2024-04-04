@@ -171,10 +171,10 @@ int WENOInitialize(
   double* tmp_w1 = (double*) calloc (4*total_size,sizeof(double));
   double* tmp_w2 = (double*) calloc (4*total_size,sizeof(double));
   double* tmp_w3 = (double*) calloc (4*total_size,sizeof(double));
-  for (d=0; d<ndims; d++) WENOFifthOrderInitializeWeights(  tmp_w1, 
-                                                            tmp_w2, 
-                                                            tmp_w3, 
-                                                            weno->offset, 
+  for (d=0; d<ndims; d++) WENOFifthOrderInitializeWeights(  tmp_w1,
+                                                            tmp_w2,
+                                                            tmp_w3,
+                                                            weno->offset,
                                                             d,
                                                             solver,
                                                             mpi);

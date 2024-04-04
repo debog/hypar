@@ -4,14 +4,14 @@
 
   1D-1V Vlasov Equation:
   \f{equation}{
-      \frac{\partial f}{\partial t} 
+      \frac{\partial f}{\partial t}
       +
       v \frac{\partial f}{\partial x}
       +
       E \frac{\partial f}{\partial v}
       = 0,
   \f}
-  where 
+  where
     + \f$f\f$ is the distribution function
     + \f$x\f$ is the spatial coordinate
     + \f$v\f$ is the velocity
@@ -31,7 +31,7 @@
 #endif
 #endif
 
-/*! \def _VLASOV_ 
+/*! \def _VLASOV_
     1D-1V Vlasov equation
 */
 #define _VLASOV_  "vlasov"
@@ -47,11 +47,11 @@
 
 /*! \def Vlasov
     \brief Structure containing variables and parameters for the Vlasov equation
- *  This structure contains the physical parameters, variables, and function pointers 
+ *  This structure contains the physical parameters, variables, and function pointers
  *  specific to the Vlasov equation.
 */
 /* \brief Structure containing variables and parameters for the Vlasov equation
- * This structure contains the physical parameters, variables, and function pointers 
+ * This structure contains the physical parameters, variables, and function pointers
  * specific to the Vlasov equation.
 */
 typedef struct vlasov_parameters {

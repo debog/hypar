@@ -11,18 +11,18 @@
 #include <physicalmodels/euler2d.h>
 #include <physicalmodels/navierstokes3d.h>
 
-/*! Applies the subsonic "ambivalent" boundary condition: 
-    The velocity at the boundary face is extrapolated from the interior and 
+/*! Applies the subsonic "ambivalent" boundary condition:
+    The velocity at the boundary face is extrapolated from the interior and
     its dot product with the boundary normal (pointing into the domain) is
-    computed. 
-    + If it is positive, subsonic inflow boundary conditions are applied: the 
-      density and velocity at the physical boundary ghost points are specified, 
-      while the pressure is extrapolated from the interior of the domain. 
-    + If it is negative, subsonic outflow boundary conditions are applied: the 
-      pressure at the physical boundary ghost points is specified, while the 
-      density and velocity are extrapolated from the interior. 
-        
-    This boundary condition is specific to two and three dimension Euler and 
+    computed.
+    + If it is positive, subsonic inflow boundary conditions are applied: the
+      density and velocity at the physical boundary ghost points are specified,
+      while the pressure is extrapolated from the interior of the domain.
+    + If it is negative, subsonic outflow boundary conditions are applied: the
+      pressure at the physical boundary ghost points is specified, while the
+      density and velocity are extrapolated from the interior.
+
+    This boundary condition is specific to two and three dimension Euler and
     Navier-Stokes systems (#Euler2D, #NavierStokes2D, #NavierStokes3D).
 */
 int BCSubsonicAmbivalentU(
@@ -44,7 +44,7 @@ int BCSubsonicAmbivalentU(
   if (ndims == 2) {
 
     /* create a fake physics object */
-    Euler2D physics; 
+    Euler2D physics;
     double gamma;
     gamma = physics.gamma = boundary->gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
@@ -98,7 +98,7 @@ int BCSubsonicAmbivalentU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         _Euler2DGetFlowVar_((phi+nvars*p2),rho,uvel,vvel,energy,pressure,(&physics));
 
@@ -194,7 +194,7 @@ int BCSubsonicAmbivalentU(
         else return(1);
         _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
-        
+
         /* flow variables in the interior */
         _NavierStokes3DGetFlowVar_((phi+nvars*p2),_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,gamma);
 
@@ -216,7 +216,7 @@ int BCSubsonicAmbivalentU(
           wvel_gpt = wvel;
         }
         energy_gpt = inv_gamma_m1*pressure_gpt
-                    + 0.5 * rho_gpt 
+                    + 0.5 * rho_gpt
                     * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt + wvel_gpt*wvel_gpt);
 
         phi[nvars*p1+0] = rho_gpt;

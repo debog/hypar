@@ -11,14 +11,14 @@
 
 /*!
   Gathers the contents of a 1D array (partitioned amongst MPI ranks) into a global 1D array
-  on the root rank (rank 0). See documentation of MPIExchangeBoundaries1D() on what a "1D 
-  array" is in the context of a multidimensional simulation. The 1D array must be the same 
+  on the root rank (rank 0). See documentation of MPIExchangeBoundaries1D() on what a "1D
+  array" is in the context of a multidimensional simulation. The 1D array must be the same
   along spatial dimensions normal to the one it represents.
 
   Notes:
   + The global array must not have ghost points.
   + The global array must be preallocated on only rank 0. On other ranks, it must be NULL.
-  + Since this function deals with a 1D array, more than one rank may be sending the same 
+  + Since this function deals with a 1D array, more than one rank may be sending the same
     piece of data to rank 0 (i.e. if there are more than one MPI rank along the dimensions
     normal to one corresponding to \a x ). The implementation of this function ignores this
     and overwrites that portion with the latest data sent.

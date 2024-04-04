@@ -16,12 +16,12 @@
 #define __FUNCT__ "PetscIFunctionImpl"
 
 /*!
-  Compute the left-hand-side for the implicit time integration of the 
+  Compute the left-hand-side for the implicit time integration of the
   governing equations: The spatially discretized ODE can be expressed as
   \f{equation}{
     \frac {d{\bf U}} {dt} = {\bf F}\left({\bf U}\right).
   \f}
-  This function computes \f$\dot{\bf U} - {\bf F}\left({\bf U}\right)\f$, 
+  This function computes \f$\dot{\bf U} - {\bf F}\left({\bf U}\right)\f$,
   given \f${\bf U},\dot{\bf U}\f$.
 
   \sa TSSetIFunction (https://petsc.org/release/docs/manualpages/TS/TSSetIFunction.html)
@@ -50,13 +50,13 @@ PetscErrorCode PetscIFunctionImpl(  TS        ts,   /*!< Time integration object
 
     HyPar* solver = &(sim[ns].solver);
     MPIVariables* mpi = &(sim[ns].mpi);
-  
+
     solver->count_RHSFunction++;
-  
+
     int size = solver->npoints_local_wghosts;
     double* u = solver->u;
     double* rhs = solver->rhs;
-  
+
     /* copy solution from PETSc vector */
     TransferVecFromPETSc(u,Y,context,ns,context->offsets[ns]);
     /* apply boundary conditions and exchange data over MPI interfaces */
@@ -67,21 +67,21 @@ PetscErrorCode PetscIFunctionImpl(  TS        ts,   /*!< Time integration object
                               solver->ghosts,
                               mpi,
                               u );
-  
+
     /* Evaluate hyperbolic, parabolic and source terms  and the RHS */
     solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,1,solver->FFunction,solver->Upwind);
     solver->ParabolicFunction (solver->par,u,solver,mpi,t);
     solver->SourceFunction    (solver->source,u,solver,mpi,t);
-  
+
     _ArraySetValue_(rhs,size*solver->nvars,0.0);
     _ArrayAXPY_(solver->hyp   ,-1.0,rhs,size*solver->nvars);
     _ArrayAXPY_(solver->par   , 1.0,rhs,size*solver->nvars);
     _ArrayAXPY_(solver->source, 1.0,rhs,size*solver->nvars);
-  
+
     /* save a copy of the solution and RHS for use in IJacobian */
     _ArrayCopy1D_(u  ,solver->uref  ,(size*solver->nvars));
     _ArrayCopy1D_(rhs,solver->rhsref,(size*solver->nvars));
-  
+
     /* Transfer RHS to PETSc vector */
     TransferVecToPETSc(rhs,F,context,ns,context->offsets[ns]);
 

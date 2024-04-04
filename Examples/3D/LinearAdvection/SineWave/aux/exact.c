@@ -62,7 +62,7 @@ int main()
           fscanf(in,"%lf",&ax);
           fscanf(in,"%lf",&ay);
           fscanf(in,"%lf",&az);
-        } 
+        }
       }
     } else {
       fprintf(stderr,"Error: Illegal format in physics.inp. Crash and burn!\n");
@@ -71,10 +71,10 @@ int main()
   }
   fclose(in);
   printf("Advection: %3.1f, %3.1f, %3.1f\n", ax, ay, az);
-  
+
   tf = (double)n_iter * dt;
   printf("dt: %lf, n_iter: %d, Final time: %lf\n", dt, n_iter, tf);
-  
+
   double Lx, Ly, Lz;
   Lx = 1.0;
   Ly = 1.0;
@@ -97,7 +97,7 @@ int main()
 
   {
     char filename[50] = "initial.inp";
-  
+
     for (i = 0; i < NI; i++){
       for (j = 0; j < NJ; j++){
         for (k = 0; k < NK; k++) {
@@ -121,10 +121,10 @@ int main()
     }
 
   }
-  
+
   {
     char filename[50] = "exact.inp";
-  
+
     for (i = 0; i < NI; i++){
       for (j = 0; j < NJ; j++){
         for (k = 0; k < NK; k++) {

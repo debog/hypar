@@ -15,12 +15,12 @@
 static int ReadArraywInterpSerial(int,int,int*,int*,int*,int,void*,void*,double*,double*,char*,int*);
 
 /*! Read in a vector field from file: This version allows reading data with different
-    dimensions than the array being read in. The data is read in and stored in a new global 
+    dimensions than the array being read in. The data is read in and stored in a new global
     array with the appropriate size, and the array to be read is filled by interpolation.
     Currently, the dimensions of the array to be read and the those of the actual data
     can only differ by factors that are integer powers of 2.
 
-    This is a wrapper function that calls 
+    This is a wrapper function that calls
     the appropriate function depending on input mode (#HyPar::input_mode).\n\n
     The mode and type of input are specified through #HyPar::input_mode and
     #HyPar::ip_file_type. A vector field is read from file and stored in an array.
@@ -82,7 +82,7 @@ int ReadArraywInterp( int     ndims,          /*!< Number of spatial dimensions 
         /* fill right boundary along this dimension */
         for (i = dim[d]+ghosts; i < dim[d]+2*ghosts; i++) {
           int delta = i - (dim[d]+ghosts-1);
-          X[i] =  X[dim[d]+ghosts-1] 
+          X[i] =  X[dim[d]+ghosts-1]
                   + ((double) delta) * (X[dim[d]+ghosts-1]-X[dim[d]+ghosts-2]);
         }
       }
@@ -94,7 +94,7 @@ int ReadArraywInterp( int     ndims,          /*!< Number of spatial dimensions 
 }
 
 /*! Read an array in a serial fashion: This version allows reading data with different
-    dimensions than the array being read in. The data is read in and stored in a new global 
+    dimensions than the array being read in. The data is read in and stored in a new global
     array with the appropriate size, and the array to be read is filled by interpolation.
     Currently, the dimensions of the array to be read and the those of the actual data
     can only differ by factors that are integer powers of 2.
@@ -271,25 +271,25 @@ int ReadArraywInterpSerial( int     ndims,          /*!< Number of spatial dimen
 
     double *ug_src_wg;
     long size = nvars;
-    for (d=0; d<ndims; d++) size *= (dim_global_src[d]+2*ghosts); 
+    for (d=0; d<ndims; d++) size *= (dim_global_src[d]+2*ghosts);
     ug_src_wg = (double*) calloc (size, sizeof(double));
-    ArrayCopynD(  ndims, 
-                  ug_src, 
-                  ug_src_wg, 
-                  dim_global_src, 
-                  0, 
-                  ghosts, 
-                  index, 
+    ArrayCopynD(  ndims,
+                  ug_src,
+                  ug_src_wg,
+                  dim_global_src,
+                  0,
+                  ghosts,
+                  index,
                   nvars );
-    fillGhostCells( dim_global_src, 
-                    ghosts, 
-                    ug_src_wg, 
-                    nvars, 
-                    ndims, 
+    fillGhostCells( dim_global_src,
+                    ghosts,
+                    ug_src_wg,
+                    nvars,
+                    ndims,
                     solver->isPeriodic);
     free(ug_src);
 
-    /* interpolate from the data read in to a global array 
+    /* interpolate from the data read in to a global array
      * with specified dimensions */
     int ierr = InterpolateGlobalnDVar(  dim_global,
                                         &ug,

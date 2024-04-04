@@ -29,7 +29,7 @@ int ShallowWater2DTopography(
   MPIVariables   *mpi    = (MPIVariables*) m;
   ShallowWater2D *param  = (ShallowWater2D*) solver->physics;
   double         *S      = param->b;
-  int            d, done, *dim = solver->dim_local, 
+  int            d, done, *dim = solver->dim_local,
                  ghosts = solver->ghosts;
   _DECLARE_IERR_;
 
@@ -93,11 +93,11 @@ int ShallowWater2DTopography(
 
   if (param->bt_type) {
     /* if topography is periodic, then the overall problem must also be periodic
-       (i.e. boundary conditions will be specified as periodic). Hence, 
-       MPIExchangeBoundariesnD() will take care of setting the ghosts points 
+       (i.e. boundary conditions will be specified as periodic). Hence,
+       MPIExchangeBoundariesnD() will take care of setting the ghosts points
        for multi-processor simulations. For single processor, set the ghost
        points accordingly. */
-    int indexb[_MODEL_NDIMS_], indexi[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_], 
+    int indexb[_MODEL_NDIMS_], indexi[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_],
         offset[_MODEL_NDIMS_];
     for (d = 0; d < _MODEL_NDIMS_; d++) {
       if (mpi->iproc[d] == 1) {
@@ -126,7 +126,7 @@ int ShallowWater2DTopography(
     }
   } else {
     /* if topography is not periodic, extrapolate it at the boundaries */
-    int indexb[_MODEL_NDIMS_], indexi[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_], 
+    int indexb[_MODEL_NDIMS_], indexi[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_],
         offset[_MODEL_NDIMS_];
     for (d = 0; d < _MODEL_NDIMS_; d++) {
       /* left boundary */

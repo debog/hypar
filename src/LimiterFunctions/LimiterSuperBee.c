@@ -9,11 +9,11 @@
 /*! Superbee limiter
 
     Reference:
-    + Roe, P.L. (1986), "Characteristic-based schemes for the Euler equations", 
+    + Roe, P.L. (1986), "Characteristic-based schemes for the Euler equations",
       Annu. Rev. Fluid Mech., 18: 337–365,
       doi:10.1146/annurev.fl.18.010186.002005
 */
-double LimiterSuperBee( 
+double LimiterSuperBee(
                         double r /*!< Input slope ratio */
                       )
 {

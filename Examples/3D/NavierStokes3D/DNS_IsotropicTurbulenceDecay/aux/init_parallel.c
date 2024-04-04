@@ -1,15 +1,15 @@
 /*
 
   This code generates the initial solution for the
-  isotropic turbulence decay problem, using the technique 
+  isotropic turbulence decay problem, using the technique
   described in the 1981 NASA report by Rogallo.
 
-  It needs the FFTW3 library installed. To compile it, 
+  It needs the FFTW3 library installed. To compile it,
   make sure the fftw3.h and libfftw3 are available in
   the include and linking paths.
 
-  The initial solution is written for the local (MPI) sub-domains, 
-  and the number of files written depend on the number of I/O ranks. 
+  The initial solution is written for the local (MPI) sub-domains,
+  and the number of files written depend on the number of I/O ranks.
   Although this code is serial, it will compute the decomposition
   of the global domain and generate the initial solution accordingly.
 
@@ -76,8 +76,8 @@ void velocityComponent( const int N,
   double kk = sqrt(3 * (N/2)*(N/2));
   int kkmax = (int) kk;
 
-  fftw_complex *uhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
-  fftw_complex *u = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));  
+  fftw_complex *uhat = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));
+  fftw_complex *u = (fftw_complex*) fftw_malloc(N3 * sizeof(fftw_complex));
 
   fftw_plan inv_trans_u;
   inv_trans_u = fftw_plan_dft_3d(N, N, N, uhat, u, 1, FFTW_MEASURE);
@@ -93,7 +93,7 @@ void velocityComponent( const int N,
         double th2  = 2*PI * ((double)rand())/((double)RAND_MAX);
         double phi1 = 2*PI * ((double)rand())/((double)RAND_MAX);
 
-        double E = 16.0 * sqrt(2.0/PI) * (u0*u0/kp) * raiseto(kk/kp, 4.0) 
+        double E = 16.0 * sqrt(2.0/PI) * (u0*u0/kp) * raiseto(kk/kp, 4.0)
                         * exp(-2.0*(kk/kp)*(kk/kp));
         double alfa_real = sqrt(E/(4*PI*kk*kk))*cos(th1)*cos(phi1);
         double alfa_imag = sqrt(E/(4*PI*kk*kk))*sin(th1)*cos(phi1);
@@ -122,7 +122,7 @@ void velocityComponent( const int N,
         double th2  = 2*PI * ((double)rand())/((double)RAND_MAX);
         double phi1 = 2*PI * ((double)rand())/((double)RAND_MAX);
 
-        double E = 16.0 * sqrt(2.0/PI) * (u0*u0/kp) * raiseto(kk/kp, 4.0) 
+        double E = 16.0 * sqrt(2.0/PI) * (u0*u0/kp) * raiseto(kk/kp, 4.0)
                         * exp(-2.0*(kk/kp)*(kk/kp));
         double alfa_real = sqrt(E/(4*PI*kk*kk))*cos(th1)*cos(phi1);
         double alfa_imag = sqrt(E/(4*PI*kk*kk))*sin(th1)*cos(phi1);
@@ -248,11 +248,11 @@ void setVelocityField(const int N,
   double dx = 2*PI / ((double)N);
 
   printf("Computing u-velocity field.\n");
-  velocityComponent( N, 0, kp, u0, uvel ); 
+  velocityComponent( N, 0, kp, u0, uvel );
   printf("Computing v-velocity field.\n");
-  velocityComponent( N, 1, kp, u0, vvel ); 
+  velocityComponent( N, 1, kp, u0, vvel );
   printf("Computing w-velocity field.\n");
-  velocityComponent( N, 2, kp, u0, wvel ); 
+  velocityComponent( N, 2, kp, u0, wvel );
 
   double rms_velocity = 0;
   for (i = 0; i < N3; i++){
@@ -263,7 +263,7 @@ void setVelocityField(const int N,
     rms_velocity += (uu*uu + vv*vv + ww*ww);
   }
   rms_velocity = sqrt(rms_velocity / (3*((double)N3)));
-  
+
   /* scale the velocity components so that rms velocity matches u0 */
   double factor = u0 / rms_velocity;
   printf("Scaling factor = %1.16E\n",factor);
@@ -355,7 +355,7 @@ void GetStringFromInteger(int a,char *A,int width)
 {
   int i;
   for (i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0'); 
+    char digit = (char) (a%10 + '0');
     a /= 10;
     A[width-1-i] = digit;
   }
@@ -398,7 +398,7 @@ int MPIPartition1D(int nglobal,int nproc,int rank)
   return(nlocal);
 }
 
-int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie) 
+int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie)
 {
   int i;
   int ip[ndims];
@@ -507,9 +507,9 @@ int main()
   NK = dim_global[2];
   printf("Grid:  %d x %d x %d\n",NI,NJ,NK);
 
-  if ((NI != NJ) || (NI != NK) || (NJ != NK)) { 
-    printf("Error: NI,NJ,NK not equal. Bye!\n"); 
-    return(0); 
+  if ((NI != NJ) || (NI != NK) || (NJ != NK)) {
+    printf("Error: NI,NJ,NK not equal. Bye!\n");
+    return(0);
   }
   long N = NI;
   long N3 = (long) N * (long) N * (long) N;

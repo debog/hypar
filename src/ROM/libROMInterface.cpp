@@ -12,7 +12,7 @@
 #include <librom_interface.h>
 
 /*! Define the libROM interface
-  
+
     This function also reads libROM-related inputs from the file
     \b librom.inp. Rank 0 reads in the inputs and broadcasts
     them to all the processors.\n\n
@@ -35,7 +35,7 @@
     save_to_file       | string       | #libROMInterface::m_save_ROM                  | "true"
 
     Note: other keywords in this file may be read by other functions. The default value for \a rdim is invalid, so it \b must be specified.
-   
+
 */
 void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of type #SimulationObject */
                               int     a_nsims, /*!< number of simulation objects */
@@ -144,17 +144,17 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
         m_vec_size[ns] *= (sim[ns].solver.nvars);
       }
     }
-  
+
     m_rom.clear();
     m_U.clear();
     if (m_comp_mode == _ROM_COMP_MODE_MONOLITHIC_) {
       for (int ns = 0; ns < m_nsims; ns++) {
         if (m_rom_type == _ROM_TYPE_DMD_) {
-          m_rom.push_back(new DMDROMObject( m_vec_size[ns], 
-                                            m_sampling_freq*a_dt, 
-                                            m_rdim, 
-                                            m_rank, 
-                                            m_nproc, 
+          m_rom.push_back(new DMDROMObject( m_vec_size[ns],
+                                            m_sampling_freq*a_dt,
+                                            m_rdim,
+                                            m_rank,
+                                            m_nproc,
                                             ns ) );
         }
         m_U.push_back(new CAROM::Vector(m_vec_size[ns],true));
@@ -164,10 +164,10 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
         m_ncomps.push_back(sim[ns].solver.nvars);
         for (int v = 0; v < sim[ns].solver.nvars; v++) {
           if (m_rom_type == _ROM_TYPE_DMD_) {
-            m_rom.push_back(new DMDROMObject( m_vec_size[ns], 
-                                              m_sampling_freq*a_dt, 
-                                              m_rdim, 
-                                              m_rank, 
+            m_rom.push_back(new DMDROMObject( m_vec_size[ns],
+                                              m_sampling_freq*a_dt,
+                                              m_rdim,
+                                              m_rank,
                                               m_nproc,
                                               ns,
                                               v ) );
@@ -193,7 +193,7 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 }
 
 /*! Take a sample for training */
-void libROMInterface::takeSample( void* a_s,        /*!< Array of simulation objects of 
+void libROMInterface::takeSample( void* a_s,        /*!< Array of simulation objects of
                                                          type #SimulationObject */
                                   const double a_t  /*!< Current simulation time */ )
 {
@@ -225,7 +225,7 @@ void libROMInterface::takeSample( void* a_s,        /*!< Array of simulation obj
 }
 
 /*! Project initial solution for prediction */
-void libROMInterface::projectInitialSolution( void* a_s  /*!< Array of simulation objects of 
+void libROMInterface::projectInitialSolution( void* a_s  /*!< Array of simulation objects of
                                                               type #SimulationObject */ )
 {
   if (m_U.size() != m_rom.size()) {
@@ -317,7 +317,7 @@ void libROMInterface::predict(void*  a_s, /*!< Array of simulation objects of ty
 /*! Save ROM object to file */
 void libROMInterface::saveROM(const std::string& a_fname_root /*!< filename root */) const
 {
-  if (m_save_ROM) {      
+  if (m_save_ROM) {
 
     if (!m_rank) {
       printf("libROMInterface::saveROM() - saving ROM objects.\n");
@@ -412,7 +412,7 @@ void libROMInterface::loadROM(const std::string& a_fname_root /*!< filename root
  * points but the work vectors a_U is a serialized vector of the solution without ghost
  * points */
 void libROMInterface::copyFromHyPar(  std::vector<CAROM::Vector*>& a_U,  /*!< work vector */
-                                      void* a_s   /*!< Array of simulation objects of 
+                                      void* a_s   /*!< Array of simulation objects of
                                                        type #SimulationObject */ )
 {
   const SimulationObject* sim = (const SimulationObject*) a_s;
@@ -422,9 +422,9 @@ void libROMInterface::copyFromHyPar(  std::vector<CAROM::Vector*>& a_U,  /*!< wo
     for (int ns = 0; ns < m_nsims; ns++) {
       double* vec = a_U[ns]->getData();
       const double* u = sim[ns].solver.u;
-  
+
       std::vector<int> index(sim[ns].solver.ndims);
-  
+
       ArrayCopynD(  sim[ns].solver.ndims,
                     u,
                     vec,
@@ -442,9 +442,9 @@ void libROMInterface::copyFromHyPar(  std::vector<CAROM::Vector*>& a_U,  /*!< wo
       for (int v = 0; v < sim[ns].solver.nvars; v++) {
         double* vec = a_U[count]->getData();
         const double* u = sim[ns].solver.u;
-  
+
         std::vector<int> index(sim[ns].solver.ndims);
-  
+
         ArrayCopynDComponent( sim[ns].solver.ndims,
                               u,
                               vec,
@@ -473,7 +473,7 @@ void libROMInterface::copyFromHyPar(  std::vector<CAROM::Vector*>& a_U,  /*!< wo
  * into the main solution variable HyPar::u; otherwise it will be copied into the
  * variable for ROM prediction HyPar::u_rom_predicted */
 void libROMInterface::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vector */
-                                    void* a_s, /*!< Array of simulation objects of 
+                                    void* a_s, /*!< Array of simulation objects of
                                                     type #SimulationObject */
                                     int a_idx /*!< Simulation object index */ ) const
 {
@@ -499,7 +499,7 @@ void libROMInterface::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vecto
   return;
 }
 
-/*! Copy a vector a_vec to a component of the HyPar solution. Note that the HyPar solution 
+/*! Copy a vector a_vec to a component of the HyPar solution. Note that the HyPar solution
  * has ghost points but the vector a_vec is a serialized vector of one of the solution components
  * without ghost points.
  *
@@ -507,7 +507,7 @@ void libROMInterface::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vecto
  * into the main solution variable HyPar::u; otherwise it will be copied into the
  * variable for ROM prediction HyPar::u_rom_predicted */
 void libROMInterface::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vector */
-                                    void* a_s, /*!< Array of simulation objects of 
+                                    void* a_s, /*!< Array of simulation objects of
                                                     type #SimulationObject */
                                     int a_idx /*!< Simulation object index */,
                                     int a_var /*!< Vector component to copy */ ) const

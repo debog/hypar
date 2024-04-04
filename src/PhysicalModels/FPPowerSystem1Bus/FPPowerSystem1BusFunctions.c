@@ -9,7 +9,7 @@ double FPPowerSystem1BusDriftFunction(int dir,void *p,double x,double y, double 
   if (dir == _XDIR_) {
     drift = params->omegaB * (y - params->omegaS);
   } else if (dir == _YDIR_) {
-    drift = (params->omegaS/(2*params->H)) 
+    drift = (params->omegaS/(2*params->H))
           * (params->Pm_avg - params->Pmax*sin(x) - params->D*(y-params->omegaS));
   }
 

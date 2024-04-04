@@ -18,9 +18,9 @@
 
 
 int main()
-{  
+{
   /* shock formation time */
-  double ts = 2.0; 
+  double ts = 2.0;
 
   /* maximum number of iterations for computing exact solution */
   int MAX_ITER = 10000;
@@ -97,7 +97,7 @@ int main()
     x = (double*) calloc (NI   , sizeof(double));
     y = (double*) calloc (NJ   , sizeof(double));
     u = (double*) calloc (NI*NJ, sizeof(double));
-  
+
     for (i = 0; i < NI; i++){
       for (j = 0; j < NJ; j++){
         x[i] = i*dx;
@@ -106,10 +106,10 @@ int main()
         u[p] = sin(2*pi*x[i]) / (2*ts*pi);
       }
     }
-  
+
     FILE *out;
     if (!strcmp(ip_file_type,"ascii")) {
-  
+
       out = fopen("initial.inp","w");
       for (i = 0; i < NI; i++)  fprintf(out,"%1.16e ",x[i]);
       fprintf(out,"\n");
@@ -123,9 +123,9 @@ int main()
       }
       fprintf(out,"\n");
       fclose(out);
-  
+
     } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
-  
+
       printf("Writing binary exact solution file initial.inp\n");
       out = fopen("initial.inp","wb");
       fwrite(x,sizeof(double),NI,out);
@@ -141,9 +141,9 @@ int main()
       fwrite(U,sizeof(double),NI*NJ,out);
       free(U);
       fclose(out);
-  
+
     }
-  
+
     free(x);
     free(y);
     free(u);
@@ -157,7 +157,7 @@ int main()
     x = (double*) calloc (NI   , sizeof(double));
     y = (double*) calloc (NJ   , sizeof(double));
     u = (double*) calloc (NI*NJ, sizeof(double));
-  
+
     for (i = 0; i < NI; i++){
       for (j = 0; j < NJ; j++){
         x[i] = i*dx;
@@ -166,7 +166,7 @@ int main()
         u[p] = sin(2*pi*x[i]) / (2*ts*pi);
       }
     }
-  
+
     int k;
     printf("Computing exact solution iteratively...\n");
     for (k = 0; k < MAX_ITER; k++) {
@@ -186,7 +186,7 @@ int main()
 
     FILE *out;
     if (!strcmp(ip_file_type,"ascii")) {
-  
+
       out = fopen("exact.inp","w");
       for (i = 0; i < NI; i++)  fprintf(out,"%1.16e ",x[i]);
       fprintf(out,"\n");
@@ -200,9 +200,9 @@ int main()
       }
       fprintf(out,"\n");
       fclose(out);
-  
+
     } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
-  
+
       printf("Writing binary exact solution file exact.inp\n");
       out = fopen("exact.inp","wb");
       fwrite(x,sizeof(double),NI,out);
@@ -218,9 +218,9 @@ int main()
       fwrite(U,sizeof(double),NI*NJ,out);
       free(U);
       fclose(out);
-  
+
     }
-  
+
     free(x);
     free(y);
     free(u);

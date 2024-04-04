@@ -10,7 +10,7 @@
 #include <hypar.h>
 
 /*! Compute the modified solution for the upwinding step in a balanced conservative
-    finite-difference algorithm for the 2D shallow water equations. 
+    finite-difference algorithm for the 2D shallow water equations.
     \n\n
   Refer to:
   + Xing, Y., Shu, C.-W., "High order finite difference WENO schemes with the

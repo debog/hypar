@@ -10,7 +10,7 @@ int main()
   double p_ref    = 1.0;
   double grav_x   = 1.0;
   double grav_y   = 1.0;
-  
+
   double eta = 0.0001;
   printf("Enter the perturbation constant (eta): ");
   scanf("%lf",&eta);

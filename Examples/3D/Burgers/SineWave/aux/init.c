@@ -18,9 +18,9 @@
 
 
 int main()
-{  
+{
   /* shock formation time */
-  double ts = 2.0; 
+  double ts = 2.0;
 
   /* maximum number of iterations for computing exact solution */
   int MAX_ITER = 10000;
@@ -100,7 +100,7 @@ int main()
     y = (double*) calloc (NJ      , sizeof(double));
     z = (double*) calloc (NK      , sizeof(double));
     u = (double*) calloc (NI*NJ*NK, sizeof(double));
-  
+
     for (i = 0; i < NI; i++) {
       for (j = 0; j < NJ; j++) {
         for (k = 0; k < NK; k++) {
@@ -112,7 +112,7 @@ int main()
         }
       }
     }
-  
+
     FILE *out;
     if (!strcmp(ip_file_type,"ascii")) {
       printf("Writing ASCII initial solution file initial.inp\n");
@@ -142,7 +142,7 @@ int main()
       fwrite(u,sizeof(double),NI*NJ*NK,out);
       fclose(out);
     }
-  
+
     free(x);
     free(y);
     free(z);
@@ -158,7 +158,7 @@ int main()
     y = (double*) calloc (NJ      , sizeof(double));
     z = (double*) calloc (NK      , sizeof(double));
     u = (double*) calloc (NI*NJ*NK, sizeof(double));
-  
+
     for (i = 0; i < NI; i++) {
       for (j = 0; j < NJ; j++) {
         for (k = 0; k < NK; k++) {
@@ -170,7 +170,7 @@ int main()
         }
       }
     }
-  
+
     int iter;
     printf("Computing exact solution iteratively...\n");
     for (iter = 0; iter < MAX_ITER; iter++) {
@@ -219,7 +219,7 @@ int main()
       fwrite(u,sizeof(double),NI*NJ*NK,out);
       fclose(out);
     }
-  
+
     free(x);
     free(y);
     free(z);

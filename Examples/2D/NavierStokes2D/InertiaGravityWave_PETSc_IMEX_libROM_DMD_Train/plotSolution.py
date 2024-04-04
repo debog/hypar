@@ -1,6 +1,6 @@
 '''
 Python script to create plots of atmoshpheric flow variables
-of a HyPar simulation of the rising thermal bubble case. 
+of a HyPar simulation of the rising thermal bubble case.
 This particular file is for the
 2D Navier-Stokes/Euler physics, where the solution vector
 components are (rho, rho*u, rho*v, e).
@@ -116,7 +116,7 @@ def convertVar( u_conserved: np.ndarray,
                       rho0,
                       p0,
                       p_exner,
-                      theta0], 
+                      theta0],
                     axis=0)
   return retval
 
@@ -125,7 +125,7 @@ def plotData( data_fom_2d: np.ndarray,
               x2d: np.ndarray,
               y2d: np.ndarray,
               fig_filename,
-              varname, 
+              varname,
               t_solution ):
 
   data_del_2d = data_fom_2d - data_rom_2d
@@ -145,7 +145,7 @@ def plotData( data_fom_2d: np.ndarray,
   ax.set_title("FOM {:}, t={:.1f}".format(varname, t_solution))
   ax.set_xlim(np.min(x2d), np.max(x2d))
   ax.set_ylim(np.min(y2d), np.max(y2d))
-  
+
   ax = fig.add_subplot(fig_nv, fig_nh, 2)
   plot_contour2= ax.pcolor( x2d, y2d, data_rom_2d, cmap=colormap )
   cb = fig.colorbar(plot_contour2, ax=ax)
@@ -155,19 +155,19 @@ def plotData( data_fom_2d: np.ndarray,
   ax.set_title("ROM {:}, t={:.1f}".format(varname, t_solution))
   ax.set_xlim(np.min(x2d), np.max(x2d))
   ax.set_ylim(np.min(y2d), np.max(y2d))
-  
+
   ax = fig.add_subplot(fig_nv, fig_nh, 3)
   plot_contour2= ax.pcolor( x2d, y2d, data_del_2d, cmap=colormap )
   cb = fig.colorbar(plot_contour2, ax=ax)
   cb.ax.set_yticklabels(["{:.1e}".format(i) for i in cb.get_ticks()])
   ax.set_xlabel("x (m)")
   ax.set_ylabel("z (m)")
-  ax.set_title("Diff {:}, t={:.1f}, norm={:.3e}".format(varname, 
-                                                      t_solution, 
+  ax.set_title("Diff {:}, t={:.1f}, norm={:.3e}".format(varname,
+                                                      t_solution,
                                                       diff_norm))
   ax.set_xlim(np.min(x2d), np.max(x2d))
   ax.set_ylim(np.min(y2d), np.max(y2d))
-  
+
   print('Saving %s' % fig_filename)
   plt.savefig(fig_filename)
   plt.close()
@@ -180,11 +180,11 @@ if solver_inp_data['op_overwrite'] == 'no':
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   op_write_iter = int(solver_inp_data['file_op_iter'][0])
   dt_snapshots = op_write_iter*dt
   n_snapshots = int(niter/op_write_iter) + 1
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -197,7 +197,7 @@ if solver_inp_data['op_overwrite'] == 'no':
 
   for i in range(n_snapshots):
     for sim in range(nsims):
-    
+
       '''
       Load simulation data (solution snapshots)
       '''
@@ -227,24 +227,24 @@ if solver_inp_data['op_overwrite'] == 'no':
       x = grid[:size[0]]
       y = grid[size[0]:]
       y2d, x2d = np.meshgrid(y, x)
-  
+
       u_fom_cons_2d = np.transpose(solution_fom.reshape(size[1],size[0],nvars))
       u_fom_prim_2d = convertVar(u_fom_cons_2d, y2d)
-  
+
       u_rom_cons_2d = np.transpose(solution_rom.reshape(size[1],size[0],nvars))
       u_rom_prim_2d = convertVar(u_rom_cons_2d, y2d)
-  
+
       dtheta_fom = u_fom_prim_2d[4,:,:]-u_fom_prim_2d[8,:,:]
       dtheta_rom = u_rom_prim_2d[4,:,:]-u_rom_prim_2d[8,:,:]
       if nsims > 1:
         plt_fname = plt_dir_name+'/fig_dtheta_'+f'{s:03d}'+'_'+f'{i:05d}'+'.png'
       else:
         plt_fname = plt_dir_name+'/fig_dtheta_'+f'{i:05d}'+'.png'
-      plotData( dtheta_fom, 
-                dtheta_rom, 
-                x2d, y2d, 
-                plt_fname, 
-                'dtheta', 
+      plotData( dtheta_fom,
+                dtheta_rom,
+                x2d, y2d,
+                plt_fname,
+                'dtheta',
                 i*dt_snapshots)
 
 else:
@@ -252,7 +252,7 @@ else:
   niter = int(solver_inp_data['n_iter'][0])
   dt = float(solver_inp_data['dt'][0])
   t_final = dt*niter
-  
+
   print('Simulation parameters:')
   print('  ndims = ', ndims)
   print('  nvars = ', nvars)
@@ -260,7 +260,7 @@ else:
   print('  final time = ', t_final)
 
   for sim in range(nsims):
-  
+
     '''
     Load simulation data (solution snapshots)
     '''
@@ -303,8 +303,8 @@ else:
       plt_fname = plt_dir_name+'/fig_dtheta_'+f'{s:03d}'+'.png'
     else:
         plt_fname = plt_dir_name+'/fig_dtheta.png'
-    plotData( dtheta_fom, 
-              dtheta_rom, 
+    plotData( dtheta_fom,
+              dtheta_rom,
               x2d, y2d,
-              plt_fname, 'dtheta', 
+              plt_fname, 'dtheta',
               t_final )

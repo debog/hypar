@@ -1,6 +1,6 @@
 /*! @file LinearADRReaction.c
     @author Debojyoti Ghosh
-    @brief Function to evaluate the reaction term in the 
+    @brief Function to evaluate the reaction term in the
            linear advection-diffusion-reaction model
 */
 

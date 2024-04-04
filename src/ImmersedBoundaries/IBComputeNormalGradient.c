@@ -11,9 +11,9 @@
 #include <hypar.h>
 
 /*! Calculate the normal gradient of a provided variables on the
- *  immersed body surface: for each "local facet", i.e., facets 
- *  (of the immersed body surface) that lie within the local 
- *  computational domain of this MPI rank, compute the normal 
+ *  immersed body surface: for each "local facet", i.e., facets
+ *  (of the immersed body surface) that lie within the local
+ *  computational domain of this MPI rank, compute the normal
  *  gradient.
  *
  *  The variable should be a grid variable with size/layout the
@@ -23,7 +23,7 @@
  *  If the incoming variable has multiple components, this
  *  function will calculate normal gradient of each component.
  *
- *  The grad var array should be NULL at input; at output, it 
+ *  The grad var array should be NULL at input; at output, it
  *  will point to an array of size (#ImmersedBoundary::nfacets_local X nvars)
  *  that contains the normal gradient at each local facet. If there
  *  are no local facets, it will remain NULL.
@@ -38,7 +38,7 @@ int IBComputeNormalGradient(void*               s,       /*!< Solver object of t
                           )
 {
   HyPar             *solver  = (HyPar*)          s;
-  MPIVariables      *mpi     = (MPIVariables*)   m; 
+  MPIVariables      *mpi     = (MPIVariables*)   m;
   ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->ib;
 
   if (!solver->flag_ib) return(0);
@@ -57,10 +57,10 @@ int IBComputeNormalGradient(void*               s,       /*!< Solver object of t
     (*grad_var) = (double*) calloc (nvars*nfacets_local, sizeof(double));
 
     for (int n = 0; n < nfacets_local; n++) {
-  
+
       double *alpha;
       int    *nodes, j, k;
-  
+
       double v_c[nvars];
       alpha = &(fmap[n].interp_coeffs[0]);
       nodes = &(fmap[n].interp_nodes[0]);
@@ -70,7 +70,7 @@ int IBComputeNormalGradient(void*               s,       /*!< Solver object of t
           v_c[k] += ( alpha[j] * var[nvars*nodes[j]+k] );
         }
       }
-  
+
       double v_ns[nvars];
       alpha = &(fmap[n].interp_coeffs_ns[0]);
       nodes = &(fmap[n].interp_nodes_ns[0]);
@@ -80,18 +80,18 @@ int IBComputeNormalGradient(void*               s,       /*!< Solver object of t
           v_ns[k] += ( alpha[j] * var[nvars*nodes[j]+k] );
         }
       }
-  
+
      double nx = fmap[n].facet->nx;
      double ny = fmap[n].facet->ny;
      double nz = fmap[n].facet->nz;
-  
+
       for (k=0; k<nvars; k++) {
         double dv_dx = (v_ns[k] - v_c[k]) / fmap[n].dx;
         double dv_dy = (v_ns[k] - v_c[k]) / fmap[n].dy;
         double dv_dz = (v_ns[k] - v_c[k]) / fmap[n].dz;
         (*grad_var)[n*nvars+k] = dv_dx*nx + dv_dy*ny + dv_dz*nz;
       }
-  
+
     }
 
   }

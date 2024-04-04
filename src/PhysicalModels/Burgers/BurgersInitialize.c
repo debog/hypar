@@ -18,7 +18,7 @@ int    BurgersAdvection  (double*,double*,int,void*,double);
 int    BurgersUpwind     (double*,double*,double*,double*,
                           double*,double*,int,void*,double);
 
-/*! Initialize the nonlinear Burgers physics module - 
+/*! Initialize the nonlinear Burgers physics module -
     allocate and set physics-related parameters, read physics-related inputs
     from file, and set the physics-related function pointers in #HyPar
 */
@@ -27,7 +27,7 @@ int BurgersInitialize(void *s, /*!< Solver object of type #HyPar */
                      )
 {
   HyPar         *solver  = (HyPar*)        s;
-  MPIVariables  *mpi     = (MPIVariables*) m; 
+  MPIVariables  *mpi     = (MPIVariables*) m;
   Burgers       *physics = (Burgers*)      solver->physics;
   int           i, ferr;
 

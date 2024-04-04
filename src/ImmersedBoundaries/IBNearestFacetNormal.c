@@ -10,14 +10,14 @@
 #include <immersedboundaries.h>
 
 /*! For each immersed boundary point, find the nearest facet (#Facet3D) of the immersed
-    body (#ImmersedBoundary::body). The "nearest" facet is the one which is closest to 
+    body (#ImmersedBoundary::body). The "nearest" facet is the one which is closest to
     the boundary point in terms of the distance along the normal defined for that facet.
-    + The function will first try to find the nearest facet for which a line starting 
+    + The function will first try to find the nearest facet for which a line starting
       from the boundary point along the direction defind by the facet normal passes
       through that facet.
     + Failing the above criterion, the function will find the nearest facet.
 
-    \b Note: This function is sensitive to the fact that the normals defined for the 
+    \b Note: This function is sensitive to the fact that the normals defined for the
     immersed body are the \b outward normals, i.e., pointing away from the body. If
     this function returns an error, make sure this is true in the STL file the body
     is defined in.
@@ -65,8 +65,8 @@ int IBNearestFacetNormal(
       x1 = surface[n].x1;  x2 = surface[n].x2;  x3 = surface[n].x3;
       y1 = surface[n].y1;  y2 = surface[n].y2;  y3 = surface[n].y3;
       z1 = surface[n].z1;  z2 = surface[n].z2;  z3 = surface[n].z3;
-      double dist =   surface[n].nx*(xp-surface[n].x1) 
-                    + surface[n].ny*(yp-surface[n].y1) 
+      double dist =   surface[n].nx*(xp-surface[n].x1)
+                    + surface[n].ny*(yp-surface[n].y1)
                     + surface[n].nz*(zp-surface[n].z1);
       if (dist > 0)  continue;
       if (absolute(dist) < dist_min) {
@@ -99,14 +99,14 @@ int IBNearestFacetNormal(
         }
         if (is_it_in) {
           dist_min = absolute(dist);
-          n_min = n; 
+          n_min = n;
         }
       }
     }
     if (n_min == -1) {
       for (n = 0; n < nf; n++) {
-        double dist =   surface[n].nx*(xp-surface[n].x1) 
-                      + surface[n].ny*(yp-surface[n].y1) 
+        double dist =   surface[n].nx*(xp-surface[n].x1)
+                      + surface[n].ny*(yp-surface[n].y1)
                       + surface[n].nz*(zp-surface[n].z1);
         if (dist > eps)  continue;
         else {

@@ -5,7 +5,7 @@
 
 
 int main()
-{  
+{
   double pi = 4.0*atan(1.0);
   int NI,NJ,ndims,n_iter;
   double tf, dt;
@@ -55,7 +55,7 @@ int main()
         if (!strcmp(word, "advection")) {
           fscanf(in,"%lf",&ax);
           fscanf(in,"%lf",&ay);
-        } 
+        }
       }
     } else {
       fprintf(stderr,"Error: Illegal format in physics.inp. Crash and burn!\n");
@@ -64,14 +64,14 @@ int main()
   }
   fclose(in);
   printf("Advection: %3.1f, %3.1f\n",ax,ay);
-  
+
   int i,j;
   double dx = 1.0 / ((double)NI);
   double dy = 1.0 / ((double)NJ);
 
   tf = (double)n_iter * dt;
   printf("dt: %lf, n_iter: %d, Final time: %lf\n",dt,n_iter,tf);
-  
+
   double *x, *y, *u;
   x = (double*) calloc (NI   , sizeof(double));
   y = (double*) calloc (NJ   , sizeof(double));

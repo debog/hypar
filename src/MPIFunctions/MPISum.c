@@ -8,9 +8,9 @@
 
 /*!
   Compute the global sum over all MPI ranks in a given communicator for
-  \a int datatype. 
+  \a int datatype.
   + If \a var is an array of size greater than 1, \a global will be an array
-    of the same size with each element as the sum of that element 
+    of the same size with each element as the sum of that element
     in \a var on all the MPI ranks in the given communicator.
 */
 int MPISum_integer(
@@ -31,9 +31,9 @@ int MPISum_integer(
 
 /*!
   Compute the global sum over all MPI ranks in a given communicator for
-  \a double datatype. 
+  \a double datatype.
   + If \a var is an array of size greater than 1, \a global will be an array
-    of the same size with each element as the sum of that element 
+    of the same size with each element as the sum of that element
     in \a var on all the MPI ranks in the given communicator.
 */
 int MPISum_double(

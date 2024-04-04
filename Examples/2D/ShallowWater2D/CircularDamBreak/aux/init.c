@@ -1,6 +1,6 @@
 /*
   Code to generate the initial solution for:
-  Case: Small Peturbation 
+  Case: Small Peturbation
   Model: ShallowWater2D
 
   Reference:
@@ -21,7 +21,7 @@
 
 int main(){
   int   NI = 101, NJ = 101, ndims = 2;
-  char  ip_file_type[50]; 
+  char  ip_file_type[50];
   strcpy(ip_file_type,"ascii");
 
   FILE *in;

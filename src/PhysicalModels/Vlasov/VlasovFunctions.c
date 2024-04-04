@@ -8,7 +8,7 @@
 
 int VlasovEField(double*, void*, double);
 
-/*! Vlasov-specific function called at the beginning of each time-step: 
+/*! Vlasov-specific function called at the beginning of each time-step:
     Calls the function to set the electric field
 */
 int VlasovPreStep( double  *u,   /*!< Solution (conserved variables) */

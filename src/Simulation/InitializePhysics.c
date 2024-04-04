@@ -29,7 +29,7 @@
 #include <physicalmodels/shallowwater2d.h>
 #include <physicalmodels/vlasov.h>
 
-/*! Initialize the physical model for a simulation: Depending on the 
+/*! Initialize the physical model for a simulation: Depending on the
     physical model specified, this function calls the initialization
     function for that physical model. The latter is responsible for
     setting all the physics-specific functions that are required
@@ -82,7 +82,7 @@ int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #Si
     solver->IBFunction            = NULL;
 
     if (!strcmp(solver->model,_LINEAR_ADVECTION_DIFFUSION_REACTION_)) {
-  
+
       solver->physics = (LinearADR*) calloc (1,sizeof(LinearADR));
       IERR LinearADRInitialize(solver,mpi); CHECKERR(ierr);
 
@@ -92,78 +92,78 @@ int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #Si
     IERR BurgersInitialize(solver,mpi); CHECKERR(ierr);
 
     } else if (!strcmp(solver->model,_FP_DOUBLE_WELL_)) {
-  
+
       solver->physics = (FPDoubleWell*) calloc (1,sizeof(FPDoubleWell));
       IERR FPDoubleWellInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_FP_POWER_SYSTEM_)) {
-  
+
       solver->physics = (FPPowerSystem*) calloc (1,sizeof(FPPowerSystem));
       IERR FPPowerSystemInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_FP_POWER_SYSTEM_1BUS_)) {
-  
+
       solver->physics = (FPPowerSystem1Bus*) calloc (1,sizeof(FPPowerSystem1Bus));
       IERR FPPowerSystem1BusInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_FP_POWER_SYSTEM_3BUS_)) {
-  
+
       solver->physics = (FPPowerSystem3Bus*) calloc (1,sizeof(FPPowerSystem3Bus));
       IERR FPPowerSystem3BusInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_EULER_1D_)) {
-  
+
       solver->physics = (Euler1D*) calloc (1,sizeof(Euler1D));
       IERR Euler1DInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_EULER_2D_)) {
-  
+
       solver->physics = (Euler2D*) calloc (1,sizeof(Euler2D));
       IERR Euler2DInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_NAVIER_STOKES_2D_)) {
-  
+
       solver->physics = (NavierStokes2D*) calloc (1,sizeof(NavierStokes2D));
       IERR NavierStokes2DInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_NAVIER_STOKES_3D_)) {
-  
+
       solver->physics = (NavierStokes3D*) calloc (1,sizeof(NavierStokes3D));
       IERR NavierStokes3DInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_NUMA2D_)) {
-  
+
       solver->physics = (Numa2D*) calloc (1,sizeof(Numa2D));
       IERR Numa2DInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_NUMA3D_)) {
-  
+
       solver->physics = (Numa3D*) calloc (1,sizeof(Numa3D));
       IERR Numa3DInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_SHALLOW_WATER_1D_)) {
-  
+
       solver->physics = (ShallowWater1D*) calloc (1,sizeof(ShallowWater1D));
       IERR ShallowWater1DInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_SHALLOW_WATER_2D_)) {
-  
+
       solver->physics = (ShallowWater2D*) calloc (1,sizeof(ShallowWater2D));
       IERR ShallowWater2DInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     } else if (!strcmp(solver->model,_VLASOV_)) {
-  
+
       solver->physics = (Vlasov*) calloc (1,sizeof(Vlasov));
       IERR VlasovInitialize(solver,mpi); CHECKERR(ierr);
-  
+
     }else {
-  
+
       fprintf(stderr,"Error (domain %d): %s is not a supported physical model.\n",
               ns, solver->model);
       return(1);
-  
+
     }
-  
+
     /* some checks */
     if ( ( (solver->GetLeftEigenvectors == NULL) || (solver->GetRightEigenvectors == NULL) )
         && (!strcmp(solver->interp_type,_CHARACTERISTIC_)) && (solver->nvars > 1) ) {
@@ -175,7 +175,7 @@ int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #Si
       }
       return(1);
     }
-  
+
     if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
       if ((!solver->dFFunction) || (!solver->UpwinddF)) {
         if (!mpi->rank) {
@@ -189,7 +189,7 @@ int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #Si
       if (solver->FdFFunction && solver->UpwindFdF) solver->flag_fdf_specified = 1;
       else                                          solver->flag_fdf_specified = 0;
     }
-  
+
     if ((solver->IBFunction == NULL) && (solver->flag_ib)) {
       if (!mpi->rank) {
         fprintf(stderr,"Error in InitializePhysics() (domain %d): Physical model %s does not yet have an immersed boundary treatment.\n",

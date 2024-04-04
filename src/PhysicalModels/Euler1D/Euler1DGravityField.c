@@ -17,7 +17,7 @@
       http://dx.doi.org/10.1007/s10915-012-9585-8\n
     for details on the treatment of the gravitational source term.
     This function computes the graviational potential function. If
-    there is no gravity, the gravitational field is 1.0 all over 
+    there is no gravity, the gravitational field is 1.0 all over
     the domain.
 */
 int Euler1DGravityField(
@@ -57,7 +57,7 @@ int Euler1DGravityField(
   }
 
   if (param->grav_type != 1) {
-    /* a sensible simulation will not specify peridic boundary conditions 
+    /* a sensible simulation will not specify peridic boundary conditions
     * along a direction in which gravity acts (unless the gravitational field
     * itself is sinusoidal), so extrapolate the gravity field at the boundaries */
     int indexb[_MODEL_NDIMS_], indexi[_MODEL_NDIMS_];

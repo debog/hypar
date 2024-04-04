@@ -30,8 +30,8 @@ int    ShallowWater2DSourceUpwindRoe   (double*,double*,double*,double*,int,void
 int    ShallowWater2DModifiedSolution  (double*,double*,int,void*,void*,double);
 int    ShallowWater2DWriteTopography   (void*,void*,double);
 
-/*! Function to initialize the 2D shallow water equations (#ShallowWater2D) module: 
-    Sets the default parameters, read in and set physics-related parameters, 
+/*! Function to initialize the 2D shallow water equations (#ShallowWater2D) module:
+    Sets the default parameters, read in and set physics-related parameters,
     and set the physics-related function pointers in #HyPar.
 */
 int ShallowWater2DInitialize(
@@ -40,7 +40,7 @@ int ShallowWater2DInitialize(
                      )
 {
   HyPar           *solver  = (HyPar*)         s;
-  MPIVariables    *mpi     = (MPIVariables*)  m; 
+  MPIVariables    *mpi     = (MPIVariables*)  m;
   ShallowWater2D  *physics = (ShallowWater2D*)       solver->physics;
   int             ferr, d;
 
@@ -56,7 +56,7 @@ int ShallowWater2DInitialize(
   }
 
   /* default values */
-  physics->g       = 1.0; 
+  physics->g       = 1.0;
   physics->bt_type = 0;
   physics->fhat    = 0.0;
   physics->beta    = 0.0;
@@ -75,23 +75,23 @@ int ShallowWater2DInitialize(
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
           ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-          if (!strcmp(word, "gravity")) { 
-            ferr = fscanf(in,"%lf",&physics->g); 
+          if (!strcmp(word, "gravity")) {
+            ferr = fscanf(in,"%lf",&physics->g);
             if (ferr != 1) return(1);
-          } else if (!strcmp(word, "topography_type")) { 
-            ferr = fscanf(in,"%d",&physics->bt_type); 
+          } else if (!strcmp(word, "topography_type")) {
+            ferr = fscanf(in,"%d",&physics->bt_type);
             if (ferr != 1) return(1);
-          } else if (!strcmp(word, "coriolis_fhat")) { 
-            ferr = fscanf(in,"%lf",&physics->fhat); 
+          } else if (!strcmp(word, "coriolis_fhat")) {
+            ferr = fscanf(in,"%lf",&physics->fhat);
             if (ferr != 1) return(1);
-          } else if (!strcmp(word, "coriolis_beta")) { 
-            ferr = fscanf(in,"%lf",&physics->beta); 
+          } else if (!strcmp(word, "coriolis_beta")) {
+            ferr = fscanf(in,"%lf",&physics->beta);
             if (ferr != 1) return(1);
-          } else if (!strcmp(word, "coriolis_D")) { 
-            ferr = fscanf(in,"%lf",&physics->D); 
+          } else if (!strcmp(word, "coriolis_D")) {
+            ferr = fscanf(in,"%lf",&physics->D);
             if (ferr != 1) return(1);
           } else if (!strcmp(word,"upwinding")) {
-            ferr = fscanf(in,"%s",physics->upw_choice); 
+            ferr = fscanf(in,"%s",physics->upw_choice);
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
@@ -134,7 +134,7 @@ int ShallowWater2DInitialize(
   solver->GetLeftEigenvectors   = ShallowWater2DLeftEigenvectors;
   solver->GetRightEigenvectors  = ShallowWater2DRightEigenvectors;
   solver->PhysicsOutput         = ShallowWater2DWriteTopography;
-   
+
   if      (!strcmp(physics->upw_choice,_LLF_ )) physics->SourceUpwind = ShallowWater2DSourceUpwindLLF;
   else if (!strcmp(physics->upw_choice,_ROE_ )) physics->SourceUpwind = ShallowWater2DSourceUpwindRoe;
 

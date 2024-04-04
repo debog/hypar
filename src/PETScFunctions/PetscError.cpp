@@ -15,7 +15,7 @@
 #undef __FUNCT__
 #define __FUNCT__ "PetscTimeError"
 
-/*! Compute the norms of the error estimate, if the PETSc time integrator 
+/*! Compute the norms of the error estimate, if the PETSc time integrator
     has it (for example TSGLEE) */
 int PetscTimeError(TS  ts /*!< Time integrator object of PETSc type TS */)
 {
@@ -46,7 +46,7 @@ int PetscTimeError(TS  ts /*!< Time integrator object of PETSc type TS */)
                           context->offsets[ns] );
   }
 
-  if (std::string(time_scheme) == std::string(TSGLEE)) { 
+  if (std::string(time_scheme) == std::string(TSGLEE)) {
 
     Vec Z;
     ierr = VecDuplicate(Y,&Z); CHKERRQ(ierr);
@@ -66,9 +66,9 @@ int PetscTimeError(TS  ts /*!< Time integrator object of PETSc type TS */)
       MPIVariables* mpi = &(sim[ns].mpi);
 
       int size = solver->npoints_local_wghosts * solver->nvars;
-      double  sum = 0.0, 
-              global_sum = 0.0, 
-              *Uerr = solver->uref, 
+      double  sum = 0.0,
+              global_sum = 0.0,
+              *Uerr = solver->uref,
               error[3] = {0,0,0};
 
       /* calculate solution norm for relative errors */

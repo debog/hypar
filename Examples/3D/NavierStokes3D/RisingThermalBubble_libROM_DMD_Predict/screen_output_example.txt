@@ -4,13 +4,13 @@ Allocated simulation object(s).
 Reading solver inputs from file "solver.inp".
   No. of dimensions                          : 3
   No. of variables                           : 5
-  Domain size                                : 192 192 192 
-  Processes along each dimension             : 8 8 8 
-  Exact solution domain size                 : 192 192 192 
+  Domain size                                : 192 192 192
+  Processes along each dimension             : 8 8 8
+  Exact solution domain size                 : 192 192 192
   No. of ghosts pts                          : 3
   No. of iter.                               : 20
   Restart iteration                          : 0
-  Time integration scheme                    : euler 
+  Time integration scheme                    : euler
   Spatial discretization scheme (hyperbolic) : 1
   Split hyperbolic flux term?                : no
   Interpolation type for hyperbolic term     : characteristic

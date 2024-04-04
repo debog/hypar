@@ -104,7 +104,7 @@ int MPIGatherArraynD(
 /*!
   Gathers the contents of an n-dimensional array, partitioned amongst the MPI ranks, in to a global
   array on rank 0. See documentation of MPIExchangeBoundariesnD() for how the n-dimensional array is
-  stored in the memory as a single-index array. This is same as MPIGatherArraynD() but where the 
+  stored in the memory as a single-index array. This is same as MPIGatherArraynD() but where the
   global array *has* ghost points.
 
   Notes:

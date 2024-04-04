@@ -9,7 +9,7 @@
 #include <mpivars.h>
 #include <hypar.h>
 
-/*! Evaluate the parabolic term using a conservative finite-difference spatial discretization: 
+/*! Evaluate the parabolic term using a conservative finite-difference spatial discretization:
     The parabolic term is assumed to be of the form:
     \f{equation}{
       {\bf P}\left({\bf u}\right) = \sum_{d=0}^{D-1} \frac {\partial^2 {\bf g}_d\left(\bf u\right)} {\partial x_d^2},
@@ -19,7 +19,7 @@
       \left.{\bf P}\left({\bf u}\right)\right|_j = \sum_{d=0}^{D-1} \frac { \hat{\bf g}_{j+1/2} - \hat{\bf g}_{j-1/2} } {\Delta x_d^2},
     \f}
     where \f$d\f$ is the spatial dimension index, \f$D\f$ is the total number of spatial dimensions (#HyPar::ndims), and \f$j\f$ is
-    the grid index along \f$d\f$. \f$\hat{\bf g}_d\f$ is the numerical approximation to the second primitive of 
+    the grid index along \f$d\f$. \f$\hat{\bf g}_d\f$ is the numerical approximation to the second primitive of
     \f${\bf g}_d\left({\bf u}\right)\f$, computed using #HyPar::InterpolateInterfacesPar.
 
     \b Note: this form of the parabolic term \b does \b not allow for cross-derivatives.
@@ -79,8 +79,8 @@ int ParabolicFunctionCons1Stage(
       _ArrayIndex1D_(ndims,dim          ,index ,ghosts,p);
       _ArrayIndex1D_(ndims,dim_interface,index1,0     ,p1);
       _ArrayIndex1D_(ndims,dim_interface,index2,0     ,p2);
-      for (v=0; v<nvars; v++) 
-        par[nvars*p+v] +=  ((dxinv[offset+ghosts+index[d]] * dxinv[offset+ghosts+index[d]]) 
+      for (v=0; v<nvars; v++)
+        par[nvars*p+v] +=  ((dxinv[offset+ghosts+index[d]] * dxinv[offset+ghosts+index[d]])
                           * (FluxI[nvars*p2+v] - FluxI[nvars*p1+v]));
       _ArrayIncrementIndex_(ndims,dim,index,done);
     }

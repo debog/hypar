@@ -1,5 +1,5 @@
 /*
-  Code to generate the initial and exact 
+  Code to generate the initial and exact
   solutions for:
   Case: Sine Wave
   Model: Burger1D
@@ -24,7 +24,7 @@ void GetStringFromInteger(int a, char *A, int width)
 {
   int i;
   for (i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0'); 
+    char digit = (char) (a%10 + '0');
     a /= 10;
     A[width-1-i] = digit;
   }
@@ -181,7 +181,7 @@ int main()
         out = fopen(fname,"w");
         for (i = 0; i < N; i++)  fprintf(out,"%lf ",x[i]);
         fprintf(out,"\n");
-        for (i = 0; i < N; i++)  fprintf(out,"%lf ",u[i]);            
+        for (i = 0; i < N; i++)  fprintf(out,"%lf ",u[i]);
         fprintf(out,"\n");
         fclose(out);
       } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
@@ -197,7 +197,7 @@ int main()
 
     /* exact solution */
     if (tf < ts) {
-  
+
       char fname[_MAX_STRING_SIZE_] = "exact";
       if (nsims > 1) {
         char index[_MAX_STRING_SIZE_];
@@ -214,7 +214,7 @@ int main()
         x[i] = i*dx;
         u[i] = sin(2.0*pi*x[i]) / (ts*2.0*pi);
       }
-  
+
       int k;
       printf("Computing exact solution iteratively...\n");
       for (k = 0; k < MAX_ITER; k++) {
@@ -228,14 +228,14 @@ int main()
         printf("  iter=%6d, max res=%1.6e\n", k, maxres);
         if (maxres < tolerance) break;
       }
-  
+
       FILE *out;
       if (!strcmp(ip_file_type,"ascii")) {
         printf("Writing ASCII exact solution file %s\n", fname);
         out = fopen(fname,"w");
         for (i = 0; i < N; i++)  fprintf(out,"%lf ",x[i]);
         fprintf(out,"\n");
-        for (i = 0; i < N; i++)  fprintf(out,"%lf ",u[i]);            
+        for (i = 0; i < N; i++)  fprintf(out,"%lf ",u[i]);
         fprintf(out,"\n");
         fclose(out);
       } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
@@ -247,12 +247,12 @@ int main()
       }
       free(x);
       free(u);
-  
+
     } else {
-  
+
       printf("Final time (%f) greater than shock formation time (%f).\n", tf, ts);
       printf("Exact solution not available.\n");
-  
+
     }
   }
 

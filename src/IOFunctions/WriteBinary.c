@@ -34,11 +34,11 @@
 int WriteBinary(
                   int ndims,  /*!< Number of spatial dimensions */
                   int nvars,  /*!< Number of variables at each grid point */
-                  int *dim,   /*!< Integer array with the number of grid points 
+                  int *dim,   /*!< Integer array with the number of grid points
                                    in each spatial dimension as its entries */
                   double *x,  /*!< Array of spatial coordinates representing a
                                    Cartesian grid (no ghost points) */
-                  double *u,  /*!< Array containing the vector field to write 
+                  double *u,  /*!< Array containing the vector field to write
                                    (no ghost points) */
                   char *f,    /*!< Filename */
                   int *index  /*!< Preallocated integer array of size ndims */

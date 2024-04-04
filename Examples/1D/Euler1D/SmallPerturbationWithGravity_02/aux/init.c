@@ -8,7 +8,7 @@ int main(){
   double eta = 0.0001;
   printf("Enter the perturbation constant (eta): ");
   scanf("%lf",&eta);
-  
+
   int NI,ndims;
   FILE *in;
   printf("Reading file \"solver.inp\"...\n");
@@ -57,11 +57,11 @@ int main(){
   out = fopen("initial.inp","w");
   for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
   fprintf(out,"\n");
-  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rho[i]);            
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rho[i]);
   fprintf(out,"\n");
-  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rhou[i]);            
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",rhou[i]);
   fprintf(out,"\n");
-  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",e[i]);            
+  for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",e[i]);
   fprintf(out,"\n");
   fclose(out);
 

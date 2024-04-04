@@ -14,8 +14,8 @@
 #endif
 #include <tridiagLU.h>
 
-/*! 
-  ScaLAPACK's parallel tridiagonal solver: See 
+/*!
+  ScaLAPACK's parallel tridiagonal solver: See
   http://www.netlib.org/scalapack/explore-html/d7/d86/pddtsv_8f_source.html
   for its documentation.
 */
@@ -23,8 +23,8 @@ extern void pddtsv_();
 
 /*!
   Solve tridiagonal (non-periodic) systems of equations using ScaLAPACK's pddtsv:
-  This function can solve multiple independent systems with one call. The systems need not share 
-  the same left- or right-hand-sides. 
+  This function can solve multiple independent systems with one call. The systems need not share
+  the same left- or right-hand-sides.
   + This function is compiled only with the compilation flag "-Dwith_scalapack" is specified.
   + This function calls the ScaLAPACK function for solving tridiagonal systems individually
     for each system, and thus may not be efficient.
@@ -32,9 +32,9 @@ extern void pddtsv_();
   Array layout: The arguments \a a, \a b, \a c, and \a x are local 1D arrays (containing
   this processor's part of the subdiagonal, diagonal, superdiagonal, and right-hand-side)
   of size (\a n X \a ns), where \a n is the local size of the system, and \a ns is
-  the number of independent systems to solve. The ordering of the elements in these arrays 
+  the number of independent systems to solve. The ordering of the elements in these arrays
   is as follows:
-  + Elements of the same row for each of the independent systems are stored adjacent to each 
+  + Elements of the same row for each of the independent systems are stored adjacent to each
     other.
 
   For example, consider the following systems:
@@ -52,7 +52,7 @@ extern void pddtsv_();
     \ \ k= 1,\cdots,ns
   \f}
   and let \f$ ns = 3\f$. Note that in the code, \f$x\f$ and \f$r\f$ are the same array \a x.
-  
+
   Then, the array \a b must be a 1D array with the following layout of elements:\n
   [\n
   b_0^0, b_0^1, b_0^2, (diagonal element of the first row in each system) \n
@@ -60,12 +60,12 @@ extern void pddtsv_();
   ..., \n
   b_{n-1}^0, b_{n-1}^1, b_{n-1}^2 (diagonal element of the last row in each system) \n
   ]\n
-  The arrays \a a, \a c, and \a x are stored similarly. 
-  
+  The arrays \a a, \a c, and \a x are stored similarly.
+
   Notes:
   + This function does *not* preserve the sub-diagonal, diagonal, super-diagonal elements
-    and the right-hand-sides. 
-  + The input array \a x contains the right-hand-side on entering the function, and the 
+    and the right-hand-sides.
+  + The input array \a x contains the right-hand-side on entering the function, and the
     solution on exiting it.
 */
 int tridiagScaLPK(
@@ -168,7 +168,7 @@ int tridiagScaLPK(
     pddtsv_(&nglobal,&nrhs,dl,d,du,&ia,desca,rhs,&ib,descb,work,&lwork,&ierr);
     gettimeofday(&end,NULL);
     if (ierr) return(ierr);
-    
+
     for (i=0; i<n; i++) x[i*ns+s] = rhs[i];
 
     long long walltime;

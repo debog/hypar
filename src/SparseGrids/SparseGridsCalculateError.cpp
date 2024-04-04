@@ -10,8 +10,8 @@
 
 extern "C" int ExactSolution(void*,void*,double*,char*,int*);
 
-/*! Calculates the error in the solution if the exact solution is 
-    available. The exact solution should be provided in the file 
+/*! Calculates the error in the solution if the exact solution is
+    available. The exact solution should be provided in the file
     "exact.inp" in the same format as the initial solution.
 */
 void SparseGridsSimulation::CalculateError()
@@ -25,7 +25,7 @@ void SparseGridsSimulation::CalculateError()
     MPIVariables* mpi = &(m_sim_fg->mpi);
     long size = solver->nvars * solver->npoints_local_wghosts;
     uex = (double*) calloc (size, sizeof(double));
-  
+
     char fname_root[_MAX_STRING_SIZE_] = "exact";
     IERR ExactSolution( solver,
                         mpi,
@@ -44,14 +44,14 @@ void SparseGridsSimulation::CalculateError()
 
     /* No exact solution available */
     for (int n=0; n<m_nsims_sg; n++) {
-      m_sims_sg[n].solver.error[0] 
-        = m_sims_sg[n].solver.error[1] 
-        = m_sims_sg[n].solver.error[2] 
+      m_sims_sg[n].solver.error[0]
+        = m_sims_sg[n].solver.error[1]
+        = m_sims_sg[n].solver.error[2]
         = -1;
     }
-    m_sim_fg->solver.error[0] 
-      = m_sim_fg->solver.error[1] 
-      = m_sim_fg->solver.error[2] 
+    m_sim_fg->solver.error[0]
+      = m_sim_fg->solver.error[1]
+      = m_sim_fg->solver.error[2]
       = -1;
 
   } else {
@@ -64,7 +64,7 @@ void SparseGridsSimulation::CalculateError()
     double *uex2 = NULL;
 
     if (m_print_sg_errors == 1) {
-      long size =   m_sim_fg->solver.nvars 
+      long size =   m_sim_fg->solver.nvars
                   * m_sim_fg->solver.npoints_local_wghosts;
       uex2 = (double*) calloc(size, sizeof(double));
       _ArrayCopy1D_(uex, uex2, size);
@@ -76,19 +76,19 @@ void SparseGridsSimulation::CalculateError()
     /* calculate error for sparse grids */
     if (m_print_sg_errors == 1) {
       for (int n = 0; n < m_nsims_sg; n++) {
-  
+
         GridDimensions dim_fg(m_ndims,0);
         StdVecOps::copyFrom(dim_fg, m_sim_fg->solver.dim_global, m_ndims);
-  
+
         GridDimensions dim_sg(m_ndims,0);
         StdVecOps::copyFrom(dim_sg, m_sims_sg[n].solver.dim_global, m_ndims);
-  
+
         /* assemble the global exact solution on full grid */
         double *uex_global_fg = NULL;
         if (!m_rank) {
-          allocateDataArrays( dim_fg, 
-                              m_sim_fg->solver.nvars, 
-                              &uex_global_fg, 
+          allocateDataArrays( dim_fg,
+                              m_sim_fg->solver.nvars,
+                              &uex_global_fg,
                               m_sim_fg->solver.ghosts);
         }
         MPIGatherArraynDwGhosts( m_ndims,
@@ -99,8 +99,8 @@ void SparseGridsSimulation::CalculateError()
                                  m_sim_fg->solver.dim_local,
                                  m_sim_fg->solver.ghosts,
                                  m_sim_fg->solver.nvars );
-  
-        /* interpolate to sparse grid - 
+
+        /* interpolate to sparse grid -
          * this will delete the full grid array*/
         double *uex_global_sg = NULL;
         if (!m_rank) {
@@ -117,12 +117,12 @@ void SparseGridsSimulation::CalculateError()
             exit(1);
           }
         }
-  
+
         /* allocate local exact solution on this sparse grid */
-        long size = m_sims_sg[n].solver.nvars 
+        long size = m_sims_sg[n].solver.nvars
                     * m_sims_sg[n].solver.npoints_local_wghosts;
         double* uex_sg = (double*) calloc(size, sizeof(double));
-  
+
         /* partition the global exact solution to local on this sparse grid */
         MPIPartitionArraynDwGhosts( m_ndims,
                                     (void*) &(m_sims_sg[n].mpi),
@@ -132,13 +132,13 @@ void SparseGridsSimulation::CalculateError()
                                     m_sims_sg[n].solver.dim_local,
                                     m_sims_sg[n].solver.ghosts,
                                     m_sims_sg[n].solver.nvars );
-  
+
         /* delete the global exact solution array */
         if (!m_rank) free(uex_global_sg);
-  
+
         /* compute the error */
         computeError( m_sims_sg[n], uex_sg);
-  
+
         /* delete the exact solution array */
         free(uex_sg);
       }
@@ -207,12 +207,12 @@ void SparseGridsSimulation::computeError( SimulationObject& a_sim,  /*!< Simulat
   global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
   solver->error[2] = global_sum;
 
-  /* 
-    decide whether to normalize and report relative errors, 
+  /*
+    decide whether to normalize and report relative errors,
     or report absolute errors.
   */
-  if (    (solution_norm[0] > tolerance) 
-      &&  (solution_norm[1] > tolerance) 
+  if (    (solution_norm[0] > tolerance)
+      &&  (solution_norm[1] > tolerance)
       &&  (solution_norm[2] > tolerance) ) {
     solver->error[0] /= solution_norm[0];
     solver->error[1] /= solution_norm[1];

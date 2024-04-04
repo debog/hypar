@@ -18,7 +18,7 @@
 
 #undef  _MINIMUM_GHOSTS_
 /*! \def _MINIMUM_GHOSTS_
- * Minimum number of ghost points required for this interpolation 
+ * Minimum number of ghost points required for this interpolation
  * method.
 */
 #define _MINIMUM_GHOSTS_ 3
@@ -26,7 +26,7 @@
 /*! @brief 5th order WENO reconstruction (characteristic-based) on a uniform grid
 
     Computes the interpolated values of the first primitive of a function \f${\bf f}\left({\bf u}\right)\f$
-    at the interfaces from the cell-centered values of the function using the fifth order WENO scheme on a 
+    at the interfaces from the cell-centered values of the function using the fifth order WENO scheme on a
     uniform grid. The first primitive is defined as a function \f${\bf h}\left({\bf u}\right)\f$ that satisfies:
     \f{equation}{
       {\bf f}\left({\bf u}\left(x\right)\right) = \frac{1}{\Delta x} \int_{x-\Delta x/2}^{x+\Delta x/2} {\bf h}\left({\bf u}\left(\zeta\right)\right)d\zeta,
@@ -54,9 +54,9 @@
     + The left and right eigenvectors are computed at an averaged quantity at j+1/2. Thus, this function requires
       functions to compute the average state, and the left and right eigenvectors. These are provided by the physical
       model through
-      - #HyPar::GetLeftEigenvectors() 
+      - #HyPar::GetLeftEigenvectors()
       - #HyPar::GetRightEigenvectors()
-      - #HyPar::AveragingFunction() 
+      - #HyPar::AveragingFunction()
 
       If these functions are not provided by the physical model, then a characteristic-based interpolation cannot be used.
     + The function computes the interpolant for the entire grid in one call. It loops over all the grid lines along the interpolation direction
@@ -67,10 +67,10 @@
 
     \b Function \b arguments:
 
-    Argument  | Type      | Explanation             
+    Argument  | Type      | Explanation
     --------- | --------- | ---------------------------------------------
     fI        | double*   | Array to hold the computed interpolant at the grid interfaces. This array must have the same layout as the solution, but with \b no \b ghost \b points. Its size should be the same as u in all dimensions, except dir (the dimension along which to interpolate) along which it should be larger by 1 (number of interfaces is 1 more than the number of interior cell centers).
-    fC        | double*   | Array with the cell-centered values of the flux function \f${\bf f}\left({\bf u}\right)\f$. This array must have the same layout and size as the solution, \b with \b ghost \b points. 
+    fC        | double*   | Array with the cell-centered values of the flux function \f${\bf f}\left({\bf u}\right)\f$. This array must have the same layout and size as the solution, \b with \b ghost \b points.
     u         | double*   | The solution array \f${\bf u}\f$ (with ghost points). If the interpolation is characteristic based, this is needed to compute the eigendecomposition. For a multidimensional problem, the layout is as follows: u is a contiguous 1D array of size (nvars*dim[0]*dim[1]*...*dim[D-1]) corresponding to the multi-dimensional solution, with the following ordering - nvars, dim[0], dim[1], ..., dim[D-1], where nvars is the number of solution components (#HyPar::nvars), dim is the local size (#HyPar::dim_local), D is the number of spatial dimensions.
     x         | double*   | The grid array (with ghost points). This is used only by non-uniform-grid interpolation methods. For multidimensional problems, the layout is as follows: x is a contiguous 1D array of size (dim[0]+dim[1]+...+dim[D-1]), with the spatial coordinates along dim[0] stored from 0,...,dim[0]-1, the spatial coordinates along dim[1] stored along dim[0],...,dim[0]+dim[1]-1, and so forth.
     upw       | int       | Upwinding direction: if positive, a left-biased interpolant will be computed; if negative, a right-biased interpolant will be computed. If the interpolation method is central, then this has no effect.
@@ -80,7 +80,7 @@
     uflag     | int       | A flag indicating if the function being interpolated \f${\bf f}\f$ is the solution itself \f${\bf u}\f$ (if 1, \f${\bf f}\left({\bf u}\right) \equiv {\bf u}\f$).
 
 
-    \b Reference: 
+    \b Reference:
     + Jiang, G.-S., Shu, C.-W., Efficient Implementation of Weighted ENO Schemes, J. Comput. Phys., 126 (1), 1996, pp. 202-228, http://dx.doi.org/10.1006/jcph.1996.0130
  */
 int Interp1PrimFifthOrderWENOChar(

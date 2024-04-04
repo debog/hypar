@@ -439,7 +439,7 @@ INLINE int ArrayCopynD(int    ndims,    /*!< number of dimensions */
 }
 
 /*! Copies a component of an n-D array to another n-D array of at least one component
- * (both of which are stored in memory as 1D arrays); the two arrays *must* be of 
+ * (both of which are stored in memory as 1D arrays); the two arrays *must* be of
  * the same n-dimensional size (locally and globally) */
 INLINE int ArrayCopynDComponent(  int    ndims,      /*!< number of dimensions */
                                   const double *x,   /*!< copy-from array */
@@ -474,7 +474,7 @@ INLINE int ArrayCopynDComponent(  int    ndims,      /*!< number of dimensions *
   _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p1, p2;
-    _ArrayIndex1D_(ndims,dim,index,g1,p1); 
+    _ArrayIndex1D_(ndims,dim,index,g1,p1);
     _ArrayIndex1D_(ndims,dim,index,g2,p2);
     (y+p2*nvars_to)[var_to] = (x+p1*nvars_from)[var_from];
     _ArrayIncrementIndex_(ndims,dim,index,done);

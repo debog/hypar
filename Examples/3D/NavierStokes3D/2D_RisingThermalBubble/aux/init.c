@@ -18,7 +18,7 @@ int main()
   double grav_y   = 9.8;
   double grav_z   = 0.0;
   int    HB       = 0;
-  
+
   int   NI,NJ,NK,ndims;
   char  ip_file_type[50]; strcpy(ip_file_type,"ascii");
   FILE *in;

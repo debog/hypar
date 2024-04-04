@@ -1,8 +1,8 @@
 /*
 
-  This code calculates the kinetic energy as 
+  This code calculates the kinetic energy as
   a function of time. It reads in the solution
-  files (assuming they are not overwritten and 
+  files (assuming they are not overwritten and
   are available as op_xxxxx.bin).
 
 */

@@ -12,7 +12,7 @@
 
 /*!
 Initialize the tridiagLU solver by setting the various parameters in
-#TridiagLU to their default values. If the file \a lusolver.inp is 
+#TridiagLU to their default values. If the file \a lusolver.inp is
 available, read it and set the parameters.
 
 The file \b lusolver.inp must be in the following format:\n
@@ -39,7 +39,7 @@ where the list of keywords are:\n
 int tridiagLUInit(
                     void *r,  /*!< Object of type TridiagLU */
                     void *c   /*!< MPI communicator */
-                 ) 
+                 )
 {
   TridiagLU *t = (TridiagLU*) r;
   int       rank,ierr;

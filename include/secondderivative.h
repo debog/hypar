@@ -12,11 +12,11 @@
 #define _FOURTH_ORDER_CENTRAL_  "4"
 
 /* One-dimensional second derivative functions: Functions to calculate the
- * finite-difference approximation to the second derivative along a given 
+ * finite-difference approximation to the second derivative along a given
  * dimension at the cell-centers / grid points.
  *
  * Arguments:-
- *  
+ *
  *  Df        double*     array containing the approximation to the second derivative
  *                        (1D array representing an n-D solution)
  *
@@ -30,11 +30,11 @@
  *                        contain at least the following:
  *                        ndims     int       number of dimensions
  *                        nvars     int       number of elements at each grid location
- *                        dim       int*      array of grid size along each dimension 
+ *                        dim       int*      array of grid size along each dimension
  *                                            (integer array of size ndims)
  *                        ghosts    int       number of ghost points
  *
- *  m         void*       Pointer to an object providing the MPI context. Current not being 
+ *  m         void*       Pointer to an object providing the MPI context. Current not being
  *                        used. This will be required for compact finite-difference methods.
  *
  *

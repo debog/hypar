@@ -6,7 +6,7 @@
   energy as a function of time.
 
   Note: Use this only if the solution was written
-  out in unsteady form (i.e. op_overwrite is "no" 
+  out in unsteady form (i.e. op_overwrite is "no"
   in solver.inp).
 */
 

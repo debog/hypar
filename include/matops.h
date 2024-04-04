@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 /*! \def _MatrixZero_
- * Set all elements of the square matrix \a A of size \a N to 0, stored as 
+ * Set all elements of the square matrix \a A of size \a N to 0, stored as
  * a 1D array in row-major format.
 */
 #define _MatrixZero_(A,N) \
@@ -33,7 +33,7 @@
   }
 
 /*! \def _MatrixMultiplyNonSquare_
- * \a C = \a A \a B where \a A is a \a NRowA X \a NColA matrix, 
+ * \a C = \a A \a B where \a A is a \a NRowA X \a NColA matrix,
  * \a B is a \a NColA X \a NColB matrix, and \a C is a \a NRowA X \a NColB
  * matrix. All matrices are stored as 1D arrays in row-major format.
 */

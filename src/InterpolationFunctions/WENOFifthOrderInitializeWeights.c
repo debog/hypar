@@ -19,21 +19,21 @@
 
   \b Notes:
   + The three weights at all the grid interfaces along all the dimensions are stored in three big arrays
-    (#WENOParameters::w1, #WENOParameters::w2, #WENOParameters::w3), one for each weight. 
+    (#WENOParameters::w1, #WENOParameters::w2, #WENOParameters::w3), one for each weight.
   + This function initializes the values for the spatial dimension given by the input \a dir.
   + \a offset indicates the location in #WENOParameters::w1,#WENOParameters::w2, and #WENOParameters::w3
     from where the chunk of memory with the weights for the spatial dimension \a dir starts.
-  + This chunk of memory (1D array) represents a multidimensional array of the following size: 
+  + This chunk of memory (1D array) represents a multidimensional array of the following size:
     4 X (number of interfaces) X (number of solution components #HyPar::nvars). The factor 4 comes from the
-    fact that the array stores weights for the interpolation of left-biased flux function, left-biased 
+    fact that the array stores weights for the interpolation of left-biased flux function, left-biased
     solution, right-biased flux function, and right-biased solution, one after the other, in this order.
-  + The weights are initialized to their optimal values so that, if no limiting is specified 
+  + The weights are initialized to their optimal values so that, if no limiting is specified
     (#WENOParameters::no_limiting = 1), then no further computation of weights are required.
 */
 int WENOFifthOrderInitializeWeights(  double* const a_w1, /*!< Weight array */
                                       double* const a_w2, /*!< Weight array */
                                       double* const a_w3, /*!< Weight array */
-                                      const int* const a_offset, /*!< Offset array */ 
+                                      const int* const a_offset, /*!< Offset array */
                                       int   dir,  /*!< Spatial dimension */
                                       void  *s,   /*!< Solver object of type #HyPar */
                                       void  *m    /*!< MPI object of type #MPIVariables */

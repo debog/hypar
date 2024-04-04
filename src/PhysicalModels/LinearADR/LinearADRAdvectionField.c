@@ -14,7 +14,7 @@
 #include <hypar.h>
 #include <mpivars.h>
 
-/*! Set the advection field over the domain - reads the spatially-varying 
+/*! Set the advection field over the domain - reads the spatially-varying
  * advection data from a file, if available. The array to store the field
  * \b must already be allocated.
  *
@@ -27,7 +27,7 @@
  * it is being read in for.
  *
  * For a sparse grids simulation, it reads in the advection field from
- * the file with data that has the grid dimensions as the full grid. The 
+ * the file with data that has the grid dimensions as the full grid. The
  * field on the current grid is obtained by interpolation.
 */
 int LinearADRAdvectionField(void *s,      /*!< Solver object of type #HyPar */
@@ -57,7 +57,7 @@ int LinearADRAdvectionField(void *s,      /*!< Solver object of type #HyPar */
   int ghosts = solver->ghosts;
 
   /* number of advection field components at a grid point is
-   * number of spatial dimensions times number of solution 
+   * number of spatial dimensions times number of solution
    * components */
   int adv_nvar = solver->ndims * solver->nvars;
   if (param->adv_arr_size != adv_nvar*solver->npoints_local_wghosts) {
@@ -129,12 +129,12 @@ int LinearADRAdvectionField(void *s,      /*!< Solver object of type #HyPar */
 
   /* Along each dimension:
      - If boundaries are periodic, then set ghost points accordingly if
-       number of MPI ranks along that dimension is 1 (if more than 1, 
+       number of MPI ranks along that dimension is 1 (if more than 1,
        MPIExchangeBoundariesnD() called above has taken care of it).
      - Else, extrapolate at the boundaries. */
-  int indexb[solver->ndims], 
-      indexi[solver->ndims], 
-      bounds[solver->ndims], 
+  int indexb[solver->ndims],
+      indexi[solver->ndims],
+      bounds[solver->ndims],
       offset[solver->ndims];
   for (d = 0; d < solver->ndims; d++) {
     if (solver->isPeriodic[d] && (mpi->iproc[d] == 1)) {

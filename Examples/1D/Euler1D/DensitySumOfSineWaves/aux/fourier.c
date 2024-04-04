@@ -32,7 +32,7 @@ int main()
 
   FILE   *solution;
   double *u;
-  
+
   u = (double*) calloc (NI, sizeof(double));
   solution = fopen("op_exact.dat","r");
   if (solution) {
@@ -49,7 +49,7 @@ int main()
     fourier_analysis(NI,0,u,0);
   } else printf("Error: exact solution file not found.\n");
   free(u);
-  
+
   u = (double*) calloc (NI, sizeof(double));
   solution = fopen("op.dat","r");
   if (solution) {
@@ -109,7 +109,7 @@ void fourier_analysis(int N, int G, double *u, int flag)
     }else{
       phase = atan2(yy,xx);
     }
-    
+
     term += (out[i][0]*out[i][0]     +  out[i][1]*out[i][1]);
     term += (out[N-i][0]*out[N-i][0] +  out[N-i][1]*out[N-i][1]);
     fprintf(out_file,"%5d  %1.16E  %1.16E\n",i,term,phase);

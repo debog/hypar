@@ -13,10 +13,10 @@
 #include <tridiagLU.h>
 
 /*!
-  Solve tridiagonal (non-periodic) systems of equations using the gather-and-solve approach: 
-  This function can solve multiple independent systems with one call. The systems need not share 
+  Solve tridiagonal (non-periodic) systems of equations using the gather-and-solve approach:
+  This function can solve multiple independent systems with one call. The systems need not share
   the same left- or right-hand-sides. The "gather-and-solve" approach gathers a tridiagonal
-  system on one processor and solves it using tridiagLU() (sending NULL as the argument for 
+  system on one processor and solves it using tridiagLU() (sending NULL as the argument for
   MPI communicator to indicate that a serial solution is desired). Given multiple tridiagonal
   systems (\a ns > 1), this function will gather the systems on different processors in an
   optimal way, and thus each processor will solve some of the systems. After the system(s) is
@@ -25,9 +25,9 @@
   Array layout: The arguments \a a, \a b, \a c, and \a x are local 1D arrays (containing
   this processor's part of the subdiagonal, diagonal, superdiagonal, and right-hand-side)
   of size (\a n X \a ns), where \a n is the local size of the system, and \a ns is
-  the number of independent systems to solve. The ordering of the elements in these arrays 
+  the number of independent systems to solve. The ordering of the elements in these arrays
   is as follows:
-  + Elements of the same row for each of the independent systems are stored adjacent to each 
+  + Elements of the same row for each of the independent systems are stored adjacent to each
     other.
 
   For example, consider the following systems:
@@ -45,7 +45,7 @@
     \ \ k= 1,\cdots,ns
   \f}
   and let \f$ ns = 3\f$. Note that in the code, \f$x\f$ and \f$r\f$ are the same array \a x.
-  
+
   Then, the array \a b must be a 1D array with the following layout of elements:\n
   [\n
   b_0^0, b_0^1, b_0^2, (diagonal element of the first row in each system) \n
@@ -53,12 +53,12 @@
   ..., \n
   b_{n-1}^0, b_{n-1}^1, b_{n-1}^2 (diagonal element of the last row in each system) \n
   ]\n
-  The arrays \a a, \a c, and \a x are stored similarly. 
-  
+  The arrays \a a, \a c, and \a x are stored similarly.
+
   Notes:
   + This function does *not* preserve the sub-diagonal, diagonal, super-diagonal elements
-    and the right-hand-sides. 
-  + The input array \a x contains the right-hand-side on entering the function, and the 
+    and the right-hand-sides.
+  + The input array \a x contains the right-hand-side on entering the function, and the
     solution on exiting it.
 */
 int tridiagLUGS(
@@ -97,8 +97,8 @@ int tridiagLUGS(
 
   if ((ns == 0) || (n == 0)) return(0);
 
-  /* 
-    each process needs to know the local sizes of every other process 
+  /*
+    each process needs to know the local sizes of every other process
     and total size of the system
   */
   int *N = (int*) calloc (nproc, sizeof(int));
@@ -112,11 +112,11 @@ int tridiagLUGS(
   /* on all processes, calculate the number of systems each     */
   /* process has to solve                                       */
   int *ns_local = (int*) calloc ((short)nproc,sizeof(int));
-  for (p=0; p<nproc; p++)    ns_local[p] = ns / nproc; 
+  for (p=0; p<nproc; p++)    ns_local[p] = ns / nproc;
   for (p=0; p<ns%nproc; p++) ns_local[p]++;
 
   /* allocate the arrays for the gathered tridiagonal systems */
-  double *ra=NULL,*rb=NULL,*rc=NULL,*rx=NULL; 
+  double *ra=NULL,*rb=NULL,*rc=NULL,*rx=NULL;
   if (ns_local[rank] > 0) {
     ra = (double*) calloc (ns_local[rank]*NT,sizeof(double));
     rb = (double*) calloc (ns_local[rank]*NT,sizeof(double));
@@ -126,7 +126,7 @@ int tridiagLUGS(
 
   /* Gather the systems on each process */
   /* allocate receive buffer */
-  if (ns_local[rank] > 0) 
+  if (ns_local[rank] > 0)
     recvbuf = (double*) calloc (ns_local[rank]*nvar*NT,sizeof(double));
   else recvbuf = NULL;
   dstart = 0;

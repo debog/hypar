@@ -21,7 +21,7 @@ double FPDoubleWellComputeCFL(void *s,void *m,double dt,double t)
     for (i = 0; i < dim[d]; i++) {
       for (v = 0; v < nvars; v++) {
         double x; _GetCoordinate_(0,i,dim,ghosts,solver->x,x);
-        double local_cfl =  absolute(drift(x)) * dt 
+        double local_cfl =  absolute(drift(x)) * dt
                           * dxinv[offset+ghosts+i];
         if (local_cfl > max_cfl) max_cfl = local_cfl;
       }

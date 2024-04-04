@@ -38,6 +38,6 @@ int Numa3DSource(double *S,double *u,void *s,void *m,double t)
     dT = wvel;
     wvel = dT;
   }
-  
+
   return(0);
 }

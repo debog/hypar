@@ -124,22 +124,22 @@ int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
 
     /* Calculate stage values */
     for (stage = 0; stage < params->nstages; stage++) {
-  
+
       double stagetime = TS->waqt + params->c[stage]*TS->dt;
-  
+
       for (ns = 0; ns < nsims; ns++) {
         _ArrayCopy1D_(  sim[ns].solver.u,
                         (TS->U[stage] + TS->u_offsets[ns]),
                         (TS->u_sizes[ns]) );
       }
-  
+
       for (i = 0; i < stage; i++) {
         _ArrayAXPY_(  TS->Udot[i],
                       (TS->dt * params->A[stage*params->nstages+i]),
                       TS->U[stage],
                       TS->u_size_total );
       }
-  
+
       for (ns = 0; ns < nsims; ns++) {
         if (sim[ns].solver.PreStage) {
           fprintf(stderr,"ERROR in TimeRK(): Call to solver->PreStage() commented out!\n");
@@ -151,7 +151,7 @@ int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
   //                                 stagetime ); CHECKERR(ierr);
         }
       }
-  
+
       for (ns = 0; ns < nsims; ns++) {
         if (sim[ns].solver.PostStage) {
           sim[ns].solver.PostStage(  (TS->U[stage] + TS->u_offsets[ns]),
@@ -160,7 +160,7 @@ int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
                                      stagetime); CHECKERR(ierr);
         }
       }
-  
+
       for (ns = 0; ns < nsims; ns++) {
         TS->RHSFunction( (TS->Udot[stage] + TS->u_offsets[ns]),
                          (TS->U[stage] + TS->u_offsets[ns]),
@@ -168,19 +168,19 @@ int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
                          &(sim[ns].mpi),
                          stagetime);
       }
-  
+
       _ArraySetValue_(TS->BoundaryFlux[stage], TS->bf_size_total, 0.0);
       for (ns = 0; ns < nsims; ns++) {
         _ArrayCopy1D_(  sim[ns].solver.StageBoundaryIntegral,
                         (TS->BoundaryFlux[stage] + TS->bf_offsets[ns]),
                         TS->bf_sizes[ns] );
       }
-  
+
     }
-  
+
     /* Step completion */
     for (stage = 0; stage < params->nstages; stage++) {
-  
+
       for (ns = 0; ns < nsims; ns++) {
         _ArrayAXPY_(  (TS->Udot[stage] + TS->u_offsets[ns]),
                       (TS->dt * params->b[stage]),
@@ -191,7 +191,7 @@ int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
                       (sim[ns].solver.StepBoundaryIntegral),
                       (TS->bf_sizes[ns]) );
       }
-  
+
     }
 
 #if defined(HAVE_CUDA)

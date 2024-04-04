@@ -6,12 +6,12 @@
 
     \f{equation}{
       \frac {\partial} {\partial t} \left[\begin{array}{c} h \\ hu \\ hv \end{array} \right]
-    + \frac {\partial} {\partial x} \left[\begin{array}{c} hu \\ hu^2 + \frac{1}{2}gh^2 \\ huv  \end{array} \right] 
-    + \frac {\partial} {\partial x} \left[\begin{array}{c} hv \\ huv \\ hv^2 + \frac{1}{2}gh^2  \end{array} \right] 
+    + \frac {\partial} {\partial x} \left[\begin{array}{c} hu \\ hu^2 + \frac{1}{2}gh^2 \\ huv  \end{array} \right]
+    + \frac {\partial} {\partial x} \left[\begin{array}{c} hv \\ huv \\ hv^2 + \frac{1}{2}gh^2  \end{array} \right]
     = \left[\begin{array}{c} 0 \\ -ghb_x \\ -ghb_y \end{array}\right]
     + \left[\begin{array}{c} 0 \\ fv     \\ -fu    \end{array}\right]
     \f}
-    where \f$h\f$ is the height, \f$\left(u,v\right)\f$ are the velocity components, \f$b(x,y)\f$ is the bottom 
+    where \f$h\f$ is the height, \f$\left(u,v\right)\f$ are the velocity components, \f$b(x,y)\f$ is the bottom
     topography, and \f$g\f$ is the gravitational constant.\n\n
 
     The Coriolis parameter \f$f\f$ is defined as
@@ -25,10 +25,10 @@
       http://dx.doi.org/10.1175/1520-0493(1994)122%3C0946:VDAWAV%3E2.0.CO;2\n
       Eqns. (2.1)-(2.3), (2.4)
 
-    For the treatment of the topography gradient source term (well-balanced formulation), 
+    For the treatment of the topography gradient source term (well-balanced formulation),
     refer to:\n
-    + Xing, Y., Shu, C.-W., "High order finite difference WENO schemes with the 
-      exact conservation property for the shallow water equations", Journal of 
+    + Xing, Y., Shu, C.-W., "High order finite difference WENO schemes with the
+      exact conservation property for the shallow water equations", Journal of
       Computational Physics, 208, 2005, pp. 206-227.
       http://dx.doi.org/10.1016/j.jcp.2005.02.006
 */
@@ -123,7 +123,7 @@
 /*! \def _ShallowWater2DEigenvalues_
     Compute the eigenvalues, given the conserved solution vector. The
     eigenvalues are returned as a 3x3 matrix stored in row-major format.
-    It is a diagonal matrix with the eigenvalues as diagonal elements. 
+    It is a diagonal matrix with the eigenvalues as diagonal elements.
     Admittedly, it is a wasteful way of storing the eigenvalues.
 */
 #define _ShallowWater2DEigenvalues_(u,D,p,dir) \
@@ -230,11 +230,11 @@
 
 /*! \def ShallowWater2D
     \brief Structure containing variables and parameters specific to the 2D Shallow Water equations.
- *  This structure contains the physical parameters, variables, and function pointers 
+ *  This structure contains the physical parameters, variables, and function pointers
  *  specific to the 2D ShallowWater equations.
 */
 /*! \brief Structure containing variables and parameters specific to the 2D Shallow Water equations.
- *  This structure contains the physical parameters, variables, and function pointers 
+ *  This structure contains the physical parameters, variables, and function pointers
  *  specific to the 2D ShallowWater equations.
 */
 typedef struct shallowwater2d_parameters {
@@ -246,10 +246,10 @@ typedef struct shallowwater2d_parameters {
           beta,      /*!< beta-plane approximation parameter for Coriolis force */
           D;         /*!< Channel width for Coriolis force calculation */
   char    upw_choice[_MAX_STRING_SIZE_]; /*!< Choice of upwinding scheme.\sa #_ROE_, #_LLF_*/
-  /*! Function pointer to the function that computes the "upwinding" step in source term computation. To 
+  /*! Function pointer to the function that computes the "upwinding" step in source term computation. To
       understand the implementation of the gravitational source terms, see:
-      + Xing, Y., Shu, C.-W., "High order finite difference WENO schemes with the 
-        exact conservation property for the shallow water equations", Journal of 
+      + Xing, Y., Shu, C.-W., "High order finite difference WENO schemes with the
+        exact conservation property for the shallow water equations", Journal of
         Computational Physics, 208, 2005, pp. 206-227.
         http://dx.doi.org/10.1016/j.jcp.2005.02.006
   */

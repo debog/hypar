@@ -22,8 +22,8 @@ int NavierStokes3DComputeTemperature(double*, const double* const, void*);
 /*!
   Calculate the shear forces on the immersed body surface: for each
   "local facet", i.e., facets (of the immersed body surface) that lie within
-  the local computational domain of this MPI rank, compute the shear forces 
-  at the facet centroid from the flow variables at the grid points surrounding 
+  the local computational domain of this MPI rank, compute the shear forces
+  at the facet centroid from the flow variables at the grid points surrounding
   the facet.
 
   The array to hold the computed shear forces *must* be NULL when this
@@ -36,12 +36,12 @@ int NavierStokes3DComputeTemperature(double*, const double* const, void*);
 */
 static int ComputeShear(void *s,              /*!< Solver object of type #HyPar */
                         void *m,              /*!< MPI object of type #MPIVariables */
-                        const double* const u,/*!< Array containing the conserved flow variables */ 
+                        const double* const u,/*!< Array containing the conserved flow variables */
                         double** const sf     /*!< Array for (x,y,z)-components & magnitude of shear */
                        )
 {
   HyPar             *solver  = (HyPar*)          s;
-  MPIVariables      *mpi     = (MPIVariables*)   m; 
+  MPIVariables      *mpi     = (MPIVariables*)   m;
   NavierStokes3D    *physics = (NavierStokes3D*) solver->physics;
   ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->ib;
 
@@ -62,14 +62,14 @@ static int ComputeShear(void *s,              /*!< Solver object of type #HyPar 
   if (nfacets_local > 0) {
 
     (*sf) = (double*) calloc (nv*nfacets_local, sizeof(double));
-  
+
     if (physics->Re > 0) {
 
       for (int n = 0; n < nfacets_local; n++) {
-    
+
         double *alpha;
         int    *nodes, j, k;
-    
+
         alpha = &(fmap[n].interp_coeffs[0]);
         nodes = &(fmap[n].interp_nodes[0]);
         _ArraySetValue_(v,_MODEL_NVARS_,0.0);
@@ -80,7 +80,7 @@ static int ComputeShear(void *s,              /*!< Solver object of type #HyPar 
         }
         double rho_c, uvel_c, vvel_c, wvel_c, energy_c, pressure_c;
         _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho_c,uvel_c,vvel_c,wvel_c,energy_c,pressure_c,physics->gamma);
-    
+
         alpha = &(fmap[n].interp_coeffs_ns[0]);
         nodes = &(fmap[n].interp_nodes_ns[0]);
         _ArraySetValue_(v,_MODEL_NVARS_,0.0);
@@ -91,42 +91,42 @@ static int ComputeShear(void *s,              /*!< Solver object of type #HyPar 
         }
         double rho_ns, uvel_ns, vvel_ns, wvel_ns, energy_ns, pressure_ns;
         _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho_ns,uvel_ns,vvel_ns,wvel_ns,energy_ns,pressure_ns,physics->gamma);
-        
+
         double u_x = (uvel_ns - uvel_c) / fmap[n].dx;
         double v_x = (vvel_ns - vvel_c) / fmap[n].dx;
         double w_x = (wvel_ns - wvel_c) / fmap[n].dx;
-        
+
         double u_y = (uvel_ns - uvel_c) / fmap[n].dy;
         double v_y = (vvel_ns - vvel_c) / fmap[n].dy;
         double w_y = (wvel_ns - wvel_c) / fmap[n].dy;
-        
+
         double u_z = (uvel_ns - uvel_c) / fmap[n].dz;
         double v_z = (vvel_ns - vvel_c) / fmap[n].dz;
         double w_z = (wvel_ns - wvel_c) / fmap[n].dz;
-        
+
         double nx = fmap[n].facet->nx;
         double ny = fmap[n].facet->ny;
         double nz = fmap[n].facet->nz;
-        
+
         double T      = physics->gamma*pressure_c/rho_c;
         double mu     = raiseto(T, 0.76);
         double inv_Re = 1.0/physics->Re;
-  
+
         double tau_x = (mu*inv_Re) * (2*u_x*nx + (u_y+v_x)*ny + (u_z+w_x)*nz);
         double tau_y = (mu*inv_Re) * ((v_x+u_y)*nx + 2*v_y*ny + (v_z+w_y)*nz);
         double tau_z = (mu*inv_Re) * ((w_x+u_z)*nx + (w_y+v_z)*ny + 2*w_z*nz);
-  
+
         (*sf)[n*nv+_XDIR_] = tau_x;
         (*sf)[n*nv+_YDIR_] = tau_y;
         (*sf)[n*nv+_ZDIR_] = tau_z;
 
         (*sf)[n*nv+_ZDIR_+1] = sqrt(tau_x*tau_x + tau_y*tau_y + tau_z*tau_z);
       }
-  
+
     } else {
 
       _ArraySetValue_((*sf), nv*nfacets_local, 0.0);
-  
+
     }
 
   }
@@ -266,7 +266,7 @@ int NavierStokes3DIBForces( void*   s,  /*!< Solver object of type #HyPar */
                             double  a_t /*!< Current simulation time */ )
 {
   HyPar             *solver  = (HyPar*)          s;
-  MPIVariables      *mpi     = (MPIVariables*)   m; 
+  MPIVariables      *mpi     = (MPIVariables*)   m;
   NavierStokes3D    *physics = (NavierStokes3D*) solver->physics;
   ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->ib;
   int ierr;

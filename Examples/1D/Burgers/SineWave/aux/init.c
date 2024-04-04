@@ -1,5 +1,5 @@
 /*
-  Code to generate the initial and exact 
+  Code to generate the initial and exact
   solutions for:
   Case: Sine Wave
   Model: Burger1D
@@ -21,7 +21,7 @@
 int main()
 {
   /* shock formation time */
-  double ts = 2.0; 
+  double ts = 2.0;
 
   /* maximum number of iterations for computing exact solution */
   int MAX_ITER = 10000;
@@ -87,7 +87,7 @@ int main()
       out = fopen("initial.inp","w");
       for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
       fprintf(out,"\n");
-      for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);            
+      for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);
       fprintf(out,"\n");
       fclose(out);
     } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {
@@ -132,7 +132,7 @@ int main()
       out = fopen("exact.inp","w");
       for (i = 0; i < NI; i++)  fprintf(out,"%lf ",x[i]);
       fprintf(out,"\n");
-      for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);            
+      for (i = 0; i < NI; i++)  fprintf(out,"%lf ",u[i]);
       fprintf(out,"\n");
       fclose(out);
     } else if ((!strcmp(ip_file_type,"binary")) || (!strcmp(ip_file_type,"bin"))) {

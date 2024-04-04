@@ -25,7 +25,7 @@
 
     \b Notes:
     + The second derivative is computed at the grid points or the cell centers.
-    + Though the array D2f includes ghost points, the second derivative is \b not computed at these 
+    + Though the array D2f includes ghost points, the second derivative is \b not computed at these
       locations. Thus, array elements corresponding to the ghost points contain undefined values.
     + \a D2f and \a f are 1D arrays containing the function and its computed derivatives on a multi-
       dimensional grid. The derivative along the specified dimension \b dir is computed by looping
@@ -75,11 +75,11 @@ int SecondDerivativeFourthOrderCentral(
       indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
       indexC[dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp1);
       indexC[dir] = i+2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp2);
-      for (v=0; v<nvars; v++)  
+      for (v=0; v<nvars; v++)
         D2f[qC*nvars+v] = (-f[qm2*nvars+v]+16*f[qm1*nvars+v]-30*f[qC*nvars+v]+16*f[qp1*nvars+v]-f[qp2*nvars+v])*one_twelve;
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
-  
+
   return(0);
 }

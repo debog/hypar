@@ -52,7 +52,7 @@ double LinearADRComputeCFL( void    *s, /*!< Solver object of type #HyPar */
         int v;
         for (v = 0; v < nvars; v++) {
           double a = params->a[nvars*ndims*p+nvars*d+v];
-          double local_cfl = a*dt*dxinv; 
+          double local_cfl = a*dt*dxinv;
           if (local_cfl > max_cfl) max_cfl = local_cfl;
         }
         _ArrayIncrementIndex_(ndims,dim,index,done);

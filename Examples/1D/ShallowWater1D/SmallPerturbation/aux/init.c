@@ -4,9 +4,9 @@
   Model: ShallowWater1D
 
   Reference:
-  Xing, Y., Shu, C.-W., "High order finite difference WENO 
-  schemes with the exact conservation property for the shallow 
-  water equations", Journal of Computational Physics, 208, 2005, 
+  Xing, Y., Shu, C.-W., "High order finite difference WENO
+  schemes with the exact conservation property for the shallow
+  water equations", Journal of Computational Physics, 208, 2005,
   pp. 206-227. http://dx.doi.org/10.1016/j.jcp.2005.02.006
   Section 4.3
 
@@ -23,11 +23,11 @@ int main() {
   double  eps;
   printf("Enter perturbation strength (eps): ");
   scanf("%lf", &eps);
-  
+
   int     NI,ndims;
   double  pi = 4.0*atan(1.0), gamma = 1.4;
   FILE    *in, *out;
-  char    ip_file_type[50]; 
+  char    ip_file_type[50];
 
   /* default values */
   NI    = 200;
@@ -83,16 +83,16 @@ int main() {
     out = fopen("initial.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
     fprintf(out,"\n");
-    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",h[i]);            
+    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",h[i]);
     fprintf(out,"\n");
-    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",hu[i]);            
+    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",hu[i]);
     fprintf(out,"\n");
     fclose(out);
     printf("Writing ASCII topography file topography.inp\n");
     out = fopen("topography.inp","w");
     for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",x[i]);
     fprintf(out,"\n");
-    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",b[i]);            
+    for (i = 0; i < NI; i++)  fprintf(out,"%1.16E ",b[i]);
     fprintf(out,"\n");
     fclose(out);
   } else {

@@ -40,7 +40,7 @@
  * PETSc's TS module (https://petsc.org/release/docs/manualpages/TS/index.html).
 */
 typedef struct _petsccontext_ {
-  
+
   /*! MPI rank */
   int rank;
 
@@ -82,9 +82,9 @@ typedef struct _petsccontext_ {
    *  the number of vector components at each grid point. */
   int ndofs;
 
-  /*! Vector of index lists of local points in each simulation domain whose size is 
+  /*! Vector of index lists of local points in each simulation domain whose size is
      (#HyPar::ndims+1)*#PETScContext::npoints.
-      For each point, it stores its ndims-dimensional index and its 1D index 
+      For each point, it stores its ndims-dimensional index and its 1D index
       of its location in the array #HyPar::u. */
   std::vector<int*> points;
 
@@ -93,15 +93,15 @@ typedef struct _petsccontext_ {
 
   /* flags for implicit treatment */
   /*! Flag to indicate if hyperbolic term is treated implicitly or explicitly    */
-  int flag_hyperbolic;    
+  int flag_hyperbolic;
   /*! Flag to indicate if the split hyperbolic term (\a f - \a df) is treated implicitly or explicitly  */
-  int flag_hyperbolic_f;  
+  int flag_hyperbolic_f;
   /*! Flag to indicate if the split hyperbolic term \a df is treated implicitly or explicitly  */
-  int flag_hyperbolic_df; 
+  int flag_hyperbolic_df;
   /*! Flag to indicate if the parabolic term is treated implicitly or explicitly      */
-  int flag_parabolic;     
+  int flag_parabolic;
   /*! Flag to indicate if the source term is treated implicitly or explicitly         */
-  int flag_source;        
+  int flag_source;
 
   /*! Flag to turn on preconditioning (off by default) */
   int flag_use_precon;
@@ -117,7 +117,7 @@ typedef struct _petsccontext_ {
 
   /*! A vector of essentialy integer arrays of the same size and layout at the solutions
       (with ghost points) containing the global DOF index for each grid point in each
-      simulation domain. 
+      simulation domain.
       It is declared as a \a double type so that its calculation can use functions
       defined for double-type variables.
       \sa PetscGlobalDOF() */

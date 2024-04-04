@@ -11,8 +11,8 @@
 #include <mpivars.h>
 #include <common.h>
 
-/*! 
-    Get a string representing a filename indexed by the MPI rank: 
+/*!
+    Get a string representing a filename indexed by the MPI rank:
     \a filename = \a root.index, where \a index is the string
     corresponding to the MPI rank.
 */

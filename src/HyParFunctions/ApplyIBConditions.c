@@ -15,7 +15,7 @@ int ApplyIBConditions(void    *s, /*!< Object of type #HyPar containing solver-r
                       void    *m, /*!< Object of type #MPIVariables containing MPI-related variables */
                       double  *x, /*!< The solution vector to apply immersed BCs on */
                       double  waqt /*!< Current simulation time */
-                     ) 
+                     )
 {
   HyPar           *solver   = (HyPar*)          s;
   MPIVariables    *mpi      = (MPIVariables*)   m;

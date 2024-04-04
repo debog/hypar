@@ -1,6 +1,6 @@
-/* This code generates the files for reading the initial 
+/* This code generates the files for reading the initial
  * (and exact, if available) solutions with MPI-IO, from
- * the "initial.inp" and "exact.inp" files containing the 
+ * the "initial.inp" and "exact.inp" files containing the
  * initial and exact solutions of the complete domain
  *
  * The new files are "initial_mpi.inp" and "exact_mpi.inp".
@@ -90,7 +90,7 @@ int MPIPartition1D(int nglobal,int nproc,int rank)
   return(nlocal);
 }
 
-int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie) 
+int MPILocalDomainLimits(int ndims,int p,int *iproc,int *dim_global,int *is, int *ie)
 {
   int i;
   int ip[ndims];

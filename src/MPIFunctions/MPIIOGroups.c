@@ -16,10 +16,10 @@
     it to that member.
   + Output - gets the local data of each member rank and writes it to a file.
 
-  The number of I/O groups (and hence, the number of I/O ranks reading and 
+  The number of I/O groups (and hence, the number of I/O ranks reading and
   writing to files) is specified through #MPIVariables::N_IORanks. Ideally,
-  this would correspond to the number of I/O nodes available for the 
-  total number of compute nodes being used on a HPC platform. 
+  this would correspond to the number of I/O nodes available for the
+  total number of compute nodes being used on a HPC platform.
 
   Two extreme cases are:
   + Number of I/O ranks is 1, i.e., just one rank (typically rank 0) is

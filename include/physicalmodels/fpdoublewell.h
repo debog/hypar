@@ -1,7 +1,7 @@
 /*
   Fokker-Planck Model for Double Well
 
-Reference: 
+Reference:
 + Miller, R.N., Carter E.F., Blue S.T., "Data assimilation into
   nonlinear stochastic models", Tellus (1999), 51 A, 167-194
 
@@ -28,7 +28,7 @@ typedef struct fp_double_well_parameters {
   double pdf_integral; /* not an input          */
 } FPDoubleWell;
 
-#define drift(x) (4.0*(x)*(1.0-(x)*(x))) 
+#define drift(x) (4.0*(x)*(1.0-(x)*(x)))
 
 int FPDoubleWellInitialize    (void*,void*);
 int FPDoubleWellCleanup       (void*);

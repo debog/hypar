@@ -16,7 +16,7 @@
 
 int ExactSolution(void*,void*,double*,char*,int*);
 
-/*! Calculates the error in the solution if the exact solution is 
+/*! Calculates the error in the solution if the exact solution is
     available. If the exact solution is not available, the errors
     are reported as zero.
     The exact solution should be provided in the file "exact.inp"
@@ -35,7 +35,7 @@ int CalculateError(
   _DECLARE_IERR_;
 
   size = solver->nvars;
-  for (i = 0; i < solver->ndims; i++) 
+  for (i = 0; i < solver->ndims; i++)
     size *= (solver->dim_local[i]+2*solver->ghosts);
   uex = (double*) calloc (size, sizeof(double));
 
@@ -103,12 +103,12 @@ int CalculateError(
     global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
     solver->error[2] = global_sum;
 
-    /* 
-      decide whether to normalize and report relative errors, 
+    /*
+      decide whether to normalize and report relative errors,
       or report absolute errors.
     */
-    if (    (solution_norm[0] > tolerance) 
-        &&  (solution_norm[1] > tolerance) 
+    if (    (solution_norm[0] > tolerance)
+        &&  (solution_norm[1] > tolerance)
         &&  (solution_norm[2] > tolerance) ) {
       solver->error[0] /= solution_norm[0];
       solver->error[1] /= solution_norm[1];

@@ -53,7 +53,7 @@ int main()
           fscanf(in, "%s", ip_file_type);
         }
       }
-    } else { 
+    } else {
       printf("Error: Illegal format in solver.inp. Crash and burn!\n");
       return(0);
     }
@@ -91,7 +91,7 @@ int main()
         else if (!strcmp(word, "ymin"  )) fscanf(in,"%lf",&ymin  );
         else if (!strcmp(word, "ymax"  )) fscanf(in,"%lf",&ymax  );
       }
-    } else { 
+    } else {
       printf("Error: Illegal format in physics.inp. Crash and burn!\n");
     }
   }
@@ -137,8 +137,8 @@ int main()
   }
   printf("Nearest grid point to equilibrium is (%d,%d) -> (%1.16E, %1.16E)\n",imin,jmin,x[imin],y[jmin]);
   if ((imin > -1) && (jmin > -1)) {
-    /* corrected x0,y0 and Pm so that 
-       the equilibrium point lies on a 
+    /* corrected x0,y0 and Pm so that
+       the equilibrium point lies on a
        grid point
     */
     x0 = x[imin];
@@ -173,7 +173,7 @@ int main()
   fprintf(out,"\tymax            %1.16E\n",ymax  );
   fprintf(out,"end\n");
   fclose(out);
-  
+
   /* calculating domain integral of initial PDF */
   double integral = 0;
   for (i = 1; i < NI-1; i++){
@@ -209,7 +209,7 @@ int main()
     fwrite(y,sizeof(double),NJ,out);
     fwrite(u,sizeof(double),NI*NJ,out);
     fclose(out);
-  } 
+  }
 
   free(x);
   free(y);

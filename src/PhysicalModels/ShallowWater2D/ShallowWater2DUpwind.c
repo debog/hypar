@@ -14,13 +14,13 @@
 
 /*! Roe's upwinding scheme.
     \f{equation}{
-      {\bf f}_{j+1/2} = \frac{1}{2}\left[ {\bf f}_{j+1/2}^L + {\bf f}_{j+1/2}^R 
+      {\bf f}_{j+1/2} = \frac{1}{2}\left[ {\bf f}_{j+1/2}^L + {\bf f}_{j+1/2}^R
                          - \left| A\left({\bf u}_{j+1/2}^L,{\bf u}_{j+1/2}^R\right) \right|
                            \left( {\bf u}_{j+1/2}^R - {\bf u}_{j+1/2}^L  \right)\right]
     \f}
     + Roe, P. L., “Approximate Riemann solvers, parameter vectors, and difference schemes,” Journal of
     Computational Physics, Vol. 43, No. 2, 1981, pp. 357–372, http://dx.doi.org/10.1016/0021-9991(81)90128-5.
-    
+
     This upwinding scheme is modified for the balanced discretization of the 2D shallow water equations. See the following reference:
     + Xing, Y., Shu, C.-W., "High order finite difference WENO schemes with the
       exact conservation property for the shallow water equations", Journal of
@@ -51,7 +51,7 @@ int ShallowWater2DUpwindRoe(
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
-  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_], 
+  static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_],
                 DL[_MODEL_NVARS_*_MODEL_NVARS_], modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
@@ -71,7 +71,7 @@ int ShallowWater2DUpwindRoe(
       udiff[1] = 0.5 * (uR[_MODEL_NVARS_*p+1] - uL[_MODEL_NVARS_*p+1]);
       udiff[2] = 0.5 * (uR[_MODEL_NVARS_*p+2] - uL[_MODEL_NVARS_*p+2]);
 
-      _ShallowWater2DRoeAverage_         (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param); 
+      _ShallowWater2DRoeAverage_         (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
       _ShallowWater2DEigenvalues_        (uavg,D,param,dir);
       _ShallowWater2DLeftEigenvectors_   (uavg,L,param,dir);
       _ShallowWater2DRightEigenvectors_  (uavg,R,param,dir);
@@ -149,7 +149,7 @@ int ShallowWater2DUpwindLLF(
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
-      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_], 
+      double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
 
       /* Local Lax-Friedrich upwinding scheme */

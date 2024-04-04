@@ -14,10 +14,10 @@
 #define __FUNCT__ "PetscRegisterTIMethods"
 
 /*!
-  This function allows the registering of custom multi-stage time integration 
-  methods and using it with PETSc. More than one method may be provided, each 
-  with a unique name (the name \b must \b not conflict with the names of existing 
-  methods in PETSc). The methods should be provided in a file \a "time_method.inp", 
+  This function allows the registering of custom multi-stage time integration
+  methods and using it with PETSc. More than one method may be provided, each
+  with a unique name (the name \b must \b not conflict with the names of existing
+  methods in PETSc). The methods should be provided in a file \a "time_method.inp",
   and the following must be provided:
   + Name
   + Class (i.e. RK or ARK)
@@ -25,19 +25,19 @@
   + Theoretical order
   + Butcher tableaux
 
-  The method can then be used by invoking it by its name. For example, if a 
+  The method can then be used by invoking it by its name. For example, if a
   custom ARKIMEX method \a "foo" is provided through \a "time_method.inp", it can be
   used by specifying \a "-ts_type arkimex -ts_arkimex_type foo" in the command
   line or \a ".petscrc" file.
 
-  See \a /Examples/PETScInputs for examples of the input files required to 
+  See \a /Examples/PETScInputs for examples of the input files required to
   provide a time integration method.
 
   Currently supported classes of time integrators for which custom methods
   can be provided:
-  + RK (Runge-Kutta): See TSRKRegister 
+  + RK (Runge-Kutta): See TSRKRegister
     (https://petsc.org/release/docs/manualpages/TS/TSRKRegister.html)
-  + ARK (Additive Runge-Kutta): See TSARKIMEXRegister 
+  + ARK (Additive Runge-Kutta): See TSARKIMEXRegister
     (https://petsc.org/release/docs/manualpages/TS/TSRKRegister.html)
 
   To do:
@@ -87,7 +87,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
           else if (!strcmp(word,"order"))   { ierr2 = fscanf(in,"%d",&order);  if (ierr2 != 1) return(1); }
           else if (!strcmp(word,"pinterp")) { ierr2 = fscanf(in,"%d",&pinterp);if (ierr2 != 1) return(1); }
           else if (!strcmp(word,"At")) {
-            if (s == 0) { 
+            if (s == 0) {
               if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
               if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
@@ -101,7 +101,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
               }
             }
           } else if (!strcmp(word,"A")) {
-            if (s == 0) { 
+            if (s == 0) {
               if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
               if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
@@ -115,7 +115,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
               }
             }
           } else if (!strcmp(word,"bt")) {
-            if (s == 0) { 
+            if (s == 0) {
               if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
               if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
@@ -125,7 +125,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
               for (i = 0; i < s; i++) ierr2 = fscanf(in,"%lf",&bt[i]); if (ierr2 != 1) return(1);
             }
           } else if (!strcmp(word,"b")) {
-            if (s == 0) { 
+            if (s == 0) {
               if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
               if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
@@ -135,7 +135,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
               for (i = 0; i < s; i++) ierr2 = fscanf(in,"%lf",&b[i]); if (ierr2 != 1) return(1);
             }
           } else if (!strcmp(word,"ct")) {
-            if (s == 0) { 
+            if (s == 0) {
               if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
               if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
@@ -145,7 +145,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
               for (i = 0; i < s; i++) ierr2 = fscanf(in,"%lf",&ct[i]); if (ierr2 != 1) return(1);
             }
           } else if (!strcmp(word,"c")) {
-            if (s == 0) { 
+            if (s == 0) {
               if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
               if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
@@ -155,7 +155,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
               for (i = 0; i < s; i++) ierr2 = fscanf(in,"%lf",&c[i]); if (ierr2 != 1) return(1);
             }
           } else if (!strcmp(word,"bembt")) {
-            if (s == 0) { 
+            if (s == 0) {
               if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
               if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
@@ -165,7 +165,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
               for (i = 0; i < s; i++) ierr2 = fscanf(in,"%lf",&bembt[i]); if (ierr2 != 1) return(1);
             }
           } else if (!strcmp(word,"bemb")) {
-            if (s == 0) { 
+            if (s == 0) {
               if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
               if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
@@ -175,7 +175,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
               for (i = 0; i < s; i++) ierr2 = fscanf(in,"%lf",&bemb[i]); if (ierr2 != 1) return(1);
             }
           } else if (!strcmp(word,"bintt")) {
-            if (s == 0 || pinterp == 0) { 
+            if (s == 0 || pinterp == 0) {
               if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages and pinterp must be " );
               if (!rank) fprintf(stderr,"defined as positive values before specifying interpolation coeffs.\n");
               return(1);
@@ -189,7 +189,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
               }
             }
           } else if (!strcmp(word,"bint")) {
-            if (s == 0 || pinterp == 0) { 
+            if (s == 0 || pinterp == 0) {
               if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages and pinterp must be " );
               if (!rank) fprintf(stderr,"defined as positive values before specifying interpolation coeffs.\n");
               return(1);
@@ -208,7 +208,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
         if (!rank) fprintf(stderr,"Error: Illegal format in file \"time_method.inp\" (expected keyword \"begin\").\n");
         return(1);
       }
-    
+
       /* Register the method */
       if (!strcmp(type,"arkimex")) {
         if (A && At) {
@@ -291,7 +291,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
       if (bemb)   free(bemb);
       if (bintt)  free(bintt);
       if (bint)   free(bint);
-    
+
     }
   }
   PetscFunctionReturn(0);

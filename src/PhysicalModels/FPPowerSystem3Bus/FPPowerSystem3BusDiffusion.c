@@ -28,7 +28,7 @@ int FPPowerSystem3BusDiffusion(
   int *dim    = solver->dim_local;
   int ghosts  = solver->ghosts;
   static int index[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_], offset[_MODEL_NDIMS_];
-  static double dissipation[_MODEL_NDIMS_*_MODEL_NDIMS_]; 
+  static double dissipation[_MODEL_NDIMS_*_MODEL_NDIMS_];
 
   /* set bounds for array index to include ghost points */
   _ArrayCopy1D_(dim,bounds,_MODEL_NDIMS_);

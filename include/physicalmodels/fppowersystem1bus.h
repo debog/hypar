@@ -5,20 +5,20 @@
     Fokker-Planck Model for 1-Bus Power System
 
     \f{equation}{
-      \frac {\partial p} {\partial t} 
+      \frac {\partial p} {\partial t}
       + \frac {\partial} {\partial x} \left[\mu\left(x,y\right)p\right]
       + \frac {\partial} {\partial y} \left[\nu\left(x,y\right)p\right]
       = D_{yx} \frac {\partial^2 p} {\partial y \partial x}
       + D_{yy} \frac {\partial^2 p} {\partial y^2}
     \f}
-    where 
+    where
     \f{eqnarray}{
       \mu\left(x,y\right) &=& \omega_B\left(y-\omega_S\right) \\
       \nu\left(x,y\right) &=& \frac{\omega_S}{2H}\left[\left<P_m\right> - P_{\rm max} \sin\left(x\right) - D\left(y-\omega_S\right)\right] \\
       D_{yx} &=& \frac {\sigma^2\omega_S^2} {4H^2} \lambda^2 \omega_B \\
       D_{yy} &=& \frac {\sigma^2 \omega_S^2} {4H^2} \lambda \left( 1 - \lambda \frac {D \omega_S} {2H} \right)
     \f}
-    
+
     Symbol                  | Name
     ----------------------- | ------------------------------------------------------------------------------
     \f$p\f$                 | probability
@@ -32,13 +32,13 @@
     \f$\left<P_m\right>\f$  | average power input
     \f$P_{\rm max}\f$       | maximum power
     \f$\sigma\f$            | square root of variance
-    \f$\lambda\f$           | correlation time 
+    \f$\lambda\f$           | correlation time
 
     Reference:
-    + Wang, P., Barajas-Solano, D. A., Constantinescu, E. M., Abhyankar, S., 
-      Ghosh, D., Smith, B. F., Huang, Z., Tartakovsky, A. M., "Probabilistic 
-      Density Function Method for Stochastic ODEs of Power Systems with Uncertain 
-      Power Input", SIAM/ASA Journal on Uncertainty Quantification, 3 (1), 2015, 
+    + Wang, P., Barajas-Solano, D. A., Constantinescu, E. M., Abhyankar, S.,
+      Ghosh, D., Smith, B. F., Huang, Z., Tartakovsky, A. M., "Probabilistic
+      Density Function Method for Stochastic ODEs of Power Systems with Uncertain
+      Power Input", SIAM/ASA Journal on Uncertainty Quantification, 3 (1), 2015,
       pp. 873-896, http://dx.doi.org/10.1137/130940050.
 */
 

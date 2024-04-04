@@ -32,9 +32,9 @@ int OutputROMSolution(  void*   s,      /*!< Array of simulation objects of type
 
     HyPar*        solver = &(simobj[ns].solver);
     MPIVariables* mpi    = &(simobj[ns].mpi);
-    
+
     if ((!solver->WriteOutput) && (strcmp(solver->plot_solution,"yes"))) continue;
-  
+
     char fname_root[_MAX_STRING_SIZE_];
     strcpy(fname_root, solver->op_rom_fname_root);
 
@@ -44,7 +44,7 @@ int OutputROMSolution(  void*   s,      /*!< Array of simulation objects of type
       strcat(fname_root, "_");
       strcat(fname_root, index);
     }
-  
+
     WriteArray( solver->ndims,
                 solver->nvars,
                 solver->dim_global,
@@ -76,7 +76,7 @@ int OutputROMSolution(  void*   s,      /*!< Array of simulation objects of type
     }
 
   }
-  
+
   return 0;
 }
 

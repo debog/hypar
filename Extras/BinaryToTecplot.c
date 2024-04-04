@@ -9,10 +9,10 @@
  *
  * If this input file doesn't exist, then it will
  * try to find and convert HyPar solution files.
- * For this to happen, it needs to be run at the 
- * same location where the input files for the 
- * simulation exist. It needs to read in stuff from 
- * solver.inp and check the existence of 
+ * For this to happen, it needs to be run at the
+ * same location where the input files for the
+ * simulation exist. It needs to read in stuff from
+ * solver.inp and check the existence of
  * sparse_grids.inp.
 */
 

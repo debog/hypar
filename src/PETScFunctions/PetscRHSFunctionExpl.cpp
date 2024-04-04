@@ -16,7 +16,7 @@
 #define __FUNCT__ "PetscRHSFunctionExpl"
 
 /*!
-  Compute the right-hand-side (RHS) for the explicit time integration of the 
+  Compute the right-hand-side (RHS) for the explicit time integration of the
   governing equations: The spatially discretized ODE can be expressed as
   \f{equation}{
     \frac {d{\bf U}} {dt} = {\bf F}\left({\bf U}\right).
@@ -49,13 +49,13 @@ PetscErrorCode PetscRHSFunctionExpl(  TS        ts,   /*!< Time integration obje
 
     HyPar* solver = &(sim[ns].solver);
     MPIVariables* mpi = &(sim[ns].mpi);
-  
+
     solver->count_RHSFunction++;
 
     int size = solver->npoints_local_wghosts;
     double* u = solver->u;
     double* rhs = solver->rhs;
-  
+
     /* copy solution from PETSc vector */
     TransferVecFromPETSc(u,Y,context,ns,context->offsets[ns]);
     /* apply boundary conditions and exchange data over MPI interfaces */
@@ -66,18 +66,18 @@ PetscErrorCode PetscRHSFunctionExpl(  TS        ts,   /*!< Time integration obje
                               solver->ghosts,
                               mpi,
                               u );
-  
+
     /* Evaluate hyperbolic, parabolic and source terms  and the RHS */
     solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,1,solver->FFunction,solver->Upwind);
-                                                                                    
+
     solver->ParabolicFunction (solver->par,u,solver,mpi,t);
     solver->SourceFunction    (solver->source,u,solver,mpi,t);
-  
+
     _ArraySetValue_(rhs,size*solver->nvars,0.0);
     _ArrayAXPY_(solver->hyp   ,-1.0,rhs,size*solver->nvars);
     _ArrayAXPY_(solver->par   , 1.0,rhs,size*solver->nvars);
     _ArrayAXPY_(solver->source, 1.0,rhs,size*solver->nvars);
-  
+
     /* Transfer RHS to PETSc vector */
     TransferVecToPETSc(rhs,F,context,ns,context->offsets[ns]);
 

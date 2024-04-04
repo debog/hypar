@@ -81,7 +81,7 @@ extern "C" int gpuNavierStokes3DModifiedSolution(
   return 0;
 }
 
-#else 
+#else
 
 /*! Kernel for gpuNavierStokes3DModifiedSolution() */
 __global__

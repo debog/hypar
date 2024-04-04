@@ -7,7 +7,7 @@
 #include <arrayfunctions.h>
 #include <sparse_grids_simulation.h>
 
-/*! Initialize all the stuff required for a sparse grids simulation. 
+/*! Initialize all the stuff required for a sparse grids simulation.
  * Before this function is called, the solver inputs for the full
  * grid object has already been read, and therefore, the global dimensions
  * and processor decompositions are available. This function does the following:
@@ -26,7 +26,7 @@ int SparseGridsSimulation::Initialize()
     return 1;
   }
 
-  /* set full grid processor distribution based on grid size and 
+  /* set full grid processor distribution based on grid size and
    * number of MPI ranks */
   GridDimensions dim_fg(m_ndims);
   for (int d=0; d<m_ndims; d++) dim_fg[d] = m_sim_fg->solver.dim_global[d];
@@ -44,7 +44,7 @@ int SparseGridsSimulation::Initialize()
     for (int d=0; d<m_ndims; d++) printf(" %3d", iproc_fg[d]);
     printf("\n");
   }
- 
+
   if (!m_rank) printf("Initializing sparse grids...\n");
   if (!m_rank) printf("  Number of spatial dimensions: %d\n", m_ndims);
 
