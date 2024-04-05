@@ -1,5 +1,6 @@
 stages:          # List of stages for jobs, and their order of execution
   - style
+  - build
 
 workflow:
   rules:
@@ -22,3 +23,43 @@ check_style:       # This job runs in the build stage, which runs first.
     - .github/workflows/style/check_tabs.sh
     - echo "Checking EOL whitespaces..."
     - .github/workflows/style/check_trailing_whitespaces.sh
+
+build-gcc-serial:       # This job runs in the build stage, which runs first.
+  stage: build
+  rules:
+    # always run the style check on any push event
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - when: on_success
+  script:
+    - echo "Configuring..."
+    - autoreconf -i && CC=gcc CXX=g++ MPICC=gcc MPICXX=g++ ./configure --enable-serial
+    - echo "Running make..."
+    - make -j4
+
+build-gcc-mpich:       # This job runs in the build stage, which runs first.
+  stage: build
+  rules:
+    # always run the style check on any push event
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - when: on_success
+  script:
+    - echo "Installing MPICH..."
+    - apt-get update && apt-get install -y mpich libmpich-dev
+    - echo "Configuring..."
+    - autoreconf -i && ./configure
+    - echo "Running make..."
+    - make -j4
+
+build-gcc-openmpi:     # This job runs in the build stage, which runs first.
+  stage: build
+  rules:
+    # always run the style check on any push event
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - when: on_success
+  script:
+    - echo "Installing OpenMPI..."
+    - apt-get update && apt-get install -y libopenmpi-dev  openmpi-bin
+    - echo "Configuring..."
+    - autoreconf -i && ./configure
+    - echo "Running make..."
+    - make -j4
