@@ -61,7 +61,7 @@ else
 fi
 
 # compile the HyPar diff code
-hypar_diff_srcname="Extras/hyparDiff.c"
+hypar_diff_srcname="Extras/hyparDiff_RegTests.c"
 HYPAR_DIFF="HYPAR_DIFF"
 if [ -f "$hypar_dir/$hypar_diff_srcname" ]; then
   echo "Compiling HyPar-diff."
@@ -76,7 +76,7 @@ else
   echo " "
   echo "---------------------------------"
 fi
-HYPAR_DIFF_CMD="$root_dir/$HYPAR_DIFF -a 1e-12 -r 1e14 "
+HYPAR_DIFF_CMD="$root_dir/$HYPAR_DIFF -r 1.0e-14 "
 
 # clone benchmarks
 if [ -d "$hypar_benchmarks_dir" ]; then
