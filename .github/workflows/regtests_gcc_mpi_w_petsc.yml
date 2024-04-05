@@ -1,0 +1,19 @@
+name: Tests w/PETSc - GCC + MPICH
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: dependencies
+      run: source .github/workflows/dependencies/dependencies_mpich_petsc.sh
+    - name: configure
+      run: autoreconf -i && PETSC_DIR=/home/runner/work/hypar/petsc PETSC_ARCH=arch-linux-gcc ./configure
+    - name: make
+      run: make -j4 && make install
+    - name: tests
+      run: cd ../ && export HYPAR_DIR=/home/runner/work/hypar/hypar && $HYPAR_DIR/.github/workflows/tests/test_mpi_w_petsc.sh
