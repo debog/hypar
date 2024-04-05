@@ -1,4 +1,4 @@
-name: Linux GCC + OpenMPI
+name: Build - Linux GCC + OpenMPI
 
 on: [push, pull_request]
 

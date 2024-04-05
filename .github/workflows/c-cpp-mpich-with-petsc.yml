@@ -1,4 +1,4 @@
-name: Linux GCC + MPICH w/ PETSc
+name: Build - Linux GCC + MPICH w/ PETSc
 
 on: [push, pull_request]
 

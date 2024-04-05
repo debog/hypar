@@ -1,4 +1,4 @@
-name: Linux GCC + MPICH + CUDA-NVCC11
+name: Build - Linux GCC + MPICH + CUDA-NVCC11
 
 on: [push, pull_request]
 
