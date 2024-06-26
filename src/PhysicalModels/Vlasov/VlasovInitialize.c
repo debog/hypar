@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <basic.h>
+#include <common.h>
 #include <arrayfunctions.h>
 #include <bandedmatrix.h>
 #include <physicalmodels/vlasov.h>
@@ -240,7 +241,9 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   solver->PhysicsOutput = VlasovWriteEFieldAndPotential;
   solver->PostStage     = VlasovPostStage;
 
+  takeExp(solver->u,solver->npoints_local_wghosts);
   int ierr = VlasovEField(solver->u, solver, 0.0);
+  takeLog(solver->u,solver->npoints_local_wghosts);
   if (ierr) return ierr;
 
   return 0;

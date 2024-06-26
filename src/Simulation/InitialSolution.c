@@ -52,6 +52,9 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
                       simobj[n].solver.u,
                       fname_root,
                       &flag );
+
+    takeLog(simobj[n].solver.u,simobj[n].solver.npoints_local_wghosts);
+
     if (ierr) {
       fprintf(stderr, "Error in InitialSolution() on rank %d.\n",
               simobj[n].mpi.rank);

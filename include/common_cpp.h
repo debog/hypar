@@ -10,5 +10,7 @@
     \a width is 5, or "41" if \a width is 2, or "1" if \a width is 1.
 */
 extern "C" void GetStringFromInteger(int, char*, int);
+extern "C" void takeLog(double* , int);
+extern "C" void takeExp(double* , int);
 
 #endif
