@@ -101,7 +101,6 @@ int OutputSolution( void*   s,      /*!< Array of simulation objects of type #Si
     }
 #endif
 
-    takeExp(solver->u,solver->npoints_local_wghosts);
     WriteArray(  solver->ndims,
                  solver->nvars,
                  solver->dim_global,
@@ -112,7 +111,6 @@ int OutputSolution( void*   s,      /*!< Array of simulation objects of type #Si
                  solver,
                  mpi,
                  fname_root );
-    takeLog(solver->u,solver->npoints_local_wghosts);
 
     if (!strcmp(solver->plot_solution, "yes")) {
       PlotArray(   solver->ndims,
