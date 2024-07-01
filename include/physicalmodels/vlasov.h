@@ -86,6 +86,9 @@ typedef struct vlasov_parameters {
   /*! Pointer to MPI object of type #MPIVariables */
   void  *m;
 
+  /*! Solve Vlasov equation in the log form */
+  int use_log_form;
+
 #ifdef fftw
 
   /*! Buffer sum */

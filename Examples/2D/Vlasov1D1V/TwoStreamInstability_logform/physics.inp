@@ -1,0 +1,4 @@
+begin
+  self_consistent_electric_field 1
+  use_log_form                   1
+end

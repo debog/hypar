@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <basic.h>
 #include <common.h>
+#include <math.h>
+#include <stddef.h>
 
 
 /*!
@@ -31,3 +33,24 @@ void GetStringFromInteger(
   return;
 }
 
+void takeLog(double* array, int array_size)
+{
+    for (int i = 0; i < array_size; ++i) {
+        if (array[i] > 0) {
+            array[i] = log(array[i]);
+        } else {
+            fprintf(stderr, "Error: Logarithm of non-positive value (%f) at index %zu\n", array[i], i);
+            // Handle error appropriately, for example by setting to NaN, zero, or skipping
+            array[i] = NAN; // Set to NaN
+        }
+    }
+  return;
+}
+
+void takeExp(double* array, int array_size)
+{
+    for (int i = 0; i < array_size; ++i) {
+      array[i] = exp(array[i]);
+    }
+  return;
+}
