@@ -86,6 +86,8 @@ typedef struct vlasov_parameters {
   /*! Pointer to MPI object of type #MPIVariables */
   void  *m;
 
+  int use_log_form;
+
 #ifdef fftw
 
   /*! Buffer sum */

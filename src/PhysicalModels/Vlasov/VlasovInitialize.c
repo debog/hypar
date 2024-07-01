@@ -70,6 +70,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   physics->self_consistent_electric_field = 0;
   physics->ndims_x = 1;
   physics->ndims_v = 1;
+  physics->use_log_form = 0;
 
   /* reading physical model specific inputs - all processes */
   if (!mpi->rank) {
@@ -93,6 +94,10 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
           } else if (!strcmp(word, "v_ndims")) {
             /* read number of velocity dimensions */
             int ferr = fscanf(in,"%d", &physics->ndims_v);
+            if (ferr != 1) return(1);
+          } else if (!strcmp(word, "use_log_form")) {
+            /* read whether solving in log form */
+            int ferr = fscanf(in,"%d", &physics->use_log_form);
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
@@ -131,6 +136,8 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   MPIBroadcast_integer(&physics->ndims_x,1,0,&mpi->world);
   MPIBroadcast_integer(&physics->ndims_v,1,0,&mpi->world);
   MPIBroadcast_integer((int *) &physics->self_consistent_electric_field,
+                       1,0,&mpi->world);
+  MPIBroadcast_integer((int *) &physics->use_log_form,
                        1,0,&mpi->world);
 #endif
 
@@ -241,9 +248,9 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   solver->PhysicsOutput = VlasovWriteEFieldAndPotential;
   solver->PostStage     = VlasovPostStage;
 
-  takeExp(solver->u,solver->npoints_local_wghosts);
+  if (physics->use_log_form) takeExp(solver->u,solver->npoints_local_wghosts);
   int ierr = VlasovEField(solver->u, solver, 0.0);
-  takeLog(solver->u,solver->npoints_local_wghosts);
+  if (physics->use_log_form) takeLog(solver->u,solver->npoints_local_wghosts);
   if (ierr) return ierr;
 
   return 0;
