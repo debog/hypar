@@ -115,6 +115,12 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
     fclose(in);
   }
 
+  if (physics->use_log_form) {
+    if (!mpi->rank) {
+      printf("Vlasov: using the log form of the Vlasov equation.\n");
+    }
+  }
+
   if ((physics->ndims_x+physics->ndims_v) != solver->ndims) {
     if (!mpi->rank) {
       fprintf(stderr,"Error in VlasovInitialize:\n");
