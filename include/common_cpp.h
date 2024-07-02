@@ -11,11 +11,11 @@
 */
 extern "C" void GetStringFromInteger(int, char*, int);
 
-/*! Take the natural logarithm of each element of the array 
+/*! Take the natural logarithm of each element of the array
 */
 extern "C" void takeLog(double* , int);
 
-/*! Take the exponential of each element of the array 
+/*! Take the exponential of each element of the array
 */
 extern "C" void takeExp(double* , int);
 

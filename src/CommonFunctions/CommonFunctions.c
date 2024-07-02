@@ -34,7 +34,7 @@ void GetStringFromInteger(
 }
 
 /*!
-  Take the natural logarithm of each element of the array 
+  Take the natural logarithm of each element of the array
 */
 void takeLog(double* array, int array_size)
 {
@@ -51,7 +51,7 @@ void takeLog(double* array, int array_size)
 }
 
 /*!
-  Take the exponential of each element of the array 
+  Take the exponential of each element of the array
 */
 void takeExp(double* array, int array_size)
 {
