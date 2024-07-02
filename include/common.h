@@ -11,4 +11,12 @@
 */
 void GetStringFromInteger(int, char*, int);
 
+/*! Take the natural logarithm of each element of the array
+*/
+void takeLog(double* , int);
+
+/*! Take the exponential of each element of the array
+*/
+void takeExp(double* , int);
+
 #endif

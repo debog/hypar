@@ -1,0 +1,25 @@
+1D-1V VLASOV EQUATION IN LOG FORM: TWO-STREAM INSTABILITY
+
+  d(log f)       d(log f)         d(log f)
+  -------  +  v ---------  +  E ----------  =  0
+     dt            dx                dv
+
+   0 <= x <= 2pi;   Periodic
+  -7 <= v <= 7; Homogenous Dirichlet
+
+NOTE: This example requires HyPar be compiled
+with the FFTW library.
+
+The following input files are required:
++ solver.inp    -   General solver parameters
++ boundary.inp  -   Boundary conditions
++ physics.inp   -   Physical parameters 
++ initial.inp   -   Initial solution
+
+** See hypar/README for other (optional) input files
+
+Notes:-
+The code aux/init.c is an example to generate the (log form) initial
+solution file(s) in the correct format required by the solver.  
+The code aux/post_process_log.c is an example to convert the 
+solution file(s) to distribution f.

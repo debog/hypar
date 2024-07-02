@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <basic.h>
 #include <common.h>
+#include <math.h>
+#include <stddef.h>
 
 
 /*!
@@ -31,3 +33,32 @@ void GetStringFromInteger(
   return;
 }
 
+/*!
+  Take the natural logarithm of each element of the array
+*/
+void takeLog( double* const array,      /*!< the array to take log of */
+              const int     array_size  /*!< size of the array */ )
+{
+    for (size_t i = 0; i < array_size; ++i) {
+        if (array[i] > 0) {
+            array[i] = log(array[i]);
+        } else {
+            fprintf(stderr, "Error: Logarithm of non-positive value (%f) at index %zu\n", array[i], i);
+            // Handle error appropriately, for example by setting to NaN, zero, or skipping
+            array[i] = NAN; // Set to NaN
+        }
+    }
+  return;
+}
+
+/*!
+  Take the exponential of each element of the array
+*/
+void takeExp( double* const array,      /*!< the array to take log of */
+              const int     array_size  /*!< size of the array */ )
+{
+    for (size_t i = 0; i < array_size; ++i) {
+      array[i] = exp(array[i]);
+    }
+  return;
+}
