@@ -36,9 +36,10 @@ void GetStringFromInteger(
 /*!
   Take the natural logarithm of each element of the array
 */
-void takeLog(double* array, int array_size)
+void takeLog( double* const array,      /*!< the array to take log of */
+              const int     array_size  /*!< size of the array */ )
 {
-    for (int i = 0; i < array_size; ++i) {
+    for (size_t i = 0; i < array_size; ++i) {
         if (array[i] > 0) {
             array[i] = log(array[i]);
         } else {
@@ -53,9 +54,10 @@ void takeLog(double* array, int array_size)
 /*!
   Take the exponential of each element of the array
 */
-void takeExp(double* array, int array_size)
+void takeExp( double* const array,      /*!< the array to take log of */
+              const int     array_size  /*!< size of the array */ )
 {
-    for (int i = 0; i < array_size; ++i) {
+    for (size_t i = 0; i < array_size; ++i) {
       array[i] = exp(array[i]);
     }
   return;
