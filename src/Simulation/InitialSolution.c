@@ -52,8 +52,6 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
                       simobj[n].solver.u,
                       fname_root,
                       &flag );
-
-
     if (ierr) {
       fprintf(stderr, "Error in InitialSolution() on rank %d.\n",
               simobj[n].mpi.rank);

@@ -33,6 +33,9 @@ void GetStringFromInteger(
   return;
 }
 
+/*!
+  Take the natural logarithm of each element of the array 
+*/
 void takeLog(double* array, int array_size)
 {
     for (int i = 0; i < array_size; ++i) {
@@ -47,6 +50,9 @@ void takeLog(double* array, int array_size)
   return;
 }
 
+/*!
+  Take the exponential of each element of the array 
+*/
 void takeExp(double* array, int array_size)
 {
     for (int i = 0; i < array_size; ++i) {
