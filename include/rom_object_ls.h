@@ -181,6 +181,8 @@ class LSROMObject : public ROMObject
     /* Construct reduced laplace operator for potential */
     void ConstructPotentialROMLaplace( void*, const CAROM::Matrix*, int );
 
+    void ConstructROMLaplaceFFT( void*, const CAROM::Matrix*, int );
+
     void CheckPotentialProjError( void*, int );
 
     void CheckLaplaceProjError( void*, int );
@@ -201,6 +203,8 @@ class LSROMObject : public ROMObject
     void OutputROMBasisPhi( void*, const CAROM::Matrix*, int );
 
     void ConstructEBasis( void*, int );
+
+    void ConstructEBasisFFT( void*, int );
 
     /* Construct reduced hyperbolic operator in x direction */
     void ConstructROMHy_x( void*, const CAROM::Matrix*, int );
@@ -234,6 +238,7 @@ class LSROMObject : public ROMObject
 
     void FindMaxEBasis( void*, int );
 
+    void CompPhiBasisPoisson( void*, const CAROM::Matrix*, int );
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
@@ -279,8 +284,10 @@ class LSROMObject : public ROMObject
 
     bool m_write_snapshot_mat;  /*!< Write snapshot matrix to file or not */
     bool m_direct_comp_hyperbolic;  /*!< Compute Hyperbolic term directly or not */
-    bool m_solve_phi;  /*!< Solve potential or not */
+    bool m_solve_phi;  /*!< Solve reduced potential or not */
     bool m_c_err_snap;  /*!< Compute error of each snapshot*/
+    bool m_solve_poisson;  /*!< Solve potential reduced basis through possion problem*/
+    bool m_fft_derivative;  /*!< Compute derivative in the Fourier space*/
 
     double m_f_energy_criteria;
     double m_phi_energy_criteria;

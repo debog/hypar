@@ -175,6 +175,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
             ferr = fscanf(in,"%d", &m_nsets); if (ferr != 1) return;
           } else if (std::string(word) == "ls_indicator") {
             ferr = fscanf(in,"%s", indicator_str); if (ferr != 1) return;
+          } else if (std::string(word) == "ls_fft_derivative") {
+            ferr = fscanf(in,"%s", fft_derivative); if (ferr != 1) return;
           }
           if (ferr != 1) return;
         }
@@ -200,6 +202,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
     printf("  directly compute hyperbolic term:  %s\n", direct_comp_hyperbolic);
     printf("  solve reduced potential:  %s\n", solve_phi);
     printf("  construct potential basis with Poisson:  %s\n", solve_phi_basis_poisson);
+    printf("  compute deriative using FFT:  %s\n", fft_derivative);
     printf("  compute error for each snapshot:  %s\n", c_err_snap);
     printf("  number of parametric snapshot sets:   %d\n", m_nsets);
     printf("  physical indicator type:   %s\n", indicator_str);
@@ -1008,7 +1011,13 @@ void LSROMObject::train(void* a_s)
                                    i);
 
           m_romlaplace_phi.push_back(new CAROM::Matrix(m_rdims_phi[i],m_rdims_phi[i],false));
-          ConstructPotentialROMLaplace(a_s, m_basis_phi[i], i);
+          if (m_fft_derivative) {
+            ConstructROMLaplaceFFT(a_s, m_basis_phi[i], i);
+          }
+          else
+          {
+            ConstructPotentialROMLaplace(a_s, m_basis_phi[i], i);
+          }
 
           CheckPotentialProjError(a_s,i);
           CheckLaplaceProjError(a_s,i);
@@ -1017,9 +1026,16 @@ void LSROMObject::train(void* a_s)
           m_snapshots_e.push_back(new CAROM::Matrix(
                                   *m_generator_e[i]->getSnapshotMatrix()));
           m_basis_e.push_back(new CAROM::Matrix(
-                              m_generator_phi[i]->getSpatialBasis()->numRows(),
+                              m_basis_phi[i]->numRows(),
                               m_rdims_phi[i], false));
-          ConstructEBasis(a_s,i);
+          if (m_fft_derivative) {
+            ConstructEBasisFFT(a_s, i);
+          }
+          else
+          {
+            ConstructEBasis(a_s,i);
+          }
+
           CheckEProjError(a_s,i);
 
           m_romhyperb_x.push_back(new CAROM::Matrix(m_rdims[i], m_rdims[i],false));
@@ -2580,6 +2596,219 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
   return;
 }
 
+/*! Construct laplacian for potential in the reduced space using FFT */
+void LSROMObject::ConstructROMLaplaceFFT(void* a_s, const CAROM::Matrix* a_rombasis_phi, int idx)
+{
+  if (!m_rank) {
+    std::cout << "------------------------------------------------\n";
+    std::cout << "Construct Laplace using FFT: ";
+    std::cout << std::endl;
+  }
+
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  if (param->ndims_x > 1) {
+    fprintf(stderr,"Error in ConstructROMLaplaceFFT:\n");
+    fprintf(stderr,"  Implemented for 1 spatial dimension only.\n");
+  }
+
+  int *dim    = solver->dim_local;
+  int  N      = solver->dim_global[0];
+  int  ghosts = solver->ghosts;
+  int  ndims  = solver->ndims;
+
+  double       *sum_buffer     = param->sum_buffer;
+  double       *field          = param->e_field;
+  fftw_complex *phys_buffer    = param->phys_buffer;
+  fftw_complex *fourier_buffer = param->fourier_buffer;
+  fftw_plan     plan_forward   = param->plan_forward;
+  fftw_plan     plan_backward  = param->plan_backward;
+  ptrdiff_t     local_o_start  = param->local_o_start;
+  ptrdiff_t     local_no       = param->local_no;
+
+  fftw_complex *phys_buffer_phi    = param->phys_buffer_phi;
+  fftw_complex *fourier_buffer_phi = param->fourier_buffer_phi;
+  fftw_plan     plan_forward_phi   = param->plan_forward_phi;
+  fftw_plan     plan_backward_phi  = param->plan_backward_phi;
+
+  int index[ndims], bounds[ndims], bounds_noghost[ndims], offset[ndims];
+
+  int num_rows = a_rombasis_phi->numRows();
+  int num_cols = a_rombasis_phi->numColumns();
+
+  std::vector<double> vec_wghosts(param->npts_local_x_wghosts);
+  std::vector<double> rhs_wghosts(param->npts_local_x_wghosts);
+  std::vector<int> index_(sim[0].solver.ndims);
+
+  CAROM::Matrix* laplace_phi;
+  laplace_phi = new CAROM::Matrix(num_rows, m_rdims_phi[idx], false);
+
+  CAROM::Vector laplace_col(num_rows,false);
+
+  CAROM::Matrix* m_working;
+  m_working = new CAROM::Matrix(m_rdims_phi[idx], m_rdims_phi[idx], false);
+
+  CAROM::Vector* m_work_lap;
+  m_work_lap = new CAROM::Vector(num_rows,false);
+
+  for (int j = 0; j < m_rdims_phi[idx]; j++){
+
+    // set bounds for array index to include ghost points
+    _ArrayCopy1D_(dim,bounds,ndims);
+    for (int i = 0; i < ndims; i++) bounds[i] += 2*ghosts;
+  
+    // set bounds for array index to NOT include ghost points
+    _ArrayCopy1D_(dim,bounds_noghost,ndims);
+  
+    // set offset such that index is compatible with ghost point arrangement
+    _ArraySetValue_(offset,ndims,-ghosts);
+
+    int done = 0; _ArraySetValue_(index,ndims,0);
+    _ArraySetValue_(sum_buffer,dim[0],0);
+
+		*m_work_lap = 0;
+    a_rombasis_phi->getColumn(j, *m_work_lap);
+    ArrayCopynD(1,
+                m_work_lap->getData(),
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index_.data(),
+                sim[0].solver.nvars);
+
+    if (mpi->ip[1] != 0) {
+      vec_wghosts = std::vector<double> (vec_wghosts.size(),0.0);
+    }
+    MPISum_double(vec_wghosts.data(),vec_wghosts.data(),param->npts_local_x_wghosts,&mpi->comm[1]);
+
+    char buffer_[] = "phi_basis";
+    ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),vec_wghosts.data(),buffer_);
+
+//  while (!done) {
+//    //int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
+//    int p; _ArrayIndex1D_(ndims,dim,index,ghosts,p);
+//
+//    // accumulate f at this spatial location
+//    double dvinv; _GetCoordinate_(1,index[1],dim,ghosts,solver->dxinv,dvinv);
+//    double x; _GetCoordinate_(0,index[0],dim,ghosts,solver->x,x);
+//    double v; _GetCoordinate_(1,index[1],dim,ghosts,solver->x,v);
+//
+//    sum_buffer[index[0]] += vec_wghosts.data()[p] / dvinv;
+//
+//    _ArrayIncrementIndex_(ndims,bounds_noghost,index,done);
+//  }
+
+//  // Now we can add up globally using MPI reduction 
+//  for (int i = 0; i < dim[0]; i++) {
+//    MPISum_double(&sum_buffer[i], &sum_buffer[i], 1, &mpi->comm[1]);
+//  }
+
+//  // Find the average density over all x
+//  double average_velocity = 0.0;
+//  for (int i = 0; i < dim[0]; i++) {
+//    average_velocity += vec_wghosts.data()[i];
+//  }
+//  printf("Intermediate avg before MPI: %f\n", average_velocity);
+
+//  MPISum_double(&average_velocity, &average_velocity, 1, &mpi->comm[0]);
+//  printf("Intermediate avg after MPI: %f\n", average_velocity);
+
+//  average_velocity /= (double) N;
+//  printf("Final avg after division: %f\n", average_velocity);
+
+//  printf("avg %f\n",average_velocity);
+    for (int i = 0; i < dim[0]; i++) {
+//    phys_buffer[i][0] = vec_wghosts.data()[i] - average_velocity; 
+      phys_buffer[i][0] = m_work_lap->getData()[i]; 
+      phys_buffer[i][1] = 0.0;
+    }
+  
+    // Execute the FFT
+    MPI_Barrier(mpi->comm[0]);
+    fftw_execute(plan_forward);
+    MPI_Barrier(mpi->comm[0]);
+  
+    // Simultaneously do a Poisson solve and take derivative in frequency space
+    int freq_start = 0;
+    if (local_o_start == 0) {
+      freq_start = 1;
+      fourier_buffer[0][0] = 0.0;
+      fourier_buffer[0][1] = 0.0;
+    }
+
+//  // Simultaneously do a Poisson solve in frequency space
+//  int freq_start_phi = 0;
+//  if (local_o_start == 0) {
+//    freq_start_phi = 1;
+//    fourier_buffer_phi[0][0] = 0.0;
+//    fourier_buffer_phi[0][1] = 0.0;
+//  }
+  
+    for (int i = freq_start; i < local_no; i++) {
+      double freq_num = ::FFTFreqNum(i + local_o_start, N);
+      double thek = freq_num;
+      fourier_buffer[i][0] = -(thek*thek)*fourier_buffer[i][0];
+      fourier_buffer[i][1] = -(thek*thek)*fourier_buffer[i][1];
+    }
+  
+    // Do an inverse Fourier transform to get back physical solved values
+    MPI_Barrier(mpi->comm[0]);
+    fftw_execute(plan_backward);
+    MPI_Barrier(mpi->comm[0]);
+    
+    for (int i = 0; i < dim[0]; i++) {
+      rhs_wghosts.data()[i + ghosts] = phys_buffer[i][0] / (double) N;
+    }
+
+    // Do halo exchange on the potential
+    MPIExchangeBoundaries1D(mpi, rhs_wghosts.data(), dim[0], ghosts, 0, ndims);
+    if (mpi->ip[1] != 0) {
+      rhs_wghosts = std::vector<double> (rhs_wghosts.size(),0.0);
+    }
+    MPISum_double(rhs_wghosts.data(),rhs_wghosts.data(),param->npts_local_x_wghosts,&mpi->comm[1]);
+
+    char buffer[] = "FFT_second";
+    ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),buffer);
+
+    /* increment the index string, if required */
+    if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+        ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+    }
+
+    ArrayCopynD(1,
+                rhs_wghosts.data(),
+                laplace_col.getData(),
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                index_.data(),
+                sim[0].solver.nvars);
+
+    for (int i = 0; i < num_rows; i++) {
+      (*laplace_phi)(i, j) = laplace_col.getData()[i];
+    }
+  }
+
+  // construct rhs = basis_phi^T integral_basis_f
+  a_rombasis_phi->transposeMult(*laplace_phi, *m_working);
+  MPISum_double(m_romlaplace_phi[idx]->getData(),m_working->getData(),m_rdims_phi[idx]*m_rdims_phi[idx],&mpi->world);
+  if (!m_rank) {
+    printf("m_romlaplace_phi %d %d\n",m_romlaplace_phi[idx]->numRows(),m_romlaplace_phi[idx]->numColumns());
+  }
+  m_romlaplace_phi[idx]->inverse();
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
+
+  delete laplace_phi;
+  delete m_working;
+  delete m_work_lap;
+  return;
+}
+
 /*! Check projection error in potential solution */
 void LSROMObject::CheckPotentialProjError(void* a_s, int idx)
 {
@@ -3237,6 +3466,172 @@ void LSROMObject::OutputROMBasisPhi(void* a_s, const CAROM::Matrix* a_rombasis, 
   return;
 }
 
+/*! Construct eletric field basis function using through FFT */
+void LSROMObject::ConstructEBasisFFT(void* a_s, int idx)
+{
+  if (!m_rank) {
+    std::cout << "------------------------------------------------\n";
+    std::cout << "Construct E Basis using FFT: ";
+    std::cout << std::endl;
+  }
+
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  int *dim    = solver->dim_local;
+  int  N      = solver->dim_global[0];
+  int  ghosts = solver->ghosts;
+  int  ndims  = solver->ndims;
+
+  double       *sum_buffer     = param->sum_buffer;
+  double       *field          = param->e_field;
+  fftw_complex *phys_buffer    = param->phys_buffer;
+  fftw_complex *fourier_buffer = param->fourier_buffer;
+  fftw_plan     plan_forward   = param->plan_forward;
+  fftw_plan     plan_backward  = param->plan_backward;
+  ptrdiff_t     local_o_start  = param->local_o_start;
+  ptrdiff_t     local_no       = param->local_no;
+
+  int index[ndims], bounds[ndims], bounds_noghost[ndims], offset[ndims];
+
+  int num_rows = m_basis_phi[idx]->numRows();
+  int num_cols = m_basis_phi[idx]->numColumns();
+
+  CAROM::Vector* m_work_e;
+  m_work_e = new CAROM::Vector(num_rows,false);
+  std::vector<double> basis_vec_wghosts(param->npts_local_x_wghosts);
+  std::vector<double> vec_x_wghosts(param->npts_local_x_wghosts);
+
+  double* vec_noghosts = (double*) calloc(num_rows, sizeof(double));
+  std::vector<int> index_(sim[0].solver.ndims);
+
+  for (int j = 0; j < num_cols; j++){
+
+    // set bounds for array index to include ghost points
+    _ArrayCopy1D_(dim,bounds,ndims);
+    for (int i = 0; i < ndims; i++) bounds[i] += 2*ghosts;
+  
+    // set bounds for array index to NOT include ghost points
+    _ArrayCopy1D_(dim,bounds_noghost,ndims);
+  
+    // set offset such that index is compatible with ghost point arrangement
+    _ArraySetValue_(offset,ndims,-ghosts);
+
+    int done = 0; _ArraySetValue_(index,ndims,0);
+    _ArraySetValue_(sum_buffer,dim[0],0);
+
+    // Copy potential basis solution to array of size with ghost cells
+    m_basis_phi[idx]->getColumn(j, *m_work_e);
+//  ArrayCopynD(1,
+//              m_work_e->getData(),
+//              basis_vec_wghosts.data(),
+//              sim[0].solver.dim_local,
+//              0,
+//              sim[0].solver.ghosts,
+//              index_.data(),
+//              sim[0].solver.nvars);
+
+//  while (!done) {
+//    //int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
+//    int p; _ArrayIndex1D_(ndims,dim,index,ghosts,p);
+
+//    // accumulate f at this spatial location
+//    double dvinv; _GetCoordinate_(1,index[1],dim,ghosts,solver->dxinv,dvinv);
+//    double x; _GetCoordinate_(0,index[0],dim,ghosts,solver->x,x);
+//    double v; _GetCoordinate_(1,index[1],dim,ghosts,solver->x,v);
+
+//    sum_buffer[index[0]] += basis_vec_wghosts.data()[p] / dvinv;
+
+//    _ArrayIncrementIndex_(ndims,bounds_noghost,index,done);
+//  }
+
+//  // Now we can add up globally using MPI reduction 
+//  for (int i = 0; i < dim[0]; i++) {
+//    MPISum_double(&sum_buffer[i], &sum_buffer[i], 1, &mpi->comm[1]);
+//  }
+
+//  // Find the average density over all x
+//  double average_velocity = 0.0;
+//  for (int i = 0; i < dim[0]; i++) {
+//    average_velocity += sum_buffer[i];
+//  }
+//  MPISum_double(&average_velocity, &average_velocity, 1, &mpi->comm[0]);
+//  average_velocity /= (double) N;
+//  printf("rank %d background %f \n",mpi->rank,average_velocity);
+
+    // Copy velocity-integrated values into complex-valued FFTW buffer
+    for (int i = 0; i < dim[0]; i++) {
+//    phys_buffer[i][0] = basis_vec_wghosts.data()[i] - average_velocity; 
+//    phys_buffer[i][0] = basis_vec_wghosts.data()[i]; 
+      phys_buffer[i][0] = m_work_e->getData()[i]; 
+      phys_buffer[i][1] = 0.0;
+    }
+  
+    // Execute the FFT
+    MPI_Barrier(mpi->comm[0]);
+    fftw_execute(plan_forward);
+    MPI_Barrier(mpi->comm[0]);
+  
+    // Simultaneously do a Poisson solve and take derivative in frequency space
+    int freq_start = 0;
+    if (local_o_start == 0) {
+      freq_start = 1;
+      fourier_buffer[0][0] = 0.0;
+      fourier_buffer[0][1] = 0.0;
+    }
+  
+    for (int i = freq_start; i < local_no; i++) {
+      double freq_num = ::FFTFreqNum(i + local_o_start, N);
+      double thek = freq_num;
+      double temp = fourier_buffer[i][0];
+      // Swapping values is due to multiplication by i
+      fourier_buffer[i][0] = - thek * fourier_buffer[i][1];
+      fourier_buffer[i][1] = thek * temp;
+//    fourier_buffer[i][0] = thek * temp;
+//    fourier_buffer[i][1] = thek * fourier_buffer[i][1];
+    }
+  
+    // Do an inverse Fourier transform to get back physical solved values
+    MPI_Barrier(mpi->comm[0]);
+    fftw_execute(plan_backward);
+    MPI_Barrier(mpi->comm[0]);
+    
+    // copy the solved electric field into the e buffer
+    for (int i = 0; i < dim[0]; i++) {
+      vec_x_wghosts.data()[i + ghosts] =  - phys_buffer[i][0] / (double) N;
+    }
+
+    if (mpi->ip[1] != 0) {
+      vec_x_wghosts = std::vector<double> (vec_x_wghosts.size(),0.0);
+    }
+    MPISum_double(vec_x_wghosts.data(),vec_x_wghosts.data(),param->npts_local_x_wghosts,&mpi->comm[1]);
+
+    char buffer[] = "FFT_ebasis";
+    ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),vec_x_wghosts.data(),buffer);
+    /* increment the index string, if required */
+    if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+        ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+    }
+
+    ArrayCopynD(1,
+                vec_x_wghosts.data(),
+                vec_noghosts,
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                index_.data(),
+                sim[0].solver.nvars);
+    for (int i = 0; i < num_rows; i++) {
+      (*m_basis_e[idx])(i, j) = vec_noghosts[i];
+    }
+  }
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
+  free(vec_noghosts);
+}
+
 /*! Construct E basis from phi basis */
 void LSROMObject::ConstructEBasis(void* a_s, int idx)
 {
@@ -3817,11 +4212,24 @@ void LSROMObject::online(void* a_s)
       ConstructPotentialROMRhs(a_s, m_basis[sampleWindow], m_basis_phi[sampleWindow], sampleWindow);
 
       m_romlaplace_phi.push_back(new CAROM::Matrix(m_rdims_phi[sampleWindow], m_rdims_phi[sampleWindow], false));
-      ConstructPotentialROMLaplace(a_s, m_basis_phi[sampleWindow], sampleWindow);
+      if (m_fft_derivative) {
+        ConstructROMLaplaceFFT(a_s, m_basis_phi[sampleWindow], sampleWindow);
+      }
+      else
+      {
+        ConstructPotentialROMLaplace(a_s, m_basis_phi[sampleWindow], sampleWindow);
+      }
 
       m_basis_e.push_back(new CAROM::Matrix(m_basis_phi[sampleWindow]->numRows(),
                           m_rdims_phi[sampleWindow], false));
-      ConstructEBasis(a_s, sampleWindow);
+      if (m_fft_derivative) {
+        ConstructEBasisFFT(a_s, sampleWindow);
+      }
+      else 
+      {
+        ConstructEBasis(a_s, sampleWindow);
+      }
+
       m_romMaxE.push_back(new CAROM::Vector(m_rdims_phi[sampleWindow], false));
       FindMaxEBasis(a_s, sampleWindow);
 
