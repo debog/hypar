@@ -121,6 +121,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
 
   numWindows = 0;
   endWindow = false;
+  currWindow = false;
   windowindex = 0;
 
   char dirname_c_str[_MAX_STRING_SIZE_] = "LS";
@@ -129,6 +130,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   char solve_phi[_MAX_STRING_SIZE_] = "false";
   char solve_phi_basis_poisson[_MAX_STRING_SIZE_] = "false";
   char c_err_snap[_MAX_STRING_SIZE_] = "false";
+  char indicator_str[_MAX_STRING_SIZE_] = "intEsquare";
+  char fft_derivative[_MAX_STRING_SIZE_] = "false";
 
   if (!m_rank) {
 
@@ -168,6 +171,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
             ferr = fscanf(in,"%s", c_err_snap); if (ferr != 1) return;
           } else if (std::string(word) == "ls_nsets") {
             ferr = fscanf(in,"%d", &m_nsets); if (ferr != 1) return;
+          } else if (std::string(word) == "ls_indicator") {
+            ferr = fscanf(in,"%s", indicator_str); if (ferr != 1) return;
           }
           if (ferr != 1) return;
         }
@@ -195,6 +200,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
     printf("  construct potential basis with Poisson:  %s\n", solve_phi_basis_poisson);
     printf("  compute error for each snapshot:  %s\n", c_err_snap);
     printf("  number of parametric snapshot sets:   %d\n", m_nsets);
+    printf("  physical indicator type:   %s\n", indicator_str);
     if (m_sim_idx >= 0) {
       printf("  simulation domain:  %d\n", m_sim_idx);
     }
@@ -216,6 +222,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   MPI_Bcast(&m_phi_energy_criteria,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
   MPI_Bcast(c_err_snap,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(&m_nsets,1,MPI_INT,0,MPI_COMM_WORLD);
+  MPI_Bcast(indicator_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+  MPI_Bcast(fft_derivative,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
 #endif
 
   m_dirname = std::string( dirname_c_str );
@@ -224,6 +232,12 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_solve_phi = (std::string(solve_phi) == "true");
   m_solve_poisson = (std::string(solve_phi_basis_poisson) == "true");
   m_c_err_snap = (std::string(c_err_snap) == "true");
+  indicatorType = indicator_str;
+  m_fft_derivative = (std::string(fft_derivative) == "true");
+
+  if (!m_rank) {
+    std::cout << "indicator type " << indicatorType << "\n";
+  }
 
   if (m_num_window_samples <= m_rdim) {
     printf("ERROR:LSROMObject::LSROMObject() - m_num_window_samples <= m_rdim!!\n");
@@ -257,6 +271,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
     exit(0);
   }
   if (m_num_window_samples == 0) ReadTimeWindows(); 
+
 }
 
 void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U, /*!< solution vector */
@@ -309,8 +324,14 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
   MPIVariables       *mpi = (MPIVariables *) param->m;
 
   std::vector<double> vec_wo_ghosts(param->npts_local_x, 0.0);
+  std::vector<double> e_wo_ghosts(param->npts_local_x, 0.0);
   std::vector<double> vec_x_wghosts(param->npts_local_x_wghosts);
   std::vector<int> index(sim[0].solver.ndims);
+
+  double sum = 0, global_sum = 0;
+  bool cond1;
+  bool cond2;
+  bool cond3;
 
   if (m_tic == 0)
   {
@@ -376,11 +397,37 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
         vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
       }
 
+      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+
+          sum = ArrayMaxnD (solver->nvars,1,solver->dim_local,
+                            0,solver->index,vec_wo_ghosts.data());
+//        global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->comm[0]); // This is slower than calling allreduction
+          global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world); // This is slower than calling allreduction
+          if (!m_rank) printf("FOM max |E| %f\n",global_sum);
+
       proc_maxe = ArrayMaxnD (solver->nvars,1,solver->dim_local,
                               0,solver->index,vec_wo_ghosts.data());
       real_maxe = 0; MPIMax_double(&real_maxe,&proc_maxe,1,&mpi->world);
 
-      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+      _ArrayMultiply1D_(e_wo_ghosts.data(),vec_wo_ghosts.data(),vec_wo_ghosts.data(),vec_wo_ghosts.size()); 
+
+      proc_inte2 = 0;
+      for (size_t i = 0; i < e_wo_ghosts.size(); ++i) {
+        proc_inte2 += e_wo_ghosts[i]*(1./solver->dxinv[0]);
+      }
+
+//    for (int j = 0; j < solver->npoints_local_wghosts; ++j){
+//      printf("rank %d dx %f\n",m_rank,solver->dxinv[j]);
+//    }
+      fom_inte2_curr = 0; MPISum_double(&fom_inte2_curr, &proc_inte2, 1, &mpi->world);
+      fom_inte2_max = std::max(fom_inte2_curr, fom_inte2_max);
+      fom_slopeinte2_curr = fom_inte2_curr-fom_inte2_prev;
+      if (!m_rank) printf("FOM int_E^2 current %f prev %f\n",fom_inte2_curr,fom_inte2_prev);
+      if (!m_rank) printf("int_E^2 slop current %f prev %f \n",fom_slopeinte2_curr,fom_slopeinte2_prev);
+
+
+      fom_slopeinte2_prev= fom_inte2_curr-fom_inte2_prev;
+      fom_inte2_prev = fom_inte2_curr;
     }
   }
   else
@@ -421,106 +468,133 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
         vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
       }
 
+      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+          sum = ArrayMaxnD (solver->nvars,1,solver->dim_local,
+                            0,solver->index,vec_wo_ghosts.data());
+//        global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->comm[0]); // This is slower than calling allreduction
+          global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world); // This is slower than calling allreduction
+          if (!m_rank) printf("FOM max |E| %f\n",global_sum);
+
       proc_maxe = ArrayMaxnD (solver->nvars,1,solver->dim_local,
                               0,solver->index,vec_wo_ghosts.data());
       real_maxe = 0; MPIMax_double(&real_maxe,&proc_maxe,1,&mpi->world);
 
-      bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+      _ArrayMultiply1D_(e_wo_ghosts.data(),vec_wo_ghosts.data(),vec_wo_ghosts.data(),vec_wo_ghosts.size()); 
+
+      proc_inte2 = 0;
+      for (size_t i = 0; i < e_wo_ghosts.size(); ++i) {
+        proc_inte2 += e_wo_ghosts[i]*(1./solver->dxinv[0]);
+      }
+      fom_inte2_curr = 0; MPISum_double(&fom_inte2_curr, &proc_inte2, 1, &mpi->world);
+      fom_slopeinte2_curr = fom_inte2_curr-fom_inte2_prev;
+      if (!m_rank) printf("FOM int_E^2 current %f prev %f\n",fom_inte2_curr,fom_inte2_prev);
+      if (!m_rank) printf("int_E^2 slop current %f prev %f \n",fom_slopeinte2_curr,fom_slopeinte2_prev);
+
+
     }
 
     if (numWindows > 0)
     {
+      if (!m_rank) printf("indicatorType: %s\n", indicatorType.c_str());
       if (indicatorType == "time")
       {
         endWindow = (((a_time >= twep[m_curr_win]) || (std::fabs(a_time - twep[m_curr_win]) < 1e-8)) && m_curr_win < numWindows-1);
       }
-      else if (indicatorType == "maxE")
+      else if (indicatorType == "intEsquare")
       {
-        endWindow = (((real_maxe >= twep[m_curr_win]) || (std::fabs(real_maxe - twep[m_curr_win]) < 1e-8)) && m_curr_win < numWindows-1);
+        if (m_curr_win == 0){
+          endWindow = (((a_time-4) >= 1e-4));
+        } else if (m_curr_win == 1){
+          endWindow = ((fom_inte2_curr >= 1));
+        } else if (m_curr_win == 2){
+          cond1 = (fom_slopeinte2_prev > 0.0 && fom_slopeinte2_curr < 0.0);
+          cond2 = (fom_slopeinte2_prev < 0.0 && fom_slopeinte2_curr > 0.0);
+          if (!m_rank) printf("slop %f %f \n", fom_slopeinte2_prev, fom_slopeinte2_curr);
+          if (!m_rank) printf("cond 1 %d \n", cond1);
+          if (!m_rank) printf("cond 2 %d \n", cond2);
+//        cond2 = (std::abs((rom_inte2_curr - m_twep[m_curr_win].second))/m_twep[m_curr_win].second < 5e-2);
+//        cond3 = (rom_inte2_curr >= m_twep[m_curr_win].second);
+
+//        endWindow =  (( cond1 && cond2 ) || (cond3));
+          endWindow = ( cond1 || cond2);
+        } else if (m_curr_win >= 3){
+          cond1 = (fom_slopeinte2_prev > 0.0 && fom_slopeinte2_curr < 0.0);
+          cond2 = (fom_slopeinte2_prev < 0.0 && fom_slopeinte2_curr > 0.0);
+          cond3 = (m_generator[m_curr_win]->getNumSamples() > 101);
+          if (!m_rank) printf("slop %f %f \n", fom_slopeinte2_prev, fom_slopeinte2_curr);
+          if (!m_rank) printf("cond 1 %d \n", cond1);
+          if (!m_rank) printf("cond 2 %d \n", cond2);
+          if (!m_rank) printf("cond 3 %d \n", cond3);
+          endWindow = ( cond1 || cond2 || cond3 );
+//        if (!m_rank) printf("cond 3 %d \n", cond3);
+        }
+//      endWindow = (((real_inte2 >= twep[m_curr_win]) || (std::fabs(real_inte2 - twep[m_curr_win]) < 1e-8)) && m_curr_win < numWindows-1);
       }
+      else if (indicatorType == "intEsquare_2")
+      {
+        if (m_curr_win == 0){
+          endWindow = (((a_time-4) >= 1e-4));
+        } else if (m_curr_win == 1){
+          endWindow = ((fom_inte2_curr >= 1));
+        } else if (m_curr_win == 2){
+          cond1 = (fom_slopeinte2_prev > 0.0 && fom_slopeinte2_curr < 0.0);
+          cond2 = (fom_slopeinte2_prev < 0.0 && fom_slopeinte2_curr > 0.0);
+          if (!m_rank) printf("slop %f %f \n", fom_slopeinte2_prev, fom_slopeinte2_curr);
+          if (!m_rank) printf("cond 1 %d \n", cond1);
+          if (!m_rank) printf("cond 2 %d \n", cond2);
+          endWindow = ( cond1 || cond2);
+        } else if (m_curr_win >= 3 ){
+          if (!(reach_end_non)) {
+            cond1 = (fom_slopeinte2_prev > 0.0 && fom_slopeinte2_curr < 0.0);
+            reach_end_non = (fom_slopeinte2_prev < 0.0 && fom_slopeinte2_curr > 0.0);
+            cond3 = (m_generator[m_curr_win]->getNumSamples() > 101);
+            if (!m_rank) printf("slop %f %f \n", fom_slopeinte2_prev, fom_slopeinte2_curr);
+            if (!m_rank) printf("cond 1 %d \n", cond1);
+            if (!m_rank) printf("reach_end_non %d \n", reach_end_non);
+            if (!m_rank) printf("cond 3 %d \n", cond3);
+            endWindow = ( cond1 || reach_end_non|| cond3 );
+          }
+          else if (reach_end_non){
+            cond1 = (fom_slopeinte2_prev > 0.0 && fom_slopeinte2_curr < 0.0);
+            cond2 = (fom_slopeinte2_prev < 0.0 && fom_slopeinte2_curr > 0.0);
+            if (!m_rank) printf("slop %f %f \n", fom_slopeinte2_prev, fom_slopeinte2_curr);
+            if (!m_rank) printf("cond 1 %d \n", cond1);
+            if (!m_rank) printf("cond 2 %d \n", cond2);
+            endWindow = ( cond1 || cond2 );
+          }
+        } 
+      }
+//      endWindow = (((real_inte2 >= twep[m_curr_win]) || (std::fabs(real_inte2 - twep[m_curr_win]) < 1e-8)) && m_curr_win < numWindows-1);
     }
     else
     {
-      endWindow = (m_generator[m_curr_win]->getNumSamples() >= m_num_window_samples);
+      endWindow = (m_generator[m_curr_win]->getNumSamples() > m_num_window_samples);
     }
+    fom_slopeinte2_prev= fom_inte2_curr-fom_inte2_prev;
+    fom_inte2_prev = fom_inte2_curr;
 
 //  if (m_tic%m_num_window_samples == 0) {
     if (endWindow) 
     {
-      m_intervals[m_curr_win].second = a_time;
-
-      int ncol = m_generator[m_curr_win]->getSnapshotMatrix()->numColumns();
-      if (!m_rank)
-      {
-        printf( "LSROMObject::train() - training LS object %d for sim. domain %d, var %d with %d samples.\n",
-                m_curr_win, m_sim_idx, m_var_idx, ncol );
-      }
-      m_ls_is_trained[m_curr_win] = false;
-      m_snap.push_back(0);
-
-      m_curr_win++;
-
-      m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
-
-      if (m_f_energy_criteria > 0) m_options[m_curr_win]->setSingularValueTol(m_f_energy_criteria);
-
-      const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
-      m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
-
-      bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
-
-      if ((m_solve_phi) && (!m_solve_poisson))
-      {
-        m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
-        if (m_phi_energy_criteria > 0) m_options_phi[m_curr_win]->setSingularValueTol(m_phi_energy_criteria);
-
-        const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
-        m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisFileName_phi));
-
-        if (mpi->ip[1] == 0)
+      m_overlap = 1; // resete overlap counter
+      if (m_tic != (a_nstep-1)) {
+        m_intervals[m_curr_win].second = a_time;
+  
+        int ncol = m_generator[m_curr_win]->getSnapshotMatrix()->numColumns();
+        if (!m_rank)
         {
-          ArrayCopynD(1,
-                      param->potential,
-                      vec_wo_ghosts.data(),
-                      sim[0].solver.dim_local,
-                      sim[0].solver.ghosts,
-                      0,
-                      index.data(),
-                      sim[0].solver.nvars);
+          printf( "LSROMObject::takeSample() - Done collecting samples for LS object %d for sim. domain %d, var %d with %d samples.\n",
+                  m_curr_win, m_sim_idx, m_var_idx, ncol );
         }
-        else
-        {
-          vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
-        }
-        bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
-
-        m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
-        m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
-
-        if (mpi->ip[1] == 0)
-        {
-          ArrayCopynD(1,
-                      param->e_field,
-                      vec_wo_ghosts.data(),
-                      sim[0].solver.dim_local,
-                      sim[0].solver.ghosts,
-                      0,
-                      index.data(),
-                      sim[0].solver.nvars);
-        } else
-        {
-          vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
-        }
-        bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
-      }
-
-      m_ls_is_trained.push_back(false);
-      m_intervals.push_back( Interval(a_time, m_t_final) );
-
-      if (!m_rank)
-      {
-        printf( "LSROMObject::takeSample() - creating new generator object for sim. domain %d, var %d, t=%f (total: %d).\n",
-                m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
+        m_ls_is_trained[m_curr_win] = false;
+        m_snap.push_back(0);
+  
+        m_curr_win++;
+  
+        m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
+  
+        if (m_f_energy_criteria > 0) m_options[m_curr_win]->setSingularValueTol(m_f_energy_criteria);
+  
       }
     }
   }
@@ -922,29 +996,53 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
   MPIVariables *mpi = (MPIVariables *) param->m;
   double sum = 0, global_sum = 0;
   double app_sum = 0;
+  std::vector<double> int_f_wghosts(param->npts_local_x_wghosts);
+  bool cond1;
+  bool cond2;
+  bool cond3;
+  bool cond4;
 
-  for (int i = 0; i < m_rdims.size(); i++) {
-    if (   ( (a_t >= m_intervals[i].first) || (std::abs((a_t - m_intervals[i].first) < 1e-8)))
-        && (  ((a_t - m_intervals[i].second) < -1e-8)  || (m_intervals[i].second < 0)  ) ){
-
-      if (!m_rank) printf("LS-ROM # %d predicts at time t = %f in interval [%f, %f] \n",
-                          i,a_t,m_intervals[i].first,m_intervals[i].second);
+  if (!m_rank) {
+    std::cout << "Checking " << m_numwindows << " " << numWindows << " in predict \n";
+  }
+  if (!m_rank) {
+    std::cout << "indicator type " << indicatorType << "\n";
+  }
+//for (int i = 0; i < m_rdims.size(); i++) {
+//  if (   ( (a_t >= m_intervals[i].first) || (std::abs((a_t - m_intervals[i].first) < 1e-8)))
+//      && (  ((a_t - m_intervals[i].second) < -1e-8)  || (m_intervals[i].second < 0)  ) ){
+      if (indicatorType == "time" || indicatorType == "window")
+      {
+        if (!m_rank) printf("LS-ROM # %d predicts at time t = %f in interval [%f, %f] \n",
+                            m_curr_win,a_t,m_intervals[m_curr_win].first,m_intervals[m_curr_win].second);
+      }
+      else if (indicatorType == "intEsquare" || indicatorType == "intEsquare_2")
+      {
+        if (!m_rank) printf("LS-ROM # %d predicts at time t = %f in interval [%f, %f] \n",
+                            m_curr_win,a_t,m_intervals[m_curr_win].first,m_intervals[m_curr_win].second);
+//                          m_curr_win,a_t,m_twep[m_curr_win].first,m_twep[m_curr_win].second);
+      }
 
       std::vector<int> index(sim[0].solver.ndims);
       std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
       std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
-      int num_rows = m_basis[i]->numRows();
+      int num_rows = m_basis[m_curr_win]->numRows();
 
+//    CAROM::Vector* m_working;
+//    m_working = new CAROM::Vector(m_rdims[i], false);
       CAROM::Vector* m_fomwork;
-      m_fomwork = new CAROM::Vector(num_rows,false);
-      CAROM::Vector* m_working;
-      m_working = new CAROM::Vector(m_rdims[i], false);
+      m_fomwork = new CAROM::Vector(num_rows,false); // Need to delete
 
-      if(std::abs(a_t) < 1e-9) {
-        m_working = ProjectToRB(m_snapshots[i]->getColumn(0), m_basis[i], m_rdims[i]);
-        MPISum_double(m_projected_init[i]->getData(), m_working->getData(), m_rdims[i], &mpi->world);
-        m_romcoef[i] = m_projected_init[i];
-        m_fomwork = ReconlibROMfield(m_romcoef[i], m_basis[i], m_rdims[i]);
+//    if(std::abs(a_t) < 1e-9) {
+      if((std::abs(a_t - m_intervals[0].first) < 1e-8))
+      {
+//      projectInitialSolution(*(m_snapshots[i]->getColumn(0)),a_s);
+//      m_working = ProjectToRB(m_snapshots[i]->getColumn(0), m_basis[i], m_rdims[i]);
+//      MPISum_double(m_projected_init[i]->getData(), m_working->getData(), m_rdims[i], &mpi->world);
+        m_romcoef[m_curr_win] = m_projected_init[m_curr_win];
+//      m_fomwork = ReconlibROMfield(m_romcoef[i], m_basis[i], m_rdims[i]);
+				m_basis[m_curr_win]->mult(*m_romcoef[m_curr_win], *m_fomwork);
+//      m_fomwork = m_romcoef[i], m_basis[i], m_rdims[i]);
 
         ArrayCopynD(sim[0].solver.ndims,
                     m_fomwork->getData(),
@@ -962,71 +1060,297 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
         /* Setup RK44 parameters */
         TimeExplicitRKInitialize();
         /* Initialize RK44 working variables */
-        TimeInitialize(m_rdims[i]);
-      } else {
-        if ((m_snap[i]==0) && (i>0)) {
-          m_fomwork = ReconlibROMfield(m_romcoef[i-1], m_basis[i-1], m_rdims[i-1]);
-          m_working = ProjectToRB(m_fomwork, m_basis[i], m_rdims[i]);
-          MPISum_double(m_romcoef[i]->getData(), m_working->getData(), m_rdims[i], &mpi->world);
-          TimeInitialize(m_rdims[i]);
-      } else {
-        }
-        TimeRK(a_t,a_s,i);
-      }
-
-      if ((m_snap[i] < sim[0].solver.n_iter) && (m_snap[i] % m_sampling_freq == 0)){
-        int idx;
-        idx = m_snap[i]/m_sampling_freq;
-        if (!m_rank) printf("idx %d m_snap %d m_sampling_freq %d \n",idx,m_snap[i],m_sampling_freq);
-        m_fomwork = ReconlibROMfield(m_romcoef[i], m_basis[i], m_rdims[i]);
-        ArrayCopynD(sim[0].solver.ndims,
-                    m_fomwork->getData(),
-                    vec_wghosts.data(),
-                    sim[0].solver.dim_local,
-                    0,
-                    sim[0].solver.ghosts,
-                    index.data(),
-                    sim[0].solver.nvars);
-        ArrayCopynD(sim[0].solver.ndims,
-                    m_snapshots[i]->getColumn(idx)->getData(),
-                    rhs_wghosts.data(),
-                    sim[0].solver.dim_local,
-                    0,
-                    sim[0].solver.ghosts,
-                    index.data(),
-                    sim[0].solver.nvars);
-        char buffer[] = "reproderr";  // Creates a modifiable buffer and copies the string literal
-        CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),vec_wghosts.data(),buffer);
-        if (!m_rank) printf("Reconstructive error at # %d snapshot, %.15f %.15f %.15f \n",
-                            idx,
-                            sim[0].solver.rom_diff_norms[0],
-                            sim[0].solver.rom_diff_norms[1],
-                            sim[0].solver.rom_diff_norms[2]);
-      }
-      m_snap[i]++;
-
-      m_basis[i]->mult(*m_romcoef[i], *m_recon);
-
-      if (m_solve_phi) {
-        m_basis_e[i]->mult(*m_tmpsol[i], *m_recon_E);
-        for (int j = 0; j < m_recon_E->dim(); j++) {
-          (*m_recon_E)(j) = std::fabs((*m_recon_E)(j));
-        }
-        sum = ArrayMaxnD (solver->nvars,1,solver->dim_local,
-                          0,solver->index,m_recon_E->getData());
-        global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
-        if (!m_rank) printf("Checking max |E| %f\n",global_sum);
-        for (int j = 0; j < m_tmpsol[i]->dim(); j++) {
-          (*m_tmpsol[i])(j) = std::fabs((*m_tmpsol[i])(j));
-        }
-        app_sum = m_tmpsol[i]->inner_product(m_romMaxE[i]);
-        if (!m_rank) printf("Checking approximated max |E| %f\n",app_sum);
+        TimeInitialize(m_rdims[m_curr_win]);
 
       }
+      else
+      {
+        TimeRK(a_t,a_s,m_curr_win,m_snap[m_curr_win]);
+      }
+
+//      if ((m_snap[i] < sim[0].solver.n_iter) && (m_snap[i] % m_sampling_freq == 0)){
+//        int idx;
+//        int snap_idx;
+//        idx = m_snap[i]/m_sampling_freq;
+//        if (!m_rank) printf("idx %d m_snap %d m_sampling_freq %d \n",idx,m_snap[i],m_sampling_freq);
+//				m_basis[i]->mult(*m_romcoef[i], *m_fomwork);
+//        ArrayCopynD(sim[0].solver.ndims,
+//                    m_fomwork->getData(),
+//                    vec_wghosts.data(),
+//                    sim[0].solver.dim_local,
+//                    0,
+//                    sim[0].solver.ghosts,
+//                    index.data(),
+//                    sim[0].solver.nvars);
+////      snap_idx = idx*5;
+//        snap_idx = idx;
+//        ArrayCopynD(sim[0].solver.ndims,
+//                    m_snapshots[i]->getColumn(snap_idx)->getData(),
+//                    rhs_wghosts.data(),
+//                    sim[0].solver.dim_local,
+//                    0,
+//                    sim[0].solver.ghosts,
+//                    index.data(),
+//                    sim[0].solver.nvars);
+//        char buffer[] = "reproderr";  // Creates a modifiable buffer and copies the string literal
+//        CalSnapROMDiff(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),vec_wghosts.data(),buffer);
+//        if (!m_rank) printf("Reconstructive error at # %d snapshot, %.15f %.15f %.15f \n",
+//                            snap_idx,
+//                            sim[0].solver.rom_diff_norms[0],
+//                            sim[0].solver.rom_diff_norms[1],
+//                            sim[0].solver.rom_diff_norms[2]);
+//      }
+      m_snap[m_curr_win]++;
+
+//    if (i == m_rdims.size()-1) {
+      m_basis[m_curr_win]->mult(*m_romcoef[m_curr_win], *m_recon);
+//    }
+      if (m_centered) *m_recon += m_base_sol;
+
+        if (m_solve_phi)
+        {
+          CAROM::Vector* esquare_test;
+          if ((!m_solve_poisson)) 
+          {
+            m_basis_e[m_curr_win]->mult(*m_tmpsol[m_curr_win], *m_recon_E);
+            esquare_test = new CAROM::Vector(m_tmpsol[m_curr_win]->dim(), false);
+            m_esquare[m_curr_win]->mult(*m_tmpsol[m_curr_win], *esquare_test);
+            app_sum = m_tmpsol[m_curr_win]->inner_product(esquare_test);
+          }
+          else
+          {
+            m_basis_e[m_curr_win]->mult(*m_romcoef[m_curr_win], *m_recon_E);
+            esquare_test = new CAROM::Vector(m_romcoef[m_curr_win]->dim(), false);
+            m_esquare[m_curr_win]->mult(*m_romcoef[m_curr_win], *esquare_test);
+            app_sum = m_romcoef[m_curr_win]->inner_product(esquare_test);
+            }
+          sum = ArrayMaxnD (solver->nvars,1,solver->dim_local,
+                            0,solver->index,m_recon_E->getData());
+          global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
+//        global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->comm[0]); // This is slower than calling allreduction
+//        if (!m_rank) printf("Checking max |E| %f\n",global_sum);
+          if (!m_rank) printf("Checking max |E| %.10f\n", global_sum);
+
+//        for (int j = 0; j < m_recon_E->dim(); j++){
+//          printf("Checking %d %d efield %f\n",m_rank,j, m_recon_E->item(j));
+//        }
+
+          if (mpi->ip[1] == 0) {
+            ArrayCopynD(1,m_recon_E->getData(),int_f_wghosts.data(),
+                        sim[0].solver.dim_local,
+                        0,
+                        sim[0].solver.ghosts,
+                        index.data(),
+                        sim[0].solver.nvars);
+          }
+          else {
+            int_f_wghosts = std::vector<double> (int_f_wghosts.size(),0.0);
+          }
+          MPISum_double(int_f_wghosts.data(),int_f_wghosts.data(),param->npts_local_x_wghosts,&mpi->comm[1]);
+
+//        for (int j = 0; j < int_f_wghosts.size(); j++){
+//          printf("Checking %d %d g_efield %f\n",m_rank,j, int_f_wghosts[j]);
+//        }
+          char buffer[] = "app_e";
+          ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),int_f_wghosts.data(),buffer);
+
+//
+//        for (int j = 0; j < m_tmpsol[i]->dim(); j++)
+//        {
+//          if ((!m_solve_poisson))
+//          {
+//            (*m_tmpsol[i])(j) = std::fabs((*m_tmpsol[i])(j));
+//           } 
+//           else
+//           }
+//            (*m_tmpsol[i])(j) = std::fabs((*m_romcoef[i])(j));
+//          }
+////        std::cout << "Element at index " << j << ": " << (*m_tmpsol[i])(j) << std::endl;
+//        }
+//        app_sum = m_tmpsol[i]->inner_product(m_romMaxE[i]);
+//        if (!m_rank) printf("Checking approximated max |E| %f\n",app_sum);
+////      printf("Checking approximated max |E| %f\n",app_sum);
+//
+//          CAROM::Vector* esquare;
+//          esquare = new CAROM::Vector(m_recon_E->dim(), false);
+//          _ArrayMultiply1D_(esquare->getData(),m_recon_E->getData(),m_recon_E->getData(),m_recon_E->dim()); 
+//
+//          int *dim    = solver->dim_local;
+//          int  ghosts = solver->ghosts;
+//          int  ndims  = solver->ndims;
+//
+//          for (int j = 0; j < esquare->dim(); j++){
+////          double dx; _GetCoordinate_(0,j,dim,ghosts,solver->dx,dx);
+//            sum += esquare->getData()[j]*(1./solver->dxinv[0]);
+////          printf("Checking dx and sum %f %f\n",(1./solver->dxinv[j]),sum);
+//          }
+////        printf("rank %d ROM int_E^2 %f\n",m_rank,sum);
+////        global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
+//          global_sum = 0; MPISum_double(&global_sum, &sum, 1, &mpi->world);
+
+//        rom_inte2_curr = global_sum;
+//        rom_slopeinte2_curr = rom_inte2_curr-rom_inte2_prev;
+//        if (!m_rank) printf("ROM int_E^2 current %f prev %f\n",rom_inte2_curr,rom_inte2_prev);
+//        if (!m_rank) printf("int_E^2 slop current %f prev %f \n",rom_slopeinte2_curr,rom_slopeinte2_prev);
+
+          rom_inte2_curr = app_sum;
+          rom_slopeinte2_curr = rom_inte2_curr-rom_inte2_prev;
+          if (!m_rank) printf("Eff ROM int_E^2 current %f prev %f\n",rom_inte2_curr,rom_inte2_prev);
+          if (!m_rank) printf("int_E^2 slop current %f prev %f \n",rom_slopeinte2_curr,rom_slopeinte2_prev);
+
+          if (indicatorType == "time" || indicatorType == "window")
+          {
+//          endWindow = (((a_t >= m_intervals[i].first) || (std::abs((a_t - m_intervals[i].first) < 1e-8))) && (  ((a_t - m_intervals[i].second) < -1e-8)  || (m_intervals[i].second < 0)));
+            endWindow = (((a_t >= m_intervals[m_curr_win].second) || (std::abs((a_t - m_intervals[m_curr_win].second)) < 1e-8)) && m_curr_win < numWindows-1);
+          }
+          else if (indicatorType == "intEsquare")
+          {
+//          endWindow = (((rom_inte2_curr >= m_twep[i].first) || (std::abs((rom_inte2_curr - m_twep[i].first) < 1e-8))) && (  ((rom_inte2_curr - m_twep[i].second) < -1e-8)  || (m_twep[i].second < 0)));
+            if (m_curr_win == 0){
+              endWindow = ((a_t >= 4));
+            } else if(m_curr_win == 1){
+              endWindow = ((rom_inte2_curr >= 1));
+            } else if(m_curr_win == 2){
+              if (m_snap[m_curr_win] >= 15){
+                cond1 = (rom_slopeinte2_prev > 0.0 && rom_slopeinte2_curr < 0.0);
+                cond2 = (rom_slopeinte2_prev < 0.0 && rom_slopeinte2_curr > 0.0);
+                cond3 = (m_curr_win < numWindows-1);
+                if (!m_rank) printf("ROM slop %f %f \n", rom_slopeinte2_prev, rom_slopeinte2_curr);
+                if (!m_rank) printf("cond 1 %d \n", cond1);
+                if (!m_rank) printf("cond 2 %d \n", cond2);
+                if (!m_rank) printf("cond 3 %d \n", cond3);
+//                cond2 = (std::abs((rom_inte2_curr - m_twep[m_curr_win].second))/m_twep[m_curr_win].second < 5e-2);
+//                cond3 = (rom_inte2_curr >= m_twep[m_curr_win].second);
+
+//                endWindow =  (( cond1 && cond2 ) || (cond3));
+                endWindow = ( (cond1 || cond2) & cond3 );
+              } 
+            } else if(m_curr_win >= 3){
+              if (m_snap[m_curr_win] >= 15){
+                cond1 = (rom_slopeinte2_prev > 0.0 && rom_slopeinte2_curr < 0.0);
+                cond2 = (rom_slopeinte2_prev < 0.0 && rom_slopeinte2_curr > 0.0);
+                cond3 = (m_curr_win < numWindows-1);
+                cond4 = (m_snap[m_curr_win] > 101);
+                if (!m_rank) printf("ROM slop %f %f \n", rom_slopeinte2_prev, rom_slopeinte2_curr);
+                if (!m_rank) printf("cond 1 %d \n", cond1);
+                if (!m_rank) printf("cond 2 %d \n", cond2);
+                if (!m_rank) printf("cond 3 %d \n", cond3);
+                if (!m_rank) printf("cond 4 %d \n", cond4);
+                endWindow = ( (cond1 || cond2 || cond4 ) & cond3 );
+//              endWindow = ( (cond1 || cond2 ) & cond3 );
+              }
+//            if (!m_rank) printf("cond 3 %d \n", cond3);
+            }
+//            if (m_curr_win < numWindows-2) {
+//
+//              cond1 = (rom_inte2_curr >= m_twep[m_curr_win].second);
+////            cond2 = ((std::abs((rom_inte2_curr - m_twep[m_curr_win].second)) / m_twep[m_curr_win].second) > 5e-2);
+//              cond3 = (m_curr_win < numWindows-1);
+//
+////            endWindow = (( cond1 || cond2 ) && cond3 );
+//              if (a_t >= 4.0) endWindow = true;
+////            endWindow = (( cond1 ) && cond3 );
+//
+//              if (!m_rank) printf("cond 1 %d \n", cond1);
+// //           if (!m_rank) printf("cond 2 %d \n", cond2); 
+//              if (!m_rank) printf("cond 3 %d \n", cond3);
+//
+//            } else if (m_curr_win == numWindows-2) {
+//              cond1 = (rom_slopeinte2_prev > 0.0 && rom_slopeinte2_curr < 0.0);
+//              cond2 = (std::abs((rom_inte2_curr - m_twep[m_curr_win].second))/m_twep[m_curr_win].second < 5e-2);
+//              cond3 = (rom_inte2_curr >= m_twep[m_curr_win].second);
+//
+//              endWindow =  (( cond1 && cond2 ) || (cond3));
+//
+//              if (!m_rank) printf("cond 1 %d \n", cond1);
+//              if (!m_rank) printf("cond 2 %d \n", cond2);
+//              if (!m_rank) printf("cond 3 %d \n", cond3);
+////            endWindow = (((rom_slopeinte2_prev < 0.0 && rom_slopeinte2_curr > 0.0) || (std::abs((rom_inte2_curr - m_twep[m_curr_win].second)) < 1e-8)) && m_curr_win < numWindows-1);
+//            }
+            rom_slopeinte2_prev= rom_inte2_curr-rom_inte2_prev;
+//          rom_inte2_prev = global_sum;
+            rom_inte2_prev = app_sum;
+          } else if (indicatorType == "intEsquare_2")
+          {
+            if (m_curr_win == 0){
+              endWindow = ((a_t >= 4));
+            } else if (m_curr_win == 1){
+              endWindow = ((rom_inte2_curr >= 1));
+            } else if (m_curr_win == 2){
+              if (m_snap[m_curr_win] >= 15){
+                cond1 = (rom_slopeinte2_prev > 0.0 && rom_slopeinte2_curr < 0.0);
+                cond2 = (rom_slopeinte2_prev < 0.0 && rom_slopeinte2_curr > 0.0);
+                cond3 = (m_curr_win < numWindows-1);
+                if (!m_rank) printf("ROM slop %f %f \n", rom_slopeinte2_prev, rom_slopeinte2_curr);
+                if (!m_rank) printf("cond 1 %d \n", cond1);
+                if (!m_rank) printf("cond 2 %d \n", cond2);
+                if (!m_rank) printf("cond 3 %d \n", cond3);
+                endWindow = ( (cond1 || cond2) & cond3 );
+              } 
+            } else if (m_curr_win >= 3){
+              if (!(reach_end_non)) {
+                if (m_snap[m_curr_win] >= 15){
+                  cond1 = (rom_slopeinte2_prev > 0.0 && rom_slopeinte2_curr < 0.0);
+                  reach_end_non = (rom_slopeinte2_prev < 0.0 && rom_slopeinte2_curr > 0.0);
+                  cond3 = (m_curr_win < numWindows-1);
+                  cond4 = (m_snap[m_curr_win] > 101);
+                  if (!m_rank) printf("ROM slop %f %f \n", rom_slopeinte2_prev, rom_slopeinte2_curr);
+                  if (!m_rank) printf("cond 1 %d \n", cond1);
+                  if (!m_rank) printf("reach_end_non %d \n", reach_end_non);
+                  if (!m_rank) printf("cond 3 %d \n", cond3);
+                  if (!m_rank) printf("cond 4 %d \n", cond4);
+                  endWindow = ( (cond1 || reach_end_non || cond4 ) & cond3 );
+                }
+              }
+              else if ((reach_end_non)) {
+                if (m_snap[m_curr_win] >= 15){
+                  cond1 = (rom_slopeinte2_prev > 0.0 && rom_slopeinte2_curr < 0.0);
+                  cond2 = (rom_slopeinte2_prev < 0.0 && rom_slopeinte2_curr > 0.0);
+                  cond3 = (m_curr_win < numWindows-1);
+                  if (!m_rank) printf("ROM slop %f %f \n", rom_slopeinte2_prev, rom_slopeinte2_curr);
+                  if (!m_rank) printf("cond 1 %d \n", cond1);
+                  if (!m_rank) printf("cond 2 %d \n", cond2);
+                  if (!m_rank) printf("cond 3 %d \n", cond3);
+                  endWindow = ( (cond1 || cond2 ) & cond3 );
+                }
+              }
+            }
+            rom_slopeinte2_prev= rom_inte2_curr-rom_inte2_prev;
+            rom_inte2_prev = app_sum;
+          }
+          if (endWindow){
+            m_curr_win++;
+            if ((m_snap[m_curr_win]==0) && (m_curr_win>0))
+            {
+              m_romcoef[m_curr_win] = m_fullscale[m_curr_win-1]->mult(m_romcoef[m_curr_win-1]);
+              TimeInitialize(m_rdims[m_curr_win]);
+            }
+            if (indicatorType == "intEsquare"){
+//            rom_slopeinte2_prev= 0;
+//            rom_inte2_prev = 0;
+//            m_basis_e[m_curr_win]->mult(*m_romcoef[m_curr_win], *m_recon_E);
+//            CAROM::Vector* esquare_proj;
+//            esquare_proj = new CAROM::Vector(m_recon_E->dim(), false);
+//            _ArrayMultiply1D_(esquare_proj->getData(),m_recon_E->getData(),m_recon_E->getData(),m_recon_E->dim()); 
+
+//            int *dim    = solver->dim_local;
+//            int  ghosts = solver->ghosts;
+//            int  ndims  = solver->ndims;
+
+//            for (int j = 0; j < esquare->dim(); j++){
+//              sum += esquare->getData()[j]*(1./solver->dxinv[0]);
+//            }
+//            rom_inte2_prev = 0; MPISum_double(&rom_inte2_prev, &sum, 1, &mpi->world);
+            }
+          }
+          endWindow = false;
+        }
+
 //    return ReconlibROMfield(m_romcoef[i], m_basis[i], m_rdims[i]);
+		  delete m_fomwork;
       return m_recon;
-    }
-  }
+//  }
+//}
   printf("ERROR in LSROMObject::predict(): m_generator is of size zero or interval not found!");
   return nullptr;
 }
@@ -3171,6 +3495,9 @@ void LSROMObject::writeSnapshot(void* a_s)
 //outfile_twp << m_generator.size();
 //if ((m_solve_phi) && (!m_solve_poisson)) outfile_twp << ", " << m_generator_phi.size();
 //outfile_twp.close();
+  char filename[50];
+  snprintf(filename, sizeof(filename), "twinterval_%d.csv", m_parametric_id);
+  twintervalfile = filename;
 
   outfile_twp.open(outputPath + "/" + std::string(twintervalfile));
   int precision = 16;
@@ -3192,7 +3519,21 @@ void LSROMObject::merge(void* a_s)
 
 //ReadTimeWindows(a_s);
 
-  m_numwindows = countNumLines("./" + std::string(twintervalfile));
+  int m_numwindows = 0;
+  for (int i = 0; i < m_nsets; ++i) {
+    char filename[50];
+    snprintf(filename, sizeof(filename), "twinterval_%d.csv", i);
+    twintervalfile = filename;
+    
+    int numLines; 
+    numLines = countNumLines("./" + std::string(twintervalfile));
+    numwindows_parameter.push_back(numLines);
+
+    if (numLines > m_numwindows) {
+      m_numwindows = numLines;
+    }
+    
+  }
 
   for (int sampleWindow = 0; sampleWindow < m_numwindows; ++sampleWindow)
   {
@@ -3202,10 +3543,12 @@ void LSROMObject::merge(void* a_s)
 	  CAROM::BasisGenerator* generator = new CAROM::BasisGenerator(*options, isIncremental, basisFileName);
     for (int paramID=0; paramID<m_nsets; ++paramID)
     {
-	    std::string snapshot_filename = basisName + std::to_string(
-                                      paramID) + "_" + std::to_string(sampleWindow)
-	                                    + "_snapshot";
-      generator->loadSamples(snapshot_filename,"snapshot");
+      if ( numwindows_parameter[paramID] >= sampleWindow+1) {
+	      std::string snapshot_filename = basisName + std::to_string(
+                                       paramID) + "_" + std::to_string(sampleWindow)
+	                                      + "_snapshot";
+        generator->loadSamples(snapshot_filename,"snapshot");
+      }
     }
     generator->endSamples(); // save the merged basis f
     delete generator;
@@ -3218,10 +3561,12 @@ void LSROMObject::merge(void* a_s)
       CAROM::BasisGenerator* generator_phi = new CAROM::BasisGenerator(*options_phi, isIncremental, basisFileName_phi);
       for (int paramID=0; paramID<m_nsets; ++paramID)
       {
-        std::string snapshot_filename = basisName_phi + std::to_string(
-                                        paramID) + "_" + std::to_string(sampleWindow)
-                                        + "_snapshot";
-        generator_phi->loadSamples(snapshot_filename,"snapshot");
+        if ( numwindows_parameter[paramID] >= sampleWindow+1) {
+          std::string snapshot_filename = basisName_phi + std::to_string(
+                                          paramID) + "_" + std::to_string(sampleWindow)
+                                          + "_snapshot";
+          generator_phi->loadSamples(snapshot_filename,"snapshot");
+        }
       }
       generator_phi->endSamples(); // save the merged basis f
       delete generator_phi;
@@ -3239,8 +3584,31 @@ void LSROMObject::online(void* a_s)
   Vlasov *param  = (Vlasov*) solver->physics;
   MPIVariables *mpi = (MPIVariables *) param->m;
 
-  numWindows = countNumLines("./" + std::string(twintervalfile));
-  ReadTimeWindowParameters(); // Set m_num_window_samples
+  int m_numwindows = 0;
+  int maxindex;
+  char *tmpfile;
+  for (int i = 0; i < m_nsets; ++i) {
+    char filename[50];
+    snprintf(filename, sizeof(filename), "twinterval_%d.csv", i);
+    tmpfile = filename;
+    
+    int numLines; 
+    numLines = countNumLines("./" + std::string(tmpfile));
+    numwindows_parameter.push_back(numLines);
+
+    if (numLines > m_numwindows) {
+      m_numwindows = numLines;
+      maxindex = i;
+      char filename[50];
+      snprintf(filename, sizeof(filename), "twinterval_%d.csv", maxindex);
+      twintervalfile = filename;
+    }
+    
+  }
+  printf("m_numwindows %d \n",m_numwindows);
+  numWindows = m_numwindows;
+//numWindows = countNumLines("./" + std::string(twintervalfile));
+//ReadTimeWindowParameters(); // Set m_num_window_samples
   ReadTimeIntervals(a_s); // Set m_intervals
 
   /* Looping through time windows */

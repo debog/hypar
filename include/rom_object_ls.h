@@ -116,7 +116,7 @@ class LSROMObject : public ROMObject
       m_ls_is_trained.clear();
       if (m_dir_fomwork != nullptr) delete m_dir_fomwork;
       if (m_dir_rhswork != nullptr) delete m_dir_rhswork;
-			printf("Calling LSROMObject desctructor\n");
+      m_twep.clear();
     }
 
     /*! Project initial solution for prediction */
@@ -217,8 +217,11 @@ class LSROMObject : public ROMObject
     /*! Online stage */
     virtual void online( void* );
 
+    /* Read Time Window*/
+    void ReadTimeWindows( );
+
     /* Read Time Window Paramters */
-    void ReadTimeWindows( void* );
+    void ReadTimeWindowParameters( );
 
     /* Read Time interval for each time window */
     void ReadTimeIntervals( void* );
@@ -331,6 +334,7 @@ class LSROMObject : public ROMObject
     int m_sampling_freq;       /*!< Time step size */
 
     std::vector<CAROM::Matrix*> m_fullscale;
+    std::vector<CAROM::Matrix*> m_esquare;
     std::vector<CAROM::Vector*> m_contract1;
     std::vector<CAROM::Vector*> m_contract2;
     std::vector<CAROM::Vector*> m_tmprhs;
@@ -346,12 +350,38 @@ class LSROMObject : public ROMObject
     std::ofstream outfile_twp;
     std::string outputPath = ".";
     const char *twpfile = "twp.csv";
-    const char *twintervalfile = "twinterval.csv";
+    const char *twfile = "tw.csv";
+    char *twintervalfile;
     int m_numwindows, m_numwindows_phi;
+    int numWindows;
+    bool endWindow; 
+    bool currWindow; 
+    int windowindex;
+    double proc_maxe;
+    double real_maxe;
+    double proc_inte2;
+    double fom_inte2_curr = 0;
+    double fom_inte2_prev = 0;
+    double fom_inte2_max = 0;
+    double fom_slopeinte2_curr = 0;
+    double fom_slopeinte2_prev = 0;
+    double rom_inte2_curr = 0;
+    double rom_inte2_prev = 0;
+    double rom_inte2_curr_ = 0;
+    double rom_inte2_prev_ = 0;
+    double rom_slopeinte2_curr = 0;
+    double rom_slopeinte2_prev = 0;
+    std::string indicatorType;
 
+    std::vector<double> twep;
+    std::vector<Interval> m_twep; 
+    std::vector<int> numwindows_parameter;     /*!< Latent space dimension */
     struct timeval m_tensor_start; /*<! Construct start time */
     struct timeval m_tensor_end; /*<! Construct end time */
-    double m_tensor_wctime; /*!< Wallclock time for constructing tensor */
+
+    int m_overlap;
+
+    bool reach_end_non = false;
 
   private:
 };
