@@ -62,6 +62,8 @@ extern "C" int HyperbolicFunction_1dir(double*,double*,void*,void*,double,int,
                                        int(*)(double*,double*,int,void*,double),
                                        int(*)(double*,double*,double*,double*,
                                        double*,double*,int,void*,double),int);
+extern "C" int  FFTFreqNum(int, int);
+extern "C" int  ReadArray(int,int,int*,int*,int,void*,void*,double*,double*,char*,int*);
 
 LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
                             const int     a_vec_size_wg,    /*!< vector size with ghosts point */
@@ -351,7 +353,8 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     }
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 
-    if ((m_solve_phi) && (!m_solve_poisson)) 
+//  if ((m_solve_phi) && (!m_solve_poisson)) 
+    if ((m_solve_phi)) 
     {
       m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
       if (m_phi_energy_criteria > 0) m_options_phi[m_curr_win]->setSingularValueTol(m_phi_energy_criteria);
@@ -595,6 +598,63 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
   
         if (m_f_energy_criteria > 0) m_options[m_curr_win]->setSingularValueTol(m_f_energy_criteria);
   
+        const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
+        m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
+  
+//      if ((m_solve_phi) && (!m_solve_poisson))
+        if ((m_solve_phi))
+        {
+          m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+          if (m_phi_energy_criteria > 0) m_options_phi[m_curr_win]->setSingularValueTol(m_phi_energy_criteria);
+  
+          const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
+          m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisFileName_phi));
+  
+          if (mpi->ip[1] == 0)
+          {
+            ArrayCopynD(1,
+                        param->potential,
+                        vec_wo_ghosts.data(),
+                        sim[0].solver.dim_local,
+                        sim[0].solver.ghosts,
+                        0,
+                        index.data(),
+                        sim[0].solver.nvars);
+          }
+          else
+          {
+            vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
+          }
+          bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+  
+          m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
+          m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
+  
+          if (mpi->ip[1] == 0)
+          {
+            ArrayCopynD(1,
+                        param->e_field,
+                        vec_wo_ghosts.data(),
+                        sim[0].solver.dim_local,
+                        sim[0].solver.ghosts,
+                        0,
+                        index.data(),
+                        sim[0].solver.nvars);
+          } else
+          {
+            vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
+          }
+          bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
+        }
+  
+        m_ls_is_trained.push_back(false);
+        m_intervals.push_back( Interval(a_time, m_t_final) );
+  
+        if (!m_rank)
+        {
+          printf( "LSROMObject::takeSample() - creating new generator object for sim. domain %d, var %d, t=%f (total: %d).\n",
+                  m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
+        }
       }
     }
   }
@@ -901,24 +961,36 @@ void LSROMObject::train(void* a_s)
           CheckHyProjError(a_s,i);
         }
 
-        if ((m_solve_phi) && (!m_solve_poisson)) {
-          m_snapshots_phi.push_back(new CAROM::Matrix(
-                                    *m_generator_phi[i]->getSnapshotMatrix())),
+//      if ((m_solve_phi) && (!m_solve_poisson)) {
+        if (m_solve_phi) {
+            m_snapshots_phi.push_back(new CAROM::Matrix(
+                                      *m_generator_phi[i]->getSnapshotMatrix()));
+          if (!m_solve_poisson) {
+            // m_snapshots_phi is not  istributed due to getSnapshotMatrix
+            m_S_phi = m_generator_phi[i]->getSingularValues();
+            // m_basis_phi is necessary since getSpatialBasis is distributed
+            m_basis_phi.push_back(new CAROM::Matrix(
+                                  m_generator_phi[i]->getSpatialBasis()->getData(),
+                                  m_generator_phi[i]->getSpatialBasis()->numRows(),
+                                  m_generator_phi[i]->getSpatialBasis()->numColumns(),
+                                  false,
+                                  true));
+          }
+          else {
+            /* Potential reduced basis from solving Poisson problem */
+            CompPhiBasisPoisson(a_s, m_basis[i], i);
+          }
+
           m_rdims_phi.push_back(m_rdim_phi);
-					// m_snapshots_phi is not distributed due to getSnapshotMatrix
-          m_S_phi = m_generator_phi[i]->getSingularValues();
-					// m_basis_phi is necessary since getSpatialBasis is distributed
-          m_basis_phi.push_back(new CAROM::Matrix(
-                                m_generator_phi[i]->getSpatialBasis()->getData(),
-                                m_generator_phi[i]->getSpatialBasis()->numRows(),
-                                m_generator_phi[i]->getSpatialBasis()->numColumns(),
-                                false,
-                                true));
-          if (m_rdims_phi[i] != m_generator_phi[i]->getSpatialBasis()->numColumns()){
-            m_rdims_phi[i] = m_generator_phi[i]->getSpatialBasis()->numColumns();
+          int numRowRB_phi, numColumnRB_phi;
+          numRowRB_phi = m_basis_phi[i]->numRows();
+          numColumnRB_phi = m_basis_phi[i]->numColumns();
+
+          if (m_rdims_phi[i] != numColumnRB_phi){
+            m_rdims_phi[i] = numColumnRB_phi;
             if (!m_rank) printf("m_rdim_phi %d is reset to %d \n",
                                 m_rdim_phi,
-                                m_generator_phi[i]->getSpatialBasis()->numColumns());
+                                m_rdims_phi[i]);
           }
           if (!m_rank) {
             std::cout << "----------------------------------------\n";
