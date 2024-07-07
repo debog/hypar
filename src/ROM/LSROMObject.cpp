@@ -839,7 +839,7 @@ void LSROMObject::train(void* a_s)
         int ncol = m_generator[i]->getSnapshotMatrix()->numColumns();
         if (!m_rank) {
           printf( "LSROMObject::train() - training LS object %d for sim. domain %d, var %d with %d samples.\n", 
-                  m_curr_win, m_sim_idx, m_var_idx, ncol );
+                  i, m_sim_idx, m_var_idx, ncol );
         }
         if (m_write_snapshot_mat) {
           /* Since here is using gertSnapshotMatrix to write files, need additional process in order to visualize it
