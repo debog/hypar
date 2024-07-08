@@ -379,7 +379,6 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
     }
 
-//  if ((m_solve_phi) && (!m_solve_poisson)) 
     if ((m_solve_phi)) 
     {
       m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
@@ -407,6 +406,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       }
       bool addphiSample = m_generator_phi[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
 
+      // Collect snapshot for electric field (not necessary)
       m_options_e.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
       m_generator_e.push_back(new CAROM::BasisGenerator(*m_options_e[m_curr_win], isIncremental, basisName));
 
@@ -464,6 +464,27 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     else{
       bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
     }
+    if (m_curr_win >= 1 && m_overlap <= 0){
+      if (m_centered){
+        CAROM::Vector m_U_centered ; /*!< Vector of centered solution */
+        a_U.minus(m_base_sol, m_U_centered);
+        bool addSample = m_generator[m_curr_win]->takeSample( m_U_centered.getData(), a_time, m_dt );
+      }
+      else{
+        bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+      }
+      m_overlap++;
+      if (!m_rank)
+      {
+        printf( "win: %d checking number of samples %d.\n", m_curr_win-1, m_overlap);
+      }
+      int ncol = m_generator[m_curr_win-1]->getSnapshotMatrix()->numColumns();
+        if (!m_rank)
+        {
+          printf( "checking number of samples %d.\n", ncol);
+        }
+    }
+    if ((m_solve_phi)) 
     {
       if (mpi->ip[1] == 0) 
       {
@@ -518,8 +539,6 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       fom_slopeinte2_curr = fom_inte2_curr-fom_inte2_prev;
       if (!m_rank) printf("FOM int_E^2 current %.12f prev %.12f\n", fom_inte2_curr, fom_inte2_prev);
       if (!m_rank) printf("int_E^2 slop current %.12f prev %.12f \n", fom_slopeinte2_curr, fom_slopeinte2_prev);
-
-
     }
 
     if (numWindows > 0)
@@ -635,7 +654,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
         else{
           bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
         }
-//      if ((m_solve_phi) && (!m_solve_poisson))
+
         if ((m_solve_phi))
         {
           m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
@@ -786,10 +805,6 @@ void LSROMObject::takeSample_old(  const CAROM::Vector& a_U, /*!< solution vecto
     }
   } else {
 
-//  for (size_t i = 0; i < a_U_stages.size(); i++) {
-//    printf("checking how many a_u %d\n",i);
-//    bool addSample = m_generator[m_curr_win]->takeSample( a_U_stages[i]->getData(), a_time, m_dt );
-//  }
     bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
 //  char buffer[] = "sample";  // Creates a modifiable buffer and copies the string literal
 //  OutputlibROMfield(m_generator[m_curr_win]->getSnapshotMatrix()->getColumn(0)->getData(),
@@ -1057,7 +1072,7 @@ void LSROMObject::train(void* a_s)
           ConstructESquare(a_s, m_basis_e[i], i);
           CheckEProjError(a_s,i);
 
-          m_romhyperb_x.push_back(new CAROM::Matrix(m_rdims[i], m_rdims[i],false));
+          m_romhyperb_x.push_back(new CAROM::Matrix(m_rdims[i], m_rdims[i], false));
           ConstructROMHy_x(a_s, m_basis[i], i);
           if (m_centered){
             m_romhyperb_x_off.push_back(new CAROM::Vector(m_rdims[i], false));
@@ -1070,6 +1085,10 @@ void LSROMObject::train(void* a_s)
             ConstructROMHy_v_offset(a_s, m_basis[i], m_basis_e[i], i);
           }
 
+          m_contract1.push_back(new CAROM::Vector(m_rdims_phi[i],false));
+          m_contract2.push_back(new CAROM::Vector(m_rdims[i],false));
+          m_tmprhs.push_back(new CAROM::Vector(m_rdims[i],false));
+          m_tmpsol.push_back(new CAROM::Vector(m_rdims_phi[i],false));
         }
 
       }
@@ -3918,8 +3937,6 @@ void LSROMObject::online(void* a_s)
   }
   printf("m_numwindows %d \n",m_numwindows);
   numWindows = m_numwindows;
-//numWindows = countNumLines("./" + std::string(twintervalfile));
-//ReadTimeWindowParameters(); // Set m_num_window_samples
   ReadTimeIntervals(a_s); // Set m_intervals
   if (m_centered) 
   {
@@ -3953,9 +3970,14 @@ void LSROMObject::online(void* a_s)
       for (int i = 0; i < singularf->dim(); i++) {
             std::cout << (singularf->item(i)) << " ";
       }
-//    for (int i = 0; i < reader.getSingularValues(0,m_f_energy_criteria)->dim(); i++) {
-//          std::cout << (reader.getSingularValues(0,m_f_energy_criteria)->item(i)) << " ";
-//    }
+      std::cout << "\n";
+      std::cout << std::endl;
+
+      std::cout << "----------------\n";
+      std::cout << "Time window #" << sampleWindow << ": Singular values of f: ";
+      for (int i = 0; i < reader.getSingularValues(0,1)->dim(); i++) {
+            std::cout << (reader.getSingularValues(0,1)->item(i)) << " ";
+      }
       std::cout << "\n";
       std::cout << std::endl;
     }
@@ -4159,17 +4181,15 @@ void LSROMObject::ReadTimeWindows()
     std::cout << "Error reading CSV file. Read " << count << " lines but expected " << numWindows << std::endl;
   }
 
-  m_numwindows = count;
-  if ((m_solve_phi) && (!m_solve_poisson)) m_numwindows_phi = m_numwindows;
+  m_numwindows = count+1;
+  if ((m_solve_phi) && (!m_solve_poisson)) m_numwindows_phi = m_numwindows+1;
 
 }
 
 void LSROMObject::ReadTimeWindowParameters()
 {
   if (!m_rank) std::cout << "Reading time window parameters from file " << std::string(twpfile) << std::endl;
-
   std::ifstream ifs(std::string(twpfile).c_str());
-
   if (!ifs.is_open())
   {
     std::cout << "Error: invalid file" << std::endl;
@@ -4186,21 +4206,15 @@ void LSROMObject::ReadTimeWindowParameters()
     }
 
     std::stringstream s(line);
-    std::vector<std::string> row;
 
-    while (getline(s, word, ','))
-      row.push_back(word);
-
-    if (row.size() != 1)
-    {
-      std::cout << "Error: CSV file does not specify exactly 1 parameter" << std::endl;
-      ifs.close();
+    double firstValue, secondValue;
+    char comma;
+		if (s >> firstValue >> comma >> secondValue) {
+        m_twep.push_back( Interval(firstValue, secondValue) );
+        count++;
+    } else {
+        std::cout << "Error: Invalid data format in the file." << std::endl;
     }
-
-    twep.push_back(stod(row[0]));
-
-    if (!m_rank) std::cout << "Using time window " << count << " with end time " << twep[count] << std::endl;
-    count++;
   }
 
   ifs.close();
@@ -4230,30 +4244,16 @@ void LSROMObject::ReadTimeIntervals(void* a_s)
   while (getline(ifs, line))
   {
     std::stringstream s(line);
-//   std::vector<std::string> row;
-
-//   while (getline(s, word, ','))
-//     row.push_back(word);
-//   if (row.size() != nparamRead)
-//   {
-//     std::cout << "Error: CSV file does not specify " << nparamRead << " parameters" << std::endl;
-//     ifs.close();
-//   }
-//   m_intervals.push_back( Interval(stod(row[0]), stod(row[1])) );
-//   printf("checking m_intervals %f %f \n",m_intervals[count].first, m_intervals[count].second);
-//   count++;
     double firstValue, secondValue;
     char comma;
 		if (s >> firstValue >> comma >> secondValue) {
         m_intervals.push_back( Interval(firstValue, secondValue) );
-//      printf("checking m_intervals %f %f \n", m_intervals[count].first, m_intervals[count].second);
         count++;
     } else {
         std::cout << "Error: Invalid data format in the file." << std::endl;
     }
   }
   ifs.close();
-  // check if size of m_intervals is equal to number of windows
 }
 
 /*! Evale max |basis_E| */
