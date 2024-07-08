@@ -1605,6 +1605,9 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   CAROM::Vector* m_romwork;
   m_romwork = new CAROM::Vector(m_rdims[idx],false);
 
+  CAROM::Vector* m_offset;
+  m_offset = new CAROM::Vector(m_rdims[idx],false);
+
 
     /* Calculate stage values */
   for (stage = 0; stage < nstages; stage++) {
@@ -1680,6 +1683,20 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
 //    }
 
       m_romhyperb_x[idx]->mult(*m_U[stage], *m_romwork);
+
+      if (m_centered){
+        /* Add offset contribution */
+        *m_romwork += *m_romhyperb_x_off[idx];
+  
+        if ((!m_solve_poisson)) {
+          m_romhyperb_v_off[idx]->mult(*m_tmpsol[idx], *m_offset);
+        }
+        else{
+          m_romhyperb_v_off[idx]->mult(*m_U[stage], *m_offset);
+        }
+        *m_romwork -= *m_offset;
+      }
+      
 
 //    /* Tensor contraction */
       for (int k = 0; k < m_rdims[idx]; k++) {
@@ -1825,11 +1842,8 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   }
 
   delete m_romwork;
+  delete m_offset;
 
-  if (m_direct_comp_hyperbolic) {
-		if (m_fomwork != nullptr) delete m_fomwork;
-		if (m_rhswork != nullptr) delete m_rhswork;
-	}
 
   if (m_solve_phi) {
     if (m_tmprhs != nullptr) delete m_tmprhs;
