@@ -1671,9 +1671,9 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
     }
     else if (m_solve_phi) {
       if ((!m_solve_poisson)) {
-      m_romrhs_phi[idx]->mult(*m_U[stage], *m_tmprhs[idx]);
+        m_romrhs_phi[idx]->mult(*m_U[stage], *m_tmprhs[idx]);
 //      m_romlaplace_phi[idx]->mult(*m_tmprhs[idx], *m_tmpsol[idx]);
-      m_romlaplace_phi[idx]->mult(*m_tmprhs[idx], *m_tmpsol[idx]);
+        m_romlaplace_phi[idx]->mult(*m_tmprhs[idx], *m_tmpsol[idx]);
       } 
 //    else {
 //      m_tmpsol[idx] = m_U[stage];
@@ -1685,12 +1685,14 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
       for (int k = 0; k < m_rdims[idx]; k++) {
         m_romhyperb_v[idx][k]->mult(*m_U[stage], *m_contract1[idx]);
         if ((!m_solve_poisson)) {
-        m_contract2[idx]->item(k) = m_contract1[idx]->inner_product(m_tmpsol[idx]);
+          m_contract2[idx]->item(k) = m_contract1[idx]->inner_product(m_tmpsol[idx]);
         } else {
           m_contract2[idx]->item(k) = m_contract1[idx]->inner_product(m_U[stage]);
         }
       }
-      m_romwork->plus(*m_contract2[idx], *m_Udot[stage]);
+      m_romwork->minus(*m_contract2[idx], *m_Udot[stage]);
+
+
 //
 //    m_e = m_basis_e->mult(m_tmpsol);
 
@@ -2419,6 +2421,19 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
                                                  sim[0].solver.ghosts,
                                                  1,
                                                  &(sim[0].mpi));
+    if (mpi->ip[1] != 0) {
+      rhs_wghosts = std::vector<double> (rhs_wghosts.size(),0.0);
+    }
+    MPISum_double(rhs_wghosts.data(),rhs_wghosts.data(),param->npts_local_x_wghosts,&mpi->comm[1]);
+
+    char buffer[] = "FD_second";
+    ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),rhs_wghosts.data(),buffer);
+
+    /* increment the index string, if required */
+    if ((!strcmp(sim[0].solver.output_mode,"serial")) && (!strcmp(sim[0].solver.op_overwrite,"no"))) {
+        ::IncrementFilenameIndex(sim[0].solver.filename_index,sim[0].solver.index_length);
+    }
+    printf("solver->dxinv %f \n",solver->dxinv[0]);
 
     ArrayCopynD(1,
                 rhs_wghosts.data(),
@@ -2429,9 +2444,11 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
                 index.data(),
                 sim[0].solver.nvars);
 
+
     /* Copy \int basis_f dv back to columns of integral_basis_f matrix */
     for (int i = 0; i < num_rows; i++) {
-      (*laplace_phi)(i, j) = -1.0*laplace_col.getData()[i]*(solver->dxinv[0])*(solver->dxinv[0]);
+//    (*laplace_phi)(i, j) = -1.0*laplace_col.getData()[i]*(solver->dxinv[0])*(solver->dxinv[0]);
+      (*laplace_phi)(i, j) = laplace_col.getData()[i]*(solver->dxinv[0])*(solver->dxinv[0]);
     }
   }
 

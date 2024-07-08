@@ -18,7 +18,7 @@
     Calling this routine one bin at a time is not efficient,
     but we do not care about speed here.
 */
-static int FFTFreqNum(int bin,  /*!< The bin number for the Fourier frequency to be returned */
+int FFTFreqNum(int bin,  /*!< The bin number for the Fourier frequency to be returned */
                       int N     /*!< The total number of Fourier frequencies */
                      )
 {
@@ -209,8 +209,8 @@ int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
     double freq_num = FFTFreqNum(i + local_o_start, N);
     double thek = freq_num;
     // Swapping values is due to multiplication by i
-    fourier_buffer_phi[i][0] = fourier_buffer[i][0] / (thek*thek);
-    fourier_buffer_phi[i][1] = fourier_buffer[i][1]/ (thek*thek);
+    fourier_buffer_phi[i][0] = -fourier_buffer[i][0] / (thek*thek);
+    fourier_buffer_phi[i][1] = -fourier_buffer[i][1] / (thek*thek);
   }
 
 
