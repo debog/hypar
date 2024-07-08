@@ -409,7 +409,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
                             0,solver->index,vec_wo_ghosts.data());
 //        global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->comm[0]); // This is slower than calling allreduction
           global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world); // This is slower than calling allreduction
-          if (!m_rank) printf("FOM max |E| %f\n",global_sum);
+          if (!m_rank) printf("FOM max |E| %.10f\n",global_sum);
 
       proc_maxe = ArrayMaxnD (solver->nvars,1,solver->dim_local,
                               0,solver->index,vec_wo_ghosts.data());
@@ -428,9 +428,8 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       fom_inte2_curr = 0; MPISum_double(&fom_inte2_curr, &proc_inte2, 1, &mpi->world);
       fom_inte2_max = std::max(fom_inte2_curr, fom_inte2_max);
       fom_slopeinte2_curr = fom_inte2_curr-fom_inte2_prev;
-      if (!m_rank) printf("FOM int_E^2 current %f prev %f\n",fom_inte2_curr,fom_inte2_prev);
-      if (!m_rank) printf("int_E^2 slop current %f prev %f \n",fom_slopeinte2_curr,fom_slopeinte2_prev);
-
+      if (!m_rank) printf("FOM int_E^2 current %.10f prev %.10f\n",fom_inte2_curr,fom_inte2_prev);
+      if (!m_rank) printf("int_E^2 slop current %.10f prev %.10f \n",fom_slopeinte2_curr,fom_slopeinte2_prev);
 
       fom_slopeinte2_prev= fom_inte2_curr-fom_inte2_prev;
       fom_inte2_prev = fom_inte2_curr;
