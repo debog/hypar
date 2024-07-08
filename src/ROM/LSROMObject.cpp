@@ -259,7 +259,6 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   if (m_direct_comp_hyperbolic) {
     m_dir_fomwork = new CAROM::Vector(m_vec_size,false);
     m_dir_rhswork = new CAROM::Vector(m_vec_size,false);
-		printf("checking m_vec_size_wg %d %d %d \n",m_vec_size,m_vec_size_wg,m_nvars);
     dir_vec_wghosts.resize(m_vec_size_wg * m_nvars);
     dir_rhs_wghosts.resize(m_vec_size_wg * m_nvars);
 
@@ -365,8 +364,8 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
       m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisFileName_phi));
 
-      // Need to force only mpi->ip[1] =0 holds the potential data 
-      // to compute the SVD correctly
+      // In order to compute the SVD for the potential fields correctly,
+      // we need to force only mpi->ip[1] =0 holds the data
       if (mpi->ip[1] == 0) 
       {
         ArrayCopynD(1,
@@ -407,8 +406,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 
           sum = ArrayMaxnD (solver->nvars,1,solver->dim_local,
                             0,solver->index,vec_wo_ghosts.data());
-//        global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->comm[0]); // This is slower than calling allreduction
-          global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world); // This is slower than calling allreduction
+          global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world); // This is faster than calling mpi->comm[0]
           if (!m_rank) printf("FOM max |E| %.12f\n", global_sum);
 
       proc_maxe = ArrayMaxnD (solver->nvars,1,solver->dim_local,
@@ -422,9 +420,6 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
         proc_inte2 += e_wo_ghosts[i]*(1./solver->dxinv[0]);
       }
 
-//    for (int j = 0; j < solver->npoints_local_wghosts; ++j){
-//      printf("rank %d dx %f\n",m_rank,solver->dxinv[j]);
-//    }
       fom_inte2_curr = 0; MPISum_double(&fom_inte2_curr, &proc_inte2, 1, &mpi->world);
       fom_inte2_max = std::max(fom_inte2_curr, fom_inte2_max);
       fom_slopeinte2_curr = fom_inte2_curr-fom_inte2_prev;
@@ -476,8 +471,7 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       bool addeSample = m_generator_e[m_curr_win]->takeSample( vec_wo_ghosts.data(), a_time, m_dt );
           sum = ArrayMaxnD (solver->nvars,1,solver->dim_local,
                             0,solver->index,vec_wo_ghosts.data());
-//        global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->comm[0]); // This is slower than calling allreduction
-          global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world); // This is slower than calling allreduction
+          global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world); // This is faster than calling mpi->comm[0]
           if (!m_rank) printf("FOM max |E| %.12f\n", global_sum);
 
       proc_maxe = ArrayMaxnD (solver->nvars,1,solver->dim_local,
@@ -718,7 +712,7 @@ void LSROMObject::takeSample_old(  const CAROM::Vector& a_U, /*!< solution vecto
       const std::string basisFileName_phi = basisName_phi + std::to_string(m_parametric_id) + "_" + std::to_string(m_tic);
       m_generator_phi.push_back(new CAROM::BasisGenerator(*m_options_phi[m_curr_win], isIncremental, basisFileName_phi));
 
-      // Need to force only mpi->ip[1] =0 holds the potential data 
+      // Need to force only mpi->ip[1] =0 holds the potential data
       // to compute the SVD correctly
       if (mpi->ip[1] == 0) {
           ArrayCopynD(1,
@@ -814,10 +808,6 @@ void LSROMObject::takeSample_old(  const CAROM::Vector& a_U, /*!< solution vecto
       const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
       m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
 
-//    for (size_t i = 0; i < a_U_stages.size(); i++) {
-//      printf("checking how many a_u %d\n",i);
-//      bool addSample = m_generator[m_curr_win]->takeSample( a_U_stages[i]->getData(), a_time, m_dt );
-//    }
       bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
       if ((m_solve_phi) && (!m_solve_poisson)) {
         m_options_phi.push_back(new CAROM::Options(param->npts_local_x, max_num_snapshots, 1, update_right_SV));
@@ -903,15 +893,6 @@ void LSROMObject::train(void* a_s)
           printf( "LSROMObject::train() - training LS object %d for sim. domain %d, var %d with %d samples.\n", 
                   i, m_sim_idx, m_var_idx, ncol );
         }
-        if (m_write_snapshot_mat) {
-          /* Since here is using gertSnapshotMatrix to write files, need additional process in order to visualize it
-             Similar in the case of DMD */
-          char idx_string[_MAX_STRING_SIZE_];
-          sprintf(idx_string, "%04d", i);
-          std::string fname_root(m_dirname + "/snapshot_mat_"+std::string(idx_string));
-          m_generator[i]->getSnapshotMatrix()->write(fname_root);
-        }
-
         /* The code below is like m_dmd[i]->train(m_rdim) but in LS-ROM, there is no
            m_ls object, instead, it has m_generator, m_options, m_spatialbasis, m_projected_init */
 
@@ -963,7 +944,6 @@ void LSROMObject::train(void* a_s)
           CheckHyProjError(a_s,i);
         }
 
-//      if ((m_solve_phi) && (!m_solve_poisson)) {
         if (m_solve_phi) {
             m_snapshots_phi.push_back(new CAROM::Matrix(
                                       *m_generator_phi[i]->getSnapshotMatrix()));
@@ -2835,7 +2815,6 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
   std::vector<int> index(sim[0].solver.ndims);
 
   int num_rows = m_basis_phi[idx]->numRows();
-//int num_rows = m_generator_phi[idx]->getSpatialBasis()->numRows();
   CAROM::Vector* recon_field;
   recon_field = new CAROM::Vector(param->npts_local_x, false);
   CAROM::Vector* recon_lap;
