@@ -1818,195 +1818,6 @@ CAROM::Vector* LSROMObject::ProjectToRB(CAROM::Vector* a_field, const CAROM::Mat
   return a_rombasis->transposeMult(a_field);
 }
 
-/*! Check LS objects */
-void LSROMObject::check(void* a_s)
-{
-  SimulationObject* sim = (SimulationObject*) a_s;
-        /* Below is just checking if the basis function is orthogonal */
-//      projectInitialSolution(*(m_generator[0]->getSpatialBasis()->getColumn(0)));
-//      projectInitialSolution(*(m_generator[0]->getSpatialBasis()->getColumn(1)));
-//      projectInitialSolution(*(m_generator[0]->getSpatialBasis()->getColumn(2)));
-//      projectInitialSolution(*(m_generator[0]->getSpatialBasis()->getColumn(3)));
-
-        /* Compute initial condition */
-        /* Can't simply pass *(m_generator[0]->getSnapshotMatrix()->getColumn(0))) since
-         * m_generator[0]->getSpatialBasis() is distributed whereas m_generator[0]->getSnapshotMatrix()
-         * is not distributed */
-
-//      projectInitialSolution(*(m_snapshots[i]->getColumn(0)));
-        if (!m_rank) {
-          printf("m_project size %d\n",m_projected_init[0]->dim());
-          std::cout << "Checking initial condition: ";
-          for (int j = 0; j < m_projected_init[0]->dim(); j++) {
-                std::cout << (m_projected_init[0]->item(j)) << " ";
-          }
-          std::cout << std::endl;
-        }
-        int num_rows = m_generator[0]->getSpatialBasis()->numRows();
-
-        CAROM::Vector* recon_init;
-        recon_init = new CAROM::Vector(num_rows,false);
-        recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init[0]);
-
-//      std::vector<int> index(sim[0].solver.ndims);
-//      ArrayCopynD(sim[0].solver.ndims,
-//                  recon_init->getData(),
-//                  sim[0].solver.u_rom_predicted,
-//                  sim[0].solver.dim_local,
-//                  0,
-//                  sim[0].solver.ghosts,
-//                  index.data(),
-//                  sim[0].solver.nvars);
-//        const char* fnam2 = "recon_";
-//        std::string fname2 = std::string(fnam2) + std::to_string(0);
-//        char* fname_buffer2 = new char[fname2.length() + 1];
-//        std::strcpy(fname_buffer2, fname2.c_str());
-
-//        WriteArray( sim[0].solver.ndims,
-//                    sim[0].solver.nvars,
-//                    sim[0].solver.dim_global,
-//                    sim[0].solver.dim_local,
-//                    0,
-//                    sim[0].solver.x,
-//                    recon_init->getData(),
-//                    &(sim[0].solver),
-//                    &(sim[0].mpi),
-//                    fname_buffer2);
-//      ArrayCopynD(sim[0].solver.ndims,
-//                  m_snapshots->getColumn(0)->getData(),
-//                  sim[0].solver.u,
-//                  sim[0].solver.dim_local,
-//                  0,
-//                  sim[0].solver.ghosts,
-//                  index.data(),
-//                  sim[0].solver.nvars);
-//        const char* fnam3 = "snap_col_";
-//        std::string fname3 = std::string(fnam3) + std::to_string(0);
-//        char* fname_buffer3 = new char[fname3.length() + 1];
-//        std::strcpy(fname_buffer3, fname3.c_str());
-
-//        double* vec_data = m_generator[0]->getSnapshotMatrix()->getColumn(0)->getData();
-//        WriteArray( sim[0].solver.ndims,
-//                    sim[0].solver.nvars,
-//                    sim[0].solver.dim_global,
-//                    sim[0].solver.dim_local,
-//                    0,
-//                    sim[0].solver.x,
-//                    m_snapshots->getColumn(0)->getData(),
-//                    &(sim[0].solver),
-//                    &(sim[0].mpi),
-//                    fname_buffer3);
-//      CalculateROMDiff(  &(sim[0].solver),
-//                         &(sim[0].mpi) );
-
-//      projectInitialSolution(*(m_snapshots->getColumn(0)));
-//      for (int j = 0; j < 1; j++){
-//        /* Extend reduced basis \phi_j with ghost points */
-//        std::vector<int> index(sim[0].solver.ndims);
-//        ArrayCopynD(sim[0].solver.ndims,
-//                    m_snapshots->getColumn(j)->getData(),
-//                    vec_wghosts.data(),
-//                    sim[0].solver.dim_local,
-//                    0,
-//                    sim[0].solver.ghosts,
-//                    index.data(),
-//                    sim[0].solver.nvars);
-
-//        /* Evaluate F(\phi_j) */
-//        TimeRHSFunctionExplicit(rhs_wghosts.data(),
-//                                vec_wghosts.data(),
-//                                &(sim[0].solver),
-//                                &(sim[0].mpi),
-//                                0);
-
-//        ArrayCopynD(sim[0].solver.ndims,
-//                    rhs_wghosts.data(),
-//                    sim[0].solver.u,
-//                    sim[0].solver.dim_local,
-//                    sim[0].solver.ghosts,
-//                    sim[0].solver.ghosts,
-//                    index.data(),
-//                    sim[0].solver.nvars);
-
-//        CAROM::Vector* recon_init;
-//        recon_init = new CAROM::Vector(num_rows,false);
-//        CAROM::Vector* phi_colwork;
-//        phi_colwork = new CAROM::Vector(num_rows,true);
-//        /* Remove ghosts point in F(phi_j) */
-//        ArrayCopynD(sim[0].solver.ndims,
-//                    rhs_wghosts.data(),
-//                    phi_colwork->getData(),
-//                    sim[0].solver.dim_local,
-//                    sim[0].solver.ghosts,
-//                    0,
-//                    index.data(),
-//                    sim[0].solver.nvars);
-//        printf("%d \n",phi_colwork->dim());
-//        CAROM::Vector* m_working;
-//        m_working = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(phi_colwork);
-//        printf("%d \n",m_working->dim());
-//        recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_working);
-//        ArrayCopynD(sim[0].solver.ndims,
-//                    recon_init->getData(),
-//                    sim[0].solver.u_rom_predicted,
-//                    sim[0].solver.dim_local,
-//                    0,
-//                    sim[0].solver.ghosts,
-//                    index.data(),
-//                    sim[0].solver.nvars);
-//        recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_projected_init[0]);
-
-//        ArrayCopynD(sim[0].solver.ndims,
-//                    recon_init->getData(),
-//                    vec_wghosts.data(),
-//                    sim[0].solver.dim_local,
-//                    0,
-//                    sim[0].solver.ghosts,
-//                    index.data(),
-//                    sim[0].solver.nvars);
-
-//        /* Evaluate F(\phi_j) */
-//        TimeRHSFunctionExplicit(rhs_wghosts.data(),
-//                                vec_wghosts.data(),
-//                                &(sim[0].solver),
-//                                &(sim[0].mpi),
-//                                0);
-
-//        ArrayCopynD(sim[0].solver.ndims,
-//                    rhs_wghosts.data(),
-//                    sim[0].solver.u_rom_predicted,
-//                    sim[0].solver.dim_local,
-//                    sim[0].solver.ghosts,
-//                    sim[0].solver.ghosts,
-//                    index.data(),
-//                    sim[0].solver.nvars);
-
-//        CAROM::Vector* m_working;
-//        m_working=m_romhyperb->mult(m_projected_init[0]);
-//        recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_working);
-//        ArrayCopynD(sim[0].solver.ndims,
-//                    recon_init->getData(),
-//                    sim[0].solver.u_rom_predicted,
-//                    sim[0].solver.dim_local,
-//                    0,
-//                    sim[0].solver.ghosts,
-//                    index.data(),
-//                    sim[0].solver.nvars);
-//        CAROM::Vector* m_working;
-//        recon_init = phi_hyper->mult(m_projected_init[0]);
-//        m_working = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->transposeMult(recon_init);
-//        recon_init = m_generator[0]->getSpatialBasis()->getFirstNColumns(m_rdim)->mult(m_working);
-//        ArrayCopynD(sim[0].solver.ndims,
-//                    recon_init->getData(),
-//                    sim[0].solver.u_rom_predicted,
-//                    sim[0].solver.dim_local,
-//                    0,
-//                    sim[0].solver.ghosts,
-//                    index.data(),
-//                    sim[0].solver.nvars);
-//      }
-}
-
 /*! Construct reduced hyperbolic operator */
 void LSROMObject::ConstructROMHy(void* a_s, const CAROM::Matrix* a_rombasis, int idx)
 {
@@ -3023,11 +2834,16 @@ void LSROMObject::CheckLaplaceProjError(void* a_s, int idx)
   std::vector<double> recon_wghosts(param->npts_local_x_wghosts);
   std::vector<int> index(sim[0].solver.ndims);
 
-  int num_rows = m_generator_phi[idx]->getSpatialBasis()->numRows();
+  int num_rows = m_basis_phi[idx]->numRows();
+//int num_rows = m_generator_phi[idx]->getSpatialBasis()->numRows();
   CAROM::Vector* recon_field;
+  recon_field = new CAROM::Vector(param->npts_local_x, false);
   CAROM::Vector* recon_lap;
+  recon_lap = new CAROM::Vector(param->npts_local_x, false);
   CAROM::Vector* field_reduced;
+  field_reduced = new CAROM::Vector(m_rdims_phi[idx], false);
   CAROM::Vector* lap_reduced;
+  lap_reduced = new CAROM::Vector(m_rdims_phi[idx], false);
   CAROM::Vector* m_working;
   m_working = new CAROM::Vector(m_rdims_phi[idx], false);
 
