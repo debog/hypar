@@ -407,8 +407,14 @@ class LSROMObject : public ROMObject
     std::vector<double> twep;
     std::vector<Interval> m_twep; 
     std::vector<int> numwindows_parameter;     /*!< Latent space dimension */
+
+    double m_tensor_wctime; /*!< Wallclock time for constructing tensor */
     struct timeval m_tensor_start; /*<! Construct start time */
     struct timeval m_tensor_end; /*<! Construct end time */
+
+    double m_phi_wctime; /*!< Wallclock time for solving potential reduced basis */
+    struct timeval m_phi_start; /*<! Construct start time */
+    struct timeval m_phi_end; /*<! Construct end time */
 
     int m_overlap;
 
