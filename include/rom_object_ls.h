@@ -98,6 +98,8 @@ class LSROMObject : public ROMObject
       m_contract1.clear();
       for (int i = 0; i < m_contract2.size(); i++) delete m_contract2[i];
       m_contract2.clear();
+      for (int i = 0; i < m_esquare.size(); i++) delete m_esquare[i];
+      m_esquare.clear();
       for (int i = 0; i < m_tmprhs.size(); i++) delete m_tmprhs[i];
       m_tmprhs.clear();
       for (int i = 0; i < m_tmpsol.size(); i++) delete m_tmpsol[i];
@@ -239,6 +241,11 @@ class LSROMObject : public ROMObject
     void FindMaxEBasis( void*, int );
 
     void CompPhiBasisPoisson( void*, const CAROM::Matrix*, int );
+    
+    int countNumLines(std::string);
+
+    void ConstructESquare( void*, const CAROM::Matrix*, int );
+
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */

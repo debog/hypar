@@ -1035,6 +1035,8 @@ void LSROMObject::train(void* a_s)
             ConstructEBasis(a_s,i);
           }
 
+          m_esquare.push_back(new CAROM::Matrix(m_rdims_phi[i], m_rdims_phi[i], false));
+          ConstructESquare(a_s, m_basis_e[i], i);
           CheckEProjError(a_s,i);
 
           m_romhyperb_x.push_back(new CAROM::Matrix(m_rdims[i], m_rdims[i],false));
@@ -1065,7 +1067,7 @@ void LSROMObject::train(void* a_s)
         }
       }
     }
-    projectInitialSolution(*(m_snapshots[0]->getColumn(0)),a_s);
+    m_recon_E = new CAROM::Vector(param->npts_local_x_wghosts, false);
   } else {
     printf("ERROR in LSROMObject::train(): m_generator is of size zero!");
   }
@@ -1210,7 +1212,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
             esquare_test = new CAROM::Vector(m_romcoef[m_curr_win]->dim(), false);
             m_esquare[m_curr_win]->mult(*m_romcoef[m_curr_win], *esquare_test);
             app_sum = m_romcoef[m_curr_win]->inner_product(esquare_test);
-            }
+          }
           sum = ArrayMaxnD (solver->nvars,1,solver->dim_local,
                             0,solver->index,m_recon_E->getData());
           global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
@@ -4232,6 +4234,9 @@ void LSROMObject::online(void* a_s)
       m_romMaxE.push_back(new CAROM::Vector(m_rdims_phi[sampleWindow], false));
       FindMaxEBasis(a_s, sampleWindow);
 
+      m_esquare.push_back(new CAROM::Matrix(m_rdims_phi[sampleWindow], m_rdims_phi[sampleWindow], false));
+      ConstructESquare(a_s, m_basis_e[sampleWindow], sampleWindow);
+
       m_romhyperb_x.push_back(new CAROM::Matrix(m_rdims[sampleWindow], m_rdims[sampleWindow], false));
       ConstructROMHy_x(a_s, m_basis[sampleWindow], sampleWindow);
 
@@ -4544,6 +4549,98 @@ int LSROMObject::countNumLines(std::string file_name)
     }
     file.close();
     return count;
+}
+
+/*! Construct matrix consists of basis^2_E */
+void LSROMObject::ConstructESquare(void* a_s, const CAROM::Matrix* a_rombasis_e, int idx)
+{
+    SimulationObject* sim = (SimulationObject*) a_s;
+    HyPar  *solver = (HyPar*) &(sim[0].solver);
+    Vlasov *param  = (Vlasov*) solver->physics;
+    MPIVariables *mpi = (MPIVariables *) param->m;
+  
+    double sum = 0, global_sum = 0;
+
+    if (param->ndims_x > 1) {
+      fprintf(stderr,"Error in ConstructESquare:\n");
+      fprintf(stderr,"  Implemented for 1 spatial dimension only.\n");
+    }
+  
+    int *dim    = solver->dim_local;
+    int  ghosts = solver->ghosts;
+    int  ndims  = solver->ndims;
+  
+    int num_rows = a_rombasis_e->numRows();
+    int num_cols = a_rombasis_e->numColumns();
+    if (!m_rank) printf("num_rows %d num_cols %d\n",num_rows,num_cols);
+  
+    std::vector<double> vec_wghosts(param->npts_local_x_wghosts);
+    std::vector<double> rhs_wghosts(param->npts_local_x_wghosts);
+    std::vector<int> index(sim[0].solver.ndims);
+  
+    /* Compute basis_i * basis_j */
+    /* Integrate f reduced basis over velocity */
+    CAROM::Vector* esquare;
+    esquare = new CAROM::Vector(num_rows, false);
+    for (int j = 0; j < m_rdims_phi[idx]; j++)
+    {
+      for (int i = 0; i < m_rdims_phi[idx]; i++)
+      {
+        sum = 0;
+        _ArrayMultiply1D_(esquare->getData(),a_rombasis_e->getColumn(j)->getData(),a_rombasis_e->getColumn(i)->getData(),num_rows); 
+        for (int k = 0; k < esquare->dim(); k++)
+        {
+          sum += esquare->getData()[k]*(1./solver->dxinv[0]);
+        }
+        global_sum = 0; MPISum_double(&global_sum, &sum, 1, &mpi->world);
+        (*m_esquare[idx])(i, j) = global_sum;
+      }
+    }
+//
+//  ESquare = a_rombasis_e->transposeMult(a_rombasis_e);
+//  MPISum_double(m_esqaure[idx]->getData(), ESquare->getData(), m_rdims_phi[idx]*m_rdims_phi[idx], &mpi->world);
+//
+//  for (int j = 0; j < m_rdims_phi[idx]; j++)
+//  {
+//		*m_work_lap = 0;
+//    a_rombasis_phi->getColumn(j, *m_work_lap);
+//    ArrayCopynD(1,
+//                m_work_lap->getData(),
+//                vec_wghosts.data(),
+//                sim[0].solver.dim_local,
+//                0,
+//                sim[0].solver.ghosts,
+//                index.data(),
+//                sim[0].solver.nvars);
+//
+//     MPIExchangeBoundaries1D(&(sim[0].mpi),vec_wghosts.data(),param->npts_local_x,
+//                                  sim[0].solver.ghosts,0,sim[0].solver.ndims);
+//    ::SecondDerivativeSecondOrderCentralNoGhosts(rhs_wghosts.data(),
+//                                                 vec_wghosts.data(),
+//                                                 0,
+//                                                 1,
+//                                                 &(param->npts_local_x),
+//                                                 sim[0].solver.ghosts,
+//                                                 1,
+//                                                 &(sim[0].mpi));
+//
+//    ArrayCopynD(1,
+//                rhs_wghosts.data(),
+//                laplace_col.getData(),
+//                sim[0].solver.dim_local,
+//                sim[0].solver.ghosts,
+//                0,
+//                index.data(),
+//                sim[0].solver.nvars);
+//
+//    /* Copy \int basis_f dv back to columns of integral_basis_f matrix */
+//    for (int i = 0; i < num_rows; i++) {
+//      (*laplace_phi)(i, j) = -1.0*laplace_col.getData()[i]*(solver->dxinv[0])*(solver->dxinv[0]);
+//    }
+//  }
+//
+  delete esquare;
+  return;
 }
 
 #endif
