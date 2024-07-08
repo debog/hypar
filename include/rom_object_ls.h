@@ -211,8 +211,14 @@ class LSROMObject : public ROMObject
     /* Construct reduced hyperbolic operator in x direction */
     void ConstructROMHy_x( void*, const CAROM::Matrix*, int );
 
+    /* Construct reduced hyperbolic operator in x direction */
+    void ConstructROMHy_x_offset( void*, const CAROM::Matrix*, int );
+
     /* Construct reduced hyperbolic tensor in v direction */
     void ConstructROMHy_v( void*, const CAROM::Matrix*, const CAROM::Matrix*, int );
+
+    /* Construct reduced hyperbolic tensor in v direction */
+    void ConstructROMHy_v_offset( void*, const CAROM::Matrix*, const CAROM::Matrix*, int );
 
     /*! Write Snapshot matrix */
     virtual void writeSnapshot( void* );
@@ -246,6 +252,10 @@ class LSROMObject : public ROMObject
 
     void ConstructESquare( void*, const CAROM::Matrix*, int );
 
+    CAROM::Vector ReadBaseSolution( void*);
+
+    CAROM::Vector CompPotentialOffset( void*);
+
   protected:
 
     std::vector<CAROM::Options*> m_options; /*!< Vector of Options objects */
@@ -264,6 +274,10 @@ class LSROMObject : public ROMObject
     CAROM::Vector* m_dir_rhswork = nullptr;
     std::vector<double> dir_vec_wghosts;
     std::vector<double> dir_rhs_wghosts;
+
+    CAROM::Vector m_base_sol; /*!< Vector of base solution */
+    CAROM::Vector m_base_sol_phi; /*!< Vector of base solution */
+    CAROM::Vector* m_initial; /*!< Vector of initial solution */
 
     std::vector<bool> m_ls_is_trained; /*!< Flag to indicate if LS is trained */
     std::vector<Interval> m_intervals; /*!< Time intervals for each LS object */
@@ -295,6 +309,7 @@ class LSROMObject : public ROMObject
     bool m_c_err_snap;  /*!< Compute error of each snapshot*/
     bool m_solve_poisson;  /*!< Solve potential reduced basis through possion problem*/
     bool m_fft_derivative;  /*!< Compute derivative in the Fourier space*/
+    bool m_centered ;  /*!< center snapshot */
 
     double m_f_energy_criteria;
     double m_phi_energy_criteria;
@@ -343,8 +358,10 @@ class LSROMObject : public ROMObject
     std::vector<CAROM::Matrix*> m_snapshots_e; /*!< Snapshot Matrix */
     std::vector<CAROM::Matrix*> m_basis_e; /*!< Basis Matrix */
 
-    std::vector<CAROM::Matrix*> m_romhyperb_x; /*!< Reduced Hyperbolic Term Matrix */
-    std::vector<std::vector<CAROM::Matrix*>> m_romhyperb_v; /*!< Reduced Hyperbolic Term Matrix */
+    std::vector<CAROM::Matrix*> m_romhyperb_x; /*!< m_basis^T [Dx \otimes diag(v)] m_basis */
+    std::vector<CAROM::Vector*> m_romhyperb_x_off; /*!< m_basis^T [Dx \otimes diag(v)] f_0 */
+    std::vector<std::vector<CAROM::Matrix*>> m_romhyperb_v; /*!< m_basis^T [diag(m_basis_e) \otimes Dv] m_basis*/
+    std::vector<CAROM::Matrix*> m_romhyperb_v_off; /*!< m_basis^T [diag(m_basis_e) \otimes Dv] f_0 */
     int m_sampling_freq;       /*!< Time step size */
 
     std::vector<CAROM::Matrix*> m_fullscale;

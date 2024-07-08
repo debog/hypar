@@ -134,6 +134,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   char c_err_snap[_MAX_STRING_SIZE_] = "false";
   char indicator_str[_MAX_STRING_SIZE_] = "intEsquare";
   char fft_derivative[_MAX_STRING_SIZE_] = "false";
+  char centered[_MAX_STRING_SIZE_] = "false";
 
   if (!m_rank) {
 
@@ -177,6 +178,8 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
             ferr = fscanf(in,"%s", indicator_str); if (ferr != 1) return;
           } else if (std::string(word) == "ls_fft_derivative") {
             ferr = fscanf(in,"%s", fft_derivative); if (ferr != 1) return;
+          } else if (std::string(word) == "ls_centered") {
+            ferr = fscanf(in,"%s", centered); if (ferr != 1) return;
           }
           if (ferr != 1) return;
         }
@@ -192,6 +195,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
 
     /* print useful stuff to screen */
     printf("LSROMObject details:\n");
+    printf("  centered:   %s\n", centered);
     printf("  number of samples per window:   %d\n", m_num_window_samples);
     printf("  number of windows:   %d\n", numWindows);
     printf("  SVD energy criteria of f:   %e\n", m_f_energy_criteria);
@@ -229,6 +233,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   MPI_Bcast(&m_nsets,1,MPI_INT,0,MPI_COMM_WORLD);
   MPI_Bcast(indicator_str,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
   MPI_Bcast(fft_derivative,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
+  MPI_Bcast(centered,_MAX_STRING_SIZE_,MPI_CHAR,0,MPI_COMM_WORLD);
 #endif
 
   m_dirname = std::string( dirname_c_str );
@@ -239,6 +244,7 @@ LSROMObject::LSROMObject(   const int     a_vec_size,       /*!< vector size */
   m_c_err_snap = (std::string(c_err_snap) == "true");
   indicatorType = indicator_str;
   m_fft_derivative = (std::string(fft_derivative) == "true");
+  m_centered = (std::string(centered) == "true");
 
   if (!m_rank) {
     std::cout << "indicator type " << indicatorType << "\n";
@@ -296,6 +302,9 @@ void LSROMObject::projectInitialSolution(  CAROM::Vector& a_U, /*!< solution vec
 
   CAROM::Vector* m_fomwork;
   m_fomwork = new CAROM::Vector(a_U.getData(), a_U.dim(), false);
+  if (m_centered){
+    *m_fomwork -= m_base_sol;
+  }
   for (int i = 0; i < m_basis.size(); i++) {
     CAROM::Vector* m_working;
     m_working = new CAROM::Vector(m_rdims[i], false);
@@ -339,6 +348,13 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
 
   if (m_tic == 0)
   {
+    if (m_centered)
+    {
+      m_base_sol = ReadBaseSolution(a_s);
+      m_base_sol_phi = CompPotentialOffset(a_s);
+      m_initial = new CAROM::Vector(a_U.getData(), a_U.dim(), false);
+    }
+
     m_options.push_back(new CAROM::Options(m_vec_size, max_num_snapshots, 1, update_right_SV));
     if (m_f_energy_criteria > 0) m_options[m_curr_win]->setSingularValueTol(m_f_energy_criteria);
 
@@ -353,7 +369,15 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
       printf( "LSROMObject::takeSample() - creating new generator object for sim. domain %d, var %d, t=%f (total: %d).\n",
               m_sim_idx, m_var_idx, m_intervals[m_curr_win].first, m_generator.size());
     }
-    bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+
+    if (m_centered){
+      CAROM::Vector m_U_centered ; /*!< Vector of centered solution */
+      a_U.minus(m_base_sol, m_U_centered);
+      bool addSample = m_generator[m_curr_win]->takeSample( m_U_centered.getData(), a_time, m_dt );
+    }
+    else{
+      bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+    }
 
 //  if ((m_solve_phi) && (!m_solve_poisson)) 
     if ((m_solve_phi)) 
@@ -432,8 +456,14 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
   }
   else
   {
-    bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
-    if ((m_solve_phi) && (!m_solve_poisson)) 
+    if (m_centered){
+      CAROM::Vector m_U_centered ; /*!< Vector of centered solution */
+      a_U.minus(m_base_sol, m_U_centered);
+      bool addSample = m_generator[m_curr_win]->takeSample( m_U_centered.getData(), a_time, m_dt );
+    }
+    else{
+      bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+    }
     {
       if (mpi->ip[1] == 0) 
       {
@@ -597,6 +627,14 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
         const std::string basisFileName = basisName + std::to_string(m_parametric_id) + "_" + std::to_string(m_curr_win);
         m_generator.push_back(new CAROM::BasisGenerator(*m_options[m_curr_win], isIncremental, basisFileName));
   
+        if (m_centered){
+          CAROM::Vector m_U_centered ; /*!< Vector of centered solution */
+          a_U.minus(m_base_sol, m_U_centered);
+          bool addSample = m_generator[m_curr_win]->takeSample( m_U_centered.getData(), a_time, m_dt );
+        }
+        else{
+          bool addSample = m_generator[m_curr_win]->takeSample( a_U.getData(), a_time, m_dt );
+        }
 //      if ((m_solve_phi) && (!m_solve_poisson))
         if ((m_solve_phi))
         {
@@ -1021,8 +1059,17 @@ void LSROMObject::train(void* a_s)
 
           m_romhyperb_x.push_back(new CAROM::Matrix(m_rdims[i], m_rdims[i],false));
           ConstructROMHy_x(a_s, m_basis[i], i);
+          if (m_centered){
+            m_romhyperb_x_off.push_back(new CAROM::Vector(m_rdims[i], false));
+            ConstructROMHy_x_offset(a_s, m_basis[i], i);
+          }
           m_romhyperb_v.push_back(std::vector<CAROM::Matrix*>());
           ConstructROMHy_v(a_s, m_basis[i], m_basis_e[i], i);
+          if (m_centered){
+            m_romhyperb_v_off.push_back(new CAROM::Matrix(m_rdims[i], m_rdims_phi[i], false));
+            ConstructROMHy_v_offset(a_s, m_basis[i], m_basis_e[i], i);
+          }
+
         }
 
       }
@@ -1048,6 +1095,7 @@ void LSROMObject::train(void* a_s)
       }
     }
     m_recon_E = new CAROM::Vector(param->npts_local_x_wghosts, false);
+    projectInitialSolution(*m_initial, a_s);
   } else {
     printf("ERROR in LSROMObject::train(): m_generator is of size zero!");
   }
@@ -3873,6 +3921,10 @@ void LSROMObject::online(void* a_s)
 //numWindows = countNumLines("./" + std::string(twintervalfile));
 //ReadTimeWindowParameters(); // Set m_num_window_samples
   ReadTimeIntervals(a_s); // Set m_intervals
+  if (m_centered) 
+  {
+    m_base_sol = ReadBaseSolution(a_s);
+  }
 
   /* Looping through time windows */
   for (int sampleWindow = 0; sampleWindow < m_numwindows; ++sampleWindow)
@@ -4034,9 +4086,17 @@ void LSROMObject::online(void* a_s)
 
       m_romhyperb_x.push_back(new CAROM::Matrix(m_rdims[sampleWindow], m_rdims[sampleWindow], false));
       ConstructROMHy_x(a_s, m_basis[sampleWindow], sampleWindow);
+      if (m_centered){
+        m_romhyperb_x_off.push_back(new CAROM::Vector(m_rdims[sampleWindow],false));
+        ConstructROMHy_x_offset(a_s, m_basis[sampleWindow], sampleWindow);
+      }
 
       m_romhyperb_v.push_back(std::vector<CAROM::Matrix*>());
       ConstructROMHy_v(a_s, m_basis[sampleWindow], m_basis_e[sampleWindow], sampleWindow);
+      if (m_centered){
+        m_romhyperb_v_off.push_back(new CAROM::Matrix(m_rdims[sampleWindow], m_rdims_phi[sampleWindow], false));
+        ConstructROMHy_v_offset(a_s, m_basis[sampleWindow], m_basis_e[sampleWindow], sampleWindow);
+      }
 
       m_contract1.push_back(new CAROM::Vector(m_rdims_phi[sampleWindow],false));
       m_contract2.push_back(new CAROM::Vector(m_rdims[sampleWindow],false));
@@ -4438,4 +4498,357 @@ void LSROMObject::ConstructESquare(void* a_s, const CAROM::Matrix* a_rombasis_e,
   return;
 }
 
+CAROM::Vector LSROMObject::ReadBaseSolution ( void*  a_s)
+{
+  /* Read base solution from base.inp and retrun as CAROM::Vector object */
+
+  if (!m_rank) {
+    std::cout << "------------------------------------------------\n";
+    std::cout << "Read Base Solution: ";
+    std::cout << std::endl;
+  }
+
+  SimulationObject* sim   = (SimulationObject*) a_s;
+  HyPar           *solver = (HyPar*) &(sim[0].solver);
+  Vlasov          *param  = (Vlasov*) solver->physics;
+  MPIVariables       *mpi = (MPIVariables *) param->m;
+  int n, flag, d, i, offset, ierr;
+
+  int ghosts = sim[0].solver.ghosts;
+
+  char fname_root[_MAX_STRING_SIZE_] = "base";
+
+  std::vector<double> base_solution(m_vec_size_wg*m_nvars);
+
+  ierr = ReadArray( sim[0].solver.ndims,
+                    sim[0].solver.nvars,
+                    sim[0].solver.dim_global,
+                    sim[0].solver.dim_local,
+                    sim[0].solver.ghosts,
+                    &(sim[0].solver),
+                    &(sim[0].mpi),
+                    sim[0].solver.x,
+                    base_solution.data(),
+                    fname_root,
+                    &flag );
+  if (ierr) {
+    fprintf(stderr, "Error in ReadBaseSolution() on rank %d.\n",
+            mpi->rank);
+  }
+  if (!flag) {
+    fprintf(stderr,"Error: base solution file not found.\n");
+  }
+  CHECKERR(ierr);
+
+  char filename[_MAX_STRING_SIZE_] = "base";
+  WriteArray( sim[0].solver.ndims,
+              sim[0].solver.nvars,
+              sim[0].solver.dim_global,
+              sim[0].solver.dim_local,
+              sim[0].solver.ghosts,
+              sim[0].solver.x,
+              base_solution.data(),
+              solver,
+              mpi,
+              filename);
+
+  /* Copy Hypar array to libROM array */
+  CAROM::Vector base_solution_(m_vec_size, false);
+  std::vector<int> index(sim[0].solver.ndims);
+  ArrayCopynD(sim[0].solver.ndims,
+              base_solution.data(),
+              base_solution_.getData(),
+              sim[0].solver.dim_local,
+              sim[0].solver.ghosts,
+              0,
+              index.data(),
+              sim[0].solver.nvars);
+  return base_solution_;
+}
+
+/*! m_basis_phi^T [Dx \otimes diag(v)] f_0 */
+void LSROMObject::ConstructROMHy_x_offset(void* a_s, const CAROM::Matrix* a_rombasis, int idx)
+{
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  int num_rows = a_rombasis->numRows();
+  int num_cols = a_rombasis->numColumns();
+
+  CAROM::Vector* phi_hyper_x;
+  phi_hyper_x = new CAROM::Vector(num_rows, false);
+
+  CAROM::Vector phi_hyper_col(num_rows,false);
+
+  CAROM::Vector* m_working;
+  m_working = new CAROM::Vector(num_rows, false);
+
+  std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<int> index(sim[0].solver.ndims);
+
+  ArrayCopynD(sim[0].solver.ndims,
+              m_base_sol.getData(),
+              vec_wghosts.data(),
+              sim[0].solver.dim_local,
+              0,
+              sim[0].solver.ghosts,
+              index.data(),
+              sim[0].solver.nvars);
+
+  solver->ApplyBoundaryConditions(solver,mpi,vec_wghosts.data(),NULL,0);
+  solver->ApplyIBConditions(solver,mpi,vec_wghosts.data(),0);
+  MPIExchangeBoundariesnD(  solver->ndims,
+                            solver->nvars,
+                            solver->dim_local,
+                            solver->ghosts,
+                            mpi,
+                            vec_wghosts.data());
+  HyperbolicFunction_1dir( rhs_wghosts.data(),
+                            vec_wghosts.data(),
+                            solver,
+                            mpi,
+                            0,
+                            1,
+                            solver->FFunction,
+                            solver->Upwind, 0 );
+
+  /* Remove ghosts point in F(phi_j) */
+  ArrayCopynD(sim[0].solver.ndims,
+              rhs_wghosts.data(),
+              phi_hyper_col.getData(),
+              sim[0].solver.dim_local,
+              sim[0].solver.ghosts,
+              0,
+              index.data(),
+              sim[0].solver.nvars);
+
+  /* Copy F(phi_j) back to columns of phi_hyper matrix */
+  for (int i = 0; i < num_rows; i++) {
+    (*phi_hyper_x)(i) = phi_hyper_col.getData()[i];
+  }
+
+  // construct hyper_ROM = phi^T phi_hyper
+  a_rombasis->transposeMult(*phi_hyper_x, *m_working);
+  MPISum_double(m_romhyperb_x_off[idx]->getData(),m_working->getData(),m_rdims[idx],&mpi->world);
+
+  if (!m_rank) {
+    std::cout << "Checking romhyperb_x_off: \n";
+    for (int i = 0; i < m_romhyperb_x_off[idx]->dim(); i++) {
+          std::cout << (m_romhyperb_x_off[idx]->item(i)) << " ";
+      }
+    std::cout << std::endl;
+  }
+
+  delete phi_hyper_x;
+  delete m_working;
+
+  return;
+}
+
+/*! Construct reduced hyperbolic tensor in v direction */
+void LSROMObject::ConstructROMHy_v_offset(void* a_s, const CAROM::Matrix* a_rombasis, const CAROM::Matrix* a_rombasis_phi, int idx)
+{
+  SimulationObject* sim = (SimulationObject*) a_s;
+  HyPar  *solver = (HyPar*) &(sim[0].solver);
+  Vlasov *param  = (Vlasov*) solver->physics;
+  MPIVariables *mpi = (MPIVariables *) param->m;
+
+  int num_rows = a_rombasis->numRows();
+  int num_cols = a_rombasis->numColumns();
+
+  CAROM::Vector phi_hyper_col(num_rows, false);
+
+  CAROM::Matrix* m_working;
+  m_working = new CAROM::Matrix(m_rdims[idx], m_rdims_phi[idx], false);
+
+  CAROM::Vector* phi_hyper_work1;
+  phi_hyper_work1 = new CAROM::Vector(a_rombasis_phi->numRows(), false);
+
+  std::vector<int> index(sim[0].solver.ndims);
+  std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+  std::vector<double> vec_wo_ghosts(param->npts_local_x);
+  std::vector<double> vec_wo_ghosts1(param->npts_local_x);
+  std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
+
+  CAROM::Matrix* phi_hyper_x;
+  phi_hyper_x = new CAROM::Matrix(num_rows, m_rdims_phi[idx], false);
+
+  gettimeofday(&m_tensor_start, NULL);
+  for (int j = 0; j < m_rdims_phi[idx]; j++) {
+
+    ArrayCopynD(sim[0].solver.ndims,
+                m_base_sol.getData(),
+                vec_wghosts.data(),
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+
+    if (mpi->ip[1] == 0) {
+      *phi_hyper_work1 = 0;
+      a_rombasis_phi->getColumn(j, *phi_hyper_work1);
+      ArrayCopynD(1,
+                  a_rombasis_phi->getColumn(j)->getData(),
+                  vec_wo_ghosts.data(),
+                  sim[0].solver.dim_local,
+                  0,
+                  0,
+                  index.data(),
+                  sim[0].solver.nvars);
+    }
+    else {
+      vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
+    }
+    // Need to do the following since in HpyerbolicFunction_1dir, it assumes
+    // mpi->ip[1] > 0 has the same copy as to the mpi->ip[1] =0
+    MPISum_double(vec_wo_ghosts1.data(),vec_wo_ghosts.data(),param->npts_local_x,&mpi->comm[1]);
+
+    memset(param->e_field, 0, sizeof(double) * param->npts_local_x_wghosts);
+
+    ArrayCopynD(1,
+                vec_wo_ghosts1.data(),
+                param->e_field,
+                sim[0].solver.dim_local,
+                0,
+                sim[0].solver.ghosts,
+                index.data(),
+                sim[0].solver.nvars);
+
+    solver->ApplyBoundaryConditions(solver,mpi,vec_wghosts.data(),NULL,0);
+    solver->ApplyIBConditions(solver,mpi,vec_wghosts.data(),0);
+    MPIExchangeBoundariesnD(  solver->ndims,
+                              solver->nvars,
+                              solver->dim_local,
+                              solver->ghosts,
+                              mpi,
+                              vec_wghosts.data());
+    HyperbolicFunction_1dir( rhs_wghosts.data(),
+                              vec_wghosts.data(),
+                              solver,
+                              mpi,
+                              0,
+                              1,
+                              solver->FFunction,
+                              solver->Upwind, 1 );
+
+    ArrayCopynD(sim[0].solver.ndims,
+                rhs_wghosts.data(),
+                phi_hyper_col.getData(),
+                sim[0].solver.dim_local,
+                sim[0].solver.ghosts,
+                0,
+                index.data(),
+                sim[0].solver.nvars);
+
+    /* Copy F(phi_j) back to columns of phi_hyper matrix */
+    for (int i = 0; i < num_rows; i++) {
+      (*phi_hyper_x)(i, j) = phi_hyper_col.getData()[i];
+    }
+
+  }
+  a_rombasis->transposeMult(*phi_hyper_x, *m_working);
+  MPISum_double(m_romhyperb_v_off[idx]->getData(),m_working->getData(),m_rdims_phi[idx]*m_rdims[idx],&mpi->world);
+  if (!m_rank) {
+    std::cout << "Checking romhyperb_v_offset: \n";
+    for (int i = 0; i < m_romhyperb_v_off[idx]->numRows(); i++) {
+      for (int j = 0; j < m_romhyperb_v_off[idx]->numColumns(); j++) {
+          std::cout << (m_romhyperb_v_off[idx]->item(i,j)) << " ";
+      }
+    }
+    std::cout << std::endl;
+  }
+
+  gettimeofday(&m_tensor_end, NULL);
+  long long walltime;
+  walltime = (  (m_tensor_end.tv_sec*1000000 + m_tensor_end.tv_usec)
+              - (m_tensor_start.tv_sec*1000000 + m_tensor_start.tv_usec) );
+  m_tensor_wctime += (double) walltime / 1000000.0;
+
+  if (!m_rank) {
+    printf( "Hy_v_offset construction wallclock time: %f (seconds).\n",
+            (double) walltime / 1000000.0);
+  }
+
+#ifndef serial
+  MPI_Allreduce(  MPI_IN_PLACE,
+                  &m_tensor_wctime,
+                  1,
+                  MPI_DOUBLE,
+                  MPI_MAX,
+                  MPI_COMM_WORLD );
+#endif
+
+  delete m_working;
+  delete phi_hyper_work1;
+  return;
+}
+
+/*! Compute potential offset */
+CAROM::Vector LSROMObject::CompPotentialOffset(void* a_s)
+{
+  SimulationObject* sim     = (SimulationObject*) a_s;
+  HyPar             *solver = (HyPar*) &(sim[0].solver);
+  Vlasov            *param  = (Vlasov*) solver->physics;
+  MPIVariables      *mpi    = (MPIVariables *) param->m;
+
+  int num_rows = m_base_sol.dim();
+
+  std::vector < int  > index(solver->ndims);
+  std::vector <double> vec_wo_ghosts(param->npts_local_x);
+  std::vector <double> vec_wghosts(solver->npoints_local_wghosts*solver->nvars);
+
+  ArrayCopynD(solver->ndims,
+              m_base_sol.getData(),
+              vec_wghosts.data(),
+              solver->dim_local,
+              0,
+              solver->ghosts,
+              index.data(),
+              solver->nvars);
+
+  solver->ApplyBoundaryConditions(solver,mpi,vec_wghosts.data(),NULL,0);
+  solver->ApplyIBConditions(solver,mpi,vec_wghosts.data(),0);
+  MPIExchangeBoundariesnD(  solver->ndims,
+                            solver->nvars,
+                            solver->dim_local,
+                            solver->ghosts,
+                            mpi,
+                            vec_wghosts.data());
+
+  /* Solve for phi reduced basis */
+  SetEFieldSelfConsistent(vec_wghosts.data(), solver, 0.0);
+  for (int j=0; j < param->npts_local_x_wghosts; j++){
+    printf("rank %d potential %d %f\n",mpi->rank,j,param->potential[j]);
+  }
+
+  char buffer[] = "base_phi";
+  ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),param->potential,buffer);
+
+  /* Copy phi reduced basis to dummy variable vec_wo_ghosts */
+  if (mpi->ip[1] == 0) {
+    ArrayCopynD(1,
+                param->potential,
+                vec_wo_ghosts.data(),
+                solver->dim_local,
+                solver->ghosts,
+                0,
+                index.data(),
+                solver->nvars);
+  }
+  else {
+    vec_wo_ghosts = std::vector<double> (vec_wo_ghosts.size(),0.0);
+  }
+
+  CAROM::Vector base_solution_(param->npts_local_x, false);
+  for (int j=0; j < param->npts_local_x; j++){
+    (base_solution_)(j) = vec_wo_ghosts[j];
+    printf("rank %d base_solution_ %d %f\n",mpi->rank,j,vec_wo_ghosts[j]);
+  }
+
+  return base_solution_;
+}
 #endif
