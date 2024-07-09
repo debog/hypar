@@ -1203,7 +1203,7 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
       }
       else
       {
-        TimeRK(a_t,a_s,m_curr_win,m_snap[m_curr_win]);
+        TimeRK(a_t, a_s, m_curr_win, m_snap[m_curr_win]);
       }
 
 //      if ((m_snap[i] < sim[0].solver.n_iter) && (m_snap[i] % m_sampling_freq == 0)){
@@ -1568,10 +1568,9 @@ int LSROMObject::TimeCleanup()
   return 0;
 }
 
-int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution */
-                        void* a_s,
-                        int idx
-                        )
+int LSROMObject::TimeRK( const double a_t, /*!< time at which to predict solution */
+                         void* a_s,
+                         int idx, int snap_count )
 {
   /* Advance the ROM ODE using RK4 scheme */
 
@@ -1581,28 +1580,11 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
   MPIVariables *mpi = (MPIVariables *) param->m;
 
   int ns, stage, i;
+  int count;
   int num_rows = m_basis[idx]->numRows();
-
-  CAROM::Vector* m_fomwork = nullptr;
-  CAROM::Vector* m_rhswork = nullptr;
-  if (m_direct_comp_hyperbolic) {
-    m_fomwork = new CAROM::Vector(num_rows,false);
-    m_rhswork = new CAROM::Vector(num_rows,false);
-	}
-
-  CAROM::Vector* m_contract1 = nullptr;
-  CAROM::Vector* m_contract2 = nullptr;
-  CAROM::Vector* m_tmprhs = nullptr;
-  CAROM::Vector* m_tmpsol = nullptr;
-  CAROM::Vector* m_e = nullptr;
-  if (m_solve_phi) {
-    m_contract1 = new CAROM::Vector(m_rdims_phi[idx],false);
-    m_contract2 = new CAROM::Vector(m_rdims[idx],false);
-  }
+  std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
 
   std::vector<int> index(sim[0].solver.ndims);
-  std::vector<double> vec_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
-  std::vector<double> rhs_wghosts(sim[0].solver.npoints_local_wghosts*sim[0].solver.nvars);
 
   CAROM::Vector* m_romwork;
   m_romwork = new CAROM::Vector(m_rdims[idx],false);
@@ -1628,61 +1610,48 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
     }
 
     if (m_direct_comp_hyperbolic) {
-//    printf("compute hyperbolic term directly\n");
 
-      m_fomwork = ReconlibROMfield(m_U[stage], m_basis[idx], m_rdims[idx]);
+      m_basis[idx]->mult(*m_U[stage], *m_dir_fomwork);
 
       ArrayCopynD(sim[0].solver.ndims,
-                  m_fomwork->getData(),
-                  vec_wghosts.data(),
+                  m_dir_fomwork->getData(),
+                  dir_vec_wghosts.data(),
                   sim[0].solver.dim_local,
                   0,
                   sim[0].solver.ghosts,
                   index.data(),
                   sim[0].solver.nvars);
 
-      sim[0].solver.PostStage( vec_wghosts.data(),
+      sim[0].solver.PostStage( dir_vec_wghosts.data(),
                                &(sim[0].solver),
                                &(sim[0].mpi),
                                stagetime); CHECKERR(ierr);
 
       /* Evaluate F(\phi_j) */
-      TimeRHSFunctionExplicit(rhs_wghosts.data(),
-                              vec_wghosts.data(),
+      TimeRHSFunctionExplicit(dir_rhs_wghosts.data(),
+                              dir_vec_wghosts.data(),
                               &(sim[0].solver),
                               &(sim[0].mpi),
-                              0);
+                              stagetime);
 
 
       ArrayCopynD(sim[0].solver.ndims,
-                  rhs_wghosts.data(),
-                  m_rhswork->getData(),
+                  dir_rhs_wghosts.data(),
+                  m_dir_rhswork->getData(),
                   sim[0].solver.dim_local,
                   sim[0].solver.ghosts,
                   0,
                   index.data(),
                   sim[0].solver.nvars);
 
-      m_romwork = ProjectToRB(m_rhswork, m_basis[idx], m_rdims[idx]);
-      MPISum_double(m_Udot[stage]->getData(), m_romwork->getData(), m_rdims[idx], &mpi->world);
-
-//    if (!m_rank) {
-//      std::cout << "Checking hyperbolic term [directly]: ";
-//      for (int j = 0; j < m_rdim; j++) {
-//            std::cout << m_Udot[stage]->item(j) << " ";
-//      }
-//      std::cout << std::endl;
-//    }
+        m_basis[idx]->transposeMult(*m_dir_rhswork, *m_romwork);
+        MPISum_double(m_Udot[stage]->getData(), m_romwork->getData(), m_rdims[idx], &mpi->world);
     }
     else if (m_solve_phi) {
       if ((!m_solve_poisson)) {
         m_romrhs_phi[idx]->mult(*m_U[stage], *m_tmprhs[idx]);
-//      m_romlaplace_phi[idx]->mult(*m_tmprhs[idx], *m_tmpsol[idx]);
         m_romlaplace_phi[idx]->mult(*m_tmprhs[idx], *m_tmpsol[idx]);
       } 
-//    else {
-//      m_tmpsol[idx] = m_U[stage];
-//    }
 
       m_romhyperb_x[idx]->mult(*m_U[stage], *m_romwork);
 
@@ -1700,7 +1669,7 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
       }
       
 
-//    /* Tensor contraction */
+      /* Tensor contraction */
       for (int k = 0; k < m_rdims[idx]; k++) {
         m_romhyperb_v[idx][k]->mult(*m_U[stage], *m_contract1[idx]);
         if ((!m_solve_poisson)) {
@@ -1711,119 +1680,18 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
       }
       m_romwork->minus(*m_contract2[idx], *m_Udot[stage]);
 
-
-//
-//    m_e = m_basis_e->mult(m_tmpsol);
-
-//    ArrayCopynD(1,
-//                m_e->getData(),
-//                param->e_field,
-//                sim[0].solver.dim_local,
-//                0,
-//                sim[0].solver.ghosts,
-//                index.data(),
-//                sim[0].solver.nvars);
-
-//    m_fomwork = ReconlibROMfield(m_U[stage], m_generator[0]->getSpatialBasis(), m_rdim);
-
-//    ArrayCopynD(sim[0].solver.ndims,
-//                m_fomwork->getData(),
-//                vec_wghosts.data(),
-//                sim[0].solver.dim_local,
-//                0,
-//                sim[0].solver.ghosts,
-//                index.data(),
-//                sim[0].solver.nvars);
-//      solver->ApplyBoundaryConditions(solver,mpi,vec_wghosts.data(),NULL,0);
-//      solver->ApplyIBConditions(solver,mpi,vec_wghosts.data(),0);
-//      MPIExchangeBoundariesnD(  solver->ndims,
-//                                solver->nvars,
-//                                solver->dim_local,
-//                                solver->ghosts,
-//                                mpi,
-//                                vec_wghosts.data());
-
-//      HyperbolicFunction_1dir( rhs_wghosts.data(),
-//                               vec_wghosts.data(),
-//                               solver,
-//                               mpi,
-//                               0,
-//                               1,
-//                               solver->FFunction,
-//                               solver->Upwind, 1 );
-
-//    ArrayCopynD(sim[0].solver.ndims,
-//                rhs_wghosts.data(),
-//                m_rhswork->getData(),
-//                sim[0].solver.dim_local,
-//                sim[0].solver.ghosts,
-//                0,
-//                index.data(),
-//                sim[0].solver.nvars);
-
-//    m_contract2 = ProjectToRB(m_rhswork,m_generator[0]->getSpatialBasis(), m_rdim);
-//    m_Udot[stage] = m_romwork->plus(m_contract2);
       *m_Udot[stage] *= -1.0;
-
-      /* Reconstruct potential */
-//    m_e = m_basis_e->mult(m_tmpsol);
-
-//    ArrayCopynD(1,
-//                m_e->getData(),
-//                param->e_field,
-//                sim[0].solver.dim_local,
-//                0,
-//                sim[0].solver.ghosts,
-//                index.data(),
-//                sim[0].solver.nvars);
-
-//    m_fomwork = ReconlibROMfield(m_U[stage], m_generator[0]->getSpatialBasis(), m_rdim);
-
-//    ArrayCopynD(sim[0].solver.ndims,
-//                m_fomwork->getData(),
-//                vec_wghosts.data(),
-//                sim[0].solver.dim_local,
-//                0,
-//                sim[0].solver.ghosts,
-//                index.data(),
-//                sim[0].solver.nvars);
-
-//    /* Evaluate F(\phi_j) */
-//    TimeRHSFunctionExplicit(rhs_wghosts.data(),
-//                            vec_wghosts.data(),
-//                            &(sim[0].solver),
-//                            &(sim[0].mpi),
-//                            0);
-
-//    ArrayCopynD(sim[0].solver.ndims,
-//                rhs_wghosts.data(),
-//                m_rhswork->getData(),
-//                sim[0].solver.dim_local,
-//                sim[0].solver.ghosts,
-//                0,
-//                index.data(),
-//                sim[0].solver.nvars);
-
-//    m_Udot[stage] = ProjectToRB(m_rhswork,m_generator[0]->getSpatialBasis(), m_rdim);
-//    if (!m_rank) {
-//      std::cout << "Checking hyperbolic term [phi]: ";
-//      for (int j = 0; j < m_rdim; j++) {
-//            std::cout << m_Udot[stage]->item(j) << " ";
-//      }
-//      std::cout << std::endl;
-//    }
     }
     else {
       m_Udot[stage] = m_romhyperb[idx]->mult(m_U[stage]);
-//    if (!m_rank) {
-//      std::cout << "Checking hyperbolic term [efficient]: ";
-//      for (int j = 0; j < m_rdim; j++) {
-//            std::cout << m_Udot[stage]->item(j) << " ";
-//      }
-//      std::cout << std::endl;
-//    }
+      if (!m_rank) {
+        std::cout << "Checking hyperbolic term [efficient]: ";
+        for (int j = 0; j < m_rdim; j++) {
+              std::cout << m_Udot[stage]->item(j) << " ";
+        }
+        std::cout << std::endl;
+      }
     }
-
   }
 
   /* Step completion */
@@ -1845,15 +1713,6 @@ int LSROMObject::TimeRK(const double a_t, /*!< time at which to predict solution
 
   delete m_romwork;
   delete m_offset;
-
-
-  if (m_solve_phi) {
-    if (m_tmprhs != nullptr) delete m_tmprhs;
-    if (m_tmpsol != nullptr) delete m_tmpsol;
-    if (m_e != nullptr) delete m_e;
-    if (m_contract1 != nullptr) delete m_contract1;
-    if (m_contract2 != nullptr) delete m_contract2;
-  }
   return 0;
 }
 
@@ -4834,6 +4693,8 @@ void LSROMObject::ConstructROMHy_v_offset(void* a_s, const CAROM::Matrix* a_romb
 /*! Compute potential offset */
 CAROM::Vector LSROMObject::CompPotentialOffset(void* a_s)
 {
+  /* If one wants to use the offset, need to take care not overwriting the
+  initial condition that is stored in param->e_field and param->potential */
   SimulationObject* sim     = (SimulationObject*) a_s;
   HyPar             *solver = (HyPar*) &(sim[0].solver);
   Vlasov            *param  = (Vlasov*) solver->physics;
@@ -4865,9 +4726,6 @@ CAROM::Vector LSROMObject::CompPotentialOffset(void* a_s)
 
   /* Solve for phi reduced basis */
   SetEFieldSelfConsistent(vec_wghosts.data(), solver, 0.0);
-  for (int j=0; j < param->npts_local_x_wghosts; j++){
-    printf("rank %d potential %d %f\n",mpi->rank,j,param->potential[j]);
-  }
 
   char buffer[] = "base_phi";
   ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),param->potential,buffer);
@@ -4888,10 +4746,6 @@ CAROM::Vector LSROMObject::CompPotentialOffset(void* a_s)
   }
 
   CAROM::Vector base_solution_(param->npts_local_x, false);
-  for (int j=0; j < param->npts_local_x; j++){
-    (base_solution_)(j) = vec_wo_ghosts[j];
-    printf("rank %d base_solution_ %d %f\n",mpi->rank,j,vec_wo_ghosts[j]);
-  }
 
   return base_solution_;
 }
