@@ -351,7 +351,9 @@ void LSROMObject::takeSample(  const CAROM::Vector& a_U, /*!< solution vector */
     if (m_centered)
     {
       m_base_sol = ReadBaseSolution(a_s);
-      m_base_sol_phi = CompPotentialOffset(a_s);
+      /* For now, turnoff potential offset, if one wants to use it, need to copy e_field and phi to temp variable 
+      so that the initial condition is not overwritten */
+//    m_base_sol_phi = CompPotentialOffset(a_s); % Compute the offset for potential
       m_initial = new CAROM::Vector(a_U.getData(), a_U.dim(), false);
     }
 
