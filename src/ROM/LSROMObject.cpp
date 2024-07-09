@@ -1264,14 +1264,8 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
           }
           sum = ArrayMaxnD (solver->nvars,1,solver->dim_local,
                             0,solver->index,m_recon_E->getData());
-          global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
-//        global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->comm[0]); // This is slower than calling allreduction
-//        if (!m_rank) printf("Checking max |E| %f\n",global_sum);
+          global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world); // This is faster than calling mpi->comm[0] 
           if (!m_rank) printf("ROM max |E| %.12f\n", global_sum);
-
-//        for (int j = 0; j < m_recon_E->dim(); j++){
-//          printf("Checking %d %d efield %f\n",m_rank,j, m_recon_E->item(j));
-//        }
 
           if (mpi->ip[1] == 0) {
             ArrayCopynD(1,m_recon_E->getData(),int_f_wghosts.data(),
@@ -1286,13 +1280,9 @@ const CAROM::Vector* LSROMObject::predict(const double a_t, /*!< time at which t
           }
           MPISum_double(int_f_wghosts.data(),int_f_wghosts.data(),param->npts_local_x_wghosts,&mpi->comm[1]);
 
-//        for (int j = 0; j < int_f_wghosts.size(); j++){
-//          printf("Checking %d %d g_efield %f\n",m_rank,j, int_f_wghosts[j]);
-//        }
           char buffer[] = "app_e";
           ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),int_f_wghosts.data(),buffer);
 
-//
 //        for (int j = 0; j < m_tmpsol[i]->dim(); j++)
 //        {
 //          if ((!m_solve_poisson))
