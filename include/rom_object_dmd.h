@@ -99,9 +99,6 @@ class DMDROMObject : public ROMObject
     /*! load DMD object from file */
     virtual void load(const std::string& a_fname_root /*!< Filename root*/);
 
-    /*! Check the DMD object */
-    virtual void check(void* );
-
     /*! Write Snapshot matrix */
     virtual void writeSnapshot(void* );
 

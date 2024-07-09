@@ -149,9 +149,6 @@ class LSROMObject : public ROMObject
     /*! Write out libROM field */
     void OutputlibROMfield( double*, SimulationObject&, char* );
 
-    /*! Check the LS object */
-    virtual void check( void* );
-
     /*! Reconstruct libROM field from coefficient */
     CAROM::Vector* ReconlibROMfield( const CAROM::Vector*, const CAROM::Matrix*, const int );
 

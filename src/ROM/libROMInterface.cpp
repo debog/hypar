@@ -578,14 +578,6 @@ void libROMInterface::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vecto
   return;
 }
 
-/*! Check things such as projection error, etc. */
-void libROMInterface::check(void* a_s)
-{
-  for (int i = 0; i < m_rom.size(); i++) {
-    m_rom[i]->check(a_s);
-  }
-}
-
 /*! Write Snapshot matrix */
 void libROMInterface::writeSnapshot( void* a_s  /*!< Array of simulation objects of
                                                               type #SimulationObject */ )
