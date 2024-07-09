@@ -2481,6 +2481,8 @@ void LSROMObject::ConstructPotentialROMLaplace(void* a_s, const CAROM::Matrix* a
 //  }
 //  std::cout << std::endl;
   }
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
   m_romlaplace_phi[idx]->inverse();
 
   delete laplace_phi;
@@ -2718,7 +2720,7 @@ void LSROMObject::CheckPotentialProjError(void* a_s, int idx)
   std::vector<double> snapproj_wghosts(param->npts_local_x_wghosts);
   std::vector<int> index(sim[0].solver.ndims);
 
-  int num_rows = m_generator_phi[idx]->getSpatialBasis()->numRows();
+  int num_rows = m_basis_phi[idx]->numRows();
   int num_cols = m_snapshots_phi[idx]->numColumns();
   CAROM::Vector* recon_caromvec;
   recon_caromvec= new CAROM::Vector(num_rows,false);
@@ -2736,7 +2738,7 @@ void LSROMObject::CheckPotentialProjError(void* a_s, int idx)
                 index.data(),
                 sim[0].solver.nvars);
 
-    m_working = ProjectToRB(m_snapshots_phi[idx]->getColumn(j),m_basis_phi[idx], m_rdims_phi[idx]);
+    m_working = ProjectToRB(m_snapshots_phi[idx]->getColumn(j), m_basis_phi[idx], m_rdims_phi[idx]);
     MPISum_double(m_projected_init_phi[idx]->getData(),m_working->getData(),m_rdims_phi[idx],&mpi->world);
     if (!m_rank) {
       printf("%d m_project phi size %d\n",idx,m_projected_init_phi[idx]->dim());
@@ -3578,6 +3580,13 @@ void LSROMObject::ConstructEBasis(void* a_s, int idx)
     if (mpi->ip[1] != 0) vec_x_wghosts = std::vector<double> (vec_x_wghosts.size(),0.0);
 
     _ArrayScale1D_(vec_x_wghosts,-1.0*(solver->dxinv[0]),param->npts_local_x_wghosts)
+    if (mpi->ip[1] != 0) {
+      vec_x_wghosts = std::vector<double> (vec_x_wghosts.size(),0.0);
+    }
+    MPISum_double(vec_x_wghosts.data(),vec_x_wghosts.data(),param->npts_local_x_wghosts,&mpi->comm[1]);
+
+    char buffer[] = "FD_ebasis";
+    ::VlasovWriteSpatialField(&(sim[0].solver),&(sim[0].mpi),vec_x_wghosts.data(),buffer);
 
     ArrayCopynD(1,
                 vec_x_wghosts.data(),
@@ -3591,6 +3600,8 @@ void LSROMObject::ConstructEBasis(void* a_s, int idx)
       (*m_basis_e[idx])(i, j) = vec_noghosts[i];
     }
   }
+  ::ResetFilenameIndex( sim[0].solver.filename_index,
+                        sim[0].solver.index_length );
   free(vec_noghosts);
 }
 
