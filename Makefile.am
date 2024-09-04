@@ -1,5 +1,5 @@
 SUBDIRS = src
-dist_doc_DATA = README
+dist_doc_DATA = README.md
 docdir = doc
 
 EXTRA_DIST = \

@@ -5,7 +5,7 @@ echo -n AC_PACKAGE_VERSION>VERSION
 AC_SUBST(PACKAGE_VERSION)
 AC_MSG_NOTICE([hypar AC_PACKAGE_VERSION])
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign])
 AC_PREFIX_DEFAULT('$(top_srcdir)')
 includedir="${ac_pwd}/${srcdir}/include"
 if ! test -d ${includedir} ; then
