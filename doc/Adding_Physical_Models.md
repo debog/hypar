@@ -62,7 +62,7 @@ Create `include/physicalmodels/yourmodel.h`:
 /*! @file yourmodel.h
     @brief Your model description
     @author Your Name
-    
+
     Mathematical description of your model:
     \f{equation}{
       \frac{\partial u}{\partial t} + \frac{\partial f(u)}{\partial x} = S(u)
@@ -78,17 +78,17 @@ Create `include/physicalmodels/yourmodel.h`:
 
 /*! Structure containing model-specific parameters */
 typedef struct yourmodel_parameters {
-  
+
   /* Physical parameters */
   double param1;        /*!< Description of parameter 1 */
   double param2;        /*!< Description of parameter 2 */
-  
+
   /* Model-specific arrays (if needed) */
   double *field;        /*!< Description of field */
-  
+
   /* Flags and options */
   int option_flag;      /*!< Description of option */
-  
+
 } YourModel;
 
 /* Function declarations */
@@ -142,14 +142,14 @@ int YourModelInitialize(void *s,  /*!< Solver object of type #HyPar */
   MPIVariables  *mpi     = (MPIVariables*) m;
   YourModel     *physics = (YourModel*)    solver->physics;
   int           ferr;
-  
+
   static int count = 0;
-  
+
   /* Default parameter values */
   physics->param1 = 1.0;
   physics->param2 = 0.0;
   physics->field = NULL;
-  
+
   /* Read physical model parameters from physics.inp */
   if (!mpi->rank) {
     FILE *in;
@@ -188,13 +188,13 @@ int YourModelInitialize(void *s,  /*!< Solver object of type #HyPar */
       }
     }
   }
-  
+
   /* Broadcast parameters to all processes */
 #ifndef serial
   IERR MPIBroadcast_double(&physics->param1,1,0,&mpi->world); CHECKERR(ierr);
   IERR MPIBroadcast_double(&physics->param2,1,0,&mpi->world); CHECKERR(ierr);
 #endif
-  
+
   /* Check for incompatible options */
   if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
     if (!mpi->rank) {
@@ -202,26 +202,26 @@ int YourModelInitialize(void *s,  /*!< Solver object of type #HyPar */
     }
     return(1);
   }
-  
+
   /* Print parameters */
   if (!mpi->rank) {
     printf("YourModel: Parameter 1 = %lf\n", physics->param1);
     printf("YourModel: Parameter 2 = %lf\n", physics->param2);
   }
-  
+
   /* Allocate model-specific arrays if needed */
   /* Example: physics->field = (double*) calloc(...); */
-  
+
   /* Register function pointers with solver */
   solver->ComputeCFL         = YourModelComputeCFL;
   solver->FFunction          = YourModelAdvection;
   solver->Upwind             = YourModelUpwind;
-  
+
   /* Optional functions - only set if implemented */
   /* solver->GFunction          = YourModelDiffusion; */
   /* solver->SFunction          = YourModelSource; */
   /* solver->ComputeDiffNumber  = YourModelComputeDiffNumber; */
-  
+
   count++;
   return(0);
 }
@@ -250,37 +250,37 @@ double YourModelComputeCFL(void   *s,   /*!< Solver object */
 {
   HyPar     *solver  = (HyPar*)     s;
   YourModel *physics = (YourModel*) solver->physics;
-  
+
   int ndims  = solver->ndims;
   int nvars  = solver->nvars;
   int ghosts = solver->ghosts;
   int *dim   = solver->dim_local;
   double *u  = solver->u;
-  
+
   double max_cfl = 0;
   int done = 0;
   int index[ndims];
-  
+
   _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p;
     _ArrayIndex1D_(ndims,dim,index,ghosts,p);
-    
+
     for (int v=0; v<nvars; v++) {
       for (int dir=0; dir<ndims; dir++) {
         double dxinv;
         _GetCoordinate_(dir,index[dir],dim,ghosts,solver->dxinv,dxinv);
-        
+
         /* Compute local wave speed */
         double wave_speed = /* physics-dependent calculation */;
         double local_cfl = fabs(wave_speed) * dt * dxinv;
-        
+
         if (local_cfl > max_cfl) max_cfl = local_cfl;
       }
     }
     _ArrayIncrementIndex_(ndims,dim,index,done);
   }
-  
+
   return(max_cfl);
 }
 ```
@@ -307,37 +307,37 @@ int YourModelAdvection(double *f,    /*!< Computed flux */
 {
   HyPar     *solver  = (HyPar*)     s;
   YourModel *physics = (YourModel*) solver->physics;
-  
+
   int *dim   = solver->dim_local;
   int ghosts = solver->ghosts;
   int ndims  = solver->ndims;
   int nvars  = solver->nvars;
-  
+
   int index[ndims], bounds[ndims], offset[ndims];
-  
+
   /* Set bounds to include ghost points */
   _ArrayCopy1D_(dim,bounds,ndims);
   for (int i=0; i<ndims; i++) bounds[i] += 2*ghosts;
-  
+
   /* Set offset for ghost point arrangement */
   _ArraySetValue_(offset,ndims,-ghosts);
-  
+
   /* Loop over all points */
   int done = 0;
   _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p;
     _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    
+
     /* Compute flux for each variable */
     for (int v=0; v<nvars; v++) {
       /* Your flux calculation here */
       f[nvars*p+v] = /* physics-dependent flux function */;
     }
-    
+
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
-  
+
   return(0);
 }
 ```
@@ -370,46 +370,46 @@ int YourModelUpwind(double *fI,   /*!< Interface flux */
 {
   HyPar     *solver  = (HyPar*)     s;
   YourModel *physics = (YourModel*) solver->physics;
-  
+
   int ndims  = solver->ndims;
   int nvars  = solver->nvars;
   int *dim   = solver->dim_local;
   int ghosts = solver->ghosts;
-  
+
   int index_outer[ndims], index_inter[ndims];
   int bounds_outer[ndims], bounds_inter[ndims];
-  
+
   _ArrayCopy1D_(dim,bounds_outer,ndims);
   bounds_outer[dir] = 1;
   _ArrayCopy1D_(dim,bounds_inter,ndims);
   bounds_inter[dir] += 1;
-  
+
   int done = 0;
   _ArraySetValue_(index_outer,ndims,0);
-  
+
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    
+
     for (index_inter[dir]=0; index_inter[dir]<bounds_inter[dir]; index_inter[dir]++) {
       int p;
       _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      
+
       int indexL[ndims], indexR[ndims];
       _ArrayCopy1D_(index_inter,indexL,ndims);
       indexL[dir]--;
       _ArrayCopy1D_(index_inter,indexR,ndims);
-      
+
       int pL, pR;
       _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
-      
+
       /* Compute upwind flux for each variable */
       for (int v=0; v<nvars; v++) {
-        
+
         /* Calculate wave speeds (eigenvalues) */
         double lambdaL = /* left wave speed */;
         double lambdaR = /* right wave speed */;
-        
+
         /* Simple upwinding: Roe averaging or local Lax-Friedrichs */
         if ((lambdaL > 0) && (lambdaR > 0)) {
           /* Both waves moving right - use left flux */
@@ -420,15 +420,15 @@ int YourModelUpwind(double *fI,   /*!< Interface flux */
         } else {
           /* Mixed or near-zero - use dissipative flux */
           double alpha = max(fabs(lambdaL), fabs(lambdaR));
-          fI[nvars*p+v] = 0.5 * (fL[nvars*p+v] + fR[nvars*p+v] 
+          fI[nvars*p+v] = 0.5 * (fL[nvars*p+v] + fR[nvars*p+v]
                                - alpha * (uR[nvars*p+v] - uL[nvars*p+v]));
         }
       }
     }
-    
+
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
-  
+
   return(0);
 }
 ```
@@ -446,10 +446,10 @@ int YourModelUpwind(double *fI,   /*!< Interface flux */
 int YourModelCleanup(void *s /*!< Solver object */)
 {
   YourModel *physics = (YourModel*) s;
-  
+
   /* Free any allocated arrays */
   if (physics->field) free(physics->field);
-  
+
   return(0);
 }
 ```

@@ -11,12 +11,12 @@
 #include <physicalmodels/template_model.h>
 #include <hypar.h>
 
-/*! 
+/*!
  * Compute the upwind interface flux for the Template Model.
- * 
+ *
  * This function computes the numerical flux at grid interfaces by combining
  * the left- and right-biased reconstructed fluxes using an upwinding scheme.
- * 
+ *
  * Common upwinding schemes:
  * 1. Simple upwind: use flux from upwind direction based on wave speed
  * 2. Local Lax-Friedrichs (Rusanov): (f_L + f_R)/2 - alpha*(u_R - u_L)/2
@@ -63,9 +63,9 @@ int TemplateModelUpwind(
   _ArraySetValue_(index_outer,ndims,0);
 
   while (!done) {
-    
+
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    
+
     for (index_inter[dir]=0; index_inter[dir]<bounds_inter[dir]; index_inter[dir]++) {
 
       /* Interface index */
@@ -89,7 +89,7 @@ int TemplateModelUpwind(
         /* [REPLACE] Calculate wave speeds (eigenvalues) */
         /* For scalar equation: wave speed is flux derivative df/du */
         /* For systems: compute eigenvalues of flux Jacobian df/du */
-        
+
         /* Example 1: Scalar advection with constant speed a */
         /*
         double lambda = physics->param1;
@@ -104,7 +104,7 @@ int TemplateModelUpwind(
         /*
         double lambdaL = uL[nvars*p+v];  // wave speed at left state
         double lambdaR = uR[nvars*p+v];  // wave speed at right state
-        
+
         if ((lambdaL > 0) && (lambdaR > 0)) {
           fI[nvars*p+v] = fL[nvars*p+v];
         } else if ((lambdaL < 0) && (lambdaR < 0)) {
@@ -112,7 +112,7 @@ int TemplateModelUpwind(
         } else {
           // Local Lax-Friedrichs flux for mixed/transonic case
           double alpha = max(fabs(lambdaL), fabs(lambdaR));
-          fI[nvars*p+v] = 0.5 * (fL[nvars*p+v] + fR[nvars*p+v] 
+          fI[nvars*p+v] = 0.5 * (fL[nvars*p+v] + fR[nvars*p+v]
                                - alpha * (uR[nvars*p+v] - uL[nvars*p+v]));
         }
         */
@@ -120,7 +120,7 @@ int TemplateModelUpwind(
         /* [REPLACE] Your upwinding scheme here */
         /* Default: simple averaging (non-upwinded - only for testing!) */
         fI[nvars*p+v] = 0.5 * (fL[nvars*p+v] + fR[nvars*p+v]);
-        
+
       }
     }
 

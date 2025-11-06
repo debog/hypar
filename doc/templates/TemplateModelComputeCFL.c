@@ -11,18 +11,18 @@
 #include <mpivars.h>
 #include <hypar.h>
 
-/*! 
+/*!
  * Compute the maximum CFL number over the local domain.
- * 
+ *
  * The CFL number is defined as:
  * \f{equation}{
  *   CFL = \lambda \frac{\Delta t}{\Delta x}
  * \f}
  * where \f$\lambda\f$ is the maximum wave speed (eigenvalue).
- * 
+ *
  * For explicit time-stepping stability, CFL should typically be < 1.0
  * (exact limit depends on the time integration scheme).
- * 
+ *
  * Note: This function computes CFL only over the local domain on this
  * processor. The global maximum across all processors is computed separately
  * by the main solver.
@@ -51,24 +51,24 @@ double TemplateModelComputeCFL(
 
   /* Loop over all interior grid points (not ghost points) */
   while (!done) {
-    
+
     /* Calculate 1D index */
     int p;
     _ArrayIndex1D_(ndims,dim,index,ghosts,p);
 
     /* [REPLACE] Compute maximum wave speed at this point */
     /* For each variable and direction, compute local CFL */
-    
+
     int v, dir;
     for (v=0; v<nvars; v++) {
       for (dir=0; dir<ndims; dir++) {
-        
+
         /* Get inverse grid spacing in this direction */
         double dxinv;
         _GetCoordinate_(dir,index[dir],dim,ghosts,solver->dxinv,dxinv);
 
         /* [REPLACE] Calculate wave speed (eigenvalue) */
-        
+
         /* Example 1: Constant advection speed */
         /*
         double wave_speed = physics->param1;

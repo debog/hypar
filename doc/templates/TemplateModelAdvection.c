@@ -9,14 +9,14 @@
 #include <physicalmodels/template_model.h>
 #include <hypar.h>
 
-/*! 
+/*!
  * Compute the hyperbolic flux function over the local domain.
- * 
+ *
  * [REPLACE] Mathematical description:
  * \f{equation}{
  *   {\bf f}({\bf u}) = [REPLACE with your flux function]
  * \f}
- * 
+ *
  * This function computes the flux at each grid point (including ghost points).
  * The flux array \a f has the same size and layout as the solution array \a u.
 */
@@ -36,7 +36,7 @@ int TemplateModelAdvection(
   int ndims   = solver->ndims;
   int nvars   = solver->nvars;
 
-  /* 
+  /*
    * Array indexing in HyPar:
    * - Solution u is a 1D array: u[nvars*p + v]
    *   where p is the point index and v is the variable index
@@ -57,7 +57,7 @@ int TemplateModelAdvection(
   int done = 0;
   _ArraySetValue_(index,ndims,0);
   while (!done) {
-    
+
     /* Calculate 1D index from multi-dimensional index */
     int p;
     _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
@@ -77,7 +77,7 @@ int TemplateModelAdvection(
     double E    = u[nvars*p+2];
     double u_vel = rhou/rho;
     double p = (physics->param1 - 1.0) * (E - 0.5*rho*u_vel*u_vel);
-    
+
     if (dir == 0) {  // x-direction flux
       f[nvars*p+0] = rhou;
       f[nvars*p+1] = rhou*u_vel + p;

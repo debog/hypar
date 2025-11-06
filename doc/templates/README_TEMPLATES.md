@@ -105,7 +105,7 @@ This directory contains template files to help you implement a new physical mode
    - Use `_ArrayIndex1D_` to convert multi-dimensional indices to 1D
    - Solution array format: `u[nvars*p + v]` where p=point, v=variable
 
-2. **Ghost Points**: 
+2. **Ghost Points**:
    - Interior arrays include ghosts, interface arrays do not
    - Use `_ArrayIndex1D_` for interior points with ghosts
    - Use `_ArrayIndex1D_` with offset=0 for interface arrays

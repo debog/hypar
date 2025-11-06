@@ -25,7 +25,7 @@ int    TemplateModelUpwind            (double*,double*,double*,double*,
 /* int    TemplateModelPreStep           (double*,void*,void*,double); */
 /* int    TemplateModelPostStep          (double*,void*,void*,double); */
 
-/*! 
+/*!
  * Initialize the Template Model physics module:
  * - Allocate and set physics-related parameters
  * - Read physics-specific inputs from physics.inp
@@ -64,27 +64,27 @@ int TemplateModelInitialize(void *s, /*!< Solver object of type #HyPar */
       if (!strcmp(word, "begin")) {
         while (strcmp(word, "end")) {
           ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-          
+
           if (!strcmp(word, "param1")) {
             /* [REPLACE] Read double parameter */
             ferr = fscanf(in,"%lf",&physics->param1);
             if (ferr != 1) return(1);
-            
+
           } else if (!strcmp(word, "param2")) {
             /* [REPLACE] Read double parameter */
             ferr = fscanf(in,"%lf",&physics->param2);
             if (ferr != 1) return(1);
-            
+
           } else if (!strcmp(word, "use_feature")) {
             /* [REPLACE] Read integer flag */
             ferr = fscanf(in,"%d",&physics->use_feature);
             if (ferr != 1) return(1);
-            
+
           } else if (!strcmp(word, "option_string")) {
             /* [REPLACE] Read string option */
             ferr = fscanf(in,"%s",physics->option_string);
             if (ferr != 1) return(1);
-            
+
           } else if (strcmp(word,"end")) {
             /* Unrecognized keyword */
             char useless[_MAX_STRING_SIZE_];
