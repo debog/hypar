@@ -9,7 +9,7 @@ hypar_exec="HyPar"
 
 #export env vars for other scripts to run HyPar
 export HYPAR_EXEC_W_PATH="${hypar_dir}/bin/${hypar_exec}"
-export MPI_EXEC="mpiexec"
+export MPI_EXEC="mpirun"
 export HYPAR_EXEC_OTHER_ARGS=""
 
 # some details about HyPar benchmarks
