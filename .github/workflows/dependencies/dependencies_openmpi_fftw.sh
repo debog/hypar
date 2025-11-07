@@ -6,7 +6,7 @@ sudo apt-get update
 
 sudo apt-get install -y --no-install-recommends\
     build-essential \
-    g++ gfortran mpich libmpich-dev
+    g++ gfortran openmpi-bin libopenmpi-dev
 
 pushd ../
 wget https://www.fftw.org/fftw-3.3.10.tar.gz
