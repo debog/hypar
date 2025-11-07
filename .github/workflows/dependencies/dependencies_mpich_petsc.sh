@@ -6,7 +6,8 @@ sudo apt-get update
 
 sudo apt-get install -y --no-install-recommends\
     build-essential \
-    g++ gfortran mpich libmpich-dev
+    g++ gfortran mpich libmpich-dev \
+    libblas-dev liblapack-dev
 
 git clone -b release https://gitlab.com/petsc/petsc.git ../petsc
 pushd ../petsc
