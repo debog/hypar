@@ -1,4 +1,4 @@
-name: Build - Linux GCC + MPICH w/ FFTW-3.3.10
+name: Build - Linux GCC + OpenMPI w/ FFTW-3.3.10
 
 on: [push, pull_request]
 
@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: dependencies
-      run: source .github/workflows/dependencies/dependencies_mpich_fftw.sh
+      run: source .github/workflows/dependencies/dependencies_openmpi_fftw.sh
     - name: configure
       run: autoreconf -i && ./configure --enable-fftw --with-fftw-dir=/home/runner/work/hypar/fftw-3.3.10
     - name: make

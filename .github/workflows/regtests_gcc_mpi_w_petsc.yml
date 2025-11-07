@@ -1,4 +1,4 @@
-name: Tests w/PETSc - GCC + MPICH
+name: Tests w/PETSc - GCC + OpenMPI
 
 on: [push, pull_request]
 
@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: dependencies
-      run: source .github/workflows/dependencies/dependencies_mpich_petsc.sh
+      run: source .github/workflows/dependencies/dependencies_openmpi_petsc.sh
     - name: configure
       run: autoreconf -i && PETSC_DIR=/home/runner/work/hypar/petsc PETSC_ARCH=arch-linux-gcc ./configure
     - name: make
