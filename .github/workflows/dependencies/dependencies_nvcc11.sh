@@ -9,7 +9,7 @@ sudo apt-get install -y --no-install-recommends\
     ca-certificates \
     cmake
 
-sudo apt-get install -y --no-install-recommends gcc-10 g++10
+sudo apt-get install -y --no-install-recommends gcc-10 g++-10
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 1
 sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 1
 
