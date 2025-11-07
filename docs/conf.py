@@ -23,12 +23,15 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
+    "sphinx.ext.mathjax",
     "sphinx_autodoc_typehints",
 ]
 
 myst_enable_extensions = [
     "deflist",
     "colon_fence",
+    "dollarmath",
+    "amsmath",
 ]
 
 templates_path = ["_templates"]
