@@ -1,5 +1,4 @@
 name: Unit Tests - Interpolation Functions
-
 on: [push, pull_request]
 
 jobs:
