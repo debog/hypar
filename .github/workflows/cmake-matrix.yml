@@ -1,0 +1,64 @@
+name: CMake Build Matrix
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: "MPI (MPICH)"
+            cmake_options: ""
+            deps: "mpich libmpich-dev"
+
+          - name: "MPI (OpenMPI)"
+            cmake_options: ""
+            deps: "openmpi-bin libopenmpi-dev"
+
+          - name: "MPI + OpenMP"
+            cmake_options: "-DENABLE_OMP=ON"
+            deps: "openmpi-bin libopenmpi-dev"
+
+          - name: "MPI + ScaLAPACK"
+            cmake_options: "-DENABLE_SCALAPACK=ON"
+            deps: "openmpi-bin libopenmpi-dev libblas-dev liblapack-dev libscalapack-mpi-dev"
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install CMake
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake
+
+    - name: Install dependencies
+      if: matrix.config.deps != ''
+      run: |
+        sudo apt-get install -y --no-install-recommends \
+          build-essential g++ gfortran ${{ matrix.config.deps }}
+
+    - name: Check ScaLAPACK installation
+      if: contains(matrix.config.cmake_options, 'SCALAPACK')
+      run: |
+        echo "Checking for ScaLAPACK libraries..."
+        find /usr/lib -name "*scalapack*" 2>/dev/null || echo "No scalapack in /usr/lib"
+        find /usr/lib/x86_64-linux-gnu -name "*scalapack*" 2>/dev/null || echo "No scalapack in /usr/lib/x86_64-linux-gnu"
+        dpkg -L libscalapack-mpi-dev 2>/dev/null | grep "\.so" || echo "Package files not found"
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake ${{ matrix.config.cmake_options }} -DCMAKE_BUILD_TYPE=Release ..
+
+    - name: Build
+      run: cmake --build build -j$(nproc)
+
+    - name: Verify executable
+      run: |
+        test -f build/src/HyPar
+        echo "${{ matrix.config.name }} build successful"

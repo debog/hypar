@@ -1,0 +1,152 @@
+name: CMake Builds
+
+on: [push, pull_request]
+
+jobs:
+  serial:
+    name: Serial Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install CMake
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake -DENABLE_SERIAL=ON -DCMAKE_BUILD_TYPE=Release ..
+    - name: Build
+      run: cmake --build build -j$(nproc)
+    - name: Verify executable
+      run: |
+        test -f build/src/HyPar
+        echo "Serial build successful"
+
+  petsc:
+    name: OpenMPI + PETSc
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          build-essential cmake g++ gfortran openmpi-bin libopenmpi-dev \
+          libblas-dev liblapack-dev
+    - name: Build PETSc
+      run: |
+        for i in {1..5}; do
+          git clone --depth=1 -b release https://gitlab.com/petsc/petsc.git ../petsc && break
+          echo "Clone failed, retrying ($i/5)..."
+          sleep 10
+        done
+        cd ../petsc
+        export PETSC_DIR=$PWD
+        export PETSC_ARCH=arch-linux-gcc
+        ./configure --with-cc=mpicc --with-fc=mpif90 --with-cxx=mpicxx --with-shared-libraries --with-debugging=0
+        make -j4 all
+    - name: Configure CMake
+      run: |
+        export PETSC_DIR=/home/runner/work/hypar/petsc
+        export PETSC_ARCH=arch-linux-gcc
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release ..
+    - name: Build
+      run: |
+        export PETSC_DIR=/home/runner/work/hypar/petsc
+        export PETSC_ARCH=arch-linux-gcc
+        cmake --build build -j$(nproc)
+    - name: Verify executable
+      run: |
+        test -f build/src/HyPar
+        echo "PETSc build successful"
+
+  fftw:
+    name: OpenMPI + FFTW
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          build-essential cmake g++ gfortran openmpi-bin libopenmpi-dev wget
+    - name: Build FFTW
+      run: |
+        cd ../
+        wget https://www.fftw.org/fftw-3.3.10.tar.gz
+        tar xzf fftw-3.3.10.tar.gz
+        rm -rf fftw-3.3.10.tar.gz
+        cd fftw-3.3.10
+        CC=mpicc MPICC=mpicc ./configure --enable-mpi --disable-fortran --prefix=$PWD
+        make -j4
+        make install
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake -DENABLE_FFTW=ON -DCMAKE_BUILD_TYPE=Release ..
+      env:
+        PKG_CONFIG_PATH: /home/runner/work/hypar/fftw-3.3.10/lib/pkgconfig
+    - name: Build
+      run: cmake --build build -j$(nproc)
+    - name: Verify executable
+      run: |
+        test -f build/src/HyPar
+        echo "FFTW build successful"
+
+  cuda:
+    name: MPICH + CUDA
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install base dependencies
+      run: |
+        sudo apt-get -qqq update
+        sudo apt-get install -y --no-install-recommends \
+          build-essential ca-certificates cmake
+    - name: Install GCC 10
+      run: |
+        sudo apt-get install -y --no-install-recommends gcc-10 g++-10
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
+    - name: Install MPI
+      run: |
+        sudo apt-get install -y --no-install-recommends \
+          mpich libmpich-dev gnupg pkg-config wget
+    - name: Install CUDA Toolkit
+      run: |
+        wget -q https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
+        sudo dpkg -i cuda-keyring_1.0-1_all.deb
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          cuda-command-line-tools-11-2 cuda-compiler-11-2 cuda-cupti-dev-11-2 \
+          cuda-minimal-build-11-2 cuda-nvml-dev-11-2 cuda-nvtx-11-2 libcurand-dev-11-2 || exit 1
+        sudo ln -sf cuda-11.2 /usr/local/cuda || exit 1
+        ls -la /usr/local/cuda/bin/nvcc || exit 1
+    - name: Verify CUDA installation
+      run: |
+        /usr/local/cuda/bin/nvcc --version
+        ls -la /usr/local/cuda/bin/
+    - name: Configure CMake
+      run: |
+        export PATH=/usr/local/cuda/bin:/usr/bin:/bin:$PATH
+        /bin/mkdir build
+        cd build
+        cmake -DENABLE_CUDA=ON -DCUDAToolkit_ROOT=/usr/local/cuda \
+          -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
+          -DCMAKE_CUDA_ARCHITECTURES=70 -DCMAKE_BUILD_TYPE=Release ..
+    - name: Build
+      run: |
+        export PATH=/usr/local/cuda/bin:/usr/bin:/bin:$PATH
+        cmake --build build -j2
+      timeout-minutes: 30
+    - name: Verify executable
+      run: |
+        export PATH=/usr/bin:/bin:$PATH
+        test -f build/src/HyPar
+        file build/src/HyPar
+        echo "CUDA build successful"

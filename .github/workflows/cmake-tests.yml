@@ -1,0 +1,86 @@
+name: CMake Tests
+
+on: [push, pull_request]
+
+jobs:
+  fftw:
+    name: OpenMPI w/ FFTW
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          build-essential cmake g++ gfortran openmpi-bin libopenmpi-dev wget
+    - name: Build FFTW
+      run: |
+        cd ../
+        wget https://www.fftw.org/fftw-3.3.10.tar.gz
+        tar xzf fftw-3.3.10.tar.gz
+        rm -rf fftw-3.3.10.tar.gz
+        cd fftw-3.3.10
+        CC=mpicc MPICC=mpicc ./configure --enable-mpi --disable-fortran --prefix=$PWD
+        make -j4
+        make install
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake -DENABLE_FFTW=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE ..
+      env:
+        PKG_CONFIG_PATH: /home/runner/work/hypar/fftw-3.3.10/lib/pkgconfig
+    - name: Build and Install
+      run: |
+        cmake --build build -j4
+        cmake --install build
+    - name: Run tests
+      run: |
+        cd ../
+        export HYPAR_DIR=$GITHUB_WORKSPACE
+        $HYPAR_DIR/.github/workflows/tests/test_mpi.sh
+
+  petsc:
+    name: OpenMPI w/ PETSc
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          build-essential cmake g++ gfortran openmpi-bin libopenmpi-dev \
+          libblas-dev liblapack-dev
+    - name: Build PETSc
+      run: |
+        for i in {1..5}; do
+          git clone --depth=1 -b release https://gitlab.com/petsc/petsc.git ../petsc && break
+          echo "Clone failed, retrying ($i/5)..."
+          sleep 10
+        done
+        cd ../petsc
+        export PETSC_DIR=$PWD
+        export PETSC_ARCH=arch-linux-gcc
+        ./configure --with-cc=mpicc --with-fc=mpif90 --with-cxx=mpicxx --with-shared-libraries --with-debugging=0
+        make -j4 all
+    - name: Configure CMake
+      run: |
+        export PETSC_DIR=/home/runner/work/hypar/petsc
+        export PETSC_ARCH=arch-linux-gcc
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE ..
+    - name: Build and Install
+      run: |
+        export PETSC_DIR=/home/runner/work/hypar/petsc
+        export PETSC_ARCH=arch-linux-gcc
+        cmake --build build -j4
+        cmake --install build
+    - name: Run tests
+      run: |
+        cd ../
+        export HYPAR_DIR=$GITHUB_WORKSPACE
+        export PETSC_DIR=/home/runner/work/hypar/petsc
+        export PETSC_ARCH=arch-linux-gcc
+        export LD_LIBRARY_PATH=/home/runner/work/hypar/petsc/arch-linux-gcc/lib:$LD_LIBRARY_PATH
+        $HYPAR_DIR/.github/workflows/tests/test_mpi_w_petsc.sh
