@@ -8,23 +8,23 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential autoconf automake libtool
-    
+
     - name: Configure (Serial Mode)
       run: |
         autoreconf -i
         ./configure --enable-serial
-    
+
     - name: Build
       run: make -j$(nproc)
-    
+
     - name: Run Unit Tests
       run: make check
-    
+
     - name: Display test results
       if: always()
       run: |
@@ -43,21 +43,21 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Install dependencies
       run: .github/workflows/dependencies/dependencies_mpich.sh
-    
+
     - name: Configure (MPI Mode)
       run: |
         autoreconf -i
         ./configure
-    
+
     - name: Build
       run: make -j$(nproc)
-    
+
     - name: Run Unit Tests
       run: make check
-    
+
     - name: Display test results
       if: always()
       run: |
