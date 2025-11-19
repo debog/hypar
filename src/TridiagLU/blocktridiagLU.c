@@ -237,8 +237,9 @@ int blocktridiagLU(
 #ifndef serial
   if (nproc > 1) {
     double *zero, *eye;
-    zero = (double*) calloc (ns*bs2, sizeof(double));
-    eye  = (double*) calloc (ns*bs2, sizeof(double));
+    size_t alloc_size = (size_t)ns * (size_t)bs2;
+    zero = (double*) calloc (alloc_size, sizeof(double));
+    eye  = (double*) calloc (alloc_size, sizeof(double));
     for (d=0; d<ns*bs2; d++) zero[d] = eye[d] = 0.0;
     for (d=0; d<ns; d++) {
       for (i=0; i<bs; i++) eye[d*bs2+(i*bs+i)] = 1.0;
