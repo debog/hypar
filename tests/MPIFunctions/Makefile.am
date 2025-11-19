@@ -9,5 +9,3 @@ test_mpi_parallel_LDADD = \
   $(top_builddir)/src/CommonFunctions/libCommonFunctions.a
 
 TESTS = run_mpi_test.sh
-
-EXTRA_DIST = run_mpi_test.sh test_mpi.c
