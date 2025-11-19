@@ -80,4 +80,7 @@ jobs:
       run: |
         cd ../
         export HYPAR_DIR=$GITHUB_WORKSPACE
+        export PETSC_DIR=/home/runner/work/hypar/petsc
+        export PETSC_ARCH=arch-linux-gcc
+        export LD_LIBRARY_PATH=/home/runner/work/hypar/petsc/arch-linux-gcc/lib:$LD_LIBRARY_PATH
         $HYPAR_DIR/.github/workflows/tests/test_mpi_w_petsc.sh
