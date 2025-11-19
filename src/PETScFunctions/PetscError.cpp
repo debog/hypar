@@ -117,8 +117,8 @@ int PetscTimeError(TS  ts /*!< Time integrator object of PETSc type TS */)
       if (!mpi->rank) {
         std::string fname = "glm_err";
         if (nsims > 1) {
-          char idx_string[10];
-          sprintf(idx_string, "%3d", ns);
+          char idx_string[16];
+          snprintf(idx_string, sizeof(idx_string), "%3d", ns);
           fname += ("_" + std::string(idx_string));
         }
         fname += ".dat";
