@@ -49,7 +49,7 @@ for cmd in "${MPI_COMMANDS[@]}"; do
         echo "✓ Found: $cmd"
         full_path=$(command -v "$cmd" 2>/dev/null || echo "$cmd")
         echo "  Path: $full_path"
-        
+
         # Try to get version
         version_output=$("$cmd" --version 2>&1 || echo "Unable to get version")
         echo "  Version info: $(echo "$version_output" | head -n 1)"
@@ -68,14 +68,14 @@ for cmd in "${MPI_COMMANDS[@]}"; do
         for flags in "${FLAGS_TO_TRY[@]}"; do
             echo "----------------------------------------"
             echo "Trying: $cmd $flags -n 2 ./test_mpi_parallel"
-            
+
             output=$($cmd $flags -n 2 ./test_mpi_parallel 2>&1)
             exit_code=$?
-            
+
             echo "Output:"
             echo "$output"
             echo "Exit code: $exit_code"
-            
+
             if [ $exit_code -eq 0 ]; then
                 echo "SUCCESS: Test passed with '$cmd $flags'"
                 test_passed=1
