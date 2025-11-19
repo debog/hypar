@@ -1,3 +1,3 @@
-SUBDIRS = InterpolationFunctions ArrayFunctions FirstDerivative SecondDerivative TridiagLU CommonFunctions LimiterFunctions MathFunctions
+SUBDIRS = InterpolationFunctions ArrayFunctions FirstDerivative SecondDerivative TridiagLU CommonFunctions LimiterFunctions MathFunctions MPIFunctions
 
 EXTRA_DIST =

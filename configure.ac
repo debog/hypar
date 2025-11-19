@@ -347,6 +347,7 @@ AC_CONFIG_FILES([
  tests/CommonFunctions/Makefile
  tests/LimiterFunctions/Makefile
  tests/MathFunctions/Makefile
+ tests/MPIFunctions/Makefile
 ])
 
 AC_OUTPUT

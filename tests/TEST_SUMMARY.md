@@ -16,7 +16,8 @@ This document provides a comprehensive summary of all unit tests implemented for
 | **CommonFunctions** | 4 | 158 | ✅ All Pass |
 | **LimiterFunctions** | 5 | 255 | ✅ All Pass |
 | **MathFunctions** | 8 | 404 | ✅ All Pass |
-| **TOTAL** | **43** | **2,317** | **✅ 43/43 Pass** |
+| **MPIFunctions** | 15 | 515 | ✅ All Pass |
+| **TOTAL** | **58** | **2,832** | **✅ 58/58 Pass** |
 
 ## Files Created
 

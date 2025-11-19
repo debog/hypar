@@ -7,6 +7,7 @@ test_tridiag
 test_common
 test_limiters
 test_math
+test_mpi
 *_test
 
 # Autotools generated files
