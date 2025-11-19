@@ -34,13 +34,13 @@ void print_test_result(TestStats *stats, const char *test_name, int result) {
 /* Test MinMod limiter */
 int test_minmod_limiter() {
   int test_result = TEST_PASS;
-  
+
   /* MinMod properties:
    * phi(r) = max(0, min(1, r)) for r > 0
    * phi(r) = 0 for r <= 0 */
-  
+
   double r, phi, expected;
-  
+
   /* Test 1: r = 0.5 */
   r = 0.5;
   phi = LimiterMinMod(r);
@@ -49,7 +49,7 @@ int test_minmod_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   /* Test 2: r = 1.5 */
   r = 1.5;
   phi = LimiterMinMod(r);
@@ -58,7 +58,7 @@ int test_minmod_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   /* Test 3: r = -0.5 (opposite signs) */
   r = -0.5;
   phi = LimiterMinMod(r);
@@ -67,7 +67,7 @@ int test_minmod_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   /* Test 4: r = 1.0 */
   r = 1.0;
   phi = LimiterMinMod(r);
@@ -76,19 +76,19 @@ int test_minmod_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   return test_result;
 }
 
 /* Test van Leer limiter */
 int test_vanleer_limiter() {
   int test_result = TEST_PASS;
-  
+
   /* van Leer: phi(r) = (r + |r|) / (1 + |r|) for r > 0
    *           phi(r) = 0 for r <= 0 */
-  
+
   double r, phi, expected;
-  
+
   /* Test 1: r = 1.0 */
   r = 1.0;
   phi = LimiterVanLeer(r);
@@ -97,7 +97,7 @@ int test_vanleer_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   /* Test 2: r = 0.5 */
   r = 0.5;
   phi = LimiterVanLeer(r);
@@ -106,7 +106,7 @@ int test_vanleer_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   /* Test 3: r = 2.0 */
   r = 2.0;
   phi = LimiterVanLeer(r);
@@ -115,7 +115,7 @@ int test_vanleer_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   /* Test 4: r = -1.0 */
   r = -1.0;
   phi = LimiterVanLeer(r);
@@ -124,18 +124,18 @@ int test_vanleer_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   return test_result;
 }
 
 /* Test SuperBee limiter */
 int test_superbee_limiter() {
   int test_result = TEST_PASS;
-  
+
   /* SuperBee: phi(r) = max(0, min(2r, 1), min(r, 2)) */
-  
+
   double r, phi, expected;
-  
+
   /* Test 1: r = 0.5 */
   r = 0.5;
   phi = LimiterSuperBee(r);
@@ -144,7 +144,7 @@ int test_superbee_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   /* Test 2: r = 1.0 */
   r = 1.0;
   phi = LimiterSuperBee(r);
@@ -153,7 +153,7 @@ int test_superbee_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   /* Test 3: r = 2.0 */
   r = 2.0;
   phi = LimiterSuperBee(r);
@@ -162,7 +162,7 @@ int test_superbee_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   /* Test 4: r = -0.5 */
   r = -0.5;
   phi = LimiterSuperBee(r);
@@ -171,18 +171,18 @@ int test_superbee_limiter() {
     printf("    r=%.2f: expected %.4f, got %.4f\n", r, expected, phi);
     test_result = TEST_FAIL;
   }
-  
+
   return test_result;
 }
 
 /* Test limiter properties: monotonicity */
 int test_limiter_monotonicity() {
   int test_result = TEST_PASS;
-  
+
   /* Test that limiters are monotone: phi(r) should increase with r for r > 0 */
   double r_values[] = {0.1, 0.5, 1.0, 1.5, 2.0, 3.0};
   int n = 6;
-  
+
   /* MinMod */
   for (int i = 0; i < n-1; i++) {
     double phi1 = LimiterMinMod(r_values[i]);
@@ -193,7 +193,7 @@ int test_limiter_monotonicity() {
       test_result = TEST_FAIL;
     }
   }
-  
+
   /* van Leer */
   for (int i = 0; i < n-1; i++) {
     double phi1 = LimiterVanLeer(r_values[i]);
@@ -204,34 +204,34 @@ int test_limiter_monotonicity() {
       test_result = TEST_FAIL;
     }
   }
-  
+
   return test_result;
 }
 
 /* Test limiter bounds: 0 <= phi(r) <= 2r and 0 <= phi(r) <= 2 */
 int test_limiter_bounds() {
   int test_result = TEST_PASS;
-  
+
   double r_values[] = {0.1, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0};
   int n = 7;
-  
+
   for (int i = 0; i < n; i++) {
     double r = r_values[i];
-    
+
     /* Test MinMod */
     double phi = LimiterMinMod(r);
     if (phi < -TOLERANCE || phi > 2.0 * r + TOLERANCE || phi > 2.0 + TOLERANCE) {
       printf("    MinMod violates bounds at r=%.2f: phi=%.4f\n", r, phi);
       test_result = TEST_FAIL;
     }
-    
+
     /* Test van Leer */
     phi = LimiterVanLeer(r);
     if (phi < -TOLERANCE || phi > 2.0 * r + TOLERANCE || phi > 2.0 + TOLERANCE) {
       printf("    VanLeer violates bounds at r=%.2f: phi=%.4f\n", r, phi);
       test_result = TEST_FAIL;
     }
-    
+
     /* Test SuperBee */
     phi = LimiterSuperBee(r);
     if (phi < -TOLERANCE || phi > 2.0 * r + TOLERANCE || phi > 2.0 + TOLERANCE) {
@@ -239,37 +239,37 @@ int test_limiter_bounds() {
       test_result = TEST_FAIL;
     }
   }
-  
+
   return test_result;
 }
 
 /* Main test runner */
 int main(int argc, char *argv[]) {
   TestStats stats = {0, 0, ""};
-  
+
   printf("========================================\n");
   printf("Limiter Functions Unit Tests\n");
   printf("========================================\n\n");
-  
+
   printf("Testing Individual Limiters:\n");
   print_test_result(&stats, "MinMod Limiter", test_minmod_limiter());
   print_test_result(&stats, "van Leer Limiter", test_vanleer_limiter());
   print_test_result(&stats, "SuperBee Limiter", test_superbee_limiter());
-  
+
   printf("\nTesting Limiter Properties:\n");
   print_test_result(&stats, "Monotonicity", test_limiter_monotonicity());
   print_test_result(&stats, "TVD Bounds", test_limiter_bounds());
-  
+
   printf("\n========================================\n");
   printf("Test Results:\n");
   printf("  Passed: %d\n", stats.passed);
   printf("  Failed: %d\n", stats.failed);
   printf("========================================\n");
-  
+
   if (stats.failed > 0) {
     printf("\nLast failed test: %s\n", stats.last_test);
     return 1;
   }
-  
+
   return 0;
 }

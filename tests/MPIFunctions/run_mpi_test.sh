@@ -23,7 +23,7 @@ if [ -f ./test_mpi ]; then
     echo "========================================="
     $MPI_CMD -n 1 ./test_mpi
     SERIAL_RESULT=$?
-    
+
     # Return failure if either test failed
     if [ $TEST_RESULT -ne 0 ] || [ $SERIAL_RESULT -ne 0 ]; then
         exit 1
