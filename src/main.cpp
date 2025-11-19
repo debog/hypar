@@ -59,8 +59,9 @@
 
   Documentation
   -------------
-  To generate a local copy of this documentation, run "doxygen Doxyfile" in $(root_dir). The folder $(root_dir)/doc
-  should contain the generated documentation in HTML format.
+  + Online documentation: https://hypar.readthedocs.io/en/latest/
+  + To generate a local copy of this documentation, run "doxygen Doxyfile" in $(root_dir). The folder $(root_dir)/doc
+    should contain the generated documentation in HTML format.
 
   Compiling
   ---------

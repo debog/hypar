@@ -13,6 +13,7 @@ Documentation
 -------------
 
 See documentation on how to compile and run along with examples:
-http://hypar.github.io/
++ https://hypar.readthedocs.io/en/latest/
++ http://hypar.github.io/
 
 
