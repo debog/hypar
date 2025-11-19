@@ -58,8 +58,8 @@ jobs:
 
     - name: Configure CMake
       run: |
-        export PATH=/usr/local/cuda/bin:$PATH
-        mkdir build
+        export PATH=/usr/local/cuda/bin:/usr/bin:/bin:$PATH
+        /bin/mkdir build
         cd build
         cmake \
           -DENABLE_CUDA=ON \
@@ -74,11 +74,12 @@ jobs:
 
     - name: Build
       run: |
-        export PATH=/usr/local/cuda/bin:$PATH
+        export PATH=/usr/local/cuda/bin:/usr/bin:/bin:$PATH
         cmake --build build --verbose -j$(nproc)
 
     - name: Verify executable and libraries
       run: |
+        export PATH=/usr/bin:/bin:$PATH
         test -f build/src/HyPar
         file build/src/HyPar
         ldd build/src/HyPar | grep cuda || echo "CUDA runtime linked"
@@ -86,6 +87,7 @@ jobs:
 
     - name: Check CUDA object files
       run: |
+        export PATH=/usr/bin:/bin:$PATH
         find build -name "*.o" -type f | head -10
         echo "Build completed with CUDA support"
         echo "Note: Executable cannot run on CI (no GPU hardware available)"

@@ -55,7 +55,8 @@ jobs:
 
     - name: Configure CMake
       run: |
-        mkdir build
+        export PATH=/usr/local/cuda/bin:/usr/bin:/bin:$PATH
+        /bin/mkdir build
         cd build
         cmake \
           -DENABLE_CUDA=ON \
@@ -65,10 +66,13 @@ jobs:
           ..
 
     - name: Build
-      run: cmake --build build -j$(nproc)
+      run: |
+        export PATH=/usr/local/cuda/bin:/usr/bin:/bin:$PATH
+        cmake --build build -j$(nproc)
 
     - name: Verify executable
       run: |
+        export PATH=/usr/bin:/bin:$PATH
         test -f build/src/HyPar
         file build/src/HyPar
         echo "HyPar with CUDA built successfully"
