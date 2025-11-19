@@ -1,0 +1,37 @@
+name: CMake Build Types
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build Type - ${{ matrix.build_type }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release, RelWithDebInfo]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          build-essential cmake g++ gfortran openmpi-bin libopenmpi-dev
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} ..
+
+    - name: Build
+      run: cmake --build build -j$(nproc)
+
+    - name: Verify executable
+      run: |
+        test -f build/src/HyPar
+        file build/src/HyPar
+        echo "${{ matrix.build_type }} build successful"

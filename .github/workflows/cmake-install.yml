@@ -1,0 +1,38 @@
+name: CMake Build and Install
+
+on: [push, pull_request]
+
+jobs:
+  build-and-install:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          build-essential cmake g++ gfortran openmpi-bin libopenmpi-dev
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/hypar-install ..
+
+    - name: Build
+      run: cmake --build build -j$(nproc)
+
+    - name: Install
+      run: cmake --install build
+
+    - name: Verify installation
+      run: |
+        test -f $HOME/hypar-install/bin/HyPar
+        test -d $HOME/hypar-install/include
+        test -f $HOME/hypar-install/share/doc/hypar/README.md
+        echo "Installation successful"
+        ls -la $HOME/hypar-install/bin/
+        ls -la $HOME/hypar-install/include/ | head -20

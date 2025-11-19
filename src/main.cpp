@@ -66,7 +66,59 @@
   Compiling
   ---------
 
-  To compile HyPar, follow these steps in the root directory:
+  HyPar supports two build systems: <B>GNU Autotools</B> (traditional) and <B>CMake</B> (modern).
+
+  \b Compiling \b with \b CMake \b (Recommended):
+
+  CMake provides a modern build system with automatic dependency detection. To compile HyPar with CMake, follow these
+  steps in the root directory:
+
+        mkdir build
+        cd build
+        cmake [options] ..
+        cmake --build . -j$(nproc)
+
+  The executable will be created at \a build/src/HyPar.
+
+  \b CMake \b Options:
+  + \b -DENABLE_SERIAL=ON: Compile a serial version without MPI.
+  + \b -DENABLE_OMP=ON: Enable OpenMP threads.
+  + \b -DENABLE_CUDA=ON: Enable CUDA if NVidia GPU present.
+  + \b -DENABLE_SCALAPACK=ON: Enable ScaLAPACK.
+  + \b -DENABLE_FFTW=ON: Enable FFTW (*needs MPI*).
+  + \b -DENABLE_PYTHON=ON: Enable Python interface.
+  + \b -DCUDAToolkit_ROOT=/path/to/cuda: Specify CUDA installation path.
+  + \b -DCMAKE_INSTALL_PREFIX=/path/to/install: Specify installation directory.
+  + \b -DCMAKE_BUILD_TYPE=Release: Set build type (Debug, Release, RelWithDebInfo, MinSizeRel).
+
+  \b CMake \b Examples:
+
+  Serial build:
+
+        mkdir build && cd build
+        cmake -DENABLE_SERIAL=ON ..
+        cmake --build . -j$(nproc)
+
+  Parallel build with CUDA and OpenMP:
+
+        mkdir build && cd build
+        cmake -DENABLE_CUDA=ON -DENABLE_OMP=ON ..
+        cmake --build . -j$(nproc)
+
+  Full-featured build with PETSc and libROM:
+
+        export PETSC_DIR=/path/to/petsc
+        export PETSC_ARCH=arch-linux-c-opt
+        export LIBROM_DIR=/path/to/librom
+        mkdir build && cd build
+        cmake -DENABLE_CUDA=ON -DENABLE_OMP=ON -DENABLE_FFTW=ON -DENABLE_SCALAPACK=ON ..
+        cmake --build . -j$(nproc)
+
+  For detailed CMake options, see CMAKE.md in the repository root.
+
+  \b Compiling \b with \b Autotools:
+
+  To compile HyPar with Autotools, follow these steps in the root directory:
 
         autoreconf -i
         [CFLAGS="..."] [CXXFLAGS="..."] ./configure [options]
@@ -77,6 +129,8 @@
 
   \b Note: Default installation target is its own directory, and thus "make install" should not require
            administrative privileges. The binary will be placed in \a bin/ subdirectory.
+
+  \b Autotools \b Options:
 
   The configure options can include options such as BLAS/LAPACK location, MPI directory, etc. Type "./configure --help"
   to see a full list. The options specific to HyPar are:
