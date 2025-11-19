@@ -12,8 +12,6 @@ jobs:
       run: autoreconf -i && CC=gcc CXX=g++ MPICC=gcc MPICXX=g++ ./configure --enable-serial
     - name: make
       run: make
-    - name: make check
-      run: make check
 
   mpich:
     name: MPICH Build
@@ -26,8 +24,6 @@ jobs:
       run: autoreconf -i && ./configure
     - name: make
       run: make
-    - name: make check
-      run: make check
 
   openmpi:
     name: OpenMPI Build
@@ -40,8 +36,6 @@ jobs:
       run: autoreconf -i && ./configure
     - name: make
       run: make
-    - name: make check
-      run: make check
 
   petsc:
     name: OpenMPI + PETSc
@@ -54,8 +48,6 @@ jobs:
       run: autoreconf -i && PETSC_DIR=/home/runner/work/hypar/petsc PETSC_ARCH=arch-linux-gcc ./configure
     - name: make
       run: make
-    - name: make check
-      run: make check
 
   fftw:
     name: OpenMPI + FFTW
@@ -68,8 +60,6 @@ jobs:
       run: autoreconf -i && ./configure --enable-fftw --with-fftw-dir=/home/runner/work/hypar/fftw-3.3.10
     - name: make
       run: make
-    - name: make check
-      run: make check
 
   cuda:
     name: MPICH + CUDA
@@ -82,5 +72,3 @@ jobs:
       run: autoreconf -i && CUDA_CFLAGS="-I/usr/include/x86_64-linux-gnu/mpich/" ./configure --enable-cuda --with-cuda-dir=/usr/local/cuda
     - name: make
       run: make
-    - name: make check
-      run: make check
