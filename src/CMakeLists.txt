@@ -18,7 +18,7 @@ function(add_hypar_library_with_cuda lib_name source_dir)
         add_library(${lib_name} STATIC ${sources})
         target_include_directories(${lib_name} PRIVATE ${CMAKE_SOURCE_DIR}/include)
     endif()
-    
+
     if(ENABLE_CUDA)
         file(GLOB_RECURSE cuda_c_sources "${source_dir}/*_GPU.c")
         if(cuda_c_sources)

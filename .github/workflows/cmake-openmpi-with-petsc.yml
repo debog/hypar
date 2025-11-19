@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -18,7 +18,7 @@ jobs:
           cmake \
           g++ gfortran openmpi-bin libopenmpi-dev \
           libblas-dev liblapack-dev
-    
+
     - name: Build PETSc
       run: |
         for i in {1..5}; do
@@ -31,7 +31,7 @@ jobs:
         export PETSC_ARCH=arch-linux-gcc
         ./configure --with-cc=mpicc --with-fc=mpif90 --with-cxx=mpicxx --with-shared-libraries --with-debugging=0
         make -j4 all
-    
+
     - name: Configure CMake
       run: |
         export PETSC_DIR=/home/runner/work/hypar/petsc
@@ -39,13 +39,13 @@ jobs:
         mkdir build
         cd build
         cmake -DCMAKE_BUILD_TYPE=Release ..
-    
+
     - name: Build
       run: |
         export PETSC_DIR=/home/runner/work/hypar/petsc
         export PETSC_ARCH=arch-linux-gcc
         cmake --build build -j$(nproc)
-    
+
     - name: Verify executable
       run: |
         test -f build/src/HyPar

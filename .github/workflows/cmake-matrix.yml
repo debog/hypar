@@ -6,7 +6,7 @@ jobs:
   build:
     name: ${{ matrix.config.name }}
     runs-on: ubuntu-latest
-    
+
     strategy:
       fail-fast: false
       matrix:
@@ -14,46 +14,46 @@ jobs:
           - name: "Serial"
             cmake_options: "-DENABLE_SERIAL=ON"
             deps: ""
-          
+
           - name: "MPI (MPICH)"
             cmake_options: ""
             deps: "mpich libmpich-dev"
-          
+
           - name: "MPI (OpenMPI)"
             cmake_options: ""
             deps: "openmpi-bin libopenmpi-dev"
-          
+
           - name: "MPI + OpenMP"
             cmake_options: "-DENABLE_OMP=ON"
             deps: "openmpi-bin libopenmpi-dev"
-          
+
           - name: "MPI + ScaLAPACK"
             cmake_options: "-DENABLE_SCALAPACK=ON"
             deps: "openmpi-bin libopenmpi-dev libblas-dev liblapack-dev libscalapack-mpi-dev"
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Install CMake
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake
-    
+
     - name: Install dependencies
       if: matrix.config.deps != ''
       run: |
         sudo apt-get install -y --no-install-recommends \
           build-essential g++ gfortran ${{ matrix.config.deps }}
-    
+
     - name: Configure CMake
       run: |
         mkdir build
         cd build
         cmake ${{ matrix.config.cmake_options }} -DCMAKE_BUILD_TYPE=Release ..
-    
+
     - name: Build
       run: cmake --build build -j$(nproc)
-    
+
     - name: Verify executable
       run: |
         test -f build/src/HyPar

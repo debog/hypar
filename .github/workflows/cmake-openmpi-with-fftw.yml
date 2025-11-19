@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -18,7 +18,7 @@ jobs:
           cmake \
           g++ gfortran openmpi-bin libopenmpi-dev \
           wget
-    
+
     - name: Build FFTW
       run: |
         cd ../
@@ -29,7 +29,7 @@ jobs:
         CC=mpicc MPICC=mpicc ./configure --enable-mpi --disable-fortran --prefix=$PWD
         make -j4
         make install
-    
+
     - name: Configure CMake
       run: |
         mkdir build
@@ -37,10 +37,10 @@ jobs:
         cmake -DENABLE_FFTW=ON -DCMAKE_BUILD_TYPE=Release ..
       env:
         PKG_CONFIG_PATH: /home/runner/work/hypar/fftw-3.3.10/lib/pkgconfig
-    
+
     - name: Build
       run: cmake --build build -j$(nproc)
-    
+
     - name: Verify executable
       run: |
         test -f build/src/HyPar

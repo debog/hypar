@@ -9,25 +9,25 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends \
           build-essential cmake g++ gfortran openmpi-bin libopenmpi-dev
-    
+
     - name: Configure CMake
       run: |
         mkdir build
         cd build
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/hypar-install ..
-    
+
     - name: Build
       run: cmake --build build -j$(nproc)
-    
+
     - name: Install
       run: cmake --install build
-    
+
     - name: Verify installation
       run: |
         test -f $HOME/hypar-install/bin/HyPar

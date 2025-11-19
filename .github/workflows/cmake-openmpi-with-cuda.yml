@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Install base dependencies
       run: |
         sudo apt-get -qqq update
@@ -17,7 +17,7 @@ jobs:
           build-essential \
           ca-certificates \
           cmake
-    
+
     - name: Install GCC 10 and MPI
       run: |
         sudo apt-get install -y --no-install-recommends \
@@ -27,7 +27,7 @@ jobs:
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
         sudo update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-10 100
-    
+
     - name: Install CUDA Toolkit 11.2
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
@@ -42,12 +42,12 @@ jobs:
           cuda-nvtx-11-2 \
           libcurand-dev-11-2
         sudo ln -sf cuda-11.2 /usr/local/cuda
-    
+
     - name: Verify CUDA installation
       run: |
         /usr/local/cuda/bin/nvcc --version
         which nvcc || echo "nvcc not in PATH, using /usr/local/cuda/bin/nvcc"
-    
+
     - name: Configure CMake with CUDA
       run: |
         mkdir build
@@ -60,12 +60,12 @@ jobs:
           ..
       env:
         PATH: /usr/local/cuda/bin:$PATH
-    
+
     - name: Build with CUDA
       run: |
         export PATH=/usr/local/cuda/bin:$PATH
         cmake --build build -j$(nproc)
-    
+
     - name: Verify CUDA-enabled executable
       run: |
         test -f build/src/HyPar

@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -17,16 +17,16 @@ jobs:
           build-essential \
           cmake \
           g++ gfortran openmpi-bin libopenmpi-dev
-    
+
     - name: Configure CMake
       run: |
         mkdir build
         cd build
         cmake -DENABLE_OMP=ON -DCMAKE_BUILD_TYPE=Release ..
-    
+
     - name: Build
       run: cmake --build build -j$(nproc)
-    
+
     - name: Verify executable
       run: |
         test -f build/src/HyPar

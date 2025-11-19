@@ -81,44 +81,44 @@ if(DEFINED ENV{PETSC_DIR} AND DEFINED ENV{PETSC_ARCH})
     if(EXISTS "$ENV{PETSC_DIR}")
         message(STATUS "Compiling with PETSc interface")
         add_compile_definitions(with_petsc)
-        
-        set(PETSC_MAKEFILE_CONTENT 
+
+        set(PETSC_MAKEFILE_CONTENT
 "PETSC_ARCH = $ENV{PETSC_ARCH}
 PETSC_DIR  = $ENV{PETSC_DIR}
 include \${PETSC_DIR}/lib/petsc/conf/variables
 include \${PETSC_DIR}/lib/petsc/conf/rules_util.mk
 ")
         file(WRITE "${CMAKE_BINARY_DIR}/petscmake.tmp" "${PETSC_MAKEFILE_CONTENT}")
-        
+
         execute_process(
             COMMAND make --no-print-directory -f ${CMAKE_BINARY_DIR}/petscmake.tmp getincludedirs
             OUTPUT_VARIABLE PETSC_INCLUDES
             OUTPUT_STRIP_TRAILING_WHITESPACE
             ERROR_QUIET
         )
-        
+
         execute_process(
             COMMAND make --no-print-directory -f ${CMAKE_BINARY_DIR}/petscmake.tmp getlinklibs
             OUTPUT_VARIABLE PETSC_LIBS
             OUTPUT_STRIP_TRAILING_WHITESPACE
             ERROR_QUIET
         )
-        
+
         file(REMOVE "${CMAKE_BINARY_DIR}/petscmake.tmp")
-        
+
         string(STRIP "${PETSC_INCLUDES}" PETSC_INCLUDES)
         string(STRIP "${PETSC_LIBS}" PETSC_LIBS)
-        
+
         separate_arguments(PETSC_INCLUDES_LIST UNIX_COMMAND "${PETSC_INCLUDES}")
         separate_arguments(PETSC_LIBS_LIST UNIX_COMMAND "${PETSC_LIBS}")
-        
+
         foreach(inc ${PETSC_INCLUDES_LIST})
             if(inc MATCHES "^-I")
                 string(SUBSTRING ${inc} 2 -1 inc_path)
                 include_directories(${inc_path})
             endif()
         endforeach()
-        
+
         foreach(lib ${PETSC_LIBS_LIST})
             if(lib MATCHES "^-L")
                 string(SUBSTRING ${lib} 2 -1 lib_path)
@@ -144,14 +144,14 @@ if(DEFINED ENV{LIBROM_DIR})
 endif()
 
 if(ENABLE_PYTHON)
-    if(DEFINED ENV{PYTHON_INCLUDE_PATH} AND DEFINED ENV{PYTHON_LIB_PATH} AND 
+    if(DEFINED ENV{PYTHON_INCLUDE_PATH} AND DEFINED ENV{PYTHON_LIB_PATH} AND
        DEFINED ENV{PYTHON_LIB_NAME} AND DEFINED ENV{PYTHON_BIN_PATH})
         message(STATUS "Compiling with Python features")
         add_compile_definitions(with_python)
         include_directories($ENV{PYTHON_INCLUDE_PATH})
         link_directories($ENV{PYTHON_LIB_PATH})
         link_libraries($ENV{PYTHON_LIB_NAME} util)
-        
+
         if(DEFINED ENV{NUMPY_INCLUDE_PATH})
             message(STATUS "Compiling with Python-numpy features")
             add_compile_definitions(with_python_numpy)
