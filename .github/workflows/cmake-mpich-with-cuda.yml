@@ -62,13 +62,15 @@ jobs:
           -DENABLE_CUDA=ON \
           -DCUDAToolkit_ROOT=/usr/local/cuda \
           -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
+          -DCMAKE_CUDA_ARCHITECTURES=70 \
           -DCMAKE_BUILD_TYPE=Release \
           ..
 
     - name: Build
       run: |
         export PATH=/usr/local/cuda/bin:/usr/bin:/bin:$PATH
-        cmake --build build -j$(nproc)
+        cmake --build build -j2
+      timeout-minutes: 30
 
     - name: Verify executable
       run: |
