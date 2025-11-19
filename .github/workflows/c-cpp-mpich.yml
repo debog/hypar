@@ -1,4 +1,4 @@
-name: Build - Linux GCC + MPICH
+name: Autotools Build - Linux GCC + MPICH
 
 on: [push, pull_request]
 

@@ -1,4 +1,4 @@
-name: Build - Linux GCC + OpenMPI w/ PETSc
+name: Autotools Build - Linux GCC + OpenMPI w/ PETSc
 
 on: [push, pull_request]
 

@@ -1,4 +1,4 @@
-name: Build - Linux GCC + MPICH + CUDA-NVCC11
+name: Autotools Build - Linux GCC + MPICH + CUDA-NVCC11
 
 on: [push, pull_request]
 

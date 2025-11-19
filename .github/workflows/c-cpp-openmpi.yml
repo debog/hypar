@@ -1,4 +1,4 @@
-name: Build - Linux GCC + OpenMPI
+name: Autotools Build - Linux GCC + OpenMPI
 
 on: [push, pull_request]
 

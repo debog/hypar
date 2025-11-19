@@ -1,4 +1,4 @@
-name: Build - Linux GCC Serial
+name: Autotools Build - Linux GCC Serial
 
 on: [push, pull_request]
 

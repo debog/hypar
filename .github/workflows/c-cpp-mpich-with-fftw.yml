@@ -1,4 +1,4 @@
-name: Build - Linux GCC + OpenMPI w/ FFTW-3.3.10
+name: Autotools Build - Linux GCC + OpenMPI w/ FFTW-3.3.10
 
 on: [push, pull_request]
 
