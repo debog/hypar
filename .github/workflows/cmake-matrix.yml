@@ -11,10 +11,6 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - name: "Serial"
-            cmake_options: "-DENABLE_SERIAL=ON"
-            deps: ""
-
           - name: "MPI (MPICH)"
             cmake_options: ""
             deps: "mpich libmpich-dev"

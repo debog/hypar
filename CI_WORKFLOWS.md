@@ -11,53 +11,41 @@ This document describes the GitHub Actions CI workflows that test HyPar CMake bu
 - No MPI dependencies
 - Minimal configuration
 
-### 2. cmake-mpich.yml
-**Purpose:** Tests parallel build with MPICH
+### 2. cmake-matrix.yml
+**Purpose:** Comprehensive matrix build testing
 **Configuration:**
-- Default parallel build (MPI auto-detected)
-- Uses MPICH implementation
-- Tests basic MPI functionality
+Tests multiple MPI configurations in parallel:
+- MPI with MPICH
+- MPI with OpenMPI
+- MPI + OpenMP
+- MPI + ScaLAPACK
 
-### 3. cmake-openmpi.yml
-**Purpose:** Tests parallel build with OpenMPI
-**Configuration:**
-- Default parallel build (MPI auto-detected)
-- Uses OpenMPI implementation
-- Alternative to MPICH for MPI testing
+This workflow provides broad coverage of different MPI-based build options.
 
-### 4. cmake-openmpi-with-petsc.yml
+### 3. cmake-openmpi-with-petsc.yml
 **Purpose:** Tests build with PETSc integration
 **Configuration:**
 - Builds PETSc from source
 - Sets PETSC_DIR and PETSC_ARCH environment variables
 - Tests CMake's automatic PETSc detection
 
-### 5. cmake-openmpi-with-fftw.yml
+### 4. cmake-openmpi-with-fftw.yml
 **Purpose:** Tests build with FFTW support
 **Configuration:**
 - Builds FFTW from source with MPI support
 - Enables FFTW option (`-DENABLE_FFTW=ON`)
 - Tests FFTW integration
 
-### 6. cmake-openmpi-with-openmp.yml
-**Purpose:** Tests build with OpenMP threading
+### 5. cmake-mpich-with-cuda.yml
+**Purpose:** Tests CUDA build with MPICH
 **Configuration:**
-- Enables OpenMP (`-DENABLE_OMP=ON`)
-- Tests hybrid MPI+OpenMP build
+- Installs CUDA Toolkit 11.2
+- Enables CUDA support (`-DENABLE_CUDA=ON`)
+- Uses GCC 10 for compatibility
+- Tests CUDA compilation (runtime requires GPU hardware)
+- Limited parallelism (-j2) to prevent memory issues
 
-### 7. cmake-matrix.yml
-**Purpose:** Comprehensive matrix build testing
-**Configuration:**
-Tests multiple configurations in parallel:
-- Serial build
-- MPI with MPICH
-- MPI with OpenMPI
-- MPI + OpenMP
-- MPI + ScaLAPACK
-
-This workflow provides broad coverage of different build options.
-
-### 8. cmake-build-types.yml
+### 6. cmake-build-types.yml
 **Purpose:** Tests different CMake build types
 **Configuration:**
 Tests three build types:
@@ -67,36 +55,12 @@ Tests three build types:
 
 Ensures the project builds correctly with different optimization levels.
 
-### 9. cmake-install.yml
+### 7. cmake-install.yml
 **Purpose:** Tests full build and installation process
 **Configuration:**
 - Builds with custom install prefix
 - Tests `cmake --install`
 - Verifies installed files (binary, headers, documentation)
-
-### 10. cmake-mpich-with-cuda.yml
-**Purpose:** Tests CUDA build with MPICH
-**Configuration:**
-- Installs CUDA Toolkit 11.2
-- Enables CUDA support (`-DENABLE_CUDA=ON`)
-- Uses GCC 10 for compatibility
-- Tests CUDA compilation (runtime requires GPU hardware)
-
-### 11. cmake-openmpi-with-cuda.yml
-**Purpose:** Tests CUDA build with OpenMPI
-**Configuration:**
-- Installs CUDA Toolkit 11.2
-- Enables CUDA support with OpenMPI
-- Uses GCC 10 for compatibility
-- Verifies CUDA libraries are linked
-
-### 12. cmake-cuda-compile-test.yml
-**Purpose:** Matrix test of multiple CUDA versions
-**Configuration:**
-- Tests CUDA 11.2 and 11.8
-- Matrix build for version compatibility
-- Verbose build output for debugging
-- Verifies CUDA object files are created
 
 ## Workflow Triggers
 
@@ -137,22 +101,32 @@ The CMake workflows provide equivalent coverage plus additional testing (matrix 
 
 ## Testing Strategy
 
-The workflows use a layered approach:
-1. **Basic builds** (serial, mpich, openmpi) - Test core functionality
-2. **Feature builds** (petsc, fftw, openmp) - Test optional features
-3. **CUDA builds** (mpich+cuda, openmpi+cuda, cuda matrix) - Test GPU compilation
-4. **Matrix build** - Comprehensive configuration coverage
-5. **Build types** - Test optimization levels
-6. **Installation** - Verify install process
+The workflows use an efficient layered approach:
+1. **Serial build** (`cmake-serial.yml`) - Tests non-MPI compilation
+2. **Matrix build** (`cmake-matrix.yml`) - Tests 4 MPI configurations in parallel
+3. **Feature builds** - Test complex integrations:
+   - PETSc (`cmake-openmpi-with-petsc.yml`)
+   - FFTW (`cmake-openmpi-with-fftw.yml`)
+   - CUDA (`cmake-mpich-with-cuda.yml`)
+4. **Build types** (`cmake-build-types.yml`) - Test Debug/Release optimization
+5. **Installation** (`cmake-install.yml`) - Verify install process
 
 ### CUDA Testing Notes
 
-CUDA workflows test compilation only, as GitHub Actions runners don't have GPU hardware:
-- Installs CUDA Toolkit (nvcc compiler and libraries)
+CUDA workflow tests compilation only, as GitHub Actions runners don't have GPU hardware:
+- Installs CUDA Toolkit 11.2 (nvcc compiler and libraries)
 - Compiles all CUDA source files (`.cu` files)
 - Verifies CUDA libraries are linked
+- Uses limited parallelism (-j2) to prevent memory issues
 - Cannot run the executable (requires actual GPU)
-- Tests multiple CUDA versions for compatibility
+
+### Workflow Optimization
+
+To minimize CI time and resource usage:
+- **Matrix builds** cover multiple configurations in one workflow
+- **Dedicated workflows** only for complex features (PETSc, FFTW, CUDA)
+- **Removed redundancies**: Single serial test, single CUDA test
+- **Total: 7 workflows** (reduced from 12) covering all features
 
 ## Adding New Workflows
 
