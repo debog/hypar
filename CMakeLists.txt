@@ -51,7 +51,9 @@ if(ENABLE_CUDA)
     enable_language(CUDA)
     find_package(CUDAToolkit REQUIRED)
     add_compile_definitions(HAVE_CUDA)
-    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -DHAVE_CUDA -lineinfo -Xptxas='-dlcm=ca -v'")
+    # Disable min/max macros that conflict with C++ std::min/std::max
+    add_compile_definitions(NOMINMAX)
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -DHAVE_CUDA -DNOMINMAX -lineinfo -Xptxas='-dlcm=ca -v'")
     link_libraries(CUDA::cudart)
 endif()
 
