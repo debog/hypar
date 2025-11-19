@@ -20,6 +20,7 @@ doc/html/
 doc/latex/
 doc/bib*
 doc/citelist*
+docs/_build/
 .deps
 stamp-h1
 *~
@@ -27,3 +28,4 @@ __pycache__
 .ipynb_checkpoints
 *.tmp
 doc/README
+.venv/
