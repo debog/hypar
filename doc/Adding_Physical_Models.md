@@ -687,7 +687,9 @@ double local_cfl = fabs(wave_speed) * dt * dxinv;
 
 ## Additional Resources
 
-- HyPar documentation: http://hypar.github.io/
+- HyPar documentation:
+  - https://hypar.readthedocs.io/en/latest/
+  - http://hypar.github.io/
 - Existing models: `src/PhysicalModels/` directory
 - Array functions: `include/arrayfunctions.h`
 - MPI functions: `include/mpivars.h`

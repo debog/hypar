@@ -128,7 +128,9 @@ This directory contains template files to help you implement a new physical mode
 
 - See `doc/Adding_Physical_Models.md` for detailed developer guide
 - Study existing models in `src/PhysicalModels/` for examples
-- HyPar documentation: http://hypar.github.io/
+- HyPar documentation:
+  - https://hypar.readthedocs.io/en/latest/
+  - http://hypar.github.io/
 
 ## Example Models to Study
 

@@ -1,0 +1,10 @@
+.name=.readthedocs.yaml
+version: 2
+
+sphinx:
+  configuration: docs/conf.py
+
+python:
+  version: 3.10
+  install:
+    - requirements: docs/requirements-docs.txt
