@@ -1,0 +1,75 @@
+name: CMake Build - Linux GCC + MPICH + CUDA
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install base dependencies
+      run: |
+        sudo apt-get -qqq update
+        sudo apt-get install -y --no-install-recommends \
+          build-essential \
+          ca-certificates \
+          cmake
+    
+    - name: Install GCC 10
+      run: |
+        sudo apt-get install -y --no-install-recommends gcc-10 g++-10
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
+    
+    - name: Install MPI
+      run: |
+        sudo apt-get install -y --no-install-recommends \
+          mpich libmpich-dev \
+          gnupg \
+          pkg-config \
+          wget
+    
+    - name: Install CUDA Toolkit
+      run: |
+        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
+        echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" \
+          | sudo tee /etc/apt/sources.list.d/cuda.list
+        sudo apt-get update
+        sudo apt-get install -y \
+          cuda-command-line-tools-11-2 \
+          cuda-compiler-11-2 \
+          cuda-cupti-dev-11-2 \
+          cuda-minimal-build-11-2 \
+          cuda-nvml-dev-11-2 \
+          cuda-nvtx-11-2 \
+          libcurand-dev-11-2
+        sudo ln -s cuda-11.2 /usr/local/cuda
+    
+    - name: Verify CUDA installation
+      run: |
+        /usr/local/cuda/bin/nvcc --version
+        ls -la /usr/local/cuda/bin/
+    
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake \
+          -DENABLE_CUDA=ON \
+          -DCUDAToolkit_ROOT=/usr/local/cuda \
+          -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
+          -DCMAKE_BUILD_TYPE=Release \
+          ..
+    
+    - name: Build
+      run: cmake --build build -j$(nproc)
+    
+    - name: Verify executable
+      run: |
+        test -f build/src/HyPar
+        file build/src/HyPar
+        echo "HyPar with CUDA built successfully"
+        echo "Note: Executable cannot run on CI (no GPU available)"
