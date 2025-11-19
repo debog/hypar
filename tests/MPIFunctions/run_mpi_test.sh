@@ -1,50 +1,98 @@
 #!/bin/bash
 # Wrapper script to run MPI test with 2 ranks
 
-set -e  # Exit on error
+# Don't exit on error - we want to try all commands
+set +e
+
+echo "=== MPI Test Runner ==="
+echo "Current directory: $(pwd)"
+echo "Date: $(date)"
+echo ""
 
 # Check if test executable exists
 if [ ! -f ./test_mpi_parallel ]; then
-    echo "Error: test_mpi_parallel executable not found in $(pwd)"
+    echo "ERROR: test_mpi_parallel executable not found"
+    echo "Contents of current directory:"
+    ls -la
     exit 1
 fi
 
-# Try to find MPI executable in common locations
-MPI_CMD=""
-MPI_FLAGS=""
+echo "Found test executable: ./test_mpi_parallel"
+echo ""
 
-# First try standard commands
-if command -v mpirun &> /dev/null; then
-    MPI_CMD="mpirun"
-    # Check if this is OpenMPI (supports --oversubscribe)
-    if mpirun --version 2>&1 | grep -iq "open mpi"; then
-        MPI_FLAGS="--oversubscribe"
+# List of MPI commands to try
+declare -a MPI_COMMANDS=(
+    "mpirun"
+    "mpiexec"
+    "/usr/bin/mpirun"
+    "/usr/bin/mpiexec"
+    "/usr/local/bin/mpirun"
+    "/usr/local/bin/mpiexec"
+)
+
+declare -a FLAGS_TO_TRY=(
+    ""
+    "--oversubscribe"
+    "--allow-run-as-root"
+    "--oversubscribe --allow-run-as-root"
+)
+
+echo "=== Environment Information ==="
+echo "PATH: $PATH"
+echo "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH:-<not set>}"
+echo "USER: $USER"
+echo ""
+
+echo "=== Searching for MPI commands ==="
+for cmd in "${MPI_COMMANDS[@]}"; do
+    if command -v "$cmd" &> /dev/null || [ -x "$cmd" ]; then
+        echo "✓ Found: $cmd"
+        full_path=$(command -v "$cmd" 2>/dev/null || echo "$cmd")
+        echo "  Path: $full_path"
+        
+        # Try to get version
+        version_output=$("$cmd" --version 2>&1 || echo "Unable to get version")
+        echo "  Version info: $(echo "$version_output" | head -n 1)"
+    else
+        echo "✗ Not found: $cmd"
     fi
-elif command -v mpiexec &> /dev/null; then
-    MPI_CMD="mpiexec"
-# Try common installation paths
-elif [ -x /usr/bin/mpirun ]; then
-    MPI_CMD="/usr/bin/mpirun"
-elif [ -x /usr/bin/mpiexec ]; then
-    MPI_CMD="/usr/bin/mpiexec"
-elif [ -x /usr/local/bin/mpirun ]; then
-    MPI_CMD="/usr/local/bin/mpirun"
-elif [ -x /usr/local/bin/mpiexec ]; then
-    MPI_CMD="/usr/local/bin/mpiexec"
+done
+echo ""
+
+# Try each MPI command with each flag combination
+echo "=== Attempting to run MPI test ==="
+test_passed=0
+
+for cmd in "${MPI_COMMANDS[@]}"; do
+    if command -v "$cmd" &> /dev/null || [ -x "$cmd" ]; then
+        for flags in "${FLAGS_TO_TRY[@]}"; do
+            echo "----------------------------------------"
+            echo "Trying: $cmd $flags -n 2 ./test_mpi_parallel"
+            
+            output=$($cmd $flags -n 2 ./test_mpi_parallel 2>&1)
+            exit_code=$?
+            
+            echo "Output:"
+            echo "$output"
+            echo "Exit code: $exit_code"
+            
+            if [ $exit_code -eq 0 ]; then
+                echo "SUCCESS: Test passed with '$cmd $flags'"
+                test_passed=1
+                break 2
+            else
+                echo "FAILED: Test failed with exit code $exit_code"
+            fi
+            echo ""
+        done
+    fi
+done
+
+if [ $test_passed -eq 1 ]; then
+    echo "=== TEST PASSED ==="
+    exit 0
 else
-    echo "Error: MPI launcher not found"
-    echo "Searched for: mpirun, mpiexec in PATH and common locations"
-    echo "PATH: $PATH"
-    echo "Available commands:"
-    which -a mpirun mpiexec 2>/dev/null || echo "  None found"
+    echo "=== ALL ATTEMPTS FAILED ==="
+    echo "None of the MPI command/flag combinations succeeded"
     exit 1
 fi
-
-echo "Using MPI command: $MPI_CMD"
-if [ -n "$MPI_FLAGS" ]; then
-    echo "MPI flags: $MPI_FLAGS"
-fi
-
-# Run the MPI tests with 2 ranks
-$MPI_CMD $MPI_FLAGS -n 2 ./test_mpi_parallel
-exit $?
