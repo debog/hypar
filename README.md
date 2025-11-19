@@ -98,4 +98,40 @@ cmake -DENABLE_FFTW=ON ..
 cmake -DENABLE_PYTHON=ON ..
 ```
 
+## Testing
+
+HyPar includes comprehensive unit tests for core numerical functions.
+
+### Running Tests
+
+**With Autotools:**
+```bash
+make check
+```
+
+**With CMake:**
+```bash
+cd build
+ctest
+# Or for verbose output:
+ctest --output-on-failure
+```
+
+### Test Coverage
+
+The test suite includes **58 tests** across **9 modules**:
+- InterpolationFunctions: 6 tests
+- ArrayFunctions: 9 tests
+- FirstDerivative: 4 tests
+- SecondDerivative: 4 tests
+- TridiagLU: 3 tests
+- CommonFunctions: 4 tests
+- LimiterFunctions: 5 tests
+- MathFunctions: 8 tests
+- MPIFunctions: 15 tests (12 parallel MPI + 3 unit tests)
+
+**Note**: MPIFunctions tests require MPI and run with 2 processes. They are automatically disabled in serial builds.
+
+For detailed test documentation, see [tests/README.md](tests/README.md).
+
 

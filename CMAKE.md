@@ -13,6 +13,27 @@ cmake --build . -j$(nproc)
 
 The executable `HyPar` will be built in the `build/src/` directory.
 
+## Running Tests
+
+HyPar includes comprehensive unit tests that can be run with CMake/CTest:
+
+```bash
+cd build
+ctest
+```
+
+Or for more verbose output:
+```bash
+ctest --output-on-failure
+```
+
+To disable building tests:
+```bash
+cmake -DBUILD_TESTING=OFF ..
+```
+
+**Note**: In serial mode (`-DENABLE_SERIAL=ON`), the MPIFunctions tests are automatically disabled. All other tests (8 modules, 46 tests) will run.
+
 ## Build Options
 
 CMake provides several options to customize the build:
