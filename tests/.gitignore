@@ -1,5 +1,11 @@
 # Test executables
 test_interpolation
+test_array
+test_first_derivative
+test_second_derivative
+test_tridiag
+test_common
+test_limiters
 *_test
 
 # Autotools generated files

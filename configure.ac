@@ -342,6 +342,10 @@ AC_CONFIG_FILES([
  tests/InterpolationFunctions/Makefile
  tests/ArrayFunctions/Makefile
  tests/FirstDerivative/Makefile
+ tests/SecondDerivative/Makefile
+ tests/TridiagLU/Makefile
+ tests/CommonFunctions/Makefile
+ tests/LimiterFunctions/Makefile
 ])
 
 AC_OUTPUT
