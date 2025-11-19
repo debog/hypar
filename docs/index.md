@@ -46,6 +46,8 @@ where:
 
 installation
 usage
+physical_models
+examples
 numerical_methods
 developer_guide
 api
@@ -57,7 +59,9 @@ api
 
 1. **[Installation](installation.md)** - Build and install HyPar
 2. **[Usage Guide](usage.md)** - Learn how to set up and run simulations
-3. **[Numerical Methods](numerical_methods.md)** - Understand the algorithms
+3. **[Physical Models](physical_models.md)** - Documentation for all implemented models
+4. **[Examples](examples.md)** - Explore over 100 test cases and tutorials
+5. **[Numerical Methods](numerical_methods.md)** - Understand the algorithms
 
 ### For Developers
 
@@ -91,26 +95,27 @@ Use MATLAB, Python, or any plotting tool to visualize the `op_*.dat` output file
 
 ## Supported Physical Models
 
-HyPar includes implementations for:
+HyPar includes implementations for a wide variety of physical models. See the **[Physical Models](physical_models.md)** documentation for comprehensive details.
 
 ### 1D Models
 - Linear advection-diffusion-reaction
 - Burgers equation
 - Euler equations (gas dynamics)
 - Shallow water equations
-- Vlasov equation (kinetic plasma physics)
 
 ### 2D Models
-- Linear advection and diffusion
-- 2D Burgers equation
 - 2D Euler equations (compressible flow)
 - 2D Navier-Stokes equations (viscous flow)
 - 2D Shallow water equations
+- 2D NUMA (non-hydrostatic atmospheric flow)
+- Vlasov equation (1D-1V kinetic plasma physics)
 
 ### 3D Models
-- 3D Euler equations
 - 3D Navier-Stokes equations
-- 3D Non-hydrostatic atmospheric flow (NUMA)
+- 3D NUMA
+
+### Specialized Models
+- Fokker-Planck equations (uncertainty quantification)
 
 ## Available Spatial Schemes
 
