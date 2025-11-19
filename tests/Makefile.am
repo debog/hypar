@@ -1,3 +1,3 @@
-SUBDIRS = InterpolationFunctions
+SUBDIRS = InterpolationFunctions ArrayFunctions FirstDerivative
 
 EXTRA_DIST =

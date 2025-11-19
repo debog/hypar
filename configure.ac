@@ -340,6 +340,8 @@ AC_CONFIG_FILES([
  src/TridiagLU/Makefile
  tests/Makefile
  tests/InterpolationFunctions/Makefile
+ tests/ArrayFunctions/Makefile
+ tests/FirstDerivative/Makefile
 ])
 
 AC_OUTPUT
