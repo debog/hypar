@@ -69,7 +69,7 @@ This document summarizes the GitHub CI test infrastructure created for the Inter
 ### Tested Interpolation Functions
 
 1. `Interp1PrimFirstOrderUpwind()` - Component-wise 1st order upwind
-2. `Interp1PrimSecondOrderCentral()` - Component-wise 2nd order central  
+2. `Interp1PrimSecondOrderCentral()` - Component-wise 2nd order central
 3. `Interp1PrimFourthOrderCentral()` - Component-wise 4th order central
 4. `Interp1PrimFifthOrderWENO()` - Component-wise 5th order WENO
 

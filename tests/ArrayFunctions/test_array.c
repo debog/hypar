@@ -37,14 +37,14 @@ int test_array_copy_1d() {
   int size = 10;
   double *x = (double*) malloc(size * sizeof(double));
   double *y = (double*) malloc(size * sizeof(double));
-  
+
   for (int i = 0; i < size; i++) {
     x[i] = (double)(i + 1);
     y[i] = 0.0;
   }
-  
+
   _ArrayCopy1D_(x, y, size);
-  
+
   int test_result = TEST_PASS;
   for (int i = 0; i < size; i++) {
     if (fabs(y[i] - x[i]) > TOLERANCE) {
@@ -53,7 +53,7 @@ int test_array_copy_1d() {
       break;
     }
   }
-  
+
   free(x);
   free(y);
   return test_result;
@@ -64,9 +64,9 @@ int test_array_set_value() {
   int size = 20;
   double *x = (double*) malloc(size * sizeof(double));
   double value = 3.14159;
-  
+
   _ArraySetValue_(x, size, value);
-  
+
   int test_result = TEST_PASS;
   for (int i = 0; i < size; i++) {
     if (fabs(x[i] - value) > TOLERANCE) {
@@ -75,7 +75,7 @@ int test_array_set_value() {
       break;
     }
   }
-  
+
   free(x);
   return test_result;
 }
@@ -85,16 +85,16 @@ int test_array_scale_1d() {
   int size = 10;
   double *x = (double*) malloc(size * sizeof(double));
   double scale = 2.5;
-  
+
   for (int i = 0; i < size; i++) {
     x[i] = (double)(i + 1);
   }
-  
+
   double *original = (double*) malloc(size * sizeof(double));
   _ArrayCopy1D_(x, original, size);
-  
+
   _ArrayScale1D_(x, scale, size);
-  
+
   int test_result = TEST_PASS;
   for (int i = 0; i < size; i++) {
     double expected = original[i] * scale;
@@ -104,7 +104,7 @@ int test_array_scale_1d() {
       break;
     }
   }
-  
+
   free(x);
   free(original);
   return test_result;
@@ -116,18 +116,18 @@ int test_array_axpy() {
   double *x = (double*) malloc(size * sizeof(double));
   double *y = (double*) malloc(size * sizeof(double));
   double a = 3.0;
-  
+
   for (int i = 0; i < size; i++) {
     x[i] = (double)(i + 1);
     y[i] = (double)(2 * i);
   }
-  
+
   double *y_orig = (double*) malloc(size * sizeof(double));
   _ArrayCopy1D_(y, y_orig, size);
-  
+
   /* _ArrayAXPY_ is defined as: y[i] += a*x[i], so arguments are (x, a, y, size) */
   _ArrayAXPY_(x, a, y, size);
-  
+
   int test_result = TEST_PASS;
   for (int i = 0; i < size; i++) {
     double expected = y_orig[i] + a * x[i];
@@ -137,7 +137,7 @@ int test_array_axpy() {
       break;
     }
   }
-  
+
   free(x);
   free(y);
   free(y_orig);
@@ -151,24 +151,24 @@ int test_array_index_1d() {
   int ghosts = 2;
   int index_nd[1];
   int index_1d;
-  
+
   int test_result = TEST_PASS;
-  
+
   /* Test converting from nD to 1D and back */
   for (int i = 0; i < dim[0]; i++) {
     index_nd[0] = i;
     _ArrayIndex1D_(ndims, dim, index_nd, ghosts, index_1d);
-    
+
     int reconstructed[1];
     _ArrayIndexnD_(ndims, index_1d, dim, reconstructed, ghosts);
-    
+
     if (reconstructed[0] != index_nd[0]) {
       test_result = TEST_FAIL;
       printf("    Failed for i=%d: got %d\n", i, reconstructed[0]);
       break;
     }
   }
-  
+
   return test_result;
 }
 
@@ -179,29 +179,29 @@ int test_array_index_2d() {
   int ghosts = 1;
   int index_nd[2];
   int index_1d;
-  
+
   int test_result = TEST_PASS;
-  
+
   /* Test converting from nD to 1D and back */
   for (int i = 0; i < dim[0]; i++) {
     for (int j = 0; j < dim[1]; j++) {
       index_nd[0] = i;
       index_nd[1] = j;
       _ArrayIndex1D_(ndims, dim, index_nd, ghosts, index_1d);
-      
+
       int reconstructed[2];
       _ArrayIndexnD_(ndims, index_1d, dim, reconstructed, ghosts);
-      
+
       if (reconstructed[0] != index_nd[0] || reconstructed[1] != index_nd[1]) {
         test_result = TEST_FAIL;
-        printf("    Failed for (%d,%d): got (%d,%d)\n", 
+        printf("    Failed for (%d,%d): got (%d,%d)\n",
                i, j, reconstructed[0], reconstructed[1]);
         break;
       }
     }
     if (test_result == TEST_FAIL) break;
   }
-  
+
   return test_result;
 }
 
@@ -212,9 +212,9 @@ int test_array_index_3d() {
   int ghosts = 2;
   int index_nd[3];
   int index_1d;
-  
+
   int test_result = TEST_PASS;
-  
+
   /* Test a subset of points to keep test fast */
   for (int i = 0; i < dim[0]; i += 1) {
     for (int j = 0; j < dim[1]; j += 1) {
@@ -223,15 +223,15 @@ int test_array_index_3d() {
         index_nd[1] = j;
         index_nd[2] = k;
         _ArrayIndex1D_(ndims, dim, index_nd, ghosts, index_1d);
-        
+
         int reconstructed[3];
         _ArrayIndexnD_(ndims, index_1d, dim, reconstructed, ghosts);
-        
-        if (reconstructed[0] != index_nd[0] || 
-            reconstructed[1] != index_nd[1] || 
+
+        if (reconstructed[0] != index_nd[0] ||
+            reconstructed[1] != index_nd[1] ||
             reconstructed[2] != index_nd[2]) {
           test_result = TEST_FAIL;
-          printf("    Failed for (%d,%d,%d): got (%d,%d,%d)\n", 
+          printf("    Failed for (%d,%d,%d): got (%d,%d,%d)\n",
                  i, j, k, reconstructed[0], reconstructed[1], reconstructed[2]);
           break;
         }
@@ -240,7 +240,7 @@ int test_array_index_3d() {
     }
     if (test_result == TEST_FAIL) break;
   }
-  
+
   return test_result;
 }
 
@@ -249,15 +249,15 @@ int test_array_product_1d() {
   int size = 5;
   int x[5] = {2, 3, 4, 5, 6};
   int product;
-  
+
   _ArrayProduct1D_(x, size, product);
-  
+
   int expected = 2 * 3 * 4 * 5 * 6;
   if (product != expected) {
     printf("    Expected %d, got %d\n", expected, product);
     return TEST_FAIL;
   }
-  
+
   return TEST_PASS;
 }
 
@@ -267,23 +267,23 @@ int test_array_copy_nd_2d() {
   int nvars = 3;
   int dim[2] = {4, 5};
   int ghosts = 1;
-  
+
   int size_with_ghosts = 1;
   for (int d = 0; d < ndims; d++) {
     size_with_ghosts *= (dim[d] + 2*ghosts);
   }
-  
+
   double *x = (double*) calloc(size_with_ghosts * nvars, sizeof(double));
   double *y = (double*) calloc(size_with_ghosts * nvars, sizeof(double));
   int *index = (int*) calloc(ndims, sizeof(int));
-  
+
   /* Initialize x with some values */
   for (int i = 0; i < size_with_ghosts * nvars; i++) {
     x[i] = (double)(i + 1);
   }
-  
+
   int ierr = ArrayCopynD(ndims, x, y, dim, ghosts, ghosts, index, nvars);
-  
+
   int test_result = TEST_PASS;
   if (ierr != 0) {
     printf("    ArrayCopynD returned error: %d\n", ierr);
@@ -307,7 +307,7 @@ int test_array_copy_nd_2d() {
       _ArrayIncrementIndex_(ndims, dim, index, done);
     }
   }
-  
+
   free(x);
   free(y);
   free(index);
@@ -317,36 +317,36 @@ int test_array_copy_nd_2d() {
 /* Main test runner */
 int main(int argc, char *argv[]) {
   TestStats stats = {0, 0, ""};
-  
+
   printf("========================================\n");
   printf("Array Functions Unit Tests\n");
   printf("========================================\n\n");
-  
+
   printf("Testing Basic Array Operations:\n");
   print_test_result(&stats, "Array Copy 1D", test_array_copy_1d());
   print_test_result(&stats, "Array Set Value", test_array_set_value());
   print_test_result(&stats, "Array Scale 1D", test_array_scale_1d());
   print_test_result(&stats, "Array AXPY", test_array_axpy());
-  
+
   printf("\nTesting Array Indexing:\n");
   print_test_result(&stats, "Array Index 1D", test_array_index_1d());
   print_test_result(&stats, "Array Index 2D", test_array_index_2d());
   print_test_result(&stats, "Array Index 3D", test_array_index_3d());
   print_test_result(&stats, "Array Product 1D", test_array_product_1d());
-  
+
   printf("\nTesting Multi-dimensional Operations:\n");
   print_test_result(&stats, "Array Copy nD (2D)", test_array_copy_nd_2d());
-  
+
   printf("\n========================================\n");
   printf("Test Results:\n");
   printf("  Passed: %d\n", stats.passed);
   printf("  Failed: %d\n", stats.failed);
   printf("========================================\n");
-  
+
   if (stats.failed > 0) {
     printf("\nLast failed test: %s\n", stats.last_test);
     return 1;
   }
-  
+
   return 0;
 }

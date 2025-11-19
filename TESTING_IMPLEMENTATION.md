@@ -176,15 +176,15 @@ int test_scheme_property() {
   double *fI = calloc((N+1)*nvars, sizeof(double));
   HyPar solver;
   MPIVariables mpi;
-  
+
   // 2. Initialize test data
   for (int i = 0; i < N+2*ghosts; i++) {
     fC[i] = test_function(i);
   }
-  
+
   // 3. Call interpolation function
   Interp1PrimScheme(fI, fC, u, x, upw, dir, &solver, &mpi, 1);
-  
+
   // 4. Verify results
   int result = TEST_PASS;
   for (int i = 0; i < N+1; i++) {
@@ -193,7 +193,7 @@ int test_scheme_property() {
       break;
     }
   }
-  
+
   // 5. Cleanup
   free(fC); free(fI);
   return result;
@@ -352,7 +352,7 @@ Same as HyPar (BSD 3-Clause)
 
 ---
 
-**Implementation Date**: November 19, 2025  
-**HyPar Version**: 4.1  
-**Test Framework**: Custom (no external dependencies)  
+**Implementation Date**: November 19, 2025
+**HyPar Version**: 4.1
+**Test Framework**: Custom (no external dependencies)
 **CI Platform**: GitHub Actions

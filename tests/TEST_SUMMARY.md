@@ -123,7 +123,7 @@ cd tests/InterpolationFunctions
 cd tests/ArrayFunctions
 ./test_array
 
-# Derivative tests  
+# Derivative tests
 cd tests/FirstDerivative
 ./test_first_derivative
 ```
@@ -267,7 +267,7 @@ make check
 ## Known Limitations
 
 - No tests for MPI communication (all tests run in serial mode internally)
-- Limited testing of edge cases and error conditions  
+- Limited testing of edge cases and error conditions
 - No performance/timing tests
 - No tests with nvars > 3
 - Limited 3D testing
@@ -302,8 +302,8 @@ make check
 
 ---
 
-**Last Updated**: November 19, 2025  
-**HyPar Version**: 4.1  
-**Total Test Cases**: 19  
-**Test Framework**: Custom (no dependencies)  
+**Last Updated**: November 19, 2025
+**HyPar Version**: 4.1
+**Total Test Cases**: 19
+**Test Framework**: Custom (no dependencies)
 **CI Platform**: GitHub Actions
