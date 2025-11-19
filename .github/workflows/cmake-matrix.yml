@@ -45,6 +45,14 @@ jobs:
         sudo apt-get install -y --no-install-recommends \
           build-essential g++ gfortran ${{ matrix.config.deps }}
 
+    - name: Check ScaLAPACK installation
+      if: contains(matrix.config.cmake_options, 'SCALAPACK')
+      run: |
+        echo "Checking for ScaLAPACK libraries..."
+        find /usr/lib -name "*scalapack*" 2>/dev/null || echo "No scalapack in /usr/lib"
+        find /usr/lib/x86_64-linux-gnu -name "*scalapack*" 2>/dev/null || echo "No scalapack in /usr/lib/x86_64-linux-gnu"
+        dpkg -L libscalapack-mpi-dev 2>/dev/null | grep "\.so" || echo "Package files not found"
+
     - name: Configure CMake
       run: |
         mkdir build

@@ -57,7 +57,19 @@ endif()
 
 if(ENABLE_SCALAPACK)
     add_compile_definitions(with_scalapack)
-    link_libraries(scalapack blas lapack)
+    # Try to find ScaLAPACK library with different possible names
+    find_library(SCALAPACK_LIB
+        NAMES scalapack scalapack-openmpi scalapack-mpich libscalapack.so
+        PATHS /usr/lib /usr/lib/x86_64-linux-gnu /usr/local/lib
+        PATH_SUFFIXES openmpi mpich
+    )
+    if(SCALAPACK_LIB)
+        message(STATUS "Found ScaLAPACK: ${SCALAPACK_LIB}")
+        link_libraries(${SCALAPACK_LIB} blas lapack)
+    else()
+        message(STATUS "ScaLAPACK library not found, trying common names")
+        link_libraries(scalapack-openmpi blas lapack)
+    endif()
 endif()
 
 if(ENABLE_FFTW)
