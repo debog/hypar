@@ -338,6 +338,8 @@ AC_CONFIG_FILES([
  src/SparseGrids/Makefile
  src/TimeIntegration/Makefile
  src/TridiagLU/Makefile
+ tests/Makefile
+ tests/InterpolationFunctions/Makefile
 ])
 
 AC_OUTPUT

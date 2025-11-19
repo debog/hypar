@@ -1,0 +1,25 @@
+# Test executables
+test_interpolation
+*_test
+
+# Autotools generated files
+Makefile
+Makefile.in
+.deps/
+.dirstamp
+
+# Test logs
+*.log
+*.trs
+test-suite.log
+
+# Object files
+*.o
+*.lo
+*.la
+.libs/
+
+# Backup files
+*~
+*.bak
+*.swp
