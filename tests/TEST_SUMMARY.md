@@ -11,7 +11,12 @@ This document provides a comprehensive summary of all unit tests implemented for
 | **InterpolationFunctions** | 6 | 413 | ✅ All Pass |
 | **ArrayFunctions** | 9 | 345 | ✅ All Pass |
 | **FirstDerivative** | 4 | 247 | ✅ All Pass |
-| **TOTAL** | **19** | **1,005** | **✅ 19/19 Pass** |
+| **SecondDerivative** | 4 | 263 | ✅ All Pass |
+| **TridiagLU** | 3 | 232 | ✅ All Pass |
+| **CommonFunctions** | 4 | 158 | ✅ All Pass |
+| **LimiterFunctions** | 5 | 255 | ✅ All Pass |
+| **MathFunctions** | 8 | 404 | ✅ All Pass |
+| **TOTAL** | **43** | **2,317** | **✅ 43/43 Pass** |
 
 ## Files Created
 

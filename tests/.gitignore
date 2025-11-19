@@ -6,6 +6,7 @@ test_second_derivative
 test_tridiag
 test_common
 test_limiters
+test_math
 *_test
 
 # Autotools generated files

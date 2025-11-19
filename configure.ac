@@ -346,6 +346,7 @@ AC_CONFIG_FILES([
  tests/TridiagLU/Makefile
  tests/CommonFunctions/Makefile
  tests/LimiterFunctions/Makefile
+ tests/MathFunctions/Makefile
 ])
 
 AC_OUTPUT
