@@ -18,9 +18,9 @@ static int ReadArrayMPI_IO    (int,int,int*,int*,int,void*,void*,double*,double*
 #endif
 
 /*! Read in a vector field from file: wrapper function that calls
-    the appropriate function depending on input mode (#HyPar::input_mode).\n\n
-    The mode and type of input are specified through #HyPar::input_mode and
-    #HyPar::ip_file_type. A vector field is read from file and stored in an array.
+    the appropriate function depending on input mode (#HyPar::m_input_mode).\n\n
+    The mode and type of input are specified through #HyPar::m_input_mode and
+    #HyPar::m_ip_file_type. A vector field is read from file and stored in an array.
 */
 int ReadArray(
               int     ndims,        /*!< Number of spatial dimensions */
@@ -40,19 +40,19 @@ int ReadArray(
   MPIVariables  *mpi    = (MPIVariables*) m;
   _DECLARE_IERR_;
 
-  if      (!strcmp(solver->input_mode,"serial")) {
+  if      (!strcmp(solver->m_input_mode,"serial")) {
     IERR ReadArraySerial(ndims,nvars,dim_global,dim_local,ghosts,s,m,x,u,fname_root,read_flag);
     CHECKERR(ierr);
 #ifndef serial
-  } else if (!strcmp(solver->input_mode,"parallel")) {
+  } else if (!strcmp(solver->m_input_mode,"parallel")) {
     ReadArrayParallel(ndims,nvars,dim_global,dim_local,ghosts,s,m,x,u,fname_root,read_flag);
     CHECKERR(ierr);
-  } else if (!strcmp(solver->input_mode,"mpi-io"  )) {
+  } else if (!strcmp(solver->m_input_mode,"mpi-io"  )) {
     ReadArrayMPI_IO(ndims,nvars,dim_global,dim_local,ghosts,s,m,x,u,fname_root,read_flag);
     CHECKERR(ierr);
 #endif
   } else {
-    fprintf(stderr,"Error: Illegal value (%s) for input_mode.\n",solver->input_mode);
+    fprintf(stderr,"Error: Illegal value (%s) for input_mode.\n",solver->m_input_mode);
     return(1);
   }
 
@@ -70,14 +70,14 @@ int ReadArray(
     for (d = 0; d < ndims; d++) {
       double *X     = &x[offset];
       int    *dim   = dim_local, i;
-      if (mpi->ip[d] == 0) {
+      if (mpi->m_ip[d] == 0) {
         /* fill left boundary along this dimension */
         for (i = 0; i < ghosts; i++) {
           int delta = ghosts - i;
           X[i] = X[ghosts] + ((double) delta) * (X[ghosts]-X[ghosts+1]);
         }
       }
-      if (mpi->ip[d] == mpi->iproc[d]-1) {
+      if (mpi->m_ip[d] == mpi->m_iproc[d]-1) {
         /* fill right boundary along this dimension */
         for (i = dim[d]+ghosts; i < dim[d]+2*ghosts; i++) {
           int delta = i - (dim[d]+ghosts-1);
@@ -169,9 +169,9 @@ int ReadArraySerial(
 
   *read_flag = 0;
   /* Only root process reads from the file */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 
-    if (!strcmp(solver->ip_file_type,"ascii")) {
+    if (!strcmp(solver->m_ip_file_type,"ascii")) {
       char filename[_MAX_STRING_SIZE_];
       strcpy(filename,fname_root);
       strcat(filename,".inp");
@@ -217,7 +217,7 @@ int ReadArraySerial(
 
         fclose(in);
       }
-    } else if ((!strcmp(solver->ip_file_type,"bin")) || (!strcmp(solver->ip_file_type,"binary"))) {
+    } else if ((!strcmp(solver->m_ip_file_type,"bin")) || (!strcmp(solver->m_ip_file_type,"binary"))) {
 
       char filename[_MAX_STRING_SIZE_];
       strcpy(filename,fname_root);
@@ -260,28 +260,28 @@ int ReadArraySerial(
   }
 
   /* Broadcast read_flag to all processes */
-  IERR MPIBroadcast_integer(read_flag,1,0,&mpi->world); CHECKERR(ierr);
+  IERR MPIBroadcast_integer(read_flag,1,0,&mpi->m_world); CHECKERR(ierr);
 
   if (*read_flag) {
 
     /* partition global array to all processes */
-    IERR MPIPartitionArraynD(ndims,mpi,(mpi->rank?NULL:ug),u,dim_global,
+    IERR MPIPartitionArraynD(ndims,mpi,(mpi->m_rank?NULL:ug),u,dim_global,
                              dim_local,ghosts,nvars); CHECKERR(ierr);
 
     if (x) {
       /* partition x vector across the processes */
       int offset_global = 0, offset_local = 0;
       for (d=0; d<ndims; d++) {
-        IERR MPIPartitionArray1D(mpi,(mpi->rank?NULL:&xg[offset_global]),
+        IERR MPIPartitionArray1D(mpi,(mpi->m_rank?NULL:&xg[offset_global]),
                                  &x[offset_local+ghosts],
-                                 mpi->is[d],mpi->ie[d],dim_local[d],0); CHECKERR(ierr);
+                                 mpi->m_is[d],mpi->m_ie[d],dim_local[d],0); CHECKERR(ierr);
         offset_global += dim_global[d];
         offset_local  += dim_local [d] + 2*ghosts;
       }
     }
 
     /* free global arrays */
-    if (!mpi->rank) {
+    if (!mpi->m_rank) {
       free(ug);
       free(xg);
     }
@@ -363,10 +363,10 @@ int ReadArrayParallel(
   strcat(filename_root,"_par.inp");
 
   /* check for existence of the file */
-  if (mpi->IOParticipant) {
+  if (mpi->m_IOParticipant) {
     FILE *in;
     char filename[_MAX_STRING_SIZE_];
-    MPIGetFilename(filename_root,&mpi->IOWorld,filename);
+    MPIGetFilename(filename_root,&mpi->m_IOWorld,filename);
     in = fopen(filename,"rb");
     if (!in)  *read_flag = 0;
     else {
@@ -374,11 +374,11 @@ int ReadArrayParallel(
       fclose(in);
     }
   }
-  IERR MPIMin_integer(read_flag,read_flag,1,&mpi->world);
+  IERR MPIMin_integer(read_flag,read_flag,1,&mpi->m_world);
 
   if (*read_flag) {
 
-    if (!mpi->rank) printf("Reading from binary file %s.xxx (parallel mode).\n",filename_root);
+    if (!mpi->m_rank) printf("Reading from binary file %s.xxx (parallel mode).\n",filename_root);
 
     /* calculate size of the local grid on this rank */
     int sizex = 0;     for (d=0; d<ndims; d++) sizex += dim_local[d];
@@ -387,7 +387,7 @@ int ReadArrayParallel(
     /* allocate buffer arrays to read in grid and solution */
     double *buffer = (double*) calloc (sizex+sizeu, sizeof(double));
 
-    if (mpi->IOParticipant) {
+    if (mpi->m_IOParticipant) {
 
       /* if this rank is responsible for file I/O */
       double *read_buffer = NULL;
@@ -398,7 +398,7 @@ int ReadArrayParallel(
       FILE *in;
       int  bytes;
       char filename[_MAX_STRING_SIZE_];
-      MPIGetFilename(filename_root,&mpi->IOWorld,filename);
+      MPIGetFilename(filename_root,&mpi->m_IOWorld,filename);
 
       in = fopen(filename,"rb");
       if (!in) {
@@ -414,7 +414,7 @@ int ReadArrayParallel(
       }
 
       /* read and send the data for the other processors in this IO rank's group */
-      for (proc=mpi->GroupStartRank+1; proc<mpi->GroupEndRank; proc++) {
+      for (proc=mpi->m_GroupStartRank+1; proc<mpi->m_GroupEndRank; proc++) {
         /* get the local domain limits for process proc */
         IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie);
         /* calculate the size of its local data and allocate read buffer */
@@ -430,7 +430,7 @@ int ReadArrayParallel(
         }
         /* send the data */
         MPI_Request req = MPI_REQUEST_NULL;
-        MPI_Isend(read_buffer,read_total_size,MPI_DOUBLE,proc,1100,mpi->world,&req);
+        MPI_Isend(read_buffer,read_total_size,MPI_DOUBLE,proc,1100,mpi->m_world,&req);
         MPI_Wait(&req,MPI_STATUS_IGNORE);
         free(read_buffer);
       }
@@ -443,7 +443,7 @@ int ReadArrayParallel(
       /* all other processes, just receive the data from
        * the rank responsible for file I/O */
       MPI_Request req = MPI_REQUEST_NULL;
-      MPI_Irecv(buffer,(sizex+sizeu),MPI_DOUBLE,mpi->IORank,1100,mpi->world,&req);
+      MPI_Irecv(buffer,(sizex+sizeu),MPI_DOUBLE,mpi->m_IORank,1100,mpi->m_world,&req);
       MPI_Wait(&req,MPI_STATUS_IGNORE);
 
     }
@@ -535,7 +535,7 @@ int ReadArrayMPI_IO(
   strcat(filename,"_mpi.inp");
 
   /* check for existence of file */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     FILE *in;
     in = fopen(filename,"rb");
     if (!in)  *read_flag = 0;
@@ -544,11 +544,11 @@ int ReadArrayMPI_IO(
       fclose(in);
     }
   }
-  IERR MPIBroadcast_integer(read_flag,1,0,&mpi->world);
+  IERR MPIBroadcast_integer(read_flag,1,0,&mpi->m_world);
 
   if (*read_flag) {
 
-    if (!mpi->rank) printf("Reading from binary file %s (MPI-IO mode).\n",filename);
+    if (!mpi->m_rank) printf("Reading from binary file %s (MPI-IO mode).\n",filename);
 
     /* calculate size of the local grid on this rank */
     int sizex = 0;     for (d=0; d<ndims; d++) sizex += dim_local[d];
@@ -557,7 +557,7 @@ int ReadArrayMPI_IO(
     /* allocate buffer arrays to read in grid and solution */
     double *buffer = (double*) calloc (sizex+sizeu, sizeof(double));
 
-    if (mpi->IOParticipant) {
+    if (mpi->m_IOParticipant) {
 
       /* if this rank is responsible for file I/O */
       double *read_buffer = NULL;
@@ -566,7 +566,7 @@ int ReadArrayMPI_IO(
 
       /* calculate offset */
       long long offset = 0;
-      for (proc=0; proc < mpi->rank; proc++) {
+      for (proc=0; proc < mpi->m_rank; proc++) {
         /* get the local domain limits for process proc */
         IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie);
         /* calculate the size of its local grid */
@@ -581,7 +581,7 @@ int ReadArrayMPI_IO(
       MPI_Status  status;
       MPI_File    in;
       int         error;
-      error = MPI_File_open(mpi->IOWorld,filename,MPI_MODE_RDONLY,MPI_INFO_NULL,&in);
+      error = MPI_File_open(mpi->m_IOWorld,filename,MPI_MODE_RDONLY,MPI_INFO_NULL,&in);
       if (error != MPI_SUCCESS) {
         fprintf(stderr,"Error in ReadArrayMPI_IO(): Unable to open %s.\n",filename);
         return(1);
@@ -595,7 +595,7 @@ int ReadArrayMPI_IO(
       MPI_File_read(in,buffer,(sizex+sizeu)*sizeof(double),MPI_BYTE,&status);
 
       /* read and send the data for the other processors in this IO rank's group */
-      for (proc=mpi->GroupStartRank+1; proc<mpi->GroupEndRank; proc++) {
+      for (proc=mpi->m_GroupStartRank+1; proc<mpi->m_GroupEndRank; proc++) {
         /* get the local domain limits for process proc */
         IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie);
         /* calculate the size of its local data and allocate read buffer */
@@ -607,7 +607,7 @@ int ReadArrayMPI_IO(
         MPI_File_read(in,read_buffer,read_total_size*sizeof(double),MPI_BYTE,&status);
         /* send the data */
         MPI_Request req = MPI_REQUEST_NULL;
-        MPI_Isend(read_buffer,read_total_size,MPI_DOUBLE,proc,1100,mpi->world,&req);
+        MPI_Isend(read_buffer,read_total_size,MPI_DOUBLE,proc,1100,mpi->m_world,&req);
         MPI_Wait(&req,MPI_STATUS_IGNORE);
         free(read_buffer);
       }
@@ -620,7 +620,7 @@ int ReadArrayMPI_IO(
       /* all other processes, just receive the data from
        * the rank responsible for file I/O */
       MPI_Request req = MPI_REQUEST_NULL;
-      MPI_Irecv(buffer,(sizex+sizeu),MPI_DOUBLE,mpi->IORank,1100,mpi->world,&req);
+      MPI_Irecv(buffer,(sizex+sizeu),MPI_DOUBLE,mpi->m_IORank,1100,mpi->m_world,&req);
       MPI_Wait(&req,MPI_STATUS_IGNORE);
 
     }

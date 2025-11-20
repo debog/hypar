@@ -14,7 +14,7 @@
     from the other side of the domain. Otherwise, the interior data is extrapolated
     by a 4th order polynomial (assuming uniform grid spacing).
 */
-void fillGhostCells( const int* const a_dim,      /*!< grid dimensions of solution */
+void FillGhostCells( const int* const a_dim,      /*!< grid dimensions of solution */
                      const int        a_ngpt,     /*!< number of ghost cells */
                      double* const    a_u,        /*!< solution array */
                      const int        a_nvars,    /*!< number of vector components of the solution */

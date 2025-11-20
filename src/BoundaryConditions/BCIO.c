@@ -21,16 +21,16 @@ int BCReadTurbulentInflowData(void *b,void *m,int ndims,int nvars,int *DomainSiz
   DomainBoundary *boundary = (DomainBoundary*) b;
   MPIVariables   *mpi      = (MPIVariables*)   m;
 
-  char    *filename     = boundary->UnsteadyDirichletFilename;
+  char    *filename     = boundary->m_UnsteadyDirichletFilename;
   int     *inflow_size  = NULL;
   double  *inflow_data  = NULL;
   double  *buffer       = NULL;
 
-  int dim = boundary->dim;
-  int face= boundary->face;
+  int dim = boundary->m_dim;
+  int face= boundary->m_face;
   int d;
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 
     printf("Reading turbulent inflow boundary data from %s.\n",filename);
 
@@ -39,7 +39,7 @@ int BCReadTurbulentInflowData(void *b,void *m,int ndims,int nvars,int *DomainSiz
 
     /* calculate the number of processors that sit on unsteady boundary */
     int nproc = 1;
-    for (d=0; d<ndims; d++) nproc *= mpi->iproc[d]; nproc /= mpi->iproc[dim];
+    for (d=0; d<ndims; d++) nproc *= mpi->m_iproc[d]; nproc /= mpi->m_iproc[dim];
 
     in = fopen(filename,"rb");
     if (!in) {
@@ -54,7 +54,7 @@ int BCReadTurbulentInflowData(void *b,void *m,int ndims,int nvars,int *DomainSiz
         fprintf(stderr,"Error in BCReadTurbulentInflowData(): Error (1) in file reading, count %d.\n",count);
         return(1);
       }
-      if (rank[dim] != (face > 0 ? 0 : mpi->iproc[dim]-1) ) {
+      if (rank[dim] != (face > 0 ? 0 : mpi->m_iproc[dim]-1) ) {
         fprintf(stderr,"Error in BCReadTurbulentInflowData(): Error (2) in file reading, count %d.\n",count);
         return(1);
       }
@@ -79,7 +79,7 @@ int BCReadTurbulentInflowData(void *b,void *m,int ndims,int nvars,int *DomainSiz
         return(1);
       }
 
-      int rank1D = MPIRank1D(ndims,mpi->iproc,rank);
+      int rank1D = MPIRank1D(ndims,mpi->m_iproc,rank);
 
       if (!rank1D) {
 
@@ -92,8 +92,8 @@ int BCReadTurbulentInflowData(void *b,void *m,int ndims,int nvars,int *DomainSiz
       } else {
 #ifndef serial
         MPI_Request req[2] = {MPI_REQUEST_NULL,MPI_REQUEST_NULL};
-        MPI_Isend(size,ndims,MPI_INT,rank1D,2152,mpi->world,&req[0]);
-        MPI_Isend(buffer,data_size,MPI_DOUBLE,rank1D,2153,mpi->world,&req[1]);
+        MPI_Isend(size,ndims,MPI_INT,rank1D,2152,mpi->m_world,&req[0]);
+        MPI_Isend(buffer,data_size,MPI_DOUBLE,rank1D,2153,mpi->m_world,&req[1]);
         MPI_Status status_arr[3];
         MPI_Waitall(2,&req[0],status_arr);
 #else
@@ -116,15 +116,15 @@ int BCReadTurbulentInflowData(void *b,void *m,int ndims,int nvars,int *DomainSiz
 
   } else {
 #ifndef serial
-    if (mpi->ip[dim] == (face > 0 ? 0 : mpi->iproc[dim]-1) ) {
+    if (mpi->m_ip[dim] == (face > 0 ? 0 : mpi->m_iproc[dim]-1) ) {
       MPI_Request req = MPI_REQUEST_NULL;
       inflow_size = (int*) calloc (ndims,sizeof(int));
-      MPI_Irecv(inflow_size,ndims,MPI_INT,0,2152,mpi->world,&req);
+      MPI_Irecv(inflow_size,ndims,MPI_INT,0,2152,mpi->m_world,&req);
       MPI_Wait(&req,MPI_STATUS_IGNORE);
       int data_size = nvars;
       for (d=0; d<ndims; d++) data_size *= inflow_size[d];
       inflow_data = (double*) calloc (data_size,sizeof(double));
-      MPI_Irecv(inflow_data,data_size,MPI_DOUBLE,0,2153,mpi->world,&req);
+      MPI_Irecv(inflow_data,data_size,MPI_DOUBLE,0,2153,mpi->m_world,&req);
       MPI_Wait(&req,MPI_STATUS_IGNORE);
     }
 #else
@@ -132,8 +132,8 @@ int BCReadTurbulentInflowData(void *b,void *m,int ndims,int nvars,int *DomainSiz
 #endif
   }
 
-  boundary->UnsteadyDirichletSize = inflow_size;
-  boundary->UnsteadyDirichletData = inflow_data;
+  boundary->m_UnsteadyDirichletSize = inflow_size;
+  boundary->m_UnsteadyDirichletData = inflow_data;
 
   return(0);
 }
@@ -149,18 +149,18 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
   DomainBoundary *boundary = (DomainBoundary*) b;
   MPIVariables   *mpi      = (MPIVariables*)   m;
 
-  char    *filename = boundary->UnsteadyTemperatureFilename;
+  char    *filename = boundary->m_UnsteadyTemperatureFilename;
   int     *temperature_field_size  = NULL;
   double  *time_level_data         = NULL;
   double  *temperature_field_data  = NULL;
   double  *time_buffer = NULL;
   double  *data_buffer = NULL;
 
-  int dim = boundary->dim;
-  int face= boundary->face;
+  int dim = boundary->m_dim;
+  int face= boundary->m_face;
   int d;
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 
     printf("Reading boundary temperature data from %s.\n",filename);
 
@@ -169,7 +169,7 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
 
     /* calculate the number of processors that sit on this temperature boundary */
     int nproc = 1;
-    for (d=0; d<ndims; d++) nproc *= mpi->iproc[d]; nproc /= mpi->iproc[dim];
+    for (d=0; d<ndims; d++) nproc *= mpi->m_iproc[d]; nproc /= mpi->m_iproc[dim];
 
     in = fopen(filename,"rb");
     if (!in) {
@@ -186,7 +186,7 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
         fprintf(stderr,"Error in BCReadTemperatureData(): Error (1) in file reading, count %d.\n",count);
         return(1);
       }
-      if (rank[dim] != (face > 0 ? 0 : mpi->iproc[dim]-1) ) {
+      if (rank[dim] != (face > 0 ? 0 : mpi->m_iproc[dim]-1) ) {
         fprintf(stderr,"Error in BCReadTemperatureData(): Error (2) in file reading, count %d.\n",count);
         return(1);
       }
@@ -213,7 +213,7 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
         return(1);
       }
 
-      int rank1D = MPIRank1D(ndims,mpi->iproc,rank);
+      int rank1D = MPIRank1D(ndims,mpi->m_iproc,rank);
 
       if (!rank1D) {
 
@@ -232,9 +232,9 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
 
 #ifndef serial
         MPI_Request req[3] = {MPI_REQUEST_NULL,MPI_REQUEST_NULL,MPI_REQUEST_NULL};
-        MPI_Isend(size,ndims,MPI_INT,rank1D,2152,mpi->world,&req[0]);
-        MPI_Isend(time_buffer,size[dim],MPI_DOUBLE,rank1D,2154,mpi->world,&req[2]);
-        MPI_Isend(data_buffer,data_size,MPI_DOUBLE,rank1D,2153,mpi->world,&req[1]);
+        MPI_Isend(size,ndims,MPI_INT,rank1D,2152,mpi->m_world,&req[0]);
+        MPI_Isend(time_buffer,size[dim],MPI_DOUBLE,rank1D,2154,mpi->m_world,&req[2]);
+        MPI_Isend(data_buffer,data_size,MPI_DOUBLE,rank1D,2153,mpi->m_world,&req[1]);
         MPI_Status status_arr[3];
         MPI_Waitall(3,&req[0],status_arr);
 #else
@@ -260,29 +260,29 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
   } else {
 
 #ifndef serial
-    if (mpi->ip[dim] == (face > 0 ? 0 : mpi->iproc[dim]-1) ) {
+    if (mpi->m_ip[dim] == (face > 0 ? 0 : mpi->m_iproc[dim]-1) ) {
 
       MPI_Request req = MPI_REQUEST_NULL;
 
       temperature_field_size = (int*) calloc (ndims,sizeof(int));
-      MPI_Irecv(temperature_field_size,ndims,MPI_INT,0,2152,mpi->world,&req);
+      MPI_Irecv(temperature_field_size,ndims,MPI_INT,0,2152,mpi->m_world,&req);
       MPI_Wait(&req,MPI_STATUS_IGNORE);
 
       int flag = 1;
       for (d=0; d<ndims; d++) if ((d != dim) && (temperature_field_size[d] != DomainSize[d])) flag = 0;
       if (!flag) {
-        fprintf(stderr,"Error in BCReadTemperatureData(): Error (4) (dimension mismatch) in file reading, rank %d.\n",mpi->rank);
+        fprintf(stderr,"Error in BCReadTemperatureData(): Error (4) (dimension mismatch) in file reading, rank %d.\n",mpi->m_rank);
         return(1);
       }
 
       time_level_data = (double*) calloc (temperature_field_size[dim],sizeof(double));
-      MPI_Irecv(time_level_data, temperature_field_size[dim], MPI_DOUBLE,0,2154,mpi->world,&req);
+      MPI_Irecv(time_level_data, temperature_field_size[dim], MPI_DOUBLE,0,2154,mpi->m_world,&req);
       MPI_Wait(&req,MPI_STATUS_IGNORE);
 
       int data_size = 1;
       for (d=0; d<ndims; d++) data_size *= temperature_field_size[d];
       temperature_field_data = (double*) calloc (data_size,sizeof(double));
-      MPI_Irecv(temperature_field_data,data_size,MPI_DOUBLE,0,2153,mpi->world,&req);
+      MPI_Irecv(temperature_field_data,data_size,MPI_DOUBLE,0,2153,mpi->m_world,&req);
       MPI_Wait(&req,MPI_STATUS_IGNORE);
 
     }
@@ -292,9 +292,9 @@ int BCReadTemperatureData(void *b,void *m,int ndims,int nvars,int *DomainSize)
 
   }
 
-  boundary->UnsteadyTemperatureSize = temperature_field_size;
-  boundary->UnsteadyTimeLevels      = time_level_data;
-  boundary->UnsteadyTemperatureData = temperature_field_data;
+  boundary->m_UnsteadyTemperatureSize = temperature_field_size;
+  boundary->m_UnsteadyTimeLevels      = time_level_data;
+  boundary->m_UnsteadyTemperatureData = temperature_field_data;
 
   return(0);
 }

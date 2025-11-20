@@ -25,44 +25,44 @@
 int PetscCreatePointList(void *obj /*!< Object of type #PETScContext */)
 {
   PETScContext* ctxt = (PETScContext*) obj;
-  SimulationObject* sim = (SimulationObject*) ctxt->simobj;
+  SimulationObject* sim = (SimulationObject*) ctxt->m_simobj;
 
-  int nsims = ctxt->nsims;
-  int ndims = sim[0].solver.ndims;
+  int nsims = ctxt->m_nsims;
+  int ndims = sim[0].solver.m_ndims;
 
   /* count the number of computational points */
-  ctxt->npoints = 0;
-  ctxt->ndofs = 0;
-  ctxt->offsets = (int*) calloc(nsims, sizeof(int));
+  ctxt->m_npoints = 0;
+  ctxt->m_ndofs = 0;
+  ctxt->m_offsets = (int*) calloc(nsims, sizeof(int));
   for (int ns = 0; ns < nsims; ns++) {
-    ctxt->npoints += sim[ns].solver.npoints_local;
-    ctxt->offsets[ns] = ctxt->ndofs;
-    ctxt->ndofs += (sim[ns].solver.npoints_local*sim[ns].solver.nvars);
+    ctxt->m_npoints += sim[ns].solver.m_npoints_local;
+    ctxt->m_offsets[ns] = ctxt->m_ndofs;
+    ctxt->m_ndofs += (sim[ns].solver.m_npoints_local*sim[ns].solver.m_nvars);
   }
 
   int nv = ndims+1;
-  ctxt->points.resize(nsims, nullptr);
+  ctxt->m_points.resize(nsims, nullptr);
 
   for (int ns = 0; ns < nsims; ns++) {
 
-    int npoints = sim[ns].solver.npoints_local;
-    ctxt->points[ns] = (int*) calloc (npoints*nv,sizeof(int));
+    int npoints = sim[ns].solver.m_npoints_local;
+    ctxt->m_points[ns] = (int*) calloc (npoints*nv,sizeof(int));
 
-    const int* const dim( sim[ns].solver.dim_local );
-    const int ghosts( sim[ns].solver.ghosts );
+    const int* const dim( sim[ns].solver.m_dim_local );
+    const int ghosts( sim[ns].solver.m_ghosts );
 
     int done = 0, i = 0;
     std::vector<int> index(ndims,0);
     while (!done) {
       int p; _ArrayIndex1D_(ndims, dim, index.data(), ghosts, p);
-      _ArrayCopy1D_(index.data(), (ctxt->points[ns]+i*nv), ndims);
-      (ctxt->points[ns]+i*nv)[ndims] = p;
+      _ArrayCopy1D_(index.data(), (ctxt->m_points[ns]+i*nv), ndims);
+      (ctxt->m_points[ns]+i*nv)[ndims] = p;
       _ArrayIncrementIndex_(ndims,dim,index,done);
       i++;
     }
 
     if (i != npoints) {
-      fprintf(stderr,"Error in PetscCreatePointList() on rank %d:\n", sim[ns].mpi.rank);
+      fprintf(stderr,"Error in PetscCreatePointList() on rank %d:\n", sim[ns].mpi.m_rank);
       fprintf(stderr,"Inconsistency in point count - %d, %d.\n",
               i, npoints);
       return 1;
@@ -71,9 +71,9 @@ int PetscCreatePointList(void *obj /*!< Object of type #PETScContext */)
 
   int global_npoints;
   int global_ndofs;
-  MPISum_integer(&global_npoints,&(ctxt->npoints),1,&sim[0].mpi.world);
-  MPISum_integer(&global_ndofs,&(ctxt->ndofs),1,&sim[0].mpi.world);
-  if (!ctxt->rank) {
+  MPISum_integer(&global_npoints,&(ctxt->m_npoints),1,&sim[0].mpi.m_world);
+  MPISum_integer(&global_ndofs,&(ctxt->m_ndofs),1,&sim[0].mpi.m_world);
+  if (!ctxt->m_rank) {
     printf("PETSc:    total number of computational points is %d.\n",global_npoints);
     printf("PETSc:    total number of computational DOFs is %d.\n",global_ndofs);
   }

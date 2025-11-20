@@ -39,71 +39,71 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
   if (!sim) return(1);
 
 
-  TS->simulation    = sim;
-  TS->nsims         = nsims;
+  TS->m_simulation    = sim;
+  TS->m_nsims         = nsims;
 
-  TS->rank          = rank;
-  TS->nproc         = nproc;
+  TS->m_rank          = rank;
+  TS->m_nproc         = nproc;
 
-  TS->n_iter        = sim[0].solver.n_iter;
-  TS->restart_iter  = sim[0].solver.restart_iter;
-  TS->dt            = sim[0].solver.dt;
+  TS->m_n_iter        = sim[0].solver.m_n_iter;
+  TS->m_restart_iter  = sim[0].solver.m_restart_iter;
+  TS->m_dt            = sim[0].solver.m_dt;
 
-  TS->waqt          = (double) TS->restart_iter * TS->dt;
-  TS->max_cfl       = 0.0;
-  TS->norm          = 0.0;
+  TS->m_waqt          = (double) TS->m_restart_iter * TS->m_dt;
+  TS->m_max_cfl       = 0.0;
+  TS->m_norm          = 0.0;
   TS->TimeIntegrate = sim[0].solver.TimeIntegrate;
-  TS->iter_wctime_total = 0.0;
+  TS->m_iter_wctime_total = 0.0;
 
-  TS->u_offsets = (long*) calloc (nsims, sizeof(long));
-  TS->u_sizes = (long*) calloc (nsims, sizeof(long));
+  TS->m_u_offsets = (long*) calloc (nsims, sizeof(long));
+  TS->m_u_sizes = (long*) calloc (nsims, sizeof(long));
 
-  TS->u_size_total = 0;
+  TS->m_u_size_total = 0;
   for (ns = 0; ns < nsims; ns++) {
-    TS->u_offsets[ns] = TS->u_size_total;
-    TS->u_sizes[ns] = sim[ns].solver.npoints_local_wghosts * sim[ns].solver.nvars ;
-    TS->u_size_total += TS->u_sizes[ns];
+    TS->m_u_offsets[ns] = TS->m_u_size_total;
+    TS->m_u_sizes[ns] = sim[ns].solver.m_npoints_local_wghosts * sim[ns].solver.m_nvars ;
+    TS->m_u_size_total += TS->m_u_sizes[ns];
   }
 
-  TS->u   = (double*) calloc (TS->u_size_total,sizeof(double));
-  TS->rhs = (double*) calloc (TS->u_size_total,sizeof(double));
-  _ArraySetValue_(TS->u  ,TS->u_size_total,0.0);
-  _ArraySetValue_(TS->rhs,TS->u_size_total,0.0);
+  TS->m_u   = (double*) calloc (TS->m_u_size_total,sizeof(double));
+  TS->m_rhs = (double*) calloc (TS->m_u_size_total,sizeof(double));
+  _ArraySetValue_(TS->m_u  ,TS->m_u_size_total,0.0);
+  _ArraySetValue_(TS->m_rhs,TS->m_u_size_total,0.0);
 
   /* initialize arrays to NULL, then allocate as necessary */
-  TS->U             = NULL;
-  TS->Udot          = NULL;
-  TS->BoundaryFlux  = NULL;
+  TS->m_U             = NULL;
+  TS->m_Udot          = NULL;
+  TS->m_BoundaryFlux  = NULL;
 
-  TS->bf_offsets = (int*) calloc (nsims, sizeof(int));
-  TS->bf_sizes = (int*) calloc (nsims, sizeof(int));
-  TS->bf_size_total = 0;
+  TS->m_bf_offsets = (int*) calloc (nsims, sizeof(int));
+  TS->m_bf_sizes = (int*) calloc (nsims, sizeof(int));
+  TS->m_bf_size_total = 0;
   for (ns = 0; ns < nsims; ns++) {
-    TS->bf_offsets[ns] = TS->bf_size_total;
-    TS->bf_sizes[ns] =  2 * sim[ns].solver.ndims * sim[ns].solver.nvars;
-    TS->bf_size_total += TS->bf_sizes[ns];
+    TS->m_bf_offsets[ns] = TS->m_bf_size_total;
+    TS->m_bf_sizes[ns] =  2 * sim[ns].solver.m_ndims * sim[ns].solver.m_nvars;
+    TS->m_bf_size_total += TS->m_bf_sizes[ns];
   }
 
 #if defined(HAVE_CUDA)
-  if (sim[0].solver.use_gpu) {
+  if (sim[0].solver.m_use_gpu) {
 
-    if (!strcmp(sim[0].solver.time_scheme,_RK_)) {
+    if (!strcmp(sim[0].solver.m_time_scheme,_RK_)) {
 
       /* explicit Runge-Kutta methods */
-      ExplicitRKParameters  *params = (ExplicitRKParameters*)  sim[0].solver.msti;
+      ExplicitRKParameters  *params = (ExplicitRKParameters*)  sim[0].solver.m_msti;
       int nstages = params->nstages;
 
-      gpuMalloc((void**)&TS->gpu_U, TS->u_size_total*nstages*sizeof(double));
-      gpuMalloc((void**)&TS->gpu_Udot, TS->u_size_total*nstages*sizeof(double));
-      gpuMalloc((void**)&TS->gpu_BoundaryFlux, TS->bf_size_total*nstages*sizeof(double));
-      gpuMemset(TS->gpu_U, 0, TS->u_size_total*nstages*sizeof(double));
-      gpuMemset(TS->gpu_Udot, 0, TS->u_size_total*nstages*sizeof(double));
-      gpuMemset(TS->gpu_BoundaryFlux, 0, TS->bf_size_total*nstages*sizeof(double));
+      gpuMalloc((void**)&TS->m_gpu_U, TS->m_u_size_total*nstages*sizeof(double));
+      gpuMalloc((void**)&TS->m_gpu_Udot, TS->m_u_size_total*nstages*sizeof(double));
+      gpuMalloc((void**)&TS->m_gpu_BoundaryFlux, TS->m_bf_size_total*nstages*sizeof(double));
+      gpuMemset(TS->m_gpu_U, 0, TS->m_u_size_total*nstages*sizeof(double));
+      gpuMemset(TS->m_gpu_Udot, 0, TS->m_u_size_total*nstages*sizeof(double));
+      gpuMemset(TS->m_gpu_BoundaryFlux, 0, TS->m_bf_size_total*nstages*sizeof(double));
 
     } else {
 
       fprintf(stderr,"ERROR in TimeInitialize(): %s is not yet implemented on GPUs.\n",
-              sim[0].solver.time_scheme );
+              sim[0].solver.m_time_scheme );
       return 1;
 
     }
@@ -111,59 +111,59 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
   } else {
 #endif
 
-    if (!strcmp(sim[0].solver.time_scheme,_RK_)) {
+    if (!strcmp(sim[0].solver.m_time_scheme,_RK_)) {
 
       /* explicit Runge-Kutta methods */
-      ExplicitRKParameters  *params = (ExplicitRKParameters*)  sim[0].solver.msti;
+      ExplicitRKParameters  *params = (ExplicitRKParameters*)  sim[0].solver.m_msti;
       int nstages = params->nstages;
-      TS->U     = (double**) calloc (nstages,sizeof(double*));
-      TS->Udot  = (double**) calloc (nstages,sizeof(double*));
+      TS->m_U     = (double**) calloc (nstages,sizeof(double*));
+      TS->m_Udot  = (double**) calloc (nstages,sizeof(double*));
       for (i = 0; i < nstages; i++) {
-        TS->U[i]    = (double*) calloc (TS->u_size_total,sizeof(double));
-        TS->Udot[i] = (double*) calloc (TS->u_size_total,sizeof(double));
+        TS->m_U[i]    = (double*) calloc (TS->m_u_size_total,sizeof(double));
+        TS->m_Udot[i] = (double*) calloc (TS->m_u_size_total,sizeof(double));
       }
 
-      TS->BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
+      TS->m_BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
       for (i=0; i<nstages; i++) {
-        TS->BoundaryFlux[i] = (double*) calloc (TS->bf_size_total,sizeof(double));
+        TS->m_BoundaryFlux[i] = (double*) calloc (TS->m_bf_size_total,sizeof(double));
       }
 
-    } else if (!strcmp(sim[0].solver.time_scheme,_FORWARD_EULER_)) {
+    } else if (!strcmp(sim[0].solver.m_time_scheme,_FORWARD_EULER_)) {
 
       int nstages = 1;
-      TS->BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
+      TS->m_BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
       for (i=0; i<nstages; i++) {
-        TS->BoundaryFlux[i] = (double*) calloc (TS->bf_size_total,sizeof(double));
+        TS->m_BoundaryFlux[i] = (double*) calloc (TS->m_bf_size_total,sizeof(double));
       }
 
-    } else if (!strcmp(sim[0].solver.time_scheme,_GLM_GEE_)) {
+    } else if (!strcmp(sim[0].solver.m_time_scheme,_GLM_GEE_)) {
 
       /* General Linear Methods with Global Error Estimate */
-      GLMGEEParameters *params = (GLMGEEParameters*) sim[0].solver.msti;
+      GLMGEEParameters *params = (GLMGEEParameters*) sim[0].solver.m_msti;
       int nstages = params->nstages;
       int r       = params->r;
-      TS->U     = (double**) calloc (2*r-1  ,sizeof(double*));
-      TS->Udot  = (double**) calloc (nstages,sizeof(double*));
-      for (i=0; i<2*r-1; i++)   TS->U[i]    = (double*) calloc (TS->u_size_total,sizeof(double));
-      for (i=0; i<nstages; i++) TS->Udot[i] = (double*) calloc (TS->u_size_total,sizeof(double));
+      TS->m_U     = (double**) calloc (2*r-1  ,sizeof(double*));
+      TS->m_Udot  = (double**) calloc (nstages,sizeof(double*));
+      for (i=0; i<2*r-1; i++)   TS->m_U[i]    = (double*) calloc (TS->m_u_size_total,sizeof(double));
+      for (i=0; i<nstages; i++) TS->m_Udot[i] = (double*) calloc (TS->m_u_size_total,sizeof(double));
 
-      TS->BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
+      TS->m_BoundaryFlux = (double**) calloc (nstages,sizeof(double*));
       for (i=0; i<nstages; i++) {
-        TS->BoundaryFlux[i] = (double*) calloc (TS->bf_size_total,sizeof(double));
+        TS->m_BoundaryFlux[i] = (double*) calloc (TS->m_bf_size_total,sizeof(double));
       }
 
 
       if (!strcmp(params->ee_mode,_GLM_GEE_YYT_)) {
         for (ns = 0; ns < nsims; ns++) {
           for (i=0; i<r-1; i++) {
-            _ArrayCopy1D_(  (sim[ns].solver.u),
-                            (TS->U[r+i] + TS->u_offsets[ns]),
-                            (TS->u_sizes[ns])  );
+            _ArrayCopy1D_(  (sim[ns].solver.m_u),
+                            (TS->m_U[r+i] + TS->m_u_offsets[ns]),
+                            (TS->m_u_sizes[ns])  );
           }
         }
       } else {
         for (i=0; i<r-1; i++) {
-          _ArraySetValue_(TS->U[r+i],TS->u_size_total,0.0);
+          _ArraySetValue_(TS->m_U[r+i],TS->m_u_size_total,0.0);
         }
       }
     }
@@ -176,12 +176,12 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
 
   /* open files for writing */
   if (!rank) {
-    if (sim[0].solver.write_residual) TS->ResidualFile = (void*) fopen("residual.out","w");
-    else                              TS->ResidualFile = NULL;
-  } else                              TS->ResidualFile = NULL;
+    if (sim[0].solver.m_write_residual) TS->m_ResidualFile = (void*) fopen("residual.out","w");
+    else                              TS->m_ResidualFile = NULL;
+  } else                              TS->m_ResidualFile = NULL;
 
   for (ns = 0; ns < nsims; ns++) {
-    sim[ns].solver.time_integrator = TS;
+    sim[ns].solver.m_time_integrator = TS;
   }
 
   return 0;

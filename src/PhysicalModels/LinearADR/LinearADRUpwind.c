@@ -25,21 +25,21 @@ int LinearADRUpwind(  double  *fI,  /*!< Computed upwind interface flux */
                    )
 {
   HyPar     *solver = (HyPar*)      s;
-  LinearADR *param  = (LinearADR*)  solver->physics;
+  LinearADR *param  = (LinearADR*)  solver->m_physics;
   int       done,v;
 
-  int ndims = solver->ndims;
-  int nvars = solver->nvars;
-  int ghosts= solver->ghosts;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int nvars = solver->m_nvars;
+  int ghosts= solver->m_ghosts;
+  int *dim  = solver->m_dim_local;
 
-  double *a = param->a;
+  double *a = param->m_a;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
 
-  if (param->constant_advection == 1) {
+  if (param->m_constant_advection == 1) {
 
     done = 0; _ArraySetValue_(index_outer,ndims,0);
     while (!done) {
@@ -53,7 +53,7 @@ int LinearADRUpwind(  double  *fI,  /*!< Computed upwind interface flux */
       _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
     }
 
-  } else if (param->constant_advection == 0) {
+  } else if (param->m_constant_advection == 0) {
 
     done = 0; _ArraySetValue_(index_outer,ndims,0);
     while (!done) {
@@ -112,12 +112,12 @@ int LinearADRCenteredFlux(  double  *fI,  /*!< Computed upwind interface flux */
                          )
 {
   HyPar     *solver = (HyPar*)      s;
-  LinearADR *param  = (LinearADR*)  solver->physics;
+  LinearADR *param  = (LinearADR*)  solver->m_physics;
 
-  int ndims = solver->ndims;
-  int nvars = solver->nvars;
-  int ghosts= solver->ghosts;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int nvars = solver->m_nvars;
+  int ghosts= solver->m_ghosts;
+  int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;

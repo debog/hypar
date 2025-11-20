@@ -22,13 +22,13 @@ double ShallowWater2DComputeCFL(
                                )
 {
   HyPar           *solver = (HyPar*)   s;
-  ShallowWater2D  *param  = (ShallowWater2D*) solver->physics;
+  ShallowWater2D  *param  = (ShallowWater2D*) solver->m_physics;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
   int index[ndims];
-  double *u   = solver->u;
+  double *u   = solver->m_u;
 
   double max_cfl = 0;
   int done = 0; _ArraySetValue_(index,ndims,0);
@@ -37,9 +37,9 @@ double ShallowWater2DComputeCFL(
     double h, uvel, vvel, c, dxinv, dyinv, local_cfl[_MODEL_NDIMS_];
     _ShallowWater2DGetFlowVar_((u+_MODEL_NVARS_*p),h,uvel,vvel);
 
-    _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->dxinv,dxinv); /* 1/dx */
-    _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->dxinv,dyinv); /* 1/dy */
-    c = sqrt(param->g*h); /* speed of gravity waves */
+    _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->m_dxinv,dxinv); /* 1/dx */
+    _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->m_dxinv,dyinv); /* 1/dy */
+    c = sqrt(param->m_g*h); /* speed of gravity waves */
     local_cfl[_XDIR_]=(absolute(uvel)+c)*dt*dxinv;/* local cfl for this grid point (x) */
     local_cfl[_YDIR_]=(absolute(vvel)+c)*dt*dyinv;/* local cfl for this grid point (y) */
     if (local_cfl[_XDIR_] > max_cfl) max_cfl = local_cfl[_XDIR_];

@@ -26,7 +26,7 @@ int NavierStokes3DLeftEigenvectors(
                                   )
 {
   NavierStokes3D *param  = (NavierStokes3D*)  p;
-  _NavierStokes3DLeftEigenvectors_(u,_NavierStokes3D_stride_,L,param->gamma,dir);
+  _NavierStokes3DLeftEigenvectors_(u,_NavierStokes3D_stride_,L,param->m_gamma,dir);
   return(0);
 }
 
@@ -45,6 +45,6 @@ int NavierStokes3DRightEigenvectors(
                                    )
 {
   NavierStokes3D *param  = (NavierStokes3D*)  p;
-  _NavierStokes3DRightEigenvectors_(u,_NavierStokes3D_stride_,R,param->gamma,dir);
+  _NavierStokes3DRightEigenvectors_(u,_NavierStokes3D_stride_,R,param->m_gamma,dir);
   return(0);
 }

@@ -22,23 +22,23 @@ int CompactSchemeInitialize(
 {
   HyPar         *solver = (HyPar*) s;
   MPIVariables  *mpi    = (MPIVariables*) m;
-  CompactScheme *compact   = (CompactScheme*) solver->compact;
+  CompactScheme *compact   = (CompactScheme*) solver->m_compact;
 
-  int nvars = solver->nvars;
-  int ndims = solver->ndims;
+  int nvars = solver->m_nvars;
+  int ndims = solver->m_ndims;
 
   int size = 1, d;
-  for (d=0; d<solver->ndims; d++) size *= (solver->dim_local[d]+1);
-  size *= solver->nvars;
-  if (!strcmp(solver->interp_type,_CHARACTERISTIC_)) size *= solver->nvars;
+  for (d=0; d<solver->m_ndims; d++) size *= (solver->m_dim_local[d]+1);
+  size *= solver->m_nvars;
+  if (!strcmp(solver->m_interp_type,_CHARACTERISTIC_)) size *= solver->m_nvars;
 
-  compact->A = (double*) calloc (size, sizeof(double));
-  compact->B = (double*) calloc (size, sizeof(double));
-  compact->C = (double*) calloc (size, sizeof(double));
-  compact->R = (double*) calloc (size, sizeof(double));
+  compact->m_A = (double*) calloc (size, sizeof(double));
+  compact->m_B = (double*) calloc (size, sizeof(double));
+  compact->m_C = (double*) calloc (size, sizeof(double));
+  compact->m_R = (double*) calloc (size, sizeof(double));
 
-  compact->sendbuf = (double*) calloc (size, sizeof(double));
-  compact->recvbuf = (double*) calloc (size, sizeof(double));
+  compact->m_sendbuf = (double*) calloc (size, sizeof(double));
+  compact->m_recvbuf = (double*) calloc (size, sizeof(double));
 
   return(0);
 }

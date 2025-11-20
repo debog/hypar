@@ -39,25 +39,25 @@ int MPIPartitionArray1D(
 #endif
 
   /* xg should be non-null only on root */
-  if (mpi->rank && xg) {
+  if (mpi->m_rank && xg) {
     fprintf(stderr,"Error in MPIPartitionArray1D(): global array exists on non-root processors (rank %d).\n",
-            mpi->rank);
+            mpi->m_rank);
     ierr = 1;
   }
-  if ((!mpi->rank) && (!xg)) {
+  if ((!mpi->m_rank) && (!xg)) {
     fprintf(stderr,"Error in MPIPartitionArray1D(): global array is not allocated on root processor.\n");
     ierr = 1;
   }
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     int proc;
-    for (proc = 0; proc < mpi->nproc; proc++) {
+    for (proc = 0; proc < mpi->m_nproc; proc++) {
       /* Find out the domain limits for each process */
       int is,ie;
       if (proc) {
 #ifndef serial
-        MPI_Recv(&is,1,MPI_INT,proc,1442,mpi->world,&status);
-        MPI_Recv(&ie,1,MPI_INT,proc,1443,mpi->world,&status);
+        MPI_Recv(&is,1,MPI_INT,proc,1442,mpi->m_world,&status);
+        MPI_Recv(&ie,1,MPI_INT,proc,1443,mpi->m_world,&status);
 #endif
       } else {
         is = istart;
@@ -68,7 +68,7 @@ int MPIPartitionArray1D(
       _ArrayCopy1D_((xg+is),buffer,size);
       if (proc) {
 #ifndef serial
-        MPI_Send(buffer,size,MPI_DOUBLE,proc,1539,mpi->world);
+        MPI_Send(buffer,size,MPI_DOUBLE,proc,1539,mpi->m_world);
 #endif
       } else _ArrayCopy1D_(buffer,x,N_local);
       free(buffer);
@@ -78,10 +78,10 @@ int MPIPartitionArray1D(
 #ifndef serial
     /* Meanwhile, on other processes */
     /* send local start and end indices to root */
-    MPI_Send(&istart,1,MPI_INT,0,1442,mpi->world);
-    MPI_Send(&iend  ,1,MPI_INT,0,1443,mpi->world);
+    MPI_Send(&istart,1,MPI_INT,0,1442,mpi->m_world);
+    MPI_Send(&iend  ,1,MPI_INT,0,1443,mpi->m_world);
     double *buffer = (double*) calloc (N_local, sizeof(buffer));
-    MPI_Recv(buffer,N_local,MPI_DOUBLE,0,1539,mpi->world,&status);
+    MPI_Recv(buffer,N_local,MPI_DOUBLE,0,1539,mpi->m_world,&status);
     _ArrayCopy1D_(buffer,x,N_local);
     free(buffer);
 #endif

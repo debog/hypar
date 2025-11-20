@@ -24,46 +24,46 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
 {
   HyPar             *solver   = (HyPar*)   s;
   MPIVariables      *mpi      = (MPIVariables*) m;
-  ImmersedBoundary  *IB       = (ImmersedBoundary*) solver->ib;
-  IBNode            *boundary = IB->boundary;
-  NavierStokes3D    *param    = (NavierStokes3D*) solver->physics;
+  ImmersedBoundary  *IB       = (ImmersedBoundary*) solver->m_ib;
+  IBNode            *boundary = IB->m_boundary;
+  NavierStokes3D    *param    = (NavierStokes3D*) solver->m_physics;
   static double     v[_MODEL_NVARS_];
-  int               n, j, k, nb = IB->n_boundary_nodes;
+  int               n, j, k, nb = IB->m_n_boundary_nodes;
 
-  if (!solver->flag_ib) return(0);
+  if (!solver->m_flag_ib) return(0);
 
   /* Ideally, this shouldn't be here - But this function is called everywhere
      (through ApplyIBConditions()) *before* MPIExchangeBoundariesnD is called! */
-  MPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->dim_local,solver->ghosts,mpi,u);
+  MPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_dim_local,solver->m_ghosts,mpi,u);
 
-  double inv_gamma_m1 = 1.0 / (param->gamma - 1.0);
+  double inv_gamma_m1 = 1.0 / (param->m_gamma - 1.0);
 
   double ramp_fac = 1.0;
-  if (param->t_ib_ramp > 0) {
-    double x = t/param->t_ib_ramp;
-    if (!strcmp(param->ib_ramp_type,_IB_RAMP_LINEAR_)) {
+  if (param->m_t_ib_ramp > 0) {
+    double x = t/param->m_t_ib_ramp;
+    if (!strcmp(param->m_ib_ramp_type,_IB_RAMP_LINEAR_)) {
       ramp_fac = x;
-    } else if (!strcmp(param->ib_ramp_type,_IB_RAMP_SMOOTHEDSLAB_)) {
+    } else if (!strcmp(param->m_ib_ramp_type,_IB_RAMP_SMOOTHEDSLAB_)) {
       double a = 0.0;
       double b = 1.0;
       double c = 0.5;
-      double r = param->t_ib_ramp/param->t_ib_width;
+      double r = param->m_t_ib_ramp/param->m_t_ib_width;
       ramp_fac = (a*exp(c*r)+b*exp(r*x))/(exp(c*r)+exp(r*x));
-    } else if (!strcmp(param->ib_ramp_type,_IB_RAMP_DISABLE_)) {
+    } else if (!strcmp(param->m_ib_ramp_type,_IB_RAMP_DISABLE_)) {
       ramp_fac = 0.0;
     } else {
       fprintf(stderr,"Error in NavierStokes3DImmersedBoundary():\n");
-      fprintf(stderr,"  Ramp type %s not recognized.\n", param->ib_ramp_type);
+      fprintf(stderr,"  Ramp type %s not recognized.\n", param->m_ib_ramp_type);
       return 1;
     }
   }
 
   for (n=0; n<nb; n++) {
 
-    int     node_index = boundary[n].p;
-    double  *alpha = &(boundary[n].interp_coeffs[0]);
-    int     *nodes = &(boundary[n].interp_nodes[0]);
-    double  factor = boundary[n].surface_distance / boundary[n].interp_node_distance;
+    int     node_index = boundary[n].m_p;
+    double  *alpha = &(boundary[n].m_interp_coeffs[0]);
+    int     *nodes = &(boundary[n].m_interp_nodes[0]);
+    double  factor = boundary[n].m_surface_distance / boundary[n].m_interp_node_distance;
 
     _ArraySetValue_(v,_MODEL_NVARS_,0.0);
     for (j=0; j<_IB_NNODES_; j++) {
@@ -73,7 +73,7 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
     }
 
     double rho, uvel, vvel, wvel, energy, pressure;
-    _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,param->gamma);
+    _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,param->m_gamma);
 
     double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
     _NavierStokes3DGetFlowVar_( (u+_MODEL_NVARS_*node_index),
@@ -84,7 +84,7 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
                                 wvel_gpt,
                                 energy_gpt,
                                 pressure_gpt,
-                                param->gamma );
+                                param->m_gamma );
 
     double rho_ib_target, uvel_ib_target, vvel_ib_target, wvel_ib_target, pressure_ib_target;
     rho_ib_target = rho;
@@ -124,46 +124,46 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
 {
   HyPar             *solver   = (HyPar*)   s;
   MPIVariables      *mpi      = (MPIVariables*) m;
-  ImmersedBoundary  *IB       = (ImmersedBoundary*) solver->ib;
-  IBNode            *boundary = IB->boundary;
-  NavierStokes3D    *param    = (NavierStokes3D*) solver->physics;
+  ImmersedBoundary  *IB       = (ImmersedBoundary*) solver->m_ib;
+  IBNode            *boundary = IB->m_boundary;
+  NavierStokes3D    *param    = (NavierStokes3D*) solver->m_physics;
   static double     v[_MODEL_NVARS_];
-  int               n, j, k, nb = IB->n_boundary_nodes;
+  int               n, j, k, nb = IB->m_n_boundary_nodes;
 
-  if (!solver->flag_ib) return(0);
+  if (!solver->m_flag_ib) return(0);
 
   /* Ideally, this shouldn't be here - But this function is called everywhere
      (through ApplyIBConditions()) *before* MPIExchangeBoundariesnD is called! */
-  MPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->dim_local,solver->ghosts,mpi,u);
+  MPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_dim_local,solver->m_ghosts,mpi,u);
 
-  double inv_gamma_m1 = 1.0 / (param->gamma - 1.0);
+  double inv_gamma_m1 = 1.0 / (param->m_gamma - 1.0);
 
   double ramp_fac = 1.0;
-  if (param->t_ib_ramp > 0) {
-    double x = t/param->t_ib_ramp;
-    if (!strcmp(param->ib_ramp_type,_IB_RAMP_LINEAR_)) {
+  if (param->m_t_ib_ramp > 0) {
+    double x = t/param->m_t_ib_ramp;
+    if (!strcmp(param->m_ib_ramp_type,_IB_RAMP_LINEAR_)) {
       ramp_fac = x;
-    } else if (!strcmp(param->ib_ramp_type,_IB_RAMP_SMOOTHEDSLAB_)) {
+    } else if (!strcmp(param->m_ib_ramp_type,_IB_RAMP_SMOOTHEDSLAB_)) {
       double a = 0.0;
       double b = 1.0;
       double c = 0.5;
-      double r = param->t_ib_ramp/param->t_ib_width;
+      double r = param->m_t_ib_ramp/param->m_t_ib_width;
       ramp_fac = (a*exp(c*r)+b*exp(r*x))/(exp(c*r)+exp(r*x));
-    } else if (!strcmp(param->ib_ramp_type,_IB_RAMP_DISABLE_)) {
+    } else if (!strcmp(param->m_ib_ramp_type,_IB_RAMP_DISABLE_)) {
       ramp_fac = 0.0;
     } else {
       fprintf(stderr,"Error in NavierStokes3DImmersedBoundary():\n");
-      fprintf(stderr,"  Ramp type %s not recognized.\n", param->ib_ramp_type);
+      fprintf(stderr,"  Ramp type %s not recognized.\n", param->m_ib_ramp_type);
       return 1;
     }
   }
 
   for (n=0; n<nb; n++) {
 
-    int     node_index = boundary[n].p;
-    double  *alpha = &(boundary[n].interp_coeffs[0]);
-    int     *nodes = &(boundary[n].interp_nodes[0]);
-    double  factor = boundary[n].surface_distance / boundary[n].interp_node_distance;
+    int     node_index = boundary[n].m_p;
+    double  *alpha = &(boundary[n].m_interp_coeffs[0]);
+    int     *nodes = &(boundary[n].m_interp_nodes[0]);
+    double  factor = boundary[n].m_surface_distance / boundary[n].m_interp_node_distance;
 
     _ArraySetValue_(v,_MODEL_NVARS_,0.0);
     for (j=0; j<_IB_NNODES_; j++) {
@@ -173,7 +173,7 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
     }
 
     double rho, uvel, vvel, wvel, energy, pressure, temperature;
-    _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,param->gamma);
+    _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,param->m_gamma);
     temperature = pressure / rho;
 
     double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt, temperature_gpt;
@@ -185,7 +185,7 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
                                 wvel_gpt,
                                 energy_gpt,
                                 pressure_gpt,
-                                param->gamma );
+                                param->m_gamma );
     temperature_gpt = pressure_gpt / rho_gpt;
 
     double  rho_ib_target,

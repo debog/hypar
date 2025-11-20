@@ -35,19 +35,19 @@ int MPIPartitionArraynD(
   int is[ndims], ie[ndims], index[ndims], bounds[ndims];
 
   /* xg should be non-null only on root */
-  if (mpi->rank && xg) {
+  if (mpi->m_rank && xg) {
     fprintf(stderr,"Error in MPIPartitionArraynD(): global array exists on non-root processors (rank %d).\n",
-            mpi->rank);
+            mpi->m_rank);
     return(1);
   }
-  if ((!mpi->rank) && (!xg)) {
+  if ((!mpi->m_rank) && (!xg)) {
     fprintf(stderr,"Error in MPIPartitionArraynD(): global array is not allocated on root processor.\n");
     return(1);
   }
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     int proc;
-    for (proc = 0; proc < mpi->nproc; proc++) {
+    for (proc = 0; proc < mpi->m_nproc; proc++) {
       int d,done,size;
       /* Find out the domain limits for each process */
       IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie); CHECKERR(ierr);
@@ -66,7 +66,7 @@ int MPIPartitionArraynD(
       }
       if (proc) {
 #ifndef serial
-        MPI_Send(buffer,size*nvars,MPI_DOUBLE,proc,1538,mpi->world);
+        MPI_Send(buffer,size*nvars,MPI_DOUBLE,proc,1538,mpi->m_world);
 #endif
       } else {
         done = 0; _ArraySetValue_(index,ndims,0);
@@ -87,7 +87,7 @@ int MPIPartitionArraynD(
     int d, done, size;
     size = 1; for (d=0; d<ndims; d++) size *= dim_local[d];
     double *buffer = (double*) calloc (size*nvars, sizeof(double));
-    MPI_Recv(buffer,size*nvars,MPI_DOUBLE,0,1538,mpi->world,&status);
+    MPI_Recv(buffer,size*nvars,MPI_DOUBLE,0,1538,mpi->m_world,&status);
     done = 0; _ArraySetValue_(index,ndims,0);
     while (!done) {
       int p1; _ArrayIndex1D_(ndims,dim_local,index,ghosts,p1);
@@ -131,19 +131,19 @@ int MPIPartitionArraynDwGhosts(
   for (d = 0; d < ndims; d++) dim_global_wghosts[d] = dim_global[d] + 2*ghosts;
 
   /* xg should be non-null only on root */
-  if (mpi->rank && xg) {
+  if (mpi->m_rank && xg) {
     fprintf(stderr,"Error in MPIPartitionArraynD(): global array exists on non-root processors (rank %d).\n",
-            mpi->rank);
+            mpi->m_rank);
     return(1);
   }
-  if ((!mpi->rank) && (!xg)) {
+  if ((!mpi->m_rank) && (!xg)) {
     fprintf(stderr,"Error in MPIPartitionArraynD(): global array is not allocated on root processor.\n");
     return(1);
   }
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     int proc;
-    for (proc = 0; proc < mpi->nproc; proc++) {
+    for (proc = 0; proc < mpi->m_nproc; proc++) {
       int done,size;
       /* Find out the domain limits for each process */
       IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie); CHECKERR(ierr);
@@ -162,7 +162,7 @@ int MPIPartitionArraynDwGhosts(
       }
       if (proc) {
 #ifndef serial
-        MPI_Send(buffer,size*nvars,MPI_DOUBLE,proc,1538,mpi->world);
+        MPI_Send(buffer,size*nvars,MPI_DOUBLE,proc,1538,mpi->m_world);
 #endif
       } else {
         done = 0; _ArraySetValue_(index,ndims,0);
@@ -178,7 +178,7 @@ int MPIPartitionArraynDwGhosts(
     int done, size;
     size = 1; for (d=0; d<ndims; d++) size *= (dim_local[d]+2*ghosts);
     double *buffer = (double*) calloc (size*nvars, sizeof(double));
-    MPI_Recv(buffer,size*nvars,MPI_DOUBLE,0,1538,mpi->world,&status);
+    MPI_Recv(buffer,size*nvars,MPI_DOUBLE,0,1538,mpi->m_world,&status);
     _ArrayCopy1D_(buffer, x, size*nvars);
     free(buffer);
 #endif

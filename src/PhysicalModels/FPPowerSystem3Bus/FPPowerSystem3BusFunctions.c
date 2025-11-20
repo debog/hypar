@@ -95,7 +95,7 @@ int FPPowerSystem3BusDriftFunction(
   double H1         = params->H1;
   double H2         = params->H2;
   double Href       = params->Href;
-  double gamma      = params->gamma;
+  double gamma      = params->m_gamma;
 
   double Pe1, Pe2, Peref;
   ComputeElectricalPower(theta1,theta2,params,&Pe1,&Pe2,&Peref);
@@ -136,7 +136,7 @@ int FPPowerSystem3BusDissipationFunction(
   double lambda21 = params->lambda[1][0];
   double lambda22 = params->lambda[1][1];
 
-  double gamma  = params->gamma;
+  double gamma  = params->m_gamma;
   double omegaB = params->omegaB;
 
 #if 0

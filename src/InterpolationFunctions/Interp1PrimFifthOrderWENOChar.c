@@ -42,7 +42,7 @@
     \f{equation}{
       \alpha^k = {\bf l}_k \cdot {\bf f},\ k=1,\cdots,n
     \f}
-    is the \f$k\f$-th characteristic quantity, and \f${\bf l}_k\f$ is the \f$k\f$-th left eigenvector, \f${\bf r}_k\f$ is the \f$k\f$-th right eigenvector, and \f$n\f$ is #HyPar::nvars. The nonlinear weights \f$\omega_k; k=1,2,3\f$ are the WENO weights computed in WENOFifthOrderCalculateWeightsChar(). The final interpolated function is computed from the interpolated characteristic quantities as:
+    is the \f$k\f$-th characteristic quantity, and \f${\bf l}_k\f$ is the \f$k\f$-th left eigenvector, \f${\bf r}_k\f$ is the \f$k\f$-th right eigenvector, and \f$n\f$ is #HyPar::m_nvars. The nonlinear weights \f$\omega_k; k=1,2,3\f$ are the WENO weights computed in WENOFifthOrderCalculateWeightsChar(). The final interpolated function is computed from the interpolated characteristic quantities as:
     \f{equation}{
       \hat{\bf f}_{j+1/2} = \sum_{k=1}^n \alpha^k_{j+1/2} {\bf r}_k
     \f}
@@ -71,11 +71,11 @@
     --------- | --------- | ---------------------------------------------
     fI        | double*   | Array to hold the computed interpolant at the grid interfaces. This array must have the same layout as the solution, but with \b no \b ghost \b points. Its size should be the same as u in all dimensions, except dir (the dimension along which to interpolate) along which it should be larger by 1 (number of interfaces is 1 more than the number of interior cell centers).
     fC        | double*   | Array with the cell-centered values of the flux function \f${\bf f}\left({\bf u}\right)\f$. This array must have the same layout and size as the solution, \b with \b ghost \b points.
-    u         | double*   | The solution array \f${\bf u}\f$ (with ghost points). If the interpolation is characteristic based, this is needed to compute the eigendecomposition. For a multidimensional problem, the layout is as follows: u is a contiguous 1D array of size (nvars*dim[0]*dim[1]*...*dim[D-1]) corresponding to the multi-dimensional solution, with the following ordering - nvars, dim[0], dim[1], ..., dim[D-1], where nvars is the number of solution components (#HyPar::nvars), dim is the local size (#HyPar::dim_local), D is the number of spatial dimensions.
+    u         | double*   | The solution array \f${\bf u}\f$ (with ghost points). If the interpolation is characteristic based, this is needed to compute the eigendecomposition. For a multidimensional problem, the layout is as follows: u is a contiguous 1D array of size (nvars*dim[0]*dim[1]*...*dim[D-1]) corresponding to the multi-dimensional solution, with the following ordering - nvars, dim[0], dim[1], ..., dim[D-1], where nvars is the number of solution components (#HyPar::m_nvars), dim is the local size (#HyPar::m_dim_local), D is the number of spatial dimensions.
     x         | double*   | The grid array (with ghost points). This is used only by non-uniform-grid interpolation methods. For multidimensional problems, the layout is as follows: x is a contiguous 1D array of size (dim[0]+dim[1]+...+dim[D-1]), with the spatial coordinates along dim[0] stored from 0,...,dim[0]-1, the spatial coordinates along dim[1] stored along dim[0],...,dim[0]+dim[1]-1, and so forth.
     upw       | int       | Upwinding direction: if positive, a left-biased interpolant will be computed; if negative, a right-biased interpolant will be computed. If the interpolation method is central, then this has no effect.
     dir       | int       | Spatial dimension along which to interpolate (eg: 0 for 1D; 0 or 1 for 2D; 0,1 or 2 for 3D)
-    s         | void*     | Solver object of type #HyPar: the following variables are needed - #HyPar::ghosts, #HyPar::ndims, #HyPar::nvars, #HyPar::dim_local.
+    s         | void*     | Solver object of type #HyPar: the following variables are needed - #HyPar::m_ghosts, #HyPar::m_ndims, #HyPar::m_nvars, #HyPar::m_dim_local.
     m         | void*     | MPI object of type #MPIVariables: this is needed only by compact interpolation method that need to solve a global implicit system across MPI ranks.
     uflag     | int       | A flag indicating if the function being interpolated \f${\bf f}\f$ is the solution itself \f${\bf u}\f$ (if 1, \f${\bf f}\left({\bf u}\right) \equiv {\bf u}\f$).
 
@@ -96,22 +96,22 @@ int Interp1PrimFifthOrderWENOChar(
                                  )
 {
   HyPar           *solver = (HyPar*) s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
   int             i, k, v;
   _DECLARE_IERR_;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
 
   /* define some constants */
   static const double one_sixth          = 1.0/6.0;
 
   double *ww1, *ww2, *ww3;
-  ww1 = weno->w1 + (upw < 0 ? 2*weno->size : 0) + (uflag ? weno->size : 0) + weno->offset[dir];
-  ww2 = weno->w2 + (upw < 0 ? 2*weno->size : 0) + (uflag ? weno->size : 0) + weno->offset[dir];
-  ww3 = weno->w3 + (upw < 0 ? 2*weno->size : 0) + (uflag ? weno->size : 0) + weno->offset[dir];
+  ww1 = weno->m_w1 + (upw < 0 ? 2*weno->m_size : 0) + (uflag ? weno->m_size : 0) + weno->m_offset[dir];
+  ww2 = weno->m_w2 + (upw < 0 ? 2*weno->m_size : 0) + (uflag ? weno->m_size : 0) + weno->m_offset[dir];
+  ww3 = weno->m_w3 + (upw < 0 ? 2*weno->m_size : 0) + (uflag ? weno->m_size : 0) + weno->m_offset[dir];
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -151,11 +151,11 @@ int Interp1PrimFifthOrderWENOChar(
       _ArrayIndex1D_(ndims,bounds_inter,indexI,0,p);
 
       /* find averaged state at this interface */
-      IERR solver->AveragingFunction(uavg,&u[nvars*qm1],&u[nvars*qp1],solver->physics); CHECKERR(ierr);
+      IERR solver->AveragingFunction(uavg,&u[nvars*qm1],&u[nvars*qp1],solver->m_physics); CHECKERR(ierr);
 
       /* Get the left and right eigenvectors */
-      IERR solver->GetLeftEigenvectors  (uavg,L,solver->physics,dir); CHECKERR(ierr);
-      IERR solver->GetRightEigenvectors (uavg,R,solver->physics,dir); CHECKERR(ierr);
+      IERR solver->GetLeftEigenvectors  (uavg,L,solver->m_physics,dir); CHECKERR(ierr);
+      IERR solver->GetRightEigenvectors (uavg,R,solver->m_physics,dir); CHECKERR(ierr);
 
       /* For each characteristic field */
       for (v = 0; v < nvars; v++) {

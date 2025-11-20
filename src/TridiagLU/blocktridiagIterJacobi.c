@@ -85,7 +85,7 @@
   + The input array \a x contains the right-hand-side on entering the function, and the
     solution on exiting it.
 */
-int blocktridiagIterJacobi(
+int BlockTridiagIterJacobi(
                             double  *a, /*!< Array containing the sub-diagonal elements */
                             double  *b, /*!< Array containing the diagonal elements */
                             double  *c, /*!< Array containing the super-diagonal elements */
@@ -94,11 +94,11 @@ int blocktridiagIterJacobi(
                                              multiplied by the block size) */
                             int     ns, /*!< Number of systems to solve */
                             int     bs, /*!< Block size */
-                            void    *r, /*!< Object of type #TridiagLU */
+                            void    *r, /*!< Object of type #TridiagLU_Params */
                             void    *m  /*!< MPI communicator */
                           )
 {
-  TridiagLU  *context = (TridiagLU*) r;
+  TridiagLU_Params *context = (TridiagLU_Params *) r;
   int        iter,d,i,j,NT,bs2=bs*bs,nsbs=ns*bs;
   double     norm=0,norm0=0,global_norm=0;
 
@@ -116,7 +116,7 @@ int blocktridiagIterJacobi(
 #endif
 
   if (!context) {
-    fprintf(stderr,"Error in tridiagIterJacobi(): NULL pointer passed for parameters!\n");
+    fprintf(stderr,"Error in TridiagIterJacobi(): NULL pointer passed for parameters!\n");
     return(-1);
   }
 
@@ -139,26 +139,26 @@ int blocktridiagIterJacobi(
 
   /* total number of points */
 #ifdef serial
-  if (context->evaluate_norm)    NT = n;
+  if (context->m_evaluate_norm)    NT = n;
   else                           NT = 0;
 #else
-  if (context->evaluate_norm) MPI_Allreduce(&n,&NT,1,MPI_INT,MPI_SUM,*comm);
+  if (context->m_evaluate_norm) MPI_Allreduce(&n,&NT,1,MPI_INT,MPI_SUM,*comm);
   else NT = 0;
 #endif
 
 #ifdef serial
-    if (context->verbose) printf("\n");
+    if (context->m_verbose) printf("\n");
 #else
-    if (context->verbose && (!rank)) printf("\n");
+    if (context->m_verbose && (!rank)) printf("\n");
 #endif
 
   iter = 0;
   while(1) {
 
     /* evaluate break conditions */
-    if (    (iter >= context->maxiter)
-        ||  (iter && context->evaluate_norm && (global_norm < context->atol))
-        ||  (iter && context->evaluate_norm && (global_norm/norm0 < context->rtol))  ) {
+    if (    (iter >= context->m_maxiter)
+        ||  (iter && context->m_evaluate_norm && (global_norm < context->m_atol))
+        ||  (iter && context->m_evaluate_norm && (global_norm/norm0 < context->m_rtol))  ) {
       break;
     }
 
@@ -177,7 +177,7 @@ int blocktridiagIterJacobi(
 #endif
 
     /* calculate error norm - interior */
-    if (context->evaluate_norm) {
+    if (context->m_evaluate_norm) {
       norm = 0;
       for (i=1; i<n-1; i++) {
         for (d=0; d<ns; d++) {
@@ -194,7 +194,7 @@ int blocktridiagIterJacobi(
     MPI_Status status_arr[4];
     MPI_Waitall(4,req,status_arr);
 #endif
-    if (context->evaluate_norm) {
+    if (context->m_evaluate_norm) {
       if (n > 1) {
         for (d=0; d<ns; d++) {
           double err[bs]; for (j=0; j<bs; j++) err[j] = rhs[d*bs+j];
@@ -233,9 +233,9 @@ int blocktridiagIterJacobi(
     }
 
 #ifdef serial
-    if (context->verbose)
+    if (context->m_verbose)
 #else
-    if (context->verbose && (!rank))
+    if (context->m_verbose && (!rank))
 #endif
       printf("\t\titer: %d, norm: %1.16E\n",iter,global_norm);
 
@@ -284,8 +284,8 @@ int blocktridiagIterJacobi(
   }
 
   /* save convergence information */
-  context->exitnorm = (context->evaluate_norm ? global_norm : -1.0);
-  context->exititer = iter;
+  context->m_exitnorm = (context->m_evaluate_norm ? global_norm : -1.0);
+  context->m_exititer = iter;
 
   free(rhs);
   free(sendbufL);

@@ -28,7 +28,7 @@ int IBIdentifyMode(
                   )
 {
   ImmersedBoundary  *IB = (ImmersedBoundary*) ib;
-  Body3D            *body   = IB->body;
+  Body3D            *body   = IB->m_body;
 
   double *x = X, *y = x + dim[0], *z = y + dim[1];
 
@@ -39,10 +39,10 @@ int IBIdentifyMode(
          grid_zmin = z[0],
          grid_zmax = z[dim[2]-1];
 
-  if      ( (grid_xmin > body->xmin) && (grid_xmax < body->xmax) ) strcpy(IB->mode,_IB_YZ_);
-  else if ( (grid_ymin > body->ymin) && (grid_ymax < body->ymax) ) strcpy(IB->mode,_IB_XZ_);
-  else if ( (grid_zmin > body->zmin) && (grid_zmax < body->zmax) ) strcpy(IB->mode,_IB_XY_);
-  else                                                             strcpy(IB->mode,_IB_3D_);
+  if      ( (grid_xmin > body->m_xmin) && (grid_xmax < body->m_xmax) ) strcpy(IB->m_mode,_IB_YZ_);
+  else if ( (grid_ymin > body->m_ymin) && (grid_ymax < body->m_ymax) ) strcpy(IB->m_mode,_IB_XZ_);
+  else if ( (grid_zmin > body->m_zmin) && (grid_zmax < body->m_zmax) ) strcpy(IB->m_mode,_IB_XY_);
+  else                                                             strcpy(IB->m_mode,_IB_3D_);
 
   return(0);
 }

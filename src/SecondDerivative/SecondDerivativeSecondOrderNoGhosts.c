@@ -77,7 +77,7 @@ int SecondDerivativeSecondOrderCentralNoGhosts( double*  D2f,   /*!< Array to ho
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
 
-  if (mpi->ip[dir] == 0) {
+  if (mpi->m_ip[dir] == 0) {
     /* left physical boundary: overwrite the leftmost value with biased finite-difference */
     int done = 0; _ArraySetValue_(index_outer,ndims,0);
     while (!done) {
@@ -93,7 +93,7 @@ int SecondDerivativeSecondOrderCentralNoGhosts( double*  D2f,   /*!< Array to ho
     }
   }
 
-  if (mpi->ip[dir] == (mpi->iproc[dir]-1)) {
+  if (mpi->m_ip[dir] == (mpi->m_iproc[dir]-1)) {
     /* right physical boundary: overwrite the rightmost value with biased finite-difference */
     int done = 0; _ArraySetValue_(index_outer,ndims,0);
     while (!done) {

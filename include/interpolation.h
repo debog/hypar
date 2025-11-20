@@ -174,8 +174,8 @@ int InterpSetLimiterVar(double*,double*,double*,int,void*,void*);
 */
 typedef struct paramters_muscl {
 
-  char limiter_type[_MAX_STRING_SIZE_]; /*!< Type of slope limiter */
-  double eps; /*!< Epsilon parameter for the Koren's limiter */
+  char m_limiter_type[_MAX_STRING_SIZE_]; /*!< Type of slope limiter */
+  double m_eps; /*!< Epsilon parameter for the Koren's limiter */
 
   /*! pointer the limiter function */
   double (*LimiterFunction) (double);
@@ -192,29 +192,29 @@ int MUSCLInitialize(void*,void*);
  * This structure contains the variables/parameters needed by the WENO-type scheme (#_FIFTH_ORDER_WENO_, #_FIFTH_ORDER_CRWENO_, #_FIFTH_ORDER_HCWENO_).
 */
 typedef struct parameters_weno {
-  int     mapped;        /*!< Use mapped weights? (Henrick, Aslam, J. Comput. Phys., 2005) */
-  int     borges;        /*!< Use Borges' implementation of weights? (Borges, et. al, J. Comput. Phys., 2008) */
-  int     yc;            /*!< Use Yamaleev-Carpenter implementation of weights? (Yamaleev, Carpenter, J. Comput. Phys., 2009) */
-  int     no_limiting;  /*!< Remove limiting -> 5th order polynomial interpolation (freeze the WENO weights to the optimal coefficients)  */
-  double  eps;          /*!< epsilon parameter */
-  double  p;            /*!< p parameter */
-  double  tol;          /*!< a general tolerance parameter */
+  int     m_mapped;        /*!< Use mapped weights? (Henrick, Aslam, J. Comput. Phys., 2005) */
+  int     m_borges;        /*!< Use Borges' implementation of weights? (Borges, et. al, J. Comput. Phys., 2008) */
+  int     m_yc;            /*!< Use Yamaleev-Carpenter implementation of weights? (Yamaleev, Carpenter, J. Comput. Phys., 2009) */
+  int     m_no_limiting;  /*!< Remove limiting -> 5th order polynomial interpolation (freeze the WENO weights to the optimal coefficients)  */
+  double  m_eps;          /*!< epsilon parameter */
+  double  m_p;            /*!< p parameter */
+  double  m_tol;          /*!< a general tolerance parameter */
 
   /* hybrid compact-WENO scheme related parameters
    * **References**:
    * + http://dx.doi.org/10.1006/jcph.2002.7021
    * + http://dx.doi.org/10.1016/j.jcp.2003.07.006
   */
-  double  rc, /*!< Parameter for the hybrid compact-WENO scheme */
-          xi; /*!< Parameter for the hybrid compact-WENO scheme */
+  double  m_rc, /*!< Parameter for the hybrid compact-WENO scheme */
+          m_xi; /*!< Parameter for the hybrid compact-WENO scheme */
 
   /* Arrays to save the WENO weights */
-  double *w1, /*!< Array to save the first WENO weight */
-         *w2, /*!< Array to save the second WENO weight */
-         *w3;/*!< Array to save the third WENO weight */
+  double *m_w1, /*!< Array to save the first WENO weight */
+         *m_w2, /*!< Array to save the second WENO weight */
+         *m_w3;/*!< Array to save the third WENO weight */
   /* size and offset for the WENO weights arrays */
-  int *offset /*! Array containing the offset information for the WENO weights */,
-      size /*! Size of the WENO weights array */;
+  int *m_offset /*! Array containing the offset information for the WENO weights */,
+      m_size /*! Size of the WENO weights array */;
 
 } WENOParameters;
 
@@ -559,13 +559,13 @@ int WENOCleanup(void*, int);
 */
 typedef struct compact_scheme {
 
-  double *A, /*!< Array to save the sub-diagonal of the tridiagonal system resulting from the fifth-order CRWENO scheme */
-         *B, /*!< Array to save the diagonal of the tridiagonal system resulting from the fifth-order CRWENO scheme */
-         *C, /*!< Array to save the super-diagonal of the tridiagonal system resulting from the fifth-order CRWENO scheme */
-         *R;/*!< Array to save the right-hand-side of the tridiagonal system resulting from the fifth-order CRWENO scheme */
+  double *m_A, /*!< Array to save the sub-diagonal of the tridiagonal system resulting from the fifth-order CRWENO scheme */
+         *m_B, /*!< Array to save the diagonal of the tridiagonal system resulting from the fifth-order CRWENO scheme */
+         *m_C, /*!< Array to save the super-diagonal of the tridiagonal system resulting from the fifth-order CRWENO scheme */
+         *m_R;/*!< Array to save the right-hand-side of the tridiagonal system resulting from the fifth-order CRWENO scheme */
   /* CRWENO scheme: buffer arrays for sending and receiving data */
-  double *sendbuf, /*!< Buffer array to send data across processors */
-         *recvbuf; /*!< Buffer array to receive data across processors */
+  double *m_sendbuf, /*!< Buffer array to send data across processors */
+         *m_recvbuf; /*!< Buffer array to receive data across processors */
 
 } CompactScheme;
 

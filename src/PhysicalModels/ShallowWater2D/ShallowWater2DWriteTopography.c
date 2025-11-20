@@ -20,39 +20,39 @@ int ShallowWater2DWriteTopography(  void*   s,  /*!< Solver object of type #HyPa
 {
   HyPar           *solver = (HyPar*)          s;
   MPIVariables    *mpi    = (MPIVariables*)   m;
-  ShallowWater2D  *params = (ShallowWater2D*) solver->physics;
+  ShallowWater2D  *params = (ShallowWater2D*) solver->m_physics;
   _DECLARE_IERR_;
 
-  if (params->topo_flag) {
+  if (params->m_topo_flag) {
 
     char fname_root[_MAX_STRING_SIZE_] = "topography";
-    if (solver->nsims > 1) {
+    if (solver->m_nsims > 1) {
       char index[_MAX_STRING_SIZE_];
-      GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
+      GetStringFromInteger(solver->m_my_idx, index, (int)log10(solver->m_nsims)+1);
       strcat(fname_root, "_");
       strcat(fname_root, index);
       strcat(fname_root, "_");
     }
 
-    WriteArray(  solver->ndims,
+    WriteArray(  solver->m_ndims,
                  1,
-                 solver->dim_global,
-                 solver->dim_local,
-                 solver->ghosts,
-                 solver->x,
-                 params->b,
+                 solver->m_dim_global,
+                 solver->m_dim_local,
+                 solver->m_ghosts,
+                 solver->m_x,
+                 params->m_b,
                  solver,
                  mpi,
                  fname_root );
 
-    if (!strcmp(solver->plot_solution, "yes")) {
-      PlotArray( solver->ndims,
+    if (!strcmp(solver->m_plot_solution, "yes")) {
+      PlotArray( solver->m_ndims,
                  1,
-                 solver->dim_global,
-                 solver->dim_local,
-                 solver->ghosts,
-                 solver->x,
-                 params->b,
+                 solver->m_dim_global,
+                 solver->m_dim_local,
+                 solver->m_ghosts,
+                 solver->m_x,
+                 params->m_b,
                  a_t,
                  solver,
                  mpi,

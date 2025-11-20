@@ -94,7 +94,7 @@
   { \
     double h,v,c; \
     _ShallowWater1DGetFlowVar_(u,h,v); \
-    c = sqrt(p->g*h); \
+    c = sqrt(p->m_g*h); \
     D[0*_MODEL_NVARS_+0] = (v+c);  D[0*_MODEL_NVARS_+1] = 0;     \
     D[1*_MODEL_NVARS_+0] = 0;      D[1*_MODEL_NVARS_+1] = (v-c); \
   }
@@ -118,7 +118,7 @@
   { \
     double h,v,c; \
     _ShallowWater1DGetFlowVar_(u,h,v); \
-    c    = sqrt(p->g*h); \
+    c    = sqrt(p->m_g*h); \
     R[0*_MODEL_NVARS_+0] = 1.0; \
     R[1*_MODEL_NVARS_+0] = v+c; \
     R[0*_MODEL_NVARS_+1] = 1.0; \
@@ -135,11 +135,11 @@
  *  specific to the 1D ShallowWater equations.
 */
 typedef struct shallowwater1d_parameters {
-  double  g;         /*!< Acceleration due to gravity */
-  int     bt_type,   /*!< 1 -> bottom topography is periodic, 0 -> bottom topography is not periodic */
-          topo_flag; /*!< Flag to indicate if topography file was provided */
-  double  *b;        /*!< Array to store the bottom topography \f$b(x)\f$ */
-  char    upw_choice[_MAX_STRING_SIZE_]; /*!< Choice of upwinding scheme.\sa #_ROE_, #_LLF_*/
+  double  m_g;         /*!< Acceleration due to gravity */
+  int     m_bt_type,   /*!< 1 -> bottom topography is periodic, 0 -> bottom topography is not periodic */
+          m_topo_flag; /*!< Flag to indicate if topography file was provided */
+  double  *m_b;        /*!< Array to store the bottom topography \f$b(x)\f$ */
+  char    m_upw_choice[_MAX_STRING_SIZE_]; /*!< Choice of upwinding scheme.\sa #_ROE_, #_LLF_*/
   /*! Function pointer to the function that computes the "upwinding" step in source term computation. To
       understand the implementation of the gravitational source terms, see:
       + Xing, Y., Shu, C.-W., "High order finite difference WENO schemes with the

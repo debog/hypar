@@ -13,11 +13,11 @@ int IBCleanup(void *s /*!< Object of type #ImmersedBoundary */)
   ImmersedBoundary *ib = (ImmersedBoundary*) s;
   if (!ib) return(0);
 
-  free(ib->body->surface);
-  free(ib->body);
+  free(ib->m_body->m_surface);
+  free(ib->m_body);
 
-  if (ib->n_boundary_nodes > 0) free(ib->boundary);
-  if (ib->nfacets_local > 0) free(ib->fmap);
+  if (ib->m_n_boundary_nodes > 0) free(ib->m_boundary);
+  if (ib->m_nfacets_local > 0) free(ib->m_fmap);
 
   return(0);
 }

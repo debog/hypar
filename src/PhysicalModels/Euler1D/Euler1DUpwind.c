@@ -40,13 +40,13 @@ int Euler1DUpwindRoe(
                     )
 {
   HyPar     *solver = (HyPar*)    s;
-  Euler1D   *param  = (Euler1D*)  solver->physics;
+  Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
 
-  int ndims = solver->ndims;
-  int ghosts= solver->ghosts;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int ghosts= solver->m_ghosts;
+  int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
@@ -76,7 +76,7 @@ int Euler1DUpwindRoe(
       _Euler1DLeftEigenvectors_   (uavg,L,param,0);
       _Euler1DRightEigenvectors_  (uavg,R,param,0);
 
-      double kappa = max(param->grav_field[pL],param->grav_field[pR]);
+      double kappa = max(param->m_grav_field[pL],param->m_grav_field[pR]);
       k = 0; D[k] = kappa*absolute(D[k]);
       k = 4; D[k] = kappa*absolute(D[k]);
       k = 8; D[k] = kappa*absolute(D[k]);
@@ -125,13 +125,13 @@ int Euler1DUpwindRF(
                     )
 {
   HyPar     *solver = (HyPar*)    s;
-  Euler1D   *param  = (Euler1D*)  solver->physics;
+  Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
 
-  int ndims   = solver->ndims;
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
+  int ndims   = solver->m_ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
@@ -149,7 +149,7 @@ int Euler1DUpwindRF(
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
       double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
-      double kappa = max(param->grav_field[pL],param->grav_field[pR]);
+      double kappa = max(param->m_grav_field[pL],param->m_grav_field[pR]);
 
       /* Roe-Fixed upwinding scheme */
 
@@ -222,13 +222,13 @@ int Euler1DUpwindLLF(
                     )
 {
   HyPar     *solver = (HyPar*)    s;
-  Euler1D   *param  = (Euler1D*)  solver->physics;
+  Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
 
-  int ndims   = solver->ndims;
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
+  int ndims   = solver->m_ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
@@ -246,7 +246,7 @@ int Euler1DUpwindLLF(
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
       double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
-      double kappa = max(param->grav_field[pL],param->grav_field[pR]);
+      double kappa = max(param->m_grav_field[pL],param->m_grav_field[pR]);
 
       /* Local Lax-Friedrich upwinding scheme */
 
@@ -303,12 +303,12 @@ int Euler1DUpwindSWFS(
                     )
 {
   HyPar     *solver = (HyPar*)    s;
-  Euler1D   *param  = (Euler1D*)  solver->physics;
+  Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done;
   _DECLARE_IERR_;
 
-  int ndims = solver->ndims;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
@@ -320,7 +320,7 @@ int Euler1DUpwindSWFS(
     _ArrayCopy1D_(index_outer,index_inter,ndims);
     for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      double rho,v,e,P,c,gamma=param->gamma,term,Mach;
+      double rho,v,e,P,c,gamma=param->m_gamma,term,Mach;
 
       /* Steger Warming flux splitting */
       _Euler1DRoeAverage_(uavg,(uL+_MODEL_NVARS_*p),(uR+_MODEL_NVARS_*p),param);
@@ -386,13 +386,13 @@ int Euler1DUpwindRusanov(
                         )
 {
   HyPar     *solver = (HyPar*)    s;
-  Euler1D   *param  = (Euler1D*)  solver->physics;
+  Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
 
-  int ndims = solver->ndims;
-  int ghosts= solver->ghosts;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int ghosts= solver->m_ghosts;
+  int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
@@ -419,18 +419,18 @@ int Euler1DUpwindRusanov(
       double rho, uvel, E, P, c;
 
       _Euler1DGetFlowVar_((u+_MODEL_NVARS_*pL),rho,uvel,E,P,param);
-      c = param->gamma*P/rho;
+      c = param->m_gamma*P/rho;
       double alphaL = c + absolute(uvel);
 
       _Euler1DGetFlowVar_((u+_MODEL_NVARS_*pR),rho,uvel,E,P,param);
-      c = param->gamma*P/rho;
+      c = param->m_gamma*P/rho;
       double alphaR = c + absolute(uvel);
 
       _Euler1DGetFlowVar_(uavg,rho,uvel,E,P,param);
-      c = param->gamma*P/rho;
+      c = param->m_gamma*P/rho;
       double alphaavg = c + absolute(uvel);
 
-      double kappa = max(param->grav_field[pL],param->grav_field[pR]);
+      double kappa = max(param->m_grav_field[pL],param->m_grav_field[pR]);
       double alpha = kappa*max3(alphaL,alphaR,alphaavg);
 
       for (k = 0; k < _MODEL_NVARS_; k++) {
@@ -463,14 +463,14 @@ int Euler1DUpwinddFRoe(
                     )
 {
   HyPar     *solver = (HyPar*)    s;
-  Euler1D   *param  = (Euler1D*)  solver->physics;
+  Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
 
-  int     ndims = solver->ndims;
-  int     ghosts= solver->ghosts;
-  int     *dim  = solver->dim_local;
-  double  *uref = param->solution;
+  int     ndims = solver->m_ndims;
+  int     ghosts= solver->m_ghosts;
+  int     *dim  = solver->m_dim_local;
+  double  *uref = param->m_solution;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
@@ -500,7 +500,7 @@ int Euler1DUpwinddFRoe(
       _Euler1DLeftEigenvectors_   (uavg,L,param,0);
       _Euler1DRightEigenvectors_  (uavg,R,param,0);
 
-      double kappa = max(param->grav_field[pL],param->grav_field[pR]);
+      double kappa = max(param->m_grav_field[pL],param->m_grav_field[pR]);
       k = 0; D[k] = 0.0;
       k = 4; D[k] = kappa*absolute(D[k]);
       k = 8; D[k] = kappa*absolute(D[k]);
@@ -544,14 +544,14 @@ int Euler1DUpwinddFRF(
                     )
 {
   HyPar     *solver = (HyPar*)    s;
-  Euler1D   *param  = (Euler1D*)  solver->physics;
+  Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
 
-  int     ndims   = solver->ndims;
-  int     *dim    = solver->dim_local;
-  int     ghosts  = solver->ghosts;
-  double  *uref   = param->solution;
+  int     ndims   = solver->m_ndims;
+  int     *dim    = solver->m_dim_local;
+  int     ghosts  = solver->m_ghosts;
+  double  *uref   = param->m_solution;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
@@ -569,7 +569,7 @@ int Euler1DUpwinddFRF(
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
       double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
-      double kappa = max(param->grav_field[pL],param->grav_field[pR]);
+      double kappa = max(param->m_grav_field[pL],param->m_grav_field[pR]);
 
       /* Roe-Fixed upwinding scheme */
 
@@ -633,14 +633,14 @@ int Euler1DUpwinddFLLF(
                     )
 {
   HyPar     *solver = (HyPar*)    s;
-  Euler1D   *param  = (Euler1D*)  solver->physics;
+  Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
 
-  int     ndims   = solver->ndims;
-  int     *dim    = solver->dim_local;
-  int     ghosts  = solver->ghosts;
-  double  *uref   = param->solution;
+  int     ndims   = solver->m_ndims;
+  int     *dim    = solver->m_dim_local;
+  int     ghosts  = solver->m_ghosts;
+  double  *uref   = param->m_solution;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
@@ -658,7 +658,7 @@ int Euler1DUpwinddFLLF(
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
       double uavg[_MODEL_NVARS_], fcL[_MODEL_NVARS_], fcR[_MODEL_NVARS_],
              ucL[_MODEL_NVARS_], ucR[_MODEL_NVARS_], fc[_MODEL_NVARS_];
-      double kappa = max(param->grav_field[pL],param->grav_field[pR]);
+      double kappa = max(param->m_grav_field[pL],param->m_grav_field[pR]);
 
       /* Local Lax-Friedrich upwinding scheme */
 

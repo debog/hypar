@@ -49,14 +49,14 @@ static int ApplyPeriodicity(  int     dir,    /*!< Spatial dimension along which
 }
 
 /*! Compute the global DOF index for all the grid points: The "global DOF index"
-    is the component number (or block component number for #HyPar::nvars > 1) of
+    is the component number (or block component number for #HyPar::m_nvars > 1) of
     a grid point in the global solution vector. It is also the row number (or
     block row number) of the grid point in the global matrix representing, for
     example, the Jacobian of the right-hand-side.
 
     #PETScContext::globalDOF is an integer array with the same layout as the solution
-    array #HyPar::u (but with one component) containing the global DOF index for the
-    corresponding grid points. It has the same number of ghost points as #HyPar::u.
+    array #HyPar::m_u (but with one component) containing the global DOF index for the
+    corresponding grid points. It has the same number of ghost points as #HyPar::m_u.
     + This array is initialized to -1.
     + The global DOF indices are computed for all non-ghost grid points.
     + If any boundaries are periodic, periodic boundary conditions are applied to fill
@@ -69,18 +69,18 @@ static int ApplyPeriodicity(  int     dir,    /*!< Spatial dimension along which
 int PetscGlobalDOF(void* c /*!< Object of type #PETScContext*/)
 {
   PETScContext* ctxt = (PETScContext*) c;
-  SimulationObject* sim = (SimulationObject*) ctxt->simobj;
-  int nsims = ctxt->nsims;
+  SimulationObject* sim = (SimulationObject*) ctxt->m_simobj;
+  int nsims = ctxt->m_nsims;
 
-  ctxt->globalDOF.resize(nsims, nullptr);
+  ctxt->m_globalDOF.resize(nsims, nullptr);
 
   /* compute MPI offset */
-  std::vector<int> local_sizes(ctxt->nproc ,0);
-  local_sizes[ctxt->rank] = ctxt->npoints;
-  MPIMax_integer(local_sizes.data(),local_sizes.data(),ctxt->nproc,&sim[0].mpi.world);
+  std::vector<int> local_sizes(ctxt->m_nproc ,0);
+  local_sizes[ctxt->m_rank] = ctxt->m_npoints;
+  MPIMax_integer(local_sizes.data(),local_sizes.data(),ctxt->m_nproc,&sim[0].mpi.m_world);
 
   int MPIOffset = 0;
-  for (int i=0; i<ctxt->rank; i++) MPIOffset += local_sizes[i];
+  for (int i=0; i<ctxt->m_rank; i++) MPIOffset += local_sizes[i];
 
   int simOffset = 0;
   for (int ns = 0; ns < nsims; ns++) {
@@ -88,27 +88,27 @@ int PetscGlobalDOF(void* c /*!< Object of type #PETScContext*/)
     HyPar* solver = &(sim[ns].solver);
     MPIVariables* mpi = &(sim[ns].mpi);
 
-    int   *dim        = solver->dim_local,
-          ndims       = solver->ndims,
-          ghosts      = solver->ghosts,
-          npoints     = solver->npoints_local,
-          npoints_wg  = solver->npoints_local_wghosts,
+    int   *dim        = solver->m_dim_local,
+          ndims       = solver->m_ndims,
+          ghosts      = solver->m_ghosts,
+          npoints     = solver->m_npoints_local,
+          npoints_wg  = solver->m_npoints_local_wghosts,
           nv          = ndims + 1, i;
 
-    ctxt->globalDOF[ns] = (double*) calloc( npoints_wg, sizeof(double) );
-    _ArraySetValue_(ctxt->globalDOF[ns], npoints_wg, -1.0);
+    ctxt->m_globalDOF[ns] = (double*) calloc( npoints_wg, sizeof(double) );
+    _ArraySetValue_(ctxt->m_globalDOF[ns], npoints_wg, -1.0);
 
     for (int i = 0; i < npoints; i++) {
-      int p = (ctxt->points[ns]+i*nv)[ndims];
-      ctxt->globalDOF[ns][p] = (double) (i + simOffset + MPIOffset);
+      int p = (ctxt->m_points[ns]+i*nv)[ndims];
+      ctxt->m_globalDOF[ns][p] = (double) (i + simOffset + MPIOffset);
     }
 
     for (int i=0; i<ndims; i++) {
-      if (solver->isPeriodic[i]) {
-        ApplyPeriodicity(i,ndims,dim,ghosts,ctxt->globalDOF[ns]);
+      if (solver->m_is_periodic[i]) {
+        ApplyPeriodicity(i,ndims,dim,ghosts,ctxt->m_globalDOF[ns]);
       }
     }
-    MPIExchangeBoundariesnD(ndims,1,dim,ghosts,mpi,ctxt->globalDOF[ns]);
+    MPIExchangeBoundariesnD(ndims,1,dim,ghosts,mpi,ctxt->m_globalDOF[ns]);
 
     simOffset += npoints;
   }

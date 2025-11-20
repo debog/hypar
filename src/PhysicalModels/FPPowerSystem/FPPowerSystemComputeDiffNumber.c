@@ -11,18 +11,18 @@ double FPPowerSystemDissipationFunction(int,void*,double);
 double FPPowerSystemComputeDiffNumber(void *s,void *m,double dt,double t)
 {
   HyPar         *solver = (HyPar*)        s;
-  FPPowerSystem *params = (FPPowerSystem*)solver->physics;
+  FPPowerSystem *params = (FPPowerSystem*)solver->m_physics;
 
-  int     ndims  = solver->ndims;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
+  int     ndims  = solver->m_ndims;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
 
   double  max_diff = 0;
   int     index[ndims];
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
-    double dxinv; _GetCoordinate_(0,index[0],dim,ghosts,solver->dxinv,dxinv);
-    double dyinv; _GetCoordinate_(1,index[1],dim,ghosts,solver->dxinv,dyinv);
+    double dxinv; _GetCoordinate_(0,index[0],dim,ghosts,solver->m_dxinv,dxinv);
+    double dyinv; _GetCoordinate_(1,index[1],dim,ghosts,solver->m_dxinv,dyinv);
     double dissp_x= FPPowerSystemDissipationFunction(0,params,t);
     double dissp_y= FPPowerSystemDissipationFunction(1,params,t);
 

@@ -42,78 +42,78 @@
 typedef struct _petsccontext_ {
 
   /*! MPI rank */
-  int rank;
+  int m_rank;
 
   /*! number of MPI ranks */
-  int nproc;
+  int m_nproc;
 
   /*! array of simulation objects of type #SimulationObject */
-  void *simobj;
+  void *m_simobj;
 
   /*! number of simulation objects */
-  int nsims;
+  int m_nsims;
 
   /*! The shift variable in implicit time-integration */
-  PetscReal shift;
+  PetscReal m_shift;
 
   /*! Current time */
-  double waqt;
+  double m_waqt;
 
   /*! Simulation time at start of step */
-  double t_start;
+  double m_t_start;
 
   /*! Current dt */
-  double dt;
+  double m_dt;
 
   /*! Stage times */
-  std::vector<double> stage_times;
+  std::vector<double> m_stage_times;
 
   /*! Current stage */
-  int stage_index;
+  int m_stage_index;
 
   /*! A counter variable */
-  int tic;
+  int m_tic;
 
   /*! Number of computational points (local), i.e., total number of grid points
       not counting the ghost points */
-  int npoints;
+  int m_npoints;
 
   /*! Number of computational DOFs (local), i.e., total number of grid points times
    *  the number of vector components at each grid point. */
-  int ndofs;
+  int m_ndofs;
 
   /*! Vector of index lists of local points in each simulation domain whose size is
-     (#HyPar::ndims+1)*#PETScContext::npoints.
+     (#HyPar::m_ndims+1)*#PETScContext::m_npoints.
       For each point, it stores its ndims-dimensional index and its 1D index
-      of its location in the array #HyPar::u. */
-  std::vector<int*> points;
+      of its location in the array #HyPar::m_u. */
+  std::vector<int*> m_points;
 
   /*! Vector offsets for each simulation domain */
-  int* offsets;
+  int* m_offsets;
 
   /* flags for implicit treatment */
   /*! Flag to indicate if hyperbolic term is treated implicitly or explicitly    */
-  int flag_hyperbolic;
+  int m_flag_hyperbolic;
   /*! Flag to indicate if the split hyperbolic term (\a f - \a df) is treated implicitly or explicitly  */
-  int flag_hyperbolic_f;
+  int m_flag_hyperbolic_f;
   /*! Flag to indicate if the split hyperbolic term \a df is treated implicitly or explicitly  */
-  int flag_hyperbolic_df;
+  int m_flag_hyperbolic_df;
   /*! Flag to indicate if the parabolic term is treated implicitly or explicitly      */
-  int flag_parabolic;
+  int m_flag_parabolic;
   /*! Flag to indicate if the source term is treated implicitly or explicitly         */
-  int flag_source;
+  int m_flag_source;
 
   /*! Flag to turn on preconditioning (off by default) */
-  int flag_use_precon;
+  int m_flag_use_precon;
 
   /*! Construct or use provided PC matrix */
-  std::string precon_matrix_type;
+  std::string m_precon_matrix_type;
 
   /*! Flag to indicate if the system being solved for implicit time-integration is linear/nonlinear. */
-  int flag_is_linear;
+  int m_flag_is_linear;
 
   /*! \f$\epsilon\f$ parameter for the Jacobian-free Newton-Krylov directional derivative computation */
-  double jfnk_eps;
+  double m_jfnk_eps;
 
   /*! A vector of essentialy integer arrays of the same size and layout at the solutions
       (with ghost points) containing the global DOF index for each grid point in each
@@ -121,24 +121,24 @@ typedef struct _petsccontext_ {
       It is declared as a \a double type so that its calculation can use functions
       defined for double-type variables.
       \sa PetscGlobalDOF() */
-  std::vector<double*> globalDOF;
+  std::vector<double*> m_globalDOF;
 
   /*! iteration start time */
-  struct timeval iter_start_time;
+  struct timeval m_iter_start_time;
   /*! iteration end time */
-  struct timeval iter_end_time;
+  struct timeval m_iter_end_time;
   /*! iteration wallclock time (in seconds) */
-  double iter_wctime;
+  double m_iter_wctime;
   /*! total time integration wall time (in seconds) */
-  double ti_runtime;
+  double m_ti_runtime;
 
 #ifdef with_librom
   /*! libROM interface */
-  void* rom_interface;
+  void* m_rom_interface;
   /*! ROM mode \sa #libROMInterface::m_mode */
-  std::string rom_mode;
+  std::string m_rom_mode;
   /*! Array of simulation times to write solution output at */
-  std::vector<double> op_times_arr;
+  std::vector<double> m_op_times_arr;
 #endif
 } PETScContext;
 

@@ -42,14 +42,14 @@ int LinearADRAdvection( double  *f, /*!< Array to hold the computed flux (same s
                       )
 {
   HyPar     *solver = (HyPar*)     s;
-  LinearADR *param  = (LinearADR*) solver->physics;
-  double    *adv    = param->a;
+  LinearADR *param  = (LinearADR*) solver->m_physics;
+  double    *adv    = param->m_a;
   int       i, v;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
 
   int index[ndims],
       bounds[ndims],
@@ -63,15 +63,15 @@ int LinearADRAdvection( double  *f, /*!< Array to hold the computed flux (same s
   _ArraySetValue_(offset,ndims,-ghosts);
 
   int done = 0; _ArraySetValue_(index,ndims,0);
-  if (param->constant_advection == 1) {
+  if (param->m_constant_advection == 1) {
     while (!done) {
       int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
       for (v = 0; v < nvars; v++) {
-        f[nvars*p+v] = param->a[nvars*dir+v] * u[nvars*p+v];
+        f[nvars*p+v] = param->m_a[nvars*dir+v] * u[nvars*p+v];
       }
       _ArrayIncrementIndex_(ndims,bounds,index,done);
     }
-  } else if (param->constant_advection == 0) {
+  } else if (param->m_constant_advection == 0) {
     while (!done) {
       int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
       for (v = 0; v < nvars; v++) {

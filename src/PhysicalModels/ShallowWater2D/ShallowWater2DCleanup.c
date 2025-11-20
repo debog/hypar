@@ -12,6 +12,6 @@ int ShallowWater2DCleanup(
                   )
 {
   ShallowWater2D *param  = (ShallowWater2D*) s;
-  free(param->b);
+  free(param->m_b);
   return(0);
 }

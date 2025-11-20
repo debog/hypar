@@ -19,7 +19,7 @@
  * The solver object (of type #HyPar) contains an oject of type #DomainBoundary
  * that contains all the boundary information (dimension, extent, face, type, etc).
  * This function iterates through each of the boundary zones
- * (#HyPar::boundary[#HyPar::nBoundaryZones]) and calls the corresponding boundary
+ * (#HyPar::m_boundary[#HyPar::m_n_boundary_zones]) and calls the corresponding boundary
  * condition function.
  * \n\n
  * The variable \a flag indicates if the array \a x is the solution, or a delta-solution
@@ -33,17 +33,17 @@ int ApplyBoundaryConditions(void    *s,     /*!< Object of type #HyPar containin
                            )
 {
   HyPar           *solver   = (HyPar*)          s;
-  DomainBoundary  *boundary = (DomainBoundary*) solver->boundary;
+  DomainBoundary  *boundary = (DomainBoundary*) solver->m_boundary;
   MPIVariables    *mpi      = (MPIVariables*)   m;
-  int             nb        = solver->nBoundaryZones;
+  int             nb        = solver->m_n_boundary_zones;
 
   int* dim_local;
 #if defined(HAVE_CUDA)
-  if (solver->use_gpu) {
-    dim_local = solver->gpu_dim_local;
+  if (solver->m_use_gpu) {
+    dim_local = solver->m_gpu_dim_local;
   } else {
 #endif
-    dim_local = solver->dim_local;
+    dim_local = solver->m_dim_local;
 #if defined(HAVE_CUDA)
   }
 #endif
@@ -51,8 +51,8 @@ int ApplyBoundaryConditions(void    *s,     /*!< Object of type #HyPar containin
   /* Apply domain boundary conditions to x */
   int n;
   for (n = 0; n < nb; n++) {
-    boundary[n].BCFunctionU(&boundary[n],mpi,solver->ndims,solver->nvars,
-                            dim_local,solver->ghosts,x,waqt);
+    boundary[n].BCFunctionU(&boundary[n],mpi,solver->m_ndims,solver->m_nvars,
+                            dim_local,solver->m_ghosts,x,waqt);
   }
 
   return(0);

@@ -29,12 +29,12 @@ int TemplateModelAdvection(
 )
 {
   HyPar         *solver  = (HyPar*)         s;
-  TemplateModel *physics = (TemplateModel*) solver->physics;
+  TemplateModel *physics = (TemplateModel*) solver->m_physics;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
 
   /*
    * Array indexing in HyPar:

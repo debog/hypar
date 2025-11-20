@@ -22,6 +22,6 @@ int FPPowerSystem3BusAdvection(
                               )
 {
   HyPar *solver = (HyPar*) s;
-  _ArrayCopy1D_(u,f,solver->npoints_local_wghosts);
+  _ArrayCopy1D_(u,f,solver->m_npoints_local_wghosts);
   return(0);
 }

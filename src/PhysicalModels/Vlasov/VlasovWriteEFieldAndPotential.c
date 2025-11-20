@@ -26,21 +26,21 @@ int VlasovWriteEFieldAndPotential(  void*   s,    /*!< Solver object of type #Hy
 {
   HyPar         *solver = (HyPar*)        s;
   MPIVariables  *mpi    = (MPIVariables*) m;
-  Vlasov        *param  = (Vlasov*)       solver->physics;
+  Vlasov        *param  = (Vlasov*)       solver->m_physics;
 
   {
     char fname_root[_MAX_STRING_SIZE_] = "efield";
-    VlasovWriteSpatialField( solver, mpi, param->e_field, fname_root );
-    if (!strcmp(solver->plot_solution,"yes")) {
-      VlasovPlotSpatialField( solver, mpi, param->e_field, a_t, fname_root );
+    VlasovWriteSpatialField( solver, mpi, param->m_e_field, fname_root );
+    if (!strcmp(solver->m_plot_solution,"yes")) {
+      VlasovPlotSpatialField( solver, mpi, param->m_e_field, a_t, fname_root );
     }
   }
 
-  if (param->self_consistent_electric_field) {
+  if (param->m_self_consistent_electric_field) {
     char fname_root[_MAX_STRING_SIZE_] = "potential";
-    VlasovWriteSpatialField( solver, mpi, param->potential, fname_root );
-    if (!strcmp(solver->plot_solution,"yes")) {
-      VlasovPlotSpatialField( solver, mpi, param->potential, a_t, fname_root );
+    VlasovWriteSpatialField( solver, mpi, param->m_potential, fname_root );
+    if (!strcmp(solver->m_plot_solution,"yes")) {
+      VlasovPlotSpatialField( solver, mpi, param->m_potential, a_t, fname_root );
     }
   }
 

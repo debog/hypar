@@ -27,12 +27,12 @@ void CombineSolutions(  SimulationObject*     a_sims_src, /*!< Array of simulati
   HyPar* solver_dst = &(a_sim_dst->solver);
   MPIVariables* mpi_dst = &(a_sim_dst->mpi);
 
-  int ndims = solver_dst->ndims;
-  int nvars = solver_dst->nvars;
-  int ghosts = solver_dst->ghosts;
+  int ndims = solver_dst->m_ndims;
+  int nvars = solver_dst->m_nvars;
+  int ghosts = solver_dst->m_ghosts;
 
   /* array size */
-  int* dim_global_dst = solver_dst->dim_global;
+  int* dim_global_dst = solver_dst->m_dim_global;
   int dim_dst_wgpt[ndims];
   _ArrayCopy1D_(dim_global_dst, dim_dst_wgpt, ndims);
   long size_dst_wgpt = nvars;
@@ -43,7 +43,7 @@ void CombineSolutions(  SimulationObject*     a_sims_src, /*!< Array of simulati
 
   /* allocate global data array for combined solution */
   double *ug_dst_wgpt = NULL;
-  if (!mpi_dst->rank) {
+  if (!mpi_dst->m_rank) {
     ug_dst_wgpt = (double*) calloc (size_dst_wgpt, sizeof(double));
     _ArraySetValue_(ug_dst_wgpt, size_dst_wgpt, 0.0);
   }
@@ -52,7 +52,7 @@ void CombineSolutions(  SimulationObject*     a_sims_src, /*!< Array of simulati
    * and add to the solution */
   for (int n = 0; n < a_nsims; n++) {
 
-    int* dim_global_src = a_sims_src[n].solver.dim_global;
+    int* dim_global_src = a_sims_src[n].solver.m_dim_global;
     int dim_global_src_wgpt[ndims];
     _ArrayCopy1D_(dim_global_src, dim_global_src_wgpt, ndims);
     long size_src_wgpt = nvars;
@@ -62,7 +62,7 @@ void CombineSolutions(  SimulationObject*     a_sims_src, /*!< Array of simulati
     }
 
     double* ug_src_wgpt = NULL;
-    if (!a_sims_src[n].mpi.rank) {
+    if (!a_sims_src[n].mpi.m_rank) {
       ug_src_wgpt = (double*) calloc (size_src_wgpt, sizeof(double));
       _ArraySetValue_(ug_src_wgpt, size_src_wgpt, 0.0);
     }
@@ -71,20 +71,20 @@ void CombineSolutions(  SimulationObject*     a_sims_src, /*!< Array of simulati
                              ug_src_wgpt,
                              a_u_src[n],
                              dim_global_src,
-                             a_sims_src[n].solver.dim_local,
+                             a_sims_src[n].solver.m_dim_local,
                              ghosts,
                              nvars );
 
-    if (!mpi_dst->rank) {
+    if (!mpi_dst->m_rank) {
       double *u_src_interpolated = NULL;
       InterpolateGlobalnDVar( dim_global_dst,
                               &u_src_interpolated,
-                              a_sims_src[n].solver.dim_global,
+                              a_sims_src[n].solver.m_dim_global,
                               ug_src_wgpt,
                               nvars,
                               ghosts,
                               ndims,
-                              a_sims_src[n].solver.isPeriodic );
+                              a_sims_src[n].solver.m_is_periodic );
       _ArrayAXPY_(u_src_interpolated, a_coeffs[n], ug_dst_wgpt, size_dst_wgpt);
       free(u_src_interpolated);
     }
@@ -94,15 +94,15 @@ void CombineSolutions(  SimulationObject*     a_sims_src, /*!< Array of simulati
   /* now partition the global combined solution to its processor */
   MPIPartitionArraynDwGhosts( ndims,
                               mpi_dst,
-                              (mpi_dst->rank ? NULL : ug_dst_wgpt),
+                              (mpi_dst->m_rank ? NULL : ug_dst_wgpt),
                               a_u_dst,
-                              solver_dst->dim_global,
-                              solver_dst->dim_local,
+                              solver_dst->m_dim_global,
+                              solver_dst->m_dim_local,
                               ghosts,
                               nvars );
 
   /* free memory */
-  if (!mpi_dst->rank) free(ug_dst_wgpt);
+  if (!mpi_dst->m_rank) free(ug_dst_wgpt);
 
   /* done */
   return;

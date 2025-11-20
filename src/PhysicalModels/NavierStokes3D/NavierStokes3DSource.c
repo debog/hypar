@@ -45,28 +45,28 @@ int NavierStokes3DSource(
 {
   HyPar           *solver = (HyPar* )         s;
   MPIVariables    *mpi    = (MPIVariables*)   m;
-  NavierStokes3D  *param  = (NavierStokes3D*) solver->physics;
+  NavierStokes3D  *param  = (NavierStokes3D*) solver->m_physics;
 
-  if ((param->grav_x == 0.0) && (param->grav_y == 0.0) && (param->grav_z == 0.0))
+  if ((param->m_grav_x == 0.0) && (param->m_grav_y == 0.0) && (param->m_grav_z == 0.0))
     return(0); /* no gravitational forces */
 
   int     v, done, p, p1, p2, dir;
-  double  *SourceI = solver->fluxI; /* interace source term       */
-  double  *SourceC = solver->fluxC; /* cell-centered source term  */
-  double  *SourceL = solver->fL;
-  double  *SourceR = solver->fR;
+  double  *SourceI = solver->m_flux_i; /* interace source term       */
+  double  *SourceC = solver->m_flux_c; /* cell-centered source term  */
+  double  *SourceL = solver->m_f_l;
+  double  *SourceR = solver->m_f_r;
 
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  double  *x      = solver->x;
-  double  *dxinv  = solver->dxinv;
-  double  RT      =  param->p0 / param->rho0;
+  int     ghosts  = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  double  *x      = solver->m_x;
+  double  *dxinv  = solver->m_dxinv;
+  double  RT      =  param->m_p0 / param->m_rho0;
   static int index[_MODEL_NDIMS_],index1[_MODEL_NDIMS_],index2[_MODEL_NDIMS_],dim_interface[_MODEL_NDIMS_];
   static double grav[_MODEL_NDIMS_];
 
-  grav[_XDIR_] = param->grav_x;
-  grav[_YDIR_] = param->grav_y;
-  grav[_ZDIR_] = param->grav_z;
+  grav[_XDIR_] = param->m_grav_x;
+  grav[_YDIR_] = param->m_grav_y;
+  grav[_ZDIR_] = param->m_grav_z;
   for (dir = 0; dir < _MODEL_NDIMS_; dir++) {
     if (grav[dir] != 0.0) {
       /* set interface dimensions */
@@ -89,10 +89,10 @@ int NavierStokes3DSource(
 
         double dx_inverse; _GetCoordinate_(dir,index[dir],dim,ghosts,dxinv,dx_inverse);
         double rho, vel[_MODEL_NDIMS_], e, P;
-        _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vel[0],vel[1],vel[2],e,P,param->gamma);
+        _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vel[0],vel[1],vel[2],e,P,param->m_gamma);
         double term[_MODEL_NVARS_] = {0.0, rho*RT*(dir==_XDIR_), rho*RT*(dir==_YDIR_), rho*RT*(dir==_ZDIR_), rho*RT*vel[dir]};
         for (v=0; v<_MODEL_NVARS_; v++) {
-          source[_MODEL_NVARS_*p+v] += (  (term[v]*param->grav_field_f[p])
+          source[_MODEL_NVARS_*p+v] += (  (term[v]*param->m_grav_field_f[p])
                                         * (SourceI[_MODEL_NVARS_*p2+v]-SourceI[_MODEL_NVARS_*p1+v])*dx_inverse );
         }
         vel[0] = P; /* useless statement to avoid compiler warnings */
@@ -132,10 +132,10 @@ int NavierStokes3DSourceFunction(
                                 )
 {
   HyPar           *solver = (HyPar* )         s;
-  NavierStokes3D  *param  = (NavierStokes3D*) solver->physics;
+  NavierStokes3D  *param  = (NavierStokes3D*) solver->m_physics;
 
-  int ghosts  = solver->ghosts;
-  int *dim    = solver->dim_local;
+  int ghosts  = solver->m_ghosts;
+  int *dim    = solver->m_dim_local;
   static int index[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_], offset[_MODEL_NDIMS_];
 
   /* set bounds for array index to include ghost points */
@@ -149,10 +149,10 @@ int NavierStokes3DSourceFunction(
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
     (f+_MODEL_NVARS_*p)[0] = 0.0;
-    (f+_MODEL_NVARS_*p)[1] = param->grav_field_g[p] * (dir == _XDIR_);
-    (f+_MODEL_NVARS_*p)[2] = param->grav_field_g[p] * (dir == _YDIR_);
-    (f+_MODEL_NVARS_*p)[3] = param->grav_field_g[p] * (dir == _ZDIR_);
-    (f+_MODEL_NVARS_*p)[4] = param->grav_field_g[p];
+    (f+_MODEL_NVARS_*p)[1] = param->m_grav_field_g[p] * (dir == _XDIR_);
+    (f+_MODEL_NVARS_*p)[2] = param->m_grav_field_g[p] * (dir == _YDIR_);
+    (f+_MODEL_NVARS_*p)[3] = param->m_grav_field_g[p] * (dir == _ZDIR_);
+    (f+_MODEL_NVARS_*p)[4] = param->m_grav_field_g[p];
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }
 
@@ -182,7 +182,7 @@ int NavierStokes3DSourceUpwind(
                               )
 {
   HyPar *solver = (HyPar*) s;
-  int   done,k, *dim  = solver->dim_local;
+  int   done,k, *dim  = solver->m_dim_local;
   _DECLARE_IERR_;
 
 

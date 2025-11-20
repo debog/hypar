@@ -6,9 +6,9 @@ int Numa3DCalculateStandardAtmosphere_1(void *p,double z,double *ExnerP,double *
 {
   Numa3D *physics = (Numa3D*) p;
 
-  double R      = physics->R;
-  double gamma  = physics->gamma;
-  double g      = physics->g;
+  double R      = physics->m_R;
+  double gamma  = physics->m_gamma;
+  double g      = physics->m_g;
 
   /* reference quantities at zero altitude */
   double P0, T0;
@@ -31,9 +31,9 @@ int Numa3DCalculateStandardAtmosphere_2(void *p,double z,double *ExnerP,double *
 {
   Numa3D *physics = (Numa3D*) p;
 
-  double R      = physics->R;
-  double gamma  = physics->gamma;
-  double g      = physics->g;
+  double R      = physics->m_R;
+  double gamma  = physics->m_gamma;
+  double g      = physics->m_g;
 
   /* reference quantities at zero altitude */
   double P0, T0;

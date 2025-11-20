@@ -9,11 +9,11 @@
 int Numa3DRusanovFlux(double *fI,double *fL,double *fR,double *uL,double *uR,double *u,int dir,void *s,double t)
 {
   HyPar   *solver = (HyPar*)  s;
-  Numa3D  *param  = (Numa3D*) solver->physics;
+  Numa3D  *param  = (Numa3D*) solver->m_physics;
   int      done;
 
-  int *dim   = solver->dim_local;
-  int ghosts = solver->ghosts;
+  int *dim   = solver->m_dim_local;
+  int ghosts = solver->m_ghosts;
 
   int bounds_outer[_MODEL_NDIMS_], bounds_inter[_MODEL_NDIMS_];
   _ArrayCopy1D3_(dim,bounds_outer,_MODEL_NDIMS_); bounds_outer[dir] =  1;
@@ -28,10 +28,10 @@ int Numa3DRusanovFlux(double *fI,double *fL,double *fR,double *uL,double *uR,dou
       double zcoordL, zcoordR;
 
       if (dir == _ZDIR_) {
-        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]-1),dim,ghosts,solver->x,zcoordL);
-        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]  ),dim,ghosts,solver->x,zcoordR);
+        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]-1),dim,ghosts,solver->m_x,zcoordL);
+        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]  ),dim,ghosts,solver->m_x,zcoordR);
       } else {
-        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]  ),dim,ghosts,solver->x,zcoordL);
+        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]  ),dim,ghosts,solver->m_x,zcoordL);
         zcoordR = zcoordL;
       }
 
@@ -46,13 +46,13 @@ int Numa3DRusanovFlux(double *fI,double *fL,double *fR,double *uL,double *uR,dou
       /* left of the interface */
       param->StandardAtmosphere(param,zcoordL,&EP,&P0,&rho0,&T0);
       _Numa3DGetFlowVars_         ((uL+_MODEL_NVARS_*p),drho,vel[0],vel[1],vel[2],dT,rho0);
-      _Numa3DComputeSpeedofSound_ (param->gamma,param->R,T0,dT,rho0,drho,EP,c);
+      _Numa3DComputeSpeedofSound_ (param->m_gamma,param->m_R,T0,dT,rho0,drho,EP,c);
       double alphaL = c + absolute(vel[dir]);
 
       /* right of the interface */
       param->StandardAtmosphere(param,zcoordR,&EP,&P0,&rho0,&T0);
       _Numa3DGetFlowVars_         ((uR+_MODEL_NVARS_*p),drho,vel[0],vel[1],vel[2],dT,rho0);
-      _Numa3DComputeSpeedofSound_ (param->gamma,param->R,T0,dT,rho0,drho,EP,c);
+      _Numa3DComputeSpeedofSound_ (param->m_gamma,param->m_R,T0,dT,rho0,drho,EP,c);
       double alphaR = c + absolute(vel[dir]);
 
       double alpha = max(alphaL,alphaR);
@@ -71,11 +71,11 @@ int Numa3DRusanovFlux(double *fI,double *fL,double *fR,double *uL,double *uR,dou
 int Numa3DRusanovLinearFlux(double *fI,double *fL,double *fR,double *uL,double *uR,double *u,int dir,void *s,double t)
 {
   HyPar   *solver = (HyPar*)  s;
-  Numa3D  *param  = (Numa3D*) solver->physics;
+  Numa3D  *param  = (Numa3D*) solver->m_physics;
   int      done;
 
-  int *dim   = solver->dim_local;
-  int ghosts = solver->ghosts;
+  int *dim   = solver->m_dim_local;
+  int ghosts = solver->m_ghosts;
 
   int bounds_outer[_MODEL_NDIMS_], bounds_inter[_MODEL_NDIMS_];
   _ArrayCopy1D3_(dim,bounds_outer,_MODEL_NDIMS_); bounds_outer[dir] =  1;
@@ -90,10 +90,10 @@ int Numa3DRusanovLinearFlux(double *fI,double *fL,double *fR,double *uL,double *
       double zcoordL, zcoordR;
 
       if (dir == _ZDIR_) {
-        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]-1),dim,ghosts,solver->x,zcoordL);
-        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]  ),dim,ghosts,solver->x,zcoordR);
+        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]-1),dim,ghosts,solver->m_x,zcoordL);
+        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]  ),dim,ghosts,solver->m_x,zcoordR);
       } else {
-        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]  ),dim,ghosts,solver->x,zcoordL);
+        _GetCoordinate_(_ZDIR_,(index_inter[_ZDIR_]  ),dim,ghosts,solver->m_x,zcoordL);
         zcoordR = zcoordL;
       }
 
@@ -108,13 +108,13 @@ int Numa3DRusanovLinearFlux(double *fI,double *fL,double *fR,double *uL,double *
       /* left of the interface */
       param->StandardAtmosphere   (param,zcoordL,&EP,&P0,&rho0,&T0);
       _Numa3DGetFlowVars_         ((uL+_MODEL_NVARS_*p),drho,vel[0],vel[1],vel[2],dT,rho0);
-      _Numa3DComputeLinearizedSpeedofSound_ (param->gamma,param->R,T0,rho0,EP,c);
+      _Numa3DComputeLinearizedSpeedofSound_ (param->m_gamma,param->m_R,T0,rho0,EP,c);
       double alphaL = c + absolute(vel[dir]);
 
       /* right of the interface */
       param->StandardAtmosphere(param,zcoordR,&EP,&P0,&rho0,&T0);
       _Numa3DGetFlowVars_         ((uR+_MODEL_NVARS_*p),drho,vel[0],vel[1],vel[2],dT,rho0);
-      _Numa3DComputeLinearizedSpeedofSound_ (param->gamma,param->R,T0,rho0,EP,c);
+      _Numa3DComputeLinearizedSpeedofSound_ (param->m_gamma,param->m_R,T0,rho0,EP,c);
       double alphaR = c + absolute(vel[dir]);
 
       double alpha = max(alphaL,alphaR);

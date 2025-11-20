@@ -45,26 +45,26 @@ int NavierStokes2DParabolicFunction(
 {
   HyPar           *solver   = (HyPar*) s;
   MPIVariables    *mpi      = (MPIVariables*) m;
-  NavierStokes2D  *physics  = (NavierStokes2D*) solver->physics;
+  NavierStokes2D  *physics  = (NavierStokes2D*) solver->m_physics;
   int             i,j,v;
   _DECLARE_IERR_;
 
-  int ghosts = solver->ghosts;
-  int imax   = solver->dim_local[0];
-  int jmax   = solver->dim_local[1];
-  int *dim   = solver->dim_local;
-  int nvars  = solver->nvars;
-  int ndims  = solver->ndims;
+  int ghosts = solver->m_ghosts;
+  int imax   = solver->m_dim_local[0];
+  int jmax   = solver->m_dim_local[1];
+  int *dim   = solver->m_dim_local;
+  int nvars  = solver->m_nvars;
+  int ndims  = solver->m_ndims;
   int size   = (imax+2*ghosts)*(jmax+2*ghosts)*nvars;
 
   _ArraySetValue_(par,size,0.0);
-  if (physics->Re <= 0) return(0); /* inviscid flow */
-  solver->count_par++;
+  if (physics->m_Re <= 0) return(0); /* inviscid flow */
+  solver->m_count_par++;
 
   static double two_third = 2.0/3.0;
-  double        inv_gamma_m1 = 1.0 / (physics->gamma-1.0);
-  double        inv_Re       = 1.0 / physics->Re;
-  double        inv_Pr       = 1.0 / physics->Pr;
+  double        inv_gamma_m1 = 1.0 / (physics->m_gamma-1.0);
+  double        inv_Re       = 1.0 / physics->m_Re;
+  double        inv_Pr       = 1.0 / physics->m_Pr;
 
   double *Q; /* primitive variables */
   Q = (double*) calloc (size,sizeof(double));
@@ -74,8 +74,8 @@ int NavierStokes2DParabolicFunction(
       double energy,pressure;
       _ArrayIndex1D_(ndims,dim,index,ghosts,p); p *= nvars;
       _NavierStokes2DGetFlowVar_( (u+p),Q[p+0],Q[p+1],Q[p+2],energy,
-                                  pressure,physics->gamma);
-      Q[p+3] = physics->gamma*pressure/Q[p+0]; /* temperature */
+                                  pressure,physics->m_gamma);
+      Q[p+3] = physics->m_gamma*pressure/Q[p+0]; /* temperature */
     }
   }
 
@@ -85,18 +85,18 @@ int NavierStokes2DParabolicFunction(
   IERR solver->FirstDerivativePar(QDerivX,Q,_XDIR_,1,solver,mpi); CHECKERR(ierr);
   IERR solver->FirstDerivativePar(QDerivY,Q,_YDIR_,1,solver,mpi); CHECKERR(ierr);
 
-  IERR MPIExchangeBoundariesnD(solver->ndims,solver->nvars,dim,
-                               solver->ghosts,mpi,QDerivX);     CHECKERR(ierr);
-  IERR MPIExchangeBoundariesnD(solver->ndims,solver->nvars,dim,
-                               solver->ghosts,mpi,QDerivY);     CHECKERR(ierr);
+  IERR MPIExchangeBoundariesnD(solver->m_ndims,solver->m_nvars,dim,
+                               solver->m_ghosts,mpi,QDerivX);     CHECKERR(ierr);
+  IERR MPIExchangeBoundariesnD(solver->m_ndims,solver->m_nvars,dim,
+                               solver->m_ghosts,mpi,QDerivY);     CHECKERR(ierr);
 
   for (i=-ghosts; i<(imax+ghosts); i++) {
     for (j=-ghosts; j<(jmax+ghosts); j++) {
       int p,index[2]; index[0]=i; index[1]=j;
       double dxinv, dyinv;
       _ArrayIndex1D_(ndims,dim,index,ghosts,p); p *= nvars;
-      _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->dxinv,dxinv);
-      _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->dxinv,dyinv);
+      _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->m_dxinv,dxinv);
+      _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->m_dxinv,dyinv);
       _ArrayScale1D_((QDerivX+p),dxinv,nvars);
       _ArrayScale1D_((QDerivY+p),dyinv,nvars);
     }
@@ -141,7 +141,7 @@ int NavierStokes2DParabolicFunction(
       int p,index[2]; index[0]=i; index[1]=j;
       double dxinv;
       _ArrayIndex1D_(ndims,dim,index,ghosts,p); p *= nvars;
-      _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->dxinv,dxinv);
+      _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->m_dxinv,dxinv);
       for (v=0; v<nvars; v++) (par+p)[v] += (dxinv * (FDeriv+p)[v] );
     }
   }
@@ -182,7 +182,7 @@ int NavierStokes2DParabolicFunction(
       int p,index[2]; index[0]=i; index[1]=j;
       double dyinv;
       _ArrayIndex1D_(ndims,dim,index,ghosts,p); p *= nvars;
-      _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->dxinv,dyinv);
+      _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->m_dxinv,dyinv);
       for (v=0; v<nvars; v++) (par+p)[v] += (dyinv * (FDeriv+p)[v] );
     }
   }

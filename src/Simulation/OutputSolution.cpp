@@ -37,7 +37,7 @@ int OutputSolution( void*   s,      /*!< Array of simulation objects of type #Si
     HyPar*        solver = &(simobj[ns].solver);
     MPIVariables* mpi    = &(simobj[ns].mpi);
 
-    if ((!solver->WriteOutput) && (strcmp(solver->plot_solution,"yes"))) continue;
+    if ((!solver->WriteOutput) && (strcmp(solver->m_plot_solution,"yes"))) continue;
 
     /* time integration module may have auxiliary arrays to write out, so get them */
     int NSolutions = 0;
@@ -47,8 +47,8 @@ int OutputSolution( void*   s,      /*!< Array of simulation objects of type #Si
     int  nu;
     char fname_root[_MAX_STRING_SIZE_];
     char aux_fname_root[_MAX_STRING_SIZE_];
-    strcpy(fname_root, solver->op_fname_root);
-    strcpy(aux_fname_root, solver->aux_op_fname_root);
+    strcpy(fname_root, solver->m_op_fname_root);
+    strcpy(aux_fname_root, solver->m_aux_op_fname_root);
 
     if (nsims > 1) {
       char index[_MAX_STRING_SIZE_];
@@ -64,12 +64,12 @@ int OutputSolution( void*   s,      /*!< Array of simulation objects of type #Si
       double  *uaux = NULL;
       IERR TimeGetAuxSolutions(&NSolutions,&uaux,solver,nu,ns); CHECKERR(ierr);
 
-      IERR WriteArray(  solver->ndims,
-                        solver->nvars,
-                        solver->dim_global,
-                        solver->dim_local,
-                        solver->ghosts,
-                        solver->x,
+      IERR WriteArray(  solver->m_ndims,
+                        solver->m_nvars,
+                        solver->m_dim_global,
+                        solver->m_dim_local,
+                        solver->m_ghosts,
+                        solver->m_x,
                         uaux,
                         solver,
                         mpi,
@@ -79,21 +79,21 @@ int OutputSolution( void*   s,      /*!< Array of simulation objects of type #Si
     }
 
 #if defined(HAVE_CUDA)
-    if (solver->use_gpu) {
+    if (solver->m_use_gpu) {
       /* Copy values from GPU memory to CPU memory for writing. */
-      gpuMemcpy(solver->x, solver->gpu_x, sizeof(double)*solver->size_x, gpuMemcpyDeviceToHost);
+      gpuMemcpy(solver->m_x, solver->m_gpu_x, sizeof(double)*solver->m_size_x, gpuMemcpyDeviceToHost);
 
 #ifdef CUDA_VAR_ORDERDING_AOS
-      gpuMemcpy(  solver->u,
-                  solver->gpu_u,
-                  sizeof(double)*solver->ndof_cells_wghosts,
+      gpuMemcpy(  solver->m_u,
+                  solver->m_gpu_u,
+                  sizeof(double)*solver->m_ndof_cells_wghosts,
                   gpuMemcpyDeviceToHost );
 #else
-      double *h_u = (double *) malloc(sizeof(double)*solver->ndof_cells_wghosts);
-      gpuMemcpy(h_u, solver->gpu_u, sizeof(double)*solver->ndof_cells_wghosts, gpuMemcpyDeviceToHost);
-      for (int i=0; i<solver->npoints_local_wghosts; i++) {
-        for (int v=0; v<solver->nvars; v++) {
-          solver->u[i*solver->nvars+v] = h_u[i+v*solver->npoints_local_wghosts];
+      double *h_u = (double *) malloc(sizeof(double)*solver->m_ndof_cells_wghosts);
+      gpuMemcpy(h_u, solver->m_gpu_u, sizeof(double)*solver->m_ndof_cells_wghosts, gpuMemcpyDeviceToHost);
+      for (int i=0; i<solver->m_npoints_local_wghosts; i++) {
+        for (int v=0; v<solver->m_nvars; v++) {
+          solver->m_u[i*solver->m_nvars+v] = h_u[i+v*solver->m_npoints_local_wghosts];
         }
       }
       free(h_u);
@@ -101,25 +101,25 @@ int OutputSolution( void*   s,      /*!< Array of simulation objects of type #Si
     }
 #endif
 
-    WriteArray(  solver->ndims,
-                 solver->nvars,
-                 solver->dim_global,
-                 solver->dim_local,
-                 solver->ghosts,
-                 solver->x,
-                 solver->u,
+    WriteArray(  solver->m_ndims,
+                 solver->m_nvars,
+                 solver->m_dim_global,
+                 solver->m_dim_local,
+                 solver->m_ghosts,
+                 solver->m_x,
+                 solver->m_u,
                  solver,
                  mpi,
                  fname_root );
 
-    if (!strcmp(solver->plot_solution, "yes")) {
-      PlotArray(   solver->ndims,
-                   solver->nvars,
-                   solver->dim_global,
-                   solver->dim_local,
-                   solver->ghosts,
-                   solver->x,
-                   solver->u,
+    if (!strcmp(solver->m_plot_solution, "yes")) {
+      PlotArray(   solver->m_ndims,
+                   solver->m_nvars,
+                   solver->m_dim_global,
+                   solver->m_dim_local,
+                   solver->m_ghosts,
+                   solver->m_x,
+                   solver->m_u,
                    a_time,
                    solver,
                    mpi,
@@ -127,8 +127,8 @@ int OutputSolution( void*   s,      /*!< Array of simulation objects of type #Si
     }
 
     /* increment the index string, if required */
-    if ((!strcmp(solver->output_mode,"serial")) && (!strcmp(solver->op_overwrite,"no"))) {
-      IncrementFilenameIndex(solver->filename_index,solver->index_length);
+    if ((!strcmp(solver->m_output_mode,"serial")) && (!strcmp(solver->m_op_overwrite,"no"))) {
+      IncrementFilenameIndex(solver->m_filename_index,solver->m_index_length);
     }
 
   }

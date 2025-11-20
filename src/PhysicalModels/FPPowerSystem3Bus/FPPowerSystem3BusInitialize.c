@@ -31,17 +31,17 @@ int FPPowerSystem3BusInitialize(
 {
   HyPar               *solver  = (HyPar*)             s;
   MPIVariables        *mpi     = (MPIVariables*)      m;
-  FPPowerSystem3Bus   *physics = (FPPowerSystem3Bus*) solver->physics;
+  FPPowerSystem3Bus   *physics = (FPPowerSystem3Bus*) solver->m_physics;
   int                 ferr, N;
   _DECLARE_IERR_;
 
   static int count = 0;
 
-  if (solver->nvars != _MODEL_NVARS_) {
+  if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in FPPowerSystem3BusInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
     return(1);
   }
-  if (solver->ndims != _MODEL_NDIMS_) {
+  if (solver->m_ndims != _MODEL_NDIMS_) {
     fprintf(stderr,"Error in FPPowerSystem3BusInitialize(): ndims has to be %d.\n",_MODEL_NDIMS_);
     return(1);
   }
@@ -67,7 +67,7 @@ int FPPowerSystem3BusInitialize(
   physics->lambda[0][1] = 0.0;
   physics->lambda[1][0] = 0.0;
   physics->lambda[1][1] = 10.0/physics->omegaB;
-  physics->gamma        = 0.25;
+  physics->m_gamma        = 0.25;
 
   physics->G   = (double*) calloc (3*3,sizeof(double));
   physics->B   = (double*) calloc (3*3,sizeof(double));
@@ -94,10 +94,10 @@ int FPPowerSystem3BusInitialize(
 
   /* reading physical model specific inputs - all processes */
   FILE *in;
-  if ((!mpi->rank) && (!count)) printf("Reading physical model inputs from file \"physics.inp\".\n");
+  if ((!mpi->m_rank) && (!count)) printf("Reading physical model inputs from file \"physics.inp\".\n");
   in = fopen("physics.inp","r");
   if (!in) {
-    if (!mpi->rank) fprintf(stderr,"Error: File \"physics.inp\" not found.\n");
+    if (!mpi->m_rank) fprintf(stderr,"Error: File \"physics.inp\" not found.\n");
     return(1);
   } else {
     char word[_MAX_STRING_SIZE_];
@@ -115,7 +115,7 @@ int FPPowerSystem3BusInitialize(
         else if (!strcmp(word,"E2"        ))  {ferr=fscanf(in,"%lf",&physics->E2        ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"Eref"      ))  {ferr=fscanf(in,"%lf",&physics->Eref      ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"omegaB"    ))  {ferr=fscanf(in,"%lf",&physics->omegaB    ) ;if(ferr!=1)return(1);}
-        else if (!strcmp(word,"gamma"     ))  {ferr=fscanf(in,"%lf",&physics->gamma     ) ;if(ferr!=1)return(1);}
+        else if (!strcmp(word,"gamma"     ))  {ferr=fscanf(in,"%lf",&physics->m_gamma     ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"sigma"  ))  {
           ferr=fscanf(in,"%lf",&physics->sigma[0][0]) ;if(ferr!=1)return(1);
           ferr=fscanf(in,"%lf",&physics->sigma[0][1]) ;if(ferr!=1)return(1);
@@ -149,14 +149,14 @@ int FPPowerSystem3BusInitialize(
         }
       }
     } else {
-      if (!mpi->rank) fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
+      if (!mpi->m_rank) fprintf(stderr,"Error: Illegal format in file \"physics.inp\".\n");
       return(1);
     }
   }
   fclose(in);
 
-  if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-    if (!mpi->rank) {
+  if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in FPPowerSystem3BusInitialize: This physical model does not have a splitting ");
       fprintf(stderr,"of the hyperbolic term defined.\n");
     }

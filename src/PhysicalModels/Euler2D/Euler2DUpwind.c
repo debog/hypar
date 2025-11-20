@@ -10,10 +10,10 @@
 int Euler2DUpwindRoe(double *fI,double *fL,double *fR,double *uL,double *uR,double *u,int dir,void *s,double t)
 {
   HyPar    *solver = (HyPar*)    s;
-  Euler2D  *param  = (Euler2D*)  solver->physics;
+  Euler2D  *param  = (Euler2D*)  solver->m_physics;
   int      done;
 
-  int *dim  = solver->dim_local;
+  int *dim  = solver->m_dim_local;
 
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
@@ -68,10 +68,10 @@ int Euler2DUpwindRoe(double *fI,double *fL,double *fR,double *uL,double *uR,doub
 int Euler2DUpwindRF(double *fI,double *fL,double *fR,double *uL,double *uR,double *u,int dir,void *s,double t)
 {
   HyPar    *solver = (HyPar*)    s;
-  Euler2D  *param  = (Euler2D*)  solver->physics;
+  Euler2D  *param  = (Euler2D*)  solver->m_physics;
   int      done,k;
 
-  int *dim  = solver->dim_local;
+  int *dim  = solver->m_dim_local;
 
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
@@ -139,10 +139,10 @@ int Euler2DUpwindRF(double *fI,double *fL,double *fR,double *uL,double *uR,doubl
 int Euler2DUpwindLLF(double *fI,double *fL,double *fR,double *uL,double *uR,double *u,int dir,void *s,double t)
 {
   HyPar    *solver = (HyPar*)    s;
-  Euler2D  *param  = (Euler2D*)  solver->physics;
+  Euler2D  *param  = (Euler2D*)  solver->m_physics;
   int      done;
 
-  int *dim  = solver->dim_local;
+  int *dim  = solver->m_dim_local;
 
   int bounds_outer[2], bounds_inter[2];
   bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
@@ -211,12 +211,12 @@ int Euler2DUpwindLLF(double *fI,double *fL,double *fR,double *uL,double *uR,doub
 int Euler2DUpwindSWFS(double *fI,double *fL,double *fR,double *uL,double *uR,double *u,int dir,void *s,double t)
 {
   HyPar     *solver = (HyPar*)    s;
-  Euler2D   *param  = (Euler2D*)  solver->physics;
+  Euler2D   *param  = (Euler2D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
 
-  int ndims = solver->ndims;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
@@ -228,7 +228,7 @@ int Euler2DUpwindSWFS(double *fI,double *fL,double *fR,double *uL,double *uR,dou
     _ArrayCopy1D_(index_outer,index_inter,ndims);
     for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      double rho,vx,vy,e,P,c,gamma=param->gamma,term,Mach,lp[_MODEL_NVARS_],lm[_MODEL_NVARS_];
+      double rho,vx,vy,e,P,c,gamma=param->m_gamma,term,Mach,lp[_MODEL_NVARS_],lm[_MODEL_NVARS_];
 
       /* Steger Warming flux splitting */
       _Euler2DRoeAverage_(uavg,(uL+_MODEL_NVARS_*p),(uR+_MODEL_NVARS_*p),param);

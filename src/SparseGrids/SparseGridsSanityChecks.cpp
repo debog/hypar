@@ -17,8 +17,8 @@
 */
 int SparseGridsSimulation::SanityChecks()
 {
-  int *dim_global_fg = m_sim_fg->solver.dim_global;
-  int *iproc_fg = m_sim_fg->mpi.iproc;
+  int *dim_global_fg = m_sim_fg->solver.m_dim_global;
+  int *iproc_fg = m_sim_fg->mpi.m_iproc;
 
   /* check if grid sizes are same along all dimensions */
   {

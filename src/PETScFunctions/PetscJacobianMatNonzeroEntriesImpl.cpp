@@ -40,10 +40,10 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
                                         void *ctxt  /*!< Application context */ )
 {
   PETScContext* context = (PETScContext*) ctxt;
-  SimulationObject* sim = (SimulationObject*) context->simobj;
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
 
   PetscFunctionBegin;
-  int nsims = context->nsims;
+  int nsims = context->m_nsims;
   /* initialize matrix to zero */
   MatZeroEntries(Amat);
 
@@ -52,12 +52,12 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
     HyPar* solver( &(sim[ns].solver) );
     MPIVariables* mpi( &(sim[ns].mpi) );
 
-    int ndims = solver->ndims,
-        nvars = solver->nvars,
-        npoints = solver->npoints_local,
-        ghosts = solver->ghosts,
-        *dim = solver->dim_local,
-        *points = context->points[ns],
+    int ndims = solver->m_ndims,
+        nvars = solver->m_nvars,
+        npoints = solver->m_npoints_local,
+        ghosts = solver->m_ghosts,
+        *dim = solver->m_dim_local,
+        *points = context->m_points[ns],
         index[ndims],indexL[ndims],indexR[ndims],
         rows[nvars],cols[nvars];
 
@@ -72,7 +72,7 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
 
       for (int dir = 0; dir < ndims; dir++) {
 
-        int pg = (int) context->globalDOF[ns][p];
+        int pg = (int) context->m_globalDOF[ns][p];
         /* diagonal element */
         for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pg + v; }
         MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
@@ -83,7 +83,7 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
           _ArrayCopy1D_(index,indexL,ndims);
           indexL[dir] -= d;
           int pL;  _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
-          int pgL = (int) context->globalDOF[ns][pL];
+          int pgL = (int) context->m_globalDOF[ns][pL];
           if (pgL >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgL + v; }
             MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
@@ -92,7 +92,7 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
           _ArrayCopy1D_(index,indexR,ndims);
           indexR[dir] += d;
           int pR;  _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
-          int pgR = (int) context->globalDOF[ns][pR];
+          int pgR = (int) context->m_globalDOF[ns][pR];
           /* right neighbor */
           if (pgR >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgR + v; }

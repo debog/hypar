@@ -90,15 +90,15 @@ static int interpNodesCoeffs(
   else if (!strcmp(mode,_IB_YZ_))  { ic = ghosts; xc = 0.5*(xmin+xmax); }
 
   if (ic == -1) {
-    fprintf(stderr,"Error in interpNodesCoeffs() (in ImmersedBoundaries/IBCreateFacetMapping.c) on rank %d: ic = -1.\n", mpi->rank);
+    fprintf(stderr,"Error in interpNodesCoeffs() (in ImmersedBoundaries/IBCreateFacetMapping.c) on rank %d: ic = -1.\n", mpi->m_rank);
     return(1);
   }
   if (jc == -1) {
-    fprintf(stderr,"Error in interpNodesCoeffs() (in ImmersedBoundaries/IBCreateFacetMapping.c) on rank %d: jc = -1.\n", mpi->rank);
+    fprintf(stderr,"Error in interpNodesCoeffs() (in ImmersedBoundaries/IBCreateFacetMapping.c) on rank %d: jc = -1.\n", mpi->m_rank);
     return(1);
   }
   if (kc == -1) {
-    fprintf(stderr,"Error in interpNodesCoeffs() (in ImmersedBoundaries/IBCreateFacetMapping.c) on rank %d: kc = -1.\n", mpi->rank);
+    fprintf(stderr,"Error in interpNodesCoeffs() (in ImmersedBoundaries/IBCreateFacetMapping.c) on rank %d: kc = -1.\n", mpi->m_rank);
     return(1);
   }
   ic++;
@@ -150,9 +150,9 @@ int IBCreateFacetMapping(
 {
   ImmersedBoundary  *IB     = (ImmersedBoundary*) ib;
   MPIVariables      *mpi    = (MPIVariables*) m;
-  Body3D            *body   = IB->body;
-  int               nfacets = body->nfacets, n, count, ierr;
-  Facet3D           *facets = body->surface;
+  Body3D            *body   = IB->m_body;
+  int               nfacets = body->m_nfacets, n, count, ierr;
+  Facet3D           *facets = body->m_surface;
 
   double  *x = X,
           *y = (x + dim[0] + 2*ghosts),
@@ -170,17 +170,17 @@ int IBCreateFacetMapping(
 
     /* find facet centroid */
     double xc, yc, zc;
-    xc = (facets[n].x1 + facets[n].x2 + facets[n].x3) / 3.0;
-    yc = (facets[n].y1 + facets[n].y2 + facets[n].y3) / 3.0;
-    zc = (facets[n].z1 + facets[n].z2 + facets[n].z3) / 3.0;
+    xc = (facets[n].m_x1 + facets[n].m_x2 + facets[n].m_x3) / 3.0;
+    yc = (facets[n].m_y1 + facets[n].m_y2 + facets[n].m_y3) / 3.0;
+    zc = (facets[n].m_z1 + facets[n].m_z2 + facets[n].m_z3) / 3.0;
 
-    if (!strcmp(IB->mode,_IB_3D_)) {
+    if (!strcmp(IB->m_mode,_IB_3D_)) {
       if (isInside(xc,xmin,xmax) && isInside(yc,ymin,ymax) && isInside(zc,zmin,zmax)) count++;
-    } else if (!strcmp(IB->mode,_IB_XY_)) {
+    } else if (!strcmp(IB->m_mode,_IB_XY_)) {
       if (isInside(xc,xmin,xmax) && isInside(yc,ymin,ymax)) count++;
-    } else if (!strcmp(IB->mode,_IB_XZ_)) {
+    } else if (!strcmp(IB->m_mode,_IB_XZ_)) {
       if (isInside(xc,xmin,xmax) && isInside(zc,zmin,zmax)) count++;
-    } else if (!strcmp(IB->mode,_IB_YZ_)) {
+    } else if (!strcmp(IB->m_mode,_IB_YZ_)) {
       if (isInside(yc,ymin,ymax) && isInside(zc,zmin,zmax)) count++;
     }
   }
@@ -194,28 +194,28 @@ int IBCreateFacetMapping(
     for (n = 0; n < nfacets; n++) {
 
       double xc, yc, zc;
-      xc = (facets[n].x1 + facets[n].x2 + facets[n].x3) / 3.0;
-      yc = (facets[n].y1 + facets[n].y2 + facets[n].y3) / 3.0;
-      zc = (facets[n].z1 + facets[n].z2 + facets[n].z3) / 3.0;
+      xc = (facets[n].m_x1 + facets[n].m_x2 + facets[n].m_x3) / 3.0;
+      yc = (facets[n].m_y1 + facets[n].m_y2 + facets[n].m_y3) / 3.0;
+      zc = (facets[n].m_z1 + facets[n].m_z2 + facets[n].m_z3) / 3.0;
 
       int flag = 0;
-      if (!strcmp(IB->mode,_IB_3D_)) {
+      if (!strcmp(IB->m_mode,_IB_3D_)) {
         if (isInside(xc,xmin,xmax) && isInside(yc,ymin,ymax) && isInside(zc,zmin,zmax)) flag = 1;
-      } else if (!strcmp(IB->mode,_IB_XY_)) {
+      } else if (!strcmp(IB->m_mode,_IB_XY_)) {
         if (isInside(xc,xmin,xmax) && isInside(yc,ymin,ymax)) flag = 1;
-      } else if (!strcmp(IB->mode,_IB_XZ_)) {
+      } else if (!strcmp(IB->m_mode,_IB_XZ_)) {
         if (isInside(xc,xmin,xmax) && isInside(zc,zmin,zmax)) flag = 1;
-      } else if (!strcmp(IB->mode,_IB_YZ_)) {
+      } else if (!strcmp(IB->m_mode,_IB_YZ_)) {
         if (isInside(yc,ymin,ymax) && isInside(zc,zmin,zmax)) flag = 1;
       }
 
       if (flag == 1) {
-        fmap[count].facet = facets + n;
-        fmap[count].index = n;
+        fmap[count].m_facet = facets + n;
+        fmap[count].m_index = n;
 
-        fmap[count].xc = xc;
-        fmap[count].yc = yc;
-        fmap[count].zc = zc;
+        fmap[count].m_xc = xc;
+        fmap[count].m_yc = yc;
+        fmap[count].m_zc = zc;
 
         int ic,jc, kc;
 
@@ -224,14 +224,14 @@ int IBCreateFacetMapping(
                                   x, y, z,
                                   dim,
                                   ghosts,
-                                  IB->mode,
+                                  IB->m_mode,
                                   &ic, &jc, &kc,
-                                  fmap[count].interp_nodes,
-                                  fmap[count].interp_coeffs );
+                                  fmap[count].m_interp_nodes,
+                                  fmap[count].m_interp_coeffs );
         if (ierr) {
           fprintf(stderr, "Error in IBCreateFacetMapping(): \n");
           fprintf(stderr, "  interpNodesCoeffs() returned with error code %d on rank %d.\n",
-                  ierr, mpi->rank );
+                  ierr, mpi->m_rank );
           return(ierr);
         }
 
@@ -239,40 +239,40 @@ int IBCreateFacetMapping(
         double dy = y[jc] - y[jc-1];
         double dz = z[kc] - z[kc-1];
         double ds;
-        if      (!strcmp(IB->mode,_IB_XY_)) ds = min(dx,dy);
-        else if (!strcmp(IB->mode,_IB_XZ_)) ds = min(dx,dz);
-        else if (!strcmp(IB->mode,_IB_YZ_)) ds = min(dy,dz);
+        if      (!strcmp(IB->m_mode,_IB_XY_)) ds = min(dx,dy);
+        else if (!strcmp(IB->m_mode,_IB_XZ_)) ds = min(dx,dz);
+        else if (!strcmp(IB->m_mode,_IB_YZ_)) ds = min(dy,dz);
         else                                ds = min3(dx,dy,dz);
 
-        double nx = fmap[count].facet->nx;
-        double ny = fmap[count].facet->ny;
-        double nz = fmap[count].facet->nz;
+        double nx = fmap[count].m_facet->m_nx;
+        double ny = fmap[count].m_facet->m_ny;
+        double nz = fmap[count].m_facet->m_nz;
 
-        if (nx == 0.0) nx += IB->delta*ds;
-        if (ny == 0.0) ny += IB->delta*ds;
-        if (nz == 0.0) nz += IB->delta*ds;
+        if (nx == 0.0) nx += IB->m_delta*ds;
+        if (ny == 0.0) ny += IB->m_delta*ds;
+        if (nz == 0.0) nz += IB->m_delta*ds;
 
         double xns = xc + sign(nx)*ds;
         double yns = yc + sign(ny)*ds;
         double zns = zc + sign(nz)*ds;
 
-        fmap[count].dx = xns - xc;
-        fmap[count].dy = yns - yc;
-        fmap[count].dz = zns - zc;
+        fmap[count].m_dx = xns - xc;
+        fmap[count].m_dy = yns - yc;
+        fmap[count].m_dz = zns - zc;
 
         ierr = interpNodesCoeffs( mpi,
                                   xns, yns, zns,
                                   x, y, z,
                                   dim,
                                   ghosts,
-                                  IB->mode,
+                                  IB->m_mode,
                                   NULL,NULL,NULL,
-                                  fmap[count].interp_nodes_ns,
-                                  fmap[count].interp_coeffs_ns );
+                                  fmap[count].m_interp_nodes_ns,
+                                  fmap[count].m_interp_coeffs_ns );
         if (ierr) {
           fprintf(stderr, "Error in IBCreateFacetMapping(): \n");
           fprintf(stderr, "  interpNodesCoeffs() returned with error code %d on rank %d.\n",
-                  ierr, mpi->rank );
+                  ierr, mpi->m_rank );
           return(ierr);
         }
 
@@ -280,13 +280,13 @@ int IBCreateFacetMapping(
       }
     }
 
-    IB->nfacets_local = nfacets_local;
-    IB->fmap = fmap;
+    IB->m_nfacets_local = nfacets_local;
+    IB->m_fmap = fmap;
 
   } else {
 
-    IB->nfacets_local = 0;
-    IB->fmap = NULL;
+    IB->m_nfacets_local = 0;
+    IB->m_fmap = NULL;
 
   }
 

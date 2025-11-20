@@ -26,9 +26,9 @@ int ShallowWater2DFlux(
                       )
 {
   HyPar             *solver = (HyPar*)   s;
-  ShallowWater2D    *param  = (ShallowWater2D*) solver->physics;
-  int               *dim    = solver->dim_local;
-  int               ghosts  = solver->ghosts;
+  ShallowWater2D    *param  = (ShallowWater2D*) solver->m_physics;
+  int               *dim    = solver->m_dim_local;
+  int               ghosts  = solver->m_ghosts;
   static const int  ndims   = _MODEL_NDIMS_;
   static const int  nvars   = _MODEL_NVARS_;
   static int        index[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_], offset[_MODEL_NDIMS_];
@@ -43,7 +43,7 @@ int ShallowWater2DFlux(
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double h, uvel, vvel;
     _ShallowWater2DGetFlowVar_((u+nvars*p),h,uvel,vvel);
-    _ShallowWater2DSetFlux_((f+nvars*p),h,uvel,vvel,param->g,dir);
+    _ShallowWater2DSetFlux_((f+nvars*p),h,uvel,vvel,param->m_g,dir);
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

@@ -38,16 +38,16 @@ int NonLinearInterpolation(
 {
   HyPar         *solver = (HyPar*)        s;
   MPIVariables  *mpi    = (MPIVariables*) m;
-  double        *FluxC  = solver->fluxC; /* cell centered flux */
+  double        *FluxC  = solver->m_flux_c; /* cell centered flux */
   _DECLARE_IERR_;
 
-  int flag = (FluxFunction && solver->flag_nonlinearinterp && solver->SetInterpLimiterVar);
+  int flag = (FluxFunction && solver->m_flag_nonlinearinterp && solver->SetInterpLimiterVar);
   if (flag) {;
-    int     ndims  = solver->ndims;
-    int     nvars  = solver->nvars;
-    int     ghosts = solver->ghosts;
-    int     *dim   = solver->dim_local;
-    double  *x     = solver->x;
+    int     ndims  = solver->m_ndims;
+    int     nvars  = solver->m_nvars;
+    int     ghosts = solver->m_ghosts;
+    int     *dim   = solver->m_dim_local;
+    double  *x     = solver->m_x;
 
     int size = 1, d;
     for (d=0; d<ndims; d++) size *= (dim[d] + 2*ghosts);

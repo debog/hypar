@@ -20,10 +20,10 @@ int SingleSimulation::define( int a_rank, /*!< MPI rank of this process */
   m_nproc = a_nproc;
 
   m_sim = new SimulationObject;
-  m_sim->solver.my_idx = 0;
-  m_sim->solver.nsims = 1;
-  m_sim->mpi.rank = m_rank;
-  m_sim->mpi.nproc = m_nproc;
+  m_sim->solver.m_my_idx = 0;
+  m_sim->solver.m_nsims = 1;
+  m_sim->mpi.m_rank = m_rank;
+  m_sim->mpi.m_nproc = m_nproc;
 
   if (!m_rank) {
     printf("Allocated simulation object(s).\n");

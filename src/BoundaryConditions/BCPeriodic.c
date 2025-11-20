@@ -30,12 +30,12 @@ int BCPeriodicU(
   DomainBoundary *boundary = (DomainBoundary*) b;
   MPIVariables   *mpi      = (MPIVariables*)   m;
 
-  int dim   = boundary->dim;
-  int face  = boundary->face;
+  int dim   = boundary->m_dim;
+  int face  = boundary->m_face;
 
-  if ((boundary->on_this_proc) && (mpi->iproc[dim] == 1)) {
+  if ((boundary->m_on_this_proc) && (mpi->m_iproc[dim] == 1)) {
     int bounds[ndims], index1[ndims], index2[ndims];
-    _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
+    _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
     _ArraySetValue_(index1,ndims,0);
     _ArraySetValue_(index2,ndims,0);
     int done = 0;
@@ -44,10 +44,10 @@ int BCPeriodicU(
       _ArrayCopy1D_(index1,index2,ndims);
       if (face == 1) {
         index2[dim] = index1[dim] + size[dim]-ghosts;
-        _ArrayIndex1DWO_(ndims,size,index1,boundary->is,ghosts,p1);
+        _ArrayIndex1DWO_(ndims,size,index1,boundary->m_is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,index2,ghosts,p2);
       } else if (face == -1) {
-        _ArrayIndex1DWO_(ndims,size,index1,boundary->is,ghosts,p1);
+        _ArrayIndex1DWO_(ndims,size,index1,boundary->m_is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,index1,ghosts,p2);
       }
       _ArrayCopy1D_((phi+nvars*p2),(phi+nvars*p1),nvars);

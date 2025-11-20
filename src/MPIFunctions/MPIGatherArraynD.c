@@ -36,12 +36,12 @@ int MPIGatherArraynD(
   int is[ndims], ie[ndims], index[ndims], bounds[ndims];
 
   /* xg should be non-null only on root */
-  if (mpi->rank && xg) {
+  if (mpi->m_rank && xg) {
     fprintf(stderr,"Error in MPIGatherArraynD(): global array exists on non-root processors (rank %d).\n",
-            mpi->rank);
+            mpi->m_rank);
     return(1);
   }
-  if ((!mpi->rank) && (!xg)) {
+  if ((!mpi->m_rank) && (!xg)) {
     fprintf(stderr,"Error in MPIGatherArraynD(): global array is not allocated on root processor.\n");
     return(1);
   }
@@ -54,9 +54,9 @@ int MPIGatherArraynD(
   double *buffer = (double*) calloc (size*nvars, sizeof(double));
   IERR ArrayCopynD(ndims,x,buffer,dim_local,ghosts,0,index,nvars); CHECKERR(ierr);
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     int proc;
-    for (proc = 0; proc < mpi->nproc; proc++) {
+    for (proc = 0; proc < mpi->m_nproc; proc++) {
       int d,done,size;
       /* Find out the domain limits for each process */
       IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie); CHECKERR(ierr);
@@ -69,7 +69,7 @@ int MPIGatherArraynD(
 #ifndef serial
         MPI_Status status;
         double *recvbuf = (double*) calloc (size*nvars, sizeof(double));
-        MPI_Recv(recvbuf,size*nvars,MPI_DOUBLE,proc,1902,mpi->world,&status);
+        MPI_Recv(recvbuf,size*nvars,MPI_DOUBLE,proc,1902,mpi->m_world,&status);
         int done = 0; _ArraySetValue_(index,ndims,0);
         while (!done) {
           int p1; _ArrayIndex1D_(ndims,bounds,index,0,p1);
@@ -93,7 +93,7 @@ int MPIGatherArraynD(
   } else {
 #ifndef serial
     /* Meanwhile, on other processes */
-    MPI_Send(buffer,size*nvars,MPI_DOUBLE,0,1902,mpi->world);
+    MPI_Send(buffer,size*nvars,MPI_DOUBLE,0,1902,mpi->m_world);
 #endif
   }
 
@@ -135,12 +135,12 @@ int MPIGatherArraynDwGhosts(
   for (d = 0; d < ndims; d++) dim_global_wghosts[d] = dim_global[d] + 2*ghosts;
 
   /* xg should be non-null only on root */
-  if (mpi->rank && xg) {
+  if (mpi->m_rank && xg) {
     fprintf(stderr,"Error in MPIGatherArraynD(): global array exists on non-root processors (rank %d).\n",
-            mpi->rank);
+            mpi->m_rank);
     return(1);
   }
-  if ((!mpi->rank) && (!xg)) {
+  if ((!mpi->m_rank) && (!xg)) {
     fprintf(stderr,"Error in MPIGatherArraynD(): global array is not allocated on root processor.\n");
     return(1);
   }
@@ -153,9 +153,9 @@ int MPIGatherArraynDwGhosts(
   double *buffer = (double*) calloc (size*nvars, sizeof(double));
   _ArrayCopy1D_(x, buffer, size*nvars);
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     int proc;
-    for (proc = 0; proc < mpi->nproc; proc++) {
+    for (proc = 0; proc < mpi->m_nproc; proc++) {
       int d,done;
       /* Find out the domain limits for each process */
       IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie); CHECKERR(ierr);
@@ -171,7 +171,7 @@ int MPIGatherArraynDwGhosts(
         }
         MPI_Status status;
         double *recvbuf = (double*) calloc (size*nvars, sizeof(double));
-        MPI_Recv(recvbuf,size*nvars,MPI_DOUBLE,proc,1902,mpi->world,&status);
+        MPI_Recv(recvbuf,size*nvars,MPI_DOUBLE,proc,1902,mpi->m_world,&status);
         int done = 0; _ArraySetValue_(index,ndims,0);
         while (!done) {
           int p1; _ArrayIndex1D_(ndims,bounds,index,ghosts,p1);
@@ -195,7 +195,7 @@ int MPIGatherArraynDwGhosts(
   } else {
 #ifndef serial
     /* Meanwhile, on other processes */
-    MPI_Send(buffer,size*nvars,MPI_DOUBLE,0,1902,mpi->world);
+    MPI_Send(buffer,size*nvars,MPI_DOUBLE,0,1902,mpi->m_world);
 #endif
   }
 

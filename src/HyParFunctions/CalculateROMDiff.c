@@ -30,82 +30,82 @@ int CalculateROMDiff( void *s, /*!< Solver object of type #HyPar */
 
   static const double tolerance = 1e-15;
 
-  int size = solver->npoints_local_wghosts * solver->nvars;
+  int size = solver->m_npoints_local_wghosts * solver->m_nvars;
   double* u_diff = (double*) calloc (size, sizeof(double));
 
   /* calculate solution norms (for relative error) */
   double solution_norm[3] = {0.0,0.0,0.0};
   /* L1 */
-  sum = ArraySumAbsnD ( solver->nvars,
-                        solver->ndims,
-                        solver->dim_local,
-                        solver->ghosts,
-                        solver->index,
-                        solver->u );
-  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-  solution_norm[0] = global_sum/((double)solver->npoints_global);
+  sum = ArraySumAbsnD ( solver->m_nvars,
+                        solver->m_ndims,
+                        solver->m_dim_local,
+                        solver->m_ghosts,
+                        solver->m_index,
+                        solver->m_u );
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+  solution_norm[0] = global_sum/((double)solver->m_npoints_global);
   /* L2 */
-  sum = ArraySumSquarenD  ( solver->nvars,
-                            solver->ndims,
-                            solver->dim_local,
-                            solver->ghosts,
-                            solver->index,
-                            solver->u );
-  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-  solution_norm[1] = sqrt(global_sum/((double)solver->npoints_global));
+  sum = ArraySumSquarenD  ( solver->m_nvars,
+                            solver->m_ndims,
+                            solver->m_dim_local,
+                            solver->m_ghosts,
+                            solver->m_index,
+                            solver->m_u );
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+  solution_norm[1] = sqrt(global_sum/((double)solver->m_npoints_global));
   /* Linf */
-  sum = ArrayMaxnD  ( solver->nvars,
-                      solver->ndims,
-                      solver->dim_local,
-                      solver->ghosts,
-                      solver->index
-                      ,solver->u  );
-  global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
+  sum = ArrayMaxnD  ( solver->m_nvars,
+                      solver->m_ndims,
+                      solver->m_dim_local,
+                      solver->m_ghosts,
+                      solver->m_index
+                      ,solver->m_u  );
+  global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->m_world);
   solution_norm[2] = global_sum;
 
   /* set u_diff to PDE solution */
-  _ArrayCopy1D_(solver->u, u_diff, size);
+  _ArrayCopy1D_(solver->m_u, u_diff, size);
   /* subtract the ROM solutions */
-  _ArrayAXPY_(solver->u_rom_predicted, -1.0, u_diff, size);
+  _ArrayAXPY_(solver->m_u_rom_predicted, -1.0, u_diff, size);
 
   /* calculate L1 norm of error */
-  sum = ArraySumAbsnD ( solver->nvars,
-                        solver->ndims,
-                        solver->dim_local,
-                        solver->ghosts,
-                        solver->index,
+  sum = ArraySumAbsnD ( solver->m_nvars,
+                        solver->m_ndims,
+                        solver->m_dim_local,
+                        solver->m_ghosts,
+                        solver->m_index,
                         u_diff  );
-  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-  solver->rom_diff_norms[0] = global_sum/((double)solver->npoints_global);
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+  solver->m_rom_diff_norms[0] = global_sum/((double)solver->m_npoints_global);
 
   /* calculate L2 norm of error */
-  sum = ArraySumSquarenD  ( solver->nvars,
-                            solver->ndims,
-                            solver->dim_local,
-                            solver->ghosts,
-                            solver->index,
+  sum = ArraySumSquarenD  ( solver->m_nvars,
+                            solver->m_ndims,
+                            solver->m_dim_local,
+                            solver->m_ghosts,
+                            solver->m_index,
                             u_diff  );
-  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-  solver->rom_diff_norms[1] = sqrt(global_sum/((double)solver->npoints_global));
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+  solver->m_rom_diff_norms[1] = sqrt(global_sum/((double)solver->m_npoints_global));
 
   /* calculate Linf norm of error */
-  sum = ArrayMaxnD  ( solver->nvars,
-                      solver->ndims,
-                      solver->dim_local,
-                      solver->ghosts,
-                      solver->index,
+  sum = ArrayMaxnD  ( solver->m_nvars,
+                      solver->m_ndims,
+                      solver->m_dim_local,
+                      solver->m_ghosts,
+                      solver->m_index,
                       u_diff  );
-  global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
-  solver->rom_diff_norms[2] = global_sum;
+  global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->m_world);
+  solver->m_rom_diff_norms[2] = global_sum;
 
   /* decide whether to normalize and report relative diff norms,
     or report absolute diff norms. */
   if (    (solution_norm[0] > tolerance)
       &&  (solution_norm[1] > tolerance)
       &&  (solution_norm[2] > tolerance) ) {
-    solver->rom_diff_norms[0] /= solution_norm[0];
-    solver->rom_diff_norms[1] /= solution_norm[1];
-    solver->rom_diff_norms[2] /= solution_norm[2];
+    solver->m_rom_diff_norms[0] /= solution_norm[0];
+    solver->m_rom_diff_norms[1] /= solution_norm[1];
+    solver->m_rom_diff_norms[2] /= solution_norm[2];
   }
 
   free(u_diff);

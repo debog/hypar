@@ -39,13 +39,13 @@ int MPICreateCommunicators(
 {
   MPIVariables *mpi = (MPIVariables*) m;
 #ifdef serial
-  mpi->comm = NULL;
+  mpi->m_comm = NULL;
 #else
   int          i,n,color,key;
   int          *ip,*iproc;
 
-  mpi->comm = (MPI_Comm*) calloc (ndims, sizeof(MPI_Comm));
-  if (ndims == 1) MPI_Comm_dup(mpi->world,mpi->comm);
+  mpi->m_comm = (MPI_Comm*) calloc (ndims, sizeof(MPI_Comm));
+  if (ndims == 1) MPI_Comm_dup(mpi->m_world,mpi->m_comm);
   else {
     ip    = (int*) calloc (ndims-1,sizeof(int));
     iproc = (int*) calloc (ndims-1,sizeof(int));
@@ -53,14 +53,14 @@ int MPICreateCommunicators(
       int tick=0;
       for (i=0; i<ndims; i++) {
         if (i != n) {
-          ip[tick]    = mpi->ip[i];
-          iproc[tick] = mpi->iproc[i];
+          ip[tick]    = mpi->m_ip[i];
+          iproc[tick] = mpi->m_iproc[i];
           tick++;
         }
       }
       _ArrayIndex1D_(ndims-1,iproc,ip,0,color);
-      key   = mpi->ip[n];
-      MPI_Comm_split(mpi->world,color,key,&mpi->comm[n]);
+      key   = mpi->m_ip[n];
+      MPI_Comm_split(mpi->m_world,color,key,&mpi->m_comm[n]);
     }
     free(ip);
     free(iproc);
@@ -80,10 +80,10 @@ int MPIFreeCommunicators(
 #ifndef serial
   MPIVariables *mpi = (MPIVariables*) m;
   int          n;
-  for (n=0; n<ndims; n++) MPI_Comm_free(&mpi->comm[n]);
-  free(mpi->comm);
-  if (mpi->IOParticipant) MPI_Comm_free(&mpi->IOWorld);
-  MPI_Comm_free(&mpi->world);
+  for (n=0; n<ndims; n++) MPI_Comm_free(&mpi->m_comm[n]);
+  free(mpi->m_comm);
+  if (mpi->m_IOParticipant) MPI_Comm_free(&mpi->m_IOWorld);
+  MPI_Comm_free(&mpi->m_world);
 #endif
   return(0);
 }

@@ -19,28 +19,28 @@ double LinearADRComputeCFL( void    *s, /*!< Solver object of type #HyPar */
                           )
 {
   HyPar         *solver = (HyPar*)        s;
-  LinearADR     *params = (LinearADR*)    solver->physics;
+  LinearADR     *params = (LinearADR*)    solver->m_physics;
 
-  int     ndims  = solver->ndims;
-  int     nvars  = solver->nvars;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
+  int     ndims  = solver->m_ndims;
+  int     nvars  = solver->m_nvars;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
 
   double  max_cfl = 0;
-  if (params->constant_advection == 1) {
+  if (params->m_constant_advection == 1) {
 
     int d, i, v;
     for (d = 0; d < ndims; d++) {
       for (i = 0; i < dim[d]; i++) {
         for (v = 0; v < nvars; v++) {
-          double dxinv; _GetCoordinate_(d,i,dim,ghosts,solver->dxinv,dxinv);
-          double local_cfl = params->a[nvars*d+v]*dt*dxinv;
+          double dxinv; _GetCoordinate_(d,i,dim,ghosts,solver->m_dxinv,dxinv);
+          double local_cfl = params->m_a[nvars*d+v]*dt*dxinv;
           if (local_cfl > max_cfl) max_cfl = local_cfl;
         }
       }
     }
 
-  } else if (params->constant_advection == 0) {
+  } else if (params->m_constant_advection == 0) {
 
     int d;
     for (d = 0; d < ndims; d++) {
@@ -48,10 +48,10 @@ double LinearADRComputeCFL( void    *s, /*!< Solver object of type #HyPar */
       int done = 0; _ArraySetValue_(index,ndims,0);
       while (!done) {
         int p; _ArrayIndex1D_(ndims,dim,index,ghosts,p);
-        double dxinv; _GetCoordinate_(0,index[0],dim,ghosts,solver->dxinv,dxinv);
+        double dxinv; _GetCoordinate_(0,index[0],dim,ghosts,solver->m_dxinv,dxinv);
         int v;
         for (v = 0; v < nvars; v++) {
-          double a = params->a[nvars*ndims*p+nvars*d+v];
+          double a = params->m_a[nvars*ndims*p+nvars*d+v];
           double local_cfl = a*dt*dxinv;
           if (local_cfl > max_cfl) max_cfl = local_cfl;
         }

@@ -35,20 +35,20 @@ int BCSpongeSource(
                   )
 {
   DomainBoundary *boundary = (DomainBoundary*) b;
-  int            dim       = boundary->dim;
-  int            face      = boundary->face;
-  double         *uref     = boundary->SpongeValue;
-  double         *xmin     = boundary->xmin;
-  double         *xmax     = boundary->xmax;
+  int            dim       = boundary->m_dim;
+  int            face      = boundary->m_face;
+  double         *uref     = boundary->m_SpongeValue;
+  double         *xmin     = boundary->m_xmin;
+  double         *xmax     = boundary->m_xmax;
   int            v;
 
-  if (boundary->on_this_proc) {
+  if (boundary->m_on_this_proc) {
     int bounds[ndims], indexb[ndims];
-    _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
+    _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
     _ArraySetValue_(indexb,ndims,0);
     int done = 0;
     while (!done) {
-      int i = indexb[dim] + boundary->is[dim];
+      int i = indexb[dim] + boundary->m_is[dim];
       double x, xstart, xend;
       _GetCoordinate_(dim,i,size,ghosts,grid,x);
       xstart = xmin[dim];
@@ -58,7 +58,7 @@ int BCSpongeSource(
       if (face > 0) sigma = (x - xstart) / (xend - xstart);
       else          sigma = (x - xend  ) / (xstart - xend);
       /* add to the source term */
-      int p; _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p);
+      int p; _ArrayIndex1DWO_(ndims,size,indexb,boundary->m_is,ghosts,p);
       for (v=0; v<nvars; v++) source[nvars*p+v] -= (sigma * (u[nvars*p+v]-uref[v]));
       _ArrayIncrementIndex_(ndims,bounds,indexb,done);
     }

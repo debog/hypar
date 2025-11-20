@@ -44,10 +44,10 @@ int SecondDerivativeSecondOrderCentral(
   HyPar         *solver = (HyPar*) s;
   int           i, v;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
 
 
   if ((!D2f) || (!f)) {

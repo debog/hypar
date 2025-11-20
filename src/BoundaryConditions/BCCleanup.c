@@ -13,27 +13,27 @@ int BCCleanup(  void *b, /*!< Boundary object of type #DomainBoundary*/
                 int flag_gpu /*!< Flag indicating if GPU is being used */ )
 {
   DomainBoundary *boundary = (DomainBoundary*) b;
-  free(boundary->xmin);
-  free(boundary->xmax);
-  free(boundary->is);
-  free(boundary->ie);
-  if (boundary->DirichletValue) free(boundary->DirichletValue);
-  if (boundary->SpongeValue   ) free(boundary->SpongeValue   );
-  if (boundary->FlowVelocity  ) free(boundary->FlowVelocity  );
+  free(boundary->m_xmin);
+  free(boundary->m_xmax);
+  free(boundary->m_is);
+  free(boundary->m_ie);
+  if (boundary->m_DirichletValue) free(boundary->m_DirichletValue);
+  if (boundary->m_SpongeValue   ) free(boundary->m_SpongeValue   );
+  if (boundary->m_FlowVelocity  ) free(boundary->m_FlowVelocity  );
 
-  if (boundary->UnsteadyDirichletSize) free(boundary->UnsteadyDirichletSize);
-  if (boundary->UnsteadyDirichletData) free(boundary->UnsteadyDirichletData);
+  if (boundary->m_UnsteadyDirichletSize) free(boundary->m_UnsteadyDirichletSize);
+  if (boundary->m_UnsteadyDirichletData) free(boundary->m_UnsteadyDirichletData);
 
-  if (boundary->UnsteadyTemperatureSize)  free(boundary->UnsteadyTemperatureSize);
-  if (boundary->UnsteadyTimeLevels)       free(boundary->UnsteadyTimeLevels);
-  if (boundary->UnsteadyTemperatureData)  free(boundary->UnsteadyTemperatureData);
+  if (boundary->m_UnsteadyTemperatureSize)  free(boundary->m_UnsteadyTemperatureSize);
+  if (boundary->m_UnsteadyTimeLevels)       free(boundary->m_UnsteadyTimeLevels);
+  if (boundary->m_UnsteadyTemperatureData)  free(boundary->m_UnsteadyTemperatureData);
 
 #if defined(HAVE_CUDA)
   if (flag_gpu) {
-    gpuFree(boundary->gpu_bounds);
-    gpuFree(boundary->gpu_is);
-    gpuFree(boundary->gpu_ie);
-    if (boundary->FlowVelocity) gpuFree(boundary->gpu_FlowVelocity  );
+    gpuFree(boundary->m_gpu_bounds);
+    gpuFree(boundary->m_gpu_is);
+    gpuFree(boundary->m_gpu_ie);
+    if (boundary->m_FlowVelocity) gpuFree(boundary->m_gpu_FlowVelocity  );
   }
 #endif
 

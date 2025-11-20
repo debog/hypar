@@ -36,12 +36,12 @@ int TemplateModelUpwind(
 )
 {
   HyPar         *solver  = (HyPar*)         s;
-  TemplateModel *physics = (TemplateModel*) solver->physics;
+  TemplateModel *physics = (TemplateModel*) solver->m_physics;
 
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
-  int ghosts = solver->ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
+  int ghosts = solver->m_ghosts;
 
   /*
    * Interface array indexing:

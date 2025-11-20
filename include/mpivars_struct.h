@@ -22,43 +22,43 @@
  * using the MPI library.
 */
 typedef struct mpi_variables {
-  int   rank;     /*!< Process rank                                       */
-  int   nproc;    /*!< Total number of processes                          */
-  int   *iproc;   /*!< Number of processes along each dimension           */
-  int   *ip;      /*!< Process rank along each dimension                  */
-  int   *is,      /*!< Global start index of local domain along each dimension  */
-        *ie;      /*!< Global end index of local domain along each dimension  */
-  int   *bcperiodic; /*!< Flag for periodic BCs along any dimension       */
+  int   m_rank;     /*!< Process rank                                       */
+  int   m_nproc;    /*!< Total number of processes                          */
+  int   *m_iproc;   /*!< Number of processes along each dimension           */
+  int   *m_ip;      /*!< Process rank along each dimension                  */
+  int   *m_is,      /*!< Global start index of local domain along each dimension  */
+        *m_ie;      /*!< Global end index of local domain along each dimension  */
+  int   *m_bcperiodic; /*!< Flag for periodic BCs along any dimension       */
 
 #ifdef serial
-  int   world; /* Dummy variable */
-  int   *comm; /* Dummy variable */
+  int   m_world; /* Dummy variable */
+  int   *m_comm; /* Dummy variable */
 #else
-  MPI_Comm  world;   /*!< Communicator for all processes                  */
-  MPI_Comm  *comm;   /*!< Sub-communicators                               */
+  MPI_Comm  m_world;   /*!< Communicator for all processes                  */
+  MPI_Comm  *m_comm;   /*!< Sub-communicators                               */
 #endif
 
-  int N_IORanks;      /*!< Number of IO ranks                             */
-  int IOParticipant;  /*!< Whether this rank will handle file I/O         */
-  int CommGroup;      /*!< I/O group this rank is a part of               */
-  int IORank       ;  /*!< Rank of the process this rank will get I/O from*/
-  int GroupStartRank; /*!< Starting rank of the IO group                  */
-  int GroupEndRank;   /*!< Last rank of the IO group                      */
+  int m_N_IORanks;      /*!< Number of IO ranks                             */
+  int m_IOParticipant;  /*!< Whether this rank will handle file I/O         */
+  int m_CommGroup;      /*!< I/O group this rank is a part of               */
+  int m_IORank       ;  /*!< Rank of the process this rank will get I/O from*/
+  int m_GroupStartRank; /*!< Starting rank of the IO group                  */
+  int m_GroupEndRank;   /*!< Last rank of the IO group                      */
 #ifndef serial
-  MPI_Comm IOWorld;   /*!< Communicator of processes participating in file I/O */
+  MPI_Comm m_IOWorld;   /*!< Communicator of processes participating in file I/O */
 #endif
 
-  double *sendbuf, /*!< Buffer to send data */
-         *recvbuf; /*!< Buffer to receive data */
-  int    maxbuf;   /*!< Maximum buffer size */
+  double *m_sendbuf, /*!< Buffer to send data */
+         *m_recvbuf; /*!< Buffer to receive data */
+  int    m_maxbuf;   /*!< Maximum buffer size */
 
 #if defined(HAVE_CUDA)
-  int    ncalls;
-  double wctime;
-  double wctime_total;
-  int    *cpu_dim;
-  double *gpu_sendbuf,
-         *gpu_recvbuf;
+  int    m_ncalls;
+  double m_wctime;
+  double m_wctime_total;
+  int    *m_cpu_dim;
+  double *m_gpu_sendbuf,
+         *m_gpu_recvbuf;
 #endif
 } MPIVariables;
 

@@ -43,11 +43,11 @@ int test_first_derivative_first_order_linear() {
   int bias = 1;
 
   HyPar solver;
-  solver.ndims = 1;
-  solver.nvars = nvars;
-  solver.ghosts = ghosts;
+  solver.m_ndims = 1;
+  solver.m_nvars = nvars;
+  solver.m_ghosts = ghosts;
   int dim_local[1] = {N};
-  solver.dim_local = dim_local;
+  solver.m_dim_local = dim_local;
 
   double *f = (double*) calloc((N+2*ghosts)*nvars, sizeof(double));
   double *Df = (double*) calloc((N+2*ghosts)*nvars, sizeof(double));
@@ -86,11 +86,11 @@ int test_first_derivative_second_order_quadratic() {
   int bias = 0;
 
   HyPar solver;
-  solver.ndims = 1;
-  solver.nvars = nvars;
-  solver.ghosts = ghosts;
+  solver.m_ndims = 1;
+  solver.m_nvars = nvars;
+  solver.m_ghosts = ghosts;
   int dim_local[1] = {N};
-  solver.dim_local = dim_local;
+  solver.m_dim_local = dim_local;
 
   double *f = (double*) calloc((N+2*ghosts)*nvars, sizeof(double));
   double *Df = (double*) calloc((N+2*ghosts)*nvars, sizeof(double));
@@ -131,11 +131,11 @@ int test_first_derivative_fourth_order_cubic() {
   int bias = 0;
 
   HyPar solver;
-  solver.ndims = 1;
-  solver.nvars = nvars;
-  solver.ghosts = ghosts;
+  solver.m_ndims = 1;
+  solver.m_nvars = nvars;
+  solver.m_ghosts = ghosts;
   int dim_local[1] = {N};
-  solver.dim_local = dim_local;
+  solver.m_dim_local = dim_local;
 
   double *f = (double*) calloc((N+2*ghosts)*nvars, sizeof(double));
   double *Df = (double*) calloc((N+2*ghosts)*nvars, sizeof(double));
@@ -180,10 +180,10 @@ int test_first_derivative_2d() {
   int bias = 0;
 
   HyPar solver;
-  solver.ndims = ndims;
-  solver.nvars = nvars;
-  solver.ghosts = ghosts;
-  solver.dim_local = dim_local;
+  solver.m_ndims = ndims;
+  solver.m_nvars = nvars;
+  solver.m_ghosts = ghosts;
+  solver.m_dim_local = dim_local;
 
   int size_with_ghosts = 1;
   for (int d = 0; d < ndims; d++) {

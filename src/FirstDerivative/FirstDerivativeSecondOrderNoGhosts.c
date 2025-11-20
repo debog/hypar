@@ -82,7 +82,7 @@ int FirstDerivativeSecondOrderCentralNoGhosts(  double  *Df,    /*!< Array to ho
     }
   }
 
-  if (mpi->ip[dir] == 0) {
+  if (mpi->m_ip[dir] == 0) {
     /* left physical boundary: overwrite the leftmost value with biased finite-difference */
 #pragma omp parallel for schedule(auto) default(shared) private(i,j,v,index_outer,indexC)
     for (j=0; j<N_outer; j++) {
@@ -97,7 +97,7 @@ int FirstDerivativeSecondOrderCentralNoGhosts(  double  *Df,    /*!< Array to ho
     }
   }
 
-  if (mpi->ip[dir] == (mpi->iproc[dir]-1)) {
+  if (mpi->m_ip[dir] == (mpi->m_iproc[dir]-1)) {
     /* right physical boundary: overwrite the rightmost value with biased finite-difference */
 #pragma omp parallel for schedule(auto) default(shared) private(i,j,v,index_outer,indexC)
     for (j=0; j<N_outer; j++) {

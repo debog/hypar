@@ -132,11 +132,11 @@ int SparseGridsSimulation::define(  int a_rank, /*!< MPI rank of this process */
   m_sim_fg = new SimulationObject;
   /* the following are deliberately set to junk values
    * to ensure they are never used */
-  m_sim_fg->solver.my_idx = -1;
-  m_sim_fg->solver.nsims = -1;
+  m_sim_fg->solver.m_my_idx = -1;
+  m_sim_fg->solver.m_nsims = -1;
   /* these are okay */
-  m_sim_fg->mpi.rank = m_rank;
-  m_sim_fg->mpi.nproc = m_nproc;
+  m_sim_fg->mpi.m_rank = m_rank;
+  m_sim_fg->mpi.m_nproc = m_nproc;
 
   if (!m_rank) {
     printf("Allocated full grid simulation object(s).\n");

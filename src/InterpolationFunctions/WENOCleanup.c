@@ -19,17 +19,17 @@ int WENOCleanup(void *s, /*!< WENO object of type #WENOParameters */
 {
   WENOParameters  *weno   = (WENOParameters*) s;
 
-  if (weno->offset) free(weno->offset);
+  if (weno->m_offset) free(weno->m_offset);
 #if defined(HAVE_CUDA)
   if (flag_gpu) {
-    if (weno->w1) gpuFree(weno->w1);
-    if (weno->w2) gpuFree(weno->w2);
-    if (weno->w3) gpuFree(weno->w3);
+    if (weno->m_w1) gpuFree(weno->m_w1);
+    if (weno->m_w2) gpuFree(weno->m_w2);
+    if (weno->m_w3) gpuFree(weno->m_w3);
   } else {
 #endif
-    if (weno->w1) free(weno->w1);
-    if (weno->w2) free(weno->w2);
-    if (weno->w3) free(weno->w3);
+    if (weno->m_w1) free(weno->m_w1);
+    if (weno->m_w2) free(weno->m_w2);
+    if (weno->m_w3) free(weno->m_w3);
 #if defined(HAVE_CUDA)
   }
 #endif

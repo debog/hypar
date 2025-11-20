@@ -18,22 +18,22 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
 {
   HyPar           *solver   = (HyPar*) s;
   MPIVariables    *mpi      = (MPIVariables*) m;
-  Numa2D          *physics  = (Numa2D*) solver->physics;
+  Numa2D          *physics  = (Numa2D*) solver->m_physics;
   int             i,v,done;
   double          dxinv, dyinv;
   _DECLARE_IERR_;
 
-  int ghosts = solver->ghosts;
-  int imax   = solver->dim_local[0];
-  int jmax   = solver->dim_local[1];
-  int *dim   = solver->dim_local;
+  int ghosts = solver->m_ghosts;
+  int imax   = solver->m_dim_local[0];
+  int jmax   = solver->m_dim_local[1];
+  int *dim   = solver->m_dim_local;
   int size   = (imax+2*ghosts)*(jmax+2*ghosts)*_MODEL_NVARS_;
 
   _ArraySetValue_(par,size,0.0);
-  if (physics->mu <= 0) return(0); /* inviscid flow */
-  solver->count_par++;
+  if (physics->m_mu <= 0) return(0); /* inviscid flow */
+  solver->m_count_par++;
 
-  double        mu        = physics->mu;
+  double        mu        = physics->m_mu;
 
   /* allocate some arrays */
   double *Q, *QDeriv, *FViscous, *FDeriv;
@@ -53,7 +53,7 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
     double drho,uvel,vvel,dT,rho0,T0,P0,EP,ycoord;
 
-    _GetCoordinate_             (_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->x,ycoord);
+    _GetCoordinate_             (_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->m_x,ycoord);
     physics->StandardAtmosphere (physics,ycoord,&EP,&P0,&rho0,&T0);
     _Numa2DGetFlowVars_         ( (u+_MODEL_NVARS_*p),drho,uvel,vvel,dT,rho0);
 
@@ -72,7 +72,7 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
   done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
-    _GetCoordinate_(_XDIR_,index[_XDIR_]-ghosts,dim,ghosts,solver->dxinv,dxinv);
+    _GetCoordinate_(_XDIR_,index[_XDIR_]-ghosts,dim,ghosts,solver->m_dxinv,dxinv);
 
     double rho, ux, vx, tx;
     rho = Q     [_MODEL_NVARS_*p+0];
@@ -92,7 +92,7 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
   done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   while (!done) {
     int p; _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
-    _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->dxinv,dxinv);
+    _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->m_dxinv,dxinv);
     for (v=0; v<_MODEL_NVARS_; v++) (par+p)[v] += (dxinv * (FDeriv+p)[v] );
     _ArrayIncrementIndex_(_MODEL_NDIMS_,dim,index,done);
   }
@@ -104,7 +104,7 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
   done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
-    _GetCoordinate_(_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->dxinv,dyinv);
+    _GetCoordinate_(_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->m_dxinv,dyinv);
 
     double rho, uy, vy, ty;
     rho = Q     [_MODEL_NVARS_*p+0];
@@ -124,7 +124,7 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
   done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   while (!done) {
     int p; _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
-    _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->dxinv,dyinv);
+    _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->m_dxinv,dyinv);
     for (v=0; v<_MODEL_NVARS_; v++) (par+p)[v] += (dyinv * (FDeriv+p)[v] );
     _ArrayIncrementIndex_(_MODEL_NDIMS_,dim,index,done);
   }

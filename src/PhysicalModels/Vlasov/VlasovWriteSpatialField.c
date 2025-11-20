@@ -26,13 +26,13 @@ int VlasovWriteSpatialField( void   *s,         /*!< Solver object of type #HyPa
 {
   HyPar         *solver = (HyPar*)        s;
   MPIVariables  *mpi    = (MPIVariables*) m;
-  Vlasov        *param  = (Vlasov*)       solver->physics;
+  Vlasov        *param  = (Vlasov*)       solver->m_physics;
 
   if (!solver->WriteOutput) return 0;
 
-  if (solver->nsims > 1) {
+  if (solver->m_nsims > 1) {
     char index[_MAX_STRING_SIZE_];
-    GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
+    GetStringFromInteger(solver->m_my_idx, index, (int)log10(solver->m_nsims)+1);
     strcat(fname_root, "_");
     strcat(fname_root, index);
     strcat(fname_root, "_");
@@ -40,20 +40,20 @@ int VlasovWriteSpatialField( void   *s,         /*!< Solver object of type #HyPa
 
   char filename[_MAX_STRING_SIZE_] = "";
   strcat(filename,fname_root);
-  if (!strcmp(solver->op_overwrite,"no")) {
+  if (!strcmp(solver->m_op_overwrite,"no")) {
     strcat(filename,"_");
-    strcat(filename,solver->filename_index);
+    strcat(filename,solver->m_filename_index);
   }
   strcat(filename,".dat");
 
   int d,
-      ghosts = solver->ghosts,
-      ndims_x = param->ndims_x;
+      ghosts = solver->m_ghosts,
+      ndims_x = param->m_ndims_x;
 
   int dim_global_x[ndims_x];
-  _ArrayCopy1D_(solver->dim_global, dim_global_x, ndims_x);
+  _ArrayCopy1D_(solver->m_dim_global, dim_global_x, ndims_x);
   int dim_local_x[ndims_x];
-  _ArrayCopy1D_(solver->dim_local, dim_local_x, ndims_x);
+  _ArrayCopy1D_(solver->m_dim_local, dim_local_x, ndims_x);
 
   /* gather the spatial coordinates into a global array */
   double *xg;
@@ -66,11 +66,11 @@ int VlasovWriteSpatialField( void   *s,         /*!< Solver object of type #HyPa
     offset_global = offset_local = 0;
     for (d=0; d<ndims_x; d++) {
       IERR MPIGatherArray1D(  mpi,
-                              (mpi->rank?NULL:&xg[offset_global]),
-                              &solver->x[offset_local+ghosts],
-                              mpi->is[d],
-                              mpi->ie[d],
-                              solver->dim_local[d],
+                              (mpi->m_rank?NULL:&xg[offset_global]),
+                              &solver->m_x[offset_local+ghosts],
+                              mpi->m_is[d],
+                              mpi->m_ie[d],
+                              solver->m_dim_local[d],
                               0);
       offset_global += dim_global_x[d];
       offset_local  += dim_local_x [d] + 2*ghosts;
@@ -80,27 +80,27 @@ int VlasovWriteSpatialField( void   *s,         /*!< Solver object of type #HyPa
   /* gather the field into a global array */
   double *field_g;
   {
-    int size_g = param->npts_global_x * param->ndims_x;
+    int size_g = param->npts_global_x * param->m_ndims_x;
     field_g = (double*) calloc (size_g, sizeof(double));
     _ArraySetValue_(field_g, size_g, 0.0);
 
-    if (param->ndims_x > 1) {
-      if (!mpi->rank) {
+    if (param->m_ndims_x > 1) {
+      if (!mpi->m_rank) {
         fprintf(stderr,"Warning in VlasovWriteSpatialField():\n");
         fprintf(stderr,"  field writing not yet supported for >1 spatial dimensions.\n");
       }
     } else {
       IERR MPIGatherArray1D(  mpi,
-                              (mpi->rank ? NULL : field_g),
+                              (mpi->m_rank ? NULL : field_g),
                               (a_field+ghosts),
-                              mpi->is[0],
-                              mpi->ie[0],
-                              solver->dim_local[0],
+                              mpi->m_is[0],
+                              mpi->m_ie[0],
+                              solver->m_dim_local[0],
                               0);
     }
   }
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     int idx[ndims_x];
     WriteText(  ndims_x,
                 1,

@@ -23,12 +23,12 @@ double VlasovComputeCFL( void    *s, /*!< Solver object of type #HyPar */
                        )
 {
   HyPar   *solver = (HyPar*)  s;
-  Vlasov  *params = (Vlasov*) solver->physics;
+  Vlasov  *params = (Vlasov*) solver->m_physics;
 
-  int     ndims  = solver->ndims;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
-  double  *u     = solver->u;
+  int     ndims  = solver->m_ndims;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
+  double  *u     = solver->m_u;
 
   double max_cfl = 0;
   int done = 0;
@@ -39,7 +39,7 @@ double VlasovComputeCFL( void    *s, /*!< Solver object of type #HyPar */
 
     for (int dir=0; dir<ndims; dir++) {
       double dxinv;
-      _GetCoordinate_(dir,index[dir],dim,ghosts,solver->dxinv,dxinv);
+      _GetCoordinate_(dir,index[dir],dim,ghosts,solver->m_dxinv,dxinv);
       double eig = VlasovAdvectionCoeff(index, dir, solver);
       double local_cfl = eig*dt*dxinv;
       if (local_cfl > max_cfl) max_cfl = local_cfl;

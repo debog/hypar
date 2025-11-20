@@ -70,15 +70,15 @@ int test_tridiag_lu_simple() {
   }
 
   /* Initialize TridiagLU structure */
-  TridiagLU params;
-  params.evaluate_norm = 0;
-  params.maxiter = 10;
-  params.atol = 1e-12;
-  params.rtol = 1e-10;
-  strcpy(params.reducedsolvetype, _TRIDIAG_GS_);
+  TridiagLU_Params params;
+  params.m_evaluate_norm = 0;
+  params.m_maxiter = 10;
+  params.m_atol = 1e-12;
+  params.m_rtol = 1e-10;
+  strcpy(params.m_reducedsolvetype, _TRIDIAG_GS_);
 
   /* Solve the system (note: tridiagLU modifies a, b, c, and rhs becomes the solution) */
-  int ierr = tridiagLU(a, b, c, rhs, n, 1, &params, NULL);
+  int ierr = TridiagLU(a, b, c, rhs, n, 1, &params, NULL);
 
   /* Copy solution from rhs to x */
   for (int i = 0; i < n; i++) {
@@ -142,14 +142,14 @@ int test_tridiag_lu_diag_dominant() {
     rhs_orig[i] = rhs[i];
   }
 
-  TridiagLU params;
-  params.evaluate_norm = 0;
-  params.maxiter = 10;
-  params.atol = 1e-12;
-  params.rtol = 1e-10;
-  strcpy(params.reducedsolvetype, _TRIDIAG_GS_);
+  TridiagLU_Params params;
+  params.m_evaluate_norm = 0;
+  params.m_maxiter = 10;
+  params.m_atol = 1e-12;
+  params.m_rtol = 1e-10;
+  strcpy(params.m_reducedsolvetype, _TRIDIAG_GS_);
 
-  int ierr = tridiagLU(a, b, c, rhs, n, 1, &params, NULL);
+  int ierr = TridiagLU(a, b, c, rhs, n, 1, &params, NULL);
 
   /* Copy solution from rhs to x */
   for (int i = 0; i < n; i++) {
@@ -210,14 +210,14 @@ int test_tridiag_lu_known_solution() {
   }
 
   /* Solve the system (tridiagLU modifies inputs) */
-  TridiagLU params;
-  params.evaluate_norm = 0;
-  params.maxiter = 10;
-  params.atol = 1e-12;
-  params.rtol = 1e-10;
-  strcpy(params.reducedsolvetype, _TRIDIAG_GS_);
+  TridiagLU_Params params;
+  params.m_evaluate_norm = 0;
+  params.m_maxiter = 10;
+  params.m_atol = 1e-12;
+  params.m_rtol = 1e-10;
+  strcpy(params.m_reducedsolvetype, _TRIDIAG_GS_);
 
-  int ierr = tridiagLU(a, b, c, rhs, n, 1, &params, NULL);
+  int ierr = TridiagLU(a, b, c, rhs, n, 1, &params, NULL);
 
   /* Copy solution from rhs to x */
   for (int i = 0; i < n; i++) {

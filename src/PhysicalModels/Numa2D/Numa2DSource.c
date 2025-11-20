@@ -7,12 +7,12 @@
 int Numa2DSource(double *S,double *u,void *s,void *m,double t)
 {
   HyPar  *solver = (HyPar*)   s;
-  Numa2D *param  = (Numa2D*) solver->physics;
+  Numa2D *param  = (Numa2D*) solver->m_physics;
   int     i;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -27,7 +27,7 @@ int Numa2DSource(double *S,double *u,void *s,void *m,double t)
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double drho,uvel,vvel,dT,rho0,P0,EP,T0,ycoord;
 
-    _GetCoordinate_(_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->x,ycoord);
+    _GetCoordinate_(_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->m_x,ycoord);
     param->StandardAtmosphere (param,ycoord,&EP,&P0,&rho0,&T0);
     _Numa2DGetFlowVars_       ((u+_MODEL_NVARS_*p),drho,uvel,vvel,dT,rho0);
     _Numa2DSetSource_         ((S+_MODEL_NVARS_*p),param,drho);

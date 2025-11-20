@@ -24,10 +24,10 @@ int TimePreStep(void *ts /*!< Object of type #TimeIntegration */ )
   TimeIntegration*  TS  = (TimeIntegration*) ts;
   _DECLARE_IERR_;
 
-  SimulationObject* sim = (SimulationObject*) TS->simulation;
-  int ns, nsims = TS->nsims;
+  SimulationObject* sim = (SimulationObject*) TS->m_simulation;
+  int ns, nsims = TS->m_nsims;
 
-  gettimeofday(&TS->iter_start_time,NULL);
+  gettimeofday(&TS->m_iter_start_time,NULL);
 
   for (ns = 0; ns < nsims; ns++) {
 
@@ -36,11 +36,11 @@ int TimePreStep(void *ts /*!< Object of type #TimeIntegration */ )
 
     double *u = NULL;
 #if defined(HAVE_CUDA)
-    if (solver->use_gpu) {
-      u = solver->gpu_u;
+    if (solver->m_use_gpu) {
+      u = solver->m_gpu_u;
     } else{
 #endif
-      u = solver->u;
+      u = solver->m_u;
 #if defined(HAVE_CUDA)
     }
 #endif
@@ -51,41 +51,41 @@ int TimePreStep(void *ts /*!< Object of type #TimeIntegration */ )
                                      mpi,
                                      u,
                                      NULL,
-                                     TS->waqt );
+                                     TS->m_waqt );
 
     solver->ApplyIBConditions( solver,
                                mpi,
                                u,
-                               TS->waqt );
+                               TS->m_waqt );
 
 #if defined(HAVE_CUDA)
-    if (solver->use_gpu) {
-      gpuMPIExchangeBoundariesnD( solver->ndims,
-                                  solver->nvars,
-                                  solver->gpu_dim_local,
-                                  solver->ghosts,
+    if (solver->m_use_gpu) {
+      gpuMPIExchangeBoundariesnD( solver->m_ndims,
+                                  solver->m_nvars,
+                                  solver->m_gpu_dim_local,
+                                  solver->m_ghosts,
                                   mpi,
                                   u );
     } else {
 #endif
-      MPIExchangeBoundariesnD( solver->ndims,
-                               solver->nvars,
-                               solver->dim_local,
-                               solver->ghosts,
+      MPIExchangeBoundariesnD( solver->m_ndims,
+                               solver->m_nvars,
+                               solver->m_dim_local,
+                               solver->m_ghosts,
                                mpi,
                                u );
 #if defined(HAVE_CUDA)
     }
 #endif
 
-    if ((TS->iter+1)%solver->screen_op_iter == 0) {
+    if ((TS->m_iter+1)%solver->m_screen_op_iter == 0) {
 
 #if defined(HAVE_CUDA)
-      if (!solver->use_gpu) {
+      if (!solver->m_use_gpu) {
 #endif
-        _ArrayCopy1D_(  solver->u,
-                        (TS->u + TS->u_offsets[ns]),
-                        (solver->npoints_local_wghosts*solver->nvars) );
+        _ArrayCopy1D_(  solver->m_u,
+                        (TS->m_u + TS->m_u_offsets[ns]),
+                        (solver->m_npoints_local_wghosts*solver->m_nvars) );
 #if defined(HAVE_CUDA)
       }
 #endif
@@ -93,34 +93,34 @@ int TimePreStep(void *ts /*!< Object of type #TimeIntegration */ )
       /* compute max CFL and diffusion number over the domain */
       if (solver->ComputeCFL) {
         double local_max_cfl  = -1.0;
-        local_max_cfl  = solver->ComputeCFL (solver,mpi,TS->dt,TS->waqt);
-        MPIMax_double(&TS->max_cfl ,&local_max_cfl ,1,&mpi->world);
+        local_max_cfl  = solver->ComputeCFL (solver,mpi,TS->m_dt,TS->m_waqt);
+        MPIMax_double(&TS->m_max_cfl ,&local_max_cfl ,1,&mpi->m_world);
       } else {
-        TS->max_cfl = -1;
+        TS->m_max_cfl = -1;
       }
       if (solver->ComputeDiffNumber) {
         double local_max_diff = -1.0;
-        local_max_diff = solver->ComputeDiffNumber (solver,mpi,TS->dt,TS->waqt);
-        MPIMax_double(&TS->max_diff,&local_max_diff,1,&mpi->world);
+        local_max_diff = solver->ComputeDiffNumber (solver,mpi,TS->m_dt,TS->m_waqt);
+        MPIMax_double(&TS->m_max_diff,&local_max_diff,1,&mpi->m_world);
       } else {
-        TS->max_diff = -1;
+        TS->m_max_diff = -1;
       }
 
     }
 
     /* set the step boundary flux integral value to zero */
 #if defined(HAVE_CUDA)
-    if (solver->use_gpu) {
-      gpuArraySetValue(solver->StepBoundaryIntegral,2*solver->ndims*solver->nvars,0.0);
+    if (solver->m_use_gpu) {
+      gpuArraySetValue(solver->m_step_boundary_integral,2*solver->m_ndims*solver->m_nvars,0.0);
     } else {
 #endif
-      _ArraySetValue_(solver->StepBoundaryIntegral,2*solver->ndims*solver->nvars,0.0);
+      _ArraySetValue_(solver->m_step_boundary_integral,2*solver->m_ndims*solver->m_nvars,0.0);
 #if defined(HAVE_CUDA)
     }
 #endif
 
     if (solver->PreStep) {
-      solver->PreStep(u,solver,mpi,TS->waqt);
+      solver->PreStep(u,solver,mpi,TS->m_waqt);
     }
 
   }

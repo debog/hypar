@@ -44,27 +44,27 @@ int NavierStokes2DSource(
 {
   HyPar           *solver = (HyPar* )         s;
   MPIVariables    *mpi    = (MPIVariables*)   m;
-  NavierStokes2D  *param  = (NavierStokes2D*) solver->physics;
+  NavierStokes2D  *param  = (NavierStokes2D*) solver->m_physics;
 
-  if ((param->grav_x == 0.0) && (param->grav_y == 0.0))
+  if ((param->m_grav_x == 0.0) && (param->m_grav_y == 0.0))
     return(0); /* no gravitational forces */
 
   int     v, done, p, p1, p2;
-  double  *SourceI = solver->fluxI; /* interace source term       */
-  double  *SourceC = solver->fluxC; /* cell-centered source term  */
-  double  *SourceL = solver->fL;
-  double  *SourceR = solver->fR;
+  double  *SourceI = solver->m_flux_i; /* interace source term       */
+  double  *SourceC = solver->m_flux_c; /* cell-centered source term  */
+  double  *SourceL = solver->m_f_l;
+  double  *SourceR = solver->m_f_r;
 
-  int     ndims   = solver->ndims;
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  double  *x      = solver->x;
-  double  *dxinv  = solver->dxinv;
-  double  RT      =  param->p0 / param->rho0;
+  int     ndims   = solver->m_ndims;
+  int     ghosts  = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  double  *x      = solver->m_x;
+  double  *dxinv  = solver->m_dxinv;
+  double  RT      =  param->m_p0 / param->m_rho0;
   int     index[ndims],index1[ndims],index2[ndims],dim_interface[ndims];
 
   /* Along X-direction */
-  if (param->grav_x != 0.0) {
+  if (param->m_grav_x != 0.0) {
     /* set interface dimensions */
     _ArrayCopy1D_(dim,dim_interface,ndims); dim_interface[_XDIR_]++;
     /* calculate the split source function exp(-phi/RT) */
@@ -85,10 +85,10 @@ int NavierStokes2DSource(
 
       double dx_inverse; _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,dxinv,dx_inverse);
       double rho, uvel, vvel, e, P;
-      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,uvel,vvel,e,P,param->gamma);
+      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,uvel,vvel,e,P,param->m_gamma);
       double term[_MODEL_NVARS_] = {0.0, rho*RT, 0.0, rho*RT*uvel};
       for (v=0; v<_MODEL_NVARS_; v++) {
-        source[_MODEL_NVARS_*p+v] += (  (term[v]*param->grav_field_f[p])
+        source[_MODEL_NVARS_*p+v] += (  (term[v]*param->m_grav_field_f[p])
                                       * (SourceI[_MODEL_NVARS_*p2+v]-SourceI[_MODEL_NVARS_*p1+v])*dx_inverse );
       }
       uvel = P; /* useless statement to avoid compiler warnings */
@@ -97,7 +97,7 @@ int NavierStokes2DSource(
   }
 
   /* Along Y-direction */
-  if (param->grav_y != 0.0) {
+  if (param->m_grav_y != 0.0) {
     /* set interface dimensions */
     _ArrayCopy1D_(dim,dim_interface,ndims); dim_interface[_YDIR_]++;
     /* calculate the split source function exp(-phi/RT) */
@@ -119,10 +119,10 @@ int NavierStokes2DSource(
 
       double dy_inverse; _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,dxinv,dy_inverse);
       double rho, uvel, vvel, e, P;
-      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,uvel,vvel,e,P,param->gamma);
+      _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,uvel,vvel,e,P,param->m_gamma);
       double term[_MODEL_NVARS_] = {0.0, 0.0, rho*RT, rho*RT*vvel};
       for (v=0; v<_MODEL_NVARS_; v++) {
-        source[_MODEL_NVARS_*p+v] += (  (term[v]*param->grav_field_f[p])
+        source[_MODEL_NVARS_*p+v] += (  (term[v]*param->m_grav_field_f[p])
                                       * (SourceI[_MODEL_NVARS_*p2+v]-SourceI[_MODEL_NVARS_*p1+v])*dy_inverse );
       }
       uvel = P; /* useless statement to avoid compiler warnings */
@@ -159,11 +159,11 @@ int NavierStokes2DSourceFunction(
                                 )
 {
   HyPar           *solver = (HyPar* )         s;
-  NavierStokes2D  *param  = (NavierStokes2D*) solver->physics;
+  NavierStokes2D  *param  = (NavierStokes2D*) solver->m_physics;
 
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  int     ndims   = solver->ndims;
+  int     ghosts  = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -177,9 +177,9 @@ int NavierStokes2DSourceFunction(
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     (f+_MODEL_NVARS_*p)[0] = 0.0;
-    (f+_MODEL_NVARS_*p)[1] = param->grav_field_g[p] * (dir == _XDIR_);
-    (f+_MODEL_NVARS_*p)[2] = param->grav_field_g[p] * (dir == _YDIR_);
-    (f+_MODEL_NVARS_*p)[3] = param->grav_field_g[p];
+    (f+_MODEL_NVARS_*p)[1] = param->m_grav_field_g[p] * (dir == _XDIR_);
+    (f+_MODEL_NVARS_*p)[2] = param->m_grav_field_g[p] * (dir == _YDIR_);
+    (f+_MODEL_NVARS_*p)[3] = param->m_grav_field_g[p];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 
@@ -211,8 +211,8 @@ int NavierStokes2DSourceUpwind(
   int             done,k;
   _DECLARE_IERR_;
 
-  int ndims = solver->ndims;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;

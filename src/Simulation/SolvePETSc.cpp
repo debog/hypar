@@ -76,48 +76,48 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
   /* create and set a PETSc context */
   PETScContext context;
 
-  context.rank = rank;
-  context.nproc = nproc;
+  context.m_rank = rank;
+  context.m_nproc = nproc;
 
-  context.simobj = sim;
-  context.nsims = nsims;
+  context.m_simobj = sim;
+  context.m_nsims = nsims;
 
   /* default: everything explicit */
-  context.flag_hyperbolic     = _EXPLICIT_;
-  context.flag_hyperbolic_f   = _EXPLICIT_;
-  context.flag_hyperbolic_df  = _EXPLICIT_;
-  context.flag_parabolic      = _EXPLICIT_;
-  context.flag_source         = _EXPLICIT_;
+  context.m_flag_hyperbolic     = _EXPLICIT_;
+  context.m_flag_hyperbolic_f   = _EXPLICIT_;
+  context.m_flag_hyperbolic_df  = _EXPLICIT_;
+  context.m_flag_parabolic      = _EXPLICIT_;
+  context.m_flag_source         = _EXPLICIT_;
 
-  context.tic = 0;
-  context.flag_is_linear = 0;
-  context.globalDOF.clear();
-  context.points.clear();
-  context.ti_runtime = 0.0;
-  context.waqt = 0.0;
-  context.dt = sim[0].solver.dt;
-  context.stage_times.clear();
-  context.stage_index = 0;
+  context.m_tic = 0;
+  context.m_flag_is_linear = 0;
+  context.m_globalDOF.clear();
+  context.m_points.clear();
+  context.m_ti_runtime = 0.0;
+  context.m_waqt = 0.0;
+  context.m_dt = sim[0].solver.m_dt;
+  context.m_stage_times.clear();
+  context.m_stage_index = 0;
 
 #ifdef with_librom
   if (!rank) printf("Setting up libROM interface.\n");
-  context.rom_interface = new libROMInterface( sim,
+  context.m_rom_interface = new libROMInterface( sim,
                                                nsims,
                                                rank,
                                                nproc,
-                                               sim[0].solver.dt );
-  context.rom_mode = ((libROMInterface*)context.rom_interface)->mode();
-  context.op_times_arr.clear();
+                                               sim[0].solver.m_dt );
+  context.m_rom_mode = ((libROMInterface*)context.m_rom_interface)->mode();
+  context.m_op_times_arr.clear();
 #endif
 
 #ifdef with_librom
-  if (      (context.rom_mode == _ROM_MODE_TRAIN_)
-        ||  (context.rom_mode == _ROM_MODE_INITIAL_GUESS_ )
-        ||  (context.rom_mode == _ROM_MODE_NONE_ ) ) {
+  if (      (context.m_rom_mode == _ROM_MODE_TRAIN_)
+        ||  (context.m_rom_mode == _ROM_MODE_INITIAL_GUESS_ )
+        ||  (context.m_rom_mode == _ROM_MODE_NONE_ ) ) {
 
-    if (context.rom_mode == _ROM_MODE_INITIAL_GUESS_) {
-      ((libROMInterface*)context.rom_interface)->loadROM();
-      ((libROMInterface*)context.rom_interface)->projectInitialSolution(sim);
+    if (context.m_rom_mode == _ROM_MODE_INITIAL_GUESS_) {
+      ((libROMInterface*)context.m_rom_interface)->loadROM();
+      ((libROMInterface*)context.m_rom_interface)->projectInitialSolution(sim);
     }
 #endif
     PetscCreatePointList(&context);
@@ -125,16 +125,16 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
     /* create and initialize PETSc solution vector and other parameters */
     /* PETSc solution vector does not have ghost points */
     VecCreate(MPI_COMM_WORLD,&Y);
-    VecSetSizes(Y,context.ndofs,PETSC_DECIDE);
+    VecSetSizes(Y,context.m_ndofs,PETSC_DECIDE);
     VecSetUp(Y);
 
     /* copy initial solution to PETSc's vector */
     for (int ns = 0; ns < nsims; ns++) {
-      TransferVecToPETSc( sim[ns].solver.u,
+      TransferVecToPETSc( sim[ns].solver.m_u,
                           Y,
                           &context,
                           ns,
-                          context.offsets[ns] );
+                          context.m_offsets[ns] );
     }
 
     /* Create the global DOF mapping for all the grid points */
@@ -142,10 +142,10 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
     /* Define and initialize the time-integration object */
     TSCreate(MPI_COMM_WORLD,&ts);
-    TSSetMaxSteps(ts,sim[0].solver.n_iter);
-    TSSetMaxTime(ts,sim[0].solver.dt*sim[0].solver.n_iter);
-    TSSetTimeStep(ts,sim[0].solver.dt);
-    TSSetTime(ts,context.waqt);
+    TSSetMaxSteps(ts,sim[0].solver.m_n_iter);
+    TSSetMaxTime(ts,sim[0].solver.m_dt*sim[0].solver.m_n_iter);
+    TSSetTimeStep(ts,sim[0].solver.m_dt);
+    TSSetTime(ts,context.m_waqt);
     TSSetExactFinalTime(ts,TS_EXACTFINALTIME_MATCHSTEP);
     TSSetType(ts,TSBEULER);
 
@@ -189,15 +189,15 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
       SNESGetType(snes,&snestype);
 
 #ifdef with_librom
-      if (context.rom_mode == _ROM_MODE_INITIAL_GUESS_) {
+      if (context.m_rom_mode == _ROM_MODE_INITIAL_GUESS_) {
         SNESSetComputeInitialGuess(snes, PetscSetInitialGuessROM, &context);
       }
 #endif
 
-      context.flag_use_precon = 0;
+      context.m_flag_use_precon = 0;
       PetscOptionsGetBool(  nullptr,nullptr,
                             "-with_pc",
-                            (PetscBool*)(&context.flag_use_precon),
+                            (PetscBool*)(&context.m_flag_use_precon),
                             nullptr );
 
       char precon_mat_type_c_st[_MAX_STRING_SIZE_] = "default";
@@ -207,31 +207,31 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
                               precon_mat_type_c_st,
                               _MAX_STRING_SIZE_,
                               nullptr );
-      context.precon_matrix_type = std::string(precon_mat_type_c_st);
+      context.m_precon_matrix_type = std::string(precon_mat_type_c_st);
 
-      if (context.flag_use_precon) {
+      if (context.m_flag_use_precon) {
 
-        if (context.precon_matrix_type == "default") {
+        if (context.m_precon_matrix_type == "default") {
 
           /* Matrix-free representation of the Jacobian */
           flag_mat_a = 1;
           MatCreateShell( MPI_COMM_WORLD,
-                          context.ndofs,
-                          context.ndofs,
+                          context.m_ndofs,
+                          context.m_ndofs,
                           PETSC_DETERMINE,
                           PETSC_DETERMINE,
                           &context,
                           &A);
           if ((!strcmp(snestype,SNESKSPONLY)) || (ptype == TS_LINEAR)) {
             /* linear problem */
-            context.flag_is_linear = 1;
+            context.m_flag_is_linear = 1;
             MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunctionIMEX_Linear);
             SNESSetType(snes,SNESKSPONLY);
           } else {
             /* nonlinear problem */
-            context.flag_is_linear = 0;
-            context.jfnk_eps = 1e-7;
-            PetscOptionsGetReal(NULL,NULL,"-jfnk_epsilon",&context.jfnk_eps,NULL);
+            context.m_flag_is_linear = 0;
+            context.m_jfnk_eps = 1e-7;
+            PetscOptionsGetReal(NULL,NULL,"-jfnk_epsilon",&context.m_jfnk_eps,NULL);
             MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunctionIMEX_JFNK);
           }
           MatSetUp(A);
@@ -249,35 +249,35 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
           /* Set up preconditioner matrix */
           flag_mat_b = 1;
           MatCreateAIJ( MPI_COMM_WORLD,
-                        context.ndofs,
-                        context.ndofs,
+                        context.m_ndofs,
+                        context.m_ndofs,
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
-                        (sim[0].solver.ndims*2+1)*sim[0].solver.nvars, NULL,
-                        2*sim[0].solver.ndims*sim[0].solver.nvars, NULL,
+                        (sim[0].solver.m_ndims*2+1)*sim[0].solver.m_nvars, NULL,
+                        2*sim[0].solver.m_ndims*sim[0].solver.m_nvars, NULL,
                         &B );
-          MatSetBlockSize(B,sim[0].solver.nvars);
+          MatSetBlockSize(B,sim[0].solver.m_nvars);
           /* Set the IJacobian function for TS */
           TSSetIJacobian(ts,A,B,PetscIJacobianIMEX,&context);
 
-        } else if (context.precon_matrix_type == "fd") {
+        } else if (context.m_precon_matrix_type == "fd") {
 
           flag_mat_a = 1;
           MatCreateSNESMF(snes,&A);
           flag_mat_b = 1;
           MatCreateAIJ( MPI_COMM_WORLD,
-                        context.ndofs,
-                        context.ndofs,
+                        context.m_ndofs,
+                        context.m_ndofs,
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
-                        (sim[0].solver.ndims*2+1)*sim[0].solver.nvars, NULL,
-                        2*sim[0].solver.ndims*sim[0].solver.nvars, NULL,
+                        (sim[0].solver.m_ndims*2+1)*sim[0].solver.m_nvars, NULL,
+                        2*sim[0].solver.m_ndims*sim[0].solver.m_nvars, NULL,
                         &B);
           MatSetOption(B, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
           /* Set the Jacobian function for SNES */
           SNESSetJacobian(snes, A, B, SNESComputeJacobianDefault, NULL);
 
-        } else if (context.precon_matrix_type == "colored_fd") {
+        } else if (context.m_precon_matrix_type == "colored_fd") {
 
           int stencil_width = 1;
           PetscOptionsGetInt( NULL,
@@ -290,12 +290,12 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
           MatCreateSNESMF(snes,&A);
           flag_mat_b = 1;
           MatCreateAIJ( MPI_COMM_WORLD,
-                        context.ndofs,
-                        context.ndofs,
+                        context.m_ndofs,
+                        context.m_ndofs,
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
-                        (sim[0].solver.ndims*2+1)*sim[0].solver.nvars, NULL,
-                        2*sim[0].solver.ndims*sim[0].solver.nvars, NULL,
+                        (sim[0].solver.m_ndims*2+1)*sim[0].solver.m_nvars, NULL,
+                        2*sim[0].solver.m_ndims*sim[0].solver.m_nvars, NULL,
                         &B);
           MatSetOption(B, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
           if (!rank) {
@@ -311,7 +311,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
           if (!rank) {
             fprintf(  stderr,"Invalid input for \"-pc_matrix_type\": %s.\n",
-                      context.precon_matrix_type.c_str());
+                      context.m_precon_matrix_type.c_str());
           }
           PetscFunctionReturn(0);
 
@@ -326,22 +326,22 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
         /* Matrix-free representation of the Jacobian */
         flag_mat_a = 1;
         MatCreateShell( MPI_COMM_WORLD,
-                        context.ndofs,
-                        context.ndofs,
+                        context.m_ndofs,
+                        context.m_ndofs,
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
                         &context,
                         &A);
         if ((!strcmp(snestype,SNESKSPONLY)) || (ptype == TS_LINEAR)) {
           /* linear problem */
-          context.flag_is_linear = 1;
+          context.m_flag_is_linear = 1;
           MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunctionIMEX_Linear);
           SNESSetType(snes,SNESKSPONLY);
         } else {
           /* nonlinear problem */
-          context.flag_is_linear = 0;
-          context.jfnk_eps = 1e-7;
-          PetscOptionsGetReal(NULL,NULL,"-jfnk_epsilon",&context.jfnk_eps,NULL);
+          context.m_flag_is_linear = 0;
+          context.m_jfnk_eps = 1e-7;
+          PetscOptionsGetReal(NULL,NULL,"-jfnk_epsilon",&context.m_jfnk_eps,NULL);
           MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunctionIMEX_JFNK);
         }
         MatSetUp(A);
@@ -357,78 +357,78 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
       /* default -> hyperbolic - explicit, parabolic and source - implicit       */
       PetscBool flag = PETSC_FALSE;
 
-      context.flag_hyperbolic     = _EXPLICIT_;
-      context.flag_hyperbolic_f   = _EXPLICIT_;
-      context.flag_hyperbolic_df  = _IMPLICIT_;
-      context.flag_parabolic      = _IMPLICIT_;
-      context.flag_source         = _IMPLICIT_;
+      context.m_flag_hyperbolic     = _EXPLICIT_;
+      context.m_flag_hyperbolic_f   = _EXPLICIT_;
+      context.m_flag_hyperbolic_df  = _IMPLICIT_;
+      context.m_flag_parabolic      = _IMPLICIT_;
+      context.m_flag_source         = _IMPLICIT_;
 
-      if (!strcmp(sim[0].solver.SplitHyperbolicFlux,"yes")) {
+      if (!strcmp(sim[0].solver.m_split_hyperbolic_flux,"yes")) {
 
         flag = PETSC_FALSE;
         PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_f_explicit",&flag,nullptr);
-        if (flag == PETSC_TRUE) context.flag_hyperbolic_f = _EXPLICIT_;
+        if (flag == PETSC_TRUE) context.m_flag_hyperbolic_f = _EXPLICIT_;
         flag = PETSC_FALSE;
         PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_f_implicit",&flag,nullptr);
-        if (flag == PETSC_TRUE) context.flag_hyperbolic_f = _IMPLICIT_;
+        if (flag == PETSC_TRUE) context.m_flag_hyperbolic_f = _IMPLICIT_;
 
         flag = PETSC_FALSE;
         PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_df_explicit",&flag,nullptr);
-        if (flag == PETSC_TRUE) context.flag_hyperbolic_df = _EXPLICIT_;
+        if (flag == PETSC_TRUE) context.m_flag_hyperbolic_df = _EXPLICIT_;
         flag = PETSC_FALSE;
         PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_df_implicit",&flag,nullptr);
-        if (flag == PETSC_TRUE) context.flag_hyperbolic_df = _IMPLICIT_;
+        if (flag == PETSC_TRUE) context.m_flag_hyperbolic_df = _IMPLICIT_;
 
       } else {
 
         flag = PETSC_FALSE;
         PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_explicit",&flag,nullptr);
-        if (flag == PETSC_TRUE) context.flag_hyperbolic = _EXPLICIT_;
+        if (flag == PETSC_TRUE) context.m_flag_hyperbolic = _EXPLICIT_;
         flag = PETSC_FALSE;
         PetscOptionsGetBool(nullptr,nullptr,"-hyperbolic_implicit",&flag,nullptr);
-        if (flag == PETSC_TRUE) context.flag_hyperbolic = _IMPLICIT_;
+        if (flag == PETSC_TRUE) context.m_flag_hyperbolic = _IMPLICIT_;
 
       }
 
       flag = PETSC_FALSE;
       PetscOptionsGetBool(nullptr,nullptr,"-parabolic_explicit",&flag,nullptr);
-      if (flag == PETSC_TRUE) context.flag_parabolic = _EXPLICIT_;
+      if (flag == PETSC_TRUE) context.m_flag_parabolic = _EXPLICIT_;
       flag = PETSC_FALSE;
       PetscOptionsGetBool(nullptr,nullptr,"-parabolic_implicit",&flag,nullptr);
-      if (flag == PETSC_TRUE) context.flag_parabolic = _IMPLICIT_;
+      if (flag == PETSC_TRUE) context.m_flag_parabolic = _IMPLICIT_;
 
       flag = PETSC_FALSE;
       PetscOptionsGetBool(nullptr,nullptr,"-source_explicit",&flag,nullptr);
-      if (flag == PETSC_TRUE) context.flag_source = _EXPLICIT_;
+      if (flag == PETSC_TRUE) context.m_flag_source = _EXPLICIT_;
       flag = PETSC_FALSE;
       PetscOptionsGetBool(nullptr,nullptr,"-source_implicit",&flag,nullptr);
-      if (flag == PETSC_TRUE) context.flag_source = _IMPLICIT_;
+      if (flag == PETSC_TRUE) context.m_flag_source = _IMPLICIT_;
 
       flag = PETSC_FALSE;
       PetscOptionsGetBool(nullptr,nullptr,"-ts_arkimex_fully_implicit",&flag,nullptr);
       if (flag == PETSC_TRUE) {
-        context.flag_hyperbolic_f   = _IMPLICIT_;
-        context.flag_hyperbolic_df  = _IMPLICIT_;
-        context.flag_hyperbolic     = _IMPLICIT_;
-        context.flag_parabolic      = _IMPLICIT_;
-        context.flag_source         = _IMPLICIT_;
+        context.m_flag_hyperbolic_f   = _IMPLICIT_;
+        context.m_flag_hyperbolic_df  = _IMPLICIT_;
+        context.m_flag_hyperbolic     = _IMPLICIT_;
+        context.m_flag_parabolic      = _IMPLICIT_;
+        context.m_flag_source         = _IMPLICIT_;
       }
 
       /* print out a summary of the treatment of each term */
       if (!rank) {
         printf("Implicit-Explicit time-integration:-\n");
-        if (!strcmp(sim[0].solver.SplitHyperbolicFlux,"yes")) {
-          if (context.flag_hyperbolic_f == _EXPLICIT_)  printf("Hyperbolic (f-df) term: Explicit\n");
+        if (!strcmp(sim[0].solver.m_split_hyperbolic_flux,"yes")) {
+          if (context.m_flag_hyperbolic_f == _EXPLICIT_)  printf("Hyperbolic (f-df) term: Explicit\n");
           else                                          printf("Hyperbolic (f-df) term: Implicit\n");
-          if (context.flag_hyperbolic_df == _EXPLICIT_) printf("Hyperbolic (df)   term: Explicit\n");
+          if (context.m_flag_hyperbolic_df == _EXPLICIT_) printf("Hyperbolic (df)   term: Explicit\n");
           else                                          printf("Hyperbolic (df)   term: Implicit\n");
         } else {
-          if (context.flag_hyperbolic == _EXPLICIT_)    printf("Hyperbolic        term: Explicit\n");
+          if (context.m_flag_hyperbolic == _EXPLICIT_)    printf("Hyperbolic        term: Explicit\n");
           else                                          printf("Hyperbolic        term: Implicit\n");
         }
-        if (context.flag_parabolic == _EXPLICIT_)       printf("Parabolic         term: Explicit\n");
+        if (context.m_flag_parabolic == _EXPLICIT_)       printf("Parabolic         term: Explicit\n");
         else                                            printf("Parabolic         term: Implicit\n");
-        if (context.flag_source    == _EXPLICIT_)       printf("Source            term: Explicit\n");
+        if (context.m_flag_source    == _EXPLICIT_)       printf("Source            term: Explicit\n");
         else                                            printf("Source            term: Implicit\n");
       }
 
@@ -455,16 +455,16 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
       SNESGetType(snes,&snestype);
 
 #ifdef with_librom
-      if (context.rom_mode == _ROM_MODE_INITIAL_GUESS_) {
+      if (context.m_rom_mode == _ROM_MODE_INITIAL_GUESS_) {
         SNESSetComputeInitialGuess(snes, PetscSetInitialGuessROM, &context);
       }
 #endif
 
-      context.flag_use_precon = 0;
+      context.m_flag_use_precon = 0;
       PetscOptionsGetBool(  nullptr,
                             nullptr,
                             "-with_pc",
-                            (PetscBool*)(&context.flag_use_precon),
+                            (PetscBool*)(&context.m_flag_use_precon),
                             nullptr );
 
       char precon_mat_type_c_st[_MAX_STRING_SIZE_] = "default";
@@ -474,31 +474,31 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
                               precon_mat_type_c_st,
                               _MAX_STRING_SIZE_,
                               nullptr );
-      context.precon_matrix_type = std::string(precon_mat_type_c_st);
+      context.m_precon_matrix_type = std::string(precon_mat_type_c_st);
 
-      if (context.flag_use_precon) {
+      if (context.m_flag_use_precon) {
 
-        if (context.precon_matrix_type == "default") {
+        if (context.m_precon_matrix_type == "default") {
 
           /* Matrix-free representation of the Jacobian */
           flag_mat_a = 1;
           MatCreateShell( MPI_COMM_WORLD,
-                          context.ndofs,
-                          context.ndofs,
+                          context.m_ndofs,
+                          context.m_ndofs,
                           PETSC_DETERMINE,
                           PETSC_DETERMINE,
                           &context,
                           &A);
           if ((!strcmp(snestype,SNESKSPONLY)) || (ptype == TS_LINEAR)) {
             /* linear problem */
-            context.flag_is_linear = 1;
+            context.m_flag_is_linear = 1;
             MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunction_Linear);
             SNESSetType(snes,SNESKSPONLY);
           } else {
             /* nonlinear problem */
-            context.flag_is_linear = 0;
-            context.jfnk_eps = 1e-7;
-            PetscOptionsGetReal(NULL,NULL,"-jfnk_epsilon",&context.jfnk_eps,NULL);
+            context.m_flag_is_linear = 0;
+            context.m_jfnk_eps = 1e-7;
+            PetscOptionsGetReal(NULL,NULL,"-jfnk_epsilon",&context.m_jfnk_eps,NULL);
             MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunction_JFNK);
           }
           MatSetUp(A);
@@ -516,35 +516,35 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
           /* Set up preconditioner matrix */
           flag_mat_b = 1;
           MatCreateAIJ( MPI_COMM_WORLD,
-                        context.ndofs,
-                        context.ndofs,
+                        context.m_ndofs,
+                        context.m_ndofs,
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
-                        (sim[0].solver.ndims*2+1)*sim[0].solver.nvars, NULL,
-                        2*sim[0].solver.ndims*sim[0].solver.nvars, NULL,
+                        (sim[0].solver.m_ndims*2+1)*sim[0].solver.m_nvars, NULL,
+                        2*sim[0].solver.m_ndims*sim[0].solver.m_nvars, NULL,
                         &B );
-          MatSetBlockSize(B,sim[0].solver.nvars);
+          MatSetBlockSize(B,sim[0].solver.m_nvars);
           /* Set the IJacobian function for TS */
           TSSetIJacobian(ts,A,B,PetscIJacobian,&context);
 
-        } else if (context.precon_matrix_type == "fd") {
+        } else if (context.m_precon_matrix_type == "fd") {
 
           flag_mat_a = 1;
           MatCreateSNESMF(snes,&A);
           flag_mat_b = 1;
           MatCreateAIJ( MPI_COMM_WORLD,
-                        context.ndofs,
-                        context.ndofs,
+                        context.m_ndofs,
+                        context.m_ndofs,
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
-                        (sim[0].solver.ndims*2+1)*sim[0].solver.nvars, NULL,
-                        2*sim[0].solver.ndims*sim[0].solver.nvars, NULL,
+                        (sim[0].solver.m_ndims*2+1)*sim[0].solver.m_nvars, NULL,
+                        2*sim[0].solver.m_ndims*sim[0].solver.m_nvars, NULL,
                         &B);
           MatSetOption(B, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
           /* Set the Jacobian function for SNES */
           SNESSetJacobian(snes, A, B, SNESComputeJacobianDefault, NULL);
 
-        } else if (context.precon_matrix_type == "colored_fd") {
+        } else if (context.m_precon_matrix_type == "colored_fd") {
 
           int stencil_width = 1;
           PetscOptionsGetInt( NULL,
@@ -557,12 +557,12 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
           MatCreateSNESMF(snes,&A);
           flag_mat_b = 1;
           MatCreateAIJ( MPI_COMM_WORLD,
-                        context.ndofs,
-                        context.ndofs,
+                        context.m_ndofs,
+                        context.m_ndofs,
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
-                        (sim[0].solver.ndims*2+1)*sim[0].solver.nvars, NULL,
-                        2*sim[0].solver.ndims*sim[0].solver.nvars, NULL,
+                        (sim[0].solver.m_ndims*2+1)*sim[0].solver.m_nvars, NULL,
+                        2*sim[0].solver.m_ndims*sim[0].solver.m_nvars, NULL,
                         &B);
           MatSetOption(B, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
           if (!rank) {
@@ -578,7 +578,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
           if (!rank) {
             fprintf(  stderr,"Invalid input for \"-pc_matrix_type\": %s.\n",
-                      context.precon_matrix_type.c_str());
+                      context.m_precon_matrix_type.c_str());
           }
           PetscFunctionReturn(0);
 
@@ -593,22 +593,22 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
         /* Matrix-free representation of the Jacobian */
         flag_mat_a = 1;
         MatCreateShell( MPI_COMM_WORLD,
-                        context.ndofs,
-                        context.ndofs,
+                        context.m_ndofs,
+                        context.m_ndofs,
                         PETSC_DETERMINE,
                         PETSC_DETERMINE,
                         &context,
                         &A);
         if ((!strcmp(snestype,SNESKSPONLY)) || (ptype == TS_LINEAR)) {
           /* linear problem */
-          context.flag_is_linear = 1;
+          context.m_flag_is_linear = 1;
           MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunction_Linear);
           SNESSetType(snes,SNESKSPONLY);
         } else {
           /* nonlinear problem */
-          context.flag_is_linear = 0;
-          context.jfnk_eps = 1e-7;
-          PetscOptionsGetReal(NULL,NULL,"-jfnk_epsilon",&context.jfnk_eps,NULL);
+          context.m_flag_is_linear = 0;
+          context.m_jfnk_eps = 1e-7;
+          PetscOptionsGetReal(NULL,NULL,"-jfnk_epsilon",&context.m_jfnk_eps,NULL);
           MatShellSetOperation(A,MATOP_MULT,(void (*)(void))PetscJacobianFunction_JFNK);
         }
         MatSetUp(A);
@@ -642,21 +642,21 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
     TSSetApplicationContext(ts,&context);
 
     if (!rank) {
-      if (context.flag_is_linear) printf("SolvePETSc(): Problem type is linear.\n");
+      if (context.m_flag_is_linear) printf("SolvePETSc(): Problem type is linear.\n");
       else                        printf("SolvePETSc(): Problem type is nonlinear.\n");
     }
 
     if (!rank) printf("** Starting PETSc time integration **\n");
-    context.ti_runtime = 0.0;
+    context.m_ti_runtime = 0.0;
     TSSolve(ts,Y);
     if (!rank) {
       printf("** Completed PETSc time integration (Final time: %f), total wctime: %f (seconds) **\n",
-              context.waqt, context.ti_runtime );
+              context.m_waqt, context.m_ti_runtime );
     }
 
     /* Get the number of time steps */
     for (int ns = 0; ns < nsims; ns++) {
-      TSGetStepNumber(ts,&(sim[ns].solver.n_iter));
+      TSGetStepNumber(ts,&(sim[ns].solver.m_n_iter));
     }
 
     /* get and write to file any auxiliary solutions */
@@ -669,14 +669,14 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
       for (i=0; i<iAuxSize; i++) {
         TSGetSolutionComponents(ts,&i,&Z);
         for (int ns = 0; ns < nsims; ns++) {
-          TransferVecFromPETSc(sim[ns].solver.u,Z,&context,ns,context.offsets[ns]);
-          WriteArray( sim[ns].solver.ndims,
-                      sim[ns].solver.nvars,
-                      sim[ns].solver.dim_global,
-                      sim[ns].solver.dim_local,
-                      sim[ns].solver.ghosts,
-                      sim[ns].solver.x,
-                      sim[ns].solver.u,
+          TransferVecFromPETSc(sim[ns].solver.m_u,Z,&context,ns,context.m_offsets[ns]);
+          WriteArray( sim[ns].solver.m_ndims,
+                      sim[ns].solver.m_nvars,
+                      sim[ns].solver.m_dim_global,
+                      sim[ns].solver.m_dim_local,
+                      sim[ns].solver.m_ghosts,
+                      sim[ns].solver.m_x,
+                      sim[ns].solver.m_u,
                       &(sim[ns].solver),
                       &(sim[ns].mpi),
                       aux_fname_root );
@@ -691,7 +691,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
     /* copy final solution from PETSc's vector */
     for (int ns = 0; ns < nsims; ns++) {
-      TransferVecFromPETSc(sim[ns].solver.u,Y,&context,ns,context.offsets[ns]);
+      TransferVecFromPETSc(sim[ns].solver.m_u,Y,&context,ns,context.m_offsets[ns]);
     }
 
     /* clean up */
@@ -703,16 +703,16 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
     DMDestroy(&dm);
 
     /* write a final solution file, if last iteration did not write one */
-    if (context.tic) {
+    if (context.m_tic) {
       for (int ns = 0; ns < nsims; ns++) {
         HyPar* solver = &(sim[ns].solver);
         MPIVariables* mpi = &(sim[ns].mpi);
         if (solver->PhysicsOutput) {
-          solver->PhysicsOutput(solver,mpi, context.waqt);
+          solver->PhysicsOutput(solver,mpi, context.m_waqt);
         }
         CalculateError(solver,mpi);
       }
-      OutputSolution(sim, nsims, context.waqt);
+      OutputSolution(sim, nsims, context.m_waqt);
     }
     /* calculate error if exact solution has been provided */
     for (int ns = 0; ns < nsims; ns++) {
@@ -722,31 +722,31 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
     PetscCleanup(&context);
 
 #ifdef with_librom
-    context.op_times_arr.push_back(context.waqt);
+    context.m_op_times_arr.push_back(context.m_waqt);
 
     for (int ns = 0; ns < nsims; ns++) {
-      ResetFilenameIndex( sim[ns].solver.filename_index,
-                          sim[ns].solver.index_length );
+      ResetFilenameIndex( sim[ns].solver.m_filename_index,
+                          sim[ns].solver.m_index_length );
     }
 
-    if (((libROMInterface*)context.rom_interface)->mode() == _ROM_MODE_TRAIN_) {
+    if (((libROMInterface*)context.m_rom_interface)->mode() == _ROM_MODE_TRAIN_) {
 
-      ((libROMInterface*)context.rom_interface)->train();
+      ((libROMInterface*)context.m_rom_interface)->train();
       if (!rank) printf("libROM: total training wallclock time: %f (seconds).\n",
-                        ((libROMInterface*)context.rom_interface)->trainWallclockTime() );
+                        ((libROMInterface*)context.m_rom_interface)->trainWallclockTime() );
 
       double total_rom_predict_time = 0;
-      for (int iter = 0; iter < context.op_times_arr.size(); iter++) {
+      for (int iter = 0; iter < context.m_op_times_arr.size(); iter++) {
 
-        double waqt = context.op_times_arr[iter];
+        double waqt = context.m_op_times_arr[iter];
 
-        ((libROMInterface*)context.rom_interface)->predict(sim, waqt);
+        ((libROMInterface*)context.m_rom_interface)->predict(sim, waqt);
         if (!rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n",
-                            waqt, ((libROMInterface*)context.rom_interface)->predictWallclockTime() );
-        total_rom_predict_time += ((libROMInterface*)context.rom_interface)->predictWallclockTime();
+                            waqt, ((libROMInterface*)context.m_rom_interface)->predictWallclockTime() );
+        total_rom_predict_time += ((libROMInterface*)context.m_rom_interface)->predictWallclockTime();
 
         /* calculate diff between ROM and PDE solutions */
-        if (iter == (context.op_times_arr.size()-1)) {
+        if (iter == (context.m_op_times_arr.size()-1)) {
           if (!rank) printf("libROM:   Calculating diff between PDE and ROM solutions.\n");
           for (int ns = 0; ns < nsims; ns++) {
             CalculateROMDiff(  &(sim[ns].solver),
@@ -763,61 +763,61 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
                 total_rom_predict_time );
       }
 
-      ((libROMInterface*)context.rom_interface)->saveROM();
+      ((libROMInterface*)context.m_rom_interface)->saveROM();
 
     } else {
 
       for (int ns = 0; ns < nsims; ns++) {
-        sim[ns].solver.rom_diff_norms[0]
-          = sim[ns].solver.rom_diff_norms[1]
-          = sim[ns].solver.rom_diff_norms[2]
+        sim[ns].solver.m_rom_diff_norms[0]
+          = sim[ns].solver.m_rom_diff_norms[1]
+          = sim[ns].solver.m_rom_diff_norms[2]
           = -1;
       }
 
     }
 
-  } else if (context.rom_mode == _ROM_MODE_PREDICT_) {
+  } else if (context.m_rom_mode == _ROM_MODE_PREDICT_) {
 
     for (int ns = 0; ns < nsims; ns++) {
-      sim[ns].solver.rom_diff_norms[0]
-        = sim[ns].solver.rom_diff_norms[1]
-        = sim[ns].solver.rom_diff_norms[2]
+      sim[ns].solver.m_rom_diff_norms[0]
+        = sim[ns].solver.m_rom_diff_norms[1]
+        = sim[ns].solver.m_rom_diff_norms[2]
         = -1;
-      strcpy(sim[ns].solver.ConservationCheck,"no");
+      strcpy(sim[ns].solver.m_conservation_check,"no");
     }
 
-    ((libROMInterface*)context.rom_interface)->loadROM();
-    ((libROMInterface*)context.rom_interface)->projectInitialSolution(sim);
+    ((libROMInterface*)context.m_rom_interface)->loadROM();
+    ((libROMInterface*)context.m_rom_interface)->projectInitialSolution(sim);
 
     {
-      int start_iter = sim[0].solver.restart_iter;
-      int n_iter = sim[0].solver.n_iter;
-      double dt = sim[0].solver.dt;
+      int start_iter = sim[0].solver.m_restart_iter;
+      int n_iter = sim[0].solver.m_n_iter;
+      double dt = sim[0].solver.m_dt;
 
       double cur_time = start_iter * dt;
-      context.op_times_arr.push_back(cur_time);
+      context.m_op_times_arr.push_back(cur_time);
 
       for (int iter = start_iter; iter < n_iter; iter++) {
         cur_time += dt;
-        if (    ( (iter+1)%sim[0].solver.file_op_iter == 0)
+        if (    ( (iter+1)%sim[0].solver.m_file_op_iter == 0)
             &&  ( (iter+1) < n_iter) ) {
-          context.op_times_arr.push_back(cur_time);
+          context.m_op_times_arr.push_back(cur_time);
         }
       }
 
       double t_final = n_iter*dt;
-      context.op_times_arr.push_back(t_final);
+      context.m_op_times_arr.push_back(t_final);
     }
 
     double total_rom_predict_time = 0;
-    for (int iter = 0; iter < context.op_times_arr.size(); iter++) {
+    for (int iter = 0; iter < context.m_op_times_arr.size(); iter++) {
 
-      double waqt = context.op_times_arr[iter];
+      double waqt = context.m_op_times_arr[iter];
 
-      ((libROMInterface*)context.rom_interface)->predict(sim, waqt);
+      ((libROMInterface*)context.m_rom_interface)->predict(sim, waqt);
       if (!rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n",
-                          waqt, ((libROMInterface*)context.rom_interface)->predictWallclockTime() );
-      total_rom_predict_time += ((libROMInterface*)context.rom_interface)->predictWallclockTime();
+                          waqt, ((libROMInterface*)context.m_rom_interface)->predictWallclockTime() );
+      total_rom_predict_time += ((libROMInterface*)context.m_rom_interface)->predictWallclockTime();
 
       /* write the solution to file */
       for (int ns = 0; ns < nsims; ns++) {
@@ -844,7 +844,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
   }
 
-  delete ((libROMInterface*)context.rom_interface);
+  delete ((libROMInterface*)context.m_rom_interface);
 #endif
 
   PetscFunctionReturn(0);

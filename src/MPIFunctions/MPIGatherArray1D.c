@@ -37,12 +37,12 @@ int MPIGatherArray1D(
   int          ierr = 0;
 
   /* xg should be non-null only on root */
-  if (mpi->rank && xg) {
+  if (mpi->m_rank && xg) {
     fprintf(stderr,"Error in MPIGatherArray1D(): global array exists on non-root processors (rank %d).\n",
-            mpi->rank);
+            mpi->m_rank);
     ierr = 1;
   }
-  if ((!mpi->rank) && (!xg)) {
+  if ((!mpi->m_rank) && (!xg)) {
     fprintf(stderr,"Error in MPIGatherArray1D(): global array is not allocated on root processor.\n");
     ierr = 1;
   }
@@ -51,25 +51,25 @@ int MPIGatherArray1D(
   double *buffer = (double*) calloc (N_local,sizeof(double));
   _ArrayCopy1D_((x+ghosts),(buffer),N_local);
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 #ifndef serial
     MPI_Status status;
 #endif
     int proc;
-    for (proc = 0; proc < mpi->nproc; proc++) {
+    for (proc = 0; proc < mpi->m_nproc; proc++) {
       /* Find out the domain limits for each process */
       int is,ie;
       if (proc) {
 #ifndef serial
-        MPI_Recv(&is,1,MPI_INT,proc,1442,mpi->world,&status);
-        MPI_Recv(&ie,1,MPI_INT,proc,1443,mpi->world,&status);
+        MPI_Recv(&is,1,MPI_INT,proc,1442,mpi->m_world,&status);
+        MPI_Recv(&ie,1,MPI_INT,proc,1443,mpi->m_world,&status);
 #endif
       } else { is = istart; ie = iend; }
       int size = ie - is;
       if (proc) {
 #ifndef serial
         double *recvbuf = (double*) calloc (size,sizeof(double));
-        MPI_Recv(recvbuf,size,MPI_DOUBLE,proc,1916,mpi->world,&status);
+        MPI_Recv(recvbuf,size,MPI_DOUBLE,proc,1916,mpi->m_world,&status);
         _ArrayCopy1D_((recvbuf),(xg+is),size);
         free(recvbuf);
 #endif
@@ -79,9 +79,9 @@ int MPIGatherArray1D(
   } else {
 #ifndef serial
     /* Meanwhile, on other processes - send stuff to root */
-    MPI_Send(&istart,1      ,MPI_INT   ,0,1442,mpi->world);
-    MPI_Send(&iend  ,1      ,MPI_INT   ,0,1443,mpi->world);
-    MPI_Send(buffer ,N_local,MPI_DOUBLE,0,1916,mpi->world);
+    MPI_Send(&istart,1      ,MPI_INT   ,0,1442,mpi->m_world);
+    MPI_Send(&iend  ,1      ,MPI_INT   ,0,1443,mpi->m_world);
+    MPI_Send(buffer ,N_local,MPI_DOUBLE,0,1916,mpi->m_world);
 #endif
   }
 

@@ -42,8 +42,8 @@ PetscErrorCode PetscIFunctionImpl(  TS        ts,   /*!< Time integration object
                                     void      *ctxt /*!< Object of type #PETScContext */ )
 {
   PETScContext* context = (PETScContext*) ctxt;
-  SimulationObject* sim = (SimulationObject*) context->simobj;
-  int nsims = context->nsims;
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
+  int nsims = context->m_nsims;
 
   PetscFunctionBegin;
   for (int ns = 0; ns < nsims; ns++) {
@@ -51,39 +51,39 @@ PetscErrorCode PetscIFunctionImpl(  TS        ts,   /*!< Time integration object
     HyPar* solver = &(sim[ns].solver);
     MPIVariables* mpi = &(sim[ns].mpi);
 
-    solver->count_RHSFunction++;
+    solver->m_count_rhs_function++;
 
-    int size = solver->npoints_local_wghosts;
-    double* u = solver->u;
-    double* rhs = solver->rhs;
+    int size = solver->m_npoints_local_wghosts;
+    double* u = solver->m_u;
+    double* rhs = solver->m_rhs;
 
     /* copy solution from PETSc vector */
-    TransferVecFromPETSc(u,Y,context,ns,context->offsets[ns]);
+    TransferVecFromPETSc(u,Y,context,ns,context->m_offsets[ns]);
     /* apply boundary conditions and exchange data over MPI interfaces */
     solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);
-    MPIExchangeBoundariesnD(  solver->ndims,
-                              solver->nvars,
-                              solver->dim_local,
-                              solver->ghosts,
+    MPIExchangeBoundariesnD(  solver->m_ndims,
+                              solver->m_nvars,
+                              solver->m_dim_local,
+                              solver->m_ghosts,
                               mpi,
                               u );
 
     /* Evaluate hyperbolic, parabolic and source terms  and the RHS */
-    solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,1,solver->FFunction,solver->Upwind);
-    solver->ParabolicFunction (solver->par,u,solver,mpi,t);
-    solver->SourceFunction    (solver->source,u,solver,mpi,t);
+    solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,t,1,solver->FFunction,solver->Upwind);
+    solver->ParabolicFunction (solver->m_par,u,solver,mpi,t);
+    solver->SourceFunction    (solver->m_source,u,solver,mpi,t);
 
-    _ArraySetValue_(rhs,size*solver->nvars,0.0);
-    _ArrayAXPY_(solver->hyp   ,-1.0,rhs,size*solver->nvars);
-    _ArrayAXPY_(solver->par   , 1.0,rhs,size*solver->nvars);
-    _ArrayAXPY_(solver->source, 1.0,rhs,size*solver->nvars);
+    _ArraySetValue_(rhs,size*solver->m_nvars,0.0);
+    _ArrayAXPY_(solver->m_hyp   ,-1.0,rhs,size*solver->m_nvars);
+    _ArrayAXPY_(solver->m_par   , 1.0,rhs,size*solver->m_nvars);
+    _ArrayAXPY_(solver->m_source, 1.0,rhs,size*solver->m_nvars);
 
     /* save a copy of the solution and RHS for use in IJacobian */
-    _ArrayCopy1D_(u  ,solver->uref  ,(size*solver->nvars));
-    _ArrayCopy1D_(rhs,solver->rhsref,(size*solver->nvars));
+    _ArrayCopy1D_(u  ,solver->m_uref  ,(size*solver->m_nvars));
+    _ArrayCopy1D_(rhs,solver->m_rhsref,(size*solver->m_nvars));
 
     /* Transfer RHS to PETSc vector */
-    TransferVecToPETSc(rhs,F,context,ns,context->offsets[ns]);
+    TransferVecToPETSc(rhs,F,context,ns,context->m_offsets[ns]);
 
   }
 

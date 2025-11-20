@@ -46,25 +46,25 @@ int HyperbolicFunction(
   HyPar         *solver = (HyPar*)        s;
   MPIVariables  *mpi    = (MPIVariables*) m;
   int           d, v, i, done;
-  double        *FluxI  = solver->fluxI; /* interface flux     */
-  double        *FluxC  = solver->fluxC; /* cell centered flux */
+  double        *FluxI  = solver->m_flux_i; /* interface flux     */
+  double        *FluxC  = solver->m_flux_c; /* cell centered flux */
   _DECLARE_IERR_;
 
-  int     ndims  = solver->ndims;
-  int     nvars  = solver->nvars;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
-  int     size   = solver->npoints_local_wghosts;
-  double  *x     = solver->x;
-  double  *dxinv = solver->dxinv;
+  int     ndims  = solver->m_ndims;
+  int     nvars  = solver->m_nvars;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
+  int     size   = solver->m_npoints_local_wghosts;
+  double  *x     = solver->m_x;
+  double  *dxinv = solver->m_dxinv;
   int     index[ndims], index1[ndims], index2[ndims], dim_interface[ndims];
 
-  LimFlag = (LimFlag && solver->flag_nonlinearinterp && solver->SetInterpLimiterVar);
+  LimFlag = (LimFlag && solver->m_flag_nonlinearinterp && solver->SetInterpLimiterVar);
 
   _ArraySetValue_(hyp,size*nvars,0.0);
-  _ArraySetValue_(solver->StageBoundaryIntegral,2*ndims*nvars,0.0);
+  _ArraySetValue_(solver->m_stage_boundary_integral,2*ndims*nvars,0.0);
   if (!FluxFunction) return(0); /* zero hyperbolic term */
-  solver->count_hyp++;
+  solver->m_count_hyp++;
 
 #if defined(CPU_STAT)
   double cpu_time = 0.0;
@@ -101,9 +101,9 @@ int HyperbolicFunction(
                                               * (FluxI[nvars*p2+v]-FluxI[nvars*p1+v]);
       /* boundary flux integral */
       if (index[d] == 0)
-        for (v=0; v<nvars; v++) solver->StageBoundaryIntegral[(2*d+0)*nvars+v] -= FluxI[nvars*p1+v];
+        for (v=0; v<nvars; v++) solver->m_stage_boundary_integral[(2*d+0)*nvars+v] -= FluxI[nvars*p1+v];
       if (index[d] == dim[d]-1)
-        for (v=0; v<nvars; v++) solver->StageBoundaryIntegral[(2*d+1)*nvars+v] += FluxI[nvars*p2+v];
+        for (v=0; v<nvars; v++) solver->m_stage_boundary_integral[(2*d+1)*nvars+v] += FluxI[nvars*p2+v];
 
       _ArrayIncrementIndex_(ndims,dim,index,done);
     }
@@ -120,7 +120,7 @@ int HyperbolicFunction(
   printf("HyperbolicFunction CPU time = %8.6lf\n", cpu_time);
 #endif
 
-  if (solver->flag_ib) _ArrayBlockMultiply_(hyp,solver->iblank,size,nvars);
+  if (solver->m_flag_ib) _ArrayBlockMultiply_(hyp,solver->m_iblank,size,nvars);
 
   return(0);
 }
@@ -142,7 +142,7 @@ int HyperbolicFunction(
       \hat{\bf u}^L_{j+1/2} &= \mathcal{I}\left({\bf u}_j,+1\right), \\
       \hat{\bf u}^R_{j+1/2} &= \mathcal{I}\left({\bf u}_j,-1\right),
     \f}
-    The specific choice of \f$\mathcal{I}\f$ is set based on #HyPar::spatial_scheme_hyp.
+    The specific choice of \f$\mathcal{I}\f$ is set based on #HyPar::m_spatial_scheme_hyp.
 
     \b Upwinding: The final flux at the interface is computed as
     \f{equation}{
@@ -188,10 +188,10 @@ int ReconstructHyperbolic(
   _DECLARE_IERR_;
 
   double *uC     = NULL;
-  double *uL     = solver->uL;
-  double *uR     = solver->uR;
-  double *fluxL  = solver->fL;
-  double *fluxR  = solver->fR;
+  double *uL     = solver->m_u_l;
+  double *uR     = solver->m_u_r;
+  double *fluxL  = solver->m_f_l;
+  double *fluxR  = solver->m_f_r;
 
   /*
     precalculate the non-linear interpolation coefficients if required
@@ -204,7 +204,7 @@ int ReconstructHyperbolic(
      e.g.: used in well-balanced schemes for Euler/Navier-Stokes with gravity
      otherwise, just copy u to uC */
   if (solver->UFunction) {
-    uC = solver->uC;
+    uC = solver->m_u_c;
     IERR solver->UFunction(uC,u,dir,solver,mpi,t); CHECKERR(ierr);
   } else uC = u;
 
@@ -238,9 +238,9 @@ int DefaultUpwinding(
   HyPar *solver = (HyPar*)    s;
   int   done;
 
-  int *dim  = solver->dim_local;
-  int ndims = solver->ndims;
-  int nvars = solver->nvars;
+  int *dim  = solver->m_dim_local;
+  int ndims = solver->m_ndims;
+  int nvars = solver->m_nvars;
 
   int bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;

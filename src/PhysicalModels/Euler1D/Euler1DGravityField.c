@@ -27,11 +27,11 @@ int Euler1DGravityField(
 {
   HyPar         *solver = (HyPar*)        s;
   MPIVariables  *mpi    = (MPIVariables*) m;
-  Euler1D       *param  = (Euler1D*)      solver->physics;
+  Euler1D       *param  = (Euler1D*)      solver->m_physics;
 
-  double  *S      = param->grav_field;
-  int     *dim    = solver->dim_local;
-  int     ghosts  = solver->ghosts;
+  double  *S      = param->m_grav_field;
+  int     *dim    = solver->m_dim_local;
+  int     ghosts  = solver->m_ghosts;
   int     index[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_],
           offset[_MODEL_NDIMS_], d, done;
 
@@ -45,10 +45,10 @@ int Euler1DGravityField(
   done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   while (!done) {
     int p;                _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
-    double xcoord;        _GetCoordinate_(_XDIR_,index[_XDIR_]-ghosts,dim,ghosts,solver->x,xcoord);
-    if (param->grav_type == 0) {
-      S[p] = exp(-param->grav*xcoord);
-    } else if (param->grav_type == 1) {
+    double xcoord;        _GetCoordinate_(_XDIR_,index[_XDIR_]-ghosts,dim,ghosts,solver->m_x,xcoord);
+    if (param->m_grav_type == 0) {
+      S[p] = exp(-param->m_grav*xcoord);
+    } else if (param->m_grav_type == 1) {
       double pi = 4.0 * atan(1.0);
       double phi = -sin(2*pi*xcoord)/(2*pi);
       S[p] = exp(-phi);
@@ -56,14 +56,14 @@ int Euler1DGravityField(
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }
 
-  if (param->grav_type != 1) {
+  if (param->m_grav_type != 1) {
     /* a sensible simulation will not specify peridic boundary conditions
     * along a direction in which gravity acts (unless the gravitational field
     * itself is sinusoidal), so extrapolate the gravity field at the boundaries */
     int indexb[_MODEL_NDIMS_], indexi[_MODEL_NDIMS_];
     for (d = 0; d < _MODEL_NDIMS_; d++) {
       /* left boundary */
-      if (!mpi->ip[d]) {
+      if (!mpi->m_ip[d]) {
         _ArrayCopy1D_(dim,bounds,_MODEL_NDIMS_); bounds[d] = ghosts;
         _ArraySetValue_(offset,_MODEL_NDIMS_,0); offset[d] = -ghosts;
         done = 0; _ArraySetValue_(indexb,_MODEL_NDIMS_,0);
@@ -76,7 +76,7 @@ int Euler1DGravityField(
         }
       }
       /* right boundary */
-      if (mpi->ip[d] == mpi->iproc[d]-1) {
+      if (mpi->m_ip[d] == mpi->m_iproc[d]-1) {
         _ArrayCopy1D_(dim,bounds,_MODEL_NDIMS_); bounds[d] = ghosts;
         _ArraySetValue_(offset,_MODEL_NDIMS_,0); offset[d] = dim[d];
         done = 0; _ArraySetValue_(indexb,_MODEL_NDIMS_,0);

@@ -46,7 +46,7 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
 
   if (nsims == 0) return 0;
 
-  if (!sim[0].mpi.rank) {
+  if (!sim[0].mpi.m_rank) {
     printf("Deallocating arrays.\n");
   }
 
@@ -59,182 +59,182 @@ int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationOb
 
     HyPar* solver = &(sim[ns].solver);
     MPIVariables* mpi = &(sim[ns].mpi);
-    DomainBoundary* boundary = (DomainBoundary*) solver->boundary;
+    DomainBoundary* boundary = (DomainBoundary*) solver->m_boundary;
     int i;
 
     /* Clean up boundary zones */
-    for (i = 0; i < solver->nBoundaryZones; i++) {
+    for (i = 0; i < solver->m_n_boundary_zones; i++) {
 #if defined(HAVE_CUDA)
-      BCCleanup(&boundary[i], solver->use_gpu);
+      BCCleanup(&boundary[i], solver->m_use_gpu);
 #else
       BCCleanup(&boundary[i], 0);
 #endif
     }
-    free(solver->boundary);
+    free(solver->m_boundary);
 
     /* Clean up immersed boundaries */
-    if (solver->flag_ib) {
-      IERR IBCleanup(solver->ib);
-      free(solver->ib);
+    if (solver->m_flag_ib) {
+      IERR IBCleanup(solver->m_ib);
+      free(solver->m_ib);
     }
 
     /* Clean up any allocations in physical model */
-    if (!strcmp(solver->model,_LINEAR_ADVECTION_DIFFUSION_REACTION_)) {
-      IERR LinearADRCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_FP_DOUBLE_WELL_)) {
-      IERR FPDoubleWellCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_FP_POWER_SYSTEM_)) {
-      IERR FPPowerSystemCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_FP_POWER_SYSTEM_1BUS_)) {
-      IERR FPPowerSystem1BusCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_FP_POWER_SYSTEM_3BUS_)) {
-      IERR FPPowerSystem3BusCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_EULER_1D_)) {
-      IERR Euler1DCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_EULER_2D_)) {
-      IERR Euler2DCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_NAVIER_STOKES_2D_)) {
-      IERR NavierStokes2DCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_NAVIER_STOKES_3D_)) {
-      IERR NavierStokes3DCleanup(solver->physics); CHECKERR(ierr);
+    if (!strcmp(solver->m_model,_LINEAR_ADVECTION_DIFFUSION_REACTION_)) {
+      IERR LinearADRCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_FP_DOUBLE_WELL_)) {
+      IERR FPDoubleWellCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_FP_POWER_SYSTEM_)) {
+      IERR FPPowerSystemCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_FP_POWER_SYSTEM_1BUS_)) {
+      IERR FPPowerSystem1BusCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_FP_POWER_SYSTEM_3BUS_)) {
+      IERR FPPowerSystem3BusCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_EULER_1D_)) {
+      IERR Euler1DCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_EULER_2D_)) {
+      IERR Euler2DCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_NAVIER_STOKES_2D_)) {
+      IERR NavierStokes2DCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_NAVIER_STOKES_3D_)) {
+      IERR NavierStokes3DCleanup(solver->m_physics); CHECKERR(ierr);
 #if defined(HAVE_CUDA)
-      if (solver->use_gpu) {
-        IERR gpuNavierStokes3DCleanup(solver->physics); CHECKERR(ierr);
+      if (solver->m_use_gpu) {
+        IERR gpuNavierStokes3DCleanup(solver->m_physics); CHECKERR(ierr);
       }
 #endif
-    } else if (!strcmp(solver->model,_NUMA2D_)) {
-      IERR Numa2DCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_NUMA3D_)) {
-      IERR Numa3DCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_SHALLOW_WATER_1D_)) {
-      IERR ShallowWater1DCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_SHALLOW_WATER_2D_)) {
-      IERR ShallowWater2DCleanup(solver->physics); CHECKERR(ierr);
-    } else if (!strcmp(solver->model,_VLASOV_)) {
-      IERR VlasovCleanup(solver->physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_NUMA2D_)) {
+      IERR Numa2DCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_NUMA3D_)) {
+      IERR Numa3DCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_SHALLOW_WATER_1D_)) {
+      IERR ShallowWater1DCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_SHALLOW_WATER_2D_)) {
+      IERR ShallowWater2DCleanup(solver->m_physics); CHECKERR(ierr);
+    } else if (!strcmp(solver->m_model,_VLASOV_)) {
+      IERR VlasovCleanup(solver->m_physics); CHECKERR(ierr);
     }
-    free(solver->physics);
+    free(solver->m_physics);
 
     /* Clean up any allocations from time-integration */
 #ifdef with_petsc
-    if (!solver->use_petscTS) {
-      if (!strcmp(solver->time_scheme,_RK_)) {
-        IERR TimeExplicitRKCleanup(solver->msti); CHECKERR(ierr);
-        free(solver->msti);
-      } else if (!strcmp(solver->time_scheme,_GLM_GEE_)) {
-        IERR TimeGLMGEECleanup(solver->msti); CHECKERR(ierr);
-        free(solver->msti);
+    if (!solver->m_use_petsc_ts) {
+      if (!strcmp(solver->m_time_scheme,_RK_)) {
+        IERR TimeExplicitRKCleanup(solver->m_msti); CHECKERR(ierr);
+        free(solver->m_msti);
+      } else if (!strcmp(solver->m_time_scheme,_GLM_GEE_)) {
+        IERR TimeGLMGEECleanup(solver->m_msti); CHECKERR(ierr);
+        free(solver->m_msti);
       }
     }
 #else
-    if (!strcmp(solver->time_scheme,_RK_)) {
-      IERR TimeExplicitRKCleanup(solver->msti); CHECKERR(ierr);
-      free(solver->msti);
-    } else if (!strcmp(solver->time_scheme,_GLM_GEE_)) {
-      IERR TimeGLMGEECleanup(solver->msti); CHECKERR(ierr);
-      free(solver->msti);
+    if (!strcmp(solver->m_time_scheme,_RK_)) {
+      IERR TimeExplicitRKCleanup(solver->m_msti); CHECKERR(ierr);
+      free(solver->m_msti);
+    } else if (!strcmp(solver->m_time_scheme,_GLM_GEE_)) {
+      IERR TimeGLMGEECleanup(solver->m_msti); CHECKERR(ierr);
+      free(solver->m_msti);
     }
 #endif
 
     /* Clean up any spatial reconstruction related allocations */
-    if (   (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_WENO_  ))
-        || (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_))
-        || (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_HCWENO_)) ) {
+    if (   (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_WENO_  ))
+        || (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_))
+        || (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_HCWENO_)) ) {
 #if defined(HAVE_CUDA)
-      IERR WENOCleanup(solver->interp, solver->use_gpu); CHECKERR(ierr);
+      IERR WENOCleanup(solver->m_interp, solver->m_use_gpu); CHECKERR(ierr);
 #else
-      IERR WENOCleanup(solver->interp, 0); CHECKERR(ierr);
+      IERR WENOCleanup(solver->m_interp, 0); CHECKERR(ierr);
 #endif
     }
-    if (solver->interp)   free(solver->interp);
-    if (   (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_COMPACT_UPWIND_ ))
-        || (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_         ))
-        || (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_HCWENO_         )) ) {
-      IERR CompactSchemeCleanup(solver->compact); CHECKERR(ierr);
+    if (solver->m_interp)   free(solver->m_interp);
+    if (   (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_COMPACT_UPWIND_ ))
+        || (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_         ))
+        || (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_HCWENO_         )) ) {
+      IERR CompactSchemeCleanup(solver->m_compact); CHECKERR(ierr);
     }
-    if (solver->compact)  free(solver->compact);
-    if (solver->lusolver) free(solver->lusolver);
+    if (solver->m_compact)  free(solver->m_compact);
+    if (solver->m_lusolver) free(solver->m_lusolver);
 
     /* Free the communicators created */
-    IERR MPIFreeCommunicators(solver->ndims,mpi); CHECKERR(ierr);
+    IERR MPIFreeCommunicators(solver->m_ndims,mpi); CHECKERR(ierr);
 
     /* These variables are allocated in Initialize.c */
-    free(solver->dim_global);
-    free(solver->dim_global_ex);
-    free(solver->dim_local);
-    free(solver->index);
-    free(solver->u);
+    free(solver->m_dim_global);
+    free(solver->m_dim_global_ex);
+    free(solver->m_dim_local);
+    free(solver->m_index);
+    free(solver->m_u);
 #ifdef with_petsc
-    if (solver->u0)     free(solver->u0);
-    if (solver->uref)   free(solver->uref);
-    if (solver->rhsref) free(solver->rhsref);
-    if (solver->rhs)    free(solver->rhs);
+    if (solver->m_u0)     free(solver->m_u0);
+    if (solver->m_uref)   free(solver->m_uref);
+    if (solver->m_rhsref) free(solver->m_rhsref);
+    if (solver->m_rhs)    free(solver->m_rhs);
 #endif
 #ifdef with_librom
-    free(solver->u_rom_predicted);
+    free(solver->m_u_rom_predicted);
 #endif
-    free(solver->iblank);
-    free(solver->x);
-    free(solver->dxinv);
-    free(solver->isPeriodic);
-    free(mpi->iproc);
-    free(mpi->ip);
-    free(mpi->is);
-    free(mpi->ie);
-    free(mpi->bcperiodic);
-    free(mpi->sendbuf);
-    free(mpi->recvbuf);
-    free(solver->VolumeIntegral);
-    free(solver->VolumeIntegralInitial);
-    free(solver->TotalBoundaryIntegral);
-    free(solver->ConservationError);
-    free(solver->stride_with_ghosts);
-    free(solver->stride_without_ghosts);
+    free(solver->m_iblank);
+    free(solver->m_x);
+    free(solver->m_dxinv);
+    free(solver->m_is_periodic);
+    free(mpi->m_iproc);
+    free(mpi->m_ip);
+    free(mpi->m_is);
+    free(mpi->m_ie);
+    free(mpi->m_bcperiodic);
+    free(mpi->m_sendbuf);
+    free(mpi->m_recvbuf);
+    free(solver->m_volume_integral);
+    free(solver->m_volume_integral_initial);
+    free(solver->m_total_boundary_integral);
+    free(solver->m_conservation_error);
+    free(solver->m_stride_with_ghosts);
+    free(solver->m_stride_without_ghosts);
 
 #if defined(HAVE_CUDA)
-    if (solver->use_gpu) {
-      gpuFree(solver->hyp);
-      gpuFree(solver->par);
-      gpuFree(solver->source);
-      gpuFree(solver->uC);
-      gpuFree(solver->fluxC);
-      gpuFree(solver->Deriv1);
-      gpuFree(solver->Deriv2);
-      gpuFree(solver->fluxI);
-      gpuFree(solver->uL);
-      gpuFree(solver->uR);
-      gpuFree(solver->fL);
-      gpuFree(solver->fR);
-      gpuFree(solver->StageBoundaryBuffer);
-      gpuFree(solver->StageBoundaryIntegral);
-      gpuFree(solver->StepBoundaryIntegral);
+    if (solver->m_use_gpu) {
+      gpuFree(solver->m_hyp);
+      gpuFree(solver->m_par);
+      gpuFree(solver->m_source);
+      gpuFree(solver->m_u_c);
+      gpuFree(solver->m_flux_c);
+      gpuFree(solver->m_deriv1);
+      gpuFree(solver->m_deriv2);
+      gpuFree(solver->m_flux_i);
+      gpuFree(solver->m_u_l);
+      gpuFree(solver->m_u_r);
+      gpuFree(solver->m_f_l);
+      gpuFree(solver->m_f_r);
+      gpuFree(solver->m_stage_boundary_buffer);
+      gpuFree(solver->m_stage_boundary_integral);
+      gpuFree(solver->m_step_boundary_integral);
 
-      gpuFree(solver->gpu_dim_local);
-      gpuFree(solver->gpu_iblank);
-      gpuFree(solver->gpu_x);
-      gpuFree(solver->gpu_dxinv);
-      gpuFree(solver->gpu_u);
+      gpuFree(solver->m_gpu_dim_local);
+      gpuFree(solver->m_gpu_iblank);
+      gpuFree(solver->m_gpu_x);
+      gpuFree(solver->m_gpu_dxinv);
+      gpuFree(solver->m_gpu_u);
     } else {
 #endif
-      free(solver->hyp);
-      free(solver->par);
-      free(solver->source);
-      free(solver->uC);
-      free(solver->fluxC);
-      free(solver->Deriv1);
-      free(solver->Deriv2);
-      free(solver->fluxI);
-      free(solver->uL);
-      free(solver->uR);
-      free(solver->fL);
-      free(solver->fR);
-      free(solver->StageBoundaryIntegral);
-      free(solver->StepBoundaryIntegral);
+      free(solver->m_hyp);
+      free(solver->m_par);
+      free(solver->m_source);
+      free(solver->m_u_c);
+      free(solver->m_flux_c);
+      free(solver->m_deriv1);
+      free(solver->m_deriv2);
+      free(solver->m_flux_i);
+      free(solver->m_u_l);
+      free(solver->m_u_r);
+      free(solver->m_f_l);
+      free(solver->m_f_r);
+      free(solver->m_stage_boundary_integral);
+      free(solver->m_step_boundary_integral);
 #if defined(HAVE_CUDA)
     }
 #endif
 
-    if (solver->filename_index) free(solver->filename_index);
+    if (solver->m_filename_index) free(solver->m_filename_index);
 
   }
 

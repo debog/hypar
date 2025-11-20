@@ -49,13 +49,13 @@ static int SetEFieldPrescribed( double* u,/*!< Conserved solution */
 {
 
   HyPar *solver = (HyPar*)  s;
-  Vlasov *param  = (Vlasov*) solver->physics;
-  MPIVariables *mpi = (MPIVariables *) param->m;
+  Vlasov *param  = (Vlasov*) solver->m_physics;
+  MPIVariables *mpi = (MPIVariables *) param->m_m_mpi;
 
-  int* dim_local = solver->dim_local;
-  int ghosts = solver->ghosts;
+  int* dim_local = solver->m_dim_local;
+  int ghosts = solver->m_ghosts;
 
-  int ndims_x = param->ndims_x;
+  int ndims_x = param->m_ndims_x;
 
   int dim_x[ndims_x];
   _ArrayCopy1D_(dim_local,dim_x,ndims_x);
@@ -74,12 +74,12 @@ static int SetEFieldPrescribed( double* u,/*!< Conserved solution */
 
     double xvec[ndims_x];
     for (int d=0; d<ndims_x; d++) {
-      _GetCoordinate_(d,index[d]-ghosts,dim_local,ghosts,solver->x,xvec[d]);
+      _GetCoordinate_(d,index[d]-ghosts,dim_local,ghosts,solver->m_x,xvec[d]);
     }
 
     int p;
     _ArrayIndex1DWO_(ndims_x,dim_x,index,offset,ghosts,p);
-    param->e_field[p*ndims_x+0] = 0.1 * cos(xvec[0]);
+    param->m_e_field[p*ndims_x+0] = 0.1 * cos(xvec[0]);
 
     _ArrayIncrementIndex_(ndims_x,bounds,index,done);
   }
@@ -95,10 +95,10 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
                                         )
 {
   HyPar  *solver = (HyPar*)  s;
-  Vlasov *param  = (Vlasov*) solver->physics;
-  MPIVariables *mpi = (MPIVariables *) param->m;
+  Vlasov *param  = (Vlasov*) solver->m_physics;
+  MPIVariables *mpi = (MPIVariables *) param->m_m_mpi;
 
-  if (param->ndims_x > 1) {
+  if (param->m_ndims_x > 1) {
     fprintf(stderr,"Error in SetEFieldSelfConsistent():\n");
     fprintf(stderr,"  Implemented for 1 spatial dimension only.\n");
     return 1;
@@ -112,13 +112,13 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
 
 #else
 
-  int *dim    = solver->dim_local;
-  int  N      = solver->dim_global[0];
-  int  ghosts = solver->ghosts;
-  int  ndims  = solver->ndims;
+  int *dim    = solver->m_dim_local;
+  int  N      = solver->m_dim_global[0];
+  int  ghosts = solver->m_ghosts;
+  int  ndims  = solver->m_ndims;
 
   double       *sum_buffer       = param->sum_buffer;
-  double       *field            = param->e_field;
+  double       *field            = param->m_e_field;
   fftw_complex *phys_buffer_e    = param->phys_buffer_e;
   fftw_complex *fourier_buffer_e = param->fourier_buffer_e;
   fftw_plan     plan_forward_e   = param->plan_forward_e;
@@ -155,9 +155,9 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
     int p; _ArrayIndex1D_(ndims,dim,index,ghosts,p);
 
     // accumulate f at this spatial location
-    double dvinv; _GetCoordinate_(1,index[1],dim,ghosts,solver->dxinv,dvinv);
-    double x; _GetCoordinate_(0,index[0],dim,ghosts,solver->x,x);
-    double v; _GetCoordinate_(1,index[1],dim,ghosts,solver->x,v);
+    double dvinv; _GetCoordinate_(1,index[1],dim,ghosts,solver->m_dxinv,dvinv);
+    double x; _GetCoordinate_(0,index[0],dim,ghosts,solver->m_x,x);
+    double v; _GetCoordinate_(1,index[1],dim,ghosts,solver->m_x,v);
 
     sum_buffer[index[0]] += u[p] / dvinv;
 
@@ -166,7 +166,7 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
 
   // Now we can add up globally using MPI reduction
   for (int i = 0; i < dim[0]; i++) {
-    MPISum_double(&sum_buffer[i], &sum_buffer[i], 1, &mpi->comm[1]);
+    MPISum_double(&sum_buffer[i], &sum_buffer[i], 1, &mpi->m_comm[1]);
   }
 
   // Find the average density over all x
@@ -174,7 +174,7 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
   for (int i = 0; i < dim[0]; i++) {
     average_velocity += sum_buffer[i];
   }
-  MPISum_double(&average_velocity, &average_velocity, 1, &mpi->comm[0]);
+  MPISum_double(&average_velocity, &average_velocity, 1, &mpi->m_comm[0]);
   average_velocity /= (double) N;
 
   // Copy velocity-integrated values into complex-valued FFTW buffer
@@ -184,9 +184,9 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
   }
 
   // Execute the FFT
-  MPI_Barrier(mpi->comm[0]);
+  MPI_Barrier(mpi->m_comm[0]);
   fftw_execute(plan_forward_e);
-  MPI_Barrier(mpi->comm[0]);
+  MPI_Barrier(mpi->m_comm[0]);
 
   // Simultaneously do a Poisson solve and take derivative in frequency space
   int freq_start = 0;
@@ -223,30 +223,30 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
   }
 
   // Do an inverse Fourier transform to get back physical solved values
-  MPI_Barrier(mpi->comm[0]);
+  MPI_Barrier(mpi->m_comm[0]);
   fftw_execute(plan_backward_e);
-  MPI_Barrier(mpi->comm[0]);
+  MPI_Barrier(mpi->m_comm[0]);
 
   // Do an inverse Fourier transform to get back physical solved values
-  MPI_Barrier(mpi->comm[0]);
+  MPI_Barrier(mpi->m_comm[0]);
   fftw_execute(plan_backward_phi);
-  MPI_Barrier(mpi->comm[0]);
+  MPI_Barrier(mpi->m_comm[0]);
 
   // copy the solved electric field into the e buffer
   for (int i = 0; i < dim[0]; i++) {
-    param->e_field[i + ghosts] = - phys_buffer_e[i][0] / (double) N;
+    param->m_e_field[i + ghosts] = - phys_buffer_e[i][0] / (double) N;
   }
 
   // copy the solved potential field into the potential buffer
   for (int i = 0; i < dim[0]; i++) {
-    param->potential[i + ghosts] = phys_buffer_phi[i][0] / (double) N;
+    param->m_potential[i + ghosts] = phys_buffer_phi[i][0] / (double) N;
   }
 
   // Do halo exchange on the e
-  MPIExchangeBoundaries1D(mpi, param->e_field, dim[0], ghosts, 0, ndims);
+  MPIExchangeBoundaries1D(mpi, param->m_e_field, dim[0], ghosts, 0, ndims);
 
   // Do halo exchange on the potential
-  MPIExchangeBoundaries1D(mpi, param->potential, dim[0], ghosts, 0, ndims);
+  MPIExchangeBoundaries1D(mpi, param->m_potential, dim[0], ghosts, 0, ndims);
 
 #endif
 
@@ -261,11 +261,11 @@ int VlasovEField( double* u, /*!< Conserved solution */
                 )
 {
   HyPar  *solver = (HyPar*)  s;
-  Vlasov *param  = (Vlasov*) solver->physics;
+  Vlasov *param  = (Vlasov*) solver->m_physics;
 
   int ierr;
 
-  if (param->self_consistent_electric_field) {
+  if (param->m_self_consistent_electric_field) {
     ierr = SetEFieldSelfConsistent(u, s, t);
   } else {
     ierr = SetEFieldPrescribed(u, s, t);

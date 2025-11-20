@@ -15,14 +15,14 @@
     from the other side of the domain. Otherwise, the interior data is extrapolated
     by a 4th order polynomial (assuming uniform grid spacing).
 */
-void SparseGridsSimulation::fillGhostCells( const GridDimensions& a_dim, /*!< grid dimensions of solution */
+void SparseGridsSimulation::FillGhostCells( const GridDimensions& a_dim, /*!< grid dimensions of solution */
                                             const int a_ngpt, /*!< number of ghost cells */
                                             double* const  a_u, /*!< solution array */
                                             const int a_nvars /*!< number of vector components of the solution */
                                           )
 {
   if (m_is_periodic.size() != m_ndims) {
-    fprintf(stderr, "Error in SparseGridsSimulation::fillGhostCells() -\n");
+    fprintf(stderr, "Error in SparseGridsSimulation::FillGhostCells() -\n");
     fprintf(stderr, "m_is_periodic.size() != m_ndims \n");
     exit(1);
   }

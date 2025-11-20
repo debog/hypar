@@ -18,20 +18,20 @@ double LinearADRComputeDiffNumber( void   *s, /*!< Solver object of type #HyPar 
                                  )
 {
   HyPar         *solver = (HyPar*)        s;
-  LinearADR     *params = (LinearADR*)    solver->physics;
+  LinearADR     *params = (LinearADR*)    solver->m_physics;
   int           d, i, v;
 
-  int     ndims  = solver->ndims;
-  int     nvars  = solver->nvars;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
+  int     ndims  = solver->m_ndims;
+  int     nvars  = solver->m_nvars;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
 
   double  max_diffno = 0;
   for (d = 0; d < ndims; d++) {
     for (i = 0; i < dim[d]; i++) {
       for (v = 0; v < nvars; v++) {
-        double dxinv;  _GetCoordinate_(d,i,dim,ghosts,solver->dxinv,dxinv);
-        double local_diffno =   params->d[nvars*d+v] * dt * dxinv * dxinv;
+        double dxinv;  _GetCoordinate_(d,i,dim,ghosts,solver->m_dxinv,dxinv);
+        double local_diffno =   params->m_d[nvars*d+v] * dt * dxinv * dxinv;
         if (local_diffno > max_diffno) max_diffno = local_diffno;
       }
     }

@@ -21,13 +21,13 @@ int MUSCLInitialize(
 {
   HyPar           *solver = (HyPar*) s;
   MPIVariables    *mpi    = (MPIVariables*) m;
-  MUSCLParameters *muscl  = (MUSCLParameters*) solver->interp;
+  MUSCLParameters *muscl  = (MUSCLParameters*) solver->m_interp;
 
   /* default values */
-  muscl->eps = 1e-3;
-  strcpy(muscl->limiter_type, _LIM_GM_);
+  muscl->m_eps = 1e-3;
+  strcpy(muscl->m_limiter_type, _LIM_GM_);
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     FILE *in;
     int ferr;
     in = fopen("muscl.inp","r");
@@ -39,8 +39,8 @@ int MUSCLInitialize(
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
           ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
-          if      (!strcmp(word,"epsilon")) { ferr = fscanf(in,"%lf",&muscl->eps);         if (ferr != 1) return(1); }
-          else if (!strcmp(word,"limiter")) { ferr = fscanf(in,"%s" ,muscl->limiter_type); if (ferr != 1) return(1); }
+          if      (!strcmp(word,"epsilon")) { ferr = fscanf(in,"%lf",&muscl->m_eps);         if (ferr != 1) return(1); }
+          else if (!strcmp(word,"limiter")) { ferr = fscanf(in,"%s" ,muscl->m_limiter_type); if (ferr != 1) return(1); }
           else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
             ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
@@ -56,21 +56,21 @@ int MUSCLInitialize(
     }
   }
 
-  MPIBroadcast_double(&muscl->eps, 1, 0, &mpi->world);
-  MPIBroadcast_character(muscl->limiter_type, _MAX_STRING_SIZE_, 0, &mpi->world);
+  MPIBroadcast_double(&muscl->m_eps, 1, 0, &mpi->m_world);
+  MPIBroadcast_character(muscl->m_limiter_type, _MAX_STRING_SIZE_, 0, &mpi->m_world);
 
-  if (!strcmp(muscl->limiter_type, _LIM_GM_)) {
+  if (!strcmp(muscl->m_limiter_type, _LIM_GM_)) {
     muscl->LimiterFunction = LimiterGeneralizedMinMod;
-  } else if (!strcmp(muscl->limiter_type, _LIM_MM_)) {
+  } else if (!strcmp(muscl->m_limiter_type, _LIM_MM_)) {
     muscl->LimiterFunction = LimiterMinMod;
-  } else if (!strcmp(muscl->limiter_type, _LIM_VANLEER_)) {
+  } else if (!strcmp(muscl->m_limiter_type, _LIM_VANLEER_)) {
     muscl->LimiterFunction = LimiterVanLeer;
-  } else if (!strcmp(muscl->limiter_type, _LIM_SUPERBEE_)) {
+  } else if (!strcmp(muscl->m_limiter_type, _LIM_SUPERBEE_)) {
     muscl->LimiterFunction = LimiterSuperBee;
   } else {
-    if (!mpi->rank) {
+    if (!mpi->m_rank) {
       fprintf(stderr, "Warning: %s is an invalid limiter type. Using default (Generalized MinMod).\n",
-              muscl->limiter_type);
+              muscl->m_limiter_type);
     }
     muscl->LimiterFunction = LimiterGeneralizedMinMod;
   }

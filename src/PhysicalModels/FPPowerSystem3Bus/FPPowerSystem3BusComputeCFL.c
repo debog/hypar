@@ -24,25 +24,25 @@ double FPPowerSystem3BusComputeCFL(
                                   )
 {
   HyPar             *solver = (HyPar*)              s;
-  FPPowerSystem3Bus *params = (FPPowerSystem3Bus*)  solver->physics;
+  FPPowerSystem3Bus *params = (FPPowerSystem3Bus*)  solver->m_physics;
 
-  int     ndims  = solver->ndims;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
+  int     ndims  = solver->m_ndims;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
 
   double  max_cfl = 0;
   int     index[ndims];
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     double x[ndims], dxinv[ndims], drift[ndims];
-    _GetCoordinate_(0,index[0],dim,ghosts,solver->x,x[0]);
-    _GetCoordinate_(1,index[1],dim,ghosts,solver->x,x[1]);
-    _GetCoordinate_(2,index[2],dim,ghosts,solver->x,x[2]);
-    _GetCoordinate_(3,index[3],dim,ghosts,solver->x,x[3]);
-    _GetCoordinate_(0,index[0],dim,ghosts,solver->dxinv,dxinv[0]);
-    _GetCoordinate_(1,index[1],dim,ghosts,solver->dxinv,dxinv[1]);
-    _GetCoordinate_(2,index[2],dim,ghosts,solver->dxinv,dxinv[2]);
-    _GetCoordinate_(3,index[3],dim,ghosts,solver->dxinv,dxinv[3]);
+    _GetCoordinate_(0,index[0],dim,ghosts,solver->m_x,x[0]);
+    _GetCoordinate_(1,index[1],dim,ghosts,solver->m_x,x[1]);
+    _GetCoordinate_(2,index[2],dim,ghosts,solver->m_x,x[2]);
+    _GetCoordinate_(3,index[3],dim,ghosts,solver->m_x,x[3]);
+    _GetCoordinate_(0,index[0],dim,ghosts,solver->m_dxinv,dxinv[0]);
+    _GetCoordinate_(1,index[1],dim,ghosts,solver->m_dxinv,dxinv[1]);
+    _GetCoordinate_(2,index[2],dim,ghosts,solver->m_dxinv,dxinv[2]);
+    _GetCoordinate_(3,index[3],dim,ghosts,solver->m_dxinv,dxinv[3]);
 
     FPPowerSystem3BusDriftFunction(0,params,x,t,drift);
 

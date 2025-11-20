@@ -21,8 +21,8 @@ static int WriteArrayParallel (int,int,int*,int*,int,double*,double*,void*,void*
 #endif
 
 /*! Write out a vector field, stored as an array, to file: wrapper function that calls
-    the appropriate function depending on output mode (#HyPar::output_mode). The
-    output file format is determined by #HyPar::op_file_format
+    the appropriate function depending on output mode (#HyPar::m_output_mode). The
+    output file format is determined by #HyPar::m_op_file_format
 */
 int WriteArray(
                 int     ndims,        /*!< Number of spatial dimensions */
@@ -46,7 +46,7 @@ int WriteArray(
   if (!solver->WriteOutput) return(0);
 
 #ifndef serial
-  if (!strcmp(solver->output_mode,"serial")) {
+  if (!strcmp(solver->m_output_mode,"serial")) {
 #endif
     IERR WriteArraySerial(ndims,nvars,dim_global,dim_local,ghosts,x,u,
                           solver,mpi,fname_root); CHECKERR(ierr);
@@ -67,7 +67,7 @@ int WriteArray(
   problems for which the entire global domain will not fit on one
   node. This approach is also not very scalable.
   + Supports binary and ASCII formats (specified through
-    #HyPar::op_file_format).
+    #HyPar::m_op_file_format).
 
   \sa WriteBinary(), WriteText(), WriteTecplot2D(), WriteTecplot3D()
 */
@@ -92,7 +92,7 @@ int WriteArraySerial(
 
   /* root process: allocate global output arrays */
   double *ug, *xg;
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     int size_global;
 
     size_global = 1;
@@ -118,25 +118,25 @@ int WriteArraySerial(
   int offset_global, offset_local;
   offset_global = offset_local = 0;
   for (d=0; d<ndims; d++) {
-    IERR MPIGatherArray1D(mpi,(mpi->rank?NULL:&xg[offset_global]),
+    IERR MPIGatherArray1D(mpi,(mpi->m_rank?NULL:&xg[offset_global]),
                             &x[offset_local+ghosts],
-                            mpi->is[d],mpi->ie[d],dim_local[d],0); CHECKERR(ierr);
+                            mpi->m_is[d],mpi->m_ie[d],dim_local[d],0); CHECKERR(ierr);
     offset_global += dim_global[d];
     offset_local  += dim_local [d] + 2*ghosts;
   }
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     /* write output file to disk */
     char filename[_MAX_STRING_SIZE_] = "";
     strcat(filename,fname_root);
-    if (!strcmp(solver->op_overwrite,"no")) {
+    if (!strcmp(solver->m_op_overwrite,"no")) {
       strcat(filename,"_");
-      strcat(filename,solver->filename_index);
+      strcat(filename,solver->m_filename_index);
     }
-    strcat(filename,solver->solnfilename_extn);
+    strcat(filename,solver->m_solnfilename_extn);
     printf("Writing solution file %s.\n",filename);
     IERR solver->WriteOutput(ndims,nvars,dim_global,xg,ug,filename,
-                             solver->index); CHECKERR(ierr);
+                             solver->m_index); CHECKERR(ierr);
 
     /* Clean up output arrays */
     free(xg);
@@ -181,7 +181,7 @@ int WriteArraySerial(
       #MPIVariables::N_IORanks such blocks in each file).
     + To stitch all the local data in these files into the global solution, and write that out to
       a binary file can be done by Extras/ParallelOutput.c.
-    + If #HyPar::op_overwrite is set to 0, the vector field at the various simulation times are appended
+    + If #HyPar::m_op_overwrite is set to 0, the vector field at the various simulation times are appended
       to each of the <fname_root>.bin.nnnn. The code Extras/ParallelOutput.c will take care of writing
       the global solution at each simulation time to a different file (in binary format) (the same files
       that WriteArraySerial() would have written out if serial file output was chosen).
@@ -214,8 +214,8 @@ int WriteArrayParallel(
 
   char filename_root[_MAX_STRING_SIZE_];
   strcpy(filename_root,fname_root);
-  strcat(filename_root,solver->solnfilename_extn);
-  if (!mpi->rank) printf("Writing solution file %s.xxxx (parallel mode).\n",filename_root);
+  strcat(filename_root,solver->m_solnfilename_extn);
+  if (!mpi->m_rank) printf("Writing solution file %s.xxxx (parallel mode).\n",filename_root);
 
   /* calculate size of the local grid on this rank */
   int sizex = 0;     for (d=0; d<ndims; d++) sizex += dim_local[d];
@@ -236,7 +236,7 @@ int WriteArrayParallel(
   int index[ndims];
   IERR ArrayCopynD(ndims,u,(buffer+sizex),dim_local,ghosts,0,index,nvars); CHECKERR(ierr);
 
-  if (mpi->IOParticipant) {
+  if (mpi->m_IOParticipant) {
 
     /* if this rank is responsible for file I/O */
     double *write_buffer = NULL;
@@ -247,10 +247,10 @@ int WriteArrayParallel(
     FILE *out;
     int  bytes;
     char filename[_MAX_STRING_SIZE_];
-    MPIGetFilename(filename_root,&mpi->IOWorld,filename);
+    MPIGetFilename(filename_root,&mpi->m_IOWorld,filename);
 
-    if (!strcmp(solver->op_overwrite,"no")) {
-      if ((!count) && (!solver->restart_iter)) {
+    if (!strcmp(solver->m_op_overwrite,"no")) {
+      if ((!count) && (!solver->m_restart_iter)) {
         /* open a new file, since this function is being called the first time
            and this is not a restart run*/
         out = fopen(filename,"wb");
@@ -285,7 +285,7 @@ int WriteArrayParallel(
     free(buffer);
 
     /* receive and write the data for the other processors in this IO rank's group */
-    for (proc=mpi->GroupStartRank+1; proc<mpi->GroupEndRank; proc++) {
+    for (proc=mpi->m_GroupStartRank+1; proc<mpi->m_GroupEndRank; proc++) {
       /* get the local domain limits for process proc */
       IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie);
       /* calculate the size of its local data and allocate write buffer */
@@ -295,7 +295,7 @@ int WriteArrayParallel(
       write_buffer = (double*) calloc (write_total_size, sizeof(double));
       /* receive the data */
       MPI_Request req = MPI_REQUEST_NULL;
-      MPI_Irecv(write_buffer,write_total_size,MPI_DOUBLE,proc,1449,mpi->world,&req);
+      MPI_Irecv(write_buffer,write_total_size,MPI_DOUBLE,proc,1449,mpi->m_world,&req);
       MPI_Wait(&req,MPI_STATUS_IGNORE);
       /* write the data */
       bytes = fwrite(write_buffer,sizeof(double),write_total_size,out);
@@ -313,7 +313,7 @@ int WriteArrayParallel(
 
     /* all other processes, just send the data to the rank responsible for file I/O */
     MPI_Request req = MPI_REQUEST_NULL;
-    MPI_Isend(buffer,(sizex+sizeu),MPI_DOUBLE,mpi->IORank,1449,mpi->world,&req);
+    MPI_Isend(buffer,(sizex+sizeu),MPI_DOUBLE,mpi->m_IORank,1449,mpi->m_world,&req);
     MPI_Wait(&req,MPI_STATUS_IGNORE);
     free(buffer);
 

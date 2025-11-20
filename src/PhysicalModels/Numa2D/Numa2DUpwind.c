@@ -9,11 +9,11 @@
 int Numa2DRusanovFlux(double *fI,double *fL,double *fR,double *uL,double *uR,double *u,int dir,void *s,double t)
 {
   HyPar   *solver = (HyPar*)  s;
-  Numa2D  *param  = (Numa2D*) solver->physics;
+  Numa2D  *param  = (Numa2D*) solver->m_physics;
   int      done;
 
-  int *dim   = solver->dim_local;
-  int ghosts = solver->ghosts;
+  int *dim   = solver->m_dim_local;
+  int ghosts = solver->m_ghosts;
 
   int bounds_outer[_MODEL_NDIMS_], bounds_inter[_MODEL_NDIMS_];
   _ArrayCopy1D2_(dim,bounds_outer,_MODEL_NDIMS_); bounds_outer[dir] =  1;
@@ -28,10 +28,10 @@ int Numa2DRusanovFlux(double *fI,double *fL,double *fR,double *uL,double *uR,dou
       double ycoordL, ycoordR;
 
       if (dir == _YDIR_) {
-        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]-1),dim,ghosts,solver->x,ycoordL);
-        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]  ),dim,ghosts,solver->x,ycoordR);
+        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]-1),dim,ghosts,solver->m_x,ycoordL);
+        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]  ),dim,ghosts,solver->m_x,ycoordR);
       } else {
-        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]  ),dim,ghosts,solver->x,ycoordL);
+        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]  ),dim,ghosts,solver->m_x,ycoordL);
         ycoordR = ycoordL;
       }
 
@@ -45,13 +45,13 @@ int Numa2DRusanovFlux(double *fI,double *fL,double *fR,double *uL,double *uR,dou
       /* left of the interface */
       param->StandardAtmosphere   (param,ycoordL,&EP,&P0,&rho0,&T0);
       _Numa2DGetFlowVars_         ((uL+_MODEL_NVARS_*p),drho,vel[0],vel[1],dT,rho0);
-      _Numa2DComputeSpeedofSound_ (param->gamma,param->R,T0,dT,rho0,drho,EP,c);
+      _Numa2DComputeSpeedofSound_ (param->m_gamma,param->m_R,T0,dT,rho0,drho,EP,c);
       double alphaL = c + absolute(vel[dir]);
 
       /* right of the interface */
       param->StandardAtmosphere   (param,ycoordR,&EP,&P0,&rho0,&T0);
       _Numa2DGetFlowVars_         ((uR+_MODEL_NVARS_*p),drho,vel[0],vel[1],dT,rho0);
-      _Numa2DComputeSpeedofSound_ (param->gamma,param->R,T0,dT,rho0,drho,EP,c);
+      _Numa2DComputeSpeedofSound_ (param->m_gamma,param->m_R,T0,dT,rho0,drho,EP,c);
       double alphaR = c + absolute(vel[dir]);
 
       double alpha = max(alphaL,alphaR);
@@ -69,11 +69,11 @@ int Numa2DRusanovFlux(double *fI,double *fL,double *fR,double *uL,double *uR,dou
 int Numa2DRusanovLinearFlux(double *fI,double *fL,double *fR,double *uL,double *uR,double *u,int dir,void *s,double t)
 {
   HyPar   *solver = (HyPar*)  s;
-  Numa2D  *param  = (Numa2D*) solver->physics;
+  Numa2D  *param  = (Numa2D*) solver->m_physics;
   int      done;
 
-  int *dim   = solver->dim_local;
-  int ghosts = solver->ghosts;
+  int *dim   = solver->m_dim_local;
+  int ghosts = solver->m_ghosts;
 
   int bounds_outer[_MODEL_NDIMS_], bounds_inter[_MODEL_NDIMS_];
   _ArrayCopy1D2_(dim,bounds_outer,_MODEL_NDIMS_); bounds_outer[dir] =  1;
@@ -88,10 +88,10 @@ int Numa2DRusanovLinearFlux(double *fI,double *fL,double *fR,double *uL,double *
       double ycoordL, ycoordR;
 
       if (dir == _YDIR_) {
-        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]-1),dim,ghosts,solver->x,ycoordL);
-        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]  ),dim,ghosts,solver->x,ycoordR);
+        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]-1),dim,ghosts,solver->m_x,ycoordL);
+        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]  ),dim,ghosts,solver->m_x,ycoordR);
       } else {
-        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]  ),dim,ghosts,solver->x,ycoordL);
+        _GetCoordinate_(_YDIR_,(index_inter[_YDIR_]  ),dim,ghosts,solver->m_x,ycoordL);
         ycoordR = ycoordL;
       }
 
@@ -105,13 +105,13 @@ int Numa2DRusanovLinearFlux(double *fI,double *fL,double *fR,double *uL,double *
       /* left of the interface */
       param->StandardAtmosphere             (param,ycoordL,&EP,&P0,&rho0,&T0);
       _Numa2DGetFlowVars_                   ((uL+_MODEL_NVARS_*p),drho,vel[0],vel[1],dT,rho0);
-      _Numa2DComputeLinearizedSpeedofSound_ (param->gamma,param->R,T0,rho0,EP,c);
+      _Numa2DComputeLinearizedSpeedofSound_ (param->m_gamma,param->m_R,T0,rho0,EP,c);
       double alphaL = c;
 
       /* right of the interface */
       param->StandardAtmosphere             (param,ycoordR,&EP,&P0,&rho0,&T0);
       _Numa2DGetFlowVars_                   ((uR+_MODEL_NVARS_*p),drho,vel[0],vel[1],dT,rho0);
-      _Numa2DComputeLinearizedSpeedofSound_ (param->gamma,param->R,T0,rho0,EP,c);
+      _Numa2DComputeLinearizedSpeedofSound_ (param->m_gamma,param->m_R,T0,rho0,EP,c);
       double alphaR = c;
 
       double alpha = max(alphaL,alphaR);

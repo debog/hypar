@@ -37,12 +37,12 @@ int NavierStokes2DGravityField(
 {
   HyPar           *solver = (HyPar*)          s;
   MPIVariables    *mpi    = (MPIVariables*)   m;
-  NavierStokes2D  *param  = (NavierStokes2D*) solver->physics;
+  NavierStokes2D  *param  = (NavierStokes2D*) solver->m_physics;
 
-  double  *f      = param->grav_field_f;
-  double  *g      = param->grav_field_g;
-  int     *dim    = solver->dim_local;
-  int     ghosts  = solver->ghosts;
+  double  *f      = param->m_grav_field_f;
+  double  *g      = param->m_grav_field_g;
+  int     *dim    = solver->m_dim_local;
+  int     ghosts  = solver->m_ghosts;
   int     index[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_],
           offset[_MODEL_NDIMS_], d, done;
 
@@ -52,15 +52,15 @@ int NavierStokes2DGravityField(
   /* set offset such that index is compatible with ghost point arrangement */
   _ArraySetValue_(offset,_MODEL_NDIMS_,-ghosts);
 
-  double p0   = param->p0;
-  double rho0 = param->rho0;
+  double p0   = param->m_p0;
+  double rho0 = param->m_rho0;
   double RT   = p0 / rho0;
-  double gamma= param->gamma;
-  double R    = param->R;
+  double gamma= param->m_gamma;
+  double R    = param->m_R;
   double Cp   = gamma*R / (gamma-1.0);
   double T0   = p0 / (rho0 * R);
-  double gx   = param->grav_x;
-  double gy   = param->grav_y;
+  double gx   = param->m_grav_x;
+  double gy   = param->m_grav_y;
   double Nbv  = param->N_bv;
 
   /* set the value of the gravity field */
@@ -68,8 +68,8 @@ int NavierStokes2DGravityField(
   if (param->HB == 1) {
     while (!done) {
       int p;         _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
-      double xcoord; _GetCoordinate_(_XDIR_,index[_XDIR_]-ghosts,dim,ghosts,solver->x,xcoord);
-      double ycoord; _GetCoordinate_(_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->x,ycoord);
+      double xcoord; _GetCoordinate_(_XDIR_,index[_XDIR_]-ghosts,dim,ghosts,solver->m_x,xcoord);
+      double ycoord; _GetCoordinate_(_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->m_x,ycoord);
       f[p] = exp( (gx*xcoord+gy*ycoord)/RT);
       g[p] = exp(-(gx*xcoord+gy*ycoord)/RT);
       _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
@@ -77,8 +77,8 @@ int NavierStokes2DGravityField(
   } else if (param->HB == 2) {
     while (!done) {
       int p;         _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
-      double xcoord; _GetCoordinate_(_XDIR_,index[_XDIR_]-ghosts,dim,ghosts,solver->x,xcoord);
-      double ycoord; _GetCoordinate_(_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->x,ycoord);
+      double xcoord; _GetCoordinate_(_XDIR_,index[_XDIR_]-ghosts,dim,ghosts,solver->m_x,xcoord);
+      double ycoord; _GetCoordinate_(_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->m_x,ycoord);
       f[p] = raiseto((1.0-(gx*xcoord+gy*ycoord)/(Cp*T0)), (-1.0 /(gamma-1.0)));
       g[p] = raiseto((1.0-(gx*xcoord+gy*ycoord)/(Cp*T0)), (gamma/(gamma-1.0)));
       _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
@@ -86,9 +86,9 @@ int NavierStokes2DGravityField(
   } else if (param->HB == 3) {
     while (!done) {
       int p;         _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
-      double ycoord; _GetCoordinate_(_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->x,ycoord);
+      double ycoord; _GetCoordinate_(_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->m_x,ycoord);
       if (gx != 0) {
-        if (!mpi->rank) {
+        if (!mpi->m_rank) {
           fprintf(stderr,"Error in NavierStokes2DGravityField(): HB = 3 is implemented only for ");
           fprintf(stderr,"gravity force along the y-coordinate.\n");
         }
@@ -117,7 +117,7 @@ int NavierStokes2DGravityField(
   int indexb[_MODEL_NDIMS_], indexi[_MODEL_NDIMS_];
   for (d = 0; d < _MODEL_NDIMS_; d++) {
     /* left boundary */
-    if (!mpi->ip[d]) {
+    if (!mpi->m_ip[d]) {
       _ArrayCopy1D_(dim,bounds,_MODEL_NDIMS_); bounds[d] = ghosts;
       _ArraySetValue_(offset,_MODEL_NDIMS_,0); offset[d] = -ghosts;
       done = 0; _ArraySetValue_(indexb,_MODEL_NDIMS_,0);
@@ -131,7 +131,7 @@ int NavierStokes2DGravityField(
       }
     }
     /* right boundary */
-    if (mpi->ip[d] == mpi->iproc[d]-1) {
+    if (mpi->m_ip[d] == mpi->m_iproc[d]-1) {
       _ArrayCopy1D_(dim,bounds,_MODEL_NDIMS_); bounds[d] = ghosts;
       _ArraySetValue_(offset,_MODEL_NDIMS_,0); offset[d] = dim[d];
       done = 0; _ArraySetValue_(indexb,_MODEL_NDIMS_,0);

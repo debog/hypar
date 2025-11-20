@@ -19,20 +19,20 @@ int CalculateConservationError(
                               )
 {
   HyPar         *solver = (HyPar*) s;
-  int           v,nvars = solver->nvars;
+  int           v,nvars = solver->m_nvars;
   double        error;
 
   double base[nvars];
   for (v=0; v<nvars; v++) {
-    if (absolute(solver->VolumeIntegralInitial[v]) > 1.0)
-      base[v] = absolute(solver->VolumeIntegralInitial[v]);
+    if (absolute(solver->m_volume_integral_initial[v]) > 1.0)
+      base[v] = absolute(solver->m_volume_integral_initial[v]);
     else base[v] = 1.0;
   }
 
   for (v=0; v<nvars; v++) {
-    error =  (solver->VolumeIntegral[v]+solver->TotalBoundaryIntegral[v]-solver->VolumeIntegralInitial[v])
-           * (solver->VolumeIntegral[v]+solver->TotalBoundaryIntegral[v]-solver->VolumeIntegralInitial[v]);
-    solver->ConservationError[v] = sqrt(error)/base[v];
+    error =  (solver->m_volume_integral[v]+solver->m_total_boundary_integral[v]-solver->m_volume_integral_initial[v])
+           * (solver->m_volume_integral[v]+solver->m_total_boundary_integral[v]-solver->m_volume_integral_initial[v]);
+    solver->m_conservation_error[v] = sqrt(error)/base[v];
   }
 
   return(0);

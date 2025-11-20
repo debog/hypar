@@ -10,7 +10,7 @@
 extern "C" void FindInterval(double,double,double*,int,int*,int*);
 
 /*! Fill the ghost cells of a global n-dimensional array */
-extern "C" void fillGhostCells( const int* const,
+extern "C" void FillGhostCells( const int* const,
                                 const int,
                                 double* const,
                                 const int,

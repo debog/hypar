@@ -19,13 +19,13 @@ double BurgersComputeCFL( void    *s, /*!< Solver object of type #HyPar */
                         )
 {
   HyPar    *solver = (HyPar*)   s;
-  Burgers  *params = (Burgers*) solver->physics;
+  Burgers  *params = (Burgers*) solver->m_physics;
 
-  int     ndims  = solver->ndims;
-  int     nvars  = solver->nvars;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
-  double  *u     = solver->u;
+  int     ndims  = solver->m_ndims;
+  int     nvars  = solver->m_nvars;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
+  double  *u     = solver->m_u;
 
   int index[ndims], dir, v;
 
@@ -36,7 +36,7 @@ double BurgersComputeCFL( void    *s, /*!< Solver object of type #HyPar */
     for (v=0; v<nvars; v++) {
       for (dir=0; dir<ndims; dir++) {
         double dxinv;
-        _GetCoordinate_(dir,index[dir],dim,ghosts,solver->dxinv,dxinv); /* 1/dx */
+        _GetCoordinate_(dir,index[dir],dim,ghosts,solver->m_dxinv,dxinv); /* 1/dx */
         double local_cfl = u[nvars*p+v]*dt*dxinv;
         if (local_cfl > max_cfl) max_cfl = local_cfl;
       }

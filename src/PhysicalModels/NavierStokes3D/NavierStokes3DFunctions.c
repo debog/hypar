@@ -23,7 +23,7 @@ int NavierStokes3DRoeAverage(
                             )
 {
   NavierStokes3D *param  = (NavierStokes3D*) p;
-  _NavierStokes3DRoeAverage_(uavg,_NavierStokes3D_stride_,uL,uR,param->gamma);
+  _NavierStokes3DRoeAverage_(uavg,_NavierStokes3D_stride_,uL,uR,param->m_gamma);
   return(0);
 }
 
@@ -34,12 +34,12 @@ int NavierStokes3DComputePressure(  double*             P, /*!< Array to hold th
                                   )
 {
   HyPar          *solver = (HyPar*)   s;
-  NavierStokes3D *param  = (NavierStokes3D*) solver->physics;
+  NavierStokes3D *param  = (NavierStokes3D*) solver->m_physics;
   int            i;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -53,7 +53,7 @@ int NavierStokes3DComputePressure(  double*             P, /*!< Array to hold th
   while (!done) {
     int idx; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,idx);
     double rho, vx, vy, vz, e, pressure;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*idx),_NavierStokes3D_stride_,rho,vx,vy,vz,e,pressure,param->gamma);
+    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*idx),_NavierStokes3D_stride_,rho,vx,vy,vz,e,pressure,param->m_gamma);
     P[idx] = pressure;
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
@@ -68,12 +68,12 @@ int NavierStokes3DComputeTemperature( double*             T, /*!< Array to hold 
                                     )
 {
   HyPar          *solver = (HyPar*)   s;
-  NavierStokes3D *param  = (NavierStokes3D*) solver->physics;
+  NavierStokes3D *param  = (NavierStokes3D*) solver->m_physics;
   int            i;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -87,7 +87,7 @@ int NavierStokes3DComputeTemperature( double*             T, /*!< Array to hold 
   while (!done) {
     int idx; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,idx);
     double rho, vx, vy, vz, e, pressure;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*idx),_NavierStokes3D_stride_,rho,vx,vy,vz,e,pressure,param->gamma);
+    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*idx),_NavierStokes3D_stride_,rho,vx,vy,vz,e,pressure,param->m_gamma);
     T[idx] = pressure/rho;
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }

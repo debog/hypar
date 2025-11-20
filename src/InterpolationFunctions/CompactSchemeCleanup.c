@@ -15,13 +15,13 @@ int CompactSchemeCleanup(void *s /*!< CompactScheme object of type #CompactSchem
 {
   CompactScheme *compact   = (CompactScheme*) s;
 
-  if (compact->A) free(compact->A);
-  if (compact->B) free(compact->B);
-  if (compact->C) free(compact->C);
-  if (compact->R) free(compact->R);
+  if (compact->m_A) free(compact->m_A);
+  if (compact->m_B) free(compact->m_B);
+  if (compact->m_C) free(compact->m_C);
+  if (compact->m_R) free(compact->m_R);
 
-  if (compact->sendbuf) free(compact->sendbuf);
-  if (compact->recvbuf) free(compact->recvbuf);
+  if (compact->m_sendbuf) free(compact->m_sendbuf);
+  if (compact->m_recvbuf) free(compact->m_recvbuf);
 
   return(0);
 }

@@ -37,28 +37,28 @@ int BCThermalNoslipWallU(
 {
   DomainBoundary *boundary = (DomainBoundary*) b;
 
-  int dim   = boundary->dim;
-  int face  = boundary->face;
+  int dim   = boundary->m_dim;
+  int face  = boundary->m_face;
 
   if (ndims == 3) {
 
     /* create a fake physics object */
     double gamma;
-    gamma = boundary->gamma;
+    gamma = boundary->m_gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
-    if (boundary->on_this_proc) {
+    if (boundary->m_on_this_proc) {
 
-      int     *temperature_field_size = boundary->UnsteadyTemperatureSize;
+      int     *temperature_field_size = boundary->m_UnsteadyTemperatureSize;
       int     n_time_levels           = temperature_field_size[dim];
-      double  *time_levels            = boundary->UnsteadyTimeLevels;
-      double  *temperature_data       = boundary->UnsteadyTemperatureData;
+      double  *time_levels            = boundary->m_UnsteadyTimeLevels;
+      double  *temperature_data       = boundary->m_UnsteadyTemperatureData;
 
       int it = n_time_levels - 1;
       while ((time_levels[it] > waqt) && (it > 0))  it--;
 
       int bounds[ndims], indexb[ndims], indexi[ndims];
-      _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
+      _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
       _ArraySetValue_(indexb,ndims,0);
 
       int done = 0;
@@ -66,11 +66,11 @@ int BCThermalNoslipWallU(
 
         int p1, p2;
         _ArrayCopy1D_(indexb,indexi,ndims);
-        _ArrayAdd1D_(indexi,indexi,boundary->is,ndims);
+        _ArrayAdd1D_(indexi,indexi,boundary->m_is,ndims);
         if      (face ==  1) indexi[dim] = ghosts-1-indexb[dim];
         else if (face == -1) indexi[dim] = size[dim]-indexb[dim]-1;
         else return(1);
-        _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
+        _ArrayIndex1DWO_(ndims,size,indexb,boundary->m_is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
 
         /* get the specified temperature */
@@ -85,9 +85,9 @@ int BCThermalNoslipWallU(
         /* set the ghost point values */
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
         rho_gpt = rho;
-        uvel_gpt = 2.0*boundary->FlowVelocity[0] - uvel;
-        vvel_gpt = 2.0*boundary->FlowVelocity[1] - vvel;
-        wvel_gpt = 2.0*boundary->FlowVelocity[2] - wvel;
+        uvel_gpt = 2.0*boundary->m_FlowVelocity[0] - uvel;
+        vvel_gpt = 2.0*boundary->m_FlowVelocity[1] - vvel;
+        wvel_gpt = 2.0*boundary->m_FlowVelocity[2] - wvel;
         pressure_gpt = rho_gpt * temperature_b;
         energy_gpt = inv_gamma_m1*pressure_gpt
                     + 0.5 * rho_gpt

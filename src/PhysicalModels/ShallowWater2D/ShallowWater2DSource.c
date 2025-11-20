@@ -40,19 +40,19 @@ int ShallowWater2DSource(
 {
   HyPar          *solver = (HyPar* ) s;
   MPIVariables   *mpi = (MPIVariables*) m;
-  ShallowWater2D *param  = (ShallowWater2D*) solver->physics;
+  ShallowWater2D *param  = (ShallowWater2D*) solver->m_physics;
 
   int     v, done, p, p1, p2;
-  double  *SourceI = solver->fluxI; /* interace source term       */
-  double  *SourceC = solver->fluxC; /* cell-centered source term  */
-  double  *SourceL = solver->fL;
-  double  *SourceR = solver->fR;
+  double  *SourceI = solver->m_flux_i; /* interace source term       */
+  double  *SourceC = solver->m_flux_c; /* cell-centered source term  */
+  double  *SourceL = solver->m_f_l;
+  double  *SourceR = solver->m_f_r;
 
-  int     ndims   = solver->ndims;
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  double  *x      = solver->x;
-  double  *dxinv  = solver->dxinv;
+  int     ndims   = solver->m_ndims;
+  int     ghosts  = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  double  *x      = solver->m_x;
+  double  *dxinv  = solver->m_dxinv;
   int     index[ndims],index1[ndims],index2[ndims],dim_interface[ndims];
 
   /* Along X */
@@ -97,7 +97,7 @@ int ShallowWater2DSource(
     _ArrayIndex1D_(ndims,dim_interface,index2,0     ,p2);
     double dx_inverse;  _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,dxinv,dx_inverse);
     double h, uvel, vvel; _ShallowWater2DGetFlowVar_((u+_MODEL_NVARS_*p),h,uvel,vvel);
-    double term[_MODEL_NVARS_] = { 0.0, -param->g * (h + param->b[p]), 0.0 };
+    double term[_MODEL_NVARS_] = { 0.0, -param->m_g * (h + param->m_b[p]), 0.0 };
     for (v=0; v<_MODEL_NVARS_; v++)
       source[_MODEL_NVARS_*p+v] += term[v]*(SourceI[_MODEL_NVARS_*p2+v]-SourceI[_MODEL_NVARS_*p1+v])*dx_inverse;
     uvel = vvel = h; /* useless statement to avoid compiler warning */
@@ -146,7 +146,7 @@ int ShallowWater2DSource(
     _ArrayIndex1D_(ndims,dim_interface,index2,0     ,p2);
     double dy_inverse;  _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,dxinv,dy_inverse);
     double h, uvel, vvel; _ShallowWater2DGetFlowVar_((u+_MODEL_NVARS_*p),h,uvel,vvel);
-    double term[_MODEL_NVARS_] = { 0.0, 0.0, -param->g * (h + param->b[p]) };
+    double term[_MODEL_NVARS_] = { 0.0, 0.0, -param->m_g * (h + param->m_b[p]) };
     for (v=0; v<_MODEL_NVARS_; v++)
       source[_MODEL_NVARS_*p+v] += term[v]*(SourceI[_MODEL_NVARS_*p2+v]-SourceI[_MODEL_NVARS_*p1+v])*dy_inverse;
     uvel = vvel = h; /* useless statement to avoid compiler warning */
@@ -159,8 +159,8 @@ int ShallowWater2DSource(
     _ArrayIndex1D_(ndims,dim,index ,ghosts,p);
     double h, uvel, vvel;
     _ShallowWater2DGetFlowVar_((u+_MODEL_NVARS_*p),h,uvel,vvel);
-    double ycoord; _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->x,ycoord);
-    double coeff = param->fhat + param->beta * (ycoord - 0.5*param->D);
+    double ycoord; _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->m_x,ycoord);
+    double coeff = param->fhat + param->m_beta * (ycoord - 0.5*param->D);
     double coriolis_x =  coeff * vvel,
            coriolis_y = -coeff * uvel;
     source[_MODEL_NVARS_*p+1] += coriolis_x;
@@ -202,11 +202,11 @@ int ShallowWater2DSourceFunction1(
                                  )
 {
   HyPar          *solver = (HyPar* ) s;
-  ShallowWater2D *param  = (ShallowWater2D*) solver->physics;
+  ShallowWater2D *param  = (ShallowWater2D*) solver->m_physics;
 
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  int     ndims   = solver->ndims;
+  int     ghosts  = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -220,8 +220,8 @@ int ShallowWater2DSourceFunction1(
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     (f+_MODEL_NVARS_*p)[0] = 0.0;
-    (f+_MODEL_NVARS_*p)[1] = (dir == _XDIR_ ? 0.5 * param->g * param->b[p] * param->b[p] : 0.0 );
-    (f+_MODEL_NVARS_*p)[2] = (dir == _YDIR_ ? 0.5 * param->g * param->b[p] * param->b[p] : 0.0 );
+    (f+_MODEL_NVARS_*p)[1] = (dir == _XDIR_ ? 0.5 * param->m_g * param->m_b[p] * param->m_b[p] : 0.0 );
+    (f+_MODEL_NVARS_*p)[2] = (dir == _YDIR_ ? 0.5 * param->m_g * param->m_b[p] * param->m_b[p] : 0.0 );
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 
@@ -259,11 +259,11 @@ int ShallowWater2DSourceFunction2(
                                  )
 {
   HyPar          *solver = (HyPar* ) s;
-  ShallowWater2D *param  = (ShallowWater2D*) solver->physics;
+  ShallowWater2D *param  = (ShallowWater2D*) solver->m_physics;
 
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  int     ndims   = solver->ndims;
+  int     ghosts  = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -277,8 +277,8 @@ int ShallowWater2DSourceFunction2(
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     (f+_MODEL_NVARS_*p)[0] = 0.0;
-    (f+_MODEL_NVARS_*p)[1] = (dir == _XDIR_ ? param->b[p] : 0.0 );
-    (f+_MODEL_NVARS_*p)[2] = (dir == _YDIR_ ? param->b[p] : 0.0 );
+    (f+_MODEL_NVARS_*p)[1] = (dir == _XDIR_ ? param->m_b[p] : 0.0 );
+    (f+_MODEL_NVARS_*p)[2] = (dir == _YDIR_ ? param->m_b[p] : 0.0 );
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

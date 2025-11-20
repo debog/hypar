@@ -13,7 +13,7 @@
 int TimeStep(void *ts /*!< Object of type #TimeIntegration */)
 {
   TimeIntegration *TS  = (TimeIntegration*) ts;
-  SimulationObject* sim = (SimulationObject*) TS->simulation;
+  SimulationObject* sim = (SimulationObject*) TS->m_simulation;
 
   if (TS->TimeIntegrate) { TS->TimeIntegrate(TS); }
 

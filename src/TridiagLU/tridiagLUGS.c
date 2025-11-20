@@ -16,7 +16,7 @@
   Solve tridiagonal (non-periodic) systems of equations using the gather-and-solve approach:
   This function can solve multiple independent systems with one call. The systems need not share
   the same left- or right-hand-sides. The "gather-and-solve" approach gathers a tridiagonal
-  system on one processor and solves it using tridiagLU() (sending NULL as the argument for
+  system on one processor and solves it using TridiagLU() (sending NULL as the argument for
   MPI communicator to indicate that a serial solution is desired). Given multiple tridiagonal
   systems (\a ns > 1), this function will gather the systems on different processors in an
   optimal way, and thus each processor will solve some of the systems. After the system(s) is
@@ -61,26 +61,26 @@
   + The input array \a x contains the right-hand-side on entering the function, and the
     solution on exiting it.
 */
-int tridiagLUGS(
+int TridiagLUGS(
                   double  *a, /*!< Array containing the sub-diagonal elements */
                   double  *b, /*!< Array containing the diagonal elements */
                   double  *c, /*!< Array containing the super-diagonal elements */
                   double  *x, /*!< Right-hand side; will contain the solution on exit */
                   int     n,  /*!< Local size of the system on this processor */
                   int     ns, /*!< Number of systems to solve */
-                  void    *r, /*!< Object of type #TridiagLU */
+                  void    *r, /*!< Object of type #TridiagLU_Params */
                   void    *m  /*!< MPI communicator */
                )
 {
-  TridiagLU *context = (TridiagLU*) r;
+  TridiagLU_Params *context = (TridiagLU_Params *) r;
   if (!context) {
-    fprintf(stderr,"Error in tridiagLUGS(): NULL pointer passed for parameters.\n");
+    fprintf(stderr,"Error in TridiagLUGS(): NULL pointer passed for parameters.\n");
     return(-1);
   }
 #ifdef serial
 
   /* Serial compilation */
-  return(tridiagLU(a,b,c,x,n,ns,context,m));
+  return(TridiagLU(a,b,c,x,n,ns,context,m));
 
 #else
 
@@ -91,7 +91,7 @@ int tridiagLUGS(
 
   /* Parallel compilation */
   MPI_Comm  *comm = (MPI_Comm*) m;
-  if (!comm) return(tridiagLU(a,b,c,x,n,ns,context,NULL));
+  if (!comm) return(TridiagLU(a,b,c,x,n,ns,context,NULL));
   MPI_Comm_size(*comm,&nproc);
   MPI_Comm_rank(*comm,&rank);
 
@@ -175,7 +175,7 @@ int tridiagLUGS(
   if (recvbuf)  free(recvbuf);
 
   /* solve the gathered systems in serial */
-  ierr = tridiagLU(ra,rb,rc,rx,NT,ns_local[rank],context,NULL);
+  ierr = TridiagLU(ra,rb,rc,rx,NT,ns_local[rank],context,NULL);
   if (ierr) return(ierr);
 
   /* allocate send buffer and save the data to send */

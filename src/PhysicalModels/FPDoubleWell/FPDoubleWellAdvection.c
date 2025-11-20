@@ -9,10 +9,10 @@ int FPDoubleWellAdvection(double *f,double *u,int dir,void *s,double t)
   HyPar         *solver = (HyPar*)        s;
   int           i, v;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -25,7 +25,7 @@ int FPDoubleWellAdvection(double *f,double *u,int dir,void *s,double t)
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    double x; _GetCoordinate_(0,index[0]-ghosts,dim,ghosts,solver->x,x);
+    double x; _GetCoordinate_(0,index[0]-ghosts,dim,ghosts,solver->m_x,x);
     for (v = 0; v < nvars; v++) f[nvars*p+v] = drift(x) * u[nvars*p+v];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }

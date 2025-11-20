@@ -37,23 +37,23 @@ int BCSupersonicInflowU(
   if (ndims == 2) {
 
     double gamma;
-    gamma = boundary->gamma;
+    gamma = boundary->m_gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
-    if (boundary->on_this_proc) {
+    if (boundary->m_on_this_proc) {
       int bounds[ndims], indexb[ndims];
-      _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
+      _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
       _ArraySetValue_(indexb,ndims,0);
       int done = 0;
       while (!done) {
-        int p1; _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
+        int p1; _ArrayIndex1DWO_(ndims,size,indexb,boundary->m_is,ghosts,p1);
 
         /* set the ghost point values */
         double rho_gpt, uvel_gpt, vvel_gpt, energy_gpt, pressure_gpt;
-        rho_gpt      = boundary->FlowDensity;
-        pressure_gpt = boundary->FlowPressure;
-        uvel_gpt     = boundary->FlowVelocity[0];
-        vvel_gpt     = boundary->FlowVelocity[1];
+        rho_gpt      = boundary->m_FlowDensity;
+        pressure_gpt = boundary->m_FlowPressure;
+        uvel_gpt     = boundary->m_FlowVelocity[0];
+        vvel_gpt     = boundary->m_FlowVelocity[1];
         energy_gpt   = inv_gamma_m1*pressure_gpt
                        + 0.5 * rho_gpt * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt);
 
@@ -69,24 +69,24 @@ int BCSupersonicInflowU(
   } else if (ndims == 3) {
 
     double gamma;
-    gamma = boundary->gamma;
+    gamma = boundary->m_gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
-    if (boundary->on_this_proc) {
+    if (boundary->m_on_this_proc) {
       int bounds[ndims], indexb[ndims];
-      _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
+      _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
       _ArraySetValue_(indexb,ndims,0);
       int done = 0;
       while (!done) {
-        int p1; _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
+        int p1; _ArrayIndex1DWO_(ndims,size,indexb,boundary->m_is,ghosts,p1);
 
         /* set the ghost point values */
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
-        rho_gpt      = boundary->FlowDensity;
-        pressure_gpt = boundary->FlowPressure;
-        uvel_gpt     = boundary->FlowVelocity[0];
-        vvel_gpt     = boundary->FlowVelocity[1];
-        wvel_gpt     = boundary->FlowVelocity[2];
+        rho_gpt      = boundary->m_FlowDensity;
+        pressure_gpt = boundary->m_FlowPressure;
+        uvel_gpt     = boundary->m_FlowVelocity[0];
+        vvel_gpt     = boundary->m_FlowVelocity[1];
+        wvel_gpt     = boundary->m_FlowVelocity[2];
         energy_gpt   = inv_gamma_m1*pressure_gpt
                        + 0.5 * rho_gpt
                        * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt + wvel_gpt*wvel_gpt);

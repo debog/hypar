@@ -442,7 +442,7 @@ int TimeGLMGEEInitialize(
       }
     }
 
-    if (!mpi->rank) {
+    if (!mpi->m_rank) {
       FILE *in;
       int ferr;
       in = fopen("glm_gee.inp","r");
@@ -477,7 +477,7 @@ int TimeGLMGEEInitialize(
       }
       printf("GLM-GEE time integration error estimation mode: %s\n",params->ee_mode);
     }
-    IERR MPIBroadcast_character(params->ee_mode,_MAX_STRING_SIZE_,0,&mpi->world);
+    IERR MPIBroadcast_character(params->ee_mode,_MAX_STRING_SIZE_,0,&mpi->m_world);
 
     if (!strcmp(params->ee_mode,_GLM_GEE_YYT_)) {
       params->A = params->A_yyt;

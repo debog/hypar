@@ -22,13 +22,13 @@ int ApplyIBConditions(void    *s, /*!< Object of type #HyPar containing solver-r
 
   /* Apply immersed boundary conditions, if applicable */
 #if defined(HAVE_CUDA)
-  if (solver->use_gpu) {
-    if (solver->flag_ib) {
+  if (solver->m_use_gpu) {
+    if (solver->m_flag_ib) {
       fprintf(stderr, "ERROR: immersed boundaries have not yet been implemented on GPU.\n");
     }
   } else {
 #endif
-    if (solver->flag_ib) solver->IBFunction(solver,mpi,x,waqt);
+    if (solver->m_flag_ib) solver->IBFunction(solver,mpi,x,waqt);
 #if defined(HAVE_CUDA)
   }
 #endif

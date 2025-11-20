@@ -116,7 +116,7 @@ class EnsembleSimulation : public Simulation
         if (retval) {
           fprintf(stderr, "Error in EnsembleSimulations::InitializePhysicsData()\n");
           fprintf(stderr, "  InitializePhysicsData returned with error code %d on rank %d.\n",
-                  retval, m_sims[ns].mpi.rank);
+                  retval, m_sims[ns].mpi.m_rank);
           return retval;
         }
       }
@@ -172,7 +172,7 @@ class EnsembleSimulation : public Simulation
     inline void usePetscTS(PetscBool a_flag)
     {
       for (int n = 0; n < m_nsims; n++) {
-        m_sims[n].solver.use_petscTS  = a_flag;
+        m_sims[n].solver.m_use_petsc_ts  = a_flag;
       }
     }
 

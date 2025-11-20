@@ -47,33 +47,33 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
 {
   HyPar        *solver    = (HyPar*)        s;
   MPIVariables *mpi       = (MPIVariables*) m;
-  Vlasov       *physics   = (Vlasov*)       solver->physics;
+  Vlasov       *physics   = (Vlasov*)       solver->m_physics;
 
-  int *dim_global = solver->dim_global;
-  int *dim_local = solver->dim_local;
-  int ghosts = solver->ghosts;
+  int *dim_global = solver->m_dim_global;
+  int *dim_local = solver->m_dim_local;
+  int ghosts = solver->m_ghosts;
 
-  if (solver->nvars != _MODEL_NVARS_) {
-    if (!mpi->rank) {
+  if (solver->m_nvars != _MODEL_NVARS_) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in VlasovInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
     }
     return(1);
   }
-  if (solver->ndims != _MODEL_NDIMS_) {
-    if (!mpi->rank) {
+  if (solver->m_ndims != _MODEL_NDIMS_) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in VlasovInitialize(): ndims has to be %d.\n",_MODEL_NDIMS_);
     }
     return(1);
   }
 
   /* default is prescribed electric field */
-  physics->self_consistent_electric_field = 0;
-  physics->ndims_x = 1;
-  physics->ndims_v = 1;
-  physics->use_log_form = 0;
+  physics->m_self_consistent_electric_field = 0;
+  physics->m_ndims_x = 1;
+  physics->m_ndims_v = 1;
+  physics->m_use_log_form = 0;
 
   /* reading physical model specific inputs - all processes */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     FILE *in;
     in = fopen("physics.inp","r");
     if (in) {
@@ -85,19 +85,19 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
           int ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "self_consistent_electric_field")) {
             /* read whether electric field is self-consistent or prescribed */
-            int ferr = fscanf(in,"%d", &physics->self_consistent_electric_field);
+            int ferr = fscanf(in,"%d", &physics->m_self_consistent_electric_field);
             if (ferr != 1) return(1);
           } else if (!strcmp(word, "x_ndims")) {
             /* read number of spatial dimensions */
-            int ferr = fscanf(in,"%d", &physics->ndims_x);
+            int ferr = fscanf(in,"%d", &physics->m_ndims_x);
             if (ferr != 1) return(1);
           } else if (!strcmp(word, "v_ndims")) {
             /* read number of velocity dimensions */
-            int ferr = fscanf(in,"%d", &physics->ndims_v);
+            int ferr = fscanf(in,"%d", &physics->m_ndims_v);
             if (ferr != 1) return(1);
           } else if (!strcmp(word, "use_log_form")) {
             /* read whether solving in log form */
-            int ferr = fscanf(in,"%d", &physics->use_log_form);
+            int ferr = fscanf(in,"%d", &physics->m_use_log_form);
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
@@ -115,22 +115,22 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
     fclose(in);
   }
 
-  if (physics->use_log_form) {
-    if (!mpi->rank) {
+  if (physics->m_use_log_form) {
+    if (!mpi->m_rank) {
       printf("Vlasov: using the log form of the Vlasov equation.\n");
     }
   }
 
-  if ((physics->ndims_x+physics->ndims_v) != solver->ndims) {
-    if (!mpi->rank) {
+  if ((physics->m_ndims_x+physics->m_ndims_v) != solver->m_ndims) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in VlasovInitialize:\n");
       fprintf(stderr, "  space + vel dims not equal to ndims!\n");
     }
     return(1);
   }
 
-  if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-    if (!mpi->rank) {
+  if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in VlasovInitialize: This physical model does not have a splitting ");
       fprintf(stderr,"of the hyperbolic term defined.\n");
     }
@@ -139,22 +139,22 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
 
 #ifndef serial
   /* Broadcast parsed problem data */
-  MPIBroadcast_integer(&physics->ndims_x,1,0,&mpi->world);
-  MPIBroadcast_integer(&physics->ndims_v,1,0,&mpi->world);
-  MPIBroadcast_integer((int *) &physics->self_consistent_electric_field,
-                       1,0,&mpi->world);
-  MPIBroadcast_integer((int *) &physics->use_log_form,
-                       1,0,&mpi->world);
+  MPIBroadcast_integer(&physics->m_ndims_x,1,0,&mpi->m_world);
+  MPIBroadcast_integer(&physics->m_ndims_v,1,0,&mpi->m_world);
+  MPIBroadcast_integer((int *) &physics->m_self_consistent_electric_field,
+                       1,0,&mpi->m_world);
+  MPIBroadcast_integer((int *) &physics->m_use_log_form,
+                       1,0,&mpi->m_world);
 #endif
 
   /* compute local number of x-space points with ghosts */
-  physics->npts_local_x_wghosts = 1;
-  physics->npts_local_x = 1;
+  physics->m_npts_local_x_wghosts = 1;
+  physics->m_npts_local_x = 1;
   physics->npts_global_x_wghosts = 1;
   physics->npts_global_x = 1;
-  for (int d=0; d<physics->ndims_x; d++) {
-    physics->npts_local_x_wghosts *= (dim_local[d]+2*ghosts);
-    physics->npts_local_x *= dim_local[d];
+  for (int d=0; d<physics->m_ndims_x; d++) {
+    physics->m_npts_local_x_wghosts *= (dim_local[d]+2*ghosts);
+    physics->m_npts_local_x *= dim_local[d];
     physics->npts_global_x_wghosts *= (dim_global[d]+2*ghosts);
     physics->npts_global_x *= dim_global[d];
   }
@@ -162,17 +162,17 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   /* allocate array to hold the electric field (needs to have ghosts);
      note that number of electric field components is the number of
      spatial dimensions */
-  physics->e_field = (double*) calloc(  physics->npts_local_x_wghosts
-                                      * physics->ndims_x,
+  physics->m_e_field = (double*) calloc(  physics->m_npts_local_x_wghosts
+                                      * physics->m_ndims_x,
                                         sizeof(double)  );
-  physics->potential = (double*) calloc(  physics->npts_local_x_wghosts
-                                      * physics->ndims_x,
+  physics->m_potential = (double*) calloc(  physics->m_npts_local_x_wghosts
+                                      * physics->m_ndims_x,
                                         sizeof(double)  );
 
   /* Put the mpi object in the params for access in other functions */
-  physics->m = m;
+  physics->m_m_mpi = m;
 
-  if (physics->self_consistent_electric_field) {
+  if (physics->m_self_consistent_electric_field) {
 #ifdef fftw
     /* If using FFTW, make sure MPI is enabled
        Currently we only support the distrubuted memory version
@@ -182,7 +182,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
     return(1);
 #else
 
-    if (physics->ndims_x > 1) {
+    if (physics->m_ndims_x > 1) {
       fprintf(stderr,"Error in VlasovInitialize():\n");
       fprintf(stderr,"  Self-consistent electric field is implemented for only 1 space dimension.\n");
       return 1;
@@ -193,7 +193,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
 
     /* Initialize FFTW and set up data buffers used for the transforms */
     fftw_mpi_init();
-    physics->alloc_local = fftw_mpi_local_size_1d(dim_global[0], mpi->comm[0],
+    physics->alloc_local = fftw_mpi_local_size_1d(dim_global[0], mpi->m_comm[0],
                                                   FFTW_FORWARD, 0,
                                                   &physics->local_ni,
                                                   &physics->local_i_start,
@@ -211,14 +211,14 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
     physics->plan_forward_e = fftw_mpi_plan_dft_1d(dim_global[0],
                                                  physics->phys_buffer_e,
                                                  physics->fourier_buffer_e,
-                                                 mpi->comm[0],
+                                                 mpi->m_comm[0],
                                                  FFTW_FORWARD,
                                                  FFTW_ESTIMATE);
 
     physics->plan_backward_e = fftw_mpi_plan_dft_1d(dim_global[0],
                                                   physics->fourier_buffer_e,
                                                   physics->phys_buffer_e,
-                                                  mpi->comm[0],
+                                                  mpi->m_comm[0],
                                                   FFTW_BACKWARD,
                                                   FFTW_ESTIMATE);
 
@@ -228,14 +228,14 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
     physics->plan_forward_phi = fftw_mpi_plan_dft_1d(dim_global[0],
                                                  physics->phys_buffer_phi,
                                                  physics->fourier_buffer_phi,
-                                                 mpi->comm[0],
+                                                 mpi->m_comm[0],
                                                  FFTW_FORWARD,
                                                  FFTW_ESTIMATE);
 
     physics->plan_backward_phi = fftw_mpi_plan_dft_1d(dim_global[0],
                                                   physics->fourier_buffer_phi,
                                                   physics->phys_buffer_phi,
-                                                  mpi->comm[0],
+                                                  mpi->m_comm[0],
                                                   FFTW_BACKWARD,
                                                   FFTW_ESTIMATE);
 #endif
@@ -254,9 +254,9 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
   solver->PhysicsOutput = VlasovWriteEFieldAndPotential;
   solver->PostStage     = VlasovPostStage;
 
-  if (physics->use_log_form) takeExp(solver->u,solver->npoints_local_wghosts);
-  int ierr = VlasovEField(solver->u, solver, 0.0);
-  if (physics->use_log_form) takeLog(solver->u,solver->npoints_local_wghosts);
+  if (physics->m_use_log_form) takeExp(solver->m_u,solver->m_npoints_local_wghosts);
+  int ierr = VlasovEField(solver->m_u, solver, 0.0);
+  if (physics->m_use_log_form) takeLog(solver->m_u,solver->m_npoints_local_wghosts);
   if (ierr) return ierr;
 
   return 0;

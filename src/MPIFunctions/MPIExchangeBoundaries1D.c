@@ -42,8 +42,8 @@ int MPIExchangeBoundaries1D(
   MPIVariables  *mpi = (MPIVariables*) m;
   int           i;
 
-  int *ip     = mpi->ip;
-  int *iproc  = mpi->iproc;
+  int *ip     = mpi->m_ip;
+  int *iproc  = mpi->m_iproc;
   int non      = 0; /* number of neighbours */
 
   int neighbor_rank[2] = {-1,-1};
@@ -77,13 +77,13 @@ int MPIExchangeBoundaries1D(
   /* exchange the data */
   int tick = 0;
   if (neighbor_rank[0]!= -1) {
-    MPI_Irecv(recvbuf[0],ghosts,MPI_DOUBLE,neighbor_rank[0],1631,mpi->world,&requests[tick]);
-    MPI_Isend(sendbuf[0],ghosts,MPI_DOUBLE,neighbor_rank[0],1631,mpi->world,&requests[tick+non]);
+    MPI_Irecv(recvbuf[0],ghosts,MPI_DOUBLE,neighbor_rank[0],1631,mpi->m_world,&requests[tick]);
+    MPI_Isend(sendbuf[0],ghosts,MPI_DOUBLE,neighbor_rank[0],1631,mpi->m_world,&requests[tick+non]);
     tick++;
   }
   if (neighbor_rank[1] != -1) {
-    MPI_Irecv(recvbuf[1],ghosts,MPI_DOUBLE,neighbor_rank[1],1631,mpi->world,&requests[tick]);
-    MPI_Isend(sendbuf[1],ghosts,MPI_DOUBLE,neighbor_rank[1],1631,mpi->world,&requests[tick+non]);
+    MPI_Irecv(recvbuf[1],ghosts,MPI_DOUBLE,neighbor_rank[1],1631,mpi->m_world,&requests[tick]);
+    MPI_Isend(sendbuf[1],ghosts,MPI_DOUBLE,neighbor_rank[1],1631,mpi->m_world,&requests[tick+non]);
     tick++;
   }
 

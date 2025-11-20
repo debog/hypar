@@ -32,8 +32,8 @@ int Euler1DSourceUpwindLLF(
   int       done,k;
   _DECLARE_IERR_;
 
-  int ndims = solver->ndims;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
@@ -75,8 +75,8 @@ int Euler1DSourceUpwindRoe(
   int       done,k;
   _DECLARE_IERR_;
 
-  int ndims = solver->ndims;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;

@@ -31,19 +31,19 @@ int IBInterpCoeffs(
 {
   ImmersedBoundary  *IB       = (ImmersedBoundary*) ib;
   MPIVariables      *mpi      = (MPIVariables*) m;
-  IBNode            *boundary = IB->boundary;
+  IBNode            *boundary = IB->m_boundary;
 
-  double  eps         = IB->tolerance;
-  int     maxiter     = IB->itr_max,
-          n_boundary  = IB->n_boundary_nodes;
+  double  eps         = IB->m_tolerance;
+  int     maxiter     = IB->m_itr_max,
+          n_boundary  = IB->m_n_boundary_nodes;
 
   int imax        = dim_l[0],
       jmax        = dim_l[1],
       kmax        = dim_l[2];
 
-  int is = mpi->is[0],
-      js = mpi->is[1],
-      ks = mpi->is[2];
+  int is = mpi->m_is[0],
+      js = mpi->m_is[1],
+      ks = mpi->m_is[2];
 
   static int index[_IB_NDIMS_];
 
@@ -57,21 +57,21 @@ int IBInterpCoeffs(
     double ds, dist;
     double xtip, ytip, ztip;
 
-    index[0] = i = boundary[dg].i;
-    index[1] = j = boundary[dg].j;
-    index[2] = k = boundary[dg].k;
+    index[0] = i = boundary[dg].m_i;
+    index[1] = j = boundary[dg].m_j;
+    index[2] = k = boundary[dg].m_k;
     _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,p);
 
-    xb = boundary[dg].x;
-    yb = boundary[dg].y;
-    zb = boundary[dg].z;
+    xb = boundary[dg].m_x;
+    yb = boundary[dg].m_y;
+    zb = boundary[dg].m_z;
 
-    nx = boundary[dg].face->nx;
-    ny = boundary[dg].face->ny;
-    nz = boundary[dg].face->nz;
-    xx = boundary[dg].face->x1;
-    yy = boundary[dg].face->y1;
-    zz = boundary[dg].face->z1;
+    nx = boundary[dg].m_face->m_nx;
+    ny = boundary[dg].m_face->m_ny;
+    nz = boundary[dg].m_face->m_nz;
+    xx = boundary[dg].m_face->m_x1;
+    yy = boundary[dg].m_face->m_y1;
+    zz = boundary[dg].m_face->m_z1;
 
     dist = nx*(xx-xb) + ny*(yy-yb) + nz*(zz-zb);
 
@@ -176,7 +176,7 @@ int IBInterpCoeffs(
         ztip += nz*absolute(ds);
       } else {
         fprintf(stderr,"Error in IBInterpCoeffs() (Bug in code) - counting interior points surrounding probe tip \n");
-        fprintf(stderr,"on rank %d.\n", mpi->rank);
+        fprintf(stderr,"on rank %d.\n", mpi->m_rank);
         fprintf(stderr,"Value of nflow is %d but can only be positive and <= %d.\n",nflow,_IB_NNODES_);
         return(1);
       }
@@ -184,7 +184,7 @@ int IBInterpCoeffs(
 
     if (!is_it_in) {
       fprintf(stderr,"Error in IBInterpCoeffs() on rank %d - interior point not found for immersed boundary point (%d,%d,%d)!\n",
-              mpi->rank, i, j, k);
+              mpi->m_rank, i, j, k);
       return(1);
     }
 
@@ -205,18 +205,18 @@ int IBInterpCoeffs(
     index[0]=itip  ; index[1]=jtip-1; index[2]=ktip  ; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[5]);
     index[0]=itip-1; index[1]=jtip  ; index[2]=ktip  ; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[6]);
     index[0]=itip  ; index[1]=jtip  ; index[2]=ktip  ; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[7]);
-    _ArrayCopy1D_(ptip,boundary[dg].interp_nodes,_IB_NNODES_);
+    _ArrayCopy1D_(ptip,boundary[dg].m_interp_nodes,_IB_NNODES_);
 
     double coeffs[_IB_NNODES_];
     TrilinearInterpCoeffs(tlx[0],tlx[1],tly[0],tly[1],tlz[0],tlz[1],xtip,ytip,ztip,&coeffs[0]);
-    _ArrayCopy1D_(coeffs,boundary[dg].interp_coeffs,_IB_NNODES_);
+    _ArrayCopy1D_(coeffs,boundary[dg].m_interp_coeffs,_IB_NNODES_);
 
     double tipdist = absolute(nx*(xx-xtip) + ny*(yy-ytip) + nz*(zz-ztip));
-    boundary[dg].interp_node_distance = tipdist;
-    boundary[dg].surface_distance = absolute(dist);
+    boundary[dg].m_interp_node_distance = tipdist;
+    boundary[dg].m_surface_distance = absolute(dist);
     if (tipdist < eps) {
       fprintf(stderr,"Warning in IBInterpCoeffs() on rank %d - how can probe tip be on surface? Tipdist = %e\n",
-              mpi->rank,tipdist);
+              mpi->m_rank,tipdist);
     }
 
   }

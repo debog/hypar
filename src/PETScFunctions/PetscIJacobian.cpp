@@ -61,13 +61,13 @@ PetscErrorCode PetscIJacobian( TS ts,        /*!< Time stepping object (see PETS
   PETScContext* context = (PETScContext*) ctxt;
 
   PetscFunctionBegin;
-  for (int ns = 0; ns < context->nsims; ns++) {
-    ((SimulationObject*)context->simobj)[ns].solver.count_IJacobian++;
+  for (int ns = 0; ns < context->m_nsims; ns++) {
+    ((SimulationObject*)context->m_simobj)[ns].solver.m_count_i_jacobian++;
   }
-  context->shift = a;
-  context->waqt  = t;
+  context->m_shift = a;
+  context->m_waqt  = t;
   /* Construct preconditioning matrix */
-  if (context->flag_use_precon) PetscComputePreconMatImpl(B,Y,context);
+  if (context->m_flag_use_precon) PetscComputePreconMatImpl(B,Y,context);
 
   PetscFunctionReturn(0);
 }
@@ -95,7 +95,7 @@ PetscErrorCode PetscIJacobian( TS ts,        /*!< Time stepping object (see PETS
     \f{equation}{
       {\bf f} = \alpha {\bf y} - \frac{1}{\epsilon} \left[ {\bf F}\left({\bf U}_0+\epsilon{\bf y}\right)-{\bf F}\left({\bf U}_0\right) \right]
     \f}
-    In the code, \f${\bf y}\f$ is \a Y, \f$\bf f\f$ is \a F, and \f${\bf U}_0\f$ is \a #HyPar::uref (the reference solution at which the
+    In the code, \f${\bf y}\f$ is \a Y, \f$\bf f\f$ is \a F, and \f${\bf U}_0\f$ is \a #HyPar::m_uref (the reference solution at which the
     nonlinear Jacobian is computed). See papers on Jacobian-free Newton-Krylov (JFNK) methods to understand how \f$\epsilon\f$ is computed.
 
     \b Notes:
@@ -118,8 +118,8 @@ PetscErrorCode PetscJacobianFunction_JFNK( Mat Jacobian, /*!< Jacobian matrix */
   PetscFunctionBegin;
 
   MatShellGetContext(Jacobian,&context);
-  SimulationObject* sim = (SimulationObject*) context->simobj;
-  int nsims = context->nsims;
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
+  int nsims = context->m_nsims;
 
   double normY;
   VecNorm(Y,NORM_2,&normY);
@@ -129,55 +129,55 @@ PetscErrorCode PetscJacobianFunction_JFNK( Mat Jacobian, /*!< Jacobian matrix */
     /* F = 0 */
     VecZeroEntries(F);
     /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->shift,0,Y);
+    VecAXPBY(F,context->m_shift,0,Y);
 
   } else {
 
-    double epsilon =  context->jfnk_eps / normY;
-    double t = context->waqt; /* current stage/step time */
+    double epsilon =  context->m_jfnk_eps / normY;
+    double t = context->m_waqt; /* current stage/step time */
 
     for (int ns = 0; ns < nsims; ns++) {
 
       HyPar* solver = &(sim[ns].solver);
       MPIVariables* mpi = &(sim[ns].mpi);
-      solver->count_IJacFunction++;
+      solver->m_count_i_jac_function++;
 
-      int size = solver->npoints_local_wghosts;
+      int size = solver->m_npoints_local_wghosts;
 
-      double *u       = solver->u;
-      double *uref    = solver->uref;
-      double *rhsref  = solver->rhsref;
-      double *rhs     = solver->rhs;
+      double *u       = solver->m_u;
+      double *uref    = solver->m_uref;
+      double *rhsref  = solver->m_rhsref;
+      double *rhs     = solver->m_rhs;
 
       /* copy solution from PETSc vector */
-      TransferVecFromPETSc(u,Y,context,ns,context->offsets[ns]);
-      _ArrayAYPX_(uref,epsilon,u,size*solver->nvars);
+      TransferVecFromPETSc(u,Y,context,ns,context->m_offsets[ns]);
+      _ArrayAYPX_(uref,epsilon,u,size*solver->m_nvars);
       /* apply boundary conditions and exchange data over MPI interfaces */
       solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);
-      MPIExchangeBoundariesnD(  solver->ndims,
-                                solver->nvars,
-                                solver->dim_local,
-                                solver->ghosts,
+      MPIExchangeBoundariesnD(  solver->m_ndims,
+                                solver->m_nvars,
+                                solver->m_dim_local,
+                                solver->m_ghosts,
                                 mpi,
                                 u );
 
       /* Evaluate hyperbolic, parabolic and source terms  and the RHS for U+dU */
-      _ArraySetValue_(rhs,size*solver->nvars,0.0);
-      solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+      _ArraySetValue_(rhs,size*solver->m_nvars,0.0);
+      solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                   solver->FFunction,solver->Upwind);
-      _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
-      solver->ParabolicFunction (solver->par,u,solver,mpi,t);
-      _ArrayAXPY_(solver->par, 1.0,rhs,size*solver->nvars);
-      solver->SourceFunction (solver->source,u,solver,mpi,t);
-      _ArrayAXPY_(solver->source, 1.0,rhs,size*solver->nvars);
+      _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
+      solver->ParabolicFunction (solver->m_par,u,solver,mpi,t);
+      _ArrayAXPY_(solver->m_par, 1.0,rhs,size*solver->m_nvars);
+      solver->SourceFunction (solver->m_source,u,solver,mpi,t);
+      _ArrayAXPY_(solver->m_source, 1.0,rhs,size*solver->m_nvars);
 
-      _ArrayAXPY_(rhsref,-1.0,rhs,size*solver->nvars);
+      _ArrayAXPY_(rhsref,-1.0,rhs,size*solver->m_nvars);
       /* Transfer RHS to PETSc vector */
-      TransferVecToPETSc(rhs,F,context,ns,context->offsets[ns]);
+      TransferVecToPETSc(rhs,F,context,ns,context->m_offsets[ns]);
     }
 
     /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->shift,(-1.0/epsilon),Y);
+    VecAXPBY(F,context->m_shift,(-1.0/epsilon),Y);
 
   }
 
@@ -209,7 +209,7 @@ PetscErrorCode PetscJacobianFunction_JFNK( Mat Jacobian, /*!< Jacobian matrix */
     \f{equation}{
       {\bf f} = \alpha {\bf y} - \left[ {\bf F}\left({\bf U}_0+{\bf y}\right)-{\bf F}\left({\bf U}_0\right) \right]
     \f}
-    In the code, \f${\bf y}\f$ is \a Y, \f$\bf f\f$ is \a F, and \f${\bf U}_0\f$ is \a #HyPar::uref (the reference solution at which the
+    In the code, \f${\bf y}\f$ is \a Y, \f$\bf f\f$ is \a F, and \f${\bf U}_0\f$ is \a #HyPar::m_uref (the reference solution at which the
     nonlinear Jacobian is computed).
 
     Since \f$\mathcal{F}\f$ is linear,
@@ -243,8 +243,8 @@ PetscErrorCode PetscJacobianFunction_Linear( Mat Jacobian, /*!< Jacobian matrix 
   PetscFunctionBegin;
 
   MatShellGetContext(Jacobian,&context);
-  SimulationObject* sim = (SimulationObject*) context->simobj;
-  int nsims = context->nsims;
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
+  int nsims = context->m_nsims;
 
   double normY;
   VecNorm(Y,NORM_2,&normY);
@@ -254,54 +254,54 @@ PetscErrorCode PetscJacobianFunction_Linear( Mat Jacobian, /*!< Jacobian matrix 
     /* F = 0 */
     VecZeroEntries(F);
     /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->shift,0,Y);
+    VecAXPBY(F,context->m_shift,0,Y);
 
   } else {
 
-    double t = context->waqt; /* current stage/step time */
+    double t = context->m_waqt; /* current stage/step time */
 
     for (int ns = 0; ns < nsims; ns++) {
 
       HyPar* solver = &(sim[ns].solver);
       MPIVariables* mpi = &(sim[ns].mpi);
-      solver->count_IJacFunction++;
+      solver->m_count_i_jac_function++;
 
-      int size = solver->npoints_local_wghosts;
+      int size = solver->m_npoints_local_wghosts;
 
-      double *u       = solver->u;
-      double *uref    = solver->uref;
-      double *rhsref  = solver->rhsref;
-      double *rhs     = solver->rhs;
+      double *u       = solver->m_u;
+      double *uref    = solver->m_uref;
+      double *rhsref  = solver->m_rhsref;
+      double *rhs     = solver->m_rhs;
 
       /* copy solution from PETSc vector */
-      TransferVecFromPETSc(u,Y,context,ns,context->offsets[ns]);
-      _ArrayAYPX_(uref,1.0,u,size*solver->nvars);
+      TransferVecFromPETSc(u,Y,context,ns,context->m_offsets[ns]);
+      _ArrayAYPX_(uref,1.0,u,size*solver->m_nvars);
       /* apply boundary conditions and exchange data over MPI interfaces */
       solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);
-      MPIExchangeBoundariesnD(  solver->ndims,
-                                solver->nvars,
-                                solver->dim_local,
-                                solver->ghosts,
+      MPIExchangeBoundariesnD(  solver->m_ndims,
+                                solver->m_nvars,
+                                solver->m_dim_local,
+                                solver->m_ghosts,
                                 mpi,
                                 u );
 
       /* Evaluate hyperbolic, parabolic and source terms  and the RHS for U+dU */
-      _ArraySetValue_(rhs,size*solver->nvars,0.0);
-      solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+      _ArraySetValue_(rhs,size*solver->m_nvars,0.0);
+      solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                   solver->FFunction,solver->Upwind);
-      _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
-      solver->ParabolicFunction (solver->par,u,solver,mpi,t);
-      _ArrayAXPY_(solver->par, 1.0,rhs,size*solver->nvars);
-      solver->SourceFunction (solver->source,u,solver,mpi,t);
-      _ArrayAXPY_(solver->source, 1.0,rhs,size*solver->nvars);
+      _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
+      solver->ParabolicFunction (solver->m_par,u,solver,mpi,t);
+      _ArrayAXPY_(solver->m_par, 1.0,rhs,size*solver->m_nvars);
+      solver->SourceFunction (solver->m_source,u,solver,mpi,t);
+      _ArrayAXPY_(solver->m_source, 1.0,rhs,size*solver->m_nvars);
 
-      _ArrayAXPY_(rhsref,-1.0,rhs,size*solver->nvars);
+      _ArrayAXPY_(rhsref,-1.0,rhs,size*solver->m_nvars);
       /* Transfer RHS to PETSc vector */
-      TransferVecToPETSc(rhs,F,context,ns,context->offsets[ns]);
+      TransferVecToPETSc(rhs,F,context,ns,context->m_offsets[ns]);
     }
 
     /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->shift,-1.0,Y);
+    VecAXPBY(F,context->m_shift,-1.0,Y);
 
   }
 

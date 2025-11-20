@@ -54,7 +54,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 
   /* write out iblank to file for visualization */
   for (int ns = 0; ns < nsims; ns++) {
-    if (sim[ns].solver.flag_ib) {
+    if (sim[ns].solver.m_flag_ib) {
 
       char fname_root[_MAX_STRING_SIZE_] = "iblank";
       if (nsims > 1) {
@@ -64,13 +64,13 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
         strcat(fname_root, index);
       }
 
-      WriteArray( sim[ns].solver.ndims,
+      WriteArray( sim[ns].solver.m_ndims,
                   1,
-                  sim[ns].solver.dim_global,
-                  sim[ns].solver.dim_local,
-                  sim[ns].solver.ghosts,
-                  sim[ns].solver.x,
-                  sim[ns].solver.iblank,
+                  sim[ns].solver.m_dim_global,
+                  sim[ns].solver.m_dim_local,
+                  sim[ns].solver.m_ghosts,
+                  sim[ns].solver.m_x,
+                  sim[ns].solver.m_iblank,
                   &(sim[ns].solver),
                   &(sim[ns].mpi),
                   fname_root );
@@ -79,7 +79,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 
 #ifdef with_librom
   if (!rank) printf("Setting up libROM interface.\n");
-  libROMInterface rom_interface( sim, nsims, rank, nproc, sim[0].solver.dt );
+  libROMInterface rom_interface( sim, nsims, rank, nproc, sim[0].solver.m_dt );
   const std::string& rom_mode( rom_interface.mode() );
   std::vector<double> op_times_arr(0);
 #endif
@@ -93,27 +93,27 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     TimeInitialize(sim, nsims, rank, nproc, &TS);
     double ti_runtime = 0.0;
 
-    if (!rank) printf("Solving in time (from %d to %d iterations)\n",TS.restart_iter,TS.n_iter);
-    for (TS.iter = TS.restart_iter; TS.iter < TS.n_iter; TS.iter++) {
+    if (!rank) printf("Solving in time (from %d to %d iterations)\n",TS.m_restart_iter,TS.m_n_iter);
+    for (TS.m_iter = TS.m_restart_iter; TS.m_iter < TS.m_n_iter; TS.m_iter++) {
 
       /* Write initial solution to file if this is the first iteration */
-      if (!TS.iter) {
+      if (!TS.m_iter) {
         for (int ns = 0; ns < nsims; ns++) {
           if (sim[ns].solver.PhysicsOutput) {
             sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
                                           &(sim[ns].mpi),
-                                          TS.waqt );
+                                          TS.m_waqt );
           }
         }
-        OutputSolution(sim, nsims, TS.waqt);
+        OutputSolution(sim, nsims, TS.m_waqt);
 #ifdef with_librom
-        op_times_arr.push_back(TS.waqt);
+        op_times_arr.push_back(TS.m_waqt);
 #endif
       }
 
 #ifdef with_librom
-      if ((rom_mode == _ROM_MODE_TRAIN_) && (TS.iter%rom_interface.samplingFrequency() == 0)) {
-        rom_interface.takeSample( sim, TS.waqt );
+      if ((rom_mode == _ROM_MODE_TRAIN_) && (TS.m_iter%rom_interface.samplingFrequency() == 0)) {
+        rom_interface.takeSample( sim, TS.m_waqt );
       }
 #endif
 
@@ -121,8 +121,8 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
       TimePreStep (&TS);
 #ifdef compute_rhs_operators
       /* compute and write (to file) matrix operators representing the right-hand side */
-//      if (((TS.iter+1)%solver->file_op_iter == 0) || (!TS.iter))
-//        { ComputeRHSOperators(solver,mpi,TS.waqt);
+//      if (((TS.m_iter+1)%solver->m_file_op_iter == 0) || (!TS.m_iter))
+//        { ComputeRHSOperators(solver,mpi,TS.m_waqt);
 #endif
 
       /* Step in time */
@@ -131,30 +131,30 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
       /* Call post-step function */
       TimePostStep (&TS);
 
-      ti_runtime += TS.iter_wctime;
+      ti_runtime += TS.m_iter_wctime;
 
       /* Print information to screen */
       TimePrintStep(&TS);
 
       /* Write intermediate solution to file */
-      if (      ((TS.iter+1)%sim[0].solver.file_op_iter == 0)
-            &&  ((TS.iter+1) < TS.n_iter) ) {
+      if (      ((TS.m_iter+1)%sim[0].solver.m_file_op_iter == 0)
+            &&  ((TS.m_iter+1) < TS.m_n_iter) ) {
         for (int ns = 0; ns < nsims; ns++) {
           if (sim[ns].solver.PhysicsOutput) {
             sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
                                           &(sim[ns].mpi),
-                                          TS.waqt );
+                                          TS.m_waqt );
           }
         }
-        OutputSolution(sim, nsims, TS.waqt);
+        OutputSolution(sim, nsims, TS.m_waqt);
 #ifdef with_librom
-        op_times_arr.push_back(TS.waqt);
+        op_times_arr.push_back(TS.m_waqt);
 #endif
       }
 
     }
 
-    double t_final = TS.waqt;
+    double t_final = TS.m_waqt;
     TimeCleanup(&TS);
 
     if (!rank) {
@@ -180,11 +180,11 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     OutputSolution(sim, nsims, t_final);
 
 #ifdef with_librom
-    op_times_arr.push_back(TS.waqt);
+    op_times_arr.push_back(TS.m_waqt);
 
     for (int ns = 0; ns < nsims; ns++) {
-      ResetFilenameIndex( sim[ns].solver.filename_index,
-                          sim[ns].solver.index_length );
+      ResetFilenameIndex( sim[ns].solver.m_filename_index,
+                          sim[ns].solver.m_index_length );
     }
 
     if (rom_interface.mode() == _ROM_MODE_TRAIN_) {
@@ -226,9 +226,9 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     } else {
 
       for (int ns = 0; ns < nsims; ns++) {
-        sim[ns].solver.rom_diff_norms[0]
-          = sim[ns].solver.rom_diff_norms[1]
-          = sim[ns].solver.rom_diff_norms[2]
+        sim[ns].solver.m_rom_diff_norms[0]
+          = sim[ns].solver.m_rom_diff_norms[1]
+          = sim[ns].solver.m_rom_diff_norms[2]
           = -1;
       }
 
@@ -237,27 +237,27 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   } else if (rom_mode == _ROM_MODE_PREDICT_) {
 
     for (int ns = 0; ns < nsims; ns++) {
-      sim[ns].solver.rom_diff_norms[0]
-        = sim[ns].solver.rom_diff_norms[1]
-        = sim[ns].solver.rom_diff_norms[2]
+      sim[ns].solver.m_rom_diff_norms[0]
+        = sim[ns].solver.m_rom_diff_norms[1]
+        = sim[ns].solver.m_rom_diff_norms[2]
         = -1;
-      strcpy(sim[ns].solver.ConservationCheck,"no");
+      strcpy(sim[ns].solver.m_conservation_check,"no");
     }
 
     rom_interface.loadROM();
     rom_interface.projectInitialSolution(sim);
 
     {
-      int start_iter = sim[0].solver.restart_iter;
-      int n_iter = sim[0].solver.n_iter;
-      double dt = sim[0].solver.dt;
+      int start_iter = sim[0].solver.m_restart_iter;
+      int n_iter = sim[0].solver.m_n_iter;
+      double dt = sim[0].solver.m_dt;
 
       double cur_time = start_iter * dt;
       op_times_arr.push_back(cur_time);
 
       for (int iter = start_iter; iter < n_iter; iter++) {
         cur_time += dt;
-        if (    ( (iter+1)%sim[0].solver.file_op_iter == 0)
+        if (    ( (iter+1)%sim[0].solver.m_file_op_iter == 0)
             &&  ( (iter+1) < n_iter) ) {
           op_times_arr.push_back(cur_time);
         }

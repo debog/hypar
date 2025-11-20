@@ -152,7 +152,7 @@ double ArraySumSquarenD(int    nvars,
   return(sum);
 }
 
-void fillGhostCells( const int* const a_dim,
+void FillGhostCells( const int* const a_dim,
                      const int        a_ngpt,
                      double* const    a_u,
                      const int        a_nvars,
@@ -654,7 +654,7 @@ int InterpolateGlobalnDVar( const int* const    a_dim_dst,
       u_to = (double*) calloc (size, sizeof(double));
     }
 
-    fillGhostCells( dim_from,
+    FillGhostCells( dim_from,
                     ghosts,
                     u_from,
                     a_nvars,

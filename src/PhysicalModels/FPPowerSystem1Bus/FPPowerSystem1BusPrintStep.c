@@ -5,7 +5,7 @@
 int FPPowerSystem1BusPrintStep(void* s,void *m,double t)
 {
   HyPar             *solver = (HyPar*)              s;
-  FPPowerSystem1Bus *params = (FPPowerSystem1Bus*)  solver->physics;
-  printf("Domain integral of the probability density function: %1.16E\n",params->pdf_integral);
+  FPPowerSystem1Bus *params = (FPPowerSystem1Bus*)  solver->m_physics;
+  printf("Domain integral of the probability density function: %1.16E\n",params->m_pdf_integral);
   return(0);
 }

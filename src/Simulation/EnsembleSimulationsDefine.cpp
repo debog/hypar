@@ -101,10 +101,10 @@ int EnsembleSimulation::define( int a_rank, /*!< MPI rank of this process */
 
   m_sims.resize(m_nsims);
   for (int ns = 0; ns < m_nsims; ns++) {
-    m_sims[ns].solver.my_idx = ns;
-    m_sims[ns].solver.nsims = m_nsims;
-    m_sims[ns].mpi.rank = m_rank;
-    m_sims[ns].mpi.nproc = m_nproc;
+    m_sims[ns].solver.m_my_idx = ns;
+    m_sims[ns].solver.m_nsims = m_nsims;
+    m_sims[ns].mpi.m_rank = m_rank;
+    m_sims[ns].mpi.m_nproc = m_nproc;
   }
 
   if (!m_rank) {

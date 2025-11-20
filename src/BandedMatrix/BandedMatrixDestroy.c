@@ -11,9 +11,9 @@ int BandedMatrixDestroy(void *A /*!< Banded matrix object of type #BandedMatrix 
 {
   BandedMatrix *B = (BandedMatrix*) A;
 
-  if (B->ncol) free(B->ncol);
-  if (B->nrow) free(B->nrow);
-  if (B->data) free(B->data);
+  if (B->m_ncol) free(B->m_ncol);
+  if (B->m_nrow) free(B->m_nrow);
+  if (B->m_data) free(B->m_data);
 
   return(0);
 }

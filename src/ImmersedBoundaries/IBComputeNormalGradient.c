@@ -17,7 +17,7 @@
  *  gradient.
  *
  *  The variable should be a grid variable with size/layout the
- *  same as the solution variable (#HyPar::u) with the appropriate
+ *  same as the solution variable (#HyPar::m_u) with the appropriate
  *  number of ghost points.
  *
  *  If the incoming variable has multiple components, this
@@ -39,19 +39,19 @@ int IBComputeNormalGradient(void*               s,       /*!< Solver object of t
 {
   HyPar             *solver  = (HyPar*)          s;
   MPIVariables      *mpi     = (MPIVariables*)   m;
-  ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->ib;
+  ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->m_ib;
 
-  if (!solver->flag_ib) return(0);
+  if (!solver->m_flag_ib) return(0);
 
   if ((*grad_var) != NULL) {
     fprintf(stderr,"Error in IBComputeNormalGradient()\n");
     fprintf(stderr," grad_var is not NULL on rank %d\n",
-            mpi->rank );
+            mpi->m_rank );
     return 1;
   }
 
-  int nfacets_local = IB->nfacets_local;
-  FacetMap *fmap = IB->fmap;
+  int nfacets_local = IB->m_nfacets_local;
+  FacetMap *fmap = IB->m_fmap;
 
   if (nfacets_local > 0) {
     (*grad_var) = (double*) calloc (nvars*nfacets_local, sizeof(double));
@@ -62,8 +62,8 @@ int IBComputeNormalGradient(void*               s,       /*!< Solver object of t
       int    *nodes, j, k;
 
       double v_c[nvars];
-      alpha = &(fmap[n].interp_coeffs[0]);
-      nodes = &(fmap[n].interp_nodes[0]);
+      alpha = &(fmap[n].m_interp_coeffs[0]);
+      nodes = &(fmap[n].m_interp_nodes[0]);
       _ArraySetValue_(v_c,nvars,0.0);
       for (j=0; j<_IB_NNODES_; j++) {
         for (k=0; k<nvars; k++) {
@@ -72,8 +72,8 @@ int IBComputeNormalGradient(void*               s,       /*!< Solver object of t
       }
 
       double v_ns[nvars];
-      alpha = &(fmap[n].interp_coeffs_ns[0]);
-      nodes = &(fmap[n].interp_nodes_ns[0]);
+      alpha = &(fmap[n].m_interp_coeffs_ns[0]);
+      nodes = &(fmap[n].m_interp_nodes_ns[0]);
       _ArraySetValue_(v_ns,nvars,0.0);
       for (j=0; j<_IB_NNODES_; j++) {
         for (k=0; k<nvars; k++) {
@@ -81,14 +81,14 @@ int IBComputeNormalGradient(void*               s,       /*!< Solver object of t
         }
       }
 
-     double nx = fmap[n].facet->nx;
-     double ny = fmap[n].facet->ny;
-     double nz = fmap[n].facet->nz;
+     double nx = fmap[n].m_facet->m_nx;
+     double ny = fmap[n].m_facet->m_ny;
+     double nz = fmap[n].m_facet->m_nz;
 
       for (k=0; k<nvars; k++) {
-        double dv_dx = (v_ns[k] - v_c[k]) / fmap[n].dx;
-        double dv_dy = (v_ns[k] - v_c[k]) / fmap[n].dy;
-        double dv_dz = (v_ns[k] - v_c[k]) / fmap[n].dz;
+        double dv_dx = (v_ns[k] - v_c[k]) / fmap[n].m_dx;
+        double dv_dy = (v_ns[k] - v_c[k]) / fmap[n].m_dy;
+        double dv_dz = (v_ns[k] - v_c[k]) / fmap[n].m_dz;
         (*grad_var)[n*nvars+k] = dv_dx*nx + dv_dy*ny + dv_dz*nz;
       }
 

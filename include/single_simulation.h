@@ -156,7 +156,7 @@ class SingleSimulation : public Simulation
     /*! Set flag whether to use PETSc time integration */
     inline void usePetscTS(PetscBool a_flag)
     {
-      m_sim->solver.use_petscTS  = a_flag;
+      m_sim->solver.m_use_petsc_ts  = a_flag;
     }
 
     /*! Run the simulation using PETSc time integrators */

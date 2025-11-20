@@ -22,11 +22,11 @@ int FPPowerSystem3BusDiffusion(
                               )
 {
   HyPar             *solver = (HyPar*)              s;
-  FPPowerSystem3Bus *params = (FPPowerSystem3Bus*)  solver->physics;
+  FPPowerSystem3Bus *params = (FPPowerSystem3Bus*)  solver->m_physics;
   int               i, v;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
   static int index[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_], offset[_MODEL_NDIMS_];
   static double dissipation[_MODEL_NDIMS_*_MODEL_NDIMS_];
 

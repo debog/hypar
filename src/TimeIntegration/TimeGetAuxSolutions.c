@@ -9,7 +9,7 @@
 
 /*!
   Return auxiliary solution: Some time integrators may have the concept of
-  auxiliary solutions that they evolve along with the main solution #HyPar::u
+  auxiliary solutions that they evolve along with the main solution #HyPar::m_u
   (these may be used for error estimation, for example). This function returns
   a pointer to such an auxiliary solution. Note that the auxiliary solution has
   the same dimensions and array layout as the main solution.
@@ -35,18 +35,18 @@ int TimeGetAuxSolutions(
                        )
 {
   HyPar           *solver = (HyPar*) s;
-  TimeIntegration *TS     = (TimeIntegration*) solver->time_integrator;
+  TimeIntegration *TS     = (TimeIntegration*) solver->m_time_integrator;
 
   if (nu >= 0) {
-    if (!strcmp(solver->time_scheme,_GLM_GEE_)) {
-      GLMGEEParameters *params = (GLMGEEParameters*) solver->msti;
-      *uaux = (TS->U[params->r+nu] + TS->u_offsets[ns]);
+    if (!strcmp(solver->m_time_scheme,_GLM_GEE_)) {
+      GLMGEEParameters *params = (GLMGEEParameters*) solver->m_msti;
+      *uaux = (TS->m_U[params->r+nu] + TS->m_u_offsets[ns]);
     }
   } else {
     if (!TS) *N = 0;
     else {
-      if (!strcmp(solver->time_scheme,_GLM_GEE_)) {
-        GLMGEEParameters *params = (GLMGEEParameters*) solver->msti;
+      if (!strcmp(solver->m_time_scheme,_GLM_GEE_)) {
+        GLMGEEParameters *params = (GLMGEEParameters*) solver->m_msti;
         *N = params->r - 1;
       } else *N = 0;
     }

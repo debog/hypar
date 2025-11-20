@@ -28,11 +28,11 @@ int VlasovAdvection( double  *f,   /*!< Array to hold the computed flux (same si
 {
 
   HyPar  *solver = (HyPar*)  s;
-  Vlasov *param  = (Vlasov*) solver->physics;
+  Vlasov *param  = (Vlasov*) solver->m_physics;
 
-  int* dim    = solver->dim_local;
-  int  ghosts = solver->ghosts;
-  int  ndims  = solver->ndims;
+  int* dim    = solver->m_dim_local;
+  int  ghosts = solver->m_ghosts;
+  int  ndims  = solver->m_ndims;
 
   // set bounds for array index to include ghost points
   int bounds[ndims];

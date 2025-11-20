@@ -31,13 +31,13 @@ int LinearADRDiffusionG(  double  *f, /*!< Array to hold the computed diffusion 
                        )
 {
   HyPar     *solver = (HyPar*)     s;
-  LinearADR *param  = (LinearADR*) solver->physics;
+  LinearADR *param  = (LinearADR*) solver->m_physics;
   int       i, v;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -50,7 +50,7 @@ int LinearADRDiffusionG(  double  *f, /*!< Array to hold the computed diffusion 
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    for (v = 0; v < nvars; v++) f[nvars*p+v] = param->d[nvars*dir+v] * u[nvars*p+v];
+    for (v = 0; v < nvars; v++) f[nvars*p+v] = param->m_d[nvars*dir+v] * u[nvars*p+v];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 
@@ -80,13 +80,13 @@ int LinearADRDiffusionH(  double  *f,   /*!< Array to hold the computed diffusio
                         )
 {
   HyPar     *solver = (HyPar*)     s;
-  LinearADR *param  = (LinearADR*) solver->physics;
+  LinearADR *param  = (LinearADR*) solver->m_physics;
   int       i, v;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
   int index[ndims], bounds[ndims], offset[ndims];
 
   if (dir1 == dir2) {
@@ -103,11 +103,11 @@ int LinearADRDiffusionH(  double  *f,   /*!< Array to hold the computed diffusio
     int done = 0; _ArraySetValue_(index,ndims,0);
     while (!done) {
       int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-      for (v = 0; v < nvars; v++) f[nvars*p+v] = param->d[nvars*dir+v] * u[nvars*p+v];
+      for (v = 0; v < nvars; v++) f[nvars*p+v] = param->m_d[nvars*dir+v] * u[nvars*p+v];
       _ArrayIncrementIndex_(ndims,bounds,index,done);
     }
 
-  } else _ArraySetValue_(f,solver->npoints_local_wghosts*nvars,0.0);
+  } else _ArraySetValue_(f,solver->m_npoints_local_wghosts*nvars,0.0);
 
 
   return(0);

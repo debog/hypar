@@ -28,16 +28,16 @@ PetscErrorCode PetscPostStage(  TS        ts,         /*!< Time integrator of PE
     fprintf(stderr,"Error in PetscPreTimeStep: Null context!\n");
     return(1);
   }
-  SimulationObject* sim = (SimulationObject*) context->simobj;
-  int nsims = context->nsims;
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
+  int nsims = context->m_nsims;
 
   TSType time_scheme;
   TSGetType(ts,&time_scheme);
 
-  TSGetTimeStep(ts,&(context->dt));
-  context->stage_index = stageindex;
-  if (context->stage_times.size() == stageindex) {
-    context->stage_times.push_back(stagetime/context->dt);
+  TSGetTimeStep(ts,&(context->m_dt));
+  context->m_stage_index = stageindex;
+  if (context->m_stage_times.size() == stageindex) {
+    context->m_stage_times.push_back(stagetime/context->m_dt);
   }
 
   for (int ns = 0; ns < nsims; ns++) {
@@ -46,15 +46,15 @@ PetscErrorCode PetscPostStage(  TS        ts,         /*!< Time integrator of PE
     MPIVariables* mpi = &(sim[ns].mpi);
 
     /* get solution */
-    TransferVecFromPETSc(solver->u,Y[stageindex],context,ns,context->offsets[ns]);
+    TransferVecFromPETSc(solver->m_u,Y[stageindex],context,ns,context->m_offsets[ns]);
 
     /* apply immersed boundaries */
-    solver->ApplyIBConditions(solver,mpi,solver->u,stagetime);
+    solver->ApplyIBConditions(solver,mpi,solver->m_u,stagetime);
 
     /* If using a non-linear scheme with ARKIMEX methods,
        compute the non-linear finite-difference operator */
     if (!strcmp(time_scheme,TSARKIMEX)) {
-      solver->NonlinearInterp(  solver->u,
+      solver->NonlinearInterp(  solver->m_u,
                                 solver,
                                 mpi,
                                 (double)stagetime,
@@ -63,10 +63,10 @@ PetscErrorCode PetscPostStage(  TS        ts,         /*!< Time integrator of PE
 
     /* Call any physics-specific post-stage function, if available */
     if (solver->PostStage) {
-      solver->PostStage(solver->u,solver,mpi,stagetime);
+      solver->PostStage(solver->m_u,solver,mpi,stagetime);
     }
 
-    TransferVecToPETSc(solver->u,Y[stageindex],context,ns,context->offsets[ns]);
+    TransferVecToPETSc(solver->m_u,Y[stageindex],context,ns,context->m_offsets[ns]);
 
   }
 

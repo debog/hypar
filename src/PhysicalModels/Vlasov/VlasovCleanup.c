@@ -11,11 +11,11 @@ int VlasovCleanup(void *s /*!< Solver object of type #HyPar */)
 {
   Vlasov *physics = (Vlasov*) s;
 
-  free(physics->e_field);
-  free(physics->potential);
+  free(physics->m_e_field);
+  free(physics->m_potential);
 
 #ifdef fftw
-  if(physics->self_consistent_electric_field) {
+  if(physics->m_self_consistent_electric_field) {
     free(physics->sum_buffer);
 
     fftw_destroy_plan(physics->plan_forward_e);

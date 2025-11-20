@@ -84,7 +84,7 @@ int PlotArraySerial(int     a_ndims,      /*!< Number of spatial dimensions */
 
   /* root process: allocate global output arrays */
   double *ug, *xg;
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 
     size_global_u = 1;
     for (int d=0; d<a_ndims; d++) size_global_u *= a_dim_global[d];
@@ -116,31 +116,31 @@ int PlotArraySerial(int     a_ndims,      /*!< Number of spatial dimensions */
   offset_global = offset_local = 0;
   for (int d=0; d<a_ndims; d++) {
     MPIGatherArray1D( mpi,
-                      (mpi->rank?NULL:&xg[offset_global]),
+                      (mpi->m_rank?NULL:&xg[offset_global]),
                       &a_x[offset_local+a_ghosts],
-                      mpi->is[d],
-                      mpi->ie[d],
+                      mpi->m_is[d],
+                      mpi->m_ie[d],
                       a_dim_local[d],
                       0 );
     offset_global += a_dim_global[d];
     offset_local  += a_dim_local [d] + 2*a_ghosts;
   }
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 
     char filename[_MAX_STRING_SIZE_] = "";
     strcat(filename,a_fname_root);
-    if (!strcmp(solver->op_overwrite,"no")) {
+    if (!strcmp(solver->m_op_overwrite,"no")) {
       strcat(filename,"_");
-      strcat(filename,solver->filename_index);
+      strcat(filename,solver->m_filename_index);
     }
-    strcat(filename,solver->plotfilename_extn);
+    strcat(filename,solver->m_plotfilename_extn);
 
 #ifdef with_python
 #ifdef with_python_numpy
     import_array();
-    PyObject* py_plt_func = (PyObject*) solver->py_plt_func;
-    PyObject* py_plt_func_args = (PyObject*) solver->py_plt_func_args;
+    PyObject* py_plt_func = (PyObject*) solver->m_py_plt_func;
+    PyObject* py_plt_func_args = (PyObject*) solver->m_py_plt_func_args;
     py_plt_func_args = PyTuple_New(7);
     {
       PyObject* py_obj = Py_BuildValue("i", a_ndims);
@@ -174,7 +174,7 @@ int PlotArraySerial(int     a_ndims,      /*!< Number of spatial dimensions */
       PyTuple_SetItem(py_plt_func_args, 6, py_obj);
     }
     if (!py_plt_func) {
-      fprintf(stderr,"Error in PlotArraySerial(): solver->py_plt_func is NULL!\n");
+      fprintf(stderr,"Error in PlotArraySerial(): solver->m_py_plt_func is NULL!\n");
     } else {
       PyObject_CallObject(py_plt_func, py_plt_func_args);
     }

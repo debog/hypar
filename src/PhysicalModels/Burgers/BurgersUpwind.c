@@ -24,13 +24,13 @@ int BurgersUpwind(  double* fI,   /*!< Computed upwind interface flux */
                 )
 {
   HyPar   *solver = (HyPar*)   s;
-  Burgers *param  = (Burgers*) solver->physics;
+  Burgers *param  = (Burgers*) solver->m_physics;
   int     done,v;
 
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;

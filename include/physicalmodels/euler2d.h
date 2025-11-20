@@ -43,7 +43,7 @@
 
 #define _Euler2DGetFlowVar_(u,rho,vx,vy,e,P,p) \
   { \
-    double  gamma = p->gamma, vsq; \
+    double  gamma = p->m_gamma, vsq; \
     rho = u[0]; \
     vx  = u[1] / rho; \
     vy  = u[2] / rho; \
@@ -72,7 +72,7 @@
     double  rho ,vx, vy, e ,P ,H ,csq, vsq; \
     double  rhoL,vxL,vyL,eL,PL,HL,cLsq,vsqL; \
     double  rhoR,vxR,vyR,eR,PR,HR,cRsq,vsqR; \
-    double  gamma = p->gamma; \
+    double  gamma = p->m_gamma; \
     rhoL = uL[0]; \
     vxL  = uL[1] / rhoL; \
     vyL  = uL[2] / rhoL; \
@@ -107,7 +107,7 @@
 
 #define _Euler2DEigenvalues_(u,D,p,dir) \
   { \
-    double  gamma = p->gamma; \
+    double  gamma = p->m_gamma; \
     double  rho,vx,vy,e,P,c,vn,vsq; \
     rho = u[0]; \
     vx  = u[1] / rho; \
@@ -134,7 +134,7 @@
 
 #define _Euler2DLeftEigenvectors_(u,L,p,dir) \
   { \
-    double  ga = param->gamma, ga_minus_one=ga-1.0; \
+    double  ga = param->m_gamma, ga_minus_one=ga-1.0; \
     double  rho,vx,vy,e,P,a,un,ek,vsq; \
     double  nx = 0,ny = 0; \
     rho = u[0]; \
@@ -188,7 +188,7 @@
 
 #define _Euler2DRightEigenvectors_(u,R,p,dir) \
   { \
-    double  ga   = param->gamma, ga_minus_one = ga-1.0; \
+    double  ga   = param->m_gamma, ga_minus_one = ga-1.0; \
     double  rho,vx,vy,e,P,un,ek,a,h0,vsq; \
     double  nx = 0,ny = 0; \
     rho = u[0]; \
@@ -242,8 +242,8 @@
   }
 
 typedef struct euler2d_parameters {
-  double  gamma;  /* Ratio of heat capacities */
-  char    upw_choice[_MAX_STRING_SIZE_]; /* choice of upwinding */
+  double  m_gamma;  /* Ratio of heat capacities */
+  char    m_upw_choice[_MAX_STRING_SIZE_]; /* choice of upwinding */
 } Euler2D;
 
 int    Euler2DInitialize (void*,void*);

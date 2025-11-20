@@ -24,7 +24,7 @@
   + Stage 2: Elimination of the 1st row on each processor (except the 1st processor) using the
     last row of the previous processor.
   + Stage 3: Solution of the reduced tridiagonal system that represents the coupling of the
-    system across the processors, using blocktridiagIterJacobi() in this implementation.
+    system across the processors, using BlockTridiagIterJacobi() in this implementation.
   + Stage 4: Backward-solve to obtain the final solution
 
   Specific details of the method implemented here are available in:
@@ -104,7 +104,7 @@
   + The input array \a x contains the right-hand-side on entering the function, and the
     solution on exiting it.
 */
-int blocktridiagLU(
+int BlockTridiagLU(
                     double  *a, /*!< Array containing the sub-diagonal elements */
                     double  *b, /*!< Array containing the diagonal elements */
                     double  *c, /*!< Array containing the super-diagonal elements */
@@ -113,11 +113,11 @@ int blocktridiagLU(
                                      multiplied by the block size) */
                     int     ns, /*!< Number of systems to solve */
                     int     bs, /*!< Block size */
-                    void    *r, /*!< Object of type #TridiagLU (contains wall times at exit) */
+                    void    *r, /*!< Object of type #TridiagLU_Params (contains wall times at exit) */
                     void    *m  /*!< MPI communicator */
                   )
 {
-  TridiagLU       *params = (TridiagLU*) r;
+  TridiagLU_Params *params = (TridiagLU_Params *) r;
   int             d,i,j,istart,iend,size;
   int             rank,nproc,bs2=bs*bs,nsbs=ns*bs;
   struct timeval  start,stage1,stage2,stage3,stage4;
@@ -140,7 +140,7 @@ int blocktridiagLU(
 #endif
 
   if (!params) {
-    fprintf(stderr,"Error in tridiagLU(): NULL pointer passed for parameters.\n");
+    fprintf(stderr,"Error in TridiagLU(): NULL pointer passed for parameters.\n");
     return(1);
   }
 
@@ -245,14 +245,14 @@ int blocktridiagLU(
       for (i=0; i<bs; i++) eye[d*bs2+(i*bs+i)] = 1.0;
     }
 
-    if (!strcmp(params->reducedsolvetype,_TRIDIAG_GS_)) {
+    if (!strcmp(params->m_reducedsolvetype,_TRIDIAG_GS_)) {
       /* not supported */
-      fprintf(stderr,"Error in blocktridiagLU(): Gather-and-solve for reduced system not available.\n");
+      fprintf(stderr,"Error in BlockTridiagLU(): Gather-and-solve for reduced system not available.\n");
       return(1);
-    } else if (!strcmp(params->reducedsolvetype,_TRIDIAG_JACOBI_)) {
+    } else if (!strcmp(params->m_reducedsolvetype,_TRIDIAG_JACOBI_)) {
       /* Solving the reduced system iteratively with the Jacobi method */
-      if (rank) ierr = blocktridiagIterJacobi(a,b,c,x,1,ns,bs,params,comm);
-      else      ierr = blocktridiagIterJacobi(zero,eye,zero,zero,1,ns,bs,params,comm);
+      if (rank) ierr = BlockTridiagIterJacobi(a,b,c,x,1,ns,bs,params,comm);
+      else      ierr = BlockTridiagIterJacobi(zero,eye,zero,zero,1,ns,bs,params,comm);
     }
     free(zero);
     free(eye);
@@ -307,14 +307,14 @@ int blocktridiagLU(
   /* save runtimes if needed */
   long long walltime;
   walltime = ((stage1.tv_sec * 1000000 + stage1.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
-  params->stage1_time = (double) walltime / 1000000.0;
+  params->m_stage1_time = (double) walltime / 1000000.0;
   walltime = ((stage2.tv_sec * 1000000 + stage2.tv_usec) - (stage1.tv_sec * 1000000 + stage1.tv_usec));
-  params->stage2_time = (double) walltime / 1000000.0;
+  params->m_stage2_time = (double) walltime / 1000000.0;
   walltime = ((stage3.tv_sec * 1000000 + stage3.tv_usec) - (stage2.tv_sec * 1000000 + stage2.tv_usec));
-  params->stage3_time = (double) walltime / 1000000.0;
+  params->m_stage3_time = (double) walltime / 1000000.0;
   walltime = ((stage4.tv_sec * 1000000 + stage4.tv_usec) - (stage3.tv_sec * 1000000 + stage3.tv_usec));
-  params->stage4_time = (double) walltime / 1000000.0;
+  params->m_stage4_time = (double) walltime / 1000000.0;
   walltime = ((stage4.tv_sec * 1000000 + stage4.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
-  params->total_time = (double) walltime / 1000000.0;
+  params->m_total_time = (double) walltime / 1000000.0;
   return(0);
 }

@@ -19,11 +19,11 @@ int VlasovPreStep( double  *u,   /*!< Solution (conserved variables) */
                  )
 {
   HyPar  *solver = (HyPar*) s;
-  Vlasov *param  = (Vlasov*) solver->physics;
+  Vlasov *param  = (Vlasov*) solver->m_physics;
 
-  if (param->use_log_form) takeExp(u,solver->npoints_local_wghosts);
+  if (param->m_use_log_form) takeExp(u,solver->m_npoints_local_wghosts);
   int ierr = VlasovEField(u, solver, waqt);
-  if (param->use_log_form) takeLog(u,solver->npoints_local_wghosts);
+  if (param->m_use_log_form) takeLog(u,solver->m_npoints_local_wghosts);
   if (ierr) return ierr;
 
   return 0;
@@ -40,11 +40,11 @@ int VlasovPostStage( double  *u,   /*!< Solution (conserved variables) */
                    )
 {
   HyPar  *solver = (HyPar*) s;
-  Vlasov *param  = (Vlasov*) solver->physics;
+  Vlasov *param  = (Vlasov*) solver->m_physics;
 
-  if (param->use_log_form) takeExp(u,solver->npoints_local_wghosts);
+  if (param->m_use_log_form) takeExp(u,solver->m_npoints_local_wghosts);
   int ierr = VlasovEField(u, solver, waqt);
-  if (param->use_log_form) takeLog(u,solver->npoints_local_wghosts);
+  if (param->m_use_log_form) takeLog(u,solver->m_npoints_local_wghosts);
   if (ierr) return ierr;
 
   return 0;

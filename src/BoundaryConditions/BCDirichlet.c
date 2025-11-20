@@ -23,14 +23,14 @@ int BCDirichletU(
 {
   DomainBoundary *boundary = (DomainBoundary*) b;
 
-  if (boundary->on_this_proc) {
+  if (boundary->m_on_this_proc) {
     int bounds[ndims], indexb[ndims];
-    _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
+    _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
     _ArraySetValue_(indexb,ndims,0);
     int done = 0;
     while (!done) {
-      int p; _ArrayIndex1DWO_(ndims,size  ,indexb,boundary->is,ghosts,p);
-      _ArrayCopy1D_((boundary->DirichletValue),(phi+nvars*p),nvars);
+      int p; _ArrayIndex1DWO_(ndims,size  ,indexb,boundary->m_is,ghosts,p);
+      _ArrayCopy1D_((boundary->m_DirichletValue),(phi+nvars*p),nvars);
       _ArrayIncrementIndex_(ndims,bounds,indexb,done);
     }
   }

@@ -32,9 +32,9 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
     fprintf(stderr,"Error in PetscPreTimeStep: Null context!\n");
     return(1);
   }
-  gettimeofday(&(context->iter_start_time),NULL);
-  SimulationObject* sim = (SimulationObject*) context->simobj;
-  int nsims = context->nsims;
+  gettimeofday(&(context->m_iter_start_time),NULL);
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
+  int nsims = context->m_nsims;
 
   Vec Y;
   TSGetSolution(ts,&Y);
@@ -46,9 +46,9 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
   int iter;
   TSGetStepNumber(ts,&iter);
 
-  context->dt = dt;
-  context->waqt = waqt;
-  context->t_start = waqt;
+  context->m_dt = dt;
+  context->m_waqt = waqt;
+  context->m_t_start = waqt;
 
   TSType time_scheme;
   TSGetType(ts,&time_scheme);
@@ -59,34 +59,34 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
     MPIVariables* mpi = &(sim[ns].mpi);
 
     /* get solution */
-    TransferVecFromPETSc(solver->u,Y,context,ns,context->offsets[ns]);
+    TransferVecFromPETSc(solver->m_u,Y,context,ns,context->m_offsets[ns]);
 
     /* save a copy of the solution to compute norm at end of time step */
-    _ArrayCopy1D_(solver->u,solver->u0,(solver->npoints_local_wghosts*solver->nvars));
+    _ArrayCopy1D_(solver->m_u,solver->m_u0,(solver->m_npoints_local_wghosts*solver->m_nvars));
 
     /* apply boundary conditions and exchange data over MPI interfaces */
-    solver->ApplyBoundaryConditions(solver,mpi,solver->u,NULL,waqt);
-    solver->ApplyIBConditions(solver,mpi,solver->u,waqt);
-    MPIExchangeBoundariesnD(  solver->ndims,
-                              solver->nvars,
-                              solver->dim_local,
-                              solver->ghosts,
+    solver->ApplyBoundaryConditions(solver,mpi,solver->m_u,NULL,waqt);
+    solver->ApplyIBConditions(solver,mpi,solver->m_u,waqt);
+    MPIExchangeBoundariesnD(  solver->m_ndims,
+                              solver->m_nvars,
+                              solver->m_dim_local,
+                              solver->m_ghosts,
                               mpi,
-                              solver->u );
+                              solver->m_u );
 
     /* Call any physics-specific pre-step function */
-    if (solver->PreStep) solver->PreStep(solver->u,solver,mpi,waqt);
+    if (solver->PreStep) solver->PreStep(solver->m_u,solver,mpi,waqt);
 
     /* If using a non-linear scheme with ARKIMEX methods,
        compute the non-linear finite-difference operator */
     if (!strcmp(time_scheme,TSARKIMEX)) {
-      solver->NonlinearInterp(solver->u,solver,mpi,waqt,solver->FFunction);
+      solver->NonlinearInterp(solver->m_u,solver,mpi,waqt,solver->FFunction);
     }
 
     /* set the step boundary flux integral value to zero */
-    _ArraySetValue_(solver->StepBoundaryIntegral,2*solver->ndims*solver->nvars,0.0);
+    _ArraySetValue_(solver->m_step_boundary_integral,2*solver->m_ndims*solver->m_nvars,0.0);
 
-    TransferVecToPETSc(solver->u,Y,context,ns,context->offsets[ns]);
+    TransferVecToPETSc(solver->m_u,Y,context,ns,context->m_offsets[ns]);
 
   }
 
@@ -99,14 +99,14 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
     }
     OutputSolution(sim, nsims,waqt);
 #ifdef with_librom
-    context->op_times_arr.push_back(waqt);
+    context->m_op_times_arr.push_back(waqt);
 #endif
   }
 
 #ifdef with_librom
-  if (      (context->rom_mode == _ROM_MODE_TRAIN_)
-        &&  (iter%((libROMInterface*)context->rom_interface)->samplingFrequency() == 0)  ) {
-    ((libROMInterface*)context->rom_interface)->takeSample( sim, waqt );
+  if (      (context->m_rom_mode == _ROM_MODE_TRAIN_)
+        &&  (iter%((libROMInterface*)context->m_rom_interface)->samplingFrequency() == 0)  ) {
+    ((libROMInterface*)context->m_rom_interface)->takeSample( sim, waqt );
   }
 #endif
 

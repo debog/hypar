@@ -30,11 +30,11 @@ int Euler1DModifiedSolution(
                            )
 {
   HyPar         *solver = (HyPar*)         s;
-  Euler1D       *param  = (Euler1D*)       solver->physics;
+  Euler1D       *param  = (Euler1D*)       solver->m_physics;
 
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  int     ndims   = solver->ndims;
+  int     ghosts  = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -47,7 +47,7 @@ int Euler1DModifiedSolution(
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p); p *= _MODEL_NVARS_;
-    _ArrayScaleCopy1D_((u+p),(1.0/param->grav_field[p/_MODEL_NVARS_]),(uC+p),_MODEL_NVARS_);
+    _ArrayScaleCopy1D_((u+p),(1.0/param->m_grav_field[p/_MODEL_NVARS_]),(uC+p),_MODEL_NVARS_);
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
   return(0);

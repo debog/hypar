@@ -22,26 +22,26 @@ int Euler2DInitialize(void *s,void *m)
 {
   HyPar         *solver  = (HyPar*)          s;
   MPIVariables  *mpi     = (MPIVariables*)   m;
-  Euler2D       *physics = (Euler2D*) solver->physics;
+  Euler2D       *physics = (Euler2D*) solver->m_physics;
   int           ferr     = 0;
 
   static int count = 0;
 
-  if (solver->nvars != _MODEL_NVARS_) {
+  if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in Euler2DInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
     return(1);
   }
-  if (solver->ndims != _MODEL_NDIMS_) {
+  if (solver->m_ndims != _MODEL_NDIMS_) {
     fprintf(stderr,"Error in Euler2DInitialize(): ndims has to be %d.\n",_MODEL_NDIMS_);
     return(1);
   }
 
   /* default values */
-  physics->gamma = 1.4;
-  strcpy(physics->upw_choice,"roe");
+  physics->m_gamma = 1.4;
+  strcpy(physics->m_upw_choice,"roe");
 
   /* reading physical model specific inputs - all processes */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     FILE *in;
     if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
@@ -53,9 +53,9 @@ int Euler2DInitialize(void *s,void *m)
         while (strcmp(word, "end")){
           ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "gamma")) {
-            ferr = fscanf(in,"%lf",&physics->gamma); if (ferr != 1) return(1);
+            ferr = fscanf(in,"%lf",&physics->m_gamma); if (ferr != 1) return(1);
           } else if (!strcmp(word,"upwinding")) {
-            ferr = fscanf(in,"%s",physics->upw_choice); if (ferr != 1) return(1);
+            ferr = fscanf(in,"%s",physics->m_upw_choice); if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
             ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
@@ -72,12 +72,12 @@ int Euler2DInitialize(void *s,void *m)
   }
 
 #ifndef serial
-  IERR MPIBroadcast_double    (&physics->gamma,1,0,&mpi->world);                      CHECKERR(ierr);
-  IERR MPIBroadcast_character (physics->upw_choice,_MAX_STRING_SIZE_,0,&mpi->world);  CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_gamma,1,0,&mpi->m_world);                      CHECKERR(ierr);
+  IERR MPIBroadcast_character (physics->m_upw_choice,_MAX_STRING_SIZE_,0,&mpi->m_world);  CHECKERR(ierr);
 #endif
 
-  if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-    if (!mpi->rank) {
+  if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in Euler2DInitialize: This physical model does not have a splitting ");
       fprintf(stderr,"of the hyperbolic term defined.\n");
     }
@@ -87,13 +87,13 @@ int Euler2DInitialize(void *s,void *m)
   /* initializing physical model-specific functions */
   solver->ComputeCFL  = Euler2DComputeCFL;
   solver->FFunction   = Euler2DFlux;
-  if      (!strcmp(physics->upw_choice,_ROE_ )) solver->Upwind = Euler2DUpwindRoe;
-  else if (!strcmp(physics->upw_choice,_RF_  )) solver->Upwind = Euler2DUpwindRF;
-  else if (!strcmp(physics->upw_choice,_LLF_ )) solver->Upwind = Euler2DUpwindLLF;
-  else if (!strcmp(physics->upw_choice,_SWFS_)) solver->Upwind = Euler2DUpwindSWFS;
+  if      (!strcmp(physics->m_upw_choice,_ROE_ )) solver->Upwind = Euler2DUpwindRoe;
+  else if (!strcmp(physics->m_upw_choice,_RF_  )) solver->Upwind = Euler2DUpwindRF;
+  else if (!strcmp(physics->m_upw_choice,_LLF_ )) solver->Upwind = Euler2DUpwindLLF;
+  else if (!strcmp(physics->m_upw_choice,_SWFS_)) solver->Upwind = Euler2DUpwindSWFS;
   else {
     fprintf(stderr,"Error in Euler2DInitialize(): %s is not a valid upwinding scheme.\n",
-            physics->upw_choice);
+            physics->m_upw_choice);
     return(1);
   }
   solver->AveragingFunction     = Euler2DRoeAverage;
@@ -102,8 +102,8 @@ int Euler2DInitialize(void *s,void *m)
 
   /* set the value of gamma in all the boundary objects */
   int n;
-  DomainBoundary  *boundary = (DomainBoundary*) solver->boundary;
-  for (n = 0; n < solver->nBoundaryZones; n++)  boundary[n].gamma = physics->gamma;
+  DomainBoundary  *boundary = (DomainBoundary*) solver->m_boundary;
+  for (n = 0; n < solver->m_n_boundary_zones; n++)  boundary[n].m_gamma = physics->m_gamma;
 
   count++;
   return(0);

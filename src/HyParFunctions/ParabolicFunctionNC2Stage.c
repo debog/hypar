@@ -14,7 +14,7 @@
     \f{equation}{
       {\bf P}\left({\bf u}\right) = \sum_{d1=0}^{D-1}\sum_{d2=0}^{D-1} \frac {\partial^2 h_{d1,d2}\left(\bf u\right)} {\partial x_{d1} \partial x_{d2}},
     \f}
-    where \f$d1\f$ and \f$d2\f$ are spatial dimension indices, and \f$D\f$ is the total number of spatial dimensions (#HyPar::ndims). This term is
+    where \f$d1\f$ and \f$d2\f$ are spatial dimension indices, and \f$D\f$ is the total number of spatial dimensions (#HyPar::m_ndims). This term is
     discretized at a grid point as:
     \f{equation}{
       \left.{\bf P}\left({\bf u}\right)\right|_j = \sum_{d1=0}^{D-1} \sum_{d2=0}^{D-1} \frac { \mathcal{D}_{d1}\mathcal{D}_{d2} \left[ {\bf h}_{d1,d2} \right] } {\Delta x_{d1} \Delta x_{d2}},
@@ -32,7 +32,7 @@
       of \f$n\f$, the first derivative is also computed with a \f$n\f$-th order approximation.
 
     To use this form of the parabolic term:
-    + specify \b "par_space_type" in solver.inp as \b "nonconservative-2stage" (#HyPar::spatial_type_par).
+    + specify \b "par_space_type" in solver.inp as \b "nonconservative-2stage" (#HyPar::m_spatial_type_par).
     + the physical model must specify \f${\bf h}_{d1,d2}\left({\bf u}\right)\f$ through #HyPar::HFunction.
 
     \sa ParabolicFunctionNC1_5Stage()
@@ -47,24 +47,24 @@ int ParabolicFunctionNC2Stage(
 {
   HyPar         *solver = (HyPar*)        s;
   MPIVariables  *mpi    = (MPIVariables*) m;
-  double        *Func   = solver->fluxC;
-  double        *Deriv1 = solver->Deriv1;
-  double        *Deriv2 = solver->Deriv2;
+  double        *Func   = solver->m_flux_c;
+  double        *Deriv1 = solver->m_deriv1;
+  double        *Deriv2 = solver->m_deriv2;
   int           d, d1, d2, v, p, done;
   double        dxinv1, dxinv2;
   _DECLARE_IERR_;
 
-  int     ndims  = solver->ndims;
-  int     nvars  = solver->nvars;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
-  double  *dxinv = solver->dxinv;
-  int     size   = solver->npoints_local_wghosts;
+  int     ndims  = solver->m_ndims;
+  int     nvars  = solver->m_nvars;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
+  double  *dxinv = solver->m_dxinv;
+  int     size   = solver->m_npoints_local_wghosts;
 
   printf("HFunction is defined? = %p\n", solver->HFunction);
 
   if (!solver->HFunction) return(0); /* zero parabolic terms */
-  solver->count_par++;
+  solver->m_count_par++;
 
   int index[ndims];
   _ArraySetValue_(par,size*nvars,0.0);
@@ -91,6 +91,6 @@ int ParabolicFunctionNC2Stage(
     }
   }
 
-  if (solver->flag_ib) _ArrayBlockMultiply_(par,solver->iblank,size,nvars);
+  if (solver->m_flag_ib) _ArrayBlockMultiply_(par,solver->m_iblank,size,nvars);
   return(0);
 }

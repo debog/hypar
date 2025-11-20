@@ -9,13 +9,13 @@ double FPPowerSystemDissipationFunction(int,void*,double);
 int FPPowerSystemDiffusion(double *f,double *u,int dir,void *s,double t)
 {
   HyPar         *solver = (HyPar*)        s;
-  FPPowerSystem *params = (FPPowerSystem*) solver->physics;
+  FPPowerSystem *params = (FPPowerSystem*) solver->m_physics;
   int           i, v;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */

@@ -47,14 +47,14 @@ int WENOFifthOrderCalculateWeights(
                                   )
 {
   HyPar           *solver = (HyPar*)          s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
   MPIVariables    *mpi    = (MPIVariables*)   m;
 
   int ret;
 
-  if (weno->yc)           ret = WENOFifthOrderCalculateWeightsYC (fC,uC,x,dir,solver,mpi);
-  else if (weno->borges)  ret = WENOFifthOrderCalculateWeightsZ  (fC,uC,x,dir,solver,mpi);
-  else if (weno->mapped)  ret = WENOFifthOrderCalculateWeightsM  (fC,uC,x,dir,solver,mpi);
+  if (weno->m_yc)           ret = WENOFifthOrderCalculateWeightsYC (fC,uC,x,dir,solver,mpi);
+  else if (weno->m_borges)  ret = WENOFifthOrderCalculateWeightsZ  (fC,uC,x,dir,solver,mpi);
+  else if (weno->m_mapped)  ret = WENOFifthOrderCalculateWeightsM  (fC,uC,x,dir,solver,mpi);
   else                    ret = WENOFifthOrderCalculateWeightsJS (fC,uC,x,dir,solver,mpi);
 
   return ret;
@@ -73,12 +73,12 @@ int WENOFifthOrderCalculateWeightsChar(
                                       )
 {
   HyPar           *solver = (HyPar*)          s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
   MPIVariables    *mpi    = (MPIVariables*)   m;
 
-  if (weno->yc)           return(WENOFifthOrderCalculateWeightsCharYC (fC,uC,x,dir,solver,mpi));
-  else if (weno->borges)  return(WENOFifthOrderCalculateWeightsCharZ  (fC,uC,x,dir,solver,mpi));
-  else if (weno->mapped)  return(WENOFifthOrderCalculateWeightsCharM  (fC,uC,x,dir,solver,mpi));
+  if (weno->m_yc)           return(WENOFifthOrderCalculateWeightsCharYC (fC,uC,x,dir,solver,mpi));
+  else if (weno->m_borges)  return(WENOFifthOrderCalculateWeightsCharZ  (fC,uC,x,dir,solver,mpi));
+  else if (weno->m_mapped)  return(WENOFifthOrderCalculateWeightsCharM  (fC,uC,x,dir,solver,mpi));
   else                    return(WENOFifthOrderCalculateWeightsCharJS (fC,uC,x,dir,solver,mpi));
 }
 
@@ -118,24 +118,24 @@ int WENOFifthOrderCalculateWeightsJS(
                                     )
 {
   HyPar           *solver = (HyPar*)          s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
   MPIVariables    *mpi    = (MPIVariables*)   m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
-  int *stride= solver->stride_with_ghosts;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
+  int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
   static const double thirteen_by_twelve = 13.0/12.0;
   static const double one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
-  int offset = weno->offset[dir];
+  int offset = weno->m_offset[dir];
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -144,18 +144,18 @@ int WENOFifthOrderCalculateWeightsJS(
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
   int N_outer; _ArrayProduct1D_(bounds_outer,ndims,N_outer);
 
-  ww1LF = weno->w1 + offset;
-  ww2LF = weno->w2 + offset;
-  ww3LF = weno->w3 + offset;
-  ww1RF = weno->w1 + 2*weno->size + offset;
-  ww2RF = weno->w2 + 2*weno->size + offset;
-  ww3RF = weno->w3 + 2*weno->size + offset;
-  ww1LU = weno->w1 + weno->size + offset;
-  ww2LU = weno->w2 + weno->size + offset;
-  ww3LU = weno->w3 + weno->size + offset;
-  ww1RU = weno->w1 + 2*weno->size + weno->size + offset;
-  ww2RU = weno->w2 + 2*weno->size + weno->size + offset;
-  ww3RU = weno->w3 + 2*weno->size + weno->size + offset;
+  ww1LF = weno->m_w1 + offset;
+  ww2LF = weno->m_w2 + offset;
+  ww3LF = weno->m_w3 + offset;
+  ww1RF = weno->m_w1 + 2*weno->m_size + offset;
+  ww2RF = weno->m_w2 + 2*weno->m_size + offset;
+  ww3RF = weno->m_w3 + 2*weno->m_size + offset;
+  ww1LU = weno->m_w1 + weno->m_size + offset;
+  ww2LU = weno->m_w2 + weno->m_size + offset;
+  ww3LU = weno->m_w3 + weno->m_size + offset;
+  ww1RU = weno->m_w1 + 2*weno->m_size + weno->m_size + offset;
+  ww2RU = weno->m_w2 + 2*weno->m_size + weno->m_size + offset;
+  ww3RU = weno->m_w3 + 2*weno->m_size + weno->m_size + offset;
 #pragma omp parallel for schedule(auto) default(shared) private(i,index_outer,indexC,indexI)
   for (i=0; i<N_outer; i++) {
     _ArrayIndexnD_(ndims,i,bounds_outer,index_outer,0);
@@ -204,9 +204,9 @@ int WENOFifthOrderCalculateWeightsJS(
 
       /* optimal weights*/
       double c1, c2, c3;
-      if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-        if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-            || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+      if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+        if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
+            || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
           c1 = _WENO_OPTIMAL_WEIGHT_1_;
           c2 = _WENO_OPTIMAL_WEIGHT_2_;
@@ -225,10 +225,10 @@ int WENOFifthOrderCalculateWeightsJS(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
-      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
-      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
-      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
+      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -272,24 +272,24 @@ int WENOFifthOrderCalculateWeightsM(
                                    )
 {
   HyPar           *solver = (HyPar*)          s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
   MPIVariables    *mpi    = (MPIVariables*)   m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
-  int *stride= solver->stride_with_ghosts;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
+  int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
   static const double thirteen_by_twelve = 13.0/12.0;
   static const double one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
-  int offset = weno->offset[dir];
+  int offset = weno->m_offset[dir];
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -298,18 +298,18 @@ int WENOFifthOrderCalculateWeightsM(
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
   int N_outer; _ArrayProduct1D_(bounds_outer,ndims,N_outer);
 
-  ww1LF = weno->w1 + offset;
-  ww2LF = weno->w2 + offset;
-  ww3LF = weno->w3 + offset;
-  ww1RF = weno->w1 + 2*weno->size + offset;
-  ww2RF = weno->w2 + 2*weno->size + offset;
-  ww3RF = weno->w3 + 2*weno->size + offset;
-  ww1LU = weno->w1 + weno->size + offset;
-  ww2LU = weno->w2 + weno->size + offset;
-  ww3LU = weno->w3 + weno->size + offset;
-  ww1RU = weno->w1 + 2*weno->size + weno->size + offset;
-  ww2RU = weno->w2 + 2*weno->size + weno->size + offset;
-  ww3RU = weno->w3 + 2*weno->size + weno->size + offset;
+  ww1LF = weno->m_w1 + offset;
+  ww2LF = weno->m_w2 + offset;
+  ww3LF = weno->m_w3 + offset;
+  ww1RF = weno->m_w1 + 2*weno->m_size + offset;
+  ww2RF = weno->m_w2 + 2*weno->m_size + offset;
+  ww3RF = weno->m_w3 + 2*weno->m_size + offset;
+  ww1LU = weno->m_w1 + weno->m_size + offset;
+  ww2LU = weno->m_w2 + weno->m_size + offset;
+  ww3LU = weno->m_w3 + weno->m_size + offset;
+  ww1RU = weno->m_w1 + 2*weno->m_size + weno->m_size + offset;
+  ww2RU = weno->m_w2 + 2*weno->m_size + weno->m_size + offset;
+  ww3RU = weno->m_w3 + 2*weno->m_size + weno->m_size + offset;
 
 #if defined(CPU_STAT)
   clock_t startTime, endTime;
@@ -365,9 +365,9 @@ int WENOFifthOrderCalculateWeightsM(
 
       /* optimal weights*/
       double c1, c2, c3;
-      if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-        if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-            || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+      if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+        if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
+            || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
           c1 = _WENO_OPTIMAL_WEIGHT_1_;
           c2 = _WENO_OPTIMAL_WEIGHT_2_;
@@ -386,10 +386,10 @@ int WENOFifthOrderCalculateWeightsM(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
-      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
-      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
-      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
+      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -441,24 +441,24 @@ int WENOFifthOrderCalculateWeightsZ(
                                    )
 {
   HyPar           *solver = (HyPar*)          s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
   MPIVariables    *mpi    = (MPIVariables*)   m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
-  int *stride= solver->stride_with_ghosts;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
+  int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
   static const double thirteen_by_twelve = 13.0/12.0;
   static const double one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
-  int offset = weno->offset[dir];
+  int offset = weno->m_offset[dir];
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -467,18 +467,18 @@ int WENOFifthOrderCalculateWeightsZ(
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
   int N_outer; _ArrayProduct1D_(bounds_outer,ndims,N_outer);
 
-  ww1LF = weno->w1 + offset;
-  ww2LF = weno->w2 + offset;
-  ww3LF = weno->w3 + offset;
-  ww1RF = weno->w1 + 2*weno->size + offset;
-  ww2RF = weno->w2 + 2*weno->size + offset;
-  ww3RF = weno->w3 + 2*weno->size + offset;
-  ww1LU = weno->w1 + weno->size + offset;
-  ww2LU = weno->w2 + weno->size + offset;
-  ww3LU = weno->w3 + weno->size + offset;
-  ww1RU = weno->w1 + 2*weno->size + weno->size + offset;
-  ww2RU = weno->w2 + 2*weno->size + weno->size + offset;
-  ww3RU = weno->w3 + 2*weno->size + weno->size + offset;
+  ww1LF = weno->m_w1 + offset;
+  ww2LF = weno->m_w2 + offset;
+  ww3LF = weno->m_w3 + offset;
+  ww1RF = weno->m_w1 + 2*weno->m_size + offset;
+  ww2RF = weno->m_w2 + 2*weno->m_size + offset;
+  ww3RF = weno->m_w3 + 2*weno->m_size + offset;
+  ww1LU = weno->m_w1 + weno->m_size + offset;
+  ww2LU = weno->m_w2 + weno->m_size + offset;
+  ww3LU = weno->m_w3 + weno->m_size + offset;
+  ww1RU = weno->m_w1 + 2*weno->m_size + weno->m_size + offset;
+  ww2RU = weno->m_w2 + 2*weno->m_size + weno->m_size + offset;
+  ww3RU = weno->m_w3 + 2*weno->m_size + weno->m_size + offset;
 #pragma omp parallel for schedule(auto) default(shared) private(i,index_outer,indexC,indexI)
   for (i=0; i<N_outer; i++) {
     _ArrayIndexnD_(ndims,i,bounds_outer,index_outer,0);
@@ -527,9 +527,9 @@ int WENOFifthOrderCalculateWeightsZ(
 
       /* optimal weights*/
       double c1, c2, c3;
-      if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-        if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-            || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+      if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+        if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
+            || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
           c1 = _WENO_OPTIMAL_WEIGHT_1_;
           c2 = _WENO_OPTIMAL_WEIGHT_2_;
@@ -548,10 +548,10 @@ int WENOFifthOrderCalculateWeightsZ(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
-      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
-      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
-      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
+      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -597,24 +597,24 @@ int WENOFifthOrderCalculateWeightsYC(
                                     )
 {
   HyPar           *solver = (HyPar*)          s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
   MPIVariables    *mpi    = (MPIVariables*)   m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
-  int *stride= solver->stride_with_ghosts;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
+  int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
   static const double thirteen_by_twelve = 13.0/12.0;
   static const double one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
-  int offset = weno->offset[dir];
+  int offset = weno->m_offset[dir];
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -623,18 +623,18 @@ int WENOFifthOrderCalculateWeightsYC(
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
   int N_outer; _ArrayProduct1D_(bounds_outer,ndims,N_outer);
 
-  ww1LF = weno->w1 + offset;
-  ww2LF = weno->w2 + offset;
-  ww3LF = weno->w3 + offset;
-  ww1RF = weno->w1 + 2*weno->size + offset;
-  ww2RF = weno->w2 + 2*weno->size + offset;
-  ww3RF = weno->w3 + 2*weno->size + offset;
-  ww1LU = weno->w1 + weno->size + offset;
-  ww2LU = weno->w2 + weno->size + offset;
-  ww3LU = weno->w3 + weno->size + offset;
-  ww1RU = weno->w1 + 2*weno->size + weno->size + offset;
-  ww2RU = weno->w2 + 2*weno->size + weno->size + offset;
-  ww3RU = weno->w3 + 2*weno->size + weno->size + offset;
+  ww1LF = weno->m_w1 + offset;
+  ww2LF = weno->m_w2 + offset;
+  ww3LF = weno->m_w3 + offset;
+  ww1RF = weno->m_w1 + 2*weno->m_size + offset;
+  ww2RF = weno->m_w2 + 2*weno->m_size + offset;
+  ww3RF = weno->m_w3 + 2*weno->m_size + offset;
+  ww1LU = weno->m_w1 + weno->m_size + offset;
+  ww2LU = weno->m_w2 + weno->m_size + offset;
+  ww3LU = weno->m_w3 + weno->m_size + offset;
+  ww1RU = weno->m_w1 + 2*weno->m_size + weno->m_size + offset;
+  ww2RU = weno->m_w2 + 2*weno->m_size + weno->m_size + offset;
+  ww3RU = weno->m_w3 + 2*weno->m_size + weno->m_size + offset;
 
 #if defined(CPU_STAT)
   clock_t cpu_start, cpu_end;
@@ -689,9 +689,9 @@ int WENOFifthOrderCalculateWeightsYC(
 
       /* optimal weights*/
       double c1, c2, c3;
-      if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-        if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-            || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+      if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+        if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
+            || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
           c1 = _WENO_OPTIMAL_WEIGHT_1_;
           c2 = _WENO_OPTIMAL_WEIGHT_2_;
@@ -710,10 +710,10 @@ int WENOFifthOrderCalculateWeightsYC(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
-      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
-      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
-      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
+      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -767,24 +767,24 @@ int WENOFifthOrderCalculateWeightsCharJS(
                                         )
 {
   HyPar           *solver = (HyPar*)          s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
   MPIVariables    *mpi    = (MPIVariables*)   m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
-  int *stride= solver->stride_with_ghosts;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
+  int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
   static const double thirteen_by_twelve = 13.0/12.0;
   static const double one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
-  int offset = weno->offset[dir];
+  int offset = weno->m_offset[dir];
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -796,18 +796,18 @@ int WENOFifthOrderCalculateWeightsCharJS(
   /* allocate arrays for the averaged state, eigenvectors and characteristic interpolated f */
   double L[nvars*nvars], uavg[nvars];
 
-  ww1LF = weno->w1 + offset;
-  ww2LF = weno->w2 + offset;
-  ww3LF = weno->w3 + offset;
-  ww1RF = weno->w1 + 2*weno->size + offset;
-  ww2RF = weno->w2 + 2*weno->size + offset;
-  ww3RF = weno->w3 + 2*weno->size + offset;
-  ww1LU = weno->w1 + weno->size + offset;
-  ww2LU = weno->w2 + weno->size + offset;
-  ww3LU = weno->w3 + weno->size + offset;
-  ww1RU = weno->w1 + 2*weno->size + weno->size + offset;
-  ww2RU = weno->w2 + 2*weno->size + weno->size + offset;
-  ww3RU = weno->w3 + 2*weno->size + weno->size + offset;
+  ww1LF = weno->m_w1 + offset;
+  ww2LF = weno->m_w2 + offset;
+  ww3LF = weno->m_w3 + offset;
+  ww1RF = weno->m_w1 + 2*weno->m_size + offset;
+  ww2RF = weno->m_w2 + 2*weno->m_size + offset;
+  ww3RF = weno->m_w3 + 2*weno->m_size + offset;
+  ww1LU = weno->m_w1 + weno->m_size + offset;
+  ww2LU = weno->m_w2 + weno->m_size + offset;
+  ww3LU = weno->m_w3 + weno->m_size + offset;
+  ww1RU = weno->m_w1 + 2*weno->m_size + weno->m_size + offset;
+  ww2RU = weno->m_w2 + 2*weno->m_size + weno->m_size + offset;
+  ww3RU = weno->m_w3 + 2*weno->m_size + weno->m_size + offset;
 #pragma omp parallel for schedule(auto) default(shared) private(i,index_outer,indexC,indexI)
   for (i=0; i<N_outer; i++) {
     _ArrayIndexnD_(ndims,i,bounds_outer,index_outer,0);
@@ -829,8 +829,8 @@ int WENOFifthOrderCalculateWeightsCharJS(
       qp2R = qm1R - 2*stride[dir];
 
       /* find averaged state and left eigenvectors at this interface */
-      IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->physics); CHECKERR(ierr);
-      IERR solver->GetLeftEigenvectors(uavg,L,solver->physics,dir); CHECKERR(ierr);
+      IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->m_physics); CHECKERR(ierr);
+      IERR solver->GetLeftEigenvectors(uavg,L,solver->m_physics,dir); CHECKERR(ierr);
 
       /* Defining stencil points */
       double m3LF[nvars], m2LF[nvars], m1LF[nvars], p1LF[nvars], p2LF[nvars];
@@ -864,9 +864,9 @@ int WENOFifthOrderCalculateWeightsCharJS(
 
       /* optimal weights*/
       double c1, c2, c3;
-      if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-        if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-            || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+      if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+        if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
+            || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
           c1 = _WENO_OPTIMAL_WEIGHT_1_;
           c2 = _WENO_OPTIMAL_WEIGHT_2_;
@@ -885,10 +885,10 @@ int WENOFifthOrderCalculateWeightsCharJS(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
-      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
-      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
-      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
+      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -937,24 +937,24 @@ int WENOFifthOrderCalculateWeightsCharM(
                                        )
 {
   HyPar           *solver = (HyPar*)          s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
   MPIVariables    *mpi    = (MPIVariables*)   m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
-  int *stride= solver->stride_with_ghosts;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
+  int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
   static const double thirteen_by_twelve = 13.0/12.0;
   static const double one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
-  int offset = weno->offset[dir];
+  int offset = weno->m_offset[dir];
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -966,18 +966,18 @@ int WENOFifthOrderCalculateWeightsCharM(
   /* allocate arrays for the averaged state, eigenvectors and characteristic interpolated f */
   double L[nvars*nvars], uavg[nvars];
 
-  ww1LF = weno->w1 + offset;
-  ww2LF = weno->w2 + offset;
-  ww3LF = weno->w3 + offset;
-  ww1RF = weno->w1 + 2*weno->size + offset;
-  ww2RF = weno->w2 + 2*weno->size + offset;
-  ww3RF = weno->w3 + 2*weno->size + offset;
-  ww1LU = weno->w1 + weno->size + offset;
-  ww2LU = weno->w2 + weno->size + offset;
-  ww3LU = weno->w3 + weno->size + offset;
-  ww1RU = weno->w1 + 2*weno->size + weno->size + offset;
-  ww2RU = weno->w2 + 2*weno->size + weno->size + offset;
-  ww3RU = weno->w3 + 2*weno->size + weno->size + offset;
+  ww1LF = weno->m_w1 + offset;
+  ww2LF = weno->m_w2 + offset;
+  ww3LF = weno->m_w3 + offset;
+  ww1RF = weno->m_w1 + 2*weno->m_size + offset;
+  ww2RF = weno->m_w2 + 2*weno->m_size + offset;
+  ww3RF = weno->m_w3 + 2*weno->m_size + offset;
+  ww1LU = weno->m_w1 + weno->m_size + offset;
+  ww2LU = weno->m_w2 + weno->m_size + offset;
+  ww3LU = weno->m_w3 + weno->m_size + offset;
+  ww1RU = weno->m_w1 + 2*weno->m_size + weno->m_size + offset;
+  ww2RU = weno->m_w2 + 2*weno->m_size + weno->m_size + offset;
+  ww3RU = weno->m_w3 + 2*weno->m_size + weno->m_size + offset;
 #pragma omp parallel for schedule(auto) default(shared) private(i,index_outer,indexC,indexI)
   for (i=0; i<N_outer; i++) {
     _ArrayIndexnD_(ndims,i,bounds_outer,index_outer,0);
@@ -999,8 +999,8 @@ int WENOFifthOrderCalculateWeightsCharM(
       qp2R = qm1R - 2*stride[dir];
 
       /* find averaged state and left eigenvectors at this interface */
-      IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->physics); CHECKERR(ierr);
-      IERR solver->GetLeftEigenvectors(uavg,L,solver->physics,dir); CHECKERR(ierr);
+      IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->m_physics); CHECKERR(ierr);
+      IERR solver->GetLeftEigenvectors(uavg,L,solver->m_physics,dir); CHECKERR(ierr);
 
       /* Defining stencil points */
       double m3LF[nvars], m2LF[nvars], m1LF[nvars], p1LF[nvars], p2LF[nvars];
@@ -1034,9 +1034,9 @@ int WENOFifthOrderCalculateWeightsCharM(
 
       /* optimal weights*/
       double c1, c2, c3;
-      if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-        if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-            || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+      if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+        if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
+            || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
           c1 = _WENO_OPTIMAL_WEIGHT_1_;
           c2 = _WENO_OPTIMAL_WEIGHT_2_;
@@ -1055,10 +1055,10 @@ int WENOFifthOrderCalculateWeightsCharM(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
-      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
-      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
-      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
+      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -1108,24 +1108,24 @@ int WENOFifthOrderCalculateWeightsCharZ(
                                        )
 {
   HyPar           *solver = (HyPar*)          s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
   MPIVariables    *mpi    = (MPIVariables*)   m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
-  int *stride= solver->stride_with_ghosts;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
+  int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
   static const double thirteen_by_twelve = 13.0/12.0;
   static const double one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
-  int offset = weno->offset[dir];
+  int offset = weno->m_offset[dir];
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -1137,18 +1137,18 @@ int WENOFifthOrderCalculateWeightsCharZ(
   /* allocate arrays for the averaged state, eigenvectors and characteristic interpolated f */
   double L[nvars*nvars], uavg[nvars];
 
-  ww1LF = weno->w1 + offset;
-  ww2LF = weno->w2 + offset;
-  ww3LF = weno->w3 + offset;
-  ww1RF = weno->w1 + 2*weno->size + offset;
-  ww2RF = weno->w2 + 2*weno->size + offset;
-  ww3RF = weno->w3 + 2*weno->size + offset;
-  ww1LU = weno->w1 + weno->size + offset;
-  ww2LU = weno->w2 + weno->size + offset;
-  ww3LU = weno->w3 + weno->size + offset;
-  ww1RU = weno->w1 + 2*weno->size + weno->size + offset;
-  ww2RU = weno->w2 + 2*weno->size + weno->size + offset;
-  ww3RU = weno->w3 + 2*weno->size + weno->size + offset;
+  ww1LF = weno->m_w1 + offset;
+  ww2LF = weno->m_w2 + offset;
+  ww3LF = weno->m_w3 + offset;
+  ww1RF = weno->m_w1 + 2*weno->m_size + offset;
+  ww2RF = weno->m_w2 + 2*weno->m_size + offset;
+  ww3RF = weno->m_w3 + 2*weno->m_size + offset;
+  ww1LU = weno->m_w1 + weno->m_size + offset;
+  ww2LU = weno->m_w2 + weno->m_size + offset;
+  ww3LU = weno->m_w3 + weno->m_size + offset;
+  ww1RU = weno->m_w1 + 2*weno->m_size + weno->m_size + offset;
+  ww2RU = weno->m_w2 + 2*weno->m_size + weno->m_size + offset;
+  ww3RU = weno->m_w3 + 2*weno->m_size + weno->m_size + offset;
 #pragma omp parallel for schedule(auto) default(shared) private(i,index_outer,indexC,indexI)
   for (i=0; i<N_outer; i++) {
     _ArrayIndexnD_(ndims,i,bounds_outer,index_outer,0);
@@ -1170,8 +1170,8 @@ int WENOFifthOrderCalculateWeightsCharZ(
       qp2R = qm1R - 2*stride[dir];
 
       /* find averaged state and left eigenvectors at this interface */
-      IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->physics); CHECKERR(ierr);
-      IERR solver->GetLeftEigenvectors(uavg,L,solver->physics,dir); CHECKERR(ierr);
+      IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->m_physics); CHECKERR(ierr);
+      IERR solver->GetLeftEigenvectors(uavg,L,solver->m_physics,dir); CHECKERR(ierr);
 
       /* Defining stencil points */
       double m3LF[nvars], m2LF[nvars], m1LF[nvars], p1LF[nvars], p2LF[nvars];
@@ -1205,9 +1205,9 @@ int WENOFifthOrderCalculateWeightsCharZ(
 
       /* optimal weights*/
       double c1, c2, c3;
-      if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-        if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-            || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+      if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+        if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
+            || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
           c1 = _WENO_OPTIMAL_WEIGHT_1_;
           c2 = _WENO_OPTIMAL_WEIGHT_2_;
@@ -1226,10 +1226,10 @@ int WENOFifthOrderCalculateWeightsCharZ(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
-      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
-      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
-      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
+      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -1279,24 +1279,24 @@ int WENOFifthOrderCalculateWeightsCharYC(
                                         )
 {
   HyPar           *solver = (HyPar*)          s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
   MPIVariables    *mpi    = (MPIVariables*)   m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
-  int *stride= solver->stride_with_ghosts;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
+  int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
   static const double thirteen_by_twelve = 13.0/12.0;
   static const double one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
-  int offset = weno->offset[dir];
+  int offset = weno->m_offset[dir];
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -1308,18 +1308,18 @@ int WENOFifthOrderCalculateWeightsCharYC(
   /* allocate arrays for the averaged state, eigenvectors and characteristic interpolated f */
   double L[nvars*nvars], uavg[nvars];
 
-  ww1LF = weno->w1 + offset;
-  ww2LF = weno->w2 + offset;
-  ww3LF = weno->w3 + offset;
-  ww1RF = weno->w1 + 2*weno->size + offset;
-  ww2RF = weno->w2 + 2*weno->size + offset;
-  ww3RF = weno->w3 + 2*weno->size + offset;
-  ww1LU = weno->w1 + weno->size + offset;
-  ww2LU = weno->w2 + weno->size + offset;
-  ww3LU = weno->w3 + weno->size + offset;
-  ww1RU = weno->w1 + 2*weno->size + weno->size + offset;
-  ww2RU = weno->w2 + 2*weno->size + weno->size + offset;
-  ww3RU = weno->w3 + 2*weno->size + weno->size + offset;
+  ww1LF = weno->m_w1 + offset;
+  ww2LF = weno->m_w2 + offset;
+  ww3LF = weno->m_w3 + offset;
+  ww1RF = weno->m_w1 + 2*weno->m_size + offset;
+  ww2RF = weno->m_w2 + 2*weno->m_size + offset;
+  ww3RF = weno->m_w3 + 2*weno->m_size + offset;
+  ww1LU = weno->m_w1 + weno->m_size + offset;
+  ww2LU = weno->m_w2 + weno->m_size + offset;
+  ww3LU = weno->m_w3 + weno->m_size + offset;
+  ww1RU = weno->m_w1 + 2*weno->m_size + weno->m_size + offset;
+  ww2RU = weno->m_w2 + 2*weno->m_size + weno->m_size + offset;
+  ww3RU = weno->m_w3 + 2*weno->m_size + weno->m_size + offset;
 #pragma omp parallel for schedule(auto) default(shared) private(i,index_outer,indexC,indexI)
   for (i=0; i<N_outer; i++) {
     _ArrayIndexnD_(ndims,i,bounds_outer,index_outer,0);
@@ -1341,8 +1341,8 @@ int WENOFifthOrderCalculateWeightsCharYC(
       qp2R = qm1R - 2*stride[dir];
 
       /* find averaged state and left eigenvectors at this interface */
-      IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->physics); CHECKERR(ierr);
-      IERR solver->GetLeftEigenvectors(uavg,L,solver->physics,dir); CHECKERR(ierr);
+      IERR solver->AveragingFunction(uavg,(uC+nvars*qm1L),(uC+nvars*qp1L),solver->m_physics); CHECKERR(ierr);
+      IERR solver->GetLeftEigenvectors(uavg,L,solver->m_physics,dir); CHECKERR(ierr);
 
       /* Defining stencil points */
       double m3LF[nvars], m2LF[nvars], m1LF[nvars], p1LF[nvars], p2LF[nvars];
@@ -1376,9 +1376,9 @@ int WENOFifthOrderCalculateWeightsCharYC(
 
       /* optimal weights*/
       double c1, c2, c3;
-      if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-        if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-            || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+      if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+        if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
+            || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
           c1 = _WENO_OPTIMAL_WEIGHT_1_;
           c2 = _WENO_OPTIMAL_WEIGHT_2_;
@@ -1397,10 +1397,10 @@ int WENOFifthOrderCalculateWeightsCharYC(
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->eps,nvars);
-      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->eps,nvars);
-      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->eps,nvars);
-      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->eps,nvars);
+      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 

@@ -52,9 +52,9 @@ int MPIExchangeBoundariesnD(
   MPIVariables  *mpi = (MPIVariables*) m;
   int           d;
 
-  int *ip     = mpi->ip;
-  int *iproc  = mpi->iproc;
-  int *bcflag = mpi->bcperiodic;
+  int *ip     = mpi->m_ip;
+  int *iproc  = mpi->m_iproc;
+  int *bcflag = mpi->m_bcperiodic;
 
   int neighbor_rank[2*ndims], nip[ndims], index[ndims], bounds[ndims], offset[ndims];
   MPI_Request rcvreq[2*ndims], sndreq[2*ndims];
@@ -76,9 +76,9 @@ int MPIExchangeBoundariesnD(
   }
 
   /* calculate dimensions of each of the send-receive regions */
-  double *sendbuf = mpi->sendbuf;
-  double *recvbuf = mpi->recvbuf;
-  int    stride   = mpi->maxbuf;
+  double *sendbuf = mpi->m_sendbuf;
+  double *recvbuf = mpi->m_recvbuf;
+  int    stride   = mpi->m_maxbuf;
   int    bufdim[ndims];
   for (d = 0; d < ndims; d++) {
     bufdim[d] = 1;
@@ -93,11 +93,11 @@ int MPIExchangeBoundariesnD(
   for (d = 0; d < ndims; d++) {
     if (neighbor_rank[2*d  ] != -1) {
       MPI_Irecv(&recvbuf[2*d*stride],bufdim[d]*nvars,MPI_DOUBLE,neighbor_rank[2*d  ],1630,
-                mpi->world,&rcvreq[2*d]);
+                mpi->m_world,&rcvreq[2*d]);
     }
     if (neighbor_rank[2*d+1] != -1) {
       MPI_Irecv(&recvbuf[(2*d+1)*stride],bufdim[d]*nvars,MPI_DOUBLE,neighbor_rank[2*d+1],1631,
-                mpi->world,&rcvreq[2*d+1]);
+                mpi->m_world,&rcvreq[2*d+1]);
     }
   }
 
@@ -130,11 +130,11 @@ int MPIExchangeBoundariesnD(
   for (d = 0; d < ndims; d++) {
     if (neighbor_rank[2*d  ] != -1) {
       MPI_Isend(&sendbuf[2*d*stride],bufdim[d]*nvars,MPI_DOUBLE,neighbor_rank[2*d  ],1631,
-                mpi->world,&sndreq[2*d]);
+                mpi->m_world,&sndreq[2*d]);
     }
     if (neighbor_rank[2*d+1] != -1) {
       MPI_Isend(&sendbuf[(2*d+1)*stride],bufdim[d]*nvars,MPI_DOUBLE,neighbor_rank[2*d+1],1630,
-                mpi->world,&sndreq[2*d+1]);
+                mpi->m_world,&sndreq[2*d+1]);
     }
   }
 

@@ -5,21 +5,21 @@
 double FPDoubleWellComputeDiffNumber(void *s,void *m,double dt,double t)
 {
   HyPar         *solver = (HyPar*)        s;
-  FPDoubleWell  *params = (FPDoubleWell*) solver->physics;
+  FPDoubleWell  *params = (FPDoubleWell*) solver->m_physics;
   int           d, i, v;
 
-  int     ndims  = solver->ndims;
-  int     nvars  = solver->nvars;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
-  double  *dxinv = solver->dxinv;
+  int     ndims  = solver->m_ndims;
+  int     nvars  = solver->m_nvars;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
+  double  *dxinv = solver->m_dxinv;
 
   int     offset  = 0;
   double  max_diffno = 0;
   for (d = 0; d < ndims; d++) {
     for (i = 0; i < dim[d]; i++) {
       for (v = 0; v < nvars; v++) {
-        double local_diffno =   0.5 * params->q * dt
+        double local_diffno =   0.5 * params->m_q * dt
                               * dxinv[offset+ghosts+i]
                               * dxinv[offset+ghosts+i];
         if (local_diffno > max_diffno) max_diffno = local_diffno;

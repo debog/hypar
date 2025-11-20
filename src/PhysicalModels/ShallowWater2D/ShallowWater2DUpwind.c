@@ -41,12 +41,12 @@ int ShallowWater2DUpwindRoe(
                            )
 {
   HyPar           *solver = (HyPar*) s;
-  ShallowWater2D  *param  = (ShallowWater2D*) solver->physics;
+  ShallowWater2D  *param  = (ShallowWater2D*) solver->m_physics;
   int             done,k;
 
-  int ndims = solver->ndims;
-  int ghosts= solver->ghosts;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int ghosts= solver->m_ghosts;
+  int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
@@ -128,12 +128,12 @@ int ShallowWater2DUpwindLLF(
                            )
 {
   HyPar           *solver = (HyPar*) s;
-  ShallowWater2D  *param  = (ShallowWater2D*) solver->physics;
+  ShallowWater2D  *param  = (ShallowWater2D*) solver->m_physics;
   int             done,k;
 
-  int ndims   = solver->ndims;
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
+  int ndims   = solver->m_ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;

@@ -136,10 +136,10 @@ static int SetBoundaryPoints(
 
           }
           if (flag) {
-            boundary[count].i = i;
-            boundary[count].j = j;
-            boundary[count].k = k;
-            boundary[count].p = p;
+            boundary[count].m_i = i;
+            boundary[count].m_j = j;
+            boundary[count].m_k = k;
+            boundary[count].m_p = p;
             count++;
           }
         }
@@ -166,21 +166,21 @@ int IBIdentifyBoundary(
 {
   ImmersedBoundary  *IB     = (ImmersedBoundary*) ib;
   MPIVariables      *mpi    = (MPIVariables*) m;
-  Body3D            *body   = IB->body;
+  Body3D            *body   = IB->m_body;
 
   int imax = dim_l[0],
       jmax = dim_l[1],
       kmax = dim_l[2];
 
   int n_boundary_nodes = CountBoundaryPoints(imax,jmax,kmax,ghosts,blank);
-  IB->n_boundary_nodes = n_boundary_nodes;
-  if (n_boundary_nodes == 0) IB->boundary = NULL;
+  IB->m_n_boundary_nodes = n_boundary_nodes;
+  if (n_boundary_nodes == 0) IB->m_boundary = NULL;
   else {
-    IB->boundary = (IBNode*) calloc (n_boundary_nodes, sizeof(IBNode));
-    int check = SetBoundaryPoints(imax,jmax,kmax,ghosts,blank,IB->boundary);
+    IB->m_boundary = (IBNode*) calloc (n_boundary_nodes, sizeof(IBNode));
+    int check = SetBoundaryPoints(imax,jmax,kmax,ghosts,blank,IB->m_boundary);
     if (check != n_boundary_nodes) {
       fprintf(stderr,"Error in IBIdentifyBoundary(): Inconsistency encountered when setting boundary indices. ");
-      fprintf(stderr,"on rank %d.\n",mpi->rank);
+      fprintf(stderr,"on rank %d.\n",mpi->m_rank);
       fprintf(stderr,"SetBoundaryPoints() returned %d, while n_boundary_nodes is %d.\n",check,n_boundary_nodes);
     }
   }

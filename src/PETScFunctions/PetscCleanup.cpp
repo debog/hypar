@@ -12,15 +12,15 @@
 int PetscCleanup(void *obj /*!< Object of type #PETScContext */)
 {
   PETScContext *ctxt = (PETScContext*) obj;
-  for (int i = 0; i < ctxt->globalDOF.size(); i++) {
-    free(ctxt->globalDOF[i]);
+  for (int i = 0; i < ctxt->m_globalDOF.size(); i++) {
+    free(ctxt->m_globalDOF[i]);
   }
-  ctxt->globalDOF.clear();
-  for (int i = 0; i < ctxt->points.size(); i++) {
-    free(ctxt->points[i]);
+  ctxt->m_globalDOF.clear();
+  for (int i = 0; i < ctxt->m_points.size(); i++) {
+    free(ctxt->m_points[i]);
   }
-  ctxt->points.clear();
-  if (ctxt->offsets) free(ctxt->offsets);
+  ctxt->m_points.clear();
+  if (ctxt->m_offsets) free(ctxt->m_offsets);
   return(0);
 }
 

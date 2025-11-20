@@ -105,8 +105,8 @@ class SparseGridsSimulation : public Simulation
       if (m_nsims_sg > 0) {
         m_is_periodic.resize(m_ndims);
         for (int d=0; d<m_ndims; d++) {
-          m_is_periodic[d] = ( m_sims_sg[0].solver.isPeriodic[d] == 1 ? true : false);
-          m_sim_fg->solver.isPeriodic[d] = m_sims_sg[0].solver.isPeriodic[d];
+          m_is_periodic[d] = ( m_sims_sg[0].solver.m_is_periodic[d] == 1 ? true : false);
+          m_sim_fg->solver.m_is_periodic[d] = m_sims_sg[0].solver.m_is_periodic[d];
         }
       }
       return retval;
@@ -135,11 +135,11 @@ class SparseGridsSimulation : public Simulation
         int retval = ::InitializePhysicsData( (void*) &(m_sims_sg[ns]),
                                               -1,
                                               m_nsims_sg,
-                                              m_sim_fg->solver.dim_global);
+                                              m_sim_fg->solver.m_dim_global);
         if (retval) {
           fprintf(stderr, "Error in SparseGridsSimulation::InitializePhysicsData()\n");
           fprintf(stderr, "  InitializePhysicsData returned with error code %d on rank %d.\n",
-                  retval, m_sims_sg[ns].mpi.rank);
+                  retval, m_sims_sg[ns].mpi.m_rank);
           return retval;
         }
       }
@@ -155,11 +155,11 @@ class SparseGridsSimulation : public Simulation
 
       /* some modifications to output filename roots */
       for (int i=0; i<m_nsims_sg; i++) {
-        strcpy(m_sims_sg[i].solver.op_fname_root, "op_sg");
-        strcpy(m_sims_sg[i].solver.aux_op_fname_root, "ts0_sg");
+        strcpy(m_sims_sg[i].solver.m_op_fname_root, "op_sg");
+        strcpy(m_sims_sg[i].solver.m_aux_op_fname_root, "ts0_sg");
       }
-      strcpy(m_sim_fg->solver.op_fname_root, "op_fg");
-      strcpy(m_sim_fg->solver.aux_op_fname_root, "ts0_fg");
+      strcpy(m_sim_fg->solver.m_op_fname_root, "op_fg");
+      strcpy(m_sim_fg->solver.m_aux_op_fname_root, "ts0_fg");
       return retval;
     }
 
@@ -193,7 +193,7 @@ class SparseGridsSimulation : public Simulation
     /*! Set flag whether to use PETSc time integration */
     inline void usePetscTS(PetscBool a_flag)
     {
-      m_sim_fg->solver.use_petscTS = a_flag;
+      m_sim_fg->solver.m_use_petsc_ts = a_flag;
     }
 
     /*! Run the simulation using PETSc time integrators */
@@ -302,7 +302,7 @@ class SparseGridsSimulation : public Simulation
                        int );
 
     /*! Fill ghost cells for interpolation */
-    void fillGhostCells(  const GridDimensions&,
+    void FillGhostCells(  const GridDimensions&,
                           const int,
                           double* const,
                           const int );

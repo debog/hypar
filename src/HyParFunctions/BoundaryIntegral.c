@@ -22,10 +22,10 @@ int BoundaryIntegral(
   HyPar         *solver = (HyPar*)        s;
   MPIVariables  *mpi    = (MPIVariables*) m;
 
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
   int d,v,k;
 
   double *local_integral  = (double*) calloc (nvars,sizeof(double));
@@ -38,21 +38,21 @@ int BoundaryIntegral(
       double dxinv[ndims], dS = 1.0;
       for (k=0; k<ndims; k++) {
         /* uniform grid assumed */
-        _GetCoordinate_(k,dim[k]/2,dim,ghosts,solver->dxinv,dxinv[k]);
+        _GetCoordinate_(k,dim[k]/2,dim,ghosts,solver->m_dxinv,dxinv[k]);
       }
       for (k=0; k<ndims; k++) if (k!=d) dS *= (1.0/dxinv[k]);
-      local_integral[v] += (solver->StepBoundaryIntegral[(2*d+0)*nvars+v])*dS;
-      local_integral[v] += (solver->StepBoundaryIntegral[(2*d+1)*nvars+v])*dS;
+      local_integral[v] += (solver->m_step_boundary_integral[(2*d+0)*nvars+v])*dS;
+      local_integral[v] += (solver->m_step_boundary_integral[(2*d+1)*nvars+v])*dS;
     }
   }
 
   /* add across process to calculate global boundary integral
    * (internal (MPI) boundaries must cancel out)
    */
-  IERR MPISum_double(global_integral,local_integral,nvars,&mpi->world); CHECKERR(ierr);
+  IERR MPISum_double(global_integral,local_integral,nvars,&mpi->m_world); CHECKERR(ierr);
 
   /* add to the total boundary integral */
-  _ArrayAXPY_(global_integral,1.0,solver->TotalBoundaryIntegral,nvars);
+  _ArrayAXPY_(global_integral,1.0,solver->m_total_boundary_integral,nvars);
 
   free(local_integral);
   free(global_integral);

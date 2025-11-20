@@ -23,8 +23,8 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
 {
   /* get the source and destination grid dimensions */
   GridDimensions dim_src, dim_dst;
-  StdVecOps::copyFrom(dim_src, a_src->solver.dim_global, m_ndims);
-  StdVecOps::copyFrom(dim_dst, a_dst->solver.dim_global, m_ndims);
+  StdVecOps::copyFrom(dim_src, a_src->solver.m_dim_global, m_ndims);
+  StdVecOps::copyFrom(dim_dst, a_dst->solver.m_dim_global, m_ndims);
 
   /* gather the source on rank 0 */
   double* xg_src = NULL;
@@ -34,14 +34,14 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
     offset_global = offset_local = 0;
     for (int d=0; d<m_ndims; d++) {
       MPIGatherArray1D(  (void*) &(a_src->mpi),
-                         (a_src->mpi.rank ? NULL : &xg_src[offset_global]),
-                         &(a_src->solver.x[offset_local+a_src->solver.ghosts]),
-                         a_src->mpi.is[d],
-                         a_src->mpi.ie[d],
-                         a_src->solver.dim_local[d],
+                         (a_src->mpi.m_rank ? NULL : &xg_src[offset_global]),
+                         &(a_src->solver.m_x[offset_local+a_src->solver.m_ghosts]),
+                         a_src->mpi.m_is[d],
+                         a_src->mpi.m_ie[d],
+                         a_src->solver.m_dim_local[d],
                          0 );
-      offset_global += a_src->solver.dim_global[d];
-      offset_local  += a_src->solver.dim_local [d] + 2*a_src->solver.ghosts;
+      offset_global += a_src->solver.m_dim_global[d];
+      offset_local  += a_src->solver.m_dim_local [d] + 2*a_src->solver.m_ghosts;
     }
   }
 
@@ -105,14 +105,14 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
   int offset_global = 0, offset_local = 0;
   for (int d=0; d<m_ndims; d++) {
     MPIPartitionArray1D(  (void*) &(a_dst->mpi),
-                          (a_dst->mpi.rank ? NULL : &xg_dst[offset_global]),
-                          &(a_dst->solver.x[offset_local+a_dst->solver.ghosts]),
-                          a_dst->mpi.is[d],
-                          a_dst->mpi.ie[d],
-                          a_dst->solver.dim_local[d],
+                          (a_dst->mpi.m_rank ? NULL : &xg_dst[offset_global]),
+                          &(a_dst->solver.m_x[offset_local+a_dst->solver.m_ghosts]),
+                          a_dst->mpi.m_is[d],
+                          a_dst->mpi.m_ie[d],
+                          a_dst->solver.m_dim_local[d],
                           0);
-    offset_global += a_dst->solver.dim_global[d];
-    offset_local  += a_dst->solver.dim_local [d] + 2*a_dst->solver.ghosts;
+    offset_global += a_dst->solver.m_dim_global[d];
+    offset_local  += a_dst->solver.m_dim_local [d] + 2*a_dst->solver.m_ghosts;
   }
 
   if (!m_rank) {
@@ -124,29 +124,29 @@ void SparseGridsSimulation::interpolateGrid ( SimulationObject* const       a_ds
     int offset = 0;
     for (int d = 0; d < m_ndims; d++) {
       MPIExchangeBoundaries1D(  (void*) &(a_dst->mpi),
-                                &(a_dst->solver.x[offset]),
-                                a_dst->solver.dim_local[d],
-                                a_dst->solver.ghosts,
+                                &(a_dst->solver.m_x[offset]),
+                                a_dst->solver.m_dim_local[d],
+                                a_dst->solver.m_ghosts,
                                 d,
                                 m_ndims);
-      offset += (a_dst->solver.dim_local[d] + 2*a_dst->solver.ghosts);
+      offset += (a_dst->solver.m_dim_local[d] + 2*a_dst->solver.m_ghosts);
     }
   }
   /* fill in ghost values of x at physical boundaries by extrapolation */
   {
     int offset = 0;
     for (int d = 0; d < m_ndims; d++) {
-      double* X       = &(a_dst->solver.x[offset]);
-      int*    dim     = a_dst->solver.dim_local;
-      int     ghosts  = a_dst->solver.ghosts;
-      if (a_dst->mpi.ip[d] == 0) {
+      double* X       = &(a_dst->solver.m_x[offset]);
+      int*    dim     = a_dst->solver.m_dim_local;
+      int     ghosts  = a_dst->solver.m_ghosts;
+      if (a_dst->mpi.m_ip[d] == 0) {
         /* fill left boundary along this dimension */
         for (int i = 0; i < ghosts; i++) {
           int delta = ghosts - i;
           X[i] = X[ghosts] + ((double) delta) * (X[ghosts]-X[ghosts+1]);
         }
       }
-      if (a_dst->mpi.ip[d] == a_dst->mpi.iproc[d]-1) {
+      if (a_dst->mpi.m_ip[d] == a_dst->mpi.m_iproc[d]-1) {
         /* fill right boundary along this dimension */
         for (int i = dim[d]+ghosts; i < dim[d]+2*ghosts; i++) {
           int delta = i - (dim[d]+ghosts-1);

@@ -7,12 +7,12 @@
 int Numa3DFlux(double *f,double *u,int dir,void *s,double t)
 {
   HyPar  *solver = (HyPar*)   s;
-  Numa3D *param  = (Numa3D*) solver->physics;
+  Numa3D *param  = (Numa3D*) solver->m_physics;
   int     i;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -27,7 +27,7 @@ int Numa3DFlux(double *f,double *u,int dir,void *s,double t)
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double drho,uvel,vvel,wvel,dT,dP,rho0,T0,P0,EP,zcoord;
 
-    _GetCoordinate_(_ZDIR_,index[_ZDIR_]-ghosts,dim,ghosts,solver->x,zcoord);
+    _GetCoordinate_(_ZDIR_,index[_ZDIR_]-ghosts,dim,ghosts,solver->m_x,zcoord);
     param->StandardAtmosphere(param,zcoord,&EP,&P0,&rho0,&T0);
 
     _Numa3DGetFlowVars_     ((u+_MODEL_NVARS_*p),drho,uvel,vvel,wvel,dT,rho0);
@@ -43,12 +43,12 @@ int Numa3DFlux(double *f,double *u,int dir,void *s,double t)
 int Numa3DStiffFlux(double *f,double *u,int dir,void *s,double t)
 {
   HyPar  *solver = (HyPar*)   s;
-  Numa3D *param  = (Numa3D*) solver->physics;
+  Numa3D *param  = (Numa3D*) solver->m_physics;
   int     i;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -63,7 +63,7 @@ int Numa3DStiffFlux(double *f,double *u,int dir,void *s,double t)
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double drho,uvel,vvel,wvel,dT,dP,rho0,T0,P0,EP,zcoord;
 
-    _GetCoordinate_(_ZDIR_,index[_ZDIR_]-ghosts,dim,ghosts,solver->x,zcoord);
+    _GetCoordinate_(_ZDIR_,index[_ZDIR_]-ghosts,dim,ghosts,solver->m_x,zcoord);
     param->StandardAtmosphere(param,zcoord,&EP,&P0,&rho0,&T0);
 
     _Numa3DGetFlowVars_               ((u+_MODEL_NVARS_*p),drho,uvel,vvel,wvel,dT,rho0);

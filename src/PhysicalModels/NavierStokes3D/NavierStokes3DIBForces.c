@@ -42,8 +42,8 @@ static int ComputeShear(void *s,              /*!< Solver object of type #HyPar 
 {
   HyPar             *solver  = (HyPar*)          s;
   MPIVariables      *mpi     = (MPIVariables*)   m;
-  NavierStokes3D    *physics = (NavierStokes3D*) solver->physics;
-  ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->ib;
+  NavierStokes3D    *physics = (NavierStokes3D*) solver->m_physics;
+  ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->m_ib;
 
   if ((*sf) != NULL) {
     fprintf(stderr, "Error in ComputeShear()\n");
@@ -51,10 +51,10 @@ static int ComputeShear(void *s,              /*!< Solver object of type #HyPar 
     return 1;
   }
 
-  if (!solver->flag_ib) return(0);
+  if (!solver->m_flag_ib) return(0);
 
-  int           nfacets_local = IB->nfacets_local;
-  FacetMap      *fmap = IB->fmap;
+  int           nfacets_local = IB->m_nfacets_local;
+  FacetMap      *fmap = IB->m_fmap;
   static double v[_MODEL_NVARS_];
 
   int nv = 4;
@@ -63,15 +63,15 @@ static int ComputeShear(void *s,              /*!< Solver object of type #HyPar 
 
     (*sf) = (double*) calloc (nv*nfacets_local, sizeof(double));
 
-    if (physics->Re > 0) {
+    if (physics->m_Re > 0) {
 
       for (int n = 0; n < nfacets_local; n++) {
 
         double *alpha;
         int    *nodes, j, k;
 
-        alpha = &(fmap[n].interp_coeffs[0]);
-        nodes = &(fmap[n].interp_nodes[0]);
+        alpha = &(fmap[n].m_interp_coeffs[0]);
+        nodes = &(fmap[n].m_interp_nodes[0]);
         _ArraySetValue_(v,_MODEL_NVARS_,0.0);
         for (j=0; j<_IB_NNODES_; j++) {
           for (k=0; k<_MODEL_NVARS_; k++) {
@@ -79,10 +79,10 @@ static int ComputeShear(void *s,              /*!< Solver object of type #HyPar 
           }
         }
         double rho_c, uvel_c, vvel_c, wvel_c, energy_c, pressure_c;
-        _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho_c,uvel_c,vvel_c,wvel_c,energy_c,pressure_c,physics->gamma);
+        _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho_c,uvel_c,vvel_c,wvel_c,energy_c,pressure_c,physics->m_gamma);
 
-        alpha = &(fmap[n].interp_coeffs_ns[0]);
-        nodes = &(fmap[n].interp_nodes_ns[0]);
+        alpha = &(fmap[n].m_interp_coeffs_ns[0]);
+        nodes = &(fmap[n].m_interp_nodes_ns[0]);
         _ArraySetValue_(v,_MODEL_NVARS_,0.0);
         for (j=0; j<_IB_NNODES_; j++) {
           for (k=0; k<_MODEL_NVARS_; k++) {
@@ -90,27 +90,27 @@ static int ComputeShear(void *s,              /*!< Solver object of type #HyPar 
           }
         }
         double rho_ns, uvel_ns, vvel_ns, wvel_ns, energy_ns, pressure_ns;
-        _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho_ns,uvel_ns,vvel_ns,wvel_ns,energy_ns,pressure_ns,physics->gamma);
+        _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho_ns,uvel_ns,vvel_ns,wvel_ns,energy_ns,pressure_ns,physics->m_gamma);
 
-        double u_x = (uvel_ns - uvel_c) / fmap[n].dx;
-        double v_x = (vvel_ns - vvel_c) / fmap[n].dx;
-        double w_x = (wvel_ns - wvel_c) / fmap[n].dx;
+        double u_x = (uvel_ns - uvel_c) / fmap[n].m_dx;
+        double v_x = (vvel_ns - vvel_c) / fmap[n].m_dx;
+        double w_x = (wvel_ns - wvel_c) / fmap[n].m_dx;
 
-        double u_y = (uvel_ns - uvel_c) / fmap[n].dy;
-        double v_y = (vvel_ns - vvel_c) / fmap[n].dy;
-        double w_y = (wvel_ns - wvel_c) / fmap[n].dy;
+        double u_y = (uvel_ns - uvel_c) / fmap[n].m_dy;
+        double v_y = (vvel_ns - vvel_c) / fmap[n].m_dy;
+        double w_y = (wvel_ns - wvel_c) / fmap[n].m_dy;
 
-        double u_z = (uvel_ns - uvel_c) / fmap[n].dz;
-        double v_z = (vvel_ns - vvel_c) / fmap[n].dz;
-        double w_z = (wvel_ns - wvel_c) / fmap[n].dz;
+        double u_z = (uvel_ns - uvel_c) / fmap[n].m_dz;
+        double v_z = (vvel_ns - vvel_c) / fmap[n].m_dz;
+        double w_z = (wvel_ns - wvel_c) / fmap[n].m_dz;
 
-        double nx = fmap[n].facet->nx;
-        double ny = fmap[n].facet->ny;
-        double nz = fmap[n].facet->nz;
+        double nx = fmap[n].m_facet->m_nx;
+        double ny = fmap[n].m_facet->m_ny;
+        double nz = fmap[n].m_facet->m_nz;
 
-        double T      = physics->gamma*pressure_c/rho_c;
+        double T      = physics->m_gamma*pressure_c/rho_c;
         double mu     = raiseto(T, 0.76);
-        double inv_Re = 1.0/physics->Re;
+        double inv_Re = 1.0/physics->m_Re;
 
         double tau_x = (mu*inv_Re) * (2*u_x*nx + (u_y+v_x)*ny + (u_z+w_x)*nz);
         double tau_y = (mu*inv_Re) * ((v_x+u_y)*nx + 2*v_y*ny + (v_z+w_y)*nz);
@@ -186,10 +186,10 @@ static int WriteSurfaceData(  void*               m,              /*!< MPI objec
   }
 
   /* Rank 0 writes the file */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 
-    int nfacets_global = IB->body->nfacets;
-    const Facet3D* const facets = IB->body->surface;
+    int nfacets_global = IB->m_body->m_nfacets;
+    const Facet3D* const facets = IB->m_body->m_surface;
 
     FILE *out;
     out = fopen(filename,"w");
@@ -208,9 +208,9 @@ static int WriteSurfaceData(  void*               m,              /*!< MPI objec
 
     for (int n = 0; n < nfacets_global; n++) {
       fprintf(  out, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-                facets[n].x1,
-                facets[n].y1,
-                facets[n].z1,
+                facets[n].m_x1,
+                facets[n].m_y1,
+                facets[n].m_z1,
                 p_surface_g[n],
                 T_surface_g[n],
                 ngrad_p_surface_g[n],
@@ -220,9 +220,9 @@ static int WriteSurfaceData(  void*               m,              /*!< MPI objec
                 shear_g[4*n+_ZDIR_],
                 shear_g[4*n+_ZDIR_+1] );
       fprintf(  out, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-                facets[n].x2,
-                facets[n].y2,
-                facets[n].z2,
+                facets[n].m_x2,
+                facets[n].m_y2,
+                facets[n].m_z2,
                 p_surface_g[n],
                 T_surface_g[n],
                 ngrad_p_surface_g[n],
@@ -232,9 +232,9 @@ static int WriteSurfaceData(  void*               m,              /*!< MPI objec
                 shear_g[4*n+_ZDIR_],
                 shear_g[4*n+_ZDIR_+1] );
       fprintf(  out, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-                facets[n].x3,
-                facets[n].y3,
-                facets[n].z3,
+                facets[n].m_x3,
+                facets[n].m_y3,
+                facets[n].m_z3,
                 p_surface_g[n],
                 T_surface_g[n],
                 ngrad_p_surface_g[n],
@@ -267,23 +267,23 @@ int NavierStokes3DIBForces( void*   s,  /*!< Solver object of type #HyPar */
 {
   HyPar             *solver  = (HyPar*)          s;
   MPIVariables      *mpi     = (MPIVariables*)   m;
-  NavierStokes3D    *physics = (NavierStokes3D*) solver->physics;
-  ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->ib;
+  NavierStokes3D    *physics = (NavierStokes3D*) solver->m_physics;
+  ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->m_ib;
   int ierr;
 
-  if (!solver->flag_ib) return(0);
+  if (!solver->m_flag_ib) return(0);
 
-  int npts = solver->npoints_local_wghosts;
+  int npts = solver->m_npoints_local_wghosts;
 
   double* pressure = (double*) calloc (npts, sizeof(double));
-  ierr = NavierStokes3DComputePressure(pressure, solver->u, solver);
+  ierr = NavierStokes3DComputePressure(pressure, solver->m_u, solver);
   if (ierr) {
     fprintf(stderr,"Error in NavierStokes3DIBForces()\n");
     fprintf(stderr,"  NavierStokes3DComputePressure() returned with error.\n");
     return 1;
   }
   double* temperature = (double*) calloc(npts, sizeof(double));
-  ierr = NavierStokes3DComputeTemperature(temperature, solver->u, solver);
+  ierr = NavierStokes3DComputeTemperature(temperature, solver->m_u, solver);
   if (ierr) {
     fprintf(stderr,"Error in NavierStokes3DIBForces()\n");
     fprintf(stderr,"  NavierStokes3DComputeTemperature() returned with error.\n");
@@ -324,7 +324,7 @@ int NavierStokes3DIBForces( void*   s,  /*!< Solver object of type #HyPar */
   }
   /* Compute shear forces */
   double *shear = NULL;
-  ierr = ComputeShear(solver, mpi, solver->u, &shear);
+  ierr = ComputeShear(solver, mpi, solver->m_u, &shear);
   if (ierr) {
     fprintf(stderr,"Error in NavierStokes3DIBForces()\n");
     fprintf(stderr,"  ComputeShear() returned with error.\n");
@@ -332,19 +332,19 @@ int NavierStokes3DIBForces( void*   s,  /*!< Solver object of type #HyPar */
   }
 
   char surface_filename[_MAX_STRING_SIZE_] = "surface";
-  if (solver->nsims == 1) {
-    if (!strcmp(solver->op_overwrite,"no")) {
-      strcat(surface_filename,solver->filename_index);
+  if (solver->m_nsims == 1) {
+    if (!strcmp(solver->m_op_overwrite,"no")) {
+      strcat(surface_filename,solver->m_filename_index);
     }
   } else {
     char index[_MAX_STRING_SIZE_];
-    GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
+    GetStringFromInteger(solver->m_my_idx, index, (int)log10(solver->m_nsims)+1);
     strcat(surface_filename, "_");
     strcat(surface_filename, index);
     strcat(surface_filename, "_");
   }
   strcat(surface_filename,".dat");
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     printf("Writing immersed body surface data file %s.\n",surface_filename);
   }
   ierr = WriteSurfaceData(  mpi,

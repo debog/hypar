@@ -12,7 +12,7 @@
 
 /*!
 Initialize the tridiagLU solver by setting the various parameters in
-#TridiagLU to their default values. If the file \a lusolver.inp is
+#TridiagLU_Params to their default values. If the file \a lusolver.inp is
 available, read it and set the parameters.
 
 The file \b lusolver.inp must be in the following format:\n
@@ -28,20 +28,20 @@ The file \b lusolver.inp must be in the following format:\n
 where the list of keywords are:\n
     Keyword name       | Type         | Variable                      | Default value
     ------------------ | ------------ | ----------------------------- | ------------------------
-    evaluate_norm      | int          | #TridiagLU::evaluate_norm     | 1
-    maxiter            | int          | #TridiagLU::maxiter           | 10
-    atol               | double       | #TridiagLU::atol              | 1e-12
-    rtol               | double       | #TridiagLU::rtol              | 1e-10
-    verbose            | int          | #TridiagLU::verbose           | 0
-    reducedsolvetype   | char[]       | #TridiagLU::reducedsolvetype  | #_TRIDIAG_JACOBI_
+    evaluate_norm      | int          | #TridiagLU_Params::evaluate_norm     | 1
+    maxiter            | int          | #TridiagLU_Params::maxiter           | 10
+    atol               | double       | #TridiagLU_Params::atol              | 1e-12
+    rtol               | double       | #TridiagLU_Params::rtol              | 1e-10
+    verbose            | int          | #TridiagLU_Params::verbose           | 0
+    reducedsolvetype   | char[]       | #TridiagLU_Params::reducedsolvetype  | #_TRIDIAG_JACOBI_
 
 */
-int tridiagLUInit(
-                    void *r,  /*!< Object of type TridiagLU */
+int TridiagLUInit(
+                    void *r,  /*!< Object of type TridiagLU_Params */
                     void *c   /*!< MPI communicator */
                  )
 {
-  TridiagLU *t = (TridiagLU*) r;
+  TridiagLU_Params *t = (TridiagLU_Params *) r;
   int       rank,ierr;
 #ifdef serial
   rank  = 0;
@@ -52,12 +52,12 @@ int tridiagLUInit(
 #endif
 
   /* default values */
-  strcpy(t->reducedsolvetype,_TRIDIAG_JACOBI_);
-  t->evaluate_norm = 1;
-  t->maxiter       = 10;
-  t->atol          = 1e-12;
-  t->rtol          = 1e-10;
-  t->verbose       = 0;
+  strcpy(t->m_reducedsolvetype,_TRIDIAG_JACOBI_);
+  t->m_evaluate_norm = 1;
+  t->m_maxiter       = 10;
+  t->m_atol          = 1e-12;
+  t->m_rtol          = 1e-10;
+  t->m_verbose       = 0;
 
   /* read from file, if available */
   if (!rank) {
@@ -71,12 +71,12 @@ int tridiagLUInit(
       if (!strcmp(word, "begin")) {
         while (strcmp(word, "end")) {
           ierr = fscanf(in,"%s",word); if (ierr != 1) return(1);
-           if      (!strcmp(word, "evaluate_norm"   ))  ierr = fscanf(in,"%d" ,&t->evaluate_norm  );
-           else if (!strcmp(word, "maxiter"         ))  ierr = fscanf(in,"%d" ,&t->maxiter        );
-           else if (!strcmp(word, "atol"            ))  ierr = fscanf(in,"%lf",&t->atol           );
-           else if (!strcmp(word, "rtol"            ))  ierr = fscanf(in,"%lf",&t->rtol           );
-           else if (!strcmp(word, "verbose"         ))  ierr = fscanf(in,"%d" ,&t->verbose        );
-           else if (!strcmp(word, "reducedsolvetype"))  ierr = fscanf(in,"%s" ,t->reducedsolvetype);
+           if      (!strcmp(word, "evaluate_norm"   ))  ierr = fscanf(in,"%d" ,&t->m_evaluate_norm  );
+           else if (!strcmp(word, "maxiter"         ))  ierr = fscanf(in,"%d" ,&t->m_maxiter        );
+           else if (!strcmp(word, "atol"            ))  ierr = fscanf(in,"%lf",&t->m_atol           );
+           else if (!strcmp(word, "rtol"            ))  ierr = fscanf(in,"%lf",&t->m_rtol           );
+           else if (!strcmp(word, "verbose"         ))  ierr = fscanf(in,"%d" ,&t->m_verbose        );
+           else if (!strcmp(word, "reducedsolvetype"))  ierr = fscanf(in,"%s" ,t->m_reducedsolvetype);
           else if (strcmp(word,"end")) {
             char useless[100];
             ierr = fscanf(in,"%s",useless);
@@ -95,12 +95,12 @@ int tridiagLUInit(
   /* broadcast to all processes */
 #ifndef serial
   if (comm) {
-    MPI_Bcast(t->reducedsolvetype,50,MPI_CHAR,0,*comm);
-    MPI_Bcast(&t->evaluate_norm,1,MPI_INT,0,*comm);
-    MPI_Bcast(&t->maxiter,1,MPI_INT,0,*comm);
-    MPI_Bcast(&t->verbose,1,MPI_INT,0,*comm);
-    MPI_Bcast(&t->atol,1,MPI_DOUBLE,0,*comm);
-    MPI_Bcast(&t->rtol,1,MPI_DOUBLE,0,*comm);
+    MPI_Bcast(t->m_reducedsolvetype,50,MPI_CHAR,0,*comm);
+    MPI_Bcast(&t->m_evaluate_norm,1,MPI_INT,0,*comm);
+    MPI_Bcast(&t->m_maxiter,1,MPI_INT,0,*comm);
+    MPI_Bcast(&t->m_verbose,1,MPI_INT,0,*comm);
+    MPI_Bcast(&t->m_atol,1,MPI_DOUBLE,0,*comm);
+    MPI_Bcast(&t->m_rtol,1,MPI_DOUBLE,0,*comm);
   }
 #endif
 

@@ -29,12 +29,12 @@ int MPILocalDomainLimits(
   _DECLARE_IERR_;
 
   int ip[ndims];
-  IERR MPIRanknD(ndims,p,mpi->iproc,ip); CHECKERR(ierr);
+  IERR MPIRanknD(ndims,p,mpi->m_iproc,ip); CHECKERR(ierr);
 
   for (i=0; i<ndims; i++) {
     int imax_local, isize, root = 0;
-    imax_local = MPIPartition1D(dim_global[i],mpi->iproc[i],root );
-    isize      = MPIPartition1D(dim_global[i],mpi->iproc[i],ip[i]);
+    imax_local = MPIPartition1D(dim_global[i],mpi->m_iproc[i],root );
+    isize      = MPIPartition1D(dim_global[i],mpi->m_iproc[i],ip[i]);
     if (is)  is[i] = ip[i]*imax_local;
     if (ie)  ie[i] = ip[i]*imax_local + isize;
   }

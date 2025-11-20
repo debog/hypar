@@ -32,27 +32,27 @@ double VlasovAdvectionCoeff(int*  idx, /*!< grid index */
 {
 
   HyPar  *solver = (HyPar*)  s;
-  Vlasov *param  = (Vlasov*) solver->physics;
+  Vlasov *param  = (Vlasov*) solver->m_physics;
 
-  int* dim    = solver->dim_local;
-  int  ghosts = solver->ghosts;
+  int* dim    = solver->m_dim_local;
+  int  ghosts = solver->m_ghosts;
 
   double retval = DBL_MAX;
 
-  if (dir < param->ndims_x) {
+  if (dir < param->m_ndims_x) {
 
-    int veldim = dir + param->ndims_x;
-    _GetCoordinate_(veldim,idx[veldim],dim,ghosts,solver->x,retval);
+    int veldim = dir + param->m_ndims_x;
+    _GetCoordinate_(veldim,idx[veldim],dim,ghosts,solver->m_x,retval);
 
   }  else {
 
-    int ndims_x = param->ndims_x;
+    int ndims_x = param->m_ndims_x;
     int dim_x[ndims_x]; _ArrayCopy1D_(dim, dim_x, ndims_x);
 
     int idx_x[ndims_x];
     _ArrayCopy1D_(idx, idx_x, ndims_x);
     int p; _ArrayIndex1D_(ndims_x, dim_x, idx_x, ghosts, p);
-    retval = param->e_field[ndims_x*p+(dir-ndims_x)];
+    retval = param->m_e_field[ndims_x*p+(dir-ndims_x)];
 
   }
 

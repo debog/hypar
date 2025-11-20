@@ -24,16 +24,16 @@ int ExactSolution(
   HyPar  *solver = (HyPar*) s;
 
   int same_size = 1;
-  for (int i=0; i<solver->ndims; i++) {
-    if (solver->dim_global[i] != solver->dim_global_ex[i]) same_size = 0;
+  for (int i=0; i<solver->m_ndims; i++) {
+    if (solver->m_dim_global[i] != solver->m_dim_global_ex[i]) same_size = 0;
   }
 
   if (same_size) {
-    ReadArray( solver->ndims,
-               solver->nvars,
-               solver->dim_global,
-               solver->dim_local,
-               solver->ghosts,
+    ReadArray( solver->m_ndims,
+               solver->m_nvars,
+               solver->m_dim_global,
+               solver->m_dim_local,
+               solver->m_ghosts,
                solver,
                m,
                NULL,
@@ -41,12 +41,12 @@ int ExactSolution(
                fname,
                flag);
   } else {
-    ReadArraywInterp( solver->ndims,
-                      solver->nvars,
-                      solver->dim_global,
-                      solver->dim_local,
-                      solver->dim_global_ex,
-                      solver->ghosts,
+    ReadArraywInterp( solver->m_ndims,
+                      solver->m_nvars,
+                      solver->m_dim_global,
+                      solver->m_dim_local,
+                      solver->m_dim_global_ex,
+                      solver->m_ghosts,
                       solver,
                       m,
                       NULL,

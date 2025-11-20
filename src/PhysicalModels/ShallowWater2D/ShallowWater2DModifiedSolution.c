@@ -28,11 +28,11 @@ int ShallowWater2DModifiedSolution(
                            )
 {
   HyPar           *solver = (HyPar*) s;
-  ShallowWater2D  *param  = (ShallowWater2D*) solver->physics;
+  ShallowWater2D  *param  = (ShallowWater2D*) solver->m_physics;
 
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  int     ndims   = solver->ndims;
+  int     ghosts  = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -47,7 +47,7 @@ int ShallowWater2DModifiedSolution(
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double h,uvel,vvel;
     _ShallowWater2DGetFlowVar_((u+_MODEL_NVARS_*p),h,uvel,vvel);
-    uC[_MODEL_NVARS_*p+0] = h + param->b[p];
+    uC[_MODEL_NVARS_*p+0] = h + param->m_b[p];
     uC[_MODEL_NVARS_*p+1] = h * uvel;
     uC[_MODEL_NVARS_*p+2] = h * vvel;
     _ArrayIncrementIndex_(ndims,bounds,index,done);

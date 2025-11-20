@@ -22,9 +22,9 @@ int Euler1DFlux(
                )
 {
   HyPar             *solver = (HyPar*)   s;
-  Euler1D           *param  = (Euler1D*) solver->physics;
-  int               *dim    = solver->dim_local;
-  int               ghosts  = solver->ghosts;
+  Euler1D           *param  = (Euler1D*) solver->m_physics;
+  int               *dim    = solver->m_dim_local;
+  int               ghosts  = solver->m_ghosts;
   static const int  ndims   = _MODEL_NDIMS_;
   static const int  nvars   = _MODEL_NVARS_;
   static int        index[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_], offset[_MODEL_NDIMS_];
@@ -70,9 +70,9 @@ int Euler1DStiffFlux(
                )
 {
   HyPar             *solver = (HyPar*)   s;
-  Euler1D           *param  = (Euler1D*) solver->physics;
-  int               *dim    = solver->dim_local;
-  int               ghosts  = solver->ghosts;
+  Euler1D           *param  = (Euler1D*) solver->m_physics;
+  int               *dim    = solver->m_dim_local;
+  int               ghosts  = solver->m_ghosts;
   static const int  ndims   = _MODEL_NDIMS_;
   static const int  nvars   = _MODEL_NVARS_;
   static int        index[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_], offset[_MODEL_NDIMS_];
@@ -85,7 +85,7 @@ int Euler1DStiffFlux(
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    _Euler1DSetLinearizedStiffFlux_((f+nvars*p),(u+nvars*p),(param->fast_jac+nvars*nvars*p));
+    _Euler1DSetLinearizedStiffFlux_((f+nvars*p),(u+nvars*p),(param->m_fast_jac+nvars*nvars*p));
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

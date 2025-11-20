@@ -8,35 +8,35 @@
 /*! Compute the bounding box for a given body. */
 int IBComputeBoundingBox(Body3D *b /*!< The body */)
 {
-  b->xmin = b->xmax = b->surface[0].x1;
-  b->ymin = b->ymax = b->surface[0].y1;
-  b->zmin = b->zmax = b->surface[0].z1;
+  b->m_xmin = b->m_xmax = b->m_surface[0].m_x1;
+  b->m_ymin = b->m_ymax = b->m_surface[0].m_y1;
+  b->m_zmin = b->m_zmax = b->m_surface[0].m_z1;
 
   int n;
-  for (n = 0; n < b->nfacets; n++) {
-    if (b->surface[n].x1 < b->xmin) b->xmin = b->surface[n].x1;
-    if (b->surface[n].x2 < b->xmin) b->xmin = b->surface[n].x2;
-    if (b->surface[n].x3 < b->xmin) b->xmin = b->surface[n].x3;
+  for (n = 0; n < b->m_nfacets; n++) {
+    if (b->m_surface[n].m_x1 < b->m_xmin) b->m_xmin = b->m_surface[n].m_x1;
+    if (b->m_surface[n].m_x2 < b->m_xmin) b->m_xmin = b->m_surface[n].m_x2;
+    if (b->m_surface[n].m_x3 < b->m_xmin) b->m_xmin = b->m_surface[n].m_x3;
 
-    if (b->surface[n].y1 < b->ymin) b->ymin = b->surface[n].y1;
-    if (b->surface[n].y2 < b->ymin) b->ymin = b->surface[n].y2;
-    if (b->surface[n].y3 < b->ymin) b->ymin = b->surface[n].y3;
+    if (b->m_surface[n].m_y1 < b->m_ymin) b->m_ymin = b->m_surface[n].m_y1;
+    if (b->m_surface[n].m_y2 < b->m_ymin) b->m_ymin = b->m_surface[n].m_y2;
+    if (b->m_surface[n].m_y3 < b->m_ymin) b->m_ymin = b->m_surface[n].m_y3;
 
-    if (b->surface[n].z1 < b->zmin) b->zmin = b->surface[n].z1;
-    if (b->surface[n].z2 < b->zmin) b->zmin = b->surface[n].z2;
-    if (b->surface[n].z3 < b->zmin) b->zmin = b->surface[n].z3;
+    if (b->m_surface[n].m_z1 < b->m_zmin) b->m_zmin = b->m_surface[n].m_z1;
+    if (b->m_surface[n].m_z2 < b->m_zmin) b->m_zmin = b->m_surface[n].m_z2;
+    if (b->m_surface[n].m_z3 < b->m_zmin) b->m_zmin = b->m_surface[n].m_z3;
 
-    if (b->surface[n].x1 > b->xmax) b->xmax = b->surface[n].x1;
-    if (b->surface[n].x2 > b->xmax) b->xmax = b->surface[n].x2;
-    if (b->surface[n].x3 > b->xmax) b->xmax = b->surface[n].x3;
+    if (b->m_surface[n].m_x1 > b->m_xmax) b->m_xmax = b->m_surface[n].m_x1;
+    if (b->m_surface[n].m_x2 > b->m_xmax) b->m_xmax = b->m_surface[n].m_x2;
+    if (b->m_surface[n].m_x3 > b->m_xmax) b->m_xmax = b->m_surface[n].m_x3;
 
-    if (b->surface[n].y1 > b->ymax) b->ymax = b->surface[n].y1;
-    if (b->surface[n].y2 > b->ymax) b->ymax = b->surface[n].y2;
-    if (b->surface[n].y3 > b->ymax) b->ymax = b->surface[n].y3;
+    if (b->m_surface[n].m_y1 > b->m_ymax) b->m_ymax = b->m_surface[n].m_y1;
+    if (b->m_surface[n].m_y2 > b->m_ymax) b->m_ymax = b->m_surface[n].m_y2;
+    if (b->m_surface[n].m_y3 > b->m_ymax) b->m_ymax = b->m_surface[n].m_y3;
 
-    if (b->surface[n].z1 > b->zmax) b->zmax = b->surface[n].z1;
-    if (b->surface[n].z2 > b->zmax) b->zmax = b->surface[n].z2;
-    if (b->surface[n].z3 > b->zmax) b->zmax = b->surface[n].z3;
+    if (b->m_surface[n].m_z1 > b->m_zmax) b->m_zmax = b->m_surface[n].m_z1;
+    if (b->m_surface[n].m_z2 > b->m_zmax) b->m_zmax = b->m_surface[n].m_z2;
+    if (b->m_surface[n].m_z3 > b->m_zmax) b->m_zmax = b->m_surface[n].m_z3;
   }
   return(0);
 }

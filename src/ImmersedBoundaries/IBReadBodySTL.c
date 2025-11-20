@@ -30,7 +30,7 @@ int IBReadBodySTL(
   *stat = 0;
 
   if ((*body) != NULL) {
-    if (!mpi->rank) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in IBReadBodySTL(): pointer to immersed body not NULL.\n");
     }
     *stat = -1;
@@ -38,7 +38,7 @@ int IBReadBodySTL(
   }
 
   /* Rank 0 reads in file */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 
     FILE  *in;
     in = fopen(filename,"r");
@@ -64,8 +64,8 @@ int IBReadBodySTL(
 
       if (nfacets > 0) {
         (*body) = (Body3D*) calloc (1,sizeof(Body3D));
-        (*body)->nfacets = nfacets;
-        (*body)->surface = (Facet3D*) calloc (nfacets,sizeof(Facet3D));
+        (*body)->m_nfacets = nfacets;
+        (*body)->m_surface = (Facet3D*) calloc (nfacets,sizeof(Facet3D));
 
         /* Read in STL data */
         in = fopen(filename,"r");
@@ -82,9 +82,9 @@ int IBReadBodySTL(
               ierr = fscanf(in,"%lf",&t1);
               ierr = fscanf(in,"%lf",&t2);
               ierr = fscanf(in,"%lf",&t3);
-              (*body)->surface[n].nx = t1;
-              (*body)->surface[n].ny = t2;
-              (*body)->surface[n].nz = t3;
+              (*body)->m_surface[n].m_nx = t1;
+              (*body)->m_surface[n].m_ny = t2;
+              (*body)->m_surface[n].m_nz = t3;
             }
             ierr = fscanf(in,"%s",word);
             if (strcmp(word, "outer")) {
@@ -104,9 +104,9 @@ int IBReadBodySTL(
                   ierr = fscanf(in,"%lf",&t1);
                   ierr = fscanf(in,"%lf",&t2);
                   ierr = fscanf(in,"%lf",&t3);
-                  (*body)->surface[n].x1 = t1;
-                  (*body)->surface[n].y1 = t2;
-                  (*body)->surface[n].z1 = t3;
+                  (*body)->m_surface[n].m_x1 = t1;
+                  (*body)->m_surface[n].m_y1 = t2;
+                  (*body)->m_surface[n].m_z1 = t3;
                 }
                 ierr = fscanf(in,"%s",word);
                 if (strcmp(word, "vertex")) {
@@ -116,9 +116,9 @@ int IBReadBodySTL(
                   ierr = fscanf(in,"%lf",&t1);
                   ierr = fscanf(in,"%lf",&t2);
                   ierr = fscanf(in,"%lf",&t3);
-                  (*body)->surface[n].x2 = t1;
-                  (*body)->surface[n].y2 = t2;
-                  (*body)->surface[n].z2 = t3;
+                  (*body)->m_surface[n].m_x2 = t1;
+                  (*body)->m_surface[n].m_y2 = t2;
+                  (*body)->m_surface[n].m_z2 = t3;
                 }
                 ierr = fscanf(in,"%s",word);
                 if (strcmp(word, "vertex")) {
@@ -128,9 +128,9 @@ int IBReadBodySTL(
                   ierr = fscanf(in,"%lf",&t1);
                   ierr = fscanf(in,"%lf",&t2);
                   ierr = fscanf(in,"%lf",&t3);
-                  (*body)->surface[n].x3 = t1;
-                  (*body)->surface[n].y3 = t2;
-                  (*body)->surface[n].z3 = t3;
+                  (*body)->m_surface[n].m_x3 = t1;
+                  (*body)->m_surface[n].m_y3 = t2;
+                  (*body)->m_surface[n].m_z3 = t3;
                 }
               }
             }
@@ -141,7 +141,7 @@ int IBReadBodySTL(
         /* done reading STL file */
         if (n != nfacets) {
           fprintf(stderr,"Error in IBReadBodySTL(): Inconsistency in number of facets read.\n");
-          free((*body)->surface);
+          free((*body)->m_surface);
           free(*body);
           *stat = 1;
         }
@@ -152,54 +152,54 @@ int IBReadBodySTL(
 
     }
   }
-  MPIBroadcast_integer(stat,1,0,&mpi->world);
+  MPIBroadcast_integer(stat,1,0,&mpi->m_world);
 
   if ((*stat)) return(0);
 
   /* Distribute the body to all MPI ranks */
   int nfacets;
-  if (!mpi->rank) nfacets = (*body)->nfacets;
-  MPIBroadcast_integer(&nfacets,1,0,&mpi->world);
+  if (!mpi->m_rank) nfacets = (*body)->m_nfacets;
+  MPIBroadcast_integer(&nfacets,1,0,&mpi->m_world);
 
-  if (mpi->rank) {
+  if (mpi->m_rank) {
     (*body) = (Body3D*) calloc (1,sizeof(Body3D));
-    (*body)->nfacets = nfacets;
-    (*body)->surface = (Facet3D*) calloc (nfacets,sizeof(Facet3D));
+    (*body)->m_nfacets = nfacets;
+    (*body)->m_surface = (Facet3D*) calloc (nfacets,sizeof(Facet3D));
   }
 
   int bufdim = 12;
   double *buffer = (double*) calloc (bufdim*nfacets,sizeof(double));
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     for (n=0; n<nfacets; n++) {
-      buffer[n*bufdim+ 0] = (*body)->surface[n].x1;
-      buffer[n*bufdim+ 1] = (*body)->surface[n].x2;
-      buffer[n*bufdim+ 2] = (*body)->surface[n].x3;
-      buffer[n*bufdim+ 3] = (*body)->surface[n].y1;
-      buffer[n*bufdim+ 4] = (*body)->surface[n].y2;
-      buffer[n*bufdim+ 5] = (*body)->surface[n].y3;
-      buffer[n*bufdim+ 6] = (*body)->surface[n].z1;
-      buffer[n*bufdim+ 7] = (*body)->surface[n].z2;
-      buffer[n*bufdim+ 8] = (*body)->surface[n].z3;
-      buffer[n*bufdim+ 9] = (*body)->surface[n].nx;
-      buffer[n*bufdim+10] = (*body)->surface[n].ny;
-      buffer[n*bufdim+11] = (*body)->surface[n].nz;
+      buffer[n*bufdim+ 0] = (*body)->m_surface[n].m_x1;
+      buffer[n*bufdim+ 1] = (*body)->m_surface[n].m_x2;
+      buffer[n*bufdim+ 2] = (*body)->m_surface[n].m_x3;
+      buffer[n*bufdim+ 3] = (*body)->m_surface[n].m_y1;
+      buffer[n*bufdim+ 4] = (*body)->m_surface[n].m_y2;
+      buffer[n*bufdim+ 5] = (*body)->m_surface[n].m_y3;
+      buffer[n*bufdim+ 6] = (*body)->m_surface[n].m_z1;
+      buffer[n*bufdim+ 7] = (*body)->m_surface[n].m_z2;
+      buffer[n*bufdim+ 8] = (*body)->m_surface[n].m_z3;
+      buffer[n*bufdim+ 9] = (*body)->m_surface[n].m_nx;
+      buffer[n*bufdim+10] = (*body)->m_surface[n].m_ny;
+      buffer[n*bufdim+11] = (*body)->m_surface[n].m_nz;
     }
   }
-  MPIBroadcast_double(buffer,(nfacets*bufdim),0,&mpi->world);
-  if (mpi->rank) {
+  MPIBroadcast_double(buffer,(nfacets*bufdim),0,&mpi->m_world);
+  if (mpi->m_rank) {
     for (n=0; n<nfacets; n++) {
-      (*body)->surface[n].x1 = buffer[n*bufdim+ 0];
-      (*body)->surface[n].x2 = buffer[n*bufdim+ 1];
-      (*body)->surface[n].x3 = buffer[n*bufdim+ 2];
-      (*body)->surface[n].y1 = buffer[n*bufdim+ 3];
-      (*body)->surface[n].y2 = buffer[n*bufdim+ 4];
-      (*body)->surface[n].y3 = buffer[n*bufdim+ 5];
-      (*body)->surface[n].z1 = buffer[n*bufdim+ 6];
-      (*body)->surface[n].z2 = buffer[n*bufdim+ 7];
-      (*body)->surface[n].z3 = buffer[n*bufdim+ 8];
-      (*body)->surface[n].nx = buffer[n*bufdim+ 9];
-      (*body)->surface[n].ny = buffer[n*bufdim+10];
-      (*body)->surface[n].nz = buffer[n*bufdim+11];
+      (*body)->m_surface[n].m_x1 = buffer[n*bufdim+ 0];
+      (*body)->m_surface[n].m_x2 = buffer[n*bufdim+ 1];
+      (*body)->m_surface[n].m_x3 = buffer[n*bufdim+ 2];
+      (*body)->m_surface[n].m_y1 = buffer[n*bufdim+ 3];
+      (*body)->m_surface[n].m_y2 = buffer[n*bufdim+ 4];
+      (*body)->m_surface[n].m_y3 = buffer[n*bufdim+ 5];
+      (*body)->m_surface[n].m_z1 = buffer[n*bufdim+ 6];
+      (*body)->m_surface[n].m_z2 = buffer[n*bufdim+ 7];
+      (*body)->m_surface[n].m_z3 = buffer[n*bufdim+ 8];
+      (*body)->m_surface[n].m_nx = buffer[n*bufdim+ 9];
+      (*body)->m_surface[n].m_ny = buffer[n*bufdim+10];
+      (*body)->m_surface[n].m_nz = buffer[n*bufdim+11];
     }
   }
   free(buffer);

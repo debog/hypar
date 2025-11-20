@@ -51,16 +51,16 @@ int test_first_order_upwind_constant() {
 
   /* Setup HyPar structure */
   HyPar solver;
-  solver.ndims = 1;
-  solver.nvars = nvars;
-  solver.ghosts = ghosts;
+  solver.m_ndims = 1;
+  solver.m_nvars = nvars;
+  solver.m_ghosts = ghosts;
   int dim_local[1] = {N};
-  solver.dim_local = dim_local;
+  solver.m_dim_local = dim_local;
 
   /* Setup MPIVariables structure (for serial) */
   MPIVariables mpi;
-  mpi.rank = 0;
-  mpi.nproc = 1;
+  mpi.m_rank = 0;
+  mpi.m_nproc = 1;
 
   /* Initialize with constant function f(x) = 2.0 */
   for (int i = 0; i < (N+2*ghosts)*nvars; i++) {
@@ -102,15 +102,15 @@ int test_first_order_upwind_linear() {
   double *x = (double*) calloc(N+2*ghosts, sizeof(double));
 
   HyPar solver;
-  solver.ndims = 1;
-  solver.nvars = nvars;
-  solver.ghosts = ghosts;
+  solver.m_ndims = 1;
+  solver.m_nvars = nvars;
+  solver.m_ghosts = ghosts;
   int dim_local[1] = {N};
-  solver.dim_local = dim_local;
+  solver.m_dim_local = dim_local;
 
   MPIVariables mpi;
-  mpi.rank = 0;
-  mpi.nproc = 1;
+  mpi.m_rank = 0;
+  mpi.m_nproc = 1;
 
   /* Initialize with linear function f(x) = x */
   for (int i = 0; i < N+2*ghosts; i++) {
@@ -152,15 +152,15 @@ int test_second_order_central_linear() {
   double *x = (double*) calloc(N+2*ghosts, sizeof(double));
 
   HyPar solver;
-  solver.ndims = 1;
-  solver.nvars = nvars;
-  solver.ghosts = ghosts;
+  solver.m_ndims = 1;
+  solver.m_nvars = nvars;
+  solver.m_ghosts = ghosts;
   int dim_local[1] = {N};
-  solver.dim_local = dim_local;
+  solver.m_dim_local = dim_local;
 
   MPIVariables mpi;
-  mpi.rank = 0;
-  mpi.nproc = 1;
+  mpi.m_rank = 0;
+  mpi.m_nproc = 1;
 
   /* Initialize with linear function f(x) = x */
   for (int i = 0; i < N+2*ghosts; i++) {
@@ -207,15 +207,15 @@ int test_second_order_central_quadratic() {
   double *x = (double*) calloc(N+2*ghosts, sizeof(double));
 
   HyPar solver;
-  solver.ndims = 1;
-  solver.nvars = nvars;
-  solver.ghosts = ghosts;
+  solver.m_ndims = 1;
+  solver.m_nvars = nvars;
+  solver.m_ghosts = ghosts;
   int dim_local[1] = {N};
-  solver.dim_local = dim_local;
+  solver.m_dim_local = dim_local;
 
   MPIVariables mpi;
-  mpi.rank = 0;
-  mpi.nproc = 1;
+  mpi.m_rank = 0;
+  mpi.m_nproc = 1;
 
   /* Initialize with quadratic function f(x) = x^2 */
   for (int i = 0; i < N+2*ghosts; i++) {
@@ -262,15 +262,15 @@ int test_fourth_order_central_cubic() {
   double *x = (double*) calloc(N+2*ghosts, sizeof(double));
 
   HyPar solver;
-  solver.ndims = 1;
-  solver.nvars = nvars;
-  solver.ghosts = ghosts;
+  solver.m_ndims = 1;
+  solver.m_nvars = nvars;
+  solver.m_ghosts = ghosts;
   int dim_local[1] = {N};
-  solver.dim_local = dim_local;
+  solver.m_dim_local = dim_local;
 
   MPIVariables mpi;
-  mpi.rank = 0;
-  mpi.nproc = 1;
+  mpi.m_rank = 0;
+  mpi.m_nproc = 1;
 
   /* Initialize with cubic function f(x) = x^3 */
   for (int i = 0; i < N+2*ghosts; i++) {
@@ -320,52 +320,52 @@ int test_weno_smooth_function() {
   double *x = (double*) calloc(N+2*ghosts, sizeof(double));
 
   HyPar solver;
-  solver.ndims = 1;
-  solver.nvars = nvars;
-  solver.ghosts = ghosts;
+  solver.m_ndims = 1;
+  solver.m_nvars = nvars;
+  solver.m_ghosts = ghosts;
   int dim_local[1] = {N};
-  solver.dim_local = dim_local;
+  solver.m_dim_local = dim_local;
   int stride_with_ghosts[1] = {1};
-  solver.stride_with_ghosts = stride_with_ghosts;
+  solver.m_stride_with_ghosts = stride_with_ghosts;
 
   /* Initialize WENO parameters */
   WENOParameters weno;
-  weno.mapped = 0;
-  weno.borges = 0;
-  weno.yc = 0;
-  weno.no_limiting = 0;
-  weno.eps = 1e-6;
-  weno.p = 2.0;
-  weno.tol = 1e-10;
-  weno.rc = 0.3;
-  weno.xi = 0.001;
+  weno.m_mapped = 0;
+  weno.m_borges = 0;
+  weno.m_yc = 0;
+  weno.m_no_limiting = 0;
+  weno.m_eps = 1e-6;
+  weno.m_p = 2.0;
+  weno.m_tol = 1e-10;
+  weno.m_rc = 0.3;
+  weno.m_xi = 0.001;
 
   /* Allocate and initialize WENO weights and offset arrays */
-  weno.offset = (int*) calloc(solver.ndims, sizeof(int));
-  weno.offset[0] = 0;
+  weno.m_offset = (int*) calloc(solver.m_ndims, sizeof(int));
+  weno.m_offset[0] = 0;
 
   /* Calculate total size for weight arrays */
   int total_size = nvars * (N + 1);  /* For 1D: nvars * (dim+1) */
-  weno.size = total_size;
+  weno.m_size = total_size;
 
   /* Allocate weight arrays (4*size for upwind/conservative flags) */
-  weno.w1 = (double*) calloc(4*total_size, sizeof(double));
-  weno.w2 = (double*) calloc(4*total_size, sizeof(double));
-  weno.w3 = (double*) calloc(4*total_size, sizeof(double));
+  weno.m_w1 = (double*) calloc(4*total_size, sizeof(double));
+  weno.m_w2 = (double*) calloc(4*total_size, sizeof(double));
+  weno.m_w3 = (double*) calloc(4*total_size, sizeof(double));
 
   /* Initialize weights to optimal values */
   for (int i = 0; i < 4*total_size; i++) {
-    weno.w1[i] = 0.1;  /* Optimal weight 1 */
-    weno.w2[i] = 0.6;  /* Optimal weight 2 */
-    weno.w3[i] = 0.3;  /* Optimal weight 3 */
+    weno.m_w1[i] = 0.1;  /* Optimal weight 1 */
+    weno.m_w2[i] = 0.6;  /* Optimal weight 2 */
+    weno.m_w3[i] = 0.3;  /* Optimal weight 3 */
   }
 
-  solver.interp = &weno;
+  solver.m_interp = &weno;
   solver.SetInterpLimiterVar = NULL;
 
   MPIVariables mpi;
-  mpi.rank = 0;
-  mpi.nproc = 1;
+  mpi.m_rank = 0;
+  mpi.m_nproc = 1;
 
   /* Initialize with smooth sine wave f(x) = sin(2*pi*x/N) */
   double pi = 4.0 * atan(1.0);
@@ -390,10 +390,10 @@ int test_weno_smooth_function() {
   }
 
   /* Clean up allocated memory */
-  free(weno.w1);
-  free(weno.w2);
-  free(weno.w3);
-  free(weno.offset);
+  free(weno.m_w1);
+  free(weno.m_w2);
+  free(weno.m_w3);
+  free(weno.m_offset);
   free(fC);
   free(fI);
   free(u);

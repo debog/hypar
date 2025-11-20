@@ -31,40 +31,40 @@ int BCTurbulentSupersonicInflowU(
 {
   DomainBoundary *boundary = (DomainBoundary*) b;
 
-  int dim   = boundary->dim;
+  int dim   = boundary->m_dim;
 
-  double *inflow_data = boundary->UnsteadyDirichletData;
-  int    *inflow_size = boundary->UnsteadyDirichletSize;
+  double *inflow_data = boundary->m_UnsteadyDirichletData;
+  int    *inflow_size = boundary->m_UnsteadyDirichletSize;
 
   if (ndims == 3) {
 
     /* create a fake physics object */
     double gamma;
-    gamma = boundary->gamma;
+    gamma = boundary->m_gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
-    if (boundary->on_this_proc) {
+    if (boundary->m_on_this_proc) {
       /* the following bit is hardcoded for the inflow data
        * representing fluctuations in a domain of length 2pi */
-      double  xt = boundary->FlowVelocity[dim] * waqt;
+      double  xt = boundary->m_FlowVelocity[dim] * waqt;
       int     N  = inflow_size[dim];
       double  L  = 2.0 * (4.0*atan(1.0));
       int     it = ((int) ((xt/L) * ((double)N))) % N;
 
       int bounds[ndims], indexb[ndims];
-      _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
+      _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
       _ArraySetValue_(indexb,ndims,0);
       int done = 0;
       while (!done) {
-        int p1; _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
+        int p1; _ArrayIndex1DWO_(ndims,size,indexb,boundary->m_is,ghosts,p1);
 
         /* set the ghost point values - mean flow */
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
-        rho_gpt      = boundary->FlowDensity;
-        pressure_gpt = boundary->FlowPressure;
-        uvel_gpt     = boundary->FlowVelocity[0];
-        vvel_gpt     = boundary->FlowVelocity[1];
-        wvel_gpt     = boundary->FlowVelocity[2];
+        rho_gpt      = boundary->m_FlowDensity;
+        pressure_gpt = boundary->m_FlowPressure;
+        uvel_gpt     = boundary->m_FlowVelocity[0];
+        vvel_gpt     = boundary->m_FlowVelocity[1];
+        wvel_gpt     = boundary->m_FlowVelocity[2];
 
         /* calculate the turbulent fluctuations */
         double duvel , dvvel , dwvel ;

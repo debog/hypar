@@ -19,10 +19,10 @@ int LinearADRAdvectionJacobian( double* Jac,  /*!< Jacobian matrix of size 1 (nv
 {
   LinearADR *param = (LinearADR*) p;
 
-  if (param->a) {
-    *Jac =    (1-absolute(upw))*absolute(param->a[dir])
-           +  absolute(upw) * (1+upw) * max(0,param->a[dir]) * 0.5
-           -  absolute(upw) * (1-upw) * min(0,param->a[dir]) * 0.5 ;
+  if (param->m_a) {
+    *Jac =    (1-absolute(upw))*absolute(param->m_a[dir])
+           +  absolute(upw) * (1+upw) * max(0,param->m_a[dir]) * 0.5
+           -  absolute(upw) * (1-upw) * min(0,param->m_a[dir]) * 0.5 ;
   } else {
     /* no advection term */
     *Jac = 0.0;
@@ -43,7 +43,7 @@ int LinearADRDiffusionJacobian( double* Jac,  /*!< Jacobian matrix of size 1 (nv
 
   int v;
   for (v = 0; v < nvars; v++) {
-    Jac[nvars*v+v] = -param->d[nvars*dir+v];
+    Jac[nvars*v+v] = -param->m_d[nvars*dir+v];
   }
 
   return 0;

@@ -28,13 +28,13 @@ int BurgersInitialize(void *s, /*!< Solver object of type #HyPar */
 {
   HyPar         *solver  = (HyPar*)        s;
   MPIVariables  *mpi     = (MPIVariables*) m;
-  Burgers       *physics = (Burgers*)      solver->physics;
+  Burgers       *physics = (Burgers*)      solver->m_physics;
   int           i, ferr;
 
   static int count = 0;
 
   /* reading physical model specific inputs - all processes */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     FILE *in;
     in = fopen("physics.inp","r");
     if (in) {
@@ -60,8 +60,8 @@ int BurgersInitialize(void *s, /*!< Solver object of type #HyPar */
     fclose(in);
   }
 
-  if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-    if (!mpi->rank) {
+  if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in BurgersInitialize: This physical model does not have a splitting ");
       fprintf(stderr,"of the hyperbolic term defined.\n");
     }

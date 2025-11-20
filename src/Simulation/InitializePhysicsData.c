@@ -24,7 +24,7 @@ int InitializePhysicsData(void  *s,       /*!< Simulation object of type #Simula
     if (ierr) {
       fprintf(stderr, "Error in InitializePhysicsData():\n");
       fprintf(stderr, "  solver->PhysicsInput() returned error %d on rank %d\n",
-              ierr, mpi->rank);
+              ierr, mpi->m_rank);
       return ierr;
     }
   }

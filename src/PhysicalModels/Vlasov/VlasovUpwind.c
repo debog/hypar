@@ -26,12 +26,12 @@ int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
                 )
 {
   HyPar  *solver = (HyPar*)  s;
-  Vlasov *param  = (Vlasov*) solver->physics;
+  Vlasov *param  = (Vlasov*) solver->m_physics;
   int    done;
 
-  int ndims   = solver->ndims;
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
+  int ndims   = solver->m_ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
 
   int index_outer[ndims],
       index_inter[ndims],

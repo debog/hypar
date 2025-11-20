@@ -27,20 +27,20 @@ int TransferVecFromPETSc( double* const u, /*!< HyPar::u type array (with ghost 
                           const int offset  /*!< Offset */ )
 {
   PETScContext* context = (PETScContext*) ctxt;
-  SimulationObject* sim = (SimulationObject*) context->simobj;
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
   const double* Yarr;
 
   PetscFunctionBegin;
   VecGetArrayRead(Y,&Yarr);
-  std::vector<int> index(sim[sim_idx].solver.ndims,0);
-  ArrayCopynD(  sim[sim_idx].solver.ndims,
+  std::vector<int> index(sim[sim_idx].solver.m_ndims,0);
+  ArrayCopynD(  sim[sim_idx].solver.m_ndims,
                 (Yarr+offset),
                 u,
-                sim[sim_idx].solver.dim_local,
+                sim[sim_idx].solver.m_dim_local,
                 0,
-                sim[sim_idx].solver.ghosts,
+                sim[sim_idx].solver.m_ghosts,
                 index.data(),
-                sim[sim_idx].solver.nvars );
+                sim[sim_idx].solver.m_nvars );
   VecRestoreArrayRead(Y,&Yarr);
 
   PetscFunctionReturn(0);

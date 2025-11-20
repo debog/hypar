@@ -16,13 +16,13 @@ int BandedMatrixPreallocate(
 {
   BandedMatrix *B = (BandedMatrix*) A;
 
-  B->nbands       = nbands;
-  B->nrows_local  = nrows_local;
-  B->BlockSize    = BlockSize;
+  B->m_nbands       = nbands;
+  B->m_nrows_local  = nrows_local;
+  B->m_BlockSize    = BlockSize;
 
-  B->ncol = (int*) calloc (nrows_local*nbands, sizeof(int));
-  B->nrow = (int*) calloc (nrows_local, sizeof(int));
-  B->data = (double*) calloc (nrows_local*nbands*BlockSize*BlockSize, sizeof(double));
+  B->m_ncol = (int*) calloc (nrows_local*nbands, sizeof(int));
+  B->m_nrow = (int*) calloc (nrows_local, sizeof(int));
+  B->m_data = (double*) calloc (nrows_local*nbands*BlockSize*BlockSize, sizeof(double));
 
   return(0);
 }

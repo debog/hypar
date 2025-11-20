@@ -9,12 +9,12 @@ double FPPowerSystem1BusDissipationFunction(int,int,void*,double);
 int FPPowerSystem1BusDiffusionLaplacian(double *f,double *u,int dir,void *s,double t)
 {
   HyPar             *solver = (HyPar*)             s;
-  FPPowerSystem1Bus *params = (FPPowerSystem1Bus*) solver->physics;
+  FPPowerSystem1Bus *params = (FPPowerSystem1Bus*) solver->m_physics;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
 
   /* calculate total size of arrays */
   int bounds[ndims]; _ArrayAddCopy1D_(dim,(2*ghosts),bounds,ndims);
@@ -32,12 +32,12 @@ int FPPowerSystem1BusDiffusionLaplacian(double *f,double *u,int dir,void *s,doub
 int FPPowerSystem1BusDiffusionGeneral(double *f,double *u,int dir1,int dir2,void *s,double t)
 {
   HyPar             *solver = (HyPar*)             s;
-  FPPowerSystem1Bus *params = (FPPowerSystem1Bus*) solver->physics;
+  FPPowerSystem1Bus *params = (FPPowerSystem1Bus*) solver->m_physics;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
 
   /* calculate total size of arrays */
   int bounds[ndims]; _ArrayAddCopy1D_(dim,(2*ghosts),bounds,ndims);

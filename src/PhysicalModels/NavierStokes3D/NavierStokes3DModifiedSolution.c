@@ -38,11 +38,11 @@ int NavierStokes3DModifiedSolution(
                                   )
 {
   HyPar           *solver = (HyPar*)          s;
-  NavierStokes3D  *param  = (NavierStokes3D*) solver->physics;
+  NavierStokes3D  *param  = (NavierStokes3D*) solver->m_physics;
 
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  int     ndims   = solver->ndims;
+  int     ghosts  = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -53,16 +53,16 @@ int NavierStokes3DModifiedSolution(
   _ArraySetValue_(offset,ndims,-ghosts);
 
   int done = 0; _ArraySetValue_(index,ndims,0);
-  double inv_gamma_m1 = 1.0 / (param->gamma-1.0);
+  double inv_gamma_m1 = 1.0 / (param->m_gamma-1.0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double rho, uvel, vvel, wvel, E, P;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,uvel,vvel,wvel,E,P,param->gamma);
-    uC[_MODEL_NVARS_*p+0] = u[_MODEL_NVARS_*p+0] * param->grav_field_f[p];
-    uC[_MODEL_NVARS_*p+1] = u[_MODEL_NVARS_*p+1] * param->grav_field_f[p];
-    uC[_MODEL_NVARS_*p+2] = u[_MODEL_NVARS_*p+2] * param->grav_field_f[p];
-    uC[_MODEL_NVARS_*p+3] = u[_MODEL_NVARS_*p+3] * param->grav_field_f[p];
-    uC[_MODEL_NVARS_*p+4] = (P*inv_gamma_m1)*(1.0/param->grav_field_g[p]) + (0.5*rho*(uvel*uvel+vvel*vvel+wvel*wvel))*param->grav_field_f[p];
+    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,uvel,vvel,wvel,E,P,param->m_gamma);
+    uC[_MODEL_NVARS_*p+0] = u[_MODEL_NVARS_*p+0] * param->m_grav_field_f[p];
+    uC[_MODEL_NVARS_*p+1] = u[_MODEL_NVARS_*p+1] * param->m_grav_field_f[p];
+    uC[_MODEL_NVARS_*p+2] = u[_MODEL_NVARS_*p+2] * param->m_grav_field_f[p];
+    uC[_MODEL_NVARS_*p+3] = u[_MODEL_NVARS_*p+3] * param->m_grav_field_f[p];
+    uC[_MODEL_NVARS_*p+4] = (P*inv_gamma_m1)*(1.0/param->m_grav_field_g[p]) + (0.5*rho*(uvel*uvel+vvel*vvel+wvel*wvel))*param->m_grav_field_f[p];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

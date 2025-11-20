@@ -11,20 +11,20 @@ double FPPowerSystemDriftFunction(int,void*,double,double,double);
 double FPPowerSystemComputeCFL(void *s,void *m,double dt,double t)
 {
   HyPar         *solver = (HyPar*)        s;
-  FPPowerSystem *params = (FPPowerSystem*)solver->physics;
+  FPPowerSystem *params = (FPPowerSystem*)solver->m_physics;
 
-  int     ndims  = solver->ndims;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
+  int     ndims  = solver->m_ndims;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
 
   double  max_cfl = 0;
   int     index[ndims];
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
-    double x;     _GetCoordinate_(0,index[0],dim,ghosts,solver->x,x);
-    double y;     _GetCoordinate_(1,index[1],dim,ghosts,solver->x,y);
-    double dxinv; _GetCoordinate_(0,index[0],dim,ghosts,solver->dxinv,dxinv);
-    double dyinv; _GetCoordinate_(1,index[1],dim,ghosts,solver->dxinv,dyinv);
+    double x;     _GetCoordinate_(0,index[0],dim,ghosts,solver->m_x,x);
+    double y;     _GetCoordinate_(1,index[1],dim,ghosts,solver->m_x,y);
+    double dxinv; _GetCoordinate_(0,index[0],dim,ghosts,solver->m_dxinv,dxinv);
+    double dyinv; _GetCoordinate_(1,index[1],dim,ghosts,solver->m_dxinv,dyinv);
     double drift_x= FPPowerSystemDriftFunction(0,params,x,y,t);
     double drift_y= FPPowerSystemDriftFunction(1,params,x,y,t);
 

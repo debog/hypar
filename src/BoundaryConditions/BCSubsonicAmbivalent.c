@@ -38,15 +38,15 @@ int BCSubsonicAmbivalentU(
 {
   DomainBoundary *boundary = (DomainBoundary*) b;
 
-  int dim   = boundary->dim;
-  int face  = boundary->face;
+  int dim   = boundary->m_dim;
+  int face  = boundary->m_face;
 
   if (ndims == 2) {
 
     /* create a fake physics object */
     Euler2D physics;
     double gamma;
-    gamma = physics.gamma = boundary->gamma;
+    gamma = physics.m_gamma = boundary->m_gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
     /* boundary normal (pointing into the domain) */
@@ -61,9 +61,9 @@ int BCSubsonicAmbivalentU(
     nx *= (double) face;
     ny *= (double) face;
 
-    if (boundary->on_this_proc) {
+    if (boundary->m_on_this_proc) {
       int bounds[ndims], indexb[ndims], indexi[ndims], indexj[ndims];
-      _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
+      _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
       _ArraySetValue_(indexb,ndims,0);
       int done = 0;
       while (!done) {
@@ -72,7 +72,7 @@ int BCSubsonicAmbivalentU(
 
         /* compute boundary face velocity  - 2nd order */
         _ArrayCopy1D_(indexb,indexi,ndims);
-        _ArrayAdd1D_(indexi,indexi,boundary->is,ndims);
+        _ArrayAdd1D_(indexi,indexi,boundary->m_is,ndims);
         _ArrayCopy1D_(indexi,indexj,ndims);
         if (face ==  1) {
           indexi[dim] = 0;
@@ -92,11 +92,11 @@ int BCSubsonicAmbivalentU(
         double vel_normal = uvelb*nx + vvelb*ny;
 
         _ArrayCopy1D_(indexb,indexi,ndims);
-        _ArrayAdd1D_(indexi,indexi,boundary->is,ndims);
+        _ArrayAdd1D_(indexi,indexi,boundary->m_is,ndims);
         if      (face ==  1) indexi[dim] = ghosts-1-indexb[dim];
         else if (face == -1) indexi[dim] = size[dim]-indexb[dim]-1;
         else return(1);
-        _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
+        _ArrayIndex1DWO_(ndims,size,indexb,boundary->m_is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
 
         /* flow variables in the interior */
@@ -106,14 +106,14 @@ int BCSubsonicAmbivalentU(
         double rho_gpt, uvel_gpt, vvel_gpt, energy_gpt, pressure_gpt;
         if (vel_normal > 0) {
           /* inflow */
-          rho_gpt = boundary->FlowDensity;
+          rho_gpt = boundary->m_FlowDensity;
           pressure_gpt = pressure;
-          uvel_gpt = boundary->FlowVelocity[0];
-          vvel_gpt = boundary->FlowVelocity[1];
+          uvel_gpt = boundary->m_FlowVelocity[0];
+          vvel_gpt = boundary->m_FlowVelocity[1];
         } else {
           /* outflow */
           rho_gpt = rho;
-          pressure_gpt = boundary->FlowPressure;
+          pressure_gpt = boundary->m_FlowPressure;
           uvel_gpt = uvel;
           vvel_gpt = vvel;
         }
@@ -133,7 +133,7 @@ int BCSubsonicAmbivalentU(
 
     /* create a fake physics object */
     double gamma;
-    gamma = boundary->gamma;
+    gamma = boundary->m_gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
     /* boundary normal (pointing into the domain) */
@@ -155,9 +155,9 @@ int BCSubsonicAmbivalentU(
     ny *= (double) face;
     nz *= (double) face;
 
-    if (boundary->on_this_proc) {
+    if (boundary->m_on_this_proc) {
       int bounds[ndims], indexb[ndims], indexi[ndims], indexj[ndims];
-      _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
+      _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
       _ArraySetValue_(indexb,ndims,0);
       int done = 0;
       while (!done) {
@@ -166,7 +166,7 @@ int BCSubsonicAmbivalentU(
 
         /* compute boundary face velocity  - 2nd order */
         _ArrayCopy1D_(indexb,indexi,ndims);
-        _ArrayAdd1D_(indexi,indexi,boundary->is,ndims);
+        _ArrayAdd1D_(indexi,indexi,boundary->m_is,ndims);
         _ArrayCopy1D_(indexi,indexj,ndims);
         if (face ==  1) {
           indexi[dim] = 0;
@@ -188,11 +188,11 @@ int BCSubsonicAmbivalentU(
         double vel_normal = uvelb*nx + vvelb*ny + wvelb*nz;
 
         _ArrayCopy1D_(indexb,indexi,ndims);
-        _ArrayAdd1D_(indexi,indexi,boundary->is,ndims);
+        _ArrayAdd1D_(indexi,indexi,boundary->m_is,ndims);
         if      (face ==  1) indexi[dim] = ghosts-1-indexb[dim];
         else if (face == -1) indexi[dim] = size[dim]-indexb[dim]-1;
         else return(1);
-        _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
+        _ArrayIndex1DWO_(ndims,size,indexb,boundary->m_is,ghosts,p1);
         _ArrayIndex1D_(ndims,size,indexi,ghosts,p2);
 
         /* flow variables in the interior */
@@ -202,15 +202,15 @@ int BCSubsonicAmbivalentU(
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
         if (vel_normal > 0) {
           /* inflow */
-          rho_gpt = boundary->FlowDensity;
+          rho_gpt = boundary->m_FlowDensity;
           pressure_gpt = pressure;
-          uvel_gpt = boundary->FlowVelocity[0];
-          vvel_gpt = boundary->FlowVelocity[1];
-          wvel_gpt = boundary->FlowVelocity[2];
+          uvel_gpt = boundary->m_FlowVelocity[0];
+          vvel_gpt = boundary->m_FlowVelocity[1];
+          wvel_gpt = boundary->m_FlowVelocity[2];
         } else {
           /* outflow */
           rho_gpt = rho;
-          pressure_gpt = boundary->FlowPressure;
+          pressure_gpt = boundary->m_FlowPressure;
           uvel_gpt = uvel;
           vvel_gpt = vvel;
           wvel_gpt = wvel;

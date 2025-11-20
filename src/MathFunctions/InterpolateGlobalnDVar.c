@@ -374,7 +374,7 @@ int InterpolateGlobalnDVar( const int* const  a_dim_dst, /*!< grid dimensions to
       u_to = (double*) calloc (size, sizeof(double));
     }
 
-    fillGhostCells( dim_from,
+    FillGhostCells( dim_from,
                     a_ghosts,
                     u_from,
                     a_nvars,
