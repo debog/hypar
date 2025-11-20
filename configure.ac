@@ -114,7 +114,7 @@ if test "x$enable_serial" = "x"; then
   fi
 
 fi
-  
+
 AM_CONDITIONAL([ENABLE_CUDA], [test "x$enable_cuda" = "xyes"])
 if test "x$enable_cuda" = "xyes"; then
   AC_MSG_NOTICE([Compiling with CUDA support.])
@@ -160,14 +160,14 @@ if test "x$enable_cuda" = "xyes"; then
     MPI_DIR=$(which ${MPICC} | sed 's/\/bin\/mpicc//g')
     if test -e ${MPI_DIR}/include/mpi.h ; then
       CUDA_CFLAGS="$CUDA_CFLAGS -I${MPI_DIR}/include -L${MPI_DIR}/lib -lmpi"
-    else 
+    else
       CUDA_CFLAGS="$CUDA_CFLAGS -lmpi"
     fi
   fi
 
   AC_SUBST(CUDA_CFLAGS)
 fi
-  
+
 if test "x$enable_serial" = "x"; then
 
   if test "x$MPICC" = "x" ; then
@@ -338,6 +338,15 @@ AC_CONFIG_FILES([
  src/SparseGrids/Makefile
  src/TimeIntegration/Makefile
  src/TridiagLU/Makefile
+ tests/Makefile
+ tests/InterpolationFunctions/Makefile
+ tests/ArrayFunctions/Makefile
+ tests/FirstDerivative/Makefile
+ tests/SecondDerivative/Makefile
+ tests/TridiagLU/Makefile
+ tests/CommonFunctions/Makefile
+ tests/LimiterFunctions/Makefile
+ tests/MathFunctions/Makefile
 ])
 
 AC_OUTPUT

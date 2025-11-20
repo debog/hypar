@@ -121,7 +121,7 @@ void gpuMalloc( void**  devPtr, /*!< pointer to memory */
     cudaMalloc(devPtr, size);
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess) {
-      fprintf(  stderr,"Error in gpuMalloc(): size=%d, error message=\"%s\"\n", size,
+      fprintf(  stderr,"Error in gpuMalloc(): size=%zu, error message=\"%s\"\n", size,
                 cudaGetErrorString(err) );
     }
     return;

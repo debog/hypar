@@ -1,0 +1,33 @@
+# Test executables
+test_interpolation
+test_array
+test_first_derivative
+test_second_derivative
+test_tridiag
+test_common
+test_limiters
+test_math
+test_mpi
+*_test
+
+# Autotools generated files
+Makefile
+Makefile.in
+.deps/
+.dirstamp
+
+# Test logs
+*.log
+*.trs
+test-suite.log
+
+# Object files
+*.o
+*.lo
+*.la
+.libs/
+
+# Backup files
+*~
+*.bak
+*.swp

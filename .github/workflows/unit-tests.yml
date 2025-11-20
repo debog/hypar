@@ -1,0 +1,71 @@
+name: Unit Tests
+on: [push, pull_request]
+
+jobs:
+  test-serial:
+    name: Unit Tests (Serial)
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential autoconf automake libtool
+
+    - name: Configure (Serial Mode)
+      run: |
+        autoreconf -i
+        ./configure --enable-serial
+
+    - name: Build
+      run: make -j$(nproc)
+
+    - name: Run Unit Tests
+      run: make check
+
+    - name: Display test results
+      if: always()
+      run: |
+        if [ -f tests/InterpolationFunctions/test-suite.log ]; then
+          echo "=== Test Suite Log ==="
+          cat tests/InterpolationFunctions/test-suite.log
+        fi
+        if [ -f tests/InterpolationFunctions/test_interpolation.log ]; then
+          echo "=== Test Interpolation Log ==="
+          cat tests/InterpolationFunctions/test_interpolation.log
+        fi
+
+  test-mpi:
+    name: Unit Tests (MPI)
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: .github/workflows/dependencies/dependencies_mpich.sh
+
+    - name: Configure (MPI Mode)
+      run: |
+        autoreconf -i
+        ./configure
+
+    - name: Build
+      run: make -j$(nproc)
+
+    - name: Run Unit Tests
+      run: make check
+
+    - name: Display test results
+      if: always()
+      run: |
+        if [ -f tests/InterpolationFunctions/test-suite.log ]; then
+          echo "=== Test Suite Log ==="
+          cat tests/InterpolationFunctions/test-suite.log
+        fi
+        if [ -f tests/InterpolationFunctions/test_interpolation.log ]; then
+          echo "=== Test Interpolation Log ==="
+          cat tests/InterpolationFunctions/test_interpolation.log
+        fi

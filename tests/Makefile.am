@@ -1,0 +1,3 @@
+SUBDIRS = InterpolationFunctions ArrayFunctions FirstDerivative SecondDerivative TridiagLU CommonFunctions LimiterFunctions MathFunctions
+
+EXTRA_DIST =

@@ -181,5 +181,12 @@ include_directories(${CMAKE_SOURCE_DIR}/include/physicalmodels)
 
 add_subdirectory(src)
 
+# Add tests if BUILD_TESTING is enabled (default ON)
+option(BUILD_TESTING "Build the testing tree" ON)
+if(BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
+
 install(DIRECTORY include/ DESTINATION include)
 install(FILES README.md DESTINATION share/doc/hypar)
