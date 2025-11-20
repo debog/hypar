@@ -21,14 +21,14 @@
   Note: the flux function needs to be computed at the ghost points as well.
 */
 int NavierStokes3DFlux(
-                        double  *f, /*!< Array to hold the computed flux vector (same layout as u) */
-                        double  *u, /*!< Array with the solution vector */
-                        int     dir,/*!< Spatial dimension (x, y, or z) for which to compute the flux */
-                        void    *s, /*!< Solver object of type #HyPar */
-                        double  t   /*!< Current simulation time */
+                        double  *a_f, /*!< Array to hold the computed flux vector (same layout as a_u) */
+                        double  *a_u, /*!< Array with the solution vector */
+                        int     a_dir,/*!< Spatial dimension (x, y, or z) for which to compute the flux */
+                        void    *a_s, /*!< Solver object of type #HyPar */
+                        double  a_t   /*!< Current simulation time */
                       )
 {
-  HyPar             *solver = (HyPar*)   s;
+  HyPar             *solver = (HyPar*)   a_s;
   NavierStokes3D    *param  = (NavierStokes3D*) solver->m_physics;
   int               i;
 
@@ -48,8 +48,8 @@ int NavierStokes3DFlux(
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double rho, vx, vy, vz, e, P;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,param->m_gamma);
-    _NavierStokes3DSetFlux_((f+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,dir);
+    _NavierStokes3DGetFlowVar_((a_u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,param->m_gamma);
+    _NavierStokes3DSetFlux_((a_f+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,a_dir);
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 
@@ -68,14 +68,14 @@ int NavierStokes3DFlux(
   Note: the flux function needs to be computed at the ghost points as well.
 */
 int NavierStokes3DStiffFlux(
-                              double  *f, /*!< Array to hold the computed flux vector (same layout as u) */
-                              double  *u, /*!< Array with the solution vector */
-                              int     dir,/*!< Spatial dimension (x,y, or z) for which to compute the flux */
-                              void    *s, /*!< Solver object of type #HyPar */
-                              double  t   /*!< Current simulation time */
+                              double  *a_f, /*!< Array to hold the computed flux vector (same layout as a_u) */
+                              double  *a_u, /*!< Array with the solution vector */
+                              int     a_dir,/*!< Spatial dimension (x,y, or z) for which to compute the flux */
+                              void    *a_s, /*!< Solver object of type #HyPar */
+                              double  a_t   /*!< Current simulation time */
                            )
 {
-  HyPar             *solver = (HyPar*)   s;
+  HyPar             *solver = (HyPar*)   a_s;
   NavierStokes3D    *param  = (NavierStokes3D*) solver->m_physics;
   int               *dim    = solver->m_dim_local;
   int               ghosts  = solver->m_ghosts;
@@ -90,8 +90,8 @@ int NavierStokes3DStiffFlux(
   int done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
-    double *Af = param->m_fast_jac+(_MODEL_NDIMS_*p+dir)*JacSize;
-    MatVecMult5(_MODEL_NVARS_,(f+_MODEL_NVARS_*p),Af,(u+_MODEL_NVARS_*p));
+    double *Af = param->m_fast_jac+(_MODEL_NDIMS_*p+a_dir)*JacSize;
+    MatVecMult5(_MODEL_NVARS_,(a_f+_MODEL_NVARS_*p),Af,(a_u+_MODEL_NVARS_*p));
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }
 
@@ -109,14 +109,14 @@ int NavierStokes3DStiffFlux(
   Note: the flux function needs to be computed at the ghost points as well.
 */
 int NavierStokes3DNonStiffFlux(
-                              double  *f, /*!< Array to hold the computed flux vector (same layout as u) */
-                              double  *u, /*!< Array with the solution vector */
-                              int     dir,/*!< Spatial dimension (x,y, or z) for which to compute the flux */
-                              void    *s, /*!< Solver object of type #HyPar */
-                              double  t   /*!< Current simulation time */
+                              double  *a_f, /*!< Array to hold the computed flux vector (same layout as a_u) */
+                              double  *a_u, /*!< Array with the solution vector */
+                              int     a_dir,/*!< Spatial dimension (x,y, or z) for which to compute the flux */
+                              void    *a_s, /*!< Solver object of type #HyPar */
+                              double  a_t   /*!< Current simulation time */
                            )
 {
-  HyPar             *solver = (HyPar*)   s;
+  HyPar             *solver = (HyPar*)   a_s;
   NavierStokes3D    *param  = (NavierStokes3D*) solver->m_physics;
   int               *dim    = solver->m_dim_local;
   int               ghosts  = solver->m_ghosts;
@@ -134,13 +134,13 @@ int NavierStokes3DNonStiffFlux(
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
     /* compute total flux */
     double rho, vx, vy, vz, e, P;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,param->m_gamma);
-    _NavierStokes3DSetFlux_(ftot,_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,dir);
+    _NavierStokes3DGetFlowVar_((a_u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,param->m_gamma);
+    _NavierStokes3DSetFlux_(ftot,_NavierStokes3D_stride_,rho,vx,vy,vz,e,P,a_dir);
     /* compute stiff stuff */
-    double *Af = param->m_fast_jac+(_MODEL_NDIMS_*p+dir)*JacSize;
-    MatVecMult5(_MODEL_NVARS_,fstiff,Af,(u+_MODEL_NVARS_*p));
+    double *Af = param->m_fast_jac+(_MODEL_NDIMS_*p+a_dir)*JacSize;
+    MatVecMult5(_MODEL_NVARS_,fstiff,Af,(a_u+_MODEL_NVARS_*p));
     /* subtract stiff flux from total flux */
-    _ArraySubtract1D_((f+_MODEL_NVARS_*p),ftot,fstiff,_MODEL_NVARS_);
+    _ArraySubtract1D_((a_f+_MODEL_NVARS_*p),ftot,fstiff,_MODEL_NVARS_);
     /* Done */
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }

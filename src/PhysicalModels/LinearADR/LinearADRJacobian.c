@@ -8,24 +8,24 @@
 
 /*! Function to compute the flux Jacobian for the hyperbolic (advection) part of the
     linear-advection-diffusion-reaction model. */
-int LinearADRAdvectionJacobian( double* Jac,  /*!< Jacobian matrix of size 1 (nvar = 1) */
-                                double* u,    /*!< solution at a grid point */
-                                void*   p,    /*!< object containing physics-related parameters */
-                                int     dir,  /*!< dimension (x/y/z) */
-                                int     nvars,/*!< number of components */
-                                int     upw   /*!< 0 -> send back complete Jacobian,
+int LinearADRAdvectionJacobian( double* a_Jac,  /*!< Jacobian matrix of size 1 (nvar = 1) */
+                                double* a_u,    /*!< solution at a grid point */
+                                void*   a_p,    /*!< object containing physics-related parameters */
+                                int     a_dir,  /*!< dimension (x/y/z) */
+                                int     a_nvars,/*!< number of components */
+                                int     a_upw   /*!< 0 -> send back complete Jacobian,
                                                    1 -> send back Jacobian of right(+)-moving flux,
                                                   -1 -> send back Jacobian of left(-)-moving flux*/ )
 {
-  LinearADR *param = (LinearADR*) p;
+  LinearADR *param = (LinearADR*) a_p;
 
   if (param->m_a) {
-    *Jac =    (1-absolute(upw))*absolute(param->m_a[dir])
-           +  absolute(upw) * (1+upw) * max(0,param->m_a[dir]) * 0.5
-           -  absolute(upw) * (1-upw) * min(0,param->m_a[dir]) * 0.5 ;
+    *a_Jac =    (1-absolute(a_upw))*absolute(param->m_a[a_dir])
+           +  absolute(a_upw) * (1+a_upw) * max(0,param->m_a[a_dir]) * 0.5
+           -  absolute(a_upw) * (1-a_upw) * min(0,param->m_a[a_dir]) * 0.5 ;
   } else {
     /* no advection term */
-    *Jac = 0.0;
+    *a_Jac = 0.0;
   }
 
   return 0;
@@ -33,17 +33,17 @@ int LinearADRAdvectionJacobian( double* Jac,  /*!< Jacobian matrix of size 1 (nv
 
 /*! Function to compute the  Jacobian for the parabolic (diffusion) part of the
     linear-advection-diffusion-reaction model. */
-int LinearADRDiffusionJacobian( double* Jac,  /*!< Jacobian matrix of size 1 (nvar = 1) */
-                                double* u,    /*!< solution at a grid point */
-                                void*   p,    /*!< object containing physics-related parameters */
-                                int     dir,  /*!< dimension (x/y/z) */
-                                int     nvars /*!< number of components */ )
+int LinearADRDiffusionJacobian( double* a_Jac,  /*!< Jacobian matrix of size 1 (nvar = 1) */
+                                double* a_u,    /*!< solution at a grid point */
+                                void*   a_p,    /*!< object containing physics-related parameters */
+                                int     a_dir,  /*!< dimension (x/y/z) */
+                                int     a_nvars /*!< number of components */ )
 {
-  LinearADR *param = (LinearADR*) p;
+  LinearADR *param = (LinearADR*) a_p;
 
   int v;
-  for (v = 0; v < nvars; v++) {
-    Jac[nvars*v+v] = -param->m_d[nvars*dir+v];
+  for (v = 0; v < a_nvars; v++) {
+    a_Jac[a_nvars*v+v] = -param->m_d[a_nvars*a_dir+v];
   }
 
   return 0;

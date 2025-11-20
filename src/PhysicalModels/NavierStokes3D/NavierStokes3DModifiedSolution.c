@@ -29,18 +29,18 @@
       for Atmospheric Flows, AIAA Journal, 54 (4), 2016, pp. 1370-1385, http://dx.doi.org/10.2514/1.J054580.
 */
 int NavierStokes3DModifiedSolution(
-                                    double  *uC,  /*!< Array to hold the computed modified solution */
-                                    double  *u,   /*!< Solution vector array */
-                                    int     d,    /*!< spatial dimension (not used) */
-                                    void    *s,   /*!< Solver object of type #HyPar */
-                                    void    *m,   /*!< MPI object of time #MPIVariables */
+                                    double  *a_uC,  /*!< Array to hold the computed modified solution */
+                                    double  *a_u,   /*!< Solution vector array */
+                                    int     a_d,    /*!< spatial dimension (not used) */
+                                    void    *a_s,   /*!< Solver object of type #HyPar */
+                                    void    *a_m,   /*!< MPI object of time #MPIVariables */
                                     double waqt   /*!< Current simulation time */
                                   )
 {
-  HyPar           *solver = (HyPar*)          s;
+  HyPar           *solver = (HyPar*)          a_s;
   NavierStokes3D  *param  = (NavierStokes3D*) solver->m_physics;
 
-  int     ghosts  = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     *dim    = solver->m_dim_local;
   int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
@@ -57,12 +57,12 @@ int NavierStokes3DModifiedSolution(
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double rho, uvel, vvel, wvel, E, P;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,uvel,vvel,wvel,E,P,param->m_gamma);
-    uC[_MODEL_NVARS_*p+0] = u[_MODEL_NVARS_*p+0] * param->m_grav_field_f[p];
-    uC[_MODEL_NVARS_*p+1] = u[_MODEL_NVARS_*p+1] * param->m_grav_field_f[p];
-    uC[_MODEL_NVARS_*p+2] = u[_MODEL_NVARS_*p+2] * param->m_grav_field_f[p];
-    uC[_MODEL_NVARS_*p+3] = u[_MODEL_NVARS_*p+3] * param->m_grav_field_f[p];
-    uC[_MODEL_NVARS_*p+4] = (P*inv_gamma_m1)*(1.0/param->m_grav_field_g[p]) + (0.5*rho*(uvel*uvel+vvel*vvel+wvel*wvel))*param->m_grav_field_f[p];
+    _NavierStokes3DGetFlowVar_((a_u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,uvel,vvel,wvel,E,P,param->m_gamma);
+    a_uC[_MODEL_NVARS_*p+0] = a_u[_MODEL_NVARS_*p+0] * param->m_grav_field_f[p];
+    a_uC[_MODEL_NVARS_*p+1] = a_u[_MODEL_NVARS_*p+1] * param->m_grav_field_f[p];
+    a_uC[_MODEL_NVARS_*p+2] = a_u[_MODEL_NVARS_*p+2] * param->m_grav_field_f[p];
+    a_uC[_MODEL_NVARS_*p+3] = a_u[_MODEL_NVARS_*p+3] * param->m_grav_field_f[p];
+    a_uC[_MODEL_NVARS_*p+4] = (P*inv_gamma_m1)*(1.0/param->m_grav_field_g[p]) + (0.5*rho*(uvel*uvel+vvel*vvel+wvel*wvel))*param->m_grav_field_f[p];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

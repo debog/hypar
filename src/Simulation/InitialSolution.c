@@ -22,21 +22,21 @@ int VolumeIntegral(double*,double*,void*,void*);
 
 /*! Read in initial solution from file, and compute grid spacing
     and volume integral of the initial solution */
-int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #SimulationObject */
-                      int   nsims /*!< Number of simulation objects */
+int InitialSolution ( void  *a_s,   /*!< Array of simulation objects of type #SimulationObject */
+                      int   a_nsims /*!< Number of simulation objects */
                     )
 {
-  SimulationObject* simobj = (SimulationObject*) s;
+  SimulationObject* simobj = (SimulationObject*) a_s;
   int n, flag, d, i, offset, ierr;
 
-  for (n = 0; n < nsims; n++) {
+  for (n = 0; n < a_nsims; n++) {
 
     int ghosts = simobj[n].solver.m_ghosts;
 
     char fname_root[_MAX_STRING_SIZE_] = "initial";
-    if (nsims > 1) {
+    if (a_nsims > 1) {
       char index[_MAX_STRING_SIZE_];
-      GetStringFromInteger(n, index, (int)log10(nsims)+1);
+      GetStringFromInteger(n, index, (int)log10(a_nsims)+1);
       strcat(fname_root, "_");
       strcat(fname_root, index);
     }
@@ -125,7 +125,7 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
       return ierr;
     }
     if (!simobj[n].mpi.m_rank) {
-      if (nsims > 1) printf("Volume integral of the initial solution on domain %d:\n", n);
+      if (a_nsims > 1) printf("Volume integral of the initial solution on domain %d:\n", n);
       else           printf("Volume integral of the initial solution:\n");
       for (d=0; d<simobj[n].solver.m_nvars; d++) {
         printf("%2d:  %1.16E\n",d,simobj[n].solver.m_volume_integral_initial[d]);
@@ -138,7 +138,7 @@ int InitialSolution ( void  *s,   /*!< Array of simulation objects of type #Simu
 
 #if defined(HAVE_CUDA)
   if (simobj[0].solver.m_use_gpu) {
-    for (int n = 0; n < nsims; n++) {
+    for (int n = 0; n < a_nsims; n++) {
       int npoints_local_wghosts = simobj[n].solver.m_npoints_local_wghosts;
       int nvars                 = simobj[n].solver.m_nvars;
       int size_x                = simobj[n].solver.m_size_x;

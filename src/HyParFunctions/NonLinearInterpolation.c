@@ -26,18 +26,18 @@
       is called with the argument \b LimFlag = 0.
 */
 int NonLinearInterpolation(
-                            double  *u, /*!< Solution array */
-                            void    *s, /*!< Solver object of type #HyPar */
-                            void    *m, /*!< MPI object of type #MPIVariables */
-                            double  t,  /*!< Current solution time */
-                            /*! The flux function \f${\bf f}_d\left({\bf u}\right)\f$, whose
+                            double  *a_u, /*!< Solution array */
+                            void    *a_s, /*!< Solver object of type #HyPar */
+                            void    *a_m, /*!< MPI object of type #MPIVariables */
+                            double  a_t,  /*!< Current solution time */
+                            /*! The flux function \f${\bf f}_d\left({\bf u}\a_right)\f$, whose
                             properties (typically smoothness) is used to evaluate the nonlinear
                             coefficients */
                             int     (*FluxFunction)(double*,double*,int,void*,double)
                           )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*) a_s;
+  MPIVariables  *mpi    = (MPIVariables*)   a_m;
   double        *FluxC  = solver->m_flux_c; /* cell centered flux */
   _DECLARE_IERR_;
 
@@ -53,16 +53,16 @@ int NonLinearInterpolation(
     for (d=0; d<ndims; d++) size *= (dim[d] + 2*ghosts);
 
     /* apply boundary conditions and exchange data over MPI interfaces */
-    IERR solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);      CHECKERR(ierr);
-    IERR solver->ApplyIBConditions(solver,mpi,u,t);                 CHECKERR(ierr);
-    IERR MPIExchangeBoundariesnD(ndims,nvars,dim,ghosts,mpi,u);     CHECKERR(ierr);
+    IERR solver->ApplyBoundaryConditions(solver,mpi,a_u,NULL,a_t);      CHECKERR(ierr);
+    IERR solver->ApplyIBConditions(solver,mpi,a_u,a_t);                 CHECKERR(ierr);
+    IERR MPIExchangeBoundariesnD(ndims,nvars,dim,ghosts,mpi,a_u);     CHECKERR(ierr);
 
     int offset = 0;
     for (d = 0; d < ndims; d++) {
       /* evaluate cell-centered flux */
-      IERR FluxFunction(FluxC,u,d,solver,t);                          CHECKERR(ierr);
+      IERR FluxFunction(FluxC,a_u,d,solver,a_t);                          CHECKERR(ierr);
       /* calculate non-linear interpolation coefficients */
-      IERR solver->SetInterpLimiterVar(FluxC,u,x+offset,d,solver,mpi);CHECKERR(ierr);
+      IERR solver->SetInterpLimiterVar(FluxC,a_u,x+offset,d,solver,mpi);CHECKERR(ierr);
       offset += dim[d] + 2*ghosts;
     }
   }

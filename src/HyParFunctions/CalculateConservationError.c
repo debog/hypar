@@ -14,11 +14,11 @@
     of the simulation to the current simulation time.
 */
 int CalculateConservationError(
-                                void *s, /*!< Solver object of type #HyPar */
-                                void *m  /*!< MPI object of type #MPIVariables */
+                                void *a_s, /*!< Solver object of type #HyPar */
+                                void *a_m  /*!< MPI object of type #MPIVariables */
                               )
 {
-  HyPar         *solver = (HyPar*) s;
+  HyPar         *solver = (HyPar*) a_s;
   int           v,nvars = solver->m_nvars;
   double        error;
 

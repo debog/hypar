@@ -19,14 +19,14 @@
   Note: the flux function needs to be computed at the ghost points as well.
 */
 int NavierStokes2DFlux(
-                        double  *f, /*!< Array to hold the computed flux vector (same layout as u) */
-                        double  *u, /*!< Array with the solution vector */
-                        int     dir,/*!< Spatial dimension (x or y) for which to compute the flux */
-                        void    *s, /*!< Solver object of type #HyPar */
-                        double  t   /*!< Current simulation time */
+                        double  *a_f, /*!< Array to hold the computed flux vector (same layout as a_u) */
+                        double  *a_u, /*!< Array with the solution vector */
+                        int     a_dir,/*!< Spatial dimension (x or y) for which to compute the flux */
+                        void    *a_s, /*!< Solver object of type #HyPar */
+                        double  a_t   /*!< Current simulation time */
                       )
 {
-  HyPar           *solver = (HyPar*)   s;
+  HyPar           *solver = (HyPar*)   a_s;
   NavierStokes2D  *param  = (NavierStokes2D*) solver->m_physics;
   int             *dim    = solver->m_dim_local;
   int             ghosts  = solver->m_ghosts;
@@ -41,8 +41,8 @@ int NavierStokes2DFlux(
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
     double rho, vx, vy, e, P;
-    _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,vx,vy,e,P,param->m_gamma);
-    _NavierStokes2DSetFlux_((f+_MODEL_NVARS_*p),rho,vx,vy,e,P,dir);
+    _NavierStokes2DGetFlowVar_((a_u+_MODEL_NVARS_*p),rho,vx,vy,e,P,param->m_gamma);
+    _NavierStokes2DSetFlux_((a_f+_MODEL_NVARS_*p),rho,vx,vy,e,P,a_dir);
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }
 
@@ -61,14 +61,14 @@ int NavierStokes2DFlux(
   Note: the flux function needs to be computed at the ghost points as well.
 */
 int NavierStokes2DStiffFlux(
-                              double  *f, /*!< Array to hold the computed flux vector (same layout as u) */
-                              double  *u, /*!< Array with the solution vector */
-                              int     dir,/*!< Spatial dimension (x or y) for which to compute the flux */
-                              void    *s, /*!< Solver object of type #HyPar */
-                              double  t   /*!< Current simulation time */
+                              double  *a_f, /*!< Array to hold the computed flux vector (same layout as a_u) */
+                              double  *a_u, /*!< Array with the solution vector */
+                              int     a_dir,/*!< Spatial dimension (x or y) for which to compute the flux */
+                              void    *a_s, /*!< Solver object of type #HyPar */
+                              double  a_t   /*!< Current simulation time */
                            )
 {
-  HyPar             *solver = (HyPar*)   s;
+  HyPar             *solver = (HyPar*)   a_s;
   NavierStokes2D    *param  = (NavierStokes2D*) solver->m_physics;
   int               *dim    = solver->m_dim_local;
   int               ghosts  = solver->m_ghosts;
@@ -83,8 +83,8 @@ int NavierStokes2DStiffFlux(
   int done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
-    double *Af = param->m_fast_jac+(2*p+dir)*JacSize;
-    MatVecMult4(_MODEL_NVARS_,(f+_MODEL_NVARS_*p),Af,(u+_MODEL_NVARS_*p));
+    double *Af = param->m_fast_jac+(2*p+a_dir)*JacSize;
+    MatVecMult4(_MODEL_NVARS_,(a_f+_MODEL_NVARS_*p),Af,(a_u+_MODEL_NVARS_*p));
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }
 
@@ -102,14 +102,14 @@ int NavierStokes2DStiffFlux(
   Note: the flux function needs to be computed at the ghost points as well.
 */
 int NavierStokes2DNonStiffFlux(
-                              double  *f, /*!< Array to hold the computed flux vector (same layout as u) */
-                              double  *u, /*!< Array with the solution vector */
-                              int     dir,/*!< Spatial dimension (x or y) for which to compute the flux */
-                              void    *s, /*!< Solver object of type #HyPar */
-                              double  t   /*!< Current simulation time */
+                              double  *a_f, /*!< Array to hold the computed flux vector (same layout as a_u) */
+                              double  *a_u, /*!< Array with the solution vector */
+                              int     a_dir,/*!< Spatial dimension (x or y) for which to compute the flux */
+                              void    *a_s, /*!< Solver object of type #HyPar */
+                              double  a_t   /*!< Current simulation time */
                            )
 {
-  HyPar             *solver = (HyPar*)   s;
+  HyPar             *solver = (HyPar*)   a_s;
   NavierStokes2D    *param  = (NavierStokes2D*) solver->m_physics;
   int               *dim    = solver->m_dim_local;
   int               ghosts  = solver->m_ghosts;
@@ -127,13 +127,13 @@ int NavierStokes2DNonStiffFlux(
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
     /* compute total flux */
     double rho, vx, vy, e, P;
-    _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,vx,vy,e,P,param->m_gamma);
-    _NavierStokes2DSetFlux_(ftot,rho,vx,vy,e,P,dir);
+    _NavierStokes2DGetFlowVar_((a_u+_MODEL_NVARS_*p),rho,vx,vy,e,P,param->m_gamma);
+    _NavierStokes2DSetFlux_(ftot,rho,vx,vy,e,P,a_dir);
     /* compute stiff stuff */
-    double *Af = param->m_fast_jac+(2*p+dir)*JacSize;
-    MatVecMult4(_MODEL_NVARS_,fstiff,Af,(u+_MODEL_NVARS_*p));
+    double *Af = param->m_fast_jac+(2*p+a_dir)*JacSize;
+    MatVecMult4(_MODEL_NVARS_,fstiff,Af,(a_u+_MODEL_NVARS_*p));
     /* subtract stiff flux from total flux */
-    _ArraySubtract1D_((f+_MODEL_NVARS_*p),ftot,fstiff,_MODEL_NVARS_);
+    _ArraySubtract1D_((a_f+_MODEL_NVARS_*p),ftot,fstiff,_MODEL_NVARS_);
     /* Done */
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }

@@ -36,21 +36,21 @@
 #endif
 
 /*! Cleans up and frees the memory after the completion of the simulation. */
-int Cleanup(  void  *s,   /*!< Array of simulation objects of type #SimulationObject */
-              int   nsims /*!< number of simulation objects */
+int Cleanup(  void  *a_s,   /*!< Array of simulation objects of type #SimulationObject */
+              int   a_nsims /*!< number of simulation objects */
            )
 {
-  SimulationObject* sim = (SimulationObject*) s;
+  SimulationObject* sim = (SimulationObject*) a_s;
   int ns;
   _DECLARE_IERR_;
 
-  if (nsims == 0) return 0;
+  if (a_nsims == 0) return 0;
 
   if (!sim[0].mpi.m_rank) {
     printf("Deallocating arrays.\n");
   }
 
-  for (ns = 0; ns < nsims; ns++) {
+  for (ns = 0; ns < a_nsims; ns++) {
 
     if (sim[ns].is_barebones == 1) {
       fprintf(stderr, "Error in Cleanup(): object is barebones type.\n");

@@ -23,12 +23,12 @@
 int IBWriteBodySTL(
                     Body3D *body,     /*!< 3D body to write to file */
                     char   *filename, /*!< Filename */
-                    void   *m,        /*!< MPI object of type #MPIVariables */
+                    void *a_m,        /*!< MPI object of type #MPIVariables */
                     int    rank,      /*!< MPI rank that does the writing */
                     int    *stat      /*!< Status (0: success; non-0: failure) */
                   )
 {
-  MPIVariables  *mpi = (MPIVariables*) m;
+  MPIVariables  *mpi = (MPIVariables*)   a_m;
 
   if (mpi->m_rank == rank) {
     FILE *out;

@@ -21,28 +21,28 @@
 
     \sa TransferVecFromPETSc()
 */
-int TransferVecToPETSc( const double* const u, /*!< HyPar::u type array (with ghost points) */
-                        Vec Y, /*!< PETSc vector */
-                        void* ctxt, /*!< Object of type #PETScContext */
-                        const int sim_idx,/*!< Simulation object index */
-                        const int offset  /*!< Offset */ )
+int TransferVecToPETSc( const double* const a_u, /*!< HyPar::u type array (with ghost points) */
+                        Vec a_Y, /*!< PETSc vector */
+                        void* a_ctxt, /*!< Object of type #PETScContext */
+                        const int a_sim_idx,/*!< Simulation object index */
+                        const int a_offset  /*!< Offset */ )
 {
-  PETScContext* context = (PETScContext*) ctxt;
+  PETScContext* context = (PETScContext*) a_ctxt;
   SimulationObject* sim = (SimulationObject*) context->m_simobj;
   double* Yarr;
 
   PetscFunctionBegin;
-  VecGetArray(Y,&Yarr);
-  std::vector<int> index(sim[sim_idx].solver.m_ndims,0);
-  ArrayCopynD(  sim[sim_idx].solver.m_ndims,
-                u,
-                (Yarr+offset),
-                sim[sim_idx].solver.m_dim_local,
-                sim[sim_idx].solver.m_ghosts,
+  VecGetArray(a_Y,&Yarr);
+  std::vector<int> index(sim[a_sim_idx].solver.m_ndims,0);
+  ArrayCopynD(  sim[a_sim_idx].solver.m_ndims,
+                a_u,
+                (Yarr+a_offset),
+                sim[a_sim_idx].solver.m_dim_local,
+                sim[a_sim_idx].solver.m_ghosts,
                 0,
                 index.data(),
-                sim[sim_idx].solver.m_nvars );
-  VecRestoreArray(Y,&Yarr);
+                sim[a_sim_idx].solver.m_nvars );
+  VecRestoreArray(a_Y,&Yarr);
 
   PetscFunctionReturn(0);
 }
@@ -50,11 +50,11 @@ int TransferVecToPETSc( const double* const u, /*!< HyPar::u type array (with gh
 /*!
   Copy a matrix of type #BandedMatrix to a PETSc matrix.
 */
-int TransferMatToPETSc( void *J,    /*!< Matrix of type #BandedMatrix */
-                        Mat   A,    /*!< PETSc matrix */
-                        void *ctxt  /*!< Object of type #PETScContext */ )
+int TransferMatToPETSc( void *a_J,    /*!< Matrix of type #BandedMatrix */
+                        Mat   a_A,    /*!< PETSc matrix */
+                        void *a_ctxt  /*!< Object of type #PETScContext */ )
 {
-  BandedMatrix    *M = (BandedMatrix*) J;
+  BandedMatrix    *M = (BandedMatrix*) a_J;
   PetscErrorCode  ierr     = 0;
   int             bs = M->m_BlockSize, nbands = M->m_nbands, bs2 = bs*bs;
 
@@ -69,11 +69,11 @@ int TransferMatToPETSc( void *J,    /*!< Matrix of type #BandedMatrix */
         }
       }
     }
-    MatSetValuesBlocked(A,1,&M->m_nrow[i],M->m_nbands,&colind[0],&val[0][0],INSERT_VALUES);
+    MatSetValuesBlocked(a_A,1,&M->m_nrow[i],M->m_nbands,&colind[0],&val[0][0],INSERT_VALUES);
   }
 
-  MatAssemblyBegin(A,MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd  (A,MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(a_A,MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd  (a_A,MAT_FINAL_ASSEMBLY);
 
   return(0);
 }

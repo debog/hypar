@@ -25,9 +25,9 @@
   + It will also call any physics-specific post-time-step function,
     if defined.
 */
-int TimePostStep(void *ts /*!< Object of type #TimeIntegration */)
+int TimePostStep(void *a_ts /*!< Object of type #TimeIntegration */)
 {
-  TimeIntegration* TS = (TimeIntegration*) ts;
+  TimeIntegration* TS = (TimeIntegration*) a_ts;
   SimulationObject* sim = (SimulationObject*) TS->m_simulation;
   int ns, nsims = TS->m_nsims;
 

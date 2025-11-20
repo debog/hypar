@@ -9,13 +9,13 @@
 
 /*! Assign the function pointers for boundary condition application depending on the boundary
     type, for a given boundary object */
-int BCInitialize( void *b, /*!< Boundary object of type #DomainBoundary*/
+int BCInitialize( void *a_b, /*!< Boundary object of type #DomainBoundary*/
                   int flag_gpu  /*!< Flag to indicate if GPU is being used */ )
 {
-  DomainBoundary *boundary = (DomainBoundary*) b;
+  DomainBoundary *boundary = (DomainBoundary*) a_b;
 
 #if defined(HAVE_CUDA)
-  if (flag_gpu) {
+  if (a_flag_gpu) {
 
     if      (!strcmp(boundary->m_bctype,_PERIODIC_)) {
       boundary->BCFunctionU = gpuBCPeriodicU;

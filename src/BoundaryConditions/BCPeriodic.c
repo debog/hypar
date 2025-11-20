@@ -17,41 +17,41 @@
     to minimize communication.
 */
 int BCPeriodicU(
-                  void    *b,     /*!< Boundary object of type #DomainBoundary */
-                  void    *m,     /*!< MPI object of type #MPIVariables */
-                  int     ndims,  /*!< Number of spatial dimensions */
-                  int     nvars,  /*!< Number of variables/DoFs per grid point */
-                  int     *size,  /*!< Integer array with the number of grid points in each spatial dimension */
-                  int     ghosts, /*!< Number of ghost points */
-                  double  *phi,   /*!< The solution array on which to apply the boundary condition */
-                  double  waqt    /*!< Current solution time */
+                  void    *a_b,     /*!< Boundary object of type #DomainBoundary */
+                  void    *a_m,     /*!< MPI object of type #MPIVariables */
+                  int     a_ndims,  /*!< Number of spatial dimensions */
+                  int     a_nvars,  /*!< Number of variables/DoFs per grid point */
+                  int     *a_size,  /*!< Integer array with the number of grid points in each spatial dimension */
+                  int     a_ghosts, /*!< Number of ghost points */
+                  double  *a_phi,   /*!< The solution array on which to apply the boundary condition */
+                  double  a_waqt    /*!< Current solution time */
                )
 {
-  DomainBoundary *boundary = (DomainBoundary*) b;
-  MPIVariables   *mpi      = (MPIVariables*)   m;
+  DomainBoundary *boundary = (DomainBoundary*) a_b;
+  MPIVariables   *mpi      = (MPIVariables*)   a_m;
 
   int dim   = boundary->m_dim;
   int face  = boundary->m_face;
 
   if ((boundary->m_on_this_proc) && (mpi->m_iproc[dim] == 1)) {
-    int bounds[ndims], index1[ndims], index2[ndims];
-    _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
-    _ArraySetValue_(index1,ndims,0);
-    _ArraySetValue_(index2,ndims,0);
+    int bounds[a_ndims], index1[a_ndims], index2[a_ndims];
+    _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,a_ndims);
+    _ArraySetValue_(index1,a_ndims,0);
+    _ArraySetValue_(index2,a_ndims,0);
     int done = 0;
     while (!done) {
       int p1 = 0, p2 = 0;
-      _ArrayCopy1D_(index1,index2,ndims);
+      _ArrayCopy1D_(index1,index2,a_ndims);
       if (face == 1) {
-        index2[dim] = index1[dim] + size[dim]-ghosts;
-        _ArrayIndex1DWO_(ndims,size,index1,boundary->m_is,ghosts,p1);
-        _ArrayIndex1D_(ndims,size,index2,ghosts,p2);
+        index2[dim] = index1[dim] + a_size[dim]-a_ghosts;
+        _ArrayIndex1DWO_(a_ndims,a_size,index1,boundary->m_is,a_ghosts,p1);
+        _ArrayIndex1D_(a_ndims,a_size,index2,a_ghosts,p2);
       } else if (face == -1) {
-        _ArrayIndex1DWO_(ndims,size,index1,boundary->m_is,ghosts,p1);
-        _ArrayIndex1D_(ndims,size,index1,ghosts,p2);
+        _ArrayIndex1DWO_(a_ndims,a_size,index1,boundary->m_is,a_ghosts,p1);
+        _ArrayIndex1D_(a_ndims,a_size,index1,a_ghosts,p2);
       }
-      _ArrayCopy1D_((phi+nvars*p2),(phi+nvars*p1),nvars);
-      _ArrayIncrementIndex_(ndims,bounds,index1,done);
+      _ArrayCopy1D_((a_phi+a_nvars*p2),(a_phi+a_nvars*p1),a_nvars);
+      _ArrayIncrementIndex_(a_ndims,bounds,index1,done);
     }
   }
 

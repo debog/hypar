@@ -7,9 +7,9 @@
 #include <physicalmodels/vlasov.h>
 
 /*! Function to clean up all physics-related allocations for the Vlasov equations */
-int VlasovCleanup(void *s /*!< Solver object of type #HyPar */)
+int VlasovCleanup(void *a_s /*!< Solver object of type #HyPar */)
 {
-  Vlasov *physics = (Vlasov*) s;
+  Vlasov *physics = (Vlasov*) a_s;
 
   free(physics->m_e_field);
   free(physics->m_potential);

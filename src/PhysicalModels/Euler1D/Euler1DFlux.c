@@ -14,14 +14,14 @@
     \f}
 */
 int Euler1DFlux(
-                double  *f, /*!< Array to hold the computed flux (same size and layout as u) */
-                double  *u, /*!< Array containing the conserved solution */
-                int     dir,/*!< Spatial dimension (unused since this is a 1D system) */
-                void    *s, /*!< Solver object of type #HyPar */
-                double  t   /*!< Current time */
+                double  *a_f, /*!< Array to hold the computed flux (same size and layout as a_u) */
+                double  *a_u, /*!< Array containing the conserved solution */
+                int     a_dir,/*!< Spatial dimension (unused since this is a 1D system) */
+                void    *a_s, /*!< Solver object of type #HyPar */
+                double  a_t   /*!< Current time */
                )
 {
-  HyPar             *solver = (HyPar*)   s;
+  HyPar             *solver = (HyPar*)   a_s;
   Euler1D           *param  = (Euler1D*) solver->m_physics;
   int               *dim    = solver->m_dim_local;
   int               ghosts  = solver->m_ghosts;
@@ -38,8 +38,8 @@ int Euler1DFlux(
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double rho, v, e, P;
-    _Euler1DGetFlowVar_((u+nvars*p),rho,v,e,P,param);
-    _Euler1DSetFlux_((f+nvars*p),rho,v,e,P);
+    _Euler1DGetFlowVar_((a_u+nvars*p),rho,v,e,P,param);
+    _Euler1DSetFlux_((a_f+nvars*p),rho,v,e,P);
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 
@@ -62,14 +62,14 @@ int Euler1DFlux(
       38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369
 */
 int Euler1DStiffFlux(
-                double  *f, /*!< Array to hold the computed flux (same size and layout as u) */
-                double  *u, /*!< Array containing the conserved solution */
-                int     dir,/*!< Spatial dimension (unused since this is a 1D system) */
-                void    *s, /*!< Solver object of type #HyPar */
-                double  t   /*!< Current time */
+                double  *a_f, /*!< Array to hold the computed flux (same size and layout as a_u) */
+                double  *a_u, /*!< Array containing the conserved solution */
+                int     a_dir,/*!< Spatial dimension (unused since this is a 1D system) */
+                void    *a_s, /*!< Solver object of type #HyPar */
+                double  a_t   /*!< Current time */
                )
 {
-  HyPar             *solver = (HyPar*)   s;
+  HyPar             *solver = (HyPar*)   a_s;
   Euler1D           *param  = (Euler1D*) solver->m_physics;
   int               *dim    = solver->m_dim_local;
   int               ghosts  = solver->m_ghosts;
@@ -85,7 +85,7 @@ int Euler1DStiffFlux(
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    _Euler1DSetLinearizedStiffFlux_((f+nvars*p),(u+nvars*p),(param->m_fast_jac+nvars*nvars*p));
+    _Euler1DSetLinearizedStiffFlux_((a_f+nvars*p),(a_u+nvars*p),(param->m_fast_jac+nvars*nvars*p));
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

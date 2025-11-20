@@ -22,9 +22,9 @@
 
   Note: this list is local, not global.
 */
-int PetscCreatePointList(void *obj /*!< Object of type #PETScContext */)
+int PetscCreatePointList(void *a_obj /*!< Object of type #PETScContext */)
 {
-  PETScContext* ctxt = (PETScContext*) obj;
+  PETScContext* ctxt = (PETScContext*) a_obj;
   SimulationObject* sim = (SimulationObject*) ctxt->m_simobj;
 
   int nsims = ctxt->m_nsims;

@@ -19,14 +19,14 @@
  *  (#Body3D::nfacets X nvars) at output on rank 0;
  *  it will remain NULL on other ranks.
 */
-int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of type #MPIVariables */
+int IBAssembleGlobalFacetData(void*               a_m,          /*!< MPI object of type #MPIVariables */
                               void*               ib,         /*!< Immersed boundary object of type #ImmersedBoundary */
                               const double* const local_var,  /*!< Local array */
                               double** const      global_var, /*!< Array to store the gradient; must be NULL at input */
                               int                 nvars       /*!< Number of components in var */
                              )
 {
-  MPIVariables     *mpi = (MPIVariables*) m;
+  MPIVariables     *mpi = (MPIVariables*)   a_m;
   ImmersedBoundary *IB  = (ImmersedBoundary*) ib;
 
   if ((*global_var) != NULL) {

@@ -69,12 +69,12 @@ int    Euler1DPreStep           (double*,void*,void*,double);
     \b Note: "physics.inp" is \b optional; if absent, default values will be used.
 */
 int Euler1DInitialize(
-                      void *s, /*!< Solver object of type #HyPar */
-                      void *m  /*!< Object of type #MPIVariables containing MPI-related info */
+                      void *a_s, /*!< Solver object of type #HyPar */
+                      void *a_m  /*!< Object of type #MPIVariables containing MPI-related info */
                      )
 {
-  HyPar         *solver  = (HyPar*)         s;
-  MPIVariables  *mpi     = (MPIVariables*)  m;
+  HyPar         *solver  = (HyPar*)         a_s;
+  MPIVariables  *mpi     = (MPIVariables*)  a_m;
   Euler1D       *physics = (Euler1D*)       solver->m_physics;
   int           ferr, d;
 
@@ -103,10 +103,10 @@ int Euler1DInitialize(
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "gamma")) {
             ferr = fscanf(in,"%lf",&physics->m_gamma);
             if (ferr != 1) return(1);
@@ -117,12 +117,12 @@ int Euler1DInitialize(
             ferr = fscanf(in,"%d",&physics->m_grav_type);
             if (ferr != 1) return(1);
           } else if (!strcmp(word,"upwinding")) {
-            ferr = fscanf(in,"%s",physics->m_upw_choice);
+            ferr = fscanf(in,"%a_s",physics->m_upw_choice);
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",word,useless);
+            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
@@ -143,7 +143,7 @@ int Euler1DInitialize(
 
   if ((physics->m_grav != 0.0) && (strcmp(physics->m_upw_choice,_LLF_)) && (strcmp(physics->m_upw_choice,_ROE_))) {
     if (!mpi->m_rank) {
-      fprintf(stderr,"Error in Euler1DInitialize: %s or %s upwinding is needed for flows ",_LLF_,_ROE_);
+      fprintf(stderr,"Error in Euler1DInitialize: %a_s or %a_s upwinding is needed for flows ",_LLF_,_ROE_);
       fprintf(stderr,"with gravitational forces.\n");
     }
     return(1);
@@ -161,7 +161,7 @@ int Euler1DInitialize(
   else if (!strcmp(physics->m_upw_choice,_SWFS_   )) solver->Upwind = Euler1DUpwindSWFS;
   else if (!strcmp(physics->m_upw_choice,_RUSANOV_)) solver->Upwind = Euler1DUpwindRusanov;
   else {
-    if (!mpi->m_rank) fprintf(stderr,"Error in Euler1DInitialize(): %s is not a valid upwinding scheme.\n",
+    if (!mpi->m_rank) fprintf(stderr,"Error in Euler1DInitialize(): %a_s is not a valid upwinding scheme.\n",
                             physics->m_upw_choice);
     return(1);
   }
@@ -173,9 +173,9 @@ int Euler1DInitialize(
     else if (!strcmp(physics->m_upw_choice,_LLF_ )) solver->UpwinddF = Euler1DUpwinddFLLF;
     else {
       if (!mpi->m_rank) {
-        fprintf(stderr,"Error in Euler1DInitialize(): %s is not a valid upwinding scheme ",
+        fprintf(stderr,"Error in Euler1DInitialize(): %a_s is not a valid upwinding scheme ",
                 physics->m_upw_choice);
-        fprintf(stderr,"when split form of the hyperbolic flux is used. Use %s, %s or %s.\n",
+        fprintf(stderr,"when split form of the hyperbolic flux is used. Use %a_s, %a_s or %a_s.\n",
                 _ROE_,_RF_,_LLF_);
       }
       return(1);

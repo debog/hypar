@@ -10,9 +10,9 @@
 /*! Function to clean up all allocations in the 3D Navier
     Stokes module.
 */
-int gpuNavierStokes3DCleanup(void *s /*!< Object of type #NavierStokes3D*/)
+int gpuNavierStokes3DCleanup(void *a_s /*!< Object of type #NavierStokes3D*/)
 {
-  NavierStokes3D  *param  = (NavierStokes3D*) s;
+  NavierStokes3D  *param  = (NavierStokes3D*) a_s;
 
   gpuFree(param->gpu_Q);
   gpuFree(param->gpu_QDerivX);

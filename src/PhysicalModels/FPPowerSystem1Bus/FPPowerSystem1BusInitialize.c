@@ -18,10 +18,10 @@ int    FPPowerSystem1BusUpwind            (double*,double*,double*,double*,
 int    FPPowerSystem1BusPostStep          (double*,void*,void*,double,int);
 int    FPPowerSystem1BusPrintStep         (void*,void*,double);
 
-int FPPowerSystem1BusInitialize(void *s,void *m)
+int FPPowerSystem1BusInitialize(void *a_s,void *a_m)
 {
-  HyPar               *solver  = (HyPar*)             s;
-  MPIVariables        *mpi     = (MPIVariables*)      m;
+  HyPar               *solver  = (HyPar*)             a_s;
+  MPIVariables        *mpi     = (MPIVariables*)      a_m;
   FPPowerSystem1Bus   *physics = (FPPowerSystem1Bus*) solver->m_physics;
   int                 ferr;
   _DECLARE_IERR_;
@@ -55,10 +55,10 @@ int FPPowerSystem1BusInitialize(void *s,void *m)
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
           if      (!strcmp(word, "omegaS")) {ferr=fscanf(in,"%lf",&physics->omegaS);if(ferr!=1)return(1);}
           else if (!strcmp(word, "omegaB")) {ferr=fscanf(in,"%lf",&physics->omegaB);if(ferr!=1)return(1);}
           else if (!strcmp(word, "H"     )) {ferr=fscanf(in,"%lf",&physics->H     );if(ferr!=1)return(1);}
@@ -110,7 +110,7 @@ int FPPowerSystem1BusInitialize(void *s,void *m)
   if ((strcmp(solver->m_spatial_type_par,_NC_2STAGE_)) && (strcmp(solver->m_spatial_type_par,_NC_1_5STAGE_))) {
     if (!mpi->m_rank) {
       fprintf(stderr,"Error in FPPowerSystem1BusInitialize(): Parabolic term spatial discretization must be ");
-      fprintf(stderr,"\"%s\" or \"%s\".\n",_NC_2STAGE_,_NC_1_5STAGE_);
+      fprintf(stderr,"\"%a_s\" or \"%a_s\".\n",_NC_2STAGE_,_NC_1_5STAGE_);
     }
     return(1);
   }

@@ -7,9 +7,9 @@
 #include <bandedmatrix.h>
 
 /*! Initialize a newly-created banded matrix object. */
-int BandedMatrixInitialize(void *A /*!< Banded matrix object of type BandedMatrix*/)
+int BandedMatrixInitialize(void *a_A /*!< Banded matrix object of type BandedMatrix*/)
 {
-  BandedMatrix *B = (BandedMatrix*) A;
+  BandedMatrix *B = (BandedMatrix*) a_A;
 
   B->m_nbands       = 0;
   B->m_nrows_local  = 0;

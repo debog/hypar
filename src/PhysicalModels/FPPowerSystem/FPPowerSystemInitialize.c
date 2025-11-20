@@ -17,10 +17,10 @@ int    FPPowerSystemUpwind            (double*,double*,double*,double*,
 int    FPPowerSystemPostStep          (double*,void*,void*,double,int);
 int    FPPowerSystemPrintStep         (void*,void*,double);
 
-int FPPowerSystemInitialize(void *s,void *m)
+int FPPowerSystemInitialize(void *a_s,void *a_m)
 {
-  HyPar           *solver  = (HyPar*)         s;
-  MPIVariables    *mpi     = (MPIVariables*)  m;
+  HyPar           *solver  = (HyPar*)         a_s;
+  MPIVariables    *mpi     = (MPIVariables*)  a_m;
   FPPowerSystem   *physics = (FPPowerSystem*) solver->m_physics;
   int             ferr;
   _DECLARE_IERR_;
@@ -59,10 +59,10 @@ int FPPowerSystemInitialize(void *s,void *m)
     return(1);
   } else {
     char word[_MAX_STRING_SIZE_];
-    ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+    ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
     if (!strcmp(word, "begin")){
       while (strcmp(word, "end")){
-        ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+        ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
         if      (!strcmp(word, "inertia")) {ferr=fscanf(in,"%lf",&physics->H  );if(ferr!=1)return(1);}
         else if (!strcmp(word, "omega_s")) {ferr=fscanf(in,"%lf",&physics->m_O_s);if(ferr!=1)return(1);}
         else if (!strcmp(word, "E"      )) {ferr=fscanf(in,"%lf",&physics->m_E  );if(ferr!=1)return(1);}

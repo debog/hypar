@@ -15,11 +15,11 @@
 
 /*! Compute the initial guess for a nonlinear solve
  *  using a trained libROM reduced-order model. */
-PetscErrorCode PetscSetInitialGuessROM( SNES  snes, /*!< Nonlinear solver object (see PETSc SNES) */
-                                        Vec   X,    /*!< Initial guess vector */
+PetscErrorCode PetscSetInitialGuessROM( SNES  a_snes, /*!< Nonlinear solver object (see PETSc SNES) */
+                                        Vec   a_X,    /*!< Initial guess vector */
                                         void* ctxt  /*!< Application context */ )
 {
-  PETScContext* context = (PETScContext*) ctxt;
+  PETScContext* context = (PETScContext*) a_ctxt;
   SimulationObject* sim = (SimulationObject*) context->m_simobj;
   int nsims = context->m_nsims;
 
@@ -39,7 +39,7 @@ PetscErrorCode PetscSetInitialGuessROM( SNES  snes, /*!< Nonlinear solver object
   }
 
   for (int ns = 0; ns < nsims; ns++) {
-    TransferVecToPETSc(sim[ns].solver.m_u,X,context,ns,context->m_offsets[ns]);
+    TransferVecToPETSc(sim[ns].solver.m_u,a_X,context,ns,context->m_offsets[ns]);
   }
 
 

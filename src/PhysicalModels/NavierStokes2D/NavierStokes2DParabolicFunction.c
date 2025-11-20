@@ -36,15 +36,15 @@
       number is based on speed of sound, instead of the freestream velocity).
 */
 int NavierStokes2DParabolicFunction(
-                                      double  *par, /*!< Array to hold the computed viscous terms */
-                                      double  *u,   /*!< Solution vector array */
-                                      void    *s,   /*!< Solver object of type #HyPar */
-                                      void    *m,   /*!< MPI object of type #MPIVariables */
-                                      double  t     /*!< Current simulation time */
+                                      double  *a_par, /*!< Array to hold the computed viscous terms */
+                                      double  *a_u,   /*!< Solution vector array */
+                                      void    *a_s,   /*!< Solver object of type #HyPar */
+                                      void    *a_m,   /*!< MPI object of type #MPIVariables */
+                                      double  a_t   /*!< Current simulation time */
                                    )
 {
-  HyPar           *solver   = (HyPar*) s;
-  MPIVariables    *mpi      = (MPIVariables*) m;
+  HyPar           *solver   = (HyPar*) a_s;
+  MPIVariables    *mpi      = (MPIVariables*) a_m;
   NavierStokes2D  *physics  = (NavierStokes2D*) solver->m_physics;
   int             i,j,v;
   _DECLARE_IERR_;
@@ -57,7 +57,7 @@ int NavierStokes2DParabolicFunction(
   int ndims  = solver->m_ndims;
   int size   = (imax+2*ghosts)*(jmax+2*ghosts)*nvars;
 
-  _ArraySetValue_(par,size,0.0);
+  _ArraySetValue_(a_par,size,0.0);
   if (physics->m_Re <= 0) return(0); /* inviscid flow */
   solver->m_count_par++;
 
@@ -73,7 +73,7 @@ int NavierStokes2DParabolicFunction(
       int p,index[2]; index[0]=i; index[1]=j;
       double energy,pressure;
       _ArrayIndex1D_(ndims,dim,index,ghosts,p); p *= nvars;
-      _NavierStokes2DGetFlowVar_( (u+p),Q[p+0],Q[p+1],Q[p+2],energy,
+      _NavierStokes2DGetFlowVar_( (a_u+p),Q[p+0],Q[p+1],Q[p+2],energy,
                                   pressure,physics->m_gamma);
       Q[p+3] = physics->m_gamma*pressure/Q[p+0]; /* temperature */
     }
@@ -121,7 +121,7 @@ int NavierStokes2DParabolicFunction(
       uy   = (QDerivY+p)[1];
       vy   = (QDerivY+p)[2];
 
-      /* calculate viscosity coeff based on Sutherland's law */
+      /* calculate viscosity coeff based on Sutherland'a_s law */
       double mu = raiseto(T, 0.76);
 
       double tau_xx, tau_xy, qx;
@@ -142,7 +142,7 @@ int NavierStokes2DParabolicFunction(
       double dxinv;
       _ArrayIndex1D_(ndims,dim,index,ghosts,p); p *= nvars;
       _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->m_dxinv,dxinv);
-      for (v=0; v<nvars; v++) (par+p)[v] += (dxinv * (FDeriv+p)[v] );
+      for (v=0; v<nvars; v++) (a_par+p)[v] += (dxinv * (FDeriv+p)[v] );
     }
   }
 
@@ -162,7 +162,7 @@ int NavierStokes2DParabolicFunction(
       uy   = (QDerivY+p)[1];
       vy   = (QDerivY+p)[2];
 
-      /* calculate viscosity coeff based on Sutherland's law */
+      /* calculate viscosity coeff based on Sutherland'a_s law */
       double mu = raiseto(T, 0.76);
 
       double tau_yx, tau_yy, qy;
@@ -183,7 +183,7 @@ int NavierStokes2DParabolicFunction(
       double dyinv;
       _ArrayIndex1D_(ndims,dim,index,ghosts,p); p *= nvars;
       _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->m_dxinv,dyinv);
-      for (v=0; v<nvars; v++) (par+p)[v] += (dyinv * (FDeriv+p)[v] );
+      for (v=0; v<nvars; v++) (a_par+p)[v] += (dyinv * (FDeriv+p)[v] );
     }
   }
 

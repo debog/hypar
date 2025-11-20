@@ -21,13 +21,13 @@ int OutputSolution (void*,int,double);   /*!< Write solutions to file */
 #define __FUNCT__ "PetscPreTimeStep"
 
 /*! Function called before a time step */
-PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
+PetscErrorCode PetscPreTimeStep(TS a_ts /*!< Time integration object */)
 {
   PETScContext* context(nullptr);
 
   PetscFunctionBegin;
 
-  TSGetApplicationContext(ts,&context);
+  TSGetApplicationContext(a_ts,&context);
   if (!context) {
     fprintf(stderr,"Error in PetscPreTimeStep: Null context!\n");
     return(1);
@@ -37,21 +37,21 @@ PetscErrorCode PetscPreTimeStep(TS ts /*!< Time integration object */)
   int nsims = context->m_nsims;
 
   Vec Y;
-  TSGetSolution(ts,&Y);
+  TSGetSolution(a_ts,&Y);
 
   double waqt;
-  TSGetTime(ts,&waqt);
+  TSGetTime(a_ts,&waqt);
   double dt;
-  TSGetTimeStep(ts,&dt);
+  TSGetTimeStep(a_ts,&dt);
   int iter;
-  TSGetStepNumber(ts,&iter);
+  TSGetStepNumber(a_ts,&iter);
 
   context->m_dt = dt;
   context->m_waqt = waqt;
   context->m_t_start = waqt;
 
   TSType time_scheme;
-  TSGetType(ts,&time_scheme);
+  TSGetType(a_ts,&time_scheme);
 
   for (int ns = 0; ns < nsims; ns++) {
 

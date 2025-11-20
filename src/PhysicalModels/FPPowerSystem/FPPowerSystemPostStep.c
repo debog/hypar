@@ -5,10 +5,10 @@
 #include <physicalmodels/fppowersystem.h>
 #include <hypar.h>
 
-int FPPowerSystemPostStep(double *u,void* s,void *m,double t,int iter)
+int FPPowerSystemPostStep(double *a_u,void* a_s,void *a_m,double a_t,int a_iter)
 {
-  HyPar         *solver = (HyPar*)         s;
-  MPIVariables  *mpi    = (MPIVariables*)  m;
+  HyPar         *solver = (HyPar*)         a_s;
+  MPIVariables  *mpi    = (MPIVariables*)  a_m;
   FPPowerSystem *params = (FPPowerSystem*) solver->m_physics;
   _DECLARE_IERR_;
 
@@ -23,7 +23,7 @@ int FPPowerSystemPostStep(double *u,void* s,void *m,double t,int iter)
     int p; _ArrayIndex1D_(ndims,dim,index,ghosts,p);
     double dxinv; _GetCoordinate_(0,index[0],dim,ghosts,solver->m_dxinv,dxinv);
     double dyinv; _GetCoordinate_(1,index[1],dim,ghosts,solver->m_dxinv,dyinv);
-    local_sum     += (u[p] / (dxinv * dyinv));
+    local_sum     += (a_u[p] / (dxinv * dyinv));
     _ArrayIncrementIndex_(ndims,dim,index,done);
   }
   double local_integral = local_sum;

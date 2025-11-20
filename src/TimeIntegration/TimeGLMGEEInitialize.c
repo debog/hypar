@@ -25,11 +25,11 @@ int TimeGLMGEEInitialize(
                           char *class, /*!< Class of time integration method; must match #_GLM_GEE_ */
                           char *type,  /*!< Name of the #_GLM_GEE_ method to use */
                           void *s,     /*!< Object of type #GLMGEEParameters */
-                          void *m      /*!< MPI object of type #MPIVariables */
+                          void *a_m      /*!< MPI object of type #MPIVariables */
                         )
 {
   GLMGEEParameters *params = (GLMGEEParameters*) s;
-  MPIVariables     *mpi    = (MPIVariables*) m;
+  MPIVariables     *mpi    = (MPIVariables*)   a_m;
   int i,j;
 
   if (!strcmp(class,_GLM_GEE_)) {

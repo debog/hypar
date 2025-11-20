@@ -23,25 +23,25 @@ static int ShallowWater1DSourceFunction2 (double*,double*,double*,void*,void*,do
       http://dx.doi.org/10.1016/j.jcp.2005.02.006
 */
 int ShallowWater1DSource(
-                          double  *source, /*!< Computed source terms (array size & layout same as u) */
-                          double  *u,      /*!< Solution (conserved variables) */
-                          void    *s,      /*!< Solver object of type #HyPar */
-                          void    *m,      /*!< MPI object of type #MPIVariables */
-                          double  t        /*!< Current solution time */
+                          double  *a_source, /*!< Computed source terms (array size & layout same as a_u) */
+                          double  *a_u,      /*!< Solution (conserved variables) */
+                          void    *a_s,      /*!< Solver object of type #HyPar */
+                          void    *a_m,      /*!< MPI object of type #MPIVariables */
+                          double  a_t   /*!< Current solution time */
                         )
 {
-  HyPar          *solver = (HyPar* ) s;
-  MPIVariables   *mpi = (MPIVariables*) m;
+  HyPar          *solver = (HyPar* ) a_s;
+  MPIVariables   *mpi = (MPIVariables*) a_m;
   ShallowWater1D *param  = (ShallowWater1D*) solver->m_physics;
 
   int     v, done, p, p1, p2;
-  double  *SourceI = solver->m_flux_i; /* interace source term       */
-  double  *SourceC = solver->m_flux_c; /* cell-centered source term  */
+  double  *SourceI = solver->m_flux_i; /* interace a_source term       */
+  double  *SourceC = solver->m_flux_c; /* cell-centered a_source term  */
   double  *SourceL = solver->m_f_l;
   double  *SourceR = solver->m_f_r;
 
   int     ndims   = solver->m_ndims;
-  int     ghosts  = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     *dim    = solver->m_dim_local;
   double  *x      = solver->m_x;
   double  *dxinv  = solver->m_dxinv;
@@ -50,14 +50,14 @@ int ShallowWater1DSource(
   /* set interface dimensions */
   _ArrayCopy1D_(dim,dim_interface,ndims); dim_interface[_XDIR_]++;
 
-  /* calculate the first source function */
-  IERR ShallowWater1DSourceFunction1(SourceC,u,x,solver,mpi,t); CHECKERR(ierr);
-  /* calculate the left and right interface source terms */
-  IERR solver->InterpolateInterfacesHyp(SourceL,SourceC,u,x, 1,_XDIR_,solver,mpi,0); CHECKERR(ierr);
-  IERR solver->InterpolateInterfacesHyp(SourceR,SourceC,u,x,-1,_XDIR_,solver,mpi,0); CHECKERR(ierr);
-  /* calculate the final interface source term */
-  IERR param->SourceUpwind(SourceI,SourceL,SourceR,u,_XDIR_,solver,t);
-  /* calculate the final cell-centered source term */
+  /* calculate the first a_source function */
+  IERR ShallowWater1DSourceFunction1(SourceC,a_u,x,solver,mpi,a_t); CHECKERR(ierr);
+  /* calculate the left and right interface a_source terms */
+  IERR solver->InterpolateInterfacesHyp(SourceL,SourceC,a_u,x, 1,_XDIR_,solver,mpi,0); CHECKERR(ierr);
+  IERR solver->InterpolateInterfacesHyp(SourceR,SourceC,a_u,x,-1,_XDIR_,solver,mpi,0); CHECKERR(ierr);
+  /* calculate the final interface a_source term */
+  IERR param->SourceUpwind(SourceI,SourceL,SourceR,a_u,_XDIR_,solver,a_t);
+  /* calculate the final cell-centered a_source term */
   done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index,index1,ndims);
@@ -67,18 +67,18 @@ int ShallowWater1DSource(
     _ArrayIndex1D_(ndims,dim_interface,index2,0     ,p2);
     double dx_inverse;   _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,dxinv,dx_inverse);
     for (v=0; v<_MODEL_NVARS_; v++)
-      source[_MODEL_NVARS_*p+v] += (SourceI[_MODEL_NVARS_*p2+v]-SourceI[_MODEL_NVARS_*p1+v])*dx_inverse;
+      a_source[_MODEL_NVARS_*p+v] += (SourceI[_MODEL_NVARS_*p2+v]-SourceI[_MODEL_NVARS_*p1+v])*dx_inverse;
     _ArrayIncrementIndex_(ndims,dim,index,done);
   }
 
-  /* calculate the second source function */
-  IERR ShallowWater1DSourceFunction2(SourceC,u,x,solver,mpi,t); CHECKERR(ierr);
-  /* calculate the left and right interface source terms */
-  IERR solver->InterpolateInterfacesHyp(SourceL,SourceC,u,x, 1,_XDIR_,solver,mpi,0); CHECKERR(ierr);
-  IERR solver->InterpolateInterfacesHyp(SourceR,SourceC,u,x,-1,_XDIR_,solver,mpi,0); CHECKERR(ierr);
-  /* calculate the final interface source term */
-  IERR param->SourceUpwind(SourceI,SourceL,SourceR,u,_XDIR_,solver,t);
-  /* calculate the final cell-centered source term */
+  /* calculate the second a_source function */
+  IERR ShallowWater1DSourceFunction2(SourceC,a_u,x,solver,mpi,a_t); CHECKERR(ierr);
+  /* calculate the left and right interface a_source terms */
+  IERR solver->InterpolateInterfacesHyp(SourceL,SourceC,a_u,x, 1,_XDIR_,solver,mpi,0); CHECKERR(ierr);
+  IERR solver->InterpolateInterfacesHyp(SourceR,SourceC,a_u,x,-1,_XDIR_,solver,mpi,0); CHECKERR(ierr);
+  /* calculate the final interface a_source term */
+  IERR param->SourceUpwind(SourceI,SourceL,SourceR,a_u,_XDIR_,solver,a_t);
+  /* calculate the final cell-centered a_source term */
   done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index,index1,ndims);
@@ -87,10 +87,10 @@ int ShallowWater1DSource(
     _ArrayIndex1D_(ndims,dim_interface,index1,0     ,p1);
     _ArrayIndex1D_(ndims,dim_interface,index2,0     ,p2);
     double dx_inverse;  _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,dxinv,dx_inverse);
-    double h, vel;      _ShallowWater1DGetFlowVar_((u+_MODEL_NVARS_*p),h,vel);
+    double h, vel;      _ShallowWater1DGetFlowVar_((a_u+_MODEL_NVARS_*p),h,vel);
     double term[_MODEL_NVARS_] = { 0.0, -param->m_g * (h + param->m_b[p]) };
     for (v=0; v<_MODEL_NVARS_; v++) {
-      source[_MODEL_NVARS_*p+v] += term[v]*(SourceI[_MODEL_NVARS_*p2+v]-SourceI[_MODEL_NVARS_*p1+v])*dx_inverse;
+      a_source[_MODEL_NVARS_*p+v] += term[v]*(SourceI[_MODEL_NVARS_*p2+v]-SourceI[_MODEL_NVARS_*p1+v])*dx_inverse;
     }
     vel = h; /* useless statement to avoid compiler warning */
     _ArrayIncrementIndex_(ndims,dim,index,done);
@@ -109,18 +109,18 @@ int ShallowWater1DSource(
       http://dx.doi.org/10.1016/j.jcp.2005.02.006
 */
 int ShallowWater1DSourceFunction1(
-                                  double  *f, /*!< Computed source function (array size and layout same as u) */
-                                  double  *u, /*!< Solution (conserved variables) */
-                                  double  *x, /*!< Spatial coordinates */
-                                  void    *s, /*!< Solver object of type #HyPar */
-                                  void    *m, /*!< MPI object of type #MPIVariables */
-                                  double  t   /*!< Current solution time */
+                                  double  *a_f, /*!< Computed source function (array size and layout same as a_u) */
+                                  double  *a_u, /*!< Solution (conserved variables) */
+                                  double  *a_x, /*!< Spatial coordinates */
+                                  void    *a_s, /*!< Solver object of type #HyPar */
+                                  void    *a_m, /*!< MPI object of type #MPIVariables */
+                                  double  a_t   /*!< Current solution time */
                                  )
 {
-  HyPar          *solver = (HyPar* ) s;
+  HyPar          *solver = (HyPar* ) a_s;
   ShallowWater1D *param  = (ShallowWater1D*) solver->m_physics;
 
-  int     ghosts  = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     *dim    = solver->m_dim_local;
   int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
@@ -135,8 +135,8 @@ int ShallowWater1DSourceFunction1(
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    (f+_MODEL_NVARS_*p)[0] = 0.0;
-    (f+_MODEL_NVARS_*p)[1] = 0.5 * param->m_g * param->m_b[p] * param->m_b[p];
+    (a_f+_MODEL_NVARS_*p)[0] = 0.0;
+    (a_f+_MODEL_NVARS_*p)[1] = 0.5 * param->m_g * param->m_b[p] * param->m_b[p];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 
@@ -153,18 +153,18 @@ int ShallowWater1DSourceFunction1(
       http://dx.doi.org/10.1016/j.jcp.2005.02.006
 */
 int ShallowWater1DSourceFunction2(
-                                  double  *f, /*!< Computed source function (array size and layout same as u) */
-                                  double  *u, /*!< Solution (conserved variables) */
-                                  double  *x, /*!< Spatial coordinates */
-                                  void    *s, /*!< Solver object of type #HyPar */
-                                  void    *m, /*!< MPI object of type #MPIVariables */
-                                  double  t   /*!< Current solution time */
+                                  double  *a_f, /*!< Computed source function (array size and layout same as a_u) */
+                                  double  *a_u, /*!< Solution (conserved variables) */
+                                  double  *a_x, /*!< Spatial coordinates */
+                                  void    *a_s, /*!< Solver object of type #HyPar */
+                                  void    *a_m, /*!< MPI object of type #MPIVariables */
+                                  double  a_t   /*!< Current solution time */
                                  )
 {
-  HyPar          *solver = (HyPar* ) s;
+  HyPar          *solver = (HyPar* ) a_s;
   ShallowWater1D *param  = (ShallowWater1D*) solver->m_physics;
 
-  int     ghosts  = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     *dim    = solver->m_dim_local;
   int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
@@ -179,8 +179,8 @@ int ShallowWater1DSourceFunction2(
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    (f+_MODEL_NVARS_*p)[0] = 0.0;
-    (f+_MODEL_NVARS_*p)[1] = param->m_b[p];
+    (a_f+_MODEL_NVARS_*p)[0] = 0.0;
+    (a_f+_MODEL_NVARS_*p)[1] = param->m_b[p];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

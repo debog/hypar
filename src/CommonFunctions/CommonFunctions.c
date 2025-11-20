@@ -15,37 +15,37 @@
   \a width is 5, or "41" if \a width is 2, or "1" if \a width is 1.
 */
 void GetStringFromInteger(
-                            int   a,    /*!< the integer to convert to a string */
-                            char  *A,   /*!< the string */
-                            int   width /*!< desired width of the string */
+                            int   a_a,    /*!< the integer to convert to a string */
+                            char  *a_A,   /*!< the string */
+                            int   a_width /*!< desired width of the string */
                          )
 {
-  if (width > _MAX_STRING_SIZE_-1) {
-    fprintf(stderr,"Error in GetStringFromInteger(): requested width is larger than _MAX_STRING_SIZE_.\n");
+  if (a_width > _MAX_STRING_SIZE_-1) {
+    fprintf(stderr,"Error in GetStringFromInteger(): requested a_width is larger than _MAX_STRING_SIZE_.\n");
   }
   int i;
-  for (i=0; i<width; i++) {
-    char digit = (char) (a%10 + '0');
-    a /= 10;
-    A[width-1-i] = digit;
+  for (i=0; i<a_width; i++) {
+    char digit = (char) (a_a%10 + '0');
+    a_a /= 10;
+    a_A[a_width-1-i] = digit;
   }
-  A[width] = 0;
+  a_A[a_width] = 0;
   return;
 }
 
 /*!
   Take the natural logarithm of each element of the array
 */
-void takeLog( double* const array,      /*!< the array to take log of */
-              const int     array_size  /*!< size of the array */ )
+void takeLog( double* const a_array,      /*!< the array to take log of */
+              const int     a_array_size  /*!< size of the array */ )
 {
-    for (size_t i = 0; i < array_size; ++i) {
-        if (array[i] > 0) {
-            array[i] = log(array[i]);
+    for (size_t i = 0; i < a_array_size; ++i) {
+        if (a_array[i] > 0) {
+            a_array[i] = log(a_array[i]);
         } else {
-            fprintf(stderr, "Error: Logarithm of non-positive value (%f) at index %zu\n", array[i], i);
+            fprintf(stderr, "Error: Logarithm of non-positive value (%f) at index %zu\n", a_array[i], i);
             // Handle error appropriately, for example by setting to NaN, zero, or skipping
-            array[i] = NAN; // Set to NaN
+            a_array[i] = NAN; // Set to NaN
         }
     }
   return;
@@ -54,11 +54,11 @@ void takeLog( double* const array,      /*!< the array to take log of */
 /*!
   Take the exponential of each element of the array
 */
-void takeExp( double* const array,      /*!< the array to take log of */
-              const int     array_size  /*!< size of the array */ )
+void takeExp( double* const a_array,      /*!< the array to take log of */
+              const int     a_array_size  /*!< size of the array */ )
 {
-    for (size_t i = 0; i < array_size; ++i) {
-      array[i] = exp(array[i]);
+    for (size_t i = 0; i < a_array_size; ++i) {
+      a_array[i] = exp(a_array[i]);
     }
   return;
 }

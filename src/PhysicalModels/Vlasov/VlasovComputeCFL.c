@@ -16,17 +16,17 @@ double VlasovAdvectionCoeff(int*, int, void*);
 /*! Computes the maximum CFL number over the domain. Note that the CFL
     is computed over the local domain on this processor only.
 */
-double VlasovComputeCFL( void    *s, /*!< Solver object of type #HyPar */
-                         void    *m, /*!< MPI object of type #MPIVariables */
-                         double  dt, /*!< Time step size for which to compute the CFL */
-                         double  t   /*!< Time */
+double VlasovComputeCFL( void    *a_s, /*!< Solver object of type #HyPar */
+                         void    *a_m, /*!< MPI object of type #MPIVariables */
+                         double  a_dt, /*!< Time step size for which to compute the CFL */
+                         double  a_t   /*!< Time */
                        )
 {
-  HyPar   *solver = (HyPar*)  s;
+  HyPar   *solver = (HyPar*)  a_s;
   Vlasov  *params = (Vlasov*) solver->m_physics;
 
   int     ndims  = solver->m_ndims;
-  int     ghosts = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     *dim   = solver->m_dim_local;
   double  *u     = solver->m_u;
 
@@ -41,7 +41,7 @@ double VlasovComputeCFL( void    *s, /*!< Solver object of type #HyPar */
       double dxinv;
       _GetCoordinate_(dir,index[dir],dim,ghosts,solver->m_dxinv,dxinv);
       double eig = VlasovAdvectionCoeff(index, dir, solver);
-      double local_cfl = eig*dt*dxinv;
+      double local_cfl = eig*a_dt*dxinv;
       if (local_cfl > max_cfl) max_cfl = local_cfl;
     }
 

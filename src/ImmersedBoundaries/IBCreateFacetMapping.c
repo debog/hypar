@@ -26,68 +26,68 @@ static inline int isInside(
     for each of the surrounding grid points.
 */
 static int interpNodesCoeffs(
-                              void    *m,       /*!< MPI object of type #MPIVariables */
-                              double  xc,       /*!< x-coordinate of the point */
-                              double  yc,       /*!< y-coordinate of the point */
-                              double  zc,       /*!< z-coordinate of the point */
-                              double  *x,       /*!< array of x-coordinates of the grid */
-                              double  *y,       /*!< array of y-coordinates of the grid */
-                              double  *z,       /*!< array of z-coordinates of the grid */
-                              int     *dim,     /*!< local dimensions of the grid */
-                              int     ghosts,   /*!< number of ghost points */
-                              char    *mode,    /*!< "mode", i.e., #ImmersedBoundary::mode */
-                              int     *ii,      /*!< i-index of the surrounding node at the high end
-                                                     (i.e. smallest i such that x[i] > xc) */
-                              int     *jj,      /*!< j-index of the surrounding node at the high end
-                                                     (i.e. smallest j such that y[j] > yc) */
-                              int     *kk,      /*!< k-index of the surrounding node at the high end
-                                                     (i.e. smallest k such that z[k] > zc) */
-                              int     *inodes,  /*!< array to store the indices of the surrounding nodes */
-                              double  *icoeffs  /*!< array to store the interpolation coefficients of the surrounding nodes */
+                              void    *a_m,       /*!< MPI object of type #MPIVariables */
+                              double  a_xc,       /*!< x-coordinate of the point */
+                              double  a_yc,       /*!< y-coordinate of the point */
+                              double  a_zc,       /*!< z-coordinate of the point */
+                              double  *a_x,       /*!< array of x-coordinates of the grid */
+                              double  *a_y,       /*!< array of y-coordinates of the grid */
+                              double  *a_z,       /*!< array of z-coordinates of the grid */
+                              int     *a_dim,     /*!< local dimensions of the grid */
+                              int     a_ghosts,   /*!< number of ghost points */
+                              char    *a_mode,    /*!< "mode", i.e., #ImmersedBoundary::mode */
+                              int     *a_ii,      /*!< i-index of the surrounding node at the high end
+                                                     (i.e. smallest i such that a_x[i] > a_xc) */
+                              int     *a_jj,      /*!< j-index of the surrounding node at the high end
+                                                     (i.e. smallest j such that a_y[j] > a_yc) */
+                              int     *a_kk,      /*!< k-index of the surrounding node at the high end
+                                                     (i.e. smallest k such that a_z[k] > a_zc) */
+                              int     *a_inodes,  /*!< array to store the indices of the surrounding nodes */
+                              double  *a_icoeffs  /*!< array to store the interpolation coefficients of the surrounding nodes */
                             )
 {
-  MPIVariables *mpi = (MPIVariables*) m;
+  MPIVariables *mpi = (MPIVariables*) a_m;
 
   int i, j, k, ic, jc, kc;
   ic = jc = kc = -1;
 
-  double  xmin = 0.5 * (x[ghosts-1]         + x[ghosts]),
-          xmax = 0.5 * (x[dim[0]+ghosts-1]  + x[dim[0]+ghosts]),
-          ymin = 0.5 * (y[ghosts-1]         + y[ghosts]),
-          ymax = 0.5 * (y[dim[1]+ghosts-1]  + y[dim[1]+ghosts]),
-          zmin = 0.5 * (z[ghosts-1]         + z[ghosts]),
-          zmax = 0.5 * (z[dim[2]+ghosts-1]  + z[dim[2]+ghosts]);
+  double  xmin = 0.5 * (a_x[a_ghosts-1]         + a_x[a_ghosts]),
+          xmax = 0.5 * (a_x[a_dim[0]+a_ghosts-1]  + a_x[a_dim[0]+a_ghosts]),
+          ymin = 0.5 * (a_y[a_ghosts-1]         + a_y[a_ghosts]),
+          ymax = 0.5 * (a_y[a_dim[1]+a_ghosts-1]  + a_y[a_dim[1]+a_ghosts]),
+          zmin = 0.5 * (a_z[a_ghosts-1]         + a_z[a_ghosts]),
+          zmax = 0.5 * (a_z[a_dim[2]+a_ghosts-1]  + a_z[a_dim[2]+a_ghosts]);
 
-  for (i = 0; i < dim[0]+2*ghosts-1; i++) {
-    if (isInside(xc,x[i],x[i+1])) {
+  for (i = 0; i < a_dim[0]+2*a_ghosts-1; i++) {
+    if (isInside(a_xc,a_x[i],a_x[i+1])) {
       ic = i;
       break;
     }
   }
-  if      (ic <= ghosts-1)        ic = ghosts;
-  else if (ic >= dim[0]+ghosts-1) ic = dim[0]+ghosts-2;
+  if      (ic <= a_ghosts-1)        ic = a_ghosts;
+  else if (ic >= a_dim[0]+a_ghosts-1) ic = a_dim[0]+a_ghosts-2;
 
-  for (j = 0; j < dim[1]+2*ghosts-1; j++) {
-    if (isInside(yc,y[j],y[j+1])) {
+  for (j = 0; j < a_dim[1]+2*a_ghosts-1; j++) {
+    if (isInside(a_yc,a_y[j],a_y[j+1])) {
       jc = j;
       break;
     }
   }
-  if      (jc <= ghosts-1)        jc = ghosts;
-  else if (jc >= dim[1]+ghosts-1) jc = dim[1]+ghosts-2;
+  if      (jc <= a_ghosts-1)        jc = a_ghosts;
+  else if (jc >= a_dim[1]+a_ghosts-1) jc = a_dim[1]+a_ghosts-2;
 
-  for (k = 0; k < dim[2]+2*ghosts-1; k++) {
-    if (isInside(zc,z[k],z[k+1])) {
+  for (k = 0; k < a_dim[2]+2*a_ghosts-1; k++) {
+    if (isInside(a_zc,a_z[k],a_z[k+1])) {
       kc = k;
       break;
     }
   }
-  if      (kc <= ghosts-1)        kc = ghosts;
-  else if (kc >= dim[2]+ghosts-1) kc = dim[2]+ghosts-2;
+  if      (kc <= a_ghosts-1)        kc = a_ghosts;
+  else if (kc >= a_dim[2]+a_ghosts-1) kc = a_dim[2]+a_ghosts-2;
 
-  if      (!strcmp(mode,_IB_XY_))  { kc = ghosts; zc = 0.5*(zmin+zmax); }
-  else if (!strcmp(mode,_IB_XZ_))  { jc = ghosts; yc = 0.5*(ymin+ymax); }
-  else if (!strcmp(mode,_IB_YZ_))  { ic = ghosts; xc = 0.5*(xmin+xmax); }
+  if      (!strcmp(a_mode,_IB_XY_))  { kc = a_ghosts; a_zc = 0.5*(zmin+zmax); }
+  else if (!strcmp(a_mode,_IB_XZ_))  { jc = a_ghosts; a_yc = 0.5*(ymin+ymax); }
+  else if (!strcmp(a_mode,_IB_YZ_))  { ic = a_ghosts; a_xc = 0.5*(xmin+xmax); }
 
   if (ic == -1) {
     fprintf(stderr,"Error in interpNodesCoeffs() (in ImmersedBoundaries/IBCreateFacetMapping.c) on rank %d: ic = -1.\n", mpi->m_rank);
@@ -105,24 +105,24 @@ static int interpNodesCoeffs(
   jc++;
   kc++;
 
-  if (ii) *ii = ic;
-  if (jj) *jj = jc;
-  if (kk) *kk = kc;
+  if (a_ii) *a_ii = ic;
+  if (a_jj) *a_jj = jc;
+  if (a_kk) *a_kk = kc;
 
   int pc[_IB_NNODES_], index[_IB_NDIMS_];
-  index[0]=ic-1-ghosts; index[1]=jc-1-ghosts; index[2]=kc-1-ghosts; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[0]);
-  index[0]=ic-ghosts  ; index[1]=jc-1-ghosts; index[2]=kc-1-ghosts; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[1]);
-  index[0]=ic-1-ghosts; index[1]=jc-ghosts  ; index[2]=kc-1-ghosts; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[2]);
-  index[0]=ic-ghosts  ; index[1]=jc-ghosts  ; index[2]=kc-1-ghosts; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[3]);
-  index[0]=ic-1-ghosts; index[1]=jc-1-ghosts; index[2]=kc-ghosts  ; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[4]);
-  index[0]=ic-ghosts  ; index[1]=jc-1-ghosts; index[2]=kc-ghosts  ; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[5]);
-  index[0]=ic-1-ghosts; index[1]=jc-ghosts  ; index[2]=kc-ghosts  ; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[6]);
-  index[0]=ic-ghosts  ; index[1]=jc-ghosts  ; index[2]=kc-ghosts  ; _ArrayIndex1D_(_IB_NDIMS_,dim,index,ghosts,pc[7]);
-  _ArrayCopy1D_(pc,inodes,_IB_NNODES_);
+  index[0]=ic-1-a_ghosts; index[1]=jc-1-a_ghosts; index[2]=kc-1-a_ghosts; _ArrayIndex1D_(_IB_NDIMS_,a_dim,index,a_ghosts,pc[0]);
+  index[0]=ic-a_ghosts  ; index[1]=jc-1-a_ghosts; index[2]=kc-1-a_ghosts; _ArrayIndex1D_(_IB_NDIMS_,a_dim,index,a_ghosts,pc[1]);
+  index[0]=ic-1-a_ghosts; index[1]=jc-a_ghosts  ; index[2]=kc-1-a_ghosts; _ArrayIndex1D_(_IB_NDIMS_,a_dim,index,a_ghosts,pc[2]);
+  index[0]=ic-a_ghosts  ; index[1]=jc-a_ghosts  ; index[2]=kc-1-a_ghosts; _ArrayIndex1D_(_IB_NDIMS_,a_dim,index,a_ghosts,pc[3]);
+  index[0]=ic-1-a_ghosts; index[1]=jc-1-a_ghosts; index[2]=kc-a_ghosts  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim,index,a_ghosts,pc[4]);
+  index[0]=ic-a_ghosts  ; index[1]=jc-1-a_ghosts; index[2]=kc-a_ghosts  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim,index,a_ghosts,pc[5]);
+  index[0]=ic-1-a_ghosts; index[1]=jc-a_ghosts  ; index[2]=kc-a_ghosts  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim,index,a_ghosts,pc[6]);
+  index[0]=ic-a_ghosts  ; index[1]=jc-a_ghosts  ; index[2]=kc-a_ghosts  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim,index,a_ghosts,pc[7]);
+  _ArrayCopy1D_(pc,a_inodes,_IB_NNODES_);
 
   double coeffs[_IB_NNODES_];
-  TrilinearInterpCoeffs(x[ic-1],x[ic],y[jc-1],y[jc],z[kc-1],z[kc],xc,yc,zc,&coeffs[0]);
-  _ArrayCopy1D_(coeffs,icoeffs,_IB_NNODES_);
+  TrilinearInterpCoeffs(a_x[ic-1],a_x[ic],a_y[jc-1],a_y[jc],a_z[kc-1],a_z[kc],a_xc,a_yc,a_zc,&coeffs[0]);
+  _ArrayCopy1D_(coeffs,a_icoeffs,_IB_NNODES_);
 
   return(0);
 }
@@ -141,29 +141,29 @@ static int interpNodesCoeffs(
 Note: each MPI rank has a copy of the entire immersed body, i.e., all the facets.
 */
 int IBCreateFacetMapping(
-                          void    *ib,    /*!< Immersed boundary object of type #ImmersedBoundary */
-                          void    *m,     /*!< MPI object of type #MPIVariables */
-                          double  *X,     /*!< Array of local spatial coordinates */
-                          int     *dim,   /*!< Local dimensions */
-                          int     ghosts  /*!< Number of ghost points */
+                          void    *a_ib,    /*!< Immersed boundary object of type #ImmersedBoundary */
+                          void    *a_m,     /*!< MPI object of type #MPIVariables */
+                          double  *a_X,     /*!< Array of local spatial coordinates */
+                          int     *a_dim,   /*!< Local dimensions */
+                          int     a_ghosts  /*!< Number of ghost points */
                         )
 {
-  ImmersedBoundary  *IB     = (ImmersedBoundary*) ib;
-  MPIVariables      *mpi    = (MPIVariables*) m;
+  ImmersedBoundary  *IB     = (ImmersedBoundary*) a_ib;
+  MPIVariables      *mpi    = (MPIVariables*) a_m;
   Body3D            *body   = IB->m_body;
   int               nfacets = body->m_nfacets, n, count, ierr;
   Facet3D           *facets = body->m_surface;
 
-  double  *x = X,
-          *y = (x + dim[0] + 2*ghosts),
-          *z = (y + dim[1] + 2*ghosts);
+  double  *x = a_X,
+          *y = (x + a_dim[0] + 2*a_ghosts),
+          *z = (y + a_dim[1] + 2*a_ghosts);
 
-  double  xmin = 0.5 * (x[ghosts-1]         + x[ghosts]),
-          xmax = 0.5 * (x[dim[0]+ghosts-1]  + x[dim[0]+ghosts]),
-          ymin = 0.5 * (y[ghosts-1]         + y[ghosts]),
-          ymax = 0.5 * (y[dim[1]+ghosts-1]  + y[dim[1]+ghosts]),
-          zmin = 0.5 * (z[ghosts-1]         + z[ghosts]),
-          zmax = 0.5 * (z[dim[2]+ghosts-1]  + z[dim[2]+ghosts]);
+  double  xmin = 0.5 * (x[a_ghosts-1]         + x[a_ghosts]),
+          xmax = 0.5 * (x[a_dim[0]+a_ghosts-1]  + x[a_dim[0]+a_ghosts]),
+          ymin = 0.5 * (y[a_ghosts-1]         + y[a_ghosts]),
+          ymax = 0.5 * (y[a_dim[1]+a_ghosts-1]  + y[a_dim[1]+a_ghosts]),
+          zmin = 0.5 * (z[a_ghosts-1]         + z[a_ghosts]),
+          zmax = 0.5 * (z[a_dim[2]+a_ghosts-1]  + z[a_dim[2]+a_ghosts]);
 
   count = 0;
   for (n = 0; n < nfacets; n++) {
@@ -222,8 +222,8 @@ int IBCreateFacetMapping(
         ierr = interpNodesCoeffs( mpi,
                                   xc, yc, zc,
                                   x, y, z,
-                                  dim,
-                                  ghosts,
+                                  a_dim,
+                                  a_ghosts,
                                   IB->m_mode,
                                   &ic, &jc, &kc,
                                   fmap[count].m_interp_nodes,
@@ -263,8 +263,8 @@ int IBCreateFacetMapping(
         ierr = interpNodesCoeffs( mpi,
                                   xns, yns, zns,
                                   x, y, z,
-                                  dim,
-                                  ghosts,
+                                  a_dim,
+                                  a_ghosts,
                                   IB->m_mode,
                                   NULL,NULL,NULL,
                                   fmap[count].m_interp_nodes_ns,

@@ -25,15 +25,15 @@
     (see TimeGLMGEE(), TimeGLMGEEInitialize() )
 */
 int TimeError(
-                void    *s,   /*!< Solver object of type #HyPar */
-                void    *m,   /*!< MPI object of type #MPIVariables */
-                double  *uex  /*!< Exact solution (stored with the same
+                void    *a_s,   /*!< Solver object of type #HyPar */
+                void    *a_m,   /*!< MPI object of type #MPIVariables */
+                double  *a_uex  /*!< Exact solution (stored with the same
                                    array layout as #HyPar::m_u (may be
                                    NULL) */
              )
 {
-  HyPar               *solver = (HyPar*)           s;
-  MPIVariables        *mpi    = (MPIVariables*)    m;
+  HyPar               *solver = (HyPar*)           a_s;
+  MPIVariables        *mpi    = (MPIVariables*)    a_m;
   TimeIntegration     *TS     = (TimeIntegration*) solver->m_time_integrator;
   int                 size    = solver->m_npoints_local_wghosts * solver->m_nvars;
   double              sum     = 0.0, global_sum = 0.0;
@@ -85,8 +85,8 @@ int TimeError(
     global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->m_world);
     error[2] = global_sum;
 
-    if (uex) {
-      _ArrayAXBY_(TS->m_Udot[0],1.0,solver->m_u,-1.0,uex,size);
+    if (a_uex) {
+      _ArrayAXBY_(TS->m_Udot[0],1.0,solver->m_u,-1.0,a_uex,size);
       _ArrayAXPY_(Uerr,-1.0,TS->m_Udot[0],size);
       /* calculate L1 norm of error */
       sum = ArraySumAbsnD   (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
@@ -111,7 +111,7 @@ int TimeError(
       error[0] /= sol_norm[0];
       error[1] /= sol_norm[1];
       error[2] /= sol_norm[2];
-      if (uex) {
+      if (a_uex) {
         error[3] /= sol_norm[0];
         error[4] /= sol_norm[1];
         error[5] /= sol_norm[2];

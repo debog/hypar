@@ -21,11 +21,11 @@
  * solution and the predicted solution by libROM.
  * error in the solution if the exact solution is
 */
-int CalculateROMDiff( void *s, /*!< Solver object of type #HyPar */
-                      void *m  /*!< MPI object of type #MPIVariables */ )
+int CalculateROMDiff( void *a_s, /*!< Solver object of type #HyPar */
+                      void *a_m  /*!< MPI object of type #MPIVariables */ )
 {
-  HyPar* solver = (HyPar*) s;
-  MPIVariables* mpi = (MPIVariables*) m;
+  HyPar* solver = (HyPar*) a_s;
+  MPIVariables* mpi = (MPIVariables*) a_m;
   double sum = 0, global_sum = 0;
 
   static const double tolerance = 1e-15;

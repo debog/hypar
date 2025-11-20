@@ -25,12 +25,12 @@ int    FPPowerSystem3BusUpwind            (double*,double*,double*,double*,
     and set the physics-related function pointers in #HyPar.
 */
 int FPPowerSystem3BusInitialize(
-                                void *s, /*!< Solver object of type #HyPar */
-                                void *m  /*!< MPI object of type #MPIVariables */
+                                void *a_s, /*!< Solver object of type #HyPar */
+                                void *a_m  /*!< MPI object of type #MPIVariables */
                                )
 {
-  HyPar               *solver  = (HyPar*)             s;
-  MPIVariables        *mpi     = (MPIVariables*)      m;
+  HyPar               *solver  = (HyPar*)             a_s;
+  MPIVariables        *mpi     = (MPIVariables*)      a_m;
   FPPowerSystem3Bus   *physics = (FPPowerSystem3Bus*) solver->m_physics;
   int                 ferr, N;
   _DECLARE_IERR_;
@@ -101,10 +101,10 @@ int FPPowerSystem3BusInitialize(
     return(1);
   } else {
     char word[_MAX_STRING_SIZE_];
-    ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+    ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
     if (!strcmp(word, "begin")){
       while (strcmp(word, "end")){
-        ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+        ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
         if      (!strcmp(word,"Pm1_avg"   ))  {ferr=fscanf(in,"%lf",&physics->Pm1_avg   ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"Pm2_avg"   ))  {ferr=fscanf(in,"%lf",&physics->Pm2_avg   ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"Pmref_avg" ))  {ferr=fscanf(in,"%lf",&physics->Pmref_avg ) ;if(ferr!=1)return(1);}

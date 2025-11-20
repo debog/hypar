@@ -7,9 +7,9 @@
 #include <bandedmatrix.h>
 
 /*! Free up allocations inside a banded matrix object */
-int BandedMatrixDestroy(void *A /*!< Banded matrix object of type #BandedMatrix */)
+int BandedMatrixDestroy(void *a_A /*!< Banded matrix object of type #BandedMatrix */)
 {
-  BandedMatrix *B = (BandedMatrix*) A;
+  BandedMatrix *B = (BandedMatrix*) a_A;
 
   if (B->m_ncol) free(B->m_ncol);
   if (B->m_nrow) free(B->m_nrow);

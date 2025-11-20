@@ -4,9 +4,9 @@
 #include <physicalmodels/numa3d.h>
 #include <hypar.h>
 
-int Numa3DSource(double *S,double *u,void *s,void *m,double t)
+int Numa3DSource(double *a_S,double *a_u,void *a_s,void *a_m,double a_t)
 {
-  HyPar  *solver = (HyPar*)   s;
+  HyPar  *solver = (HyPar*)   a_s;
   Numa3D *param  = (Numa3D*) solver->m_physics;
   int     i;
 
@@ -29,8 +29,8 @@ int Numa3DSource(double *S,double *u,void *s,void *m,double t)
 
     _GetCoordinate_(_ZDIR_,index[_ZDIR_]-ghosts,dim,ghosts,solver->m_x,zcoord);
     param->StandardAtmosphere(param,zcoord,&EP,&P0,&rho0,&T0);
-    _Numa3DGetFlowVars_((u+_MODEL_NVARS_*p),drho,uvel,vvel,wvel,dT,rho0);
-    _Numa3DSetSource_  ((S+_MODEL_NVARS_*p),param,uvel,vvel,drho,rho0);
+    _Numa3DGetFlowVars_((a_u+_MODEL_NVARS_*p),drho,uvel,vvel,wvel,dT,rho0);
+    _Numa3DSetSource_  ((a_S+_MODEL_NVARS_*p),param,uvel,vvel,drho,rho0);
 
     _ArrayIncrementIndex_(ndims,bounds,index,done);
 

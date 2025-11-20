@@ -14,10 +14,10 @@
                Journal of Computational Physics, 227 (2008), pp. 3849--3877
 */
 
-int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
+int Numa2DParabolicFunction(double *a_par,double *a_u,void *a_s,void *a_m,double a_t)
 {
-  HyPar           *solver   = (HyPar*) s;
-  MPIVariables    *mpi      = (MPIVariables*) m;
+  HyPar           *solver   = (HyPar*) a_s;
+  MPIVariables    *mpi      = (MPIVariables*) a_m;
   Numa2D          *physics  = (Numa2D*) solver->m_physics;
   int             i,v,done;
   double          dxinv, dyinv;
@@ -29,7 +29,7 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
   int *dim   = solver->m_dim_local;
   int size   = (imax+2*ghosts)*(jmax+2*ghosts)*_MODEL_NVARS_;
 
-  _ArraySetValue_(par,size,0.0);
+  _ArraySetValue_(a_par,size,0.0);
   if (physics->m_mu <= 0) return(0); /* inviscid flow */
   solver->m_count_par++;
 
@@ -55,7 +55,7 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
 
     _GetCoordinate_             (_YDIR_,index[_YDIR_]-ghosts,dim,ghosts,solver->m_x,ycoord);
     physics->StandardAtmosphere (physics,ycoord,&EP,&P0,&rho0,&T0);
-    _Numa2DGetFlowVars_         ( (u+_MODEL_NVARS_*p),drho,uvel,vvel,dT,rho0);
+    _Numa2DGetFlowVars_         ( (a_u+_MODEL_NVARS_*p),drho,uvel,vvel,dT,rho0);
 
     Q[_MODEL_NVARS_*p+0] = rho0 + drho;         /* density              */
     Q[_MODEL_NVARS_*p+1] = uvel;                /* x-velocity           */
@@ -93,7 +93,7 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
   while (!done) {
     int p; _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
     _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->m_dxinv,dxinv);
-    for (v=0; v<_MODEL_NVARS_; v++) (par+p)[v] += (dxinv * (FDeriv+p)[v] );
+    for (v=0; v<_MODEL_NVARS_; v++) (a_par+p)[v] += (dxinv * (FDeriv+p)[v] );
     _ArrayIncrementIndex_(_MODEL_NDIMS_,dim,index,done);
   }
 
@@ -125,7 +125,7 @@ int Numa2DParabolicFunction(double *par,double *u,void *s,void *m,double t)
   while (!done) {
     int p; _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
     _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->m_dxinv,dyinv);
-    for (v=0; v<_MODEL_NVARS_; v++) (par+p)[v] += (dyinv * (FDeriv+p)[v] );
+    for (v=0; v<_MODEL_NVARS_; v++) (a_par+p)[v] += (dyinv * (FDeriv+p)[v] );
     _ArrayIncrementIndex_(_MODEL_NDIMS_,dim,index,done);
   }
 

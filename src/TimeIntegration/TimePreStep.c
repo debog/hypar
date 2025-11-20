@@ -19,9 +19,9 @@
   + Computes CFL and diffusion numbers.
   + Call the physics-specific pre-time-step function, if defined.
 */
-int TimePreStep(void *ts /*!< Object of type #TimeIntegration */ )
+int TimePreStep(void *a_ts /*!< Object of type #TimeIntegration */ )
 {
-  TimeIntegration*  TS  = (TimeIntegration*) ts;
+  TimeIntegration*  TS  = (TimeIntegration*) a_ts;
   _DECLARE_IERR_;
 
   SimulationObject* sim = (SimulationObject*) TS->m_simulation;

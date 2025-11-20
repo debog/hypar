@@ -12,18 +12,18 @@
 /*! Computes the maximum CFL number over the domain. Note that the CFL
     is computed over the local domain on this processor only.
 */
-double LinearADRComputeCFL( void    *s, /*!< Solver object of type #HyPar */
-                            void    *m, /*!< MPI object of type #MPIVariables */
-                            double  dt, /*!< Time step size for which to compute the CFL */
-                            double  t   /*!< Time */
+double LinearADRComputeCFL( void    *a_s, /*!< Solver object of type #HyPar */
+                            void    *a_m, /*!< MPI object of type #MPIVariables */
+                            double  a_dt, /*!< Time step size for which to compute the CFL */
+                            double  a_t   /*!< Time */
                           )
 {
-  HyPar         *solver = (HyPar*)        s;
+  HyPar         *solver = (HyPar*)        a_s;
   LinearADR     *params = (LinearADR*)    solver->m_physics;
 
   int     ndims  = solver->m_ndims;
   int     nvars  = solver->m_nvars;
-  int     ghosts = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     *dim   = solver->m_dim_local;
 
   double  max_cfl = 0;
@@ -34,7 +34,7 @@ double LinearADRComputeCFL( void    *s, /*!< Solver object of type #HyPar */
       for (i = 0; i < dim[d]; i++) {
         for (v = 0; v < nvars; v++) {
           double dxinv; _GetCoordinate_(d,i,dim,ghosts,solver->m_dxinv,dxinv);
-          double local_cfl = params->m_a[nvars*d+v]*dt*dxinv;
+          double local_cfl = params->m_a[nvars*d+v]*a_dt*dxinv;
           if (local_cfl > max_cfl) max_cfl = local_cfl;
         }
       }
@@ -52,7 +52,7 @@ double LinearADRComputeCFL( void    *s, /*!< Solver object of type #HyPar */
         int v;
         for (v = 0; v < nvars; v++) {
           double a = params->m_a[nvars*ndims*p+nvars*d+v];
-          double local_cfl = a*dt*dxinv;
+          double local_cfl = a*a_dt*dxinv;
           if (local_cfl > max_cfl) max_cfl = local_cfl;
         }
         _ArrayIncrementIndex_(ndims,dim,index,done);

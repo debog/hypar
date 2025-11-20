@@ -35,17 +35,17 @@
   the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
   or variable name yields the specific doc page dealing with that function/variable.
 */
-int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
-                                        int width,  /*!< Stencil width */
-                                        void *ctxt  /*!< Application context */ )
+int PetscJacobianMatNonzeroEntriesImpl( Mat a_Amat,   /*!< Matrix */
+                                        int a_width,  /*!< Stencil width */
+                                        void *a_ctxt  /*!< Application context */ )
 {
-  PETScContext* context = (PETScContext*) ctxt;
+  PETScContext* context = (PETScContext*) a_ctxt;
   SimulationObject* sim = (SimulationObject*) context->m_simobj;
 
   PetscFunctionBegin;
   int nsims = context->m_nsims;
   /* initialize matrix to zero */
-  MatZeroEntries(Amat);
+  MatZeroEntries(a_Amat);
 
   for (int ns = 0; ns < nsims; ns++) {
 
@@ -75,9 +75,9 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
         int pg = (int) context->m_globalDOF[ns][p];
         /* diagonal element */
         for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pg + v; }
-        MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
+        MatSetValues(a_Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
 
-        for (int d = 1; d <= width; d++) {
+        for (int d = 1; d <= a_width; d++) {
 
           /* left neighbor */
           _ArrayCopy1D_(index,indexL,ndims);
@@ -86,7 +86,7 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
           int pgL = (int) context->m_globalDOF[ns][pL];
           if (pgL >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgL + v; }
-            MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
+            MatSetValues(a_Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
           }
 
           _ArrayCopy1D_(index,indexR,ndims);
@@ -96,7 +96,7 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
           /* right neighbor */
           if (pgR >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgR + v; }
-            MatSetValues(Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
+            MatSetValues(a_Amat,nvars,rows,nvars,cols,values.data(),ADD_VALUES);
           }
 
         }
@@ -105,8 +105,8 @@ int PetscJacobianMatNonzeroEntriesImpl( Mat Amat,   /*!< Matrix */
     }
   }
 
-  MatAssemblyBegin(Amat,MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd  (Amat,MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(a_Amat,MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd  (a_Amat,MAT_FINAL_ASSEMBLY);
 
   PetscFunctionReturn(0);
 }

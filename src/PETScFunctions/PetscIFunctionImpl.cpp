@@ -34,14 +34,14 @@
     the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
     or variable name yields the specific doc page dealing with that function/variable.
 */
-PetscErrorCode PetscIFunctionImpl(  TS        ts,   /*!< Time integration object */
-                                    PetscReal t,    /*!< Current simulation time */
-                                    Vec       Y,    /*!< State vector (input) */
-                                    Vec       Ydot, /*!< Time derivative of the state vector (input) */
-                                    Vec       F,    /*!< The computed right-hand-side vector */
-                                    void      *ctxt /*!< Object of type #PETScContext */ )
+PetscErrorCode PetscIFunctionImpl(  TS        a_ts,   /*!< Time integration object */
+                                    PetscReal a_t,    /*!< Current simulation time */
+                                    Vec       a_Y,    /*!< State vector (input) */
+                                    Vec       a_Ydot, /*!< Time derivative of the state vector (input) */
+                                    Vec       a_F,    /*!< The computed right-hand-side vector */
+                                    void *a_ctxt /*!< Object of type #PETScContext */ )
 {
-  PETScContext* context = (PETScContext*) ctxt;
+  PETScContext* context = (PETScContext*) a_ctxt;
   SimulationObject* sim = (SimulationObject*) context->m_simobj;
   int nsims = context->m_nsims;
 
@@ -58,9 +58,9 @@ PetscErrorCode PetscIFunctionImpl(  TS        ts,   /*!< Time integration object
     double* rhs = solver->m_rhs;
 
     /* copy solution from PETSc vector */
-    TransferVecFromPETSc(u,Y,context,ns,context->m_offsets[ns]);
+    TransferVecFromPETSc(u,a_Y,context,ns,context->m_offsets[ns]);
     /* apply boundary conditions and exchange data over MPI interfaces */
-    solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);
+    solver->ApplyBoundaryConditions(solver,mpi,u,NULL,a_t);
     MPIExchangeBoundariesnD(  solver->m_ndims,
                               solver->m_nvars,
                               solver->m_dim_local,
@@ -69,9 +69,9 @@ PetscErrorCode PetscIFunctionImpl(  TS        ts,   /*!< Time integration object
                               u );
 
     /* Evaluate hyperbolic, parabolic and source terms  and the RHS */
-    solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,t,1,solver->FFunction,solver->Upwind);
-    solver->ParabolicFunction (solver->m_par,u,solver,mpi,t);
-    solver->SourceFunction    (solver->m_source,u,solver,mpi,t);
+    solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,1,solver->FFunction,solver->Upwind);
+    solver->ParabolicFunction (solver->m_par,u,solver,mpi,a_t);
+    solver->SourceFunction    (solver->m_source,u,solver,mpi,a_t);
 
     _ArraySetValue_(rhs,size*solver->m_nvars,0.0);
     _ArrayAXPY_(solver->m_hyp   ,-1.0,rhs,size*solver->m_nvars);
@@ -83,12 +83,12 @@ PetscErrorCode PetscIFunctionImpl(  TS        ts,   /*!< Time integration object
     _ArrayCopy1D_(rhs,solver->m_rhsref,(size*solver->m_nvars));
 
     /* Transfer RHS to PETSc vector */
-    TransferVecToPETSc(rhs,F,context,ns,context->m_offsets[ns]);
+    TransferVecToPETSc(rhs,a_F,context,ns,context->m_offsets[ns]);
 
   }
 
-  /* LHS = Ydot - F(u) */
-  VecAYPX(F,-1.0,Ydot);
+  /* LHS = a_Ydot - a_F(u) */
+  VecAYPX(a_F,-1.0,a_Ydot);
 
   PetscFunctionReturn(0);
 }

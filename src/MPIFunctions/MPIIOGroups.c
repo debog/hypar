@@ -34,9 +34,9 @@
     multiple of the specified number of I/O groups (#MPIVariables::N_IORanks),
     then only 1 rank is used.
 */
-int MPICreateIOGroups(void *m /*!< MPI object of type #MPIVariables*/)
+int MPICreateIOGroups(void *a_m /*!< MPI object of type #MPIVariables*/)
 {
-  MPIVariables *mpi = (MPIVariables*) m;
+  MPIVariables *mpi = (MPIVariables*) a_m;
 
 #ifndef serial
 

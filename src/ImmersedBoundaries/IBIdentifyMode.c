@@ -22,22 +22,22 @@
   simulation.
 */
 int IBIdentifyMode(
-                    double *X,    /*!< Array of global spatial coordinates */
-                    int    *dim,  /*!< global dimensions */
-                    void   *ib    /*!< Immersed boundary object of type #ImmersedBoundary */
+                    double *a_X,    /*!< Array of global spatial coordinates */
+                    int    *a_dim,  /*!< global dimensions */
+                    void   *a_ib    /*!< Immersed boundary object of type #ImmersedBoundary */
                   )
 {
-  ImmersedBoundary  *IB = (ImmersedBoundary*) ib;
+  ImmersedBoundary  *IB = (ImmersedBoundary*) a_ib;
   Body3D            *body   = IB->m_body;
 
-  double *x = X, *y = x + dim[0], *z = y + dim[1];
+  double *x = a_X, *y = x + a_dim[0], *z = y + a_dim[1];
 
   double grid_xmin = x[0],
-         grid_xmax = x[dim[0]-1],
+         grid_xmax = x[a_dim[0]-1],
          grid_ymin = y[0],
-         grid_ymax = y[dim[1]-1],
+         grid_ymax = y[a_dim[1]-1],
          grid_zmin = z[0],
-         grid_zmax = z[dim[2]-1];
+         grid_zmax = z[a_dim[2]-1];
 
   if      ( (grid_xmin > body->m_xmin) && (grid_xmax < body->m_xmax) ) strcpy(IB->m_mode,_IB_YZ_);
   else if ( (grid_ymin > body->m_ymin) && (grid_ymax < body->m_ymax) ) strcpy(IB->m_mode,_IB_XZ_);

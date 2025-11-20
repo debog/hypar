@@ -4,9 +4,9 @@
 #include <physicalmodels/fpdoublewell.h>
 #include <hypar.h>
 
-int FPDoubleWellAdvection(double *f,double *u,int dir,void *s,double t)
+int FPDoubleWellAdvection(double *a_f,double *a_u,int a_dir,void *a_s,double a_t)
 {
-  HyPar         *solver = (HyPar*)        s;
+  HyPar         *solver = (HyPar*)        a_s;
   int           i, v;
 
   int *dim    = solver->m_dim_local;
@@ -26,7 +26,7 @@ int FPDoubleWellAdvection(double *f,double *u,int dir,void *s,double t)
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double x; _GetCoordinate_(0,index[0]-ghosts,dim,ghosts,solver->m_x,x);
-    for (v = 0; v < nvars; v++) f[nvars*p+v] = drift(x) * u[nvars*p+v];
+    for (v = 0; v < nvars; v++) a_f[nvars*p+v] = drift(x) * a_u[nvars*p+v];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

@@ -32,15 +32,15 @@
                   equations", SIAM J. Sci. Comput., 33 (2), 2011, pp. 939-965, http://dx.doi.org/10.1137/100791002
 */
 int ParabolicFunctionCons1Stage(
-                                  double  *par, /*!< array to hold the computed parabolic term */
-                                  double  *u,   /*!< solution */
-                                  void    *s,   /*!< Solver object of type #HyPar */
-                                  void    *m,   /*!< MPI object of type #MPIVariables */
-                                  double  t     /*!< Current simulation time */
+                                  double  *a_par, /*!< array to hold the computed parabolic term */
+                                  double  *a_u,   /*!< solution */
+                                  void    *a_s,   /*!< Solver object of type #HyPar */
+                                  void    *a_m,   /*!< MPI object of type #MPIVariables */
+                                  double  a_t     /*!< Current simulation time */
                                )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   double        *FluxI  = solver->m_flux_i; /* interface flux     array */
   double        *Func   = solver->m_flux_c; /* diffusion function array */
   int           d, v, i, done;
@@ -55,7 +55,7 @@ int ParabolicFunctionCons1Stage(
 
   int index[ndims], index1[ndims], index2[ndims], dim_interface[ndims];
 
-  _ArraySetValue_(par,size*nvars,0.0);
+  _ArraySetValue_(a_par,size*nvars,0.0);
   if (!solver->GFunction) return(0); /* zero parabolic term */
   solver->m_count_par++;
 
@@ -66,7 +66,7 @@ int ParabolicFunctionCons1Stage(
     int size_interface = 1; for (i = 0; i < ndims; i++) size_interface *= dim_interface[i];
 
     /* evaluate cell-centered flux */
-    IERR solver->GFunction(Func,u,d,solver,t); CHECKERR(ierr);
+    IERR solver->GFunction(Func,a_u,d,solver,a_t); CHECKERR(ierr);
     /* compute interface fluxes */
     IERR solver->InterpolateInterfacesPar(FluxI,Func,d,solver,mpi); CHECKERR(ierr);
 
@@ -80,7 +80,7 @@ int ParabolicFunctionCons1Stage(
       _ArrayIndex1D_(ndims,dim_interface,index1,0     ,p1);
       _ArrayIndex1D_(ndims,dim_interface,index2,0     ,p2);
       for (v=0; v<nvars; v++)
-        par[nvars*p+v] +=  ((dxinv[offset+ghosts+index[d]] * dxinv[offset+ghosts+index[d]])
+        a_par[nvars*p+v] +=  ((dxinv[offset+ghosts+index[d]] * dxinv[offset+ghosts+index[d]])
                           * (FluxI[nvars*p2+v] - FluxI[nvars*p1+v]));
       _ArrayIncrementIndex_(ndims,dim,index,done);
     }
@@ -88,6 +88,6 @@ int ParabolicFunctionCons1Stage(
     offset += dim[d] + 2*ghosts;
   }
 
-  if (solver->m_flag_ib) _ArrayBlockMultiply_(par,solver->m_iblank,size,nvars);
+  if (solver->m_flag_ib) _ArrayBlockMultiply_(a_par,solver->m_iblank,size,nvars);
   return(0);
 }

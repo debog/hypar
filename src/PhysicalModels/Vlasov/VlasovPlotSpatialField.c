@@ -23,28 +23,28 @@
 #endif
 
 /*! Plot out a spatial field or variable to file */
-int VlasovPlotSpatialField( void*   s,         /*!< Solver object of type #HyPar */
-                            void*   m,         /*!< MPI object of type #MPIVariables */
+int VlasovPlotSpatialField( void*   a_s,         /*!< Solver object of type #HyPar */
+                            void*   a_m,         /*!< MPI object of type #MPIVariables */
                             double* a_field,   /*!< Vector field to write */
                             double  a_time,    /*!< Current simulation time */
-                            char*   fname_root /*!< Filename root (extension is added automatically).
+                            char* a_fname_root /*!< Filename root (extension is added automatically).
                                                      For unsteady output, a numerical index is added
                                                      that is the same as for the solution output files. */)
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   Vlasov        *param  = (Vlasov*)       solver->m_physics;
 
   if (solver->m_nsims > 1) {
     char index[_MAX_STRING_SIZE_];
     GetStringFromInteger(solver->m_my_idx, index, (int)log10(solver->m_nsims)+1);
-    strcat(fname_root, "_");
-    strcat(fname_root, index);
-    strcat(fname_root, "_");
+    strcat(a_fname_root, "_");
+    strcat(a_fname_root, index);
+    strcat(a_fname_root, "_");
   }
 
   char filename[_MAX_STRING_SIZE_] = "";
-  strcat(filename,fname_root);
+  strcat(filename,a_fname_root);
   if (!strcmp(solver->m_op_overwrite,"no")) {
     strcat(filename,"_");
     strcat(filename,solver->m_filename_index);
@@ -140,7 +140,7 @@ int VlasovPlotSpatialField( void*   s,         /*!< Solver object of type #HyPar
       PyTuple_SetItem(py_plt_func_args, 5, u_arr);
     }
     {
-      PyObject* py_obj = Py_BuildValue("s", filename);
+      PyObject* py_obj = Py_BuildValue("a_s", filename);
       PyTuple_SetItem(py_plt_func_args, 6, py_obj);
     }
     if (!py_plt_func) {

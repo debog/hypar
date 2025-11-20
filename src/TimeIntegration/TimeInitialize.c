@@ -25,25 +25,25 @@ int TimeRHSFunctionExplicit(double*,double*,void*,void*,double);
     by specific time integration methods.
   + It calls the method-specific initialization functions.
 */
-int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #SimulationObject */
-                    int   nsims,  /*!< number of simulation objects */
-                    int   rank,   /*!< MPI rank of this process */
-                    int   nproc,  /*!< number of MPI processes */
-                    void  *ts     /*!< Time integration object of type #TimeIntegration */
+int TimeInitialize( void  *a_s,     /*!< Array of simulation objects of type #SimulationObject */
+                    int   a_nsims,  /*!< number of simulation objects */
+                    int   a_rank,   /*!< MPI rank of this process */
+                    int   a_nproc,  /*!< number of MPI processes */
+                    void  *a_ts     /*!< Time integration object of type #TimeIntegration */
                   )
 {
-  TimeIntegration*  TS  = (TimeIntegration*) ts;
-  SimulationObject* sim = (SimulationObject*) s;
+  TimeIntegration*  TS  = (TimeIntegration*) a_ts;
+  SimulationObject* sim = (SimulationObject*) a_s;
   int ns, d, i;
 
   if (!sim) return(1);
 
 
   TS->m_simulation    = sim;
-  TS->m_nsims         = nsims;
+  TS->m_nsims         = a_nsims;
 
-  TS->m_rank          = rank;
-  TS->m_nproc         = nproc;
+  TS->m_rank          = a_rank;
+  TS->m_nproc         = a_nproc;
 
   TS->m_n_iter        = sim[0].solver.m_n_iter;
   TS->m_restart_iter  = sim[0].solver.m_restart_iter;
@@ -55,11 +55,11 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
   TS->TimeIntegrate = sim[0].solver.TimeIntegrate;
   TS->m_iter_wctime_total = 0.0;
 
-  TS->m_u_offsets = (long*) calloc (nsims, sizeof(long));
-  TS->m_u_sizes = (long*) calloc (nsims, sizeof(long));
+  TS->m_u_offsets = (long*) calloc (a_nsims, sizeof(long));
+  TS->m_u_sizes = (long*) calloc (a_nsims, sizeof(long));
 
   TS->m_u_size_total = 0;
-  for (ns = 0; ns < nsims; ns++) {
+  for (ns = 0; ns < a_nsims; ns++) {
     TS->m_u_offsets[ns] = TS->m_u_size_total;
     TS->m_u_sizes[ns] = sim[ns].solver.m_npoints_local_wghosts * sim[ns].solver.m_nvars ;
     TS->m_u_size_total += TS->m_u_sizes[ns];
@@ -75,10 +75,10 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
   TS->m_Udot          = NULL;
   TS->m_BoundaryFlux  = NULL;
 
-  TS->m_bf_offsets = (int*) calloc (nsims, sizeof(int));
-  TS->m_bf_sizes = (int*) calloc (nsims, sizeof(int));
+  TS->m_bf_offsets = (int*) calloc (a_nsims, sizeof(int));
+  TS->m_bf_sizes = (int*) calloc (a_nsims, sizeof(int));
   TS->m_bf_size_total = 0;
-  for (ns = 0; ns < nsims; ns++) {
+  for (ns = 0; ns < a_nsims; ns++) {
     TS->m_bf_offsets[ns] = TS->m_bf_size_total;
     TS->m_bf_sizes[ns] =  2 * sim[ns].solver.m_ndims * sim[ns].solver.m_nvars;
     TS->m_bf_size_total += TS->m_bf_sizes[ns];
@@ -102,7 +102,7 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
 
     } else {
 
-      fprintf(stderr,"ERROR in TimeInitialize(): %s is not yet implemented on GPUs.\n",
+      fprintf(stderr,"ERROR in TimeInitialize(): %a_s is not yet implemented on GPUs.\n",
               sim[0].solver.m_time_scheme );
       return 1;
 
@@ -154,7 +154,7 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
 
 
       if (!strcmp(params->ee_mode,_GLM_GEE_YYT_)) {
-        for (ns = 0; ns < nsims; ns++) {
+        for (ns = 0; ns < a_nsims; ns++) {
           for (i=0; i<r-1; i++) {
             _ArrayCopy1D_(  (sim[ns].solver.m_u),
                             (TS->m_U[r+i] + TS->m_u_offsets[ns]),
@@ -175,12 +175,12 @@ int TimeInitialize( void  *s,     /*!< Array of simulation objects of type #Simu
   TS->RHSFunction = TimeRHSFunctionExplicit;
 
   /* open files for writing */
-  if (!rank) {
+  if (!a_rank) {
     if (sim[0].solver.m_write_residual) TS->m_ResidualFile = (void*) fopen("residual.out","w");
     else                              TS->m_ResidualFile = NULL;
   } else                              TS->m_ResidualFile = NULL;
 
-  for (ns = 0; ns < nsims; ns++) {
+  for (ns = 0; ns < a_nsims; ns++) {
     sim[ns].solver.m_time_integrator = TS;
   }
 

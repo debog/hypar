@@ -12,18 +12,18 @@
 /*! Computes the maximum CFL number over the domain. Note that the CFL
     is computed over the local domain on this processor only.
 */
-double BurgersComputeCFL( void    *s, /*!< Solver object of type #HyPar */
-                          void    *m, /*!< MPI object of type #MPIVariables */
-                          double  dt, /*!< Time step size for which to compute the CFL */
-                          double  t   /*!< Time */
+double BurgersComputeCFL( void    *a_s, /*!< Solver object of type #HyPar */
+                          void    *a_m, /*!< MPI object of type #MPIVariables */
+                          double  a_dt, /*!< Time step size for which to compute the CFL */
+                          double  a_t   /*!< Time */
                         )
 {
-  HyPar    *solver = (HyPar*)   s;
+  HyPar    *solver = (HyPar*)   a_s;
   Burgers  *params = (Burgers*) solver->m_physics;
 
   int     ndims  = solver->m_ndims;
   int     nvars  = solver->m_nvars;
-  int     ghosts = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     *dim   = solver->m_dim_local;
   double  *u     = solver->m_u;
 
@@ -37,7 +37,7 @@ double BurgersComputeCFL( void    *s, /*!< Solver object of type #HyPar */
       for (dir=0; dir<ndims; dir++) {
         double dxinv;
         _GetCoordinate_(dir,index[dir],dim,ghosts,solver->m_dxinv,dxinv); /* 1/dx */
-        double local_cfl = u[nvars*p+v]*dt*dxinv;
+        double local_cfl = u[nvars*p+v]*a_dt*dxinv;
         if (local_cfl > max_cfl) max_cfl = local_cfl;
       }
     }

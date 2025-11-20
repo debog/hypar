@@ -10,13 +10,13 @@
 #include <mathfunctions.h>
 
 /*! Is the input number an integer power of 2? */
-static int isPowerOfTwo(int x)
+static int isPowerOfTwo(int a_x)
 {
-  if (x == 0)  return 0;
+  if (a_x == 0)  return 0;
 
-  while (x > 1) {
-    if (x%2 != 0) return 0;
-    x /= 2;
+  while (a_x > 1) {
+    if (a_x%2 != 0) return 0;
+    a_x /= 2;
   }
   return 1;
 }

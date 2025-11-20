@@ -233,7 +233,7 @@ static void initializePythonPlotting(int);
  *
  * The main driver function that calls the initialization, solving, and cleaning up functions.
 */
-int main(int argc, char **argv)
+int main(int a_argc, char **a_argv)
 {
   int               ierr = 0, d, n;
   struct timeval    main_start, solve_start;
@@ -251,7 +251,7 @@ int main(int argc, char **argv)
 #else
   MPI_Comm world;
   int rank, nproc;
-  MPI_Init(&argc,&argv);
+  MPI_Init(&a_argc,&a_argv);
   MPI_Comm_dup(MPI_COMM_WORLD, &world);
   MPI_Comm_rank(MPI_COMM_WORLD,&rank );
   MPI_Comm_size(MPI_COMM_WORLD,&nproc);
@@ -259,7 +259,7 @@ int main(int argc, char **argv)
 #endif
 
 #ifdef with_petsc
-  PetscInitialize(&argc,&argv,(char*)0,help);
+  PetscInitialize(&a_argc,&a_argv,(char*)0,help);
   if (!rank) printf("Compiled with PETSc time integration.\n");
 #endif
 

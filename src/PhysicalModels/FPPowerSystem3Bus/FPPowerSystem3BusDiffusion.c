@@ -13,15 +13,15 @@ int FPPowerSystem3BusDissipationFunction(int,int,void*,double,double*);
 
 /*! Compute the dissipation term for the #FPPowerSystem3Bus system */
 int FPPowerSystem3BusDiffusion(
-                                double  *f,   /*!< Array to hold the computed dissipation term vector (same layout as u) */
-                                double  *u,   /*!< Array with the solution vector */
-                                int     dir1, /*!< First spatial dimension for the dissipation term being computed */
-                                int     dir2, /*!< Second spatial dimension for the dissipation term being computed */
-                                void    *s,   /*!< Solver object of type #HyPar */
-                                double  t     /*!< Current simulation time */
+                                double  *a_f,   /*!< Array to hold the computed dissipation term vector (same layout as a_u) */
+                                double  *a_u,   /*!< Array with the solution vector */
+                                int     a_dir1, /*!< First spatial dimension for the dissipation term being computed */
+                                int     a_dir2, /*!< Second spatial dimension for the dissipation term being computed */
+                                void    *a_s,   /*!< Solver object of type #HyPar */
+                                double  a_t   /*!< Current simulation time */
                               )
 {
-  HyPar             *solver = (HyPar*)              s;
+  HyPar             *solver = (HyPar*)              a_s;
   FPPowerSystem3Bus *params = (FPPowerSystem3Bus*)  solver->m_physics;
   int               i, v;
 
@@ -40,8 +40,8 @@ int FPPowerSystem3BusDiffusion(
   int done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
-    FPPowerSystem3BusDissipationFunction(dir1,dir2,params,t,dissipation);
-    for (v = 0; v < _MODEL_NVARS_; v++) f[_MODEL_NVARS_*p+v] = dissipation[dir1*_MODEL_NDIMS_+dir2] * u[_MODEL_NVARS_*p+v];
+    FPPowerSystem3BusDissipationFunction(a_dir1,a_dir2,params,a_t,dissipation);
+    for (v = 0; v < _MODEL_NVARS_; v++) a_f[_MODEL_NVARS_*p+v] = dissipation[a_dir1*_MODEL_NDIMS_+a_dir2] * a_u[_MODEL_NVARS_*p+v];
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }
 

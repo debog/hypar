@@ -90,13 +90,13 @@
          \b NOTE: However, if it is specified, and a file of that filename does not
          exist, it will result in an error.
 */
-int ReadInputs( void  *s,     /*!< Array of simulation objects of type #SimulationObject
+int ReadInputs( void  *a_s,     /*!< Array of simulation objects of type #SimulationObject
                                    of size nsims */
-                int   nsims,  /*!< Number of simulation objects */
-                int   rank    /*!< MPI rank of this process */
+                int   a_nsims,  /*!< Number of simulation objects */
+                int   a_rank    /*!< MPI rank of this process */
               )
 {
-  SimulationObject *sim = (SimulationObject*) s;
+  SimulationObject *sim = (SimulationObject*) a_s;
   int n, ferr    = 0;
 
   if (sim == NULL) {
@@ -105,10 +105,10 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
     return(1);
   }
 
-  if (!rank) {
+  if (!a_rank) {
 
     /* set some default values for optional inputs */
-    for (n = 0; n < nsims; n++) {
+    for (n = 0; n < a_nsims; n++) {
       sim[n].solver.m_ndims           = 1;
       sim[n].solver.m_nvars           = 1;
       sim[n].solver.m_ghosts          = 1;
@@ -158,13 +158,13 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
 
     /* reading solver inputs */
     char word[_MAX_STRING_SIZE_];
-    ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+    ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
 
     if (!strcmp(word, "begin")){
 
       while (strcmp(word, "end")) {
 
-        ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+        ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
 
         if (!strcmp(word, "ndims")) {
 
@@ -174,7 +174,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
           sim[0].solver.m_dim_global_ex = (int*) calloc (sim[0].solver.m_ndims,sizeof(int));
 
           int n;
-          for (n = 1; n < nsims; n++) {
+          for (n = 1; n < a_nsims; n++) {
             sim[n].solver.m_ndims = sim[0].solver.m_ndims;
             sim[n].solver.m_dim_global    = (int*) calloc (sim[n].solver.m_ndims,sizeof(int));
             sim[n].mpi.m_iproc            = (int*) calloc (sim[n].solver.m_ndims,sizeof(int));
@@ -184,11 +184,11 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
         } else if (!strcmp(word, "nvars")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.m_nvars));
-          for (int n = 1; n < nsims; n++) sim[n].solver.m_nvars = sim[0].solver.m_nvars;
+          for (int n = 1; n < a_nsims; n++) sim[n].solver.m_nvars = sim[0].solver.m_nvars;
 
         } else if   (!strcmp(word, "size")) {
 
-          for (int n = 0; n < nsims; n++) {
+          for (int n = 0; n < a_nsims; n++) {
             if (!sim[n].solver.m_dim_global) {
               fprintf(stderr,"Error in ReadInputs(): dim_global not allocated for n=%d.\n", n);
               fprintf(stderr,"Please specify ndims before dimensions.\n"         );
@@ -207,7 +207,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
 
         } else if   (!strcmp(word, "size_exact")) {
 
-          for (int n = 0; n < nsims; n++) {
+          for (int n = 0; n < a_nsims; n++) {
             if (!sim[n].solver.m_dim_global_ex) {
               fprintf(stderr,"Error in ReadInputs(): dim_global_ex not allocated for n=%d.\n", n);
               fprintf(stderr,"Please specify ndims before dimensions.\n"         );
@@ -226,7 +226,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
         } else if (!strcmp(word, "iproc")) {
 
           int n;
-          for (n = 0; n < nsims; n++) {
+          for (n = 0; n < a_nsims; n++) {
             if (!sim[n].mpi.m_iproc) {
               fprintf(stderr,"Error in ReadInputs(): iproc not allocated for n=%d.\n", n);
               fprintf(stderr,"Please specify ndims before iproc.\n"         );
@@ -248,183 +248,183 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
           ferr = fscanf(in,"%d",&(sim[0].solver.m_ghosts));
 
           int n;
-          for (n = 1; n < nsims; n++) sim[n].solver.m_ghosts = sim[0].solver.m_ghosts;
+          for (n = 1; n < a_nsims; n++) sim[n].solver.m_ghosts = sim[0].solver.m_ghosts;
 
         } else if (!strcmp(word, "n_iter")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.m_n_iter));
 
           int n;
-          for (n = 1; n < nsims; n++) sim[n].solver.m_n_iter = sim[0].solver.m_n_iter;
+          for (n = 1; n < a_nsims; n++) sim[n].solver.m_n_iter = sim[0].solver.m_n_iter;
 
         } else if (!strcmp(word, "restart_iter")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.m_restart_iter));
 
           int n;
-          for (n = 1; n < nsims; n++) sim[n].solver.m_restart_iter = sim[0].solver.m_restart_iter;
+          for (n = 1; n < a_nsims; n++) sim[n].solver.m_restart_iter = sim[0].solver.m_restart_iter;
 
         } else if (!strcmp(word, "time_scheme")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_time_scheme);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_time_scheme);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_time_scheme, sim[0].solver.m_time_scheme);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_time_scheme, sim[0].solver.m_time_scheme);
 
         }  else if (!strcmp(word, "time_scheme_type" )) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_time_scheme_type);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_time_scheme_type);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_time_scheme_type, sim[0].solver.m_time_scheme_type);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_time_scheme_type, sim[0].solver.m_time_scheme_type);
 
         }  else if (!strcmp(word, "hyp_space_scheme")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_spatial_scheme_hyp);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_spatial_scheme_hyp);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_spatial_scheme_hyp, sim[0].solver.m_spatial_scheme_hyp);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_spatial_scheme_hyp, sim[0].solver.m_spatial_scheme_hyp);
 
         }  else if (!strcmp(word, "hyp_flux_split")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_split_hyperbolic_flux);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_split_hyperbolic_flux);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_split_hyperbolic_flux, sim[0].solver.m_split_hyperbolic_flux);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_split_hyperbolic_flux, sim[0].solver.m_split_hyperbolic_flux);
 
         }  else if (!strcmp(word, "hyp_interp_type")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_interp_type);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_interp_type);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_interp_type, sim[0].solver.m_interp_type);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_interp_type, sim[0].solver.m_interp_type);
 
         }  else if (!strcmp(word, "par_space_type")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_spatial_type_par);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_spatial_type_par);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_spatial_type_par, sim[0].solver.m_spatial_type_par);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_spatial_type_par, sim[0].solver.m_spatial_type_par);
 
         }  else if (!strcmp(word, "par_space_scheme")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_spatial_scheme_par);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_spatial_scheme_par);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_spatial_scheme_par, sim[0].solver.m_spatial_scheme_par);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_spatial_scheme_par, sim[0].solver.m_spatial_scheme_par);
 
         }  else if (!strcmp(word, "dt")) {
 
           ferr = fscanf(in,"%lf",&(sim[0].solver.m_dt));
 
           int n;
-          for (n = 1; n < nsims; n++) sim[n].solver.m_dt = sim[0].solver.m_dt;
+          for (n = 1; n < a_nsims; n++) sim[n].solver.m_dt = sim[0].solver.m_dt;
 
         }  else if (!strcmp(word, "conservation_check" )) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_conservation_check);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_conservation_check);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_conservation_check, sim[0].solver.m_conservation_check);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_conservation_check, sim[0].solver.m_conservation_check);
 
         }  else if (!strcmp(word, "screen_op_iter")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.m_screen_op_iter));
 
           int n;
-          for (n = 1; n < nsims; n++) sim[n].solver.m_screen_op_iter = sim[0].solver.m_screen_op_iter;
+          for (n = 1; n < a_nsims; n++) sim[n].solver.m_screen_op_iter = sim[0].solver.m_screen_op_iter;
 
         }  else if (!strcmp(word, "file_op_iter")) {
 
           ferr = fscanf(in,"%d",&(sim[0].solver.m_file_op_iter));
 
           int n;
-          for (n = 1; n < nsims; n++) sim[n].solver.m_file_op_iter = sim[0].solver.m_file_op_iter;
+          for (n = 1; n < a_nsims; n++) sim[n].solver.m_file_op_iter = sim[0].solver.m_file_op_iter;
 
         }  else if (!strcmp(word, "op_file_format")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_op_file_format);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_op_file_format);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_op_file_format, sim[0].solver.m_op_file_format);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_op_file_format, sim[0].solver.m_op_file_format);
 
         }  else if (!strcmp(word, "ip_file_type")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_ip_file_type);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_ip_file_type);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_ip_file_type, sim[0].solver.m_ip_file_type);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_ip_file_type, sim[0].solver.m_ip_file_type);
 
         }  else if (!strcmp(word, "input_mode")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_input_mode);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_input_mode);
           if (strcmp(sim[0].solver.m_input_mode,"serial")) ferr = fscanf(in,"%d",&(sim[0].mpi.m_N_IORanks));
 
           int n;
-          for (n = 1; n < nsims; n++) {
+          for (n = 1; n < a_nsims; n++) {
             strcpy(sim[n].solver.m_input_mode, sim[0].solver.m_input_mode);
             if (strcmp(sim[n].solver.m_input_mode,"serial")) sim[n].mpi.m_N_IORanks = sim[0].mpi.m_N_IORanks;
           }
 
          } else if (!strcmp(word, "output_mode"))  {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_output_mode);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_output_mode);
           if (strcmp(sim[0].solver.m_output_mode,"serial")) ferr = fscanf(in,"%d",&(sim[0].mpi.m_N_IORanks));
 
           int n;
-          for (n = 1; n < nsims; n++) {
+          for (n = 1; n < a_nsims; n++) {
             strcpy(sim[n].solver.m_output_mode, sim[0].solver.m_output_mode);
             if (strcmp(sim[n].solver.m_output_mode,"serial")) sim[n].mpi.m_N_IORanks = sim[0].mpi.m_N_IORanks;
           }
 
         } else if   (!strcmp(word, "op_overwrite")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_op_overwrite);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_op_overwrite);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_op_overwrite, sim[0].solver.m_op_overwrite);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_op_overwrite, sim[0].solver.m_op_overwrite);
 
         } else if   (!strcmp(word, "plot_solution")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_plot_solution);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_plot_solution);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_plot_solution, sim[0].solver.m_plot_solution);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_plot_solution, sim[0].solver.m_plot_solution);
 
         }  else if (!strcmp(word, "model")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_model);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_model);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_model, sim[0].solver.m_model);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_model, sim[0].solver.m_model);
 
         }  else if (!strcmp(word, "immersed_body")) {
 
-          ferr = fscanf(in,"%s",sim[0].solver.m_ib_filename);
+          ferr = fscanf(in,"%a_s",sim[0].solver.m_ib_filename);
 
           int n;
-          for (n = 1; n < nsims; n++) strcpy(sim[n].solver.m_ib_filename, sim[0].solver.m_ib_filename);
+          for (n = 1; n < a_nsims; n++) strcpy(sim[n].solver.m_ib_filename, sim[0].solver.m_ib_filename);
 
         }
 #if defined(HAVE_CUDA)
         else if (!strcmp(word, "use_gpu")) {
-          ferr = fscanf(in,"%s",word);
+          ferr = fscanf(in,"%a_s",word);
           if (!strcmp(word, "yes") || !strcmp(word, "true")) sim[0].solver.m_use_gpu = 1;
 
           int n;
-          for (n = 1; n < nsims; n++) sim[n].solver.m_use_gpu = sim[0].solver.m_use_gpu;
+          for (n = 1; n < a_nsims; n++) sim[n].solver.m_use_gpu = sim[0].solver.m_use_gpu;
         } else if (!strcmp(word, "gpu_device_no")) {
           ferr = fscanf(in,"%d", &sim[0].solver.m_gpu_device_no);
 
           int n;
-          for (n = 1; n < nsims; n++) sim[n].solver.m_gpu_device_no = sim[0].solver.m_gpu_device_no;
+          for (n = 1; n < a_nsims; n++) sim[n].solver.m_gpu_device_no = sim[0].solver.m_gpu_device_no;
         }
 #endif
         else if (strcmp(word, "end")) {
 
           char useless[_MAX_STRING_SIZE_];
-          ferr = fscanf(in,"%s",useless);
-          printf("Warning: keyword %s in file \"solver.inp\" with value %s not recognized or extraneous. Ignoring.\n",
+          ferr = fscanf(in,"%a_s",useless);
+          printf("Warning: keyword %a_s in file \"solver.inp\" with value %a_s not recognized or extraneous. Ignoring.\n",
                   word,useless);
 
         }
@@ -443,14 +443,14 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
     fclose(in);
 
     /* some checks */
-    for (n = 0; n < nsims; n++) {
+    for (n = 0; n < a_nsims; n++) {
 
       if (sim[n].solver.m_screen_op_iter <= 0)  sim[n].solver.m_screen_op_iter = 1;
       if (sim[n].solver.m_file_op_iter <= 0)    sim[n].solver.m_file_op_iter   = sim[n].solver.m_n_iter;
 
       if ((sim[n].solver.m_ndims != 3) && (strcmp(sim[n].solver.m_ib_filename,"none"))) {
         printf("Warning: immersed boundaries not implemented for ndims = %d. ",sim[n].solver.m_ndims);
-        printf("Ignoring input for \"immersed_body\" (%s).\n",sim[n].solver.m_ib_filename);
+        printf("Ignoring input for \"immersed_body\" (%a_s).\n",sim[n].solver.m_ib_filename);
         strcpy(sim[n].solver.m_ib_filename,"none");
       }
       sim[n].solver.m_flag_ib = strcmp(sim[n].solver.m_ib_filename,"none");
@@ -464,7 +464,7 @@ int ReadInputs( void  *s,     /*!< Array of simulation objects of type #Simulati
   }
 
 #ifndef serial
-  for (n = 0; n < nsims; n++) {
+  for (n = 0; n < a_nsims; n++) {
 
     /* Broadcast the input parameters */
     MPIBroadcast_integer(&(sim[n].solver.m_ndims),1,0,&(sim[n].mpi.m_world));

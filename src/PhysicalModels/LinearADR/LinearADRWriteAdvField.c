@@ -15,12 +15,12 @@
 #include <physicalmodels/linearadr.h>
 
 /*! Write out the advection field to file */
-int LinearADRWriteAdvField( void*   s,    /*!< Solver object of type #HyPar */
-                            void*   m,    /*!< MPI object of type #MPIVariables */
+int LinearADRWriteAdvField( void*   a_s,    /*!< Solver object of type #HyPar */
+                            void*   a_m,    /*!< MPI object of type #MPIVariables */
                             double  a_t   /*!< Current simulation time */ )
 {
-  HyPar         *solver = (HyPar*)          s;
-  MPIVariables  *mpi    = (MPIVariables*)   m;
+  HyPar         *solver = (HyPar*)          a_s;
+  MPIVariables  *mpi    = (MPIVariables*)   a_m;
   LinearADR     *param  = (LinearADR*) solver->m_physics;
 
   if (param->m_constant_advection == 0) {

@@ -48,15 +48,15 @@
       number is based on speed of sound, instead of the freestream velocity).
 */
 int NavierStokes3DParabolicFunction(
-                                      double  *par, /*!< Array to hold the computed viscous terms */
-                                      double  *u,   /*!< Solution vector array */
-                                      void    *s,   /*!< Solver object of type #HyPar */
-                                      void    *m,   /*!< MPI object of type #MPIVariables */
-                                      double  t     /*!< Current simulation time */
+                                      double  *a_par, /*!< Array to hold the computed viscous terms */
+                                      double  *a_u,   /*!< Solution vector array */
+                                      void    *a_s,   /*!< Solver object of type #HyPar */
+                                      void    *a_m,   /*!< MPI object of type #MPIVariables */
+                                      double  a_t   /*!< Current simulation time */
                                    )
 {
-  HyPar           *solver   = (HyPar*) s;
-  MPIVariables    *mpi      = (MPIVariables*) m;
+  HyPar           *solver   = (HyPar*) a_s;
+  MPIVariables    *mpi      = (MPIVariables*) a_m;
   NavierStokes3D  *physics  = (NavierStokes3D*) solver->m_physics;
   int             i,j,k,v;
   _DECLARE_IERR_;
@@ -68,7 +68,7 @@ int NavierStokes3DParabolicFunction(
   int *dim   = solver->m_dim_local;
   int size   = solver->m_npoints_local_wghosts;
 
-  _ArraySetValue_(par,size*_MODEL_NVARS_,0.0);
+  _ArraySetValue_(a_par,size*_MODEL_NVARS_,0.0);
   if (physics->m_Re <= 0) return(0); /* inviscid flow */
   solver->m_count_par++;
 
@@ -94,7 +94,7 @@ int NavierStokes3DParabolicFunction(
         int p,index[3]; index[0]=i; index[1]=j; index[2]=k;
         double energy,pressure;
         _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
-        _NavierStokes3DGetFlowVar_( (u+p),
+        _NavierStokes3DGetFlowVar_( (a_u+p),
                                     _NavierStokes3D_stride_,
                                     Q[p+0],
                                     Q[p+1],
@@ -170,7 +170,7 @@ int NavierStokes3DParabolicFunction(
         uz   = (QDerivZ+p)[1];
         wz   = (QDerivZ+p)[3];
 
-        /* calculate viscosity coeff based on Sutherland's law */
+        /* calculate viscosity coeff based on Sutherland'a_s law */
         double mu = raiseto(T, 0.76);
         /*
         if (p/_MODEL_NVARS_ == 49841) {
@@ -202,7 +202,7 @@ int NavierStokes3DParabolicFunction(
         double dxinv;
         _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
         _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->m_dxinv,dxinv);
-        for (v=0; v<_MODEL_NVARS_; v++) (par+p)[v] += (dxinv * (FDeriv+p)[v] );
+        for (v=0; v<_MODEL_NVARS_; v++) (a_par+p)[v] += (dxinv * (FDeriv+p)[v] );
       }
     }
   }
@@ -229,7 +229,7 @@ int NavierStokes3DParabolicFunction(
         vz   = (QDerivZ+p)[2];
         wz   = (QDerivZ+p)[3];
 
-        /* calculate viscosity coeff based on Sutherland's law */
+        /* calculate viscosity coeff based on Sutherland'a_s law */
         double mu = raiseto(T, 0.76);
 
         double tau_yx, tau_yy, tau_yz, qy;
@@ -255,7 +255,7 @@ int NavierStokes3DParabolicFunction(
         double dyinv;
         _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
         _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->m_dxinv,dyinv);
-        for (v=0; v<_MODEL_NVARS_; v++) (par+p)[v] += (dyinv * (FDeriv+p)[v] );
+        for (v=0; v<_MODEL_NVARS_; v++) (a_par+p)[v] += (dyinv * (FDeriv+p)[v] );
       }
     }
   }
@@ -282,7 +282,7 @@ int NavierStokes3DParabolicFunction(
         vz   = (QDerivZ+p)[2];
         wz   = (QDerivZ+p)[3];
 
-        /* calculate viscosity coeff based on Sutherland's law */
+        /* calculate viscosity coeff based on Sutherland'a_s law */
         double mu = raiseto(T,0.76);
 
         double tau_zx, tau_zy, tau_zz, qz;
@@ -308,7 +308,7 @@ int NavierStokes3DParabolicFunction(
         double dzinv;
         _ArrayIndex1D_(_MODEL_NDIMS_,dim,index,ghosts,p); p *= _MODEL_NVARS_;
         _GetCoordinate_(_ZDIR_,index[_ZDIR_],dim,ghosts,solver->m_dxinv,dzinv);
-        for (v=0; v<_MODEL_NVARS_; v++) (par+p)[v] += (dzinv * (FDeriv+p)[v] );
+        for (v=0; v<_MODEL_NVARS_; v++) (a_par+p)[v] += (dzinv * (FDeriv+p)[v] );
       }
     }
   }
@@ -320,6 +320,6 @@ int NavierStokes3DParabolicFunction(
   free(FViscous);
   free(FDeriv);
 
-  if (solver->m_flag_ib) _ArrayBlockMultiply_(par,solver->m_iblank,size,_MODEL_NVARS_);
+  if (solver->m_flag_ib) _ArrayBlockMultiply_(a_par,solver->m_iblank,size,_MODEL_NVARS_);
   return(0);
 }

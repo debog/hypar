@@ -30,15 +30,15 @@
  * the file with data that has the grid dimensions as the full grid. The
  * field on the current grid is obtained by interpolation.
 */
-int LinearADRAdvectionField(void *s,      /*!< Solver object of type #HyPar */
-                            void *m,      /*!< MPI object of type #MPIVariables*/
-                            int  idx,     /*!< Index of this simulation */
-                            int  nsims,   /*!< Total number of simulations */
-                            int *dim_adv  /*!< Grid dimensions of the advection field stored in file */
+int LinearADRAdvectionField(void *a_s,      /*!< Solver object of type #HyPar */
+                            void *a_m,      /*!< MPI object of type #MPIVariables*/
+                            int  a_idx,     /*!< Index of this simulation */
+                            int  a_nsims,   /*!< Total number of simulations */
+                            int *a_dim_adv  /*!< Grid dimensions of the advection field stored in file */
                            )
 {
-  HyPar         *solver = (HyPar*) s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*) a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   LinearADR     *param  = (LinearADR*) solver->m_physics;
   double        *adv    = param->m_a;
 
@@ -67,17 +67,17 @@ int LinearADRAdvectionField(void *s,      /*!< Solver object of type #HyPar */
 
   char fname_root[_MAX_STRING_SIZE_];
   strcpy(fname_root, param->m_adv_filename);
-  if (idx >= 0) {
-    if (nsims > 1) {
+  if (a_idx >= 0) {
+    if (a_nsims > 1) {
       char index[_MAX_STRING_SIZE_];
-      GetStringFromInteger(idx, index, (int)log10(nsims)+1);
+      GetStringFromInteger(a_idx, index, (int)log10(a_nsims)+1);
       strcat(fname_root, "_");
       strcat(fname_root, index);
     }
   }
 
   /* read spatially-varying advection field from provided file */
-  if (dim_adv == NULL) {
+  if (a_dim_adv == NULL) {
     int ierr = ReadArray( solver->m_ndims,
                           adv_nvar,
                           solver->m_dim_global,
@@ -99,7 +99,7 @@ int LinearADRAdvectionField(void *s,      /*!< Solver object of type #HyPar */
                                 adv_nvar,
                                 solver->m_dim_global,
                                 solver->m_dim_local,
-                                dim_adv,
+                                a_dim_adv,
                                 solver->m_ghosts,
                                 solver,
                                 mpi,

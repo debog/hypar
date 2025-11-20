@@ -7,42 +7,42 @@
 
 /*! Broadcast an array of type \a double to all MPI ranks */
 int MPIBroadcast_double(
-                          double  *x,     /*!< array to broadcast to all ranks */
-                          int     size,   /*!< size of array to broadcast */
-                          int     root,   /*!< rank from which to broadcast */
+                          double  *a_x,     /*!< array to broadcast to all ranks */
+                          int     a_size,   /*!< size of array to broadcast */
+                          int     a_root,   /*!< rank from which to broadcast */
                           void    *comm   /*!< MPI communicator within which to broadcast */
                        )
 {
 #ifndef serial
-  MPI_Bcast(x,size,MPI_DOUBLE,root,*((MPI_Comm*)comm));
+  MPI_Bcast(a_x,a_size,MPI_DOUBLE,a_root,*((MPI_Comm*)a_comm));
 #endif
   return(0);
 }
 
 /*! Broadcast an array of type \a int to all MPI ranks */
 int MPIBroadcast_integer(
-                          int   *x,     /*!< array to broadcast to all ranks */
-                          int   size,   /*!< size of array to broadcast */
-                          int   root,   /*!< rank from which to broadcast */
+                          int   *a_x,     /*!< array to broadcast to all ranks */
+                          int   a_size,   /*!< size of array to broadcast */
+                          int   a_root,   /*!< rank from which to broadcast */
                           void  *comm   /*!< MPI communicator within which to broadcast */
                         )
 {
 #ifndef serial
-  MPI_Bcast(x,size,MPI_INT,root,*((MPI_Comm*)comm));
+  MPI_Bcast(a_x,a_size,MPI_INT,a_root,*((MPI_Comm*)a_comm));
 #endif
   return(0);
 }
 
 /*! Broadcast an array of type \a char to all MPI ranks */
 int MPIBroadcast_character(
-                            char  *x,   /*!< array to broadcast to all ranks */
-                            int   size, /*!< size of array to broadcast */
-                            int   root, /*!< rank from which to broadcast */
+                            char  *a_x,   /*!< array to broadcast to all ranks */
+                            int   a_size, /*!< size of array to broadcast */
+                            int   a_root, /*!< rank from which to broadcast */
                             void  *comm /*!< MPI communicator within which to broadcast */
                           )
 {
 #ifndef serial
-  MPI_Bcast(x,size,MPI_CHAR,root,*((MPI_Comm*)comm));
+  MPI_Bcast(a_x,a_size,MPI_CHAR,a_root,*((MPI_Comm*)a_comm));
 #endif
   return(0);
 }

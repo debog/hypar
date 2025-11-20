@@ -33,15 +33,15 @@ static int CalculateLocalExtent(void*,void*);
     Note that boundary conditions are implemented as boundary objects of the
     type #DomainBoundary.
 */
-int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #SimulationObject */
-                          int   nsims /*!< number of simulation objects */
+int InitializeBoundaries( void  *a_s,   /*!< Array of simulation objects of type #SimulationObject */
+                          int   a_nsims /*!< number of simulation objects */
                         )
 {
-  SimulationObject *sim = (SimulationObject*) s;
+  SimulationObject *sim = (SimulationObject*) a_s;
   int ns;
   _DECLARE_IERR_;
 
-  for (ns = 0; ns < nsims; ns++) {
+  for (ns = 0; ns < a_nsims; ns++) {
 
     DomainBoundary  *boundary = NULL;
     HyPar           *solver   = &(sim[ns].solver);
@@ -53,9 +53,9 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
 
       char filename[_MAX_STRING_SIZE_] = "boundary";
       char filename_backup[_MAX_STRING_SIZE_] = "boundary";
-      if (nsims > 1) {
+      if (a_nsims > 1) {
         char index[_MAX_STRING_SIZE_];
-        GetStringFromInteger(ns, index, (int)log10(nsims)+1);
+        GetStringFromInteger(ns, index, (int)log10(a_nsims)+1);
         strcat(filename, "_");
         strcat(filename, index);
       }
@@ -67,16 +67,16 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
       if (!in) {
         in = fopen(filename_backup, "r");
         if (!in) {
-          fprintf(stderr,"Error: boundary condition file %s or %s not found.\n",
+          fprintf(stderr,"Error: boundary condition file %a_s or %a_s not found.\n",
                   filename, filename_backup );
           return(1);
         } else {
-          if (nsims > 1) printf("Domain %d: ", ns);
-          printf("Reading boundary conditions from %s.\n", filename_backup);
+          if (a_nsims > 1) printf("Domain %d: ", ns);
+          printf("Reading boundary conditions from %a_s.\n", filename_backup);
         }
       } else {
-        if (nsims > 1) printf("Domain %d: ", ns);
-        printf("Reading boundary conditions from %s.\n", filename);
+        if (a_nsims > 1) printf("Domain %d: ", ns);
+        printf("Reading boundary conditions from %a_s.\n", filename);
       }
 
       /* read number of boundary conditions and allocate */
@@ -96,7 +96,7 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
         boundary[nb].m_xmin = (double*) calloc (solver->m_ndims,sizeof(double)); /* deallocated in BCCleanup.c */
         boundary[nb].m_xmax = (double*) calloc (solver->m_ndims,sizeof(double)); /* deallocated in BCCleanup.c */
 
-        ferr = fscanf(in,"%s",boundary[nb].m_bctype); if (ferr != 1) return(1);
+        ferr = fscanf(in,"%a_s",boundary[nb].m_bctype); if (ferr != 1) return(1);
         ferr = fscanf(in,"%d",&boundary[nb].m_dim  ); if (ferr != 1) return(1);
         ferr = fscanf(in,"%d",&boundary[nb].m_face ); if (ferr != 1) return(1);
         for (d=0; d < solver->m_ndims; d++) {
@@ -174,7 +174,7 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
           ferr = fscanf(in,"%lf",&boundary[nb].m_FlowDensity);
           for (v = 0; v < solver->m_ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_FlowVelocity[v]);
           ferr = fscanf(in,"%lf",&boundary[nb].m_FlowPressure);
-          ferr = fscanf(in,"%s" , boundary[nb].m_UnsteadyDirichletFilename);
+          ferr = fscanf(in,"%a_s" , boundary[nb].m_UnsteadyDirichletFilename);
         }
 
         if (    (!strcmp(boundary[nb].m_bctype,_THERMAL_SLIP_WALL_))
@@ -184,7 +184,7 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
           /* read the wall velocity */
           for (v = 0; v < solver->m_ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_FlowVelocity[v]);
           /* read in the filename where temperature data is available */
-          ferr = fscanf(in,"%s" , boundary[nb].m_UnsteadyTemperatureFilename);
+          ferr = fscanf(in,"%a_s" , boundary[nb].m_UnsteadyTemperatureFilename);
         }
 
         /* if boundary is periodic, let the MPI and HyPar know */
@@ -211,7 +211,7 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
       }
 
       fclose(in);
-      printf("%d boundary condition(s) read.\n",solver->m_n_boundary_zones);
+      printf("%d boundary condition(a_s) read.\n",solver->m_n_boundary_zones);
     }
 
     /* tell other processes how many BCs are there and let them allocate */
@@ -363,12 +363,12 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
     that boundary), and accordingly set the bounding grid indices.
 */
 int CalculateLocalExtent(
-                          void *s, /*!< Solver object of type #HyPar */
-                          void *m  /*!< MPI object of type #MPIVariables */
+                          void *a_s, /*!< Solver object of type #HyPar */
+                          void *a_m  /*!< MPI object of type #MPIVariables */
                         )
 {
-  HyPar           *solver   = (HyPar*)        s;
-  MPIVariables    *mpi      = (MPIVariables*) m;
+  HyPar           *solver   = (HyPar*)        a_s;
+  MPIVariables    *mpi      = (MPIVariables*) a_m;
   DomainBoundary  *boundary = solver->m_boundary;
 
   int n;

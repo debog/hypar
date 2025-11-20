@@ -81,7 +81,7 @@ void SparseGridsSimulation::interpolate(const GridDimensions& a_dim_dst, /*!< gr
 
   /* gather the source on rank 0 */
   double *ug_src = NULL;
-  if (!m_rank) allocateDataArrays(dim_src, nvars, &ug_src, ghosts);
+  if (!m_rank) allocateDataArrays(dim_src, nvars, &ug_src,ghosts);
   MPIGatherArraynDwGhosts( m_ndims,
                            (void*) &(a_src->mpi),
                            ug_src,

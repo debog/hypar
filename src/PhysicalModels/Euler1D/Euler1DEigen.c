@@ -17,15 +17,15 @@
     to interpolation functions for a characteristic-based reconstruction.
 */
 int Euler1DLeftEigenvectors(
-                            double *u, /*!< Conserved solution at a grid point */
-                            double *L, /*!< Array of size nvar^2 = 3^2 to save the matrix of
+                            double *a_u, /*!< Conserved solution at a grid point */
+                            double *a_L, /*!< Array of size nvar^2 = 3^2 to save the matrix of
                                             left eigenvectors in (row-major format). */
-                            void   *p, /*!< Object of type #Euler1D with physics-related variables */
-                            int    dir /*!< Spatial dimension (not used, since this is a 1D system) */
+                            void   *a_p, /*!< Object of type #Euler1D with physics-related variables */
+                            int     a_dir   /*!< Spatial dimension (not used, since this is a 1D system) */
                            )
 {
-  Euler1D *param  = (Euler1D*)  p;
-  _Euler1DLeftEigenvectors_(u,L,param,dir);
+  Euler1D *param  = (Euler1D*)  a_p;
+  _Euler1DLeftEigenvectors_(a_u,a_L,param,a_dir);
   return(0);
 }
 
@@ -36,14 +36,14 @@ int Euler1DLeftEigenvectors(
     to interpolation functions for a characteristic-based reconstruction.
 */
 int Euler1DRightEigenvectors(
-                              double  *u, /*!< Conserved solution at a grid point */
-                              double  *R, /*!< Array of size nvar^2 = 3^2 to save the matrix of
+                              double  *a_u, /*!< Conserved solution at a grid point */
+                              double  *a_R, /*!< Array of size nvar^2 = 3^2 to save the matrix of
                                                right eigenvectors in (row-major format). */
-                              void    *p, /*!< Object of type #Euler1D with physics-related variables */
-                              int     dir /*!< Spatial dimension (not used, since this is a 1D system) */
+                              void    *a_p, /*!< Object of type #Euler1D with physics-related variables */
+                              int     a_dir   /*!< Spatial dimension (not used, since this is a 1D system) */
                             )
 {
-  Euler1D *param  = (Euler1D*)  p;
-  _Euler1DRightEigenvectors_(u,R,param,dir);
+  Euler1D *param  = (Euler1D*)  a_p;
+  _Euler1DRightEigenvectors_(a_u,a_R,param,a_dir);
   return(0);
 }

@@ -9,10 +9,10 @@
 #include <boundaryconditions.h>
 
 /*! Cleans up a boundary object of type #DomainBoundary */
-int BCCleanup(  void *b, /*!< Boundary object of type #DomainBoundary*/
+int BCCleanup(  void *a_b, /*!< Boundary object of type #DomainBoundary*/
                 int flag_gpu /*!< Flag indicating if GPU is being used */ )
 {
-  DomainBoundary *boundary = (DomainBoundary*) b;
+  DomainBoundary *boundary = (DomainBoundary*) a_b;
   free(boundary->m_xmin);
   free(boundary->m_xmax);
   free(boundary->m_is);
@@ -29,7 +29,7 @@ int BCCleanup(  void *b, /*!< Boundary object of type #DomainBoundary*/
   if (boundary->m_UnsteadyTemperatureData)  free(boundary->m_UnsteadyTemperatureData);
 
 #if defined(HAVE_CUDA)
-  if (flag_gpu) {
+  if (a_flag_gpu) {
     gpuFree(boundary->m_gpu_bounds);
     gpuFree(boundary->m_gpu_is);
     gpuFree(boundary->m_gpu_ie);

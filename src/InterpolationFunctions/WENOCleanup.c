@@ -14,14 +14,14 @@
 /*!
     Cleans up all allocations related to the WENO-type methods.
 */
-int WENOCleanup(void *s, /*!< WENO object of type #WENOParameters */
+int WENOCleanup(void *a_s, /*!< WENO object of type #WENOParameters */
                 int flag_gpu /*!< flag to indicate if on GPU */ )
 {
-  WENOParameters  *weno   = (WENOParameters*) s;
+  WENOParameters  *weno   = (WENOParameters*) a_s;
 
   if (weno->m_offset) free(weno->m_offset);
 #if defined(HAVE_CUDA)
-  if (flag_gpu) {
+  if (a_flag_gpu) {
     if (weno->m_w1) gpuFree(weno->m_w1);
     if (weno->m_w2) gpuFree(weno->m_w2);
     if (weno->m_w3) gpuFree(weno->m_w3);

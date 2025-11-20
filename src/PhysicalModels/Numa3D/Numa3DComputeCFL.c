@@ -6,13 +6,13 @@
 #include <physicalmodels/numa3d.h>
 #include <hypar.h>
 
-double Numa3DComputeCFL(void *s,void *m,double dt,double t)
+double Numa3DComputeCFL(void *a_s,void *a_m,double a_dt,double a_t)
 {
-  HyPar  *solver = (HyPar*)  s;
+  HyPar  *solver = (HyPar*)  a_s;
   Numa3D *param  = (Numa3D*) solver->m_physics;
 
   int     *dim    = solver->m_dim_local;
-  int     ghosts  = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     ndims   = solver->m_ndims;
   double  *u      = solver->m_u;
   int     index[ndims];
@@ -34,9 +34,9 @@ double Numa3DComputeCFL(void *s,void *m,double dt,double t)
     _GetCoordinate_(_ZDIR_,index[_ZDIR_],dim,ghosts,solver->m_dxinv,dzinv); /* 1/dz */
 
     double local_cfl[3];
-    local_cfl[_XDIR_] = (absolute(uvel)+c)*dt*dxinv; /* local cfl for this grid point (x) */
-    local_cfl[_YDIR_] = (absolute(vvel)+c)*dt*dyinv; /* local cfl for this grid point (y) */
-    local_cfl[_ZDIR_] = (absolute(wvel)+c)*dt*dzinv; /* local cfl for this grid point (z) */
+    local_cfl[_XDIR_] = (absolute(uvel)+c)*a_dt*dxinv; /* local cfl for this grid point (x) */
+    local_cfl[_YDIR_] = (absolute(vvel)+c)*a_dt*dyinv; /* local cfl for this grid point (y) */
+    local_cfl[_ZDIR_] = (absolute(wvel)+c)*a_dt*dzinv; /* local cfl for this grid point (z) */
     if (local_cfl[_XDIR_] > max_cfl) max_cfl = local_cfl[_XDIR_];
     if (local_cfl[_YDIR_] > max_cfl) max_cfl = local_cfl[_YDIR_];
     if (local_cfl[_ZDIR_] > max_cfl) max_cfl = local_cfl[_ZDIR_];

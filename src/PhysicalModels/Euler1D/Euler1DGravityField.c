@@ -21,17 +21,17 @@
     the domain.
 */
 int Euler1DGravityField(
-                        void *s, /*!< Solver object of type #HyPar */
-                        void *m  /*!< MPI object of type #MPIVariables */
+                        void *a_s, /*!< Solver object of type #HyPar */
+                        void *a_m  /*!< MPI object of type #MPIVariables */
                        )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   Euler1D       *param  = (Euler1D*)      solver->m_physics;
 
   double  *S      = param->m_grav_field;
   int     *dim    = solver->m_dim_local;
-  int     ghosts  = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     index[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_],
           offset[_MODEL_NDIMS_], d, done;
 

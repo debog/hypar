@@ -6,9 +6,9 @@
 #include <physicalmodels/euler2d.h>
 #include <hypar.h>
 
-double Euler2DComputeCFL(void *s,void *m,double dt,double t)
+double Euler2DComputeCFL(void *a_s,void *a_m,double a_dt,double a_t)
 {
-  HyPar   *solver = (HyPar*)   s;
+  HyPar   *solver = (HyPar*)   a_s;
   Euler2D *param  = (Euler2D*) solver->m_physics;
   _DECLARE_IERR_;
 
@@ -29,8 +29,8 @@ double Euler2DComputeCFL(void *s,void *m,double dt,double t)
     _GetCoordinate_(_XDIR_,index[_XDIR_],dim,ghosts,solver->m_dxinv,dxinv); /* 1/dx */
     _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->m_dxinv,dyinv); /* 1/dy */
 
-    local_cfl[_XDIR_] = (absolute(vx)+c)*dt*dxinv; /* local cfl for this grid point (x) */
-    local_cfl[_YDIR_] = (absolute(vy)+c)*dt*dyinv; /* local cfl for this grid point (y) */
+    local_cfl[_XDIR_] = (absolute(vx)+c)*a_dt*dxinv; /* local cfl for this grid point (x) */
+    local_cfl[_YDIR_] = (absolute(vy)+c)*a_dt*dyinv; /* local cfl for this grid point (y) */
     if (local_cfl[_XDIR_] > max_cfl) max_cfl = local_cfl[_XDIR_];
     if (local_cfl[_YDIR_] > max_cfl) max_cfl = local_cfl[_YDIR_];
 

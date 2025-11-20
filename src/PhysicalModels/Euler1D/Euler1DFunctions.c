@@ -14,13 +14,13 @@
     to interpolation functions for a characteristic-based reconstruction.
 */
 int Euler1DRoeAverage(
-                      double  *uavg, /*!< The computed Roe-averaged state */
-                      double  *uL,   /*!< Left state (conserved variables)*/
-                      double  *uR,   /*!< Right state (conserved variables)*/
-                      void    *p     /*!< Object of type #Euler1D with physics-related variables */
+                      double  *a_uavg, /*!< The computed Roe-averaged state */
+                      double  *a_uL,   /*!< Left state (conserved variables)*/
+                      double  *a_uR,   /*!< Right state (conserved variables)*/
+                      void    *a_p     /*!< Object of type #Euler1D with physics-related variables */
                      )
 {
-  Euler1D *param  = (Euler1D*) p;
-  _Euler1DRoeAverage_(uavg,uL,uR,param);
+  Euler1D *param  = (Euler1D*) a_p;
+  _Euler1DRoeAverage_(a_uavg,a_uL,a_uR,param);
   return(0);
 }

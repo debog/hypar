@@ -11,9 +11,9 @@
 /*!
     Cleans up all allocations related to the compact finite difference methods.
 */
-int CompactSchemeCleanup(void *s /*!< CompactScheme object of type #CompactScheme */ )
+int CompactSchemeCleanup(void *a_s /*!< CompactScheme object of type #CompactScheme */ )
 {
-  CompactScheme *compact   = (CompactScheme*) s;
+  CompactScheme *compact   = (CompactScheme*) a_s;
 
   if (compact->m_A) free(compact->m_A);
   if (compact->m_B) free(compact->m_B);

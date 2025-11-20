@@ -16,14 +16,14 @@
     points (grid points within the immersed body that are within
     stencil-width distance of interior points, i.e., points in the
     interior of the computational domain). */
-int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
-                              void    *m, /*!< Solver object of type #HyPar */
-                              double  *u, /*!< Array with the solution vector */
-                              double  t   /*!< Current simulation time */
+int NavierStokes3DIBAdiabatic(void    *a_s, /*!< Solver object of type #HyPar */
+                              void    *a_m, /*!< Solver object of type #HyPar */
+                              double  *a_u, /*!< Array with the solution vector */
+                              double  a_t   /*!< Current simulation time */
                              )
 {
-  HyPar             *solver   = (HyPar*)   s;
-  MPIVariables      *mpi      = (MPIVariables*) m;
+  HyPar             *solver   = (HyPar*)   a_s;
+  MPIVariables      *mpi      = (MPIVariables*) a_m;
   ImmersedBoundary  *IB       = (ImmersedBoundary*) solver->m_ib;
   IBNode            *boundary = IB->m_boundary;
   NavierStokes3D    *param    = (NavierStokes3D*) solver->m_physics;
@@ -32,15 +32,15 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
 
   if (!solver->m_flag_ib) return(0);
 
-  /* Ideally, this shouldn't be here - But this function is called everywhere
+  /* Ideally, this shouldn'a_t be here - But this function is called everywhere
      (through ApplyIBConditions()) *before* MPIExchangeBoundariesnD is called! */
-  MPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_dim_local,solver->m_ghosts,mpi,u);
+  MPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_dim_local,solver->m_ghosts,mpi,a_u);
 
   double inv_gamma_m1 = 1.0 / (param->m_gamma - 1.0);
 
   double ramp_fac = 1.0;
   if (param->m_t_ib_ramp > 0) {
-    double x = t/param->m_t_ib_ramp;
+    double x = a_t/param->m_t_ib_ramp;
     if (!strcmp(param->m_ib_ramp_type,_IB_RAMP_LINEAR_)) {
       ramp_fac = x;
     } else if (!strcmp(param->m_ib_ramp_type,_IB_RAMP_SMOOTHEDSLAB_)) {
@@ -53,7 +53,7 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
       ramp_fac = 0.0;
     } else {
       fprintf(stderr,"Error in NavierStokes3DImmersedBoundary():\n");
-      fprintf(stderr,"  Ramp type %s not recognized.\n", param->m_ib_ramp_type);
+      fprintf(stderr,"  Ramp type %a_s not recognized.\n", param->m_ib_ramp_type);
       return 1;
     }
   }
@@ -68,7 +68,7 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
     _ArraySetValue_(v,_MODEL_NVARS_,0.0);
     for (j=0; j<_IB_NNODES_; j++) {
       for (k=0; k<_MODEL_NVARS_; k++) {
-        v[k] += ( alpha[j] * u[_MODEL_NVARS_*nodes[j]+k] );
+        v[k] += ( alpha[j] * a_u[_MODEL_NVARS_*nodes[j]+k] );
       }
     }
 
@@ -76,7 +76,7 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
     _NavierStokes3DGetFlowVar_(v,_NavierStokes3D_stride_,rho,uvel,vvel,wvel,energy,pressure,param->m_gamma);
 
     double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
-    _NavierStokes3DGetFlowVar_( (u+_MODEL_NVARS_*node_index),
+    _NavierStokes3DGetFlowVar_( (a_u+_MODEL_NVARS_*node_index),
                                 _NavierStokes3D_stride_,
                                 rho_gpt,
                                 uvel_gpt,
@@ -102,11 +102,11 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
     energy_ib   = inv_gamma_m1*pressure_ib
                   + 0.5*rho_ib*(uvel_ib*uvel_ib+vvel_ib*vvel_ib+wvel_ib*wvel_ib);
 
-    u[_MODEL_NVARS_*node_index+0] = rho_ib;
-    u[_MODEL_NVARS_*node_index+1] = rho_ib * uvel_ib;
-    u[_MODEL_NVARS_*node_index+2] = rho_ib * vvel_ib;
-    u[_MODEL_NVARS_*node_index+3] = rho_ib * wvel_ib;
-    u[_MODEL_NVARS_*node_index+4] = energy_ib;
+    a_u[_MODEL_NVARS_*node_index+0] = rho_ib;
+    a_u[_MODEL_NVARS_*node_index+1] = rho_ib * uvel_ib;
+    a_u[_MODEL_NVARS_*node_index+2] = rho_ib * vvel_ib;
+    a_u[_MODEL_NVARS_*node_index+3] = rho_ib * wvel_ib;
+    a_u[_MODEL_NVARS_*node_index+4] = energy_ib;
   }
 
   return 0;
@@ -116,14 +116,14 @@ int NavierStokes3DIBAdiabatic(void    *s, /*!< Solver object of type #HyPar */
     points (grid points within the immersed body that are within
     stencil-width distance of interior points, i.e., points in the
     interior of the computational domain). */
-int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
-                                void    *m, /*!< Solver object of type #HyPar */
-                                double  *u, /*!< Array with the solution vector */
-                                double  t   /*!< Current simulation time */
+int NavierStokes3DIBIsothermal( void    *a_s, /*!< Solver object of type #HyPar */
+                                void    *a_m, /*!< Solver object of type #HyPar */
+                                double  *a_u, /*!< Array with the solution vector */
+                                double  a_t   /*!< Current simulation time */
                               )
 {
-  HyPar             *solver   = (HyPar*)   s;
-  MPIVariables      *mpi      = (MPIVariables*) m;
+  HyPar             *solver   = (HyPar*)   a_s;
+  MPIVariables      *mpi      = (MPIVariables*) a_m;
   ImmersedBoundary  *IB       = (ImmersedBoundary*) solver->m_ib;
   IBNode            *boundary = IB->m_boundary;
   NavierStokes3D    *param    = (NavierStokes3D*) solver->m_physics;
@@ -132,15 +132,15 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
 
   if (!solver->m_flag_ib) return(0);
 
-  /* Ideally, this shouldn't be here - But this function is called everywhere
+  /* Ideally, this shouldn'a_t be here - But this function is called everywhere
      (through ApplyIBConditions()) *before* MPIExchangeBoundariesnD is called! */
-  MPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_dim_local,solver->m_ghosts,mpi,u);
+  MPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_dim_local,solver->m_ghosts,mpi,a_u);
 
   double inv_gamma_m1 = 1.0 / (param->m_gamma - 1.0);
 
   double ramp_fac = 1.0;
   if (param->m_t_ib_ramp > 0) {
-    double x = t/param->m_t_ib_ramp;
+    double x = a_t/param->m_t_ib_ramp;
     if (!strcmp(param->m_ib_ramp_type,_IB_RAMP_LINEAR_)) {
       ramp_fac = x;
     } else if (!strcmp(param->m_ib_ramp_type,_IB_RAMP_SMOOTHEDSLAB_)) {
@@ -153,7 +153,7 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
       ramp_fac = 0.0;
     } else {
       fprintf(stderr,"Error in NavierStokes3DImmersedBoundary():\n");
-      fprintf(stderr,"  Ramp type %s not recognized.\n", param->m_ib_ramp_type);
+      fprintf(stderr,"  Ramp type %a_s not recognized.\n", param->m_ib_ramp_type);
       return 1;
     }
   }
@@ -168,7 +168,7 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
     _ArraySetValue_(v,_MODEL_NVARS_,0.0);
     for (j=0; j<_IB_NNODES_; j++) {
       for (k=0; k<_MODEL_NVARS_; k++) {
-        v[k] += ( alpha[j] * u[_MODEL_NVARS_*nodes[j]+k] );
+        v[k] += ( alpha[j] * a_u[_MODEL_NVARS_*nodes[j]+k] );
       }
     }
 
@@ -177,7 +177,7 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
     temperature = pressure / rho;
 
     double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt, temperature_gpt;
-    _NavierStokes3DGetFlowVar_( (u+_MODEL_NVARS_*node_index),
+    _NavierStokes3DGetFlowVar_( (a_u+_MODEL_NVARS_*node_index),
                                 _NavierStokes3D_stride_,
                                 rho_gpt,
                                 uvel_gpt,
@@ -212,11 +212,11 @@ int NavierStokes3DIBIsothermal( void    *s, /*!< Solver object of type #HyPar */
     energy_ib   = inv_gamma_m1*pressure_ib
                   + 0.5*rho_ib*(uvel_ib*uvel_ib+vvel_ib*vvel_ib+wvel_ib*wvel_ib);
 
-    u[_MODEL_NVARS_*node_index+0] = rho_ib;
-    u[_MODEL_NVARS_*node_index+1] = rho_ib * uvel_ib;
-    u[_MODEL_NVARS_*node_index+2] = rho_ib * vvel_ib;
-    u[_MODEL_NVARS_*node_index+3] = rho_ib * wvel_ib;
-    u[_MODEL_NVARS_*node_index+4] = energy_ib;
+    a_u[_MODEL_NVARS_*node_index+0] = rho_ib;
+    a_u[_MODEL_NVARS_*node_index+1] = rho_ib * uvel_ib;
+    a_u[_MODEL_NVARS_*node_index+2] = rho_ib * vvel_ib;
+    a_u[_MODEL_NVARS_*node_index+3] = rho_ib * wvel_ib;
+    a_u[_MODEL_NVARS_*node_index+4] = energy_ib;
   }
 
   return(0);

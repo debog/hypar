@@ -23,14 +23,14 @@
       flux, and other working vectors.
     + initializes function counters to zero
 */
-int Initialize( void *s,    /*!< Array of simulation objects of type #SimulationObject */
-                int  nsims  /*!< Number of simulation objects */
+int Initialize( void *a_s,    /*!< Array of simulation objects of type #SimulationObject */
+                int  a_nsims  /*!< Number of simulation objects */
               )
 {
-  SimulationObject* simobj = (SimulationObject*) s;
+  SimulationObject* simobj = (SimulationObject*) a_s;
   int i,d,n;
 
-  if (nsims == 0) {
+  if (a_nsims == 0) {
     return 1;
   }
 
@@ -42,7 +42,7 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
 
   if (!simobj[0].mpi.m_rank)  printf("Partitioning domain and allocating data arrays.\n");
 
-  for (n = 0; n < nsims; n++) {
+  for (n = 0; n < a_nsims; n++) {
 
     /* this is a full initialization, not a barebones one */
     simobj[n].is_barebones = 0;
@@ -69,7 +69,7 @@ int Initialize( void *s,    /*!< Array of simulation objects of type #Simulation
     if (simobj[n].mpi.m_nproc != total_proc) {
       fprintf(stderr,"Error on rank %d: total number of processes is not consistent ", simobj[n].mpi.m_rank);
       fprintf(stderr,"with number of processes along each dimension.\n");
-      if (nsims > 1) fprintf(stderr,"for domain %d.\n", n);
+      if (a_nsims > 1) fprintf(stderr,"for domain %d.\n", n);
       fprintf(stderr,"mpiexec was called with %d processes, ",simobj[n].mpi.m_nproc);
       fprintf(stderr,"total number of processes from \"solver.inp\" is %d.\n", total_proc);
       return(1);

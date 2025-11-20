@@ -13,9 +13,9 @@
   Print information to screen (also calls any physics-specific
   printing function, if defined).
 */
-int TimePrintStep(void *ts /*!< Object of type #TimeIntegration */)
+int TimePrintStep(void *a_ts /*!< Object of type #TimeIntegration */)
 {
-  TimeIntegration* TS = (TimeIntegration*) ts;
+  TimeIntegration* TS = (TimeIntegration*) a_ts;
   SimulationObject* sim = (SimulationObject*) TS->m_simulation;
   int ns, nsims = TS->m_nsims;
 

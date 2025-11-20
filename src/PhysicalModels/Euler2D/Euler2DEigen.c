@@ -13,16 +13,16 @@
 
 */
 
-int Euler2DLeftEigenvectors(double *u,double *L,void *p,int dir)
+int Euler2DLeftEigenvectors(double *a_u,double *a_L,void *a_p,int a_dir)
 {
-  Euler2D *param  = (Euler2D*)  p;
-  _Euler2DLeftEigenvectors_(u,L,param,dir);
+  Euler2D *param  = (Euler2D*)  a_p;
+  _Euler2DLeftEigenvectors_(a_u,a_L,param,a_dir);
   return(0);
 }
 
-int Euler2DRightEigenvectors(double *u,double *R,void *p,int dir)
+int Euler2DRightEigenvectors(double *a_u,double *a_R,void *a_p,int a_dir)
 {
-  Euler2D *param  = (Euler2D*)  p;
-  _Euler2DRightEigenvectors_(u,R,param,dir);
+  Euler2D *param  = (Euler2D*)  a_p;
+  _Euler2DRightEigenvectors_(a_u,a_R,param,a_dir);
   return(0);
 }

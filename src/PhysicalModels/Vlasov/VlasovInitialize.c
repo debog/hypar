@@ -41,12 +41,12 @@ int VlasovEField(double*, void*, double);
     allocate and set physics-related parameters, read physics-related inputs
     from file, and set the physics-related function pointers in #HyPar
 */
-int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
-                     void *m  /*!< Object of type #MPIVariables containing MPI-related info */
+int VlasovInitialize(void *a_s, /*!< Solver object of type #HyPar */
+                     void *a_m  /*!< Object of type #MPIVariables containing MPI-related info */
                     )
 {
-  HyPar        *solver    = (HyPar*)        s;
-  MPIVariables *mpi       = (MPIVariables*) m;
+  HyPar        *solver    = (HyPar*)        a_s;
+  MPIVariables *mpi       = (MPIVariables*) a_m;
   Vlasov       *physics   = (Vlasov*)       solver->m_physics;
 
   int *dim_global = solver->m_dim_global;
@@ -79,10 +79,10 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
     if (in) {
       printf("Reading physical model inputs from file \"physics.inp\".\n");
       char word[_MAX_STRING_SIZE_];
-      int ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      int ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          int ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          int ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "self_consistent_electric_field")) {
             /* read whether electric field is self-consistent or prescribed */
             int ferr = fscanf(in,"%d", &physics->m_self_consistent_electric_field);
@@ -101,8 +101,8 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            int ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",
+            int ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",
                    word, useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
@@ -170,7 +170,7 @@ int VlasovInitialize(void *s, /*!< Solver object of type #HyPar */
                                         sizeof(double)  );
 
   /* Put the mpi object in the params for access in other functions */
-  physics->m_m_mpi = m;
+  physics->m_m_mpi = a_m;
 
   if (physics->m_self_consistent_electric_field) {
 #ifdef fftw

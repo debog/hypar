@@ -8,9 +8,9 @@
 
 /*!
 */
-int IBCleanup(void *s /*!< Object of type #ImmersedBoundary */)
+int IBCleanup(void *a_s /*!< Object of type #ImmersedBoundary */)
 {
-  ImmersedBoundary *ib = (ImmersedBoundary*) s;
+  ImmersedBoundary *ib = (ImmersedBoundary*) a_s;
   if (!ib) return(0);
 
   free(ib->m_body->m_surface);

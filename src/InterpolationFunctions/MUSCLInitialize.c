@@ -15,12 +15,12 @@
     Initialize the 2nd or 3rd order MUSCL scheme.
 */
 int MUSCLInitialize(
-                      void *s,  /*!< Solver object of type #HyPar */
-                      void *m   /*!< MPI object of type #MPIVariables */
+                      void *a_s,  /*!< Solver object of type #HyPar */
+                      void *a_m   /*!< MPI object of type #MPIVariables */
                    )
 {
-  HyPar           *solver = (HyPar*) s;
-  MPIVariables    *mpi    = (MPIVariables*) m;
+  HyPar           *solver = (HyPar*) a_s;
+  MPIVariables    *mpi    = (MPIVariables*) a_m;
   MUSCLParameters *muscl  = (MUSCLParameters*) solver->m_interp;
 
   /* default values */
@@ -35,16 +35,16 @@ int MUSCLInitialize(
     else {
       printf("Reading MUSCL parameters from muscl.inp.\n");
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
           if      (!strcmp(word,"epsilon")) { ferr = fscanf(in,"%lf",&muscl->m_eps);         if (ferr != 1) return(1); }
-          else if (!strcmp(word,"limiter")) { ferr = fscanf(in,"%s" ,muscl->m_limiter_type); if (ferr != 1) return(1); }
+          else if (!strcmp(word,"limiter")) { ferr = fscanf(in,"%a_s" ,muscl->m_limiter_type); if (ferr != 1) return(1); }
           else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %s in file \"muscl.inp\" with value %s not ",word,useless);
+            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %a_s in file \"muscl.inp\" with value %a_s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
@@ -69,7 +69,7 @@ int MUSCLInitialize(
     muscl->LimiterFunction = LimiterSuperBee;
   } else {
     if (!mpi->m_rank) {
-      fprintf(stderr, "Warning: %s is an invalid limiter type. Using default (Generalized MinMod).\n",
+      fprintf(stderr, "Warning: %a_s is an invalid limiter type. Using default (Generalized MinMod).\n",
               muscl->m_limiter_type);
     }
     muscl->LimiterFunction = LimiterGeneralizedMinMod;

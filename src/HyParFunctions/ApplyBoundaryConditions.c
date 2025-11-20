@@ -25,16 +25,16 @@
  * The variable \a flag indicates if the array \a x is the solution, or a delta-solution
  * (from implicit time-integration methods).
 */
-int ApplyBoundaryConditions(void    *s,     /*!< Object of type #HyPar containing solver-related variables */
-                            void    *m,     /*!< Object of type #MPIVariables containing MPI-related variables */
-                            double  *x,     /*!< The solution vector on which the boundary conditions are to be applied */
-                            double  *xref,  /*!< Reference solution vector, if needed */
-                            double  waqt    /*!< Current simulation time */
+int ApplyBoundaryConditions(void    *a_s,     /*!< Object of type #HyPar containing solver-related variables */
+                            void    *a_m,     /*!< Object of type #MPIVariables containing MPI-related variables */
+                            double  *a_x,     /*!< The solution vector on which the boundary conditions are to be applied */
+                            double  *a_xref,  /*!< Reference solution vector, if needed */
+                            double  a_waqt    /*!< Current simulation time */
                            )
 {
-  HyPar           *solver   = (HyPar*)          s;
+  HyPar           *solver   = (HyPar*)          a_s;
   DomainBoundary  *boundary = (DomainBoundary*) solver->m_boundary;
-  MPIVariables    *mpi      = (MPIVariables*)   m;
+  MPIVariables    *mpi      = (MPIVariables*)   a_m;
   int             nb        = solver->m_n_boundary_zones;
 
   int* dim_local;
@@ -48,11 +48,11 @@ int ApplyBoundaryConditions(void    *s,     /*!< Object of type #HyPar containin
   }
 #endif
 
-  /* Apply domain boundary conditions to x */
+  /* Apply domain boundary conditions to a_x */
   int n;
   for (n = 0; n < nb; n++) {
     boundary[n].BCFunctionU(&boundary[n],mpi,solver->m_ndims,solver->m_nvars,
-                            dim_local,solver->m_ghosts,x,waqt);
+                            dim_local,solver->m_ghosts,a_x,a_waqt);
   }
 
   return(0);

@@ -4,9 +4,9 @@
 #include <physicalmodels/fpdoublewell.h>
 #include <hypar.h>
 
-int FPDoubleWellDiffusion(double *f,double *u,int dir,void *s,double t)
+int FPDoubleWellDiffusion(double *a_f,double *a_u,int a_dir,void *a_s,double a_t)
 {
-  HyPar         *solver = (HyPar*)        s;
+  HyPar         *solver = (HyPar*)        a_s;
   FPDoubleWell  *param  = (FPDoubleWell*) solver->m_physics;
   int           i, v;
 
@@ -26,7 +26,7 @@ int FPDoubleWellDiffusion(double *f,double *u,int dir,void *s,double t)
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    for (v = 0; v < nvars; v++) f[nvars*p+v] = 0.5*param->m_q * u[nvars*p+v];
+    for (v = 0; v < nvars; v++) a_f[nvars*p+v] = 0.5*param->m_q * a_u[nvars*p+v];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

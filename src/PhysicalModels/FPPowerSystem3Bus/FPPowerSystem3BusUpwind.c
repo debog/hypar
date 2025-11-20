@@ -16,18 +16,18 @@ int FPPowerSystem3BusDriftFunction(int,void*,double*,double,double*);
     solution in this function to get the advective flux.
 */
 int FPPowerSystem3BusUpwind(
-                            double  *fI, /*!< Computed upwind interface flux */
-                            double  *fL, /*!< Left-biased reconstructed interface flux */
-                            double  *fR, /*!< Right-biased reconstructed interface flux */
-                            double  *uL, /*!< Left-biased reconstructed interface solution */
-                            double  *uR, /*!< Right-biased reconstructed interface solution */
-                            double  *u,  /*!< Cell-centered solution */
-                            int     dir, /*!< Spatial dimension (x or y) */
-                            void    *s,  /*!< Solver object of type #HyPar */
-                            double  t    /*!< Current solution time */
+                            double  *a_fI, /*!< Computed upwind interface flux */
+                            double  *a_fL, /*!< Left-biased reconstructed interface flux */
+                            double  *a_fR, /*!< Right-biased reconstructed interface flux */
+                            double  *a_uL, /*!< Left-biased reconstructed interface solution */
+                            double  *a_uR, /*!< Right-biased reconstructed interface solution */
+                            double  *a_u,  /*!< Cell-centered solution */
+                            int     a_dir, /*!< Spatial dimension (x or y) */
+                            void    *a_s,  /*!< Solver object of type #HyPar */
+                            double  a_t   /*!< Current solution time */
                            )
 {
-  HyPar             *solver = (HyPar*)              s;
+  HyPar             *solver = (HyPar*)              a_s;
   FPPowerSystem3Bus *params = (FPPowerSystem3Bus*)  solver->m_physics;
   int               done,v;
 
@@ -37,38 +37,38 @@ int FPPowerSystem3BusUpwind(
   int *dim    = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0, p);
       double x[ndims]; /* coordinates of the interface */
       double x1, x2, drift[ndims];
-      if (dir == 0) {
+      if (a_dir == 0) {
         _GetCoordinate_(0,index_inter[0]-1,dim,ghosts,solver->m_x,x1);
         _GetCoordinate_(0,index_inter[0]  ,dim,ghosts,solver->m_x,x2);
         x[0] = 0.5 * ( x1 + x2 );
         _GetCoordinate_(1,index_inter[1],dim,ghosts,solver->m_x,x[1]);
         _GetCoordinate_(2,index_inter[2],dim,ghosts,solver->m_x,x[2]);
         _GetCoordinate_(3,index_inter[3],dim,ghosts,solver->m_x,x[3]);
-      } else if (dir == 1) {
+      } else if (a_dir == 1) {
         _GetCoordinate_(0,index_inter[0],dim,ghosts,solver->m_x,x[0]);
         _GetCoordinate_(1,index_inter[1]-1,dim,ghosts,solver->m_x,x1);
         _GetCoordinate_(1,index_inter[1]  ,dim,ghosts,solver->m_x,x2);
         x[1] = 0.5 * ( x1 + x2 );
         _GetCoordinate_(2,index_inter[2],dim,ghosts,solver->m_x,x[2]);
         _GetCoordinate_(3,index_inter[3],dim,ghosts,solver->m_x,x[3]);
-      } else if (dir == 2) {
+      } else if (a_dir == 2) {
         _GetCoordinate_(0,index_inter[0],dim,ghosts,solver->m_x,x[0]);
         _GetCoordinate_(1,index_inter[1],dim,ghosts,solver->m_x,x[1]);
         _GetCoordinate_(2,index_inter[2]-1,dim,ghosts,solver->m_x,x1);
         _GetCoordinate_(2,index_inter[2]  ,dim,ghosts,solver->m_x,x2);
         x[2] = 0.5 * ( x1 + x2 );
         _GetCoordinate_(3,index_inter[3],dim,ghosts,solver->m_x,x[3]);
-      } else if (dir == 3) {
+      } else if (a_dir == 3) {
         _GetCoordinate_(0,index_inter[0],dim,ghosts,solver->m_x,x[0]);
         _GetCoordinate_(1,index_inter[1],dim,ghosts,solver->m_x,x[1]);
         _GetCoordinate_(2,index_inter[2],dim,ghosts,solver->m_x,x[2]);
@@ -76,9 +76,9 @@ int FPPowerSystem3BusUpwind(
         _GetCoordinate_(3,index_inter[3]  ,dim,ghosts,solver->m_x,x2);
         x[3] = 0.5 * ( x1 + x2 );
       }
-      FPPowerSystem3BusDriftFunction(dir,params,x,t,drift);
+      FPPowerSystem3BusDriftFunction(a_dir,params,x,a_t,drift);
       for (v = 0; v < nvars; v++)
-        fI[nvars*p+v] = drift[dir] * (drift[dir] > 0 ? fL[nvars*p+v] : fR[nvars*p+v] );
+        a_fI[nvars*p+v] = drift[a_dir] * (drift[a_dir] > 0 ? a_fL[nvars*p+v] : a_fR[nvars*p+v] );
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }

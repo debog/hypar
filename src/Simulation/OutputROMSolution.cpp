@@ -21,14 +21,14 @@
 extern "C" void IncrementFilenameIndex(char*,int);
 
 /*! Write out the ROM solution to file */
-int OutputROMSolution(  void*   s,      /*!< Array of simulation objects of type #SimulationObject */
-                        int     nsims,  /*!< Number of simulation objects */
+int OutputROMSolution(  void*   a_s,      /*!< Array of simulation objects of type #SimulationObject */
+                        int     a_nsims,  /*!< Number of simulation objects */
                         double  a_time  /*!< Current simulation time */)
 {
-  SimulationObject* simobj = (SimulationObject*) s;
+  SimulationObject* simobj = (SimulationObject*) a_s;
   int ns;
 
-  for (ns = 0; ns < nsims; ns++) {
+  for (ns = 0; ns < a_nsims; ns++) {
 
     HyPar*        solver = &(simobj[ns].solver);
     MPIVariables* mpi    = &(simobj[ns].mpi);
@@ -38,9 +38,9 @@ int OutputROMSolution(  void*   s,      /*!< Array of simulation objects of type
     char fname_root[_MAX_STRING_SIZE_];
     strcpy(fname_root, solver->m_op_rom_fname_root);
 
-    if (nsims > 1) {
+    if (a_nsims > 1) {
       char index[_MAX_STRING_SIZE_];
-      GetStringFromInteger(ns, index, (int)log10(nsims)+1);
+      GetStringFromInteger(ns, index, (int)log10(a_nsims)+1);
       strcat(fname_root, "_");
       strcat(fname_root, index);
     }

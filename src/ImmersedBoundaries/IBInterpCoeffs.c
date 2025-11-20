@@ -20,26 +20,26 @@
     coefficients to interpolate a variable from the surrounding points to the probe tip.
 */
 int IBInterpCoeffs(
-                    void    *ib,    /*!< Immersed boundary object of type #ImmersedBoundary */
-                    void    *m,     /*!< MPI object of type #MPIVariables */
-                    double  *X,     /*!< Array of (local) spatial coordinates */
-                    int     *dim_l, /*!< Integer array of local grid size in each spatial dimension */
-                    int     ghosts, /*!< Number of ghost points */
-                    double  *blank  /*!< Blanking array: for grid points within the
+                    void    *a_ib,    /*!< Immersed boundary object of type #ImmersedBoundary */
+                    void    *a_m,     /*!< MPI object of type #MPIVariables */
+                    double  *a_X,     /*!< Array of (local) spatial coordinates */
+                    int     *a_dim_l, /*!< Integer array of local grid size in each spatial dimension */
+                    int     a_ghosts, /*!< Number of ghost points */
+                    double *a_blank /*!< Blanking array: for grid points within the
                                          body, this value will be set to 0 */
                   )
 {
-  ImmersedBoundary  *IB       = (ImmersedBoundary*) ib;
-  MPIVariables      *mpi      = (MPIVariables*) m;
+  ImmersedBoundary  *IB       = (ImmersedBoundary*) a_ib;
+  MPIVariables      *mpi      = (MPIVariables*) a_m;
   IBNode            *boundary = IB->m_boundary;
 
   double  eps         = IB->m_tolerance;
   int     maxiter     = IB->m_itr_max,
           n_boundary  = IB->m_n_boundary_nodes;
 
-  int imax        = dim_l[0],
-      jmax        = dim_l[1],
-      kmax        = dim_l[2];
+  int imax        = a_dim_l[0],
+      jmax        = a_dim_l[1],
+      kmax        = a_dim_l[2];
 
   int is = mpi->m_is[0],
       js = mpi->m_is[1],
@@ -60,7 +60,7 @@ int IBInterpCoeffs(
     index[0] = i = boundary[dg].m_i;
     index[1] = j = boundary[dg].m_j;
     index[2] = k = boundary[dg].m_k;
-    _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,p);
+    _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,p);
 
     xb = boundary[dg].m_x;
     yb = boundary[dg].m_y;
@@ -76,12 +76,12 @@ int IBInterpCoeffs(
     dist = nx*(xx-xb) + ny*(yy-yb) + nz*(zz-zb);
 
     double x1, x2, y1, y2, z1, z2;
-    _GetCoordinate_(0,(i+1),dim_l,ghosts,X,x1);
-    _GetCoordinate_(0,(i-1),dim_l,ghosts,X,x2);
-    _GetCoordinate_(1,(j+1),dim_l,ghosts,X,y1);
-    _GetCoordinate_(1,(j-1),dim_l,ghosts,X,y2);
-    _GetCoordinate_(2,(k+1),dim_l,ghosts,X,z1);
-    _GetCoordinate_(2,(k-1),dim_l,ghosts,X,z2);
+    _GetCoordinate_(0,(i+1),a_dim_l,a_ghosts,a_X,x1);
+    _GetCoordinate_(0,(i-1),a_dim_l,a_ghosts,a_X,x2);
+    _GetCoordinate_(1,(j+1),a_dim_l,a_ghosts,a_X,y1);
+    _GetCoordinate_(1,(j-1),a_dim_l,a_ghosts,a_X,y2);
+    _GetCoordinate_(2,(k+1),a_dim_l,a_ghosts,a_X,z1);
+    _GetCoordinate_(2,(k-1),a_dim_l,a_ghosts,a_X,z2);
     dx = 0.5 * (x1 - x2);
     dy = 0.5 * (y1 - y2);
     dz = 0.5 * (z1 - z2);
@@ -102,71 +102,71 @@ int IBInterpCoeffs(
 
       if (xtip > xb)  {
         double xx;
-        _GetCoordinate_(0,itip,dim_l,ghosts,X,xx);
-        while ((xx < xtip) && (itip < imax+ghosts-1)) {
+        _GetCoordinate_(0,itip,a_dim_l,a_ghosts,a_X,xx);
+        while ((xx < xtip) && (itip < imax+a_ghosts-1)) {
           itip++;
-          _GetCoordinate_(0,itip,dim_l,ghosts,X,xx);
+          _GetCoordinate_(0,itip,a_dim_l,a_ghosts,a_X,xx);
         }
       }  else {
         double xx;
-        _GetCoordinate_(0,(itip-1),dim_l,ghosts,X,xx);
-        while ((xx > xtip) && (itip > -ghosts)) {
+        _GetCoordinate_(0,(itip-1),a_dim_l,a_ghosts,a_X,xx);
+        while ((xx > xtip) && (itip > -a_ghosts)) {
           itip--;
-          _GetCoordinate_(0,(itip-1),dim_l,ghosts,X,xx);
+          _GetCoordinate_(0,(itip-1),a_dim_l,a_ghosts,a_X,xx);
         }
       }
 
       if (ytip > yb) {
         double yy;
-        _GetCoordinate_(1,jtip,dim_l,ghosts,X,yy);
-        while ((yy < ytip) && (jtip < jmax+ghosts-1)) {
+        _GetCoordinate_(1,jtip,a_dim_l,a_ghosts,a_X,yy);
+        while ((yy < ytip) && (jtip < jmax+a_ghosts-1)) {
           jtip++;
-          _GetCoordinate_(1,jtip,dim_l,ghosts,X,yy);
+          _GetCoordinate_(1,jtip,a_dim_l,a_ghosts,a_X,yy);
         }
       } else {
         double yy;
-        _GetCoordinate_(1,(jtip-1),dim_l,ghosts,X,yy);
-        while ((yy > ytip) && (jtip > -ghosts)) {
+        _GetCoordinate_(1,(jtip-1),a_dim_l,a_ghosts,a_X,yy);
+        while ((yy > ytip) && (jtip > -a_ghosts)) {
           jtip--;
-          _GetCoordinate_(1,(jtip-1),dim_l,ghosts,X,yy);
+          _GetCoordinate_(1,(jtip-1),a_dim_l,a_ghosts,a_X,yy);
         }
       }
 
       if (ztip > zb) {
         double zz;
-        _GetCoordinate_(2,ktip,dim_l,ghosts,X,zz);
-        while ((zz < ztip) && (ktip < kmax+ghosts-1))  {
+        _GetCoordinate_(2,ktip,a_dim_l,a_ghosts,a_X,zz);
+        while ((zz < ztip) && (ktip < kmax+a_ghosts-1))  {
           ktip++;
-          _GetCoordinate_(2,ktip,dim_l,ghosts,X,zz);
+          _GetCoordinate_(2,ktip,a_dim_l,a_ghosts,a_X,zz);
         }
       } else {
         double zz;
-        _GetCoordinate_(2,(ktip-1),dim_l,ghosts,X,zz);
-        while ((zz > ztip) && (ktip > -ghosts))  {
+        _GetCoordinate_(2,(ktip-1),a_dim_l,a_ghosts,a_X,zz);
+        while ((zz > ztip) && (ktip > -a_ghosts))  {
           ktip--;
-          _GetCoordinate_(2,(ktip-1),dim_l,ghosts,X,zz);
+          _GetCoordinate_(2,(ktip-1),a_dim_l,a_ghosts,a_X,zz);
         }
       }
 
       int ptip[_IB_NNODES_];
-      index[0] = itip  ; index[1] = jtip  ; index[2] = ktip  ; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[0]);
-      index[0] = itip-1; index[1] = jtip  ; index[2] = ktip  ; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[1]);
-      index[0] = itip  ; index[1] = jtip-1; index[2] = ktip  ; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[2]);
-      index[0] = itip  ; index[1] = jtip  ; index[2] = ktip-1; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[3]);
-      index[0] = itip-1; index[1] = jtip-1; index[2] = ktip  ; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[4]);
-      index[0] = itip  ; index[1] = jtip-1; index[2] = ktip-1; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[5]);
-      index[0] = itip-1; index[1] = jtip  ; index[2] = ktip-1; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[6]);
-      index[0] = itip-1; index[1] = jtip-1; index[2] = ktip-1; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[7]);
+      index[0] = itip  ; index[1] = jtip  ; index[2] = ktip  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[0]);
+      index[0] = itip-1; index[1] = jtip  ; index[2] = ktip  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[1]);
+      index[0] = itip  ; index[1] = jtip-1; index[2] = ktip  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[2]);
+      index[0] = itip  ; index[1] = jtip  ; index[2] = ktip-1; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[3]);
+      index[0] = itip-1; index[1] = jtip-1; index[2] = ktip  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[4]);
+      index[0] = itip  ; index[1] = jtip-1; index[2] = ktip-1; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[5]);
+      index[0] = itip-1; index[1] = jtip  ; index[2] = ktip-1; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[6]);
+      index[0] = itip-1; index[1] = jtip-1; index[2] = ktip-1; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[7]);
 
       int nflow = 0;
-      nflow += blank[ptip[0]];
-      nflow += blank[ptip[1]];
-      nflow += blank[ptip[2]];
-      nflow += blank[ptip[3]];
-      nflow += blank[ptip[4]];
-      nflow += blank[ptip[5]];
-      nflow += blank[ptip[6]];
-      nflow += blank[ptip[7]];
+      nflow += a_blank[ptip[0]];
+      nflow += a_blank[ptip[1]];
+      nflow += a_blank[ptip[2]];
+      nflow += a_blank[ptip[3]];
+      nflow += a_blank[ptip[4]];
+      nflow += a_blank[ptip[5]];
+      nflow += a_blank[ptip[6]];
+      nflow += a_blank[ptip[7]];
       if (nflow == _IB_NNODES_) {
         is_it_in = 1;
       } else if (nflow < _IB_NNODES_) {
@@ -189,22 +189,22 @@ int IBInterpCoeffs(
     }
 
     double tlx[2],tly[2],tlz[2];
-    _GetCoordinate_(0,(itip-1),dim_l,ghosts,X,tlx[0]);
-    _GetCoordinate_(0,(itip  ),dim_l,ghosts,X,tlx[1]);
-    _GetCoordinate_(1,(jtip-1),dim_l,ghosts,X,tly[0]);
-    _GetCoordinate_(1,(jtip  ),dim_l,ghosts,X,tly[1]);
-    _GetCoordinate_(2,(ktip-1),dim_l,ghosts,X,tlz[0]);
-    _GetCoordinate_(2,(ktip  ),dim_l,ghosts,X,tlz[1]);
+    _GetCoordinate_(0,(itip-1),a_dim_l,a_ghosts,a_X,tlx[0]);
+    _GetCoordinate_(0,(itip  ),a_dim_l,a_ghosts,a_X,tlx[1]);
+    _GetCoordinate_(1,(jtip-1),a_dim_l,a_ghosts,a_X,tly[0]);
+    _GetCoordinate_(1,(jtip  ),a_dim_l,a_ghosts,a_X,tly[1]);
+    _GetCoordinate_(2,(ktip-1),a_dim_l,a_ghosts,a_X,tlz[0]);
+    _GetCoordinate_(2,(ktip  ),a_dim_l,a_ghosts,a_X,tlz[1]);
 
     int ptip[_IB_NNODES_];
-    index[0]=itip-1; index[1]=jtip-1; index[2]=ktip-1; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[0]);
-    index[0]=itip  ; index[1]=jtip-1; index[2]=ktip-1; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[1]);
-    index[0]=itip-1; index[1]=jtip  ; index[2]=ktip-1; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[2]);
-    index[0]=itip  ; index[1]=jtip  ; index[2]=ktip-1; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[3]);
-    index[0]=itip-1; index[1]=jtip-1; index[2]=ktip  ; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[4]);
-    index[0]=itip  ; index[1]=jtip-1; index[2]=ktip  ; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[5]);
-    index[0]=itip-1; index[1]=jtip  ; index[2]=ktip  ; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[6]);
-    index[0]=itip  ; index[1]=jtip  ; index[2]=ktip  ; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,ptip[7]);
+    index[0]=itip-1; index[1]=jtip-1; index[2]=ktip-1; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[0]);
+    index[0]=itip  ; index[1]=jtip-1; index[2]=ktip-1; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[1]);
+    index[0]=itip-1; index[1]=jtip  ; index[2]=ktip-1; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[2]);
+    index[0]=itip  ; index[1]=jtip  ; index[2]=ktip-1; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[3]);
+    index[0]=itip-1; index[1]=jtip-1; index[2]=ktip  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[4]);
+    index[0]=itip  ; index[1]=jtip-1; index[2]=ktip  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[5]);
+    index[0]=itip-1; index[1]=jtip  ; index[2]=ktip  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[6]);
+    index[0]=itip  ; index[1]=jtip  ; index[2]=ktip  ; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,ptip[7]);
     _ArrayCopy1D_(ptip,boundary[dg].m_interp_nodes,_IB_NNODES_);
 
     double coeffs[_IB_NNODES_];

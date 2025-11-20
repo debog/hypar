@@ -8,10 +8,10 @@
 
 /*! Function to clean up all physics-related allocations for the 1D Euler equations */
 int Euler1DCleanup(
-                   void *s /*!< Solver object of type #HyPar */
+                   void *a_s /*!< Solver object of type #HyPar */
                   )
 {
-  Euler1D *param  = (Euler1D*) s;
+  Euler1D *param  = (Euler1D*) a_s;
   free(param->m_grav_field);
   free(param->m_fast_jac);
   free(param->m_solution);

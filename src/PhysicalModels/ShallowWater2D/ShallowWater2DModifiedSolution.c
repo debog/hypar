@@ -19,18 +19,18 @@
     http://dx.doi.org/10.1016/j.jcp.2005.02.006
 */
 int ShallowWater2DModifiedSolution(
-                            double  *uC, /*!< The modified solution (same array size and layout as u) */
-                            double  *u,  /*!< The solution (conserved variables) */
-                            int     d,   /*!< Spatial dimension */
-                            void    *s,  /*!< Solver object of type #HyPar */
-                            void    *m,  /*!< MPI object of type #MPIVariables */
+                            double  *a_uC, /*!< The modified solution (same array size and layout as a_u) */
+                            double  *a_u,  /*!< The solution (conserved variables) */
+                            int     a_d,   /*!< Spatial dimension */
+                            void    *a_s,  /*!< Solver object of type #HyPar */
+                            void    *a_m,  /*!< MPI object of type #MPIVariables */
                             double  waqt /*!< Current solution time */
                            )
 {
-  HyPar           *solver = (HyPar*) s;
+  HyPar           *solver = (HyPar*) a_s;
   ShallowWater2D  *param  = (ShallowWater2D*) solver->m_physics;
 
-  int     ghosts  = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     *dim    = solver->m_dim_local;
   int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
@@ -46,10 +46,10 @@ int ShallowWater2DModifiedSolution(
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double h,uvel,vvel;
-    _ShallowWater2DGetFlowVar_((u+_MODEL_NVARS_*p),h,uvel,vvel);
-    uC[_MODEL_NVARS_*p+0] = h + param->m_b[p];
-    uC[_MODEL_NVARS_*p+1] = h * uvel;
-    uC[_MODEL_NVARS_*p+2] = h * vvel;
+    _ShallowWater2DGetFlowVar_((a_u+_MODEL_NVARS_*p),h,uvel,vvel);
+    a_uC[_MODEL_NVARS_*p+0] = h + param->m_b[p];
+    a_uC[_MODEL_NVARS_*p+1] = h * uvel;
+    a_uC[_MODEL_NVARS_*p+2] = h * vvel;
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
   return(0);

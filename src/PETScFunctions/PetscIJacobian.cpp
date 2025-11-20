@@ -49,25 +49,25 @@
       the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
       or variable name yields the specific doc page dealing with that function/variable.
 */
-PetscErrorCode PetscIJacobian( TS ts,        /*!< Time stepping object (see PETSc TS)*/
-                               PetscReal t,  /*!< Current time */
-                               Vec Y,        /*!< Solution vector */
-                               Vec Ydot,     /*!< Time-derivative of solution vector */
-                               PetscReal a,  /*!< Shift */
-                               Mat A,        /*!< Jacobian matrix */
-                               Mat B,        /*!< Preconditioning matrix */
-                               void *ctxt    /*!< Application context */ )
+PetscErrorCode PetscIJacobian( TS a_ts,        /*!< Time stepping object (see PETSc TS)*/
+                               PetscReal a_t,  /*!< Current time */
+                               Vec a_Y,        /*!< Solution vector */
+                               Vec a_Ydot,     /*!< Time-derivative of solution vector */
+                               PetscReal a_a,  /*!< Shift */
+                               Mat a_A,        /*!< Jacobian matrix */
+                               Mat a_B,        /*!< Preconditioning matrix */
+                               void *a_ctxt    /*!< Application context */ )
 {
-  PETScContext* context = (PETScContext*) ctxt;
+  PETScContext* context = (PETScContext*) a_ctxt;
 
   PetscFunctionBegin;
   for (int ns = 0; ns < context->m_nsims; ns++) {
     ((SimulationObject*)context->m_simobj)[ns].solver.m_count_i_jacobian++;
   }
-  context->m_shift = a;
-  context->m_waqt  = t;
+  context->m_shift = a_a;
+  context->m_waqt  = a_t;
   /* Construct preconditioning matrix */
-  if (context->m_flag_use_precon) PetscComputePreconMatImpl(B,Y,context);
+  if (context->m_flag_use_precon) PetscComputePreconMatImpl(a_B,a_Y,context);
 
   PetscFunctionReturn(0);
 }
@@ -108,28 +108,28 @@ PetscErrorCode PetscIJacobian( TS ts,        /*!< Time stepping object (see PETS
       the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
       or variable name yields the specific doc page dealing with that function/variable.
 */
-PetscErrorCode PetscJacobianFunction_JFNK( Mat Jacobian, /*!< Jacobian matrix */
-                                           Vec Y,        /*!< Input vector */
-                                           Vec F         /*!< Output vector
+PetscErrorCode PetscJacobianFunction_JFNK( Mat a_Jacobian, /*!< Jacobian matrix */
+                                           Vec a_Y,        /*!< Input vector */
+                                           Vec a_F         /*!< Output vector
                                                               (Jacobian times input vector) */ )
 {
   PETScContext* context(nullptr);
 
   PetscFunctionBegin;
 
-  MatShellGetContext(Jacobian,&context);
+  MatShellGetContext(a_Jacobian,&context);
   SimulationObject* sim = (SimulationObject*) context->m_simobj;
   int nsims = context->m_nsims;
 
   double normY;
-  VecNorm(Y,NORM_2,&normY);
+  VecNorm(a_Y,NORM_2,&normY);
 
   if (normY < 1e-16) {
 
-    /* F = 0 */
-    VecZeroEntries(F);
-    /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->m_shift,0,Y);
+    /* a_F = 0 */
+    VecZeroEntries(a_F);
+    /* [J]a_Y = aY - a_F(a_Y) */
+    VecAXPBY(a_F,context->m_shift,0,a_Y);
 
   } else {
 
@@ -150,7 +150,7 @@ PetscErrorCode PetscJacobianFunction_JFNK( Mat Jacobian, /*!< Jacobian matrix */
       double *rhs     = solver->m_rhs;
 
       /* copy solution from PETSc vector */
-      TransferVecFromPETSc(u,Y,context,ns,context->m_offsets[ns]);
+      TransferVecFromPETSc(u,a_Y,context,ns,context->m_offsets[ns]);
       _ArrayAYPX_(uref,epsilon,u,size*solver->m_nvars);
       /* apply boundary conditions and exchange data over MPI interfaces */
       solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);
@@ -173,11 +173,11 @@ PetscErrorCode PetscJacobianFunction_JFNK( Mat Jacobian, /*!< Jacobian matrix */
 
       _ArrayAXPY_(rhsref,-1.0,rhs,size*solver->m_nvars);
       /* Transfer RHS to PETSc vector */
-      TransferVecToPETSc(rhs,F,context,ns,context->m_offsets[ns]);
+      TransferVecToPETSc(rhs,a_F,context,ns,context->m_offsets[ns]);
     }
 
-    /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->m_shift,(-1.0/epsilon),Y);
+    /* [J]a_Y = aY - a_F(a_Y) */
+    VecAXPBY(a_F,context->m_shift,(-1.0/epsilon),a_Y);
 
   }
 
@@ -233,28 +233,28 @@ PetscErrorCode PetscJacobianFunction_JFNK( Mat Jacobian, /*!< Jacobian matrix */
       the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
       or variable name yields the specific doc page dealing with that function/variable.
 */
-PetscErrorCode PetscJacobianFunction_Linear( Mat Jacobian, /*!< Jacobian matrix */
-                                             Vec Y,        /*!< Input vector */
-                                             Vec F         /*!< Output vector
+PetscErrorCode PetscJacobianFunction_Linear( Mat a_Jacobian, /*!< Jacobian matrix */
+                                             Vec a_Y,        /*!< Input vector */
+                                             Vec a_F         /*!< Output vector
                                                                 (Jacobian times input vector */)
 {
   PETScContext* context(nullptr);
 
   PetscFunctionBegin;
 
-  MatShellGetContext(Jacobian,&context);
+  MatShellGetContext(a_Jacobian,&context);
   SimulationObject* sim = (SimulationObject*) context->m_simobj;
   int nsims = context->m_nsims;
 
   double normY;
-  VecNorm(Y,NORM_2,&normY);
+  VecNorm(a_Y,NORM_2,&normY);
 
   if (normY < 1e-16) {
 
-    /* F = 0 */
-    VecZeroEntries(F);
-    /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->m_shift,0,Y);
+    /* a_F = 0 */
+    VecZeroEntries(a_F);
+    /* [J]a_Y = aY - a_F(a_Y) */
+    VecAXPBY(a_F,context->m_shift,0,a_Y);
 
   } else {
 
@@ -274,7 +274,7 @@ PetscErrorCode PetscJacobianFunction_Linear( Mat Jacobian, /*!< Jacobian matrix 
       double *rhs     = solver->m_rhs;
 
       /* copy solution from PETSc vector */
-      TransferVecFromPETSc(u,Y,context,ns,context->m_offsets[ns]);
+      TransferVecFromPETSc(u,a_Y,context,ns,context->m_offsets[ns]);
       _ArrayAYPX_(uref,1.0,u,size*solver->m_nvars);
       /* apply boundary conditions and exchange data over MPI interfaces */
       solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);
@@ -297,11 +297,11 @@ PetscErrorCode PetscJacobianFunction_Linear( Mat Jacobian, /*!< Jacobian matrix 
 
       _ArrayAXPY_(rhsref,-1.0,rhs,size*solver->m_nvars);
       /* Transfer RHS to PETSc vector */
-      TransferVecToPETSc(rhs,F,context,ns,context->m_offsets[ns]);
+      TransferVecToPETSc(rhs,a_F,context,ns,context->m_offsets[ns]);
     }
 
-    /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->m_shift,-1.0,Y);
+    /* [J]a_Y = aY - a_F(a_Y) */
+    VecAXPBY(a_F,context->m_shift,-1.0,a_Y);
 
   }
 

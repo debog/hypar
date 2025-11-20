@@ -17,38 +17,38 @@
     Calling this routine one bin at a time is not efficient,
     but we do not care about speed here.
 */
-static int FFTFreqNum(int bin,  /*!< The bin number for the Fourier frequency to be returned */
-                      int N     /*!< The total number of Fourier frequencies */
+static int FFTFreqNum(int a_bin,  /*!< The bin number for the Fourier frequency to be returned */
+                      int a_N     /*!< The total number of Fourier frequencies */
                      )
 {
   double remainder;
   int last_positive = 0;
 
-  remainder = N % 2;
+  remainder = a_N % 2;
   // Note that last_positive is an integer
   if (remainder) {
-    // N is odd
-    last_positive = (N-1) / 2;
+    // a_N is odd
+    last_positive = (a_N-1) / 2;
   } else {
-    // N is even
-    last_positive = N/2 - 1;
+    // a_N is even
+    last_positive = a_N/2 - 1;
   }
 
-  if (bin <= last_positive) {
-    return bin;
+  if (a_bin <= last_positive) {
+    return a_bin;
   } else {
-    return -(N - bin);
+    return -(a_N - a_bin);
   }
 }
 
 /*! Sets the prescribed electric field. */
-static int SetEFieldPrescribed( double* u,/*!< Conserved solution */
-                                void*   s,/*!< Solver object of type #HyPar */
-                                double  t /*!< Current time */
+static int SetEFieldPrescribed( double* a_u,/*!< Conserved solution */
+                                void*   a_s,/*!< Solver object of type #HyPar */
+                                double  a_t   /*!< Current time */
                               )
 {
 
-  HyPar *solver = (HyPar*)  s;
+  HyPar *solver = (HyPar*)  a_s;
   Vlasov *param  = (Vlasov*) solver->m_physics;
   MPIVariables *mpi = (MPIVariables *) param->m_m_mpi;
 
@@ -89,12 +89,12 @@ static int SetEFieldPrescribed( double* u,/*!< Conserved solution */
 
 /*! Compute the self-consistent electric field over the local domain: The field
  * is solved from the solution values using a Poisson solve in Fourier space. */
-static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
-                                   void*   s,/*!< Solver object of type #HyPar */
-                                   double  t /*!< Current time */
+static int SetEFieldSelfConsistent(double* a_u,/*!< Conserved solution */
+                                   void*   a_s,/*!< Solver object of type #HyPar */
+                                   double  a_t   /*!< Current time */
                                         )
 {
-  HyPar  *solver = (HyPar*)  s;
+  HyPar  *solver = (HyPar*)  a_s;
   Vlasov *param  = (Vlasov*) solver->m_physics;
   MPIVariables *mpi = (MPIVariables *) param->m_m_mpi;
 
@@ -159,7 +159,7 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
     double x; _GetCoordinate_(0,index[0],dim,ghosts,solver->m_x,x);
     double v; _GetCoordinate_(1,index[1],dim,ghosts,solver->m_x,v);
 
-    sum_buffer[index[0]] += u[p] / dvinv;
+    sum_buffer[index[0]] += a_u[p] / dvinv;
 
     _ArrayIncrementIndex_(ndims,bounds_noghost,index,done);
   }
@@ -255,20 +255,20 @@ static int SetEFieldSelfConsistent(double* u,/*!< Conserved solution */
 
 /*! Compute electric field.\n
 */
-int VlasovEField( double* u, /*!< Conserved solution */
-                  void*   s, /*!< Solver object of type #HyPar */
-                  double  t  /*!< Current time */
+int VlasovEField( double* a_u, /*!< Conserved solution */
+                  void*   a_s, /*!< Solver object of type #HyPar */
+                  double  a_t   /*!< Current time */
                 )
 {
-  HyPar  *solver = (HyPar*)  s;
+  HyPar  *solver = (HyPar*)  a_s;
   Vlasov *param  = (Vlasov*) solver->m_physics;
 
   int ierr;
 
   if (param->m_self_consistent_electric_field) {
-    ierr = SetEFieldSelfConsistent(u, s, t);
+    ierr = SetEFieldSelfConsistent(a_u, a_s, a_t);
   } else {
-    ierr = SetEFieldPrescribed(u, s, t);
+    ierr = SetEFieldPrescribed(a_u, a_s, a_t);
   }
 
   return ierr;

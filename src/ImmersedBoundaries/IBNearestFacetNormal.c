@@ -23,16 +23,16 @@
     is defined in.
 */
 int IBNearestFacetNormal(
-                          void    *ib, /*!< Immersed boundary object of type #ImmersedBoundary */
-                          void    *m,  /*!< MPI object of type #MPIVariables */
-                          double  *X,  /*!< Array of (local) spatial coordinates */
-                          double  large_distance, /*!< A large distance */
-                          int     *dim_l, /*!< Integer array of local grid size in each spatial dimension */
-                          int     ghosts /*!< Number of ghost points */
+                          void    *a_ib, /*!< Immersed boundary object of type #ImmersedBoundary */
+                          void    *a_m,  /*!< MPI object of type #MPIVariables */
+                          double  *a_X,  /*!< Array of (local) spatial coordinates */
+                          double  a_large_distance, /*!< A large distance */
+                          int     *a_dim_l, /*!< Integer array of local grid size in each spatial dimension */
+                          int     a_ghosts /*!< Number of ghost points */
                         )
 {
-  ImmersedBoundary  *IB       = (ImmersedBoundary*) ib;
-  MPIVariables      *mpi      = (MPIVariables*) m;
+  ImmersedBoundary  *IB       = (ImmersedBoundary*) a_ib;
+  MPIVariables      *mpi      = (MPIVariables*) a_m;
   Body3D            *body     = IB->m_body;
   Facet3D           *surface  = body->m_surface;
   IBNode            *boundary = IB->m_boundary;
@@ -48,14 +48,14 @@ int IBNearestFacetNormal(
     k = boundary[dg].m_k;
 
     double xp, yp, zp;
-    _GetCoordinate_(0,i,dim_l,ghosts,X,xp);
-    _GetCoordinate_(1,j,dim_l,ghosts,X,yp);
-    _GetCoordinate_(2,k,dim_l,ghosts,X,zp);
+    _GetCoordinate_(0,i,a_dim_l,a_ghosts,a_X,xp);
+    _GetCoordinate_(1,j,a_dim_l,a_ghosts,a_X,yp);
+    _GetCoordinate_(2,k,a_dim_l,a_ghosts,a_X,zp);
     boundary[dg].m_x = xp;
     boundary[dg].m_y = yp;
     boundary[dg].m_z = zp;
 
-    double  dist_min = large_distance;
+    double  dist_min = a_large_distance;
     int     n_min    = -1;
 
     for (n = 0; n < nf; n++) {

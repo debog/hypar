@@ -14,9 +14,9 @@
       doi:10.1146/annurev.fl.18.010186.002005
 */
 double LimiterSuperBee(
-                        double r /*!< Input slope ratio */
+                        double a_r /*!< Input slope ratio */
                       )
 {
-  double retval = max3(0, min(2*r,1), min(r,2));
+  double retval = max3(0, min(2*a_r,1), min(a_r,2));
   return retval;
 }

@@ -18,14 +18,14 @@
     \f}
 */
 int ShallowWater2DFlux(
-                        double  *f, /*!< Array to hold the computed flux (same size and layout as u) */
-                        double  *u, /*!< Array containing the conserved solution */
-                        int     dir,/*!< Spatial dimension */
-                        void    *s, /*!< Solver object of type #HyPar */
-                        double  t   /*!< Current time */
+                        double  *a_f, /*!< Array to hold the computed flux (same size and layout as a_u) */
+                        double  *a_u, /*!< Array containing the conserved solution */
+                        int     a_dir,/*!< Spatial dimension */
+                        void    *a_s, /*!< Solver object of type #HyPar */
+                        double  a_t   /*!< Current time */
                       )
 {
-  HyPar             *solver = (HyPar*)   s;
+  HyPar             *solver = (HyPar*)   a_s;
   ShallowWater2D    *param  = (ShallowWater2D*) solver->m_physics;
   int               *dim    = solver->m_dim_local;
   int               ghosts  = solver->m_ghosts;
@@ -42,8 +42,8 @@ int ShallowWater2DFlux(
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double h, uvel, vvel;
-    _ShallowWater2DGetFlowVar_((u+nvars*p),h,uvel,vvel);
-    _ShallowWater2DSetFlux_((f+nvars*p),h,uvel,vvel,param->m_g,dir);
+    _ShallowWater2DGetFlowVar_((a_u+nvars*p),h,uvel,vvel);
+    _ShallowWater2DSetFlux_((a_f+nvars*p),h,uvel,vvel,param->m_g,a_dir);
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

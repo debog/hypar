@@ -15,12 +15,12 @@
     cancel out.
 */
 int BoundaryIntegral(
-                      void *s, /*!< Solver object of type #HyPar */
-                      void *m  /*!< MPI object of type #MPIVariables */
+                      void *a_s, /*!< Solver object of type #HyPar */
+                      void *a_m  /*!< MPI object of type #MPIVariables */
                     )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
 
   int ndims   = solver->m_ndims;
   int nvars   = solver->m_nvars;

@@ -16,24 +16,24 @@
     to interpolation functions for a characteristic-based reconstruction.
 */
 int NavierStokes3DRoeAverage(
-                              double  *uavg, /*!< The computed Roe-averaged state */
-                              double  *uL,   /*!< Left state (conserved variables)*/
-                              double  *uR,   /*!< Right state (conserved variables)*/
-                              void    *p     /*!< Object of type #NavierStokes3D with physics-related variables */
+                              double  *a_uavg, /*!< The computed Roe-averaged state */
+                              double  *a_uL,   /*!< Left state (conserved variables)*/
+                              double  *a_uR,   /*!< Right state (conserved variables)*/
+                              void    *a_p     /*!< Object of type #NavierStokes3D with physics-related variables */
                             )
 {
-  NavierStokes3D *param  = (NavierStokes3D*) p;
-  _NavierStokes3DRoeAverage_(uavg,_NavierStokes3D_stride_,uL,uR,param->m_gamma);
+  NavierStokes3D *param  = (NavierStokes3D*) a_p;
+  _NavierStokes3DRoeAverage_(a_uavg,_NavierStokes3D_stride_,a_uL,a_uR,param->m_gamma);
   return(0);
 }
 
 /*! Compute the pressure from the conserved solution on a grid */
-int NavierStokes3DComputePressure(  double*             P, /*!< Array to hold the computed pressure (same layout as u) */
-                                    const double* const u, /*!< Array with the solution vector */
-                                    void*               s  /*!< Solver object of type #HyPar */
+int NavierStokes3DComputePressure(  double*             a_P, /*!< Array to hold the computed pressure (same layout as a_u) */
+                                    const double* const a_u, /*!< Array with the solution vector */
+                                    void*               a_s  /*!< Solver object of type #HyPar */
                                   )
 {
-  HyPar          *solver = (HyPar*)   s;
+  HyPar          *solver = (HyPar*)   a_s;
   NavierStokes3D *param  = (NavierStokes3D*) solver->m_physics;
   int            i;
 
@@ -53,8 +53,8 @@ int NavierStokes3DComputePressure(  double*             P, /*!< Array to hold th
   while (!done) {
     int idx; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,idx);
     double rho, vx, vy, vz, e, pressure;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*idx),_NavierStokes3D_stride_,rho,vx,vy,vz,e,pressure,param->m_gamma);
-    P[idx] = pressure;
+    _NavierStokes3DGetFlowVar_((a_u+_MODEL_NVARS_*idx),_NavierStokes3D_stride_,rho,vx,vy,vz,e,pressure,param->m_gamma);
+    a_P[idx] = pressure;
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 
@@ -62,12 +62,12 @@ int NavierStokes3DComputePressure(  double*             P, /*!< Array to hold th
 }
 
 /*! Compute the temperature from the conserved solution on a grid */
-int NavierStokes3DComputeTemperature( double*             T, /*!< Array to hold the computed pressure (same layout as u) */
-                                      const double* const u, /*!< Array with the solution vector */
-                                      void*               s  /*!< Solver object of type #HyPar */
+int NavierStokes3DComputeTemperature( double*             a_T, /*!< Array to hold the computed pressure (same layout as a_u) */
+                                      const double* const a_u, /*!< Array with the solution vector */
+                                      void*               a_s  /*!< Solver object of type #HyPar */
                                     )
 {
-  HyPar          *solver = (HyPar*)   s;
+  HyPar          *solver = (HyPar*)   a_s;
   NavierStokes3D *param  = (NavierStokes3D*) solver->m_physics;
   int            i;
 
@@ -87,8 +87,8 @@ int NavierStokes3DComputeTemperature( double*             T, /*!< Array to hold 
   while (!done) {
     int idx; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,idx);
     double rho, vx, vy, vz, e, pressure;
-    _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*idx),_NavierStokes3D_stride_,rho,vx,vy,vz,e,pressure,param->m_gamma);
-    T[idx] = pressure/rho;
+    _NavierStokes3DGetFlowVar_((a_u+_MODEL_NVARS_*idx),_NavierStokes3D_stride_,rho,vx,vy,vz,e,pressure,param->m_gamma);
+    a_T[idx] = pressure/rho;
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

@@ -23,12 +23,12 @@ int ExactSolution(void*,void*,double*,char*,int*);
     in the same format as the initial solution.
 */
 int CalculateError(
-                    void *s, /*!< Solver object of type #HyPar */
-                    void *m  /*!< MPI object of type #MPIVariables */
+                    void *a_s, /*!< Solver object of type #HyPar */
+                    void *a_m  /*!< MPI object of type #MPIVariables */
                   )
 {
-  HyPar         *solver     = (HyPar*)        s;
-  MPIVariables  *mpi        = (MPIVariables*) m;
+  HyPar         *solver     = (HyPar*)        a_s;
+  MPIVariables  *mpi        = (MPIVariables*) a_m;
   int           exact_flag  = 0, i, size;
   double        sum         = 0, global_sum = 0;
   double        *uex        = NULL;

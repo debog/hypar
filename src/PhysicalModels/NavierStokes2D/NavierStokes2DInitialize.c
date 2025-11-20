@@ -101,12 +101,12 @@ int gpuNavierStokes2DParabolicFunction        (double*,double*,void*,void*,doubl
     \b Note: "physics.inp" is \b optional; if absent, default values will be used.
 */
 int NavierStokes2DInitialize(
-                              void *s, /*!< Solver object of type #HyPar */
-                              void *m  /*!< MPI object of type #MPIVariables */
+                              void *a_s, /*!< Solver object of type #HyPar */
+                              void *a_m  /*!< MPI object of type #MPIVariables */
                             )
 {
-  HyPar           *solver  = (HyPar*)          s;
-  MPIVariables    *mpi     = (MPIVariables*)   m;
+  HyPar           *solver  = (HyPar*)          a_s;
+  MPIVariables    *mpi     = (MPIVariables*)   a_m;
   NavierStokes2D  *physics = (NavierStokes2D*) solver->m_physics;
   int             ferr     = 0;
 
@@ -145,14 +145,14 @@ int NavierStokes2DInitialize(
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word);                      if (ferr != 1) return(1);
+      ferr = fscanf(in,"%a_s",word);                      if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%s",word);                  if (ferr != 1) return(1);
+          ferr = fscanf(in,"%a_s",word);                  if (ferr != 1) return(1);
           if (!strcmp(word, "gamma")) {
             ferr = fscanf(in,"%lf",&physics->m_gamma);    if (ferr != 1) return(1);
           } else if (!strcmp(word,"upwinding")) {
-            ferr = fscanf(in,"%s",physics->m_upw_choice); if (ferr != 1) return(1);
+            ferr = fscanf(in,"%a_s",physics->m_upw_choice); if (ferr != 1) return(1);
           } else if (!strcmp(word,"Pr")) {
             ferr = fscanf(in,"%lf",&physics->m_Pr);       if (ferr != 1) return(1);
           } else if (!strcmp(word,"Re")) {
@@ -175,8 +175,8 @@ int NavierStokes2DInitialize(
             ferr = fscanf(in,"%lf",&physics->m_R);        if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",word,useless);
+            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
@@ -210,7 +210,7 @@ int NavierStokes2DInitialize(
       && (strcmp(physics->m_upw_choice,_RUSANOV_))
       && (strcmp(physics->m_upw_choice,_ROE_    ))              ) {
     if (!mpi->m_rank) {
-      fprintf(stderr,"Error in NavierStokes2DInitialize: %s, %s or %s upwinding is needed for flows ",_LLF_,_ROE_,_RUSANOV_);
+      fprintf(stderr,"Error in NavierStokes2DInitialize: %a_s, %a_s or %a_s upwinding is needed for flows ",_LLF_,_ROE_,_RUSANOV_);
       fprintf(stderr,"with gravitational forces.\n");
     }
     return(1);
@@ -218,7 +218,7 @@ int NavierStokes2DInitialize(
   /* check that solver has the correct choice of diffusion formulation */
   if (strcmp(solver->m_spatial_type_par,_NC_2STAGE_) && (physics->m_Re > 0)) {
     if (!mpi->m_rank)
-      fprintf(stderr,"Error in NavierStokes2DInitialize(): Parabolic term spatial discretization must be \"%s\"\n",_NC_2STAGE_);
+      fprintf(stderr,"Error in NavierStokes2DInitialize(): Parabolic term spatial discretization must be \"%a_s\"\n",_NC_2STAGE_);
     return(1);
   }
 
@@ -254,9 +254,9 @@ int NavierStokes2DInitialize(
       if (!strcmp(physics->m_upw_choice,_RUSANOV_)) solver->Upwind = gpuNavierStokes2DUpwindRusanov;
       else {
         if (!mpi->m_rank) {
-          fprintf(stderr,"Error in NavierStokes2DInitialize(): %s is not implemented on GPU. ",
+          fprintf(stderr,"Error in NavierStokes2DInitialize(): %a_s is not implemented on GPU. ",
                   physics->m_upw_choice);
-          fprintf(stderr,"Only choice is %s.\n",_RUSANOV_);
+          fprintf(stderr,"Only choice is %a_s.\n",_RUSANOV_);
         }
         return 1;
       }
@@ -285,9 +285,9 @@ int NavierStokes2DInitialize(
         solver->UpwindFdF = NavierStokes2DUpwindFdFRusanovModified;
       } else {
         if (!mpi->m_rank) {
-          fprintf(stderr,"Error in NavierStokes2DInitialize(): %s is not a valid upwinding scheme ",
+          fprintf(stderr,"Error in NavierStokes2DInitialize(): %a_s is not a valid upwinding scheme ",
                   physics->m_upw_choice);
-          fprintf(stderr,"for use with split hyperbolic flux form. Use %s, %s, %s, or %s.\n",
+          fprintf(stderr,"for use with split hyperbolic flux form. Use %a_s, %a_s, %a_s, or %a_s.\n",
                   _ROE_,_RF_,_LLF_,_RUSANOV_);
         }
         return(1);
@@ -301,9 +301,9 @@ int NavierStokes2DInitialize(
       else if (!strcmp(physics->m_upw_choice,_RUSANOV_)) solver->Upwind = NavierStokes2DUpwindRusanov;
       else {
         if (!mpi->m_rank) {
-          fprintf(stderr,"Error in NavierStokes2DInitialize(): %s is not a valid upwinding scheme. ",
+          fprintf(stderr,"Error in NavierStokes2DInitialize(): %a_s is not a valid upwinding scheme. ",
                   physics->m_upw_choice);
-          fprintf(stderr,"Choices are %s, %s, %s, %s, and %s.\n",_ROE_,_RF_,_LLF_,_SWFS_,_RUSANOV_);
+          fprintf(stderr,"Choices are %a_s, %a_s, %a_s, %a_s, and %a_s.\n",_ROE_,_RF_,_LLF_,_SWFS_,_RUSANOV_);
         }
         return(1);
       }
@@ -317,8 +317,8 @@ int NavierStokes2DInitialize(
   DomainBoundary  *boundary = (DomainBoundary*) solver->m_boundary;
   for (n = 0; n < solver->m_n_boundary_zones; n++)  boundary[n].m_gamma = physics->m_gamma;
 
-  /* hijack the main solver's dissipation function pointer
-   * to this model's own function, since it's difficult to express
+  /* hijack the main solver'a_s dissipation function pointer
+   * to this model'a_s own function, since it'a_s difficult to express
    * the dissipation terms in the general form                      */
 #if defined(HAVE_CUDA) && defined(CUDA_VAR_ORDERDING_AOS)
   if (solver->m_use_gpu) {
@@ -343,7 +343,7 @@ int NavierStokes2DInitialize(
   IERR NavierStokes2DGravityField(solver,mpi); CHECKERR(ierr);
 
 #if defined(HAVE_CUDA) && defined(CUDA_VAR_ORDERDING_AOS)
-  if (solver->m_use_gpu) gpuNavierStokes2DInitialize(s,m);
+  if (solver->m_use_gpu) gpuNavierStokes2DInitialize(a_s,a_m);
 #endif
 
   count++;

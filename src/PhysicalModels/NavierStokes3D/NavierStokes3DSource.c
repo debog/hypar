@@ -36,27 +36,27 @@ int NavierStokes3DSourceUpwind   (double*,double*,double*,double*,int,void*,doub
       for Atmospheric Flows, AIAA Journal, 54 (4), 2016, pp. 1370-1385, http://dx.doi.org/10.2514/1.J054580.
 */
 int NavierStokes3DSource(
-                          double  *source,  /*!< Array to hold the computed source */
-                          double  *u,       /*!< Solution vector array */
-                          void    *s,       /*!< Solver object of type #HyPar */
-                          void    *m,       /*!< MPI object of type #MPIVariables */
-                          double  t         /*!< Current simulation time */
+                          double  *a_source,  /*!< Array to hold the computed source */
+                          double  *a_u,       /*!< Solution vector array */
+                          void    *a_s,       /*!< Solver object of type #HyPar */
+                          void    *a_m,       /*!< MPI object of type #MPIVariables */
+                          double  a_t   /*!< Current simulation time */
                         )
 {
-  HyPar           *solver = (HyPar* )         s;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  HyPar           *solver = (HyPar* )         a_s;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
   NavierStokes3D  *param  = (NavierStokes3D*) solver->m_physics;
 
   if ((param->m_grav_x == 0.0) && (param->m_grav_y == 0.0) && (param->m_grav_z == 0.0))
     return(0); /* no gravitational forces */
 
   int     v, done, p, p1, p2, dir;
-  double  *SourceI = solver->m_flux_i; /* interace source term       */
-  double  *SourceC = solver->m_flux_c; /* cell-centered source term  */
+  double  *SourceI = solver->m_flux_i; /* interace a_source term       */
+  double  *SourceC = solver->m_flux_c; /* cell-centered a_source term  */
   double  *SourceL = solver->m_f_l;
   double  *SourceR = solver->m_f_r;
 
-  int     ghosts  = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     *dim    = solver->m_dim_local;
   double  *x      = solver->m_x;
   double  *dxinv  = solver->m_dxinv;
@@ -71,14 +71,14 @@ int NavierStokes3DSource(
     if (grav[dir] != 0.0) {
       /* set interface dimensions */
       _ArrayCopy1D_(dim,dim_interface,_MODEL_NDIMS_); dim_interface[dir]++;
-      /* calculate the split source function exp(-phi/RT) */
-      IERR NavierStokes3DSourceFunction(SourceC,u,x,solver,mpi,t,dir); CHECKERR(ierr);
-      /* calculate the left and right interface source terms */
-      IERR solver->InterpolateInterfacesHyp(SourceL,SourceC,u,x, 1,dir,solver,mpi,0); CHECKERR(ierr);
-      IERR solver->InterpolateInterfacesHyp(SourceR,SourceC,u,x,-1,dir,solver,mpi,0); CHECKERR(ierr);
-      /* calculate the final interface source term */
-      IERR NavierStokes3DSourceUpwind(SourceI,SourceL,SourceR,u,dir,solver,t);
-      /* calculate the final cell-centered source term */
+      /* calculate the split a_source function exp(-phi/RT) */
+      IERR NavierStokes3DSourceFunction(SourceC,a_u,x,solver,mpi,a_t,dir); CHECKERR(ierr);
+      /* calculate the left and right interface a_source terms */
+      IERR solver->InterpolateInterfacesHyp(SourceL,SourceC,a_u,x, 1,dir,solver,mpi,0); CHECKERR(ierr);
+      IERR solver->InterpolateInterfacesHyp(SourceR,SourceC,a_u,x,-1,dir,solver,mpi,0); CHECKERR(ierr);
+      /* calculate the final interface a_source term */
+      IERR NavierStokes3DSourceUpwind(SourceI,SourceL,SourceR,a_u,dir,solver,a_t);
+      /* calculate the final cell-centered a_source term */
       done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
       while (!done) {
         _ArrayCopy1D_(index,index1,_MODEL_NDIMS_);
@@ -89,10 +89,10 @@ int NavierStokes3DSource(
 
         double dx_inverse; _GetCoordinate_(dir,index[dir],dim,ghosts,dxinv,dx_inverse);
         double rho, vel[_MODEL_NDIMS_], e, P;
-        _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vel[0],vel[1],vel[2],e,P,param->m_gamma);
+        _NavierStokes3DGetFlowVar_((a_u+_MODEL_NVARS_*p),_NavierStokes3D_stride_,rho,vel[0],vel[1],vel[2],e,P,param->m_gamma);
         double term[_MODEL_NVARS_] = {0.0, rho*RT*(dir==_XDIR_), rho*RT*(dir==_YDIR_), rho*RT*(dir==_ZDIR_), rho*RT*vel[dir]};
         for (v=0; v<_MODEL_NVARS_; v++) {
-          source[_MODEL_NVARS_*p+v] += (  (term[v]*param->m_grav_field_f[p])
+          a_source[_MODEL_NVARS_*p+v] += (  (term[v]*param->m_grav_field_f[p])
                                         * (SourceI[_MODEL_NVARS_*p2+v]-SourceI[_MODEL_NVARS_*p1+v])*dx_inverse );
         }
         vel[0] = P; /* useless statement to avoid compiler warnings */
@@ -122,16 +122,16 @@ int NavierStokes3DSource(
       for Atmospheric Flows, AIAA Journal, http://dx.doi.org/10.2514/1.J054580.
 */
 int NavierStokes3DSourceFunction(
-                                  double  *f, /*!< Array to hold the computed source function */
-                                  double  *u, /*!< Solution vector array */
-                                  double  *x, /*!< Array of spatial coordinates (grid) */
-                                  void    *s, /*!< Solver object of type #HyPar */
-                                  void    *m, /*!< MPI object of type #MPIVariables */
-                                  double  t,  /*!< Current simulation time */
-                                  int     dir /*!< Spatial dimension (x, y, or z) */
+                                  double  *a_f, /*!< Array to hold the computed source function */
+                                  double  *a_u, /*!< Solution vector array */
+                                  double  *a_x, /*!< Array of spatial coordinates (grid) */
+                                  void    *a_s, /*!< Solver object of type #HyPar */
+                                  void    *a_m, /*!< MPI object of type #MPIVariables */
+                                  double  a_t,  /*!< Current simulation time */
+                                  int     a_dir /*!< Spatial dimension (a_x, y, or z) */
                                 )
 {
-  HyPar           *solver = (HyPar* )         s;
+  HyPar           *solver = (HyPar* )         a_s;
   NavierStokes3D  *param  = (NavierStokes3D*) solver->m_physics;
 
   int ghosts  = solver->m_ghosts;
@@ -148,11 +148,11 @@ int NavierStokes3DSourceFunction(
   int done = 0; _ArraySetValue_(index,_MODEL_NDIMS_,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(_MODEL_NDIMS_,dim,index,offset,ghosts,p);
-    (f+_MODEL_NVARS_*p)[0] = 0.0;
-    (f+_MODEL_NVARS_*p)[1] = param->m_grav_field_g[p] * (dir == _XDIR_);
-    (f+_MODEL_NVARS_*p)[2] = param->m_grav_field_g[p] * (dir == _YDIR_);
-    (f+_MODEL_NVARS_*p)[3] = param->m_grav_field_g[p] * (dir == _ZDIR_);
-    (f+_MODEL_NVARS_*p)[4] = param->m_grav_field_g[p];
+    (a_f+_MODEL_NVARS_*p)[0] = 0.0;
+    (a_f+_MODEL_NVARS_*p)[1] = param->m_grav_field_g[p] * (a_dir == _XDIR_);
+    (a_f+_MODEL_NVARS_*p)[2] = param->m_grav_field_g[p] * (a_dir == _YDIR_);
+    (a_f+_MODEL_NVARS_*p)[3] = param->m_grav_field_g[p] * (a_dir == _ZDIR_);
+    (a_f+_MODEL_NVARS_*p)[4] = param->m_grav_field_g[p];
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds,index,done);
   }
 
@@ -172,32 +172,32 @@ int NavierStokes3DSourceFunction(
       for Atmospheric Flows, Submitted
 */
 int NavierStokes3DSourceUpwind(
-                                double  *fI,  /*!< Array to hold the computed "upwind" interface source function */
-                                double  *fL,  /*!< Interface source function value computed using left-biased interpolation */
-                                double  *fR,  /*!< Interface source function value computed using right-biased interpolation */
-                                double  *u,   /*!< Solution vector array */
-                                int     dir,  /*!< Spatial dimension (x,y, or z) */
-                                void    *s,   /*!< Solver object of type #HyPar */
-                                double  t     /*!< Current simulation time */
+                                double  *a_fI,  /*!< Array to hold the computed "upwind" interface source function */
+                                double  *a_fL,  /*!< Interface source function value computed using left-biased interpolation */
+                                double  *a_fR,  /*!< Interface source function value computed using right-biased interpolation */
+                                double  *a_u,   /*!< Solution vector array */
+                                int     a_dir,  /*!< Spatial dimension (x,y, or z) */
+                                void    *a_s,   /*!< Solver object of type #HyPar */
+                                double  a_t   /*!< Current simulation time */
                               )
 {
-  HyPar *solver = (HyPar*) s;
+  HyPar *solver = (HyPar*) a_s;
   int   done,k, *dim  = solver->m_dim_local;
   _DECLARE_IERR_;
 
 
   static int index_outer[_MODEL_NDIMS_], index_inter[_MODEL_NDIMS_],
              bounds_outer[_MODEL_NDIMS_], bounds_inter[_MODEL_NDIMS_];
-  _ArrayCopy1D_(dim,bounds_outer,_MODEL_NDIMS_); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,_MODEL_NDIMS_); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,_MODEL_NDIMS_); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,_MODEL_NDIMS_); bounds_inter[a_dir] += 1;
 
   done = 0; _ArraySetValue_(index_outer,_MODEL_NDIMS_,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,_MODEL_NDIMS_);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p;  _ArrayIndex1D_(_MODEL_NDIMS_,bounds_inter,index_inter,0,p);
       for (k = 0; k < _MODEL_NVARS_; k++)
-        (fI+_MODEL_NVARS_*p)[k] = 0.5 * ((fL+_MODEL_NVARS_*p)[k] + (fR+_MODEL_NVARS_*p)[k]);
+        (a_fI+_MODEL_NVARS_*p)[k] = 0.5 * ((a_fL+_MODEL_NVARS_*p)[k] + (a_fR+_MODEL_NVARS_*p)[k]);
     }
     _ArrayIncrementIndex_(_MODEL_NDIMS_,bounds_outer,index_outer,done);
   }

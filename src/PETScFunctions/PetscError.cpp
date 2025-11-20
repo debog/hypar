@@ -17,12 +17,12 @@
 
 /*! Compute the norms of the error estimate, if the PETSc time integrator
     has it (for example TSGLEE) */
-int PetscTimeError(TS  ts /*!< Time integrator object of PETSc type TS */)
+int PetscTimeError(TS  a_ts /*!< Time integrator object of PETSc type TS */)
 {
   PetscErrorCode ierr;
 
   PETScContext* context(nullptr);
-  ierr = TSGetApplicationContext(ts,&context); CHKERRQ(ierr);
+  ierr = TSGetApplicationContext(a_ts,&context); CHKERRQ(ierr);
   if (!context) {
     fprintf(stderr,"Error in PetscError: Null context!\n");
     return(1);
@@ -32,11 +32,11 @@ int PetscTimeError(TS  ts /*!< Time integrator object of PETSc type TS */)
   int nsims( context->m_nsims );
 
   double dt;
-  ierr = TSGetTimeStep(ts,&dt); CHKERRQ(ierr);
+  ierr = TSGetTimeStep(a_ts,&dt); CHKERRQ(ierr);
   TSType time_scheme;
-  ierr = TSGetType(ts,&time_scheme); CHKERRQ(ierr);
+  ierr = TSGetType(a_ts,&time_scheme); CHKERRQ(ierr);
   Vec Y;
-  ierr = TSGetSolution(ts,&Y); CHKERRQ(ierr);
+  ierr = TSGetSolution(a_ts,&Y); CHKERRQ(ierr);
 
   for (int ns = 0; ns < nsims; ns++) {
     TransferVecFromPETSc( sim[ns].solver.m_u,
@@ -50,7 +50,7 @@ int PetscTimeError(TS  ts /*!< Time integrator object of PETSc type TS */)
 
     Vec Z;
     ierr = VecDuplicate(Y,&Z); CHKERRQ(ierr);
-    ierr = TSGetTimeError(ts,0,&Z);CHKERRQ(ierr);
+    ierr = TSGetTimeError(a_ts,0,&Z);CHKERRQ(ierr);
     for (int ns = 0; ns < nsims; ns++) {
       TransferVecFromPETSc( sim[ns].solver.m_uref,
                             Z,

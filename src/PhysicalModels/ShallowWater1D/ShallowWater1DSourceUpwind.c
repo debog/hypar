@@ -20,32 +20,32 @@
       http://dx.doi.org/10.1016/j.jcp.2005.02.006
 */
 int ShallowWater1DSourceUpwindLLF(
-                                  double  *fI, /*!< Computed interface source term ("upwinded") */
-                                  double  *fL, /*!< Left-biased interface source term */
-                                  double  *fR, /*!< Right-biased interface source term */
-                                  double  *u,  /*!< Solution (conserved variables) */
-                                  int     dir, /*!< Spatial dimension (unused since this is a 1D case) */
-                                  void    *s,  /*!< Solver object of type #HyPar */
-                                  double  t    /*!< Current solution time */
+                                  double  *a_fI, /*!< Computed interface source term ("upwinded") */
+                                  double  *a_fL, /*!< Left-biased interface source term */
+                                  double  *a_fR, /*!< Right-biased interface source term */
+                                  double  *a_u,  /*!< Solution (conserved variables) */
+                                  int     a_dir, /*!< Spatial dimension (unused since this is a 1D case) */
+                                  void    *a_s,  /*!< Solver object of type #HyPar */
+                                  double  a_t   /*!< Current solution time */
                                  )
 {
-  HyPar     *solver = (HyPar*)    s;
+  HyPar     *solver = (HyPar*)    a_s;
   int       done,k;
 
   int ndims = solver->m_ndims;
   int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p;  _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
       for (k = 0; k < _MODEL_NVARS_; k++)
-        (fI+_MODEL_NVARS_*p)[k] = 0.5 * ((fL+_MODEL_NVARS_*p)[k] + (fR+_MODEL_NVARS_*p)[k]);
+        (a_fI+_MODEL_NVARS_*p)[k] = 0.5 * ((a_fL+_MODEL_NVARS_*p)[k] + (a_fR+_MODEL_NVARS_*p)[k]);
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
@@ -62,32 +62,32 @@ int ShallowWater1DSourceUpwindLLF(
       http://dx.doi.org/10.1016/j.jcp.2005.02.006
 */
 int ShallowWater1DSourceUpwindRoe(
-                                  double  *fI, /*!< Computed interface source term ("upwinded") */
-                                  double  *fL, /*!< Left-biased interface source term */
-                                  double  *fR, /*!< Right-biased interface source term */
-                                  double  *u,  /*!< Solution (conserved variables) */
-                                  int     dir, /*!< Spatial dimension (unused since this is a 1D case) */
-                                  void    *s,  /*!< Solver object of type #HyPar */
-                                  double  t    /*!< Current solution time */
+                                  double  *a_fI, /*!< Computed interface source term ("upwinded") */
+                                  double  *a_fL, /*!< Left-biased interface source term */
+                                  double  *a_fR, /*!< Right-biased interface source term */
+                                  double  *a_u,  /*!< Solution (conserved variables) */
+                                  int     a_dir, /*!< Spatial dimension (unused since this is a 1D case) */
+                                  void    *a_s,  /*!< Solver object of type #HyPar */
+                                  double  a_t   /*!< Current solution time */
                                  )
 {
-  HyPar     *solver = (HyPar*)    s;
+  HyPar     *solver = (HyPar*)    a_s;
   int       done,k;
 
   int ndims = solver->m_ndims;
   int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p;  _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
       for (k = 0; k < _MODEL_NVARS_; k++)
-        (fI+_MODEL_NVARS_*p)[k] = 0.5 * ((fL+_MODEL_NVARS_*p)[k] + (fR+_MODEL_NVARS_*p)[k]);
+        (a_fI+_MODEL_NVARS_*p)[k] = 0.5 * ((a_fL+_MODEL_NVARS_*p)[k] + (a_fR+_MODEL_NVARS_*p)[k]);
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }

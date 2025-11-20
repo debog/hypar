@@ -32,55 +32,55 @@
     0 <= i{ndims-1} < dim[ndims=1]-1\n
 */
 int WriteBinary(
-                  int ndims,  /*!< Number of spatial dimensions */
-                  int nvars,  /*!< Number of variables at each grid point */
-                  int *dim,   /*!< Integer array with the number of grid points
+                  int a_ndims,  /*!< Number of spatial dimensions */
+                  int a_nvars,  /*!< Number of variables at each grid point */
+                  int *a_dim,   /*!< Integer array with the number of grid points
                                    in each spatial dimension as its entries */
-                  double *x,  /*!< Array of spatial coordinates representing a
+                  double *a_x,  /*!< Array of spatial coordinates representing a
                                    Cartesian grid (no ghost points) */
-                  double *u,  /*!< Array containing the vector field to write
+                  double *a_u,  /*!< Array containing the vector field to write
                                    (no ghost points) */
-                  char *f,    /*!< Filename */
+                  char *a_f,    /*!< Filename */
                   int *index  /*!< Preallocated integer array of size ndims */
                )
 {
   int size, d;
   size_t bytes;
   FILE *out;
-  out = fopen(f,"wb");
+  out = fopen(a_f,"wb");
   if (!out) {
-    fprintf(stderr,"Error: could not open %s for writing.\n",f);
+    fprintf(stderr,"Error: could not open %s for writing.\n",a_f);
     return(1);
   }
 
-  /* write ndims, nvars */
-  bytes = fwrite(&ndims,sizeof(int),1,out);
+  /* write a_ndims, a_nvars */
+  bytes = fwrite(&a_ndims,sizeof(int),1,out);
   if ((int)bytes != 1) {
-    fprintf(stderr,"Error in WriteBinary(): Unable to write ndims to output file.\n");
+    fprintf(stderr,"Error in WriteBinary(): Unable to write a_ndims to output file.\n");
   }
-  bytes = fwrite(&nvars,sizeof(int),1,out);
+  bytes = fwrite(&a_nvars,sizeof(int),1,out);
   if ((int)bytes != 1) {
-    fprintf(stderr,"Error in WriteBinary(): Unable to write nvars to output file.\n");
+    fprintf(stderr,"Error in WriteBinary(): Unable to write a_nvars to output file.\n");
   }
 
   /* write dimensions */
-  bytes = fwrite(dim,sizeof(int),ndims,out);
-  if ((int)bytes != ndims) {
+  bytes = fwrite(a_dim,sizeof(int),a_ndims,out);
+  if ((int)bytes != a_ndims) {
     fprintf(stderr,"Error in WriteBinary(): Unable to write dimensions to output file.\n");
   }
 
   /* write grid */
   size = 0;
-  for (d = 0; d < ndims; d++) size += dim[d];
-  bytes = fwrite(x,sizeof(double),size,out);
+  for (d = 0; d < a_ndims; d++) size += a_dim[d];
+  bytes = fwrite(a_x,sizeof(double),size,out);
   if ((int)bytes != size) {
     fprintf(stderr,"Error in WriteBinary(): Unable to write grid to output file.\n");
   }
 
   /* write solution */
   size = 1;
-  for (d = 0; d < ndims; d++) size *= dim[d]; size *= nvars;
-  bytes = fwrite(u,sizeof(double),size,out);
+  for (d = 0; d < a_ndims; d++) size *= a_dim[d]; size *= a_nvars;
+  bytes = fwrite(a_u,sizeof(double),size,out);
   if ((int)bytes != size) {
     fprintf(stderr,"Error in WriteBinary(): Unable to write solution to output file.\n");
   }

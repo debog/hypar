@@ -15,9 +15,9 @@
       doi:10.1016/0021-9991(74)90019-9
 */
 double LimiterVanLeer (
-                        double r /*!< Input slope ratio */
+                        double a_r /*!< Input slope ratio */
                       )
 {
-  double retval = (r+absolute(r)) / (1.0+absolute(r));
+  double retval = (a_r+absolute(a_r)) / (1.0+absolute(a_r));
   return retval;
 }

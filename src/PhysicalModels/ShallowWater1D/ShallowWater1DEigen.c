@@ -17,15 +17,15 @@
     to interpolation functions for a characteristic-based reconstruction.
 */
 int ShallowWater1DLeftEigenvectors(
-                            double *u, /*!< Conserved solution at a grid point */
-                            double *L, /*!< Array of size nvar^2 = 2^2 to save the matrix of
+                            double *a_u, /*!< Conserved solution at a grid point */
+                            double *a_L, /*!< Array of size nvar^2 = 2^2 to save the matrix of
                                             left eigenvectors in (row-major format). */
-                            void   *p, /*!< Object of type #ShallowWater1D with physics-related variables */
-                            int    dir /*!< Spatial dimension (not used, since this is a 1D system) */
+                            void   *a_p, /*!< Object of type #ShallowWater1D with physics-related variables */
+                            int     a_dir   /*!< Spatial dimension (not used, since this is a 1D system) */
                            )
 {
-  ShallowWater1D *param  = (ShallowWater1D*)  p;
-  _ShallowWater1DLeftEigenvectors_(u,L,param,dir);
+  ShallowWater1D *param  = (ShallowWater1D*)  a_p;
+  _ShallowWater1DLeftEigenvectors_(a_u,a_L,param,a_dir);
   return(0);
 }
 
@@ -36,14 +36,14 @@ int ShallowWater1DLeftEigenvectors(
     to interpolation functions for a characteristic-based reconstruction.
 */
 int ShallowWater1DRightEigenvectors(
-                              double  *u, /*!< Conserved solution at a grid point */
-                              double  *R, /*!< Array of size nvar^2 = 2^2 to save the matrix of
+                              double  *a_u, /*!< Conserved solution at a grid point */
+                              double  *a_R, /*!< Array of size nvar^2 = 2^2 to save the matrix of
                                                right eigenvectors in (row-major format). */
-                              void    *p, /*!< Object of type #ShallowWater1D with physics-related variables */
-                              int     dir /*!< Spatial dimension (not used, since this is a 1D system) */
+                              void    *a_p, /*!< Object of type #ShallowWater1D with physics-related variables */
+                              int     a_dir   /*!< Spatial dimension (not used, since this is a 1D system) */
                             )
 {
-  ShallowWater1D *param  = (ShallowWater1D*)  p;
-  _ShallowWater1DRightEigenvectors_(u,R,param,dir);
+  ShallowWater1D *param  = (ShallowWater1D*)  a_p;
+  _ShallowWater1DRightEigenvectors_(a_u,a_R,param,a_dir);
   return(0);
 }

@@ -69,7 +69,7 @@ int TridiagLUGS(
                   int     n,  /*!< Local size of the system on this processor */
                   int     ns, /*!< Number of systems to solve */
                   void    *r, /*!< Object of type #TridiagLU_Params */
-                  void    *m  /*!< MPI communicator */
+                  void *a_m  /*!< MPI communicator */
                )
 {
   TridiagLU_Params *context = (TridiagLU_Params *) r;
@@ -80,7 +80,7 @@ int TridiagLUGS(
 #ifdef serial
 
   /* Serial compilation */
-  return(TridiagLU(a,b,c,x,n,ns,context,m));
+  return(TridiagLU(a,b,c,x,n,ns,context,a_m));
 
 #else
 

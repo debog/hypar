@@ -69,7 +69,7 @@ int TridiagIterJacobi(
                         int     n,  /*!< Local size of the system on this processor */
                         int     ns, /*!< Number of systems to solve */
                         void    *r, /*!< Object of type #TridiagLU_Params */
-                        void    *m  /*!< MPI communicator */
+                        void *a_m  /*!< MPI communicator */
                      )
 {
   TridiagLU_Params *context = (TridiagLU_Params *) r;

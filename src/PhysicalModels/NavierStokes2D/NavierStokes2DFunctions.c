@@ -13,13 +13,13 @@
     to interpolation functions for a characteristic-based reconstruction.
 */
 int NavierStokes2DRoeAverage(
-                              double  *uavg, /*!< The computed Roe-averaged state */
-                              double  *uL,   /*!< Left state (conserved variables)*/
-                              double  *uR,   /*!< Right state (conserved variables)*/
-                              void    *p     /*!< Object of type #NavierStokes2D with physics-related variables */
+                              double  *a_uavg, /*!< The computed Roe-averaged state */
+                              double  *a_uL,   /*!< Left state (conserved variables)*/
+                              double  *a_uR,   /*!< Right state (conserved variables)*/
+                              void    *a_p     /*!< Object of type #NavierStokes2D with physics-related variables */
                             )
 {
-  NavierStokes2D *param  = (NavierStokes2D*) p;
-  _NavierStokes2DRoeAverage_(uavg,uL,uR,param->m_gamma);
+  NavierStokes2D *param  = (NavierStokes2D*) a_p;
+  _NavierStokes2DRoeAverage_(a_uavg,a_uL,a_uR,param->m_gamma);
   return(0);
 }

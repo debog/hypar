@@ -19,42 +19,42 @@
     spatial dimension n, and ie[n] is the end index (+1) along spatial dimension n.
 */
 int MPIGetArrayDatanD(
-                        double  *xbuf,    /*!< preallocated memory on destination rank to hold the received data */
-                        double  *x,       /*!< local array of which a part is needed */
-                        int     *source,  /*!< MPI rank of the source */
-                        int     *dest,    /*!< MPI rank of the destination */
-                        int     *limits,  /*!< Integer array (of size 2*ndims) with the start and end indices
+                        double  *a_xbuf,    /*!< preallocated memory on destination rank to hold the received data */
+                        double  *a_x,       /*!< local array of which a part is needed */
+                        int     *a_source,  /*!< MPI rank of the source */
+                        int     *a_dest,    /*!< MPI rank of the destination */
+                        int     *a_limits,  /*!< Integer array (of size 2*a_ndims) with the start and end indices
                                                along each spatial dimension of the desired portion of the array */
-                        int     *dim,     /*!< Integer array whose elements are the local size of x in each spatial dimension */
-                        int     ghosts,   /*!< Number of ghost points */
-                        int     ndims,    /*!< Number of spatial dimensions */
-                        int     nvars,    /*!< Number of variables (vector components) */
-                        void    *m        /*!< MPI object of type #MPIVariables */
+                        int     *a_dim,     /*!< Integer array whose elements are the local size of x in each spatial dimension */
+                        int     a_ghosts,   /*!< Number of ghost points */
+                        int     a_ndims,    /*!< Number of spatial dimensions */
+                        int     a_nvars,    /*!< Number of variables (vector components) */
+                        void *a_m        /*!< MPI object of type #MPIVariables */
                      )
 {
-  MPIVariables *mpi  = (MPIVariables*) m;
+  MPIVariables *mpi  = (MPIVariables*) a_m;
   int          d;
 
-  int source_rank = MPIRank1D(ndims,mpi->m_iproc,source);
-  int dest_rank   = MPIRank1D(ndims,mpi->m_iproc,dest  );
+  int source_rank = MPIRank1D(a_ndims,mpi->m_iproc,a_source);
+  int dest_rank   = MPIRank1D(a_ndims,mpi->m_iproc,a_dest  );
 
-  int is[ndims], ie[ndims], index[ndims], bounds[ndims], size;
+  int is[a_ndims], ie[a_ndims], index[a_ndims], bounds[a_ndims], size;
   size    = 1;
-  for (d=0; d<ndims; d++) {
-    is[d] =  limits[2*d  ];
-    ie[d] =  limits[2*d+1];
+  for (d=0; d<a_ndims; d++) {
+    is[d] =  a_limits[2*d  ];
+    ie[d] =  a_limits[2*d+1];
     size  *= (ie[d] - is[d]);
   }
-  _ArraySubtract1D_(bounds,ie,is,ndims);
+  _ArraySubtract1D_(bounds,ie,is,a_ndims);
 
   if (source_rank == dest_rank) {
-    /* source and dest are the same process */
-    int done = 0; _ArraySetValue_(index,ndims,0);
+    /* a_source and a_dest are the same process */
+    int done = 0; _ArraySetValue_(index,a_ndims,0);
     while (!done) {
-      int p1; _ArrayIndex1D_(ndims,bounds,index,0,p1);
-      int p2; _ArrayIndex1DWO_(ndims,dim,index,is,ghosts,p2);
-      _ArrayCopy1D_((x+nvars*p2),(xbuf+nvars*p1),nvars);
-      _ArrayIncrementIndex_(ndims,bounds,index,done);
+      int p1; _ArrayIndex1D_(a_ndims,bounds,index,0,p1);
+      int p2; _ArrayIndex1DWO_(a_ndims,a_dim,index,is,a_ghosts,p2);
+      _ArrayCopy1D_((a_x+a_nvars*p2),(a_xbuf+a_nvars*p1),a_nvars);
+      _ArrayIncrementIndex_(a_ndims,bounds,index,done);
     }
   } else {
 #ifdef serial
@@ -64,19 +64,19 @@ int MPIGetArrayDatanD(
     return(1);
 #else
     if (mpi->m_rank == source_rank) {
-      double *buf = (double*) calloc (size*nvars, sizeof(double));
-      int done = 0; _ArraySetValue_(index,ndims,0);
+      double *buf = (double*) calloc (size*a_nvars, sizeof(double));
+      int done = 0; _ArraySetValue_(index,a_ndims,0);
       while (!done) {
-        int p1; _ArrayIndex1D_(ndims,bounds,index,0,p1);
-        int p2; _ArrayIndex1DWO_(ndims,dim,index,is,ghosts,p2);
-        _ArrayCopy1D_((x+nvars*p2),(buf+nvars*p1),nvars);
-        _ArrayIncrementIndex_(ndims,bounds,index,done);
+        int p1; _ArrayIndex1D_(a_ndims,bounds,index,0,p1);
+        int p2; _ArrayIndex1DWO_(a_ndims,a_dim,index,is,a_ghosts,p2);
+        _ArrayCopy1D_((a_x+a_nvars*p2),(buf+a_nvars*p1),a_nvars);
+        _ArrayIncrementIndex_(a_ndims,bounds,index,done);
       }
-      MPI_Send(buf,size*nvars,MPI_DOUBLE,dest_rank,2211,mpi->m_world);
+      MPI_Send(buf,size*a_nvars,MPI_DOUBLE,dest_rank,2211,mpi->m_world);
       free(buf);
     } else if (mpi->m_rank == dest_rank) {
       MPI_Status status;
-      MPI_Recv(xbuf,size*nvars,MPI_DOUBLE,source_rank,2211,mpi->m_world,&status);
+      MPI_Recv(a_xbuf,size*a_nvars,MPI_DOUBLE,source_rank,2211,mpi->m_world,&status);
     } else {
       fprintf(stderr,"Error in MPIGetArrayData3D(): Process %d shouldn't have entered this function.\n",
               mpi->m_rank);

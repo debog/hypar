@@ -96,12 +96,12 @@ int Interp1PrimSecondOrderMUSCLChar (
                                       double *x,   /*!< Grid coordinates */
                                       int    upw,  /*!< Upwind direction (left or right biased) */
                                       int    dir,  /*!< Spatial dimension along which to interpolation */
-                                      void   *s,   /*!< Object of type #HyPar containing solver-related variables */
-                                      void   *m,   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                      void   *a_s,   /*!< Object of type #HyPar containing solver-related variables */
+                                      void *a_m,   /*!< Object of type #MPIVariables containing MPI-related variables */
                                       int    uflag /*!< Flag to indicate if \f$f(u) \equiv u\f$, i.e, if the solution is being reconstructed */
                                     )
 {
-  HyPar             *solver = (HyPar*) s;
+  HyPar             *solver = (HyPar*) a_s;
   MUSCLParameters   *muscl   = (MUSCLParameters*) solver->m_interp;
   int               i, k, v;
   _DECLARE_IERR_;

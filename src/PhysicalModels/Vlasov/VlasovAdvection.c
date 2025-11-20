@@ -19,15 +19,15 @@ double VlasovAdvectionCoeff(int*, int, void*);
     where the advection coefficient \f$c\f$ is computed
     by VlasovAdvectionCoeff().
 */
-int VlasovAdvection( double  *f,   /*!< Array to hold the computed flux (same size and layout as u) */
-                     double  *u,   /*!< Array containing the conserved solution */
-                     int      dir, /*!< Spatial dimension */
-                     void    *s,   /*!< Solver object of type #HyPar */
-                     double   t    /*!< Current time */
+int VlasovAdvection( double  *a_f,   /*!< Array to hold the computed flux (same size and layout as a_u) */
+                     double  *a_u,   /*!< Array containing the conserved solution */
+                     int      a_dir, /*!< Spatial dimension */
+                     void    *a_s,   /*!< Solver object of type #HyPar */
+                     double  a_t   /*!< Current time */
                    )
 {
 
-  HyPar  *solver = (HyPar*)  s;
+  HyPar  *solver = (HyPar*)  a_s;
   Vlasov *param  = (Vlasov*) solver->m_physics;
 
   int* dim    = solver->m_dim_local;
@@ -50,10 +50,10 @@ int VlasovAdvection( double  *f,   /*!< Array to hold the computed flux (same si
 
     _ArrayCopy1D_(index, index_wog, ndims);
     for (int i = 0; i < ndims; i++) index_wog[i] -= ghosts;
-    double adv_coeff = VlasovAdvectionCoeff(index_wog, dir, solver);
+    double adv_coeff = VlasovAdvectionCoeff(index_wog, a_dir, solver);
 
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    f[p] = adv_coeff * u[p];
+    a_f[p] = adv_coeff * a_u[p];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
 
   }

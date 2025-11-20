@@ -8,9 +8,9 @@
 /*! Function to clean up all allocations in the 3D Navier
     Stokes module.
 */
-int NavierStokes3DCleanup(void *s /*!< Object of type #NavierStokes3D*/)
+int NavierStokes3DCleanup(void *a_s /*!< Object of type #NavierStokes3D*/)
 {
-  NavierStokes3D  *param  = (NavierStokes3D*) s;
+  NavierStokes3D  *param  = (NavierStokes3D*) a_s;
 
   free(param->m_grav_field_f);
   free(param->m_grav_field_g);

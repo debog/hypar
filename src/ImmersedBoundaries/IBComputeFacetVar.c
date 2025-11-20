@@ -30,16 +30,16 @@
  *
  *  The interpolation is bi/tri-linear (second-order).
 */
-int IBComputeFacetVar(void*               s,       /*!< Solver object of type #HyPar */
-                      void*               m,       /*!< MPI object of type #MPIVariables */
+int IBComputeFacetVar(void* a_s,       /*!< Solver object of type #HyPar */
+                      void*               a_m,       /*!< MPI object of type #MPIVariables */
                       const double* const var,     /*!< Variable to compute the interpolated value of */
                       int                 nvars,   /*!< Number of components in var */
                       double** const      face_var /*!< Array to store the interpolated value;
                                                         must be NULL at input */
                      )
 {
-  HyPar             *solver  = (HyPar*)          s;
-  MPIVariables      *mpi     = (MPIVariables*)   m;
+  HyPar             *solver  = (HyPar*)          a_s;
+  MPIVariables      *mpi     = (MPIVariables*)   a_m;
   ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->m_ib;
 
   if (!solver->m_flag_ib) return(0);

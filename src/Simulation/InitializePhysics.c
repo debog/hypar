@@ -35,21 +35,21 @@
     setting all the physics-specific functions that are required
     by the model.
 */
-int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #SimulationObject */
-                        int   nsims /*!< number of simulation objects */
+int InitializePhysics(  void  *a_s,   /*!< Array of simulation objects of type #SimulationObject */
+                        int   a_nsims /*!< number of simulation objects */
                      )
 {
-  SimulationObject *sim = (SimulationObject*) s;
+  SimulationObject *sim = (SimulationObject*) a_s;
   int ns;
   _DECLARE_IERR_;
 
-  if (nsims == 0) return 0;
+  if (a_nsims == 0) return 0;
 
   if (!sim[0].mpi.m_rank) {
-    printf("Initializing physics. Model = \"%s\"\n",sim[0].solver.m_model);
+    printf("Initializing physics. Model = \"%a_s\"\n",sim[0].solver.m_model);
   }
 
-  for (ns = 0; ns < nsims; ns++) {
+  for (ns = 0; ns < a_nsims; ns++) {
 
     HyPar        *solver   = &(sim[ns].solver);
     MPIVariables *mpi      = &(sim[ns].mpi);
@@ -158,7 +158,7 @@ int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #Si
 
     }else {
 
-      fprintf(stderr,"Error (domain %d): %s is not a supported physical model.\n",
+      fprintf(stderr,"Error (domain %d): %a_s is not a supported physical model.\n",
               ns, solver->m_model);
       return(1);
 
@@ -192,7 +192,7 @@ int InitializePhysics(  void  *s,   /*!< Array of simulation objects of type #Si
 
     if ((solver->IBFunction == NULL) && (solver->m_flag_ib)) {
       if (!mpi->m_rank) {
-        fprintf(stderr,"Error in InitializePhysics() (domain %d): Physical model %s does not yet have an immersed boundary treatment.\n",
+        fprintf(stderr,"Error in InitializePhysics() (domain %d): Physical model %a_s does not yet have an immersed boundary treatment.\n",
                 ns, solver->m_model);
       }
       return(1);

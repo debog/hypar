@@ -25,68 +25,68 @@ static int ReadArraywInterpSerial(int,int,int*,int*,int*,int,void*,void*,double*
     The mode and type of input are specified through #HyPar::m_input_mode and
     #HyPar::m_ip_file_type. A vector field is read from file and stored in an array.
 */
-int ReadArraywInterp( int     ndims,          /*!< Number of spatial dimensions */
-                      int     nvars,          /*!< Number of variables per grid point */
-                      int     *dim_global,    /*!< Integer array of size ndims with global size in each dimension */
-                      int     *dim_local,     /*!< Integer array of size ndims with local size in each dimension */
-                      int     *dim_global_src,/*!< Integer array of size ndims with global size of the data in each dimension */
-                      int     ghosts,         /*!< Number of ghost points */
-                      void    *s,             /*!< Solver object of type #HyPar */
-                      void    *m,             /*!< MPI object of type #MPIVariables */
-                      double  *x,             /*!< Grid associated with the array (can be NULL) */
-                      double  *u,             /*!< Array to hold the vector field */
-                      char    *fname_root,    /*!< Filename root */
-                      int     *read_flag      /*!< Flag to indicate if the file was read */
+int ReadArraywInterp( int     a_ndims,          /*!< Number of spatial dimensions */
+                      int     a_nvars,          /*!< Number of variables per grid point */
+                      int     *a_dim_global,    /*!< Integer array of size ndims with global size in each dimension */
+                      int     *a_dim_local,     /*!< Integer array of size ndims with local size in each dimension */
+                      int     *a_dim_global_src,/*!< Integer array of size ndims with global size of the data in each dimension */
+                      int     a_ghosts,         /*!< Number of ghost points */
+                      void    *a_s,             /*!< Solver object of type #HyPar */
+                      void    *a_m,             /*!< MPI object of type #MPIVariables */
+                      double  *a_x,             /*!< Grid associated with the array (can be NULL) */
+                      double  *a_u,             /*!< Array to hold the vector field */
+                      char    *a_fname_root,    /*!< Filename root */
+                      int     *a_read_flag      /*!< Flag to indicate if the file was read */
                      )
 {
-  HyPar         *solver = (HyPar*) s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*) a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   _DECLARE_IERR_;
 
-  int retval = ReadArraywInterpSerial(  ndims,
-                                        nvars,
-                                        dim_global,
-                                        dim_local,
-                                        dim_global_src,
-                                        ghosts,
-                                        s,
-                                        m,
-                                        x,
-                                        u,
-                                        fname_root,
-                                        read_flag );
+  int retval = ReadArraywInterpSerial(  a_ndims,
+                                        a_nvars,
+                                        a_dim_global,
+                                        a_dim_local,
+                                        a_dim_global_src,
+                                        a_ghosts,
+                                        a_s,
+                                        a_m,
+                                        a_x,
+                                        a_u,
+                                        a_fname_root,
+                                        a_read_flag );
   if (retval) return retval;
 
-  if (x) {
+  if (a_x) {
     int offset, d;
-    /* exchange MPI-boundary values of x between processors */
+    /* exchange MPI-boundary values of a_x between processors */
     offset = 0;
-    for (d = 0; d < ndims; d++) {
-      IERR MPIExchangeBoundaries1D(mpi,&x[offset],dim_local[d],
-                                   ghosts,d,ndims); CHECKERR(ierr);
-      offset  += (dim_local [d] + 2*ghosts);
+    for (d = 0; d < a_ndims; d++) {
+      IERR MPIExchangeBoundaries1D(mpi,&a_x[offset],a_dim_local[d],
+                                   a_ghosts,d,a_ndims); CHECKERR(ierr);
+      offset  += (a_dim_local [d] + 2*a_ghosts);
     }
-    /* fill in ghost values of x at physical boundaries by extrapolation */
+    /* fill in ghost values of a_x at physical boundaries by extrapolation */
     offset = 0;
-    for (d = 0; d < ndims; d++) {
-      double *X     = &x[offset];
-      int    *dim   = dim_local, i;
+    for (d = 0; d < a_ndims; d++) {
+      double *X     = &a_x[offset];
+      int    *dim   = a_dim_local, i;
       if (mpi->m_ip[d] == 0) {
         /* fill left boundary along this dimension */
-        for (i = 0; i < ghosts; i++) {
-          int delta = ghosts - i;
-          X[i] = X[ghosts] + ((double) delta) * (X[ghosts]-X[ghosts+1]);
+        for (i = 0; i < a_ghosts; i++) {
+          int delta = a_ghosts - i;
+          X[i] = X[a_ghosts] + ((double) delta) * (X[a_ghosts]-X[a_ghosts+1]);
         }
       }
       if (mpi->m_ip[d] == mpi->m_iproc[d]-1) {
         /* fill right boundary along this dimension */
-        for (i = dim[d]+ghosts; i < dim[d]+2*ghosts; i++) {
-          int delta = i - (dim[d]+ghosts-1);
-          X[i] =  X[dim[d]+ghosts-1]
-                  + ((double) delta) * (X[dim[d]+ghosts-1]-X[dim[d]+ghosts-2]);
+        for (i = dim[d]+a_ghosts; i < dim[d]+2*a_ghosts; i++) {
+          int delta = i - (dim[d]+a_ghosts-1);
+          X[i] =  X[dim[d]+a_ghosts-1]
+                  + ((double) delta) * (X[dim[d]+a_ghosts-1]-X[dim[d]+a_ghosts-2]);
         }
       }
-      offset  += (dim[d] + 2*ghosts);
+      offset  += (dim[d] + 2*a_ghosts);
     }
   }
 
@@ -156,73 +156,73 @@ int ReadArraywInterp( int     ndims,          /*!< Number of spatial dimensions 
     \n
 
 */
-int ReadArraywInterpSerial( int     ndims,          /*!< Number of spatial dimensions */
-                            int     nvars,          /*!< Number of variables per grid point */
-                            int     *dim_global,    /*!< Integer array of size ndims with global size in each dimension */
-                            int     *dim_local,     /*!< Integer array of size ndims with local size in each dimension */
-                            int     *dim_global_src,/*!< Integer array of size ndims with global size of the data in each dimension */
-                            int     ghosts,         /*!< Number of ghost points */
-                            void    *s,             /*!< Solver object of type #HyPar */
-                            void    *m,             /*!< MPI object of type #MPIVariables */
-                            double  *x,             /*!< Grid associated with the array (can be NULL) */
-                            double  *u,             /*!< Array to hold the vector field being read */
-                            char    *fname_root,    /*!< Filename root */
-                            int     *read_flag      /*!< Flag to indicate if the file was read */
+int ReadArraywInterpSerial( int     a_ndims,          /*!< Number of spatial dimensions */
+                            int     a_nvars,          /*!< Number of variables per grid point */
+                            int     *a_dim_global,    /*!< Integer array of size ndims with global size in each dimension */
+                            int     *a_dim_local,     /*!< Integer array of size ndims with local size in each dimension */
+                            int     *a_dim_global_src,/*!< Integer array of size ndims with global size of the data in each dimension */
+                            int     a_ghosts,         /*!< Number of ghost points */
+                            void    *a_s,             /*!< Solver object of type #HyPar */
+                            void    *a_m,             /*!< MPI object of type #MPIVariables */
+                            double  *a_x,             /*!< Grid associated with the array (can be NULL) */
+                            double  *a_u,             /*!< Array to hold the vector field being read */
+                            char    *a_fname_root,    /*!< Filename root */
+                            int     *a_read_flag      /*!< Flag to indicate if the file was read */
                           )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
-  int           i, d, ferr, index[ndims];
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
+  int           i, d, ferr, index[a_ndims];
   double        *ug_src = NULL, *xg_src = NULL;
   double        *ug = NULL, *xg = NULL;
   _DECLARE_IERR_;
 
-  *read_flag = 0;
+  *a_read_flag = 0;
   /* Only root process reads from the file */
   if (!mpi->m_rank) {
 
     /* read data from file - this data is of dimensions given by dim_global_sec */
     if (!strcmp(solver->m_ip_file_type,"ascii")) {
       char filename[_MAX_STRING_SIZE_];
-      strcpy(filename,fname_root);
+      strcpy(filename,a_fname_root);
       strcat(filename,".inp");
       FILE *in; in = fopen(filename,"r");
-      if (!in) *read_flag = 0;
+      if (!in) *a_read_flag = 0;
       else {
-        *read_flag = 1;
+        *a_read_flag = 1;
         /* Reading from file */
-        printf("Reading array from ASCII file %s (Serial mode).\n",filename);
+        printf("Reading array from ASCII file %a_s (Serial mode).\n",filename);
         int size,offset;
         /* allocate global solution array */
-        size   = 1; for (d=0; d<ndims; d++) size *= dim_global_src[d]; size *= nvars;
+        size   = 1; for (d=0; d<a_ndims; d++) size *= a_dim_global_src[d]; size *= a_nvars;
         ug_src = (double*) calloc(size,sizeof(double));
-        size   = 0; for (d=0; d<ndims; d++) size += dim_global_src[d];
+        size   = 0; for (d=0; d<a_ndims; d++) size += a_dim_global_src[d];
         xg_src = (double*) calloc(size,sizeof(double));
 
         /* read grid */
         offset = 0;
-        for (d = 0; d < ndims; d++) {
-          for (i = 0; i < dim_global_src[d]; i++) {
+        for (d = 0; d < a_ndims; d++) {
+          for (i = 0; i < a_dim_global_src[d]; i++) {
             ferr = fscanf(in,"%lf",&xg_src[i+offset]);
             if (ferr != 1) {
               printf("Error in ReadArraySerial(): unable to read data. ferr=%d\n", ferr);
               exit(1);
             }
           }
-          offset += dim_global_src[d];
+          offset += a_dim_global_src[d];
         }
 
         /* read solution */
-        for (i = 0; i < nvars; i++) {
-          int done = 0; _ArraySetValue_(index,ndims,0);
+        for (i = 0; i < a_nvars; i++) {
+          int done = 0; _ArraySetValue_(index,a_ndims,0);
           while (!done) {
-            int p; _ArrayIndex1D_(ndims,dim_global_src,index,0,p);
-            ferr = fscanf(in,"%lf",&ug_src[p*nvars+i]);
+            int p; _ArrayIndex1D_(a_ndims,a_dim_global_src,index,0,p);
+            ferr = fscanf(in,"%lf",&ug_src[p*a_nvars+i]);
             if (ferr != 1) {
               printf("Error in ReadArraySerial(): unable to read data. ferr=%d\n", ferr);
               exit(1);
             }
-            _ArrayIncrementIndex_(ndims,dim_global_src,index,done);
+            _ArrayIncrementIndex_(a_ndims,a_dim_global_src,index,done);
           }
         }
 
@@ -231,24 +231,24 @@ int ReadArraywInterpSerial( int     ndims,          /*!< Number of spatial dimen
     } else if ((!strcmp(solver->m_ip_file_type,"bin")) || (!strcmp(solver->m_ip_file_type,"binary"))) {
 
       char filename[_MAX_STRING_SIZE_];
-      strcpy(filename,fname_root);
+      strcpy(filename,a_fname_root);
       strcat(filename,".inp");
       FILE *in; in = fopen(filename,"rb");
-      if (!in) *read_flag = 0;
+      if (!in) *a_read_flag = 0;
       else {
-        *read_flag = 1;
-        printf("Reading array from binary file %s (Serial mode).\n",filename);
+        *a_read_flag = 1;
+        printf("Reading array from binary file %a_s (Serial mode).\n",filename);
         size_t bytes;
         int size;
         /* allocate global solution array */
-        size   = 1; for (d=0; d<ndims; d++) size *= dim_global_src[d]; size *= nvars;
+        size   = 1; for (d=0; d<a_ndims; d++) size *= a_dim_global_src[d]; size *= a_nvars;
         ug_src = (double*) calloc(size,sizeof(double));
-        size   = 0; for (d=0; d<ndims; d++) size += dim_global_src[d];
+        size   = 0; for (d=0; d<a_ndims; d++) size += a_dim_global_src[d];
         xg_src = (double*) calloc(size,sizeof(double));
 
         /* read grid */
         size = 0;
-        for (d = 0; d < ndims; d++) size += dim_global_src[d];
+        for (d = 0; d < a_ndims; d++) size += a_dim_global_src[d];
         bytes = fread(xg_src, sizeof(double), size, in);
         if ((int)bytes != size) {
           fprintf(stderr,"Error in ReadArray(): Unable to read grid. Expected %d, Read %d.\n",
@@ -257,7 +257,7 @@ int ReadArraywInterpSerial( int     ndims,          /*!< Number of spatial dimen
 
         /* read solution */
         size = 1;
-        for (d = 0; d < ndims; d++) size *= dim_global_src[d]; size *= nvars;
+        for (d = 0; d < a_ndims; d++) size *= a_dim_global_src[d]; size *= a_nvars;
         bytes = fread(ug_src, sizeof(double), size, in);
         if ((int)bytes != size) {
           fprintf(stderr,"Error in ReadArray(): Unable to read solution. Expected %d, Read %d.\n",
@@ -270,34 +270,34 @@ int ReadArraywInterpSerial( int     ndims,          /*!< Number of spatial dimen
     }
 
     double *ug_src_wg;
-    long size = nvars;
-    for (d=0; d<ndims; d++) size *= (dim_global_src[d]+2*ghosts);
+    long size = a_nvars;
+    for (d=0; d<a_ndims; d++) size *= (a_dim_global_src[d]+2*a_ghosts);
     ug_src_wg = (double*) calloc (size, sizeof(double));
-    ArrayCopynD(  ndims,
+    ArrayCopynD(  a_ndims,
                   ug_src,
                   ug_src_wg,
-                  dim_global_src,
+                  a_dim_global_src,
                   0,
-                  ghosts,
+                  a_ghosts,
                   index,
-                  nvars );
-    FillGhostCells( dim_global_src,
-                    ghosts,
+                  a_nvars );
+    FillGhostCells( a_dim_global_src,
+                    a_ghosts,
                     ug_src_wg,
-                    nvars,
-                    ndims,
+                    a_nvars,
+                    a_ndims,
                     solver->m_is_periodic);
     free(ug_src);
 
     /* interpolate from the data read in to a global array
      * with specified dimensions */
-    int ierr = InterpolateGlobalnDVar(  dim_global,
+    int ierr = InterpolateGlobalnDVar(  a_dim_global,
                                         &ug,
-                                        dim_global_src,
+                                        a_dim_global_src,
                                         ug_src_wg,
-                                        nvars,
-                                        ghosts,
-                                        ndims,
+                                        a_nvars,
+                                        a_ghosts,
+                                        a_ndims,
                                         solver->m_is_periodic );
     if (ierr) {
       fprintf(stderr, "Error in ReadArraywInterpSerial()\n");
@@ -305,10 +305,10 @@ int ReadArraywInterpSerial( int     ndims,          /*!< Number of spatial dimen
       return ierr;
     }
 
-    if (x) {
+    if (a_x) {
       fprintf(stderr,"Error in ReadArraywInterpSerial()\n");
-      fprintf(stderr,"  Not yet implemented for x\n");
-      //InterpolateGlobal1DVar(xg_src, dim_global_src, xg, dim_global);
+      fprintf(stderr,"  Not yet implemented for a_x\n");
+      //InterpolateGlobal1DVar(xg_src, a_dim_global_src, xg, a_dim_global);
     }
     if (xg_src) free(xg_src);
 
@@ -316,35 +316,35 @@ int ReadArraywInterpSerial( int     ndims,          /*!< Number of spatial dimen
       fprintf(stderr,"Error in ReadArraywInterp() - ug is NULL!\n");
       return 1;
     }
-    if ((xg == NULL) && (x != NULL)) {
+    if ((xg == NULL) && (a_x != NULL)) {
       fprintf(stderr,"Error in ReadArraywInterp() - xg is NULL!\n");
       return 1;
     }
   }
 
-  /* Broadcast read_flag to all processes */
-  IERR MPIBroadcast_integer(read_flag,1,0,&mpi->m_world); CHECKERR(ierr);
+  /* Broadcast a_read_flag to all processes */
+  IERR MPIBroadcast_integer(a_read_flag,1,0,&mpi->m_world); CHECKERR(ierr);
 
-  if (*read_flag) {
+  if (*a_read_flag) {
 
     /* partition global array to all processes */
-    IERR MPIPartitionArraynDwGhosts(  ndims,
+    IERR MPIPartitionArraynDwGhosts(  a_ndims,
                                       mpi,
                                       (mpi->m_rank?NULL:ug),
-                                      u,dim_global,
-                                      dim_local,
-                                      ghosts,
-                                      nvars ); CHECKERR(ierr);
+                                      a_u,a_dim_global,
+                                      a_dim_local,
+                                      a_ghosts,
+                                      a_nvars ); CHECKERR(ierr);
 
-//    if (x) {
-//      /* partition x vector across the processes */
+//    if (a_x) {
+//      /* partition a_x vector across the processes */
 //      int offset_global = 0, offset_local = 0;
-//      for (d=0; d<ndims; d++) {
+//      for (d=0; d<a_ndims; d++) {
 //        IERR MPIPartitionArray1D(mpi,(mpi->m_rank?NULL:&xg[offset_global]),
-//                                 &x[offset_local+ghosts],
-//                                 mpi->m_is[d],mpi->m_ie[d],dim_local[d],0); CHECKERR(ierr);
-//        offset_global += dim_global[d];
-//        offset_local  += dim_local [d] + 2*ghosts;
+//                                 &a_x[offset_local+a_ghosts],
+//                                 mpi->m_is[d],mpi->m_ie[d],a_dim_local[d],0); CHECKERR(ierr);
+//        offset_global += a_dim_global[d];
+//        offset_local  += a_dim_local [d] + 2*a_ghosts;
 //      }
 //    }
 

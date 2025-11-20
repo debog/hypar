@@ -18,22 +18,22 @@
   originally written by Dr. Jay Sitaraman.
 */
 int IBIdentifyBody(
-                    void   *ib,     /*!< Immersed boundary object of type #ImmersedBoundary */
-                    int    *dim_g,  /*!< global dimensions */
-                    int    *dim_l,  /*!< local dimensions */
-                    int    ghosts,  /*!< number of ghost points */
-                    void   *m,      /*!< MPI object of type #MPIVariables */
-                    double *X,      /*!< Array of global spatial coordinates */
-                    double *blank   /*!< Blanking array: for grid points within the
+                    void   *a_ib,     /*!< Immersed boundary object of type #ImmersedBoundary */
+                    int    *a_dim_g,  /*!< global dimensions */
+                    int    *a_dim_l,  /*!< local dimensions */
+                    int    a_ghosts,  /*!< number of ghost points */
+                    void   *a_m,      /*!< MPI object of type #MPIVariables */
+                    double *a_X,      /*!< Array of global spatial coordinates */
+                    double *a_blank   /*!< Blanking array: for grid points within the
                                          body, this value will be set to 0 */
                   )
 {
-  ImmersedBoundary  *IB     = (ImmersedBoundary*) ib;
-  MPIVariables      *mpi    = (MPIVariables*) m;
+  ImmersedBoundary  *IB     = (ImmersedBoundary*) a_ib;
+  MPIVariables      *mpi    = (MPIVariables*) a_m;
   Body3D            *body   = IB->m_body;
-  double            *x      = X,
-                    *y      = X+dim_g[0],
-                    *z      = X+dim_g[0]+dim_g[1],
+  double            *x      = a_X,
+                    *y      = a_X+a_dim_g[0],
+                    *z      = a_X+a_dim_g[0]+a_dim_g[1],
                     eps     = IB->m_tolerance;
   int               itr_max = IB->m_itr_max,
                     i, j, k, n, v;
@@ -62,12 +62,12 @@ int IBIdentifyBody(
   zmin = zc - fac * Lz/2;
 
   int imin, imax, jmin, jmax, kmin, kmax;
-  imin = dim_g[0]-1;  imax = 0;
-  jmin = dim_g[1]-1;  jmax = 0;
-  kmin = dim_g[2]-1;  kmax = 0;
-  for (i = 0; i < dim_g[0]; i++) {
-    for (j = 0; j < dim_g[1]; j++) {
-      for (k = 0; k < dim_g[2]; k++) {
+  imin = a_dim_g[0]-1;  imax = 0;
+  jmin = a_dim_g[1]-1;  jmax = 0;
+  kmin = a_dim_g[2]-1;  kmax = 0;
+  for (i = 0; i < a_dim_g[0]; i++) {
+    for (j = 0; j < a_dim_g[1]; j++) {
+      for (k = 0; k < a_dim_g[2]; k++) {
         if (   ((x[i]-xmin)*(x[i]-xmax) < 0)
             && ((y[j]-ymin)*(y[j]-ymax) < 0)
             && ((z[k]-zmin)*(z[k]-zmax) < 0)) {
@@ -160,7 +160,7 @@ int IBIdentifyBody(
             inside = 1;
             /* this point is inside                      */
             /* check if (i,j,k) lies within this process */
-            /* if so, set blank                          */
+            /* if so, set a_blank                          */
             if (   ((i-mpi->m_is[0])*(i-mpi->m_ie[0]) <= 0)
                 && ((j-mpi->m_is[1])*(j-mpi->m_ie[1]) <= 0)
                 && ((k-mpi->m_is[2])*(k-mpi->m_ie[2]) <= 0)) {
@@ -169,8 +169,8 @@ int IBIdentifyBody(
               index[0] = i-mpi->m_is[0];
               index[1] = j-mpi->m_is[1];
               index[2] = k-mpi->m_is[2];
-              int p; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,p);
-              blank[p] = 0;
+              int p; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,p);
+              a_blank[p] = 0;
               count++;
             }
           } else {

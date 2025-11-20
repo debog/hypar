@@ -17,39 +17,39 @@
     format as WriteText().
 */
 int WriteTecplot3D(
-                    int ndims,  /*!< Number of spatial dimensions */
-                    int nvars,  /*!< Number of variables at each grid point */
-                    int *dim,   /*!< Integer array with the number of grid points
+                    int a_ndims,  /*!< Number of spatial dimensions */
+                    int a_nvars,  /*!< Number of variables at each grid point */
+                    int *a_dim,   /*!< Integer array with the number of grid points
                                      in each spatial dimension as its entries */
-                    double *x,  /*!< Array of spatial coordinates representing a
+                    double *a_x,  /*!< Array of spatial coordinates representing a
                                      Cartesian grid (no ghost points) */
-                    double *u,  /*!< Array containing the vector field to write
+                    double *a_u,  /*!< Array containing the vector field to write
                                    (no ghost points) */
-                    char *f,    /*!< Filename */
-                    int *index  /*!< Preallocated integer array of size ndims */
+                    char *a_f,    /*!< Filename */
+                    int *a_index  /*!< Preallocated integer array of size ndims */
                   )
 {
-  if (ndims !=3) {
+  if (a_ndims !=3) {
     fprintf(stderr,"Error in WriteTecplot3D(): This functions is hardcoded for 3-dimensional ");
-    fprintf(stderr,"problems only. Instead, ndims=%d.\n",ndims);
+    fprintf(stderr,"problems only. Instead, a_ndims=%d.\n",a_ndims);
     return(1);
   }
   int i;
-  int imax = dim[0];
-  int jmax = dim[1];
-  int kmax = dim[2];
+  int imax = a_dim[0];
+  int jmax = a_dim[1];
+  int kmax = a_dim[2];
 
   FILE *out;
-  out = fopen(f,"w");
+  out = fopen(a_f,"w");
   if (!out) {
-    fprintf(stderr,"Error: could not open %s for writing.\n",f);
+    fprintf(stderr,"Error: could not open %s for writing.\n",a_f);
     return(1);
   }
 
   /* writing tecplot data file headers */
   fprintf(out,"VARIABLES=\"I\",\"J\",\"K\",\"X\",\"Y\",\"Z\",");
   char varname[3] = "00";
-  for (i = 0; i < nvars; i++) {
+  for (i = 0; i < a_nvars; i++) {
     fprintf(out,"\"%s\",",varname);
     if (varname[1] == '9') { varname[0]++; varname[1] = '0'; }
     else                     varname[1]++;
@@ -58,18 +58,18 @@ int WriteTecplot3D(
   fprintf(out,"ZONE I=%d,J=%d,K=%d,F=POINT\n",imax,jmax,kmax);
 
   /* writing the data */
-  int done = 0; _ArraySetValue_(index,ndims,0);
+  int done = 0; _ArraySetValue_(a_index,a_ndims,0);
   while (!done) {
     int i, p;
-    _ArrayIndex1D_(ndims,dim,index,0,p);
-    for (i=0; i<ndims; i++) fprintf(out,"%4d ",index[i]);
-    for (i=0; i<ndims; i++) {
-      int j,offset = 0; for (j=0; j<i; j++) offset += dim[j];
-      fprintf(out,"%+1.16E ",x[offset+index[i]]);
+    _ArrayIndex1D_(a_ndims,a_dim,a_index,0,p);
+    for (i=0; i<a_ndims; i++) fprintf(out,"%4d ",a_index[i]);
+    for (i=0; i<a_ndims; i++) {
+      int j,offset = 0; for (j=0; j<i; j++) offset += a_dim[j];
+      fprintf(out,"%+1.16E ",a_x[offset+a_index[i]]);
     }
-    for (i=0; i<nvars; i++) fprintf(out,"%+1.16E ",u[nvars*p+i]);
+    for (i=0; i<a_nvars; i++) fprintf(out,"%+1.16E ",a_u[a_nvars*p+i]);
     fprintf(out,"\n");
-    _ArrayIncrementIndex_(ndims,dim,index,done);
+    _ArrayIncrementIndex_(a_ndims,a_dim,a_index,done);
   }
   fclose(out);
   return(0);

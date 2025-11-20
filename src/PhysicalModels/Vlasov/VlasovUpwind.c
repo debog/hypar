@@ -14,18 +14,18 @@
 double VlasovAdvectionCoeff(int*, int, void*);
 
 /*! Upwinding scheme for the Vlasov equations */
-int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
-                   double* fL,   /*!< Left-biased reconstructed interface flux */
-                   double* fR,   /*!< Right-biased reconstructed interface flux */
-                   double* uL,   /*!< Left-biased reconstructed interface solution */
-                   double* uR,   /*!< Right-biased reconstructed interface solution */
-                   double* u,    /*!< Cell-centered solution */
-                   int     dir,  /*!< Spatial dimension */
-                   void*   s,    /*!< Solver object of type #HyPar */
-                   double  t     /*!< Current solution time */
+int VlasovUpwind(  double* a_fI,   /*!< Computed upwind interface flux */
+                   double* a_fL,   /*!< Left-biased reconstructed interface flux */
+                   double* a_fR,   /*!< Right-biased reconstructed interface flux */
+                   double* a_uL,   /*!< Left-biased reconstructed interface solution */
+                   double* a_uR,   /*!< Right-biased reconstructed interface solution */
+                   double* a_u,    /*!< Cell-centered solution */
+                   int     a_dir,  /*!< Spatial dimension */
+                   void*   a_s,    /*!< Solver object of type #HyPar */
+                   double  a_t   /*!< Current solution time */
                 )
 {
-  HyPar  *solver = (HyPar*)  s;
+  HyPar  *solver = (HyPar*)  a_s;
   Vlasov *param  = (Vlasov*) solver->m_physics;
   int    done;
 
@@ -37,38 +37,38 @@ int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
       index_inter[ndims],
       bounds_outer[ndims],
       bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
 
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
+      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[a_dir]--;
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int idxL[ndims], idxR[ndims];
 
       int neig = 2+4*(ndims-1);
       double eig[neig];
       int count = 0;
-      eig[count] = VlasovAdvectionCoeff(indexL, dir, solver); count++;
-      eig[count] = VlasovAdvectionCoeff(indexR, dir, solver); count++;
+      eig[count] = VlasovAdvectionCoeff(indexL, a_dir, solver); count++;
+      eig[count] = VlasovAdvectionCoeff(indexR, a_dir, solver); count++;
       for (int tdir = 0; tdir < ndims; tdir++ ) {
-        if (tdir != dir) {
+        if (tdir != a_dir) {
           _ArrayCopy1D_(indexL, idxL, ndims); idxL[tdir]--;
           _ArrayCopy1D_(indexR, idxR, ndims); idxR[tdir]--;
-          eig[count] = VlasovAdvectionCoeff(idxL, dir, solver); count++;
-          eig[count] = VlasovAdvectionCoeff(idxR, dir, solver); count++;
+          eig[count] = VlasovAdvectionCoeff(idxL, a_dir, solver); count++;
+          eig[count] = VlasovAdvectionCoeff(idxR, a_dir, solver); count++;
           _ArrayCopy1D_(indexL, idxL, ndims); idxL[tdir]++;
           _ArrayCopy1D_(indexR, idxR, ndims); idxR[tdir]++;
-          eig[count] = VlasovAdvectionCoeff(idxL, dir, solver); count++;
-          eig[count] = VlasovAdvectionCoeff(idxR, dir, solver); count++;
+          eig[count] = VlasovAdvectionCoeff(idxL, a_dir, solver); count++;
+          eig[count] = VlasovAdvectionCoeff(idxR, a_dir, solver); count++;
         }
       }
       if (count != neig) {
-        fprintf(stderr, "Error in VlasovUpwind(): count != neig for dir=%d\n",dir);
+        fprintf(stderr, "Error in VlasovUpwind(): count != neig for a_dir=%d\n",a_dir);
         return 1;
       }
 
@@ -83,11 +83,11 @@ int VlasovUpwind(  double* fI,   /*!< Computed upwind interface flux */
       }
 
       if (all_positive) {
-        fI[p] = fL[p];
+        a_fI[p] = a_fL[p];
       } else if (all_negative) {
-        fI[p] = fR[p];
+        a_fI[p] = a_fR[p];
       } else {
-        fI[p] = 0.5 * (fL[p] + fR[p] - maxabs_eig * (uR[p] - uL[p]));
+        a_fI[p] = 0.5 * (a_fL[p] + a_fR[p] - maxabs_eig * (a_uR[p] - a_uL[p]));
       }
 
     }

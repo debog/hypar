@@ -42,13 +42,13 @@ int WENOFifthOrderCalculateWeights(
                                     double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                     double  *x,  /*!< Grid coordinates */
                                     int     dir, /*!< Spatial dimension along which to interpolation */
-                                    void    *s,  /*!< Object of type #HyPar containing solver-related variables */
-                                    void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                    void *a_s,  /*!< Object of type #HyPar containing solver-related variables */
+                                    void *a_m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                   )
 {
-  HyPar           *solver = (HyPar*)          s;
+  HyPar           *solver = (HyPar*) a_s;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
 
   int ret;
 
@@ -68,13 +68,13 @@ int WENOFifthOrderCalculateWeightsChar(
                                         double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                         double  *x,  /*!< Grid coordinates */
                                         int     dir, /*!< Spatial dimension along which to interpolation */
-                                        void    *s,  /*!< Object of type #HyPar containing solver-related variables */
-                                        void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                        void *a_s,  /*!< Object of type #HyPar containing solver-related variables */
+                                        void *a_m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                       )
 {
-  HyPar           *solver = (HyPar*)          s;
+  HyPar           *solver = (HyPar*) a_s;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
 
   if (weno->m_yc)           return(WENOFifthOrderCalculateWeightsCharYC (fC,uC,x,dir,solver,mpi));
   else if (weno->m_borges)  return(WENOFifthOrderCalculateWeightsCharZ  (fC,uC,x,dir,solver,mpi));
@@ -113,13 +113,13 @@ int WENOFifthOrderCalculateWeightsJS(
                                       double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                       double  *x,  /*!< Grid coordinates */
                                       int     dir, /*!< Spatial dimension along which to interpolation */
-                                      void    *s,  /*!< Object of type #HyPar containing solver-related variables */
-                                      void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                      void *a_s,  /*!< Object of type #HyPar containing solver-related variables */
+                                      void *a_m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                     )
 {
-  HyPar           *solver = (HyPar*)          s;
+  HyPar           *solver = (HyPar*) a_s;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
@@ -267,13 +267,13 @@ int WENOFifthOrderCalculateWeightsM(
                                       double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                       double  *x,  /*!< Grid coordinates */
                                       int     dir, /*!< Spatial dimension along which to interpolation */
-                                      void    *s,  /*!< Object of type #HyPar containing solver-related variables */
-                                      void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                      void *a_s,  /*!< Object of type #HyPar containing solver-related variables */
+                                      void *a_m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                    )
 {
-  HyPar           *solver = (HyPar*)          s;
+  HyPar           *solver = (HyPar*) a_s;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
@@ -436,13 +436,13 @@ int WENOFifthOrderCalculateWeightsZ(
                                       double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                       double  *x,  /*!< Grid coordinates */
                                       int     dir, /*!< Spatial dimension along which to interpolation */
-                                      void    *s,  /*!< Object of type #HyPar containing solver-related variables */
-                                      void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                      void *a_s,  /*!< Object of type #HyPar containing solver-related variables */
+                                      void *a_m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                    )
 {
-  HyPar           *solver = (HyPar*)          s;
+  HyPar           *solver = (HyPar*) a_s;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
@@ -592,13 +592,13 @@ int WENOFifthOrderCalculateWeightsYC(
                                       double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                       double  *x,  /*!< Grid coordinates */
                                       int     dir, /*!< Spatial dimension along which to interpolation */
-                                      void    *s,  /*!< Object of type #HyPar containing solver-related variables */
-                                      void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                      void *a_s,  /*!< Object of type #HyPar containing solver-related variables */
+                                      void *a_m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                     )
 {
-  HyPar           *solver = (HyPar*)          s;
+  HyPar           *solver = (HyPar*) a_s;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
@@ -762,13 +762,13 @@ int WENOFifthOrderCalculateWeightsCharJS(
                                           double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                           double  *x,  /*!< Grid coordinates */
                                           int     dir, /*!< Spatial dimension along which to interpolation */
-                                          void    *s,  /*!< Object of type #HyPar containing solver-related variables */
-                                          void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                          void *a_s,  /*!< Object of type #HyPar containing solver-related variables */
+                                          void *a_m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                         )
 {
-  HyPar           *solver = (HyPar*)          s;
+  HyPar           *solver = (HyPar*) a_s;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
@@ -932,13 +932,13 @@ int WENOFifthOrderCalculateWeightsCharM(
                                           double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                           double  *x,  /*!< Grid coordinates */
                                           int     dir, /*!< Spatial dimension along which to interpolation */
-                                          void    *s,  /*!< Object of type #HyPar containing solver-related variables */
-                                          void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                          void *a_s,  /*!< Object of type #HyPar containing solver-related variables */
+                                          void *a_m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                        )
 {
-  HyPar           *solver = (HyPar*)          s;
+  HyPar           *solver = (HyPar*) a_s;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
@@ -1103,13 +1103,13 @@ int WENOFifthOrderCalculateWeightsCharZ(
                                           double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                           double  *x,  /*!< Grid coordinates */
                                           int     dir, /*!< Spatial dimension along which to interpolation */
-                                          void    *s,  /*!< Object of type #HyPar containing solver-related variables */
-                                          void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                          void *a_s,  /*!< Object of type #HyPar containing solver-related variables */
+                                          void *a_m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                        )
 {
-  HyPar           *solver = (HyPar*)          s;
+  HyPar           *solver = (HyPar*) a_s;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;
@@ -1274,13 +1274,13 @@ int WENOFifthOrderCalculateWeightsCharYC(
                                           double  *uC, /*!< Array of cell-centered values of the solution \f${\bf u}\f$ */
                                           double  *x,  /*!< Grid coordinates */
                                           int     dir, /*!< Spatial dimension along which to interpolation */
-                                          void    *s,  /*!< Object of type #HyPar containing solver-related variables */
-                                          void    *m   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                          void *a_s,  /*!< Object of type #HyPar containing solver-related variables */
+                                          void *a_m   /*!< Object of type #MPIVariables containing MPI-related variables */
                                         )
 {
-  HyPar           *solver = (HyPar*)          s;
+  HyPar           *solver = (HyPar*) a_s;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
   int             i;
   double          *ww1LF, *ww2LF, *ww3LF, *ww1RF, *ww2RF, *ww3RF;
   double          *ww1LU, *ww2LU, *ww3LU, *ww1RU, *ww2RU, *ww3RU;

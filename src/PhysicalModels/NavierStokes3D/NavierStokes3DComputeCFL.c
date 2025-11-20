@@ -14,13 +14,13 @@
     is computed over the local domain on this processor only.
 */
 double NavierStokes3DComputeCFL(
-                                void    *s, /*!< Solver object of type #HyPar */
-                                void    *m, /*!< MPI object of type #MPIVariables */
-                                double  dt, /*!< Time step size for which to compute the CFL */
-                                double  t   /*!< Time */
+                                void    *a_s, /*!< Solver object of type #HyPar */
+                                void    *a_m, /*!< MPI object of type #MPIVariables */
+                                double  a_dt, /*!< Time step size for which to compute the CFL */
+                                double  a_t   /*!< Time */
                                )
 {
-  HyPar             *solver = (HyPar*)   s;
+  HyPar             *solver = (HyPar*)   a_s;
   NavierStokes3D    *param  = (NavierStokes3D*) solver->m_physics;
 
   int *dim    = solver->m_dim_local;
@@ -41,9 +41,9 @@ double NavierStokes3DComputeCFL(
     _GetCoordinate_(_YDIR_,index[_YDIR_],dim,ghosts,solver->m_dxinv,dyinv); /* 1/dy */
     _GetCoordinate_(_ZDIR_,index[_ZDIR_],dim,ghosts,solver->m_dxinv,dzinv); /* 1/dz */
 
-    local_cfl[_XDIR_] = (absolute(vx)+c)*dt*dxinv; /* local cfl for this grid point (x) */
-    local_cfl[_YDIR_] = (absolute(vy)+c)*dt*dyinv; /* local cfl for this grid point (y) */
-    local_cfl[_ZDIR_] = (absolute(vz)+c)*dt*dzinv; /* local cfl for this grid point (z) */
+    local_cfl[_XDIR_] = (absolute(vx)+c)*a_dt*dxinv; /* local cfl for this grid point (x) */
+    local_cfl[_YDIR_] = (absolute(vy)+c)*a_dt*dyinv; /* local cfl for this grid point (y) */
+    local_cfl[_ZDIR_] = (absolute(vz)+c)*a_dt*dzinv; /* local cfl for this grid point (z) */
     if (local_cfl[_XDIR_] > max_cfl) max_cfl = local_cfl[_XDIR_];
     if (local_cfl[_YDIR_] > max_cfl) max_cfl = local_cfl[_YDIR_];
     if (local_cfl[_ZDIR_] > max_cfl) max_cfl = local_cfl[_ZDIR_];

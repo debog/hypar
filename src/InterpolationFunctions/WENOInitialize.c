@@ -32,14 +32,14 @@ int gpuWENOFifthOrderCalculateWeights   (double*,double*,double*,int,void*,void*
     schemes.
 */
 int WENOInitialize(
-                    void *s,      /*!< Solver object of type #HyPar */
-                    void *m,      /*!< MPI object of type #MPIVariables */
-                    char *scheme, /*!< Name of scheme */
-                    char *type    /*!< Type of interpolation */
+                    void *a_s,      /*!< Solver object of type #HyPar */
+                    void *a_m,      /*!< MPI object of type #MPIVariables */
+                    char *a_scheme, /*!< Name of scheme */
+                    char *a_type    /*!< Type of interpolation */
                   )
 {
-  HyPar           *solver = (HyPar*) s;
-  MPIVariables    *mpi    = (MPIVariables*) m;
+  HyPar           *solver = (HyPar*) a_s;
+  MPIVariables    *mpi    = (MPIVariables*) a_m;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
 
   static int count = 0;
@@ -63,14 +63,14 @@ int WENOInitialize(
     FILE *in;
     int ferr;
     in = fopen("weno.inp","r");
-    if (!in) printf("Warning: File weno.inp not found. Using default parameters for WENO5/CRWENO5/HCWENO5 scheme.\n");
+    if (!in) printf("Warning: File weno.inp not found. Using default parameters for WENO5/CRWENO5/HCWENO5 a_scheme.\n");
     else {
       if (!count) printf("Reading WENO parameters from weno.inp.\n");
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
           if      (!strcmp(word,"mapped"     )) { ferr = fscanf(in,"%d" ,&weno->m_mapped     ); if (ferr != 1) return(1); }
           else if (!strcmp(word,"borges"     )) { ferr = fscanf(in,"%d" ,&weno->m_borges     ); if (ferr != 1) return(1); }
           else if (!strcmp(word,"yc"         )) { ferr = fscanf(in,"%d" ,&weno->m_yc         ); if (ferr != 1) return(1); }
@@ -82,8 +82,8 @@ int WENOInitialize(
           else if (!strcmp(word,"tol"        )) { ferr = fscanf(in,"%lf",&weno->m_tol        ); if (ferr != 1) return(1); }
           else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %s in file \"weno.inp\" with value %s not ",word,useless);
+            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %a_s in file \"weno.inp\" with value %a_s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
@@ -122,7 +122,7 @@ int WENOInitialize(
   weno->m_tol         = real_data   [4];
 
   /* WENO weight calculation is hard-coded for p=2, so return error if p != 2 in
-   * user input file, so that there's no confusion */
+   * user input file, so that there'a_s no confusion */
   if (weno->m_p != 2.0) {
     if (!mpi->m_rank && !count) printf("Warning from WENOInitialize(): \"p\" parameter is 2.0. Any other value will be ignored!\n");
   }
@@ -153,7 +153,7 @@ int WENOInitialize(
   }
   weno->m_size = total_size;
 
-  if ((!strcmp(type,_CHARACTERISTIC_)) && (nvars > 1))
+  if ((!strcmp(a_type,_CHARACTERISTIC_)) && (nvars > 1))
     solver->SetInterpLimiterVar = WENOFifthOrderCalculateWeightsChar;
   else {
 #if defined(HAVE_CUDA)

@@ -6,9 +6,9 @@
 
 double FPPowerSystem1BusDissipationFunction(int,int,void*,double);
 
-int FPPowerSystem1BusDiffusionLaplacian(double *f,double *u,int dir,void *s,double t)
+int FPPowerSystem1BusDiffusionLaplacian(double *a_f,double *a_u,int a_dir,void *a_s,double a_t)
 {
-  HyPar             *solver = (HyPar*)             s;
+  HyPar             *solver = (HyPar*)             a_s;
   FPPowerSystem1Bus *params = (FPPowerSystem1Bus*) solver->m_physics;
 
   int *dim    = solver->m_dim_local;
@@ -21,17 +21,17 @@ int FPPowerSystem1BusDiffusionLaplacian(double *f,double *u,int dir,void *s,doub
   int size;          _ArrayProduct1D_(bounds,ndims,size); size *= nvars;
 
   /* calculate dissipation coefficient  -- constant in x and y */
-  double dissipation = FPPowerSystem1BusDissipationFunction(dir,dir,params,t);
+  double dissipation = FPPowerSystem1BusDissipationFunction(a_dir,a_dir,params,a_t);
 
-  /* f = dissipation * u */
-  _ArrayScaleCopy1D_(u,dissipation,f,size);
+  /* a_f = dissipation * a_u */
+  _ArrayScaleCopy1D_(a_u,dissipation,a_f,size);
 
   return(0);
 }
 
-int FPPowerSystem1BusDiffusionGeneral(double *f,double *u,int dir1,int dir2,void *s,double t)
+int FPPowerSystem1BusDiffusionGeneral(double *a_f,double *a_u,int a_dir1,int a_dir2,void *a_s,double a_t)
 {
-  HyPar             *solver = (HyPar*)             s;
+  HyPar             *solver = (HyPar*)             a_s;
   FPPowerSystem1Bus *params = (FPPowerSystem1Bus*) solver->m_physics;
 
   int *dim    = solver->m_dim_local;
@@ -44,10 +44,10 @@ int FPPowerSystem1BusDiffusionGeneral(double *f,double *u,int dir1,int dir2,void
   int size;          _ArrayProduct1D_(bounds,ndims,size); size *= nvars;
 
   /* calculate dissipation coefficient  -- constant in x and y */
-  double dissipation = FPPowerSystem1BusDissipationFunction(dir1,dir2,params,t);
+  double dissipation = FPPowerSystem1BusDissipationFunction(a_dir1,a_dir2,params,a_t);
 
-  /* f = dissipation * u */
-  _ArrayScaleCopy1D_(u,dissipation,f,size);
+  /* a_f = dissipation * a_u */
+  _ArrayScaleCopy1D_(a_u,dissipation,a_f,size);
 
   return(0);
 }

@@ -8,11 +8,11 @@
 
 /*! Initialize GPU-related arrays. */
 int gpuNavierStokes3DInitialize(
-    void *s,  /*!< Solver object of type #HyPar */
-    void *m   /*!< MPI object of type #MPIVariables */
+    void *a_s,  /*!< Solver object of type #HyPar */
+    void *a_m   /*!< MPI object of type #MPIVariables */
 )
 {
-    HyPar          *solver   = (HyPar*)          s;
+    HyPar          *solver   = (HyPar*)          a_s;
     NavierStokes3D *physics  = (NavierStokes3D*) solver->m_physics;
 
     int *dim = solver->m_dim_local;

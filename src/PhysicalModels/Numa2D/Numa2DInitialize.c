@@ -22,10 +22,10 @@ int    Numa2DRusanovLinearFlux(double*,double*,double*,double*,double*,double*,i
 void   Numa2DCalculateStandardAtmosphere_1(void*,double,double*,double*,double*,double*);
 void   Numa2DCalculateStandardAtmosphere_2(void*,double,double*,double*,double*,double*);
 
-int Numa2DInitialize(void *s,void *m)
+int Numa2DInitialize(void *a_s,void *a_m)
 {
-  HyPar           *solver  = (HyPar*)         s;
-  MPIVariables    *mpi     = (MPIVariables*)  m;
+  HyPar           *solver  = (HyPar*)         a_s;
+  MPIVariables    *mpi     = (MPIVariables*)  a_m;
   Numa2D          *physics = (Numa2D*)        solver->m_physics;
   int             ferr     = 0;
 
@@ -43,10 +43,10 @@ int Numa2DInitialize(void *s,void *m)
   /* default values */
   physics->m_gamma  = 1.4;
   physics->m_R      = 287.058;        /* J kg^{-1} K^{-1} */
-  physics->m_g      = 9.8;            /* m s^{-2}         */
-  physics->m_mu     = 0.0;            /* m^2 s^{-1}       */
+  physics->m_g      = 9.8;            /* a_m a_s^{-2}         */
+  physics->m_mu     = 0.0;            /* a_m^2 a_s^{-1}       */
 
-  physics->Pref   = 101327.0;       /* N m^{-2}         */
+  physics->Pref   = 101327.0;       /* N a_m^{-2}         */
   physics->Tref   = 288.15;         /* Kelvin           */
 
   strcpy(physics->m_upwind,_RUSANOV_UPWINDING_);
@@ -62,10 +62,10 @@ int Numa2DInitialize(void *s,void *m)
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "gamma")) {
             ferr = fscanf(in,"%lf",&physics->m_gamma); if (ferr != 1) return(1);
           } else if (!strcmp(word,"R")) {
@@ -81,11 +81,11 @@ int Numa2DInitialize(void *s,void *m)
           } else if (!strcmp(word,"init_atmos")) {
             ferr = fscanf(in,"%d",&physics->m_init_atmos); if (ferr != 1) return(1);
           } else if (!strcmp(word,"upwinding")) {
-            ferr = fscanf(in,"%s",physics->m_upwind); if (ferr != 1) return(1);
+            ferr = fscanf(in,"%a_s",physics->m_upwind); if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",word,useless);
+            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
@@ -143,15 +143,15 @@ int Numa2DInitialize(void *s,void *m)
   DomainBoundary  *boundary = (DomainBoundary*) solver->m_boundary;
   for (n = 0; n < solver->m_n_boundary_zones; n++)  boundary[n].m_gamma = physics->m_gamma;
 
-  /* finally, hijack the main solver's dissipation function pointer
-   * to this model's own function, since it's difficult to express
+  /* finally, hijack the main solver'a_s dissipation function pointer
+   * to this model'a_s own function, since it'a_s difficult to express
    * the dissipation terms in the general form                      */
   solver->ParabolicFunction = Numa2DParabolicFunction;
 
   /* check that solver has the correct choice of diffusion formulation */
   if (strcmp(solver->m_spatial_type_par,_NC_2STAGE_)) {
     if (!mpi->m_rank) {
-      fprintf(stderr,"Error in Numa2DInitialize(): Parabolic term spatial discretization must be \"%s\"\n",_NC_2STAGE_);
+      fprintf(stderr,"Error in Numa2DInitialize(): Parabolic term spatial discretization must be \"%a_s\"\n",_NC_2STAGE_);
     }
     return(1);
   }

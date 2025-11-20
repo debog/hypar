@@ -18,15 +18,15 @@
     data from a file, if available, else sets it to a constant
 */
 int ShallowWater1DTopography(
-                              void *s,       /*!< Solver object of type #HyPar */
-                              void *m,       /*!< MPI object of type #MPIVariables*/
-                              int  idx,      /*!< Index of this simulation */
-                              int  nsims,    /*!< Total number of simulations */
-                              int  *dim_topo /*!< Grid dimensions of the advection field stored in file */
+                              void *a_s,       /*!< Solver object of type #HyPar */
+                              void *a_m,       /*!< MPI object of type #MPIVariables*/
+                              int  a_idx,      /*!< Index of this simulation */
+                              int  a_nsims,    /*!< Total number of simulations */
+                              int  *a_dim_topo /*!< Grid dimensions of the advection field stored in file */
                             )
 {
-  HyPar          *solver = (HyPar*) s;
-  MPIVariables   *mpi    = (MPIVariables*) m;
+  HyPar          *solver = (HyPar*) a_s;
+  MPIVariables   *mpi    = (MPIVariables*) a_m;
   ShallowWater1D *param  = (ShallowWater1D*) solver->m_physics;
   double         *S      = param->m_b;
   int            d, done, *dim = solver->m_dim_local,
@@ -34,17 +34,17 @@ int ShallowWater1DTopography(
   _DECLARE_IERR_;
 
   char fname_root[_MAX_STRING_SIZE_] = "topography";
-  if (idx >= 0) {
-    if (nsims > 1) {
+  if (a_idx >= 0) {
+    if (a_nsims > 1) {
       char index[_MAX_STRING_SIZE_];
-      GetStringFromInteger(idx, index, (int)log10(nsims)+1);
+      GetStringFromInteger(a_idx, index, (int)log10(a_nsims)+1);
       strcat(fname_root, "_");
       strcat(fname_root, index);
     }
   }
 
   /* read topography from provided file, if available */
-  if (dim_topo == NULL) {
+  if (a_dim_topo == NULL) {
     int ierr = ReadArray( solver->m_ndims,
                           1,
                           solver->m_dim_global,
@@ -66,7 +66,7 @@ int ShallowWater1DTopography(
                                   1,
                                   solver->m_dim_global,
                                   solver->m_dim_local,
-                                  dim_topo,
+                                  a_dim_topo,
                                   solver->m_ghosts,
                                   solver,
                                   mpi,

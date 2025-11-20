@@ -8,13 +8,13 @@
 
 double FPPowerSystemDissipationFunction(int,void*,double);
 
-double FPPowerSystemComputeDiffNumber(void *s,void *m,double dt,double t)
+double FPPowerSystemComputeDiffNumber(void *a_s,void *a_m,double a_dt,double a_t)
 {
-  HyPar         *solver = (HyPar*)        s;
+  HyPar         *solver = (HyPar*)        a_s;
   FPPowerSystem *params = (FPPowerSystem*)solver->m_physics;
 
   int     ndims  = solver->m_ndims;
-  int     ghosts = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     *dim   = solver->m_dim_local;
 
   double  max_diff = 0;
@@ -23,11 +23,11 @@ double FPPowerSystemComputeDiffNumber(void *s,void *m,double dt,double t)
   while (!done) {
     double dxinv; _GetCoordinate_(0,index[0],dim,ghosts,solver->m_dxinv,dxinv);
     double dyinv; _GetCoordinate_(1,index[1],dim,ghosts,solver->m_dxinv,dyinv);
-    double dissp_x= FPPowerSystemDissipationFunction(0,params,t);
-    double dissp_y= FPPowerSystemDissipationFunction(1,params,t);
+    double dissp_x= FPPowerSystemDissipationFunction(0,params,a_t);
+    double dissp_y= FPPowerSystemDissipationFunction(1,params,a_t);
 
-    double local_diff_x = absolute(dissp_x) * dt * dxinv * dxinv;
-    double local_diff_y = absolute(dissp_y) * dt * dyinv * dyinv;
+    double local_diff_x = absolute(dissp_x) * a_dt * dxinv * dxinv;
+    double local_diff_y = absolute(dissp_y) * a_dt * dyinv * dyinv;
 
     if (local_diff_x > max_diff) max_diff = local_diff_x;
     if (local_diff_y > max_diff) max_diff = local_diff_y;

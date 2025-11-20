@@ -50,20 +50,20 @@
     the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
     or variable name yields the specific doc page dealing with that function/variable.
 */
-PetscErrorCode PetscIFunctionIMEX(  TS        ts,     /*!< The time integration object */
-                                    PetscReal t,      /*!< Current solution time */
-                                    Vec       Y,      /*!< State vector (input) */
-                                    Vec       Ydot,   /*!< Time derivative of the state vector (input) */
-                                    Vec       F,      /*!< The computed function vector */
-                                    void      *ctxt   /*!< Object of type PETScContext */ )
+PetscErrorCode PetscIFunctionIMEX(  TS        a_ts,     /*!< The time integration object */
+                                    PetscReal a_t,      /*!< Current solution time */
+                                    Vec       a_Y,      /*!< State vector (input) */
+                                    Vec       a_Ydot,   /*!< Time derivative of the state vector (input) */
+                                    Vec       a_F,      /*!< The computed function vector */
+                                    void      *a_ctxt   /*!< Object of type PETScContext */ )
 {
-  PETScContext* context = (PETScContext*) ctxt;
+  PETScContext* context = (PETScContext*) a_ctxt;
   SimulationObject* sim = (SimulationObject*) context->m_simobj;
   int nsims = context->m_nsims;
 
   PetscFunctionBegin;
 
-  context->m_waqt = t;
+  context->m_waqt = a_t;
 
   for (int ns = 0; ns < nsims; ns++) {
 
@@ -77,9 +77,9 @@ PetscErrorCode PetscIFunctionIMEX(  TS        ts,     /*!< The time integration 
     double *rhs = solver->m_rhs;
 
     /* copy solution from PETSc vector */
-    TransferVecFromPETSc(u,Y,context,ns,context->m_offsets[ns]);
+    TransferVecFromPETSc(u,a_Y,context,ns,context->m_offsets[ns]);
     /* apply boundary conditions and exchange data over MPI interfaces */
-    solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);
+    solver->ApplyBoundaryConditions(solver,mpi,u,NULL,a_t);
     MPIExchangeBoundariesnD(  solver->m_ndims,
                               solver->m_nvars,
                               solver->m_dim_local,
@@ -93,36 +93,36 @@ PetscErrorCode PetscIFunctionIMEX(  TS        ts,     /*!< The time integration 
     /* Evaluate hyperbolic, parabolic and source terms  and the RHS */
     if ((!strcmp(solver->m_split_hyperbolic_flux,"yes")) && solver->m_flag_fdf_specified) {
       if (context->m_flag_hyperbolic_f == _IMPLICIT_) {
-        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,t,0,solver->FdFFunction,solver->UpwindFdF);
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->FdFFunction,solver->UpwindFdF);
         _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
       }
       if (context->m_flag_hyperbolic_df == _IMPLICIT_) {
-        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF);
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->dFFunction,solver->UpwinddF);
         _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
       }
     } else if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
       if (context->m_flag_hyperbolic_f == _IMPLICIT_) {
-        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,t,0,solver->FFunction,solver->Upwind);
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->FFunction,solver->Upwind);
         _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
-        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF);
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->dFFunction,solver->UpwinddF);
         _ArrayAXPY_(solver->m_hyp, 1.0,rhs,size*solver->m_nvars);
       }
       if (context->m_flag_hyperbolic_df == _IMPLICIT_) {
-        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF);
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->dFFunction,solver->UpwinddF);
         _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
       }
     } else {
       if (context->m_flag_hyperbolic == _IMPLICIT_) {
-        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,t,0,solver->FFunction,solver->Upwind);
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->FFunction,solver->Upwind);
         _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
       }
     }
     if (context->m_flag_parabolic == _IMPLICIT_) {
-      solver->ParabolicFunction (solver->m_par,u,solver,mpi,t);
+      solver->ParabolicFunction (solver->m_par,u,solver,mpi,a_t);
       _ArrayAXPY_(solver->m_par, 1.0,rhs,size*solver->m_nvars);
     }
     if (context->m_flag_source == _IMPLICIT_) {
-      solver->SourceFunction    (solver->m_source,u,solver,mpi,t);
+      solver->SourceFunction    (solver->m_source,u,solver,mpi,a_t);
       _ArrayAXPY_(solver->m_source, 1.0,rhs,size*solver->m_nvars);
     }
 
@@ -131,12 +131,12 @@ PetscErrorCode PetscIFunctionIMEX(  TS        ts,     /*!< The time integration 
     _ArrayCopy1D_(rhs,solver->m_rhsref,(size*solver->m_nvars));
 
     /* Transfer RHS to PETSc vector */
-    TransferVecToPETSc(rhs,F,context,ns,context->m_offsets[ns]);
+    TransferVecToPETSc(rhs,a_F,context,ns,context->m_offsets[ns]);
 
   }
 
-  /* LHS = Ydot - F(u) */
-  VecAYPX(F,-1.0,Ydot);
+  /* LHS = a_Ydot - a_F(u) */
+  VecAYPX(a_F,-1.0,a_Ydot);
 
   PetscFunctionReturn(0);
 }

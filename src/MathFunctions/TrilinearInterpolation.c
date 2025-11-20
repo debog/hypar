@@ -20,34 +20,34 @@
   coeffs[7] => xmax,ymax,zmax
 */
 void TrilinearInterpCoeffs(
-                            double xmin,  /*!< x-coordinate of the lower-end */
-                            double xmax,  /*!< x-coordinate of the higher-end */
-                            double ymin,  /*!< y-coordinate of the lower-end */
-                            double ymax,  /*!< y-coordinate of the higher-end */
-                            double zmin,  /*!< z-coordinate of the lower-end */
-                            double zmax,  /*!< z-coordinate of the higher-end */
-                            double x,     /*!< x-coordinate of the point to interpolate at */
-                            double y,     /*!< y-coordinate of the point to interpolate at */
-                            double z,     /*!< z-coordinate of the point to interpolate at */
-                            double *coeffs/*!< array of size 8 (pre-allocated) to store the coefficients in */
+                            double a_xmin,  /*!< x-coordinate of the lower-end */
+                            double a_xmax,  /*!< x-coordinate of the higher-end */
+                            double a_ymin,  /*!< y-coordinate of the lower-end */
+                            double a_ymax,  /*!< y-coordinate of the higher-end */
+                            double a_zmin,  /*!< z-coordinate of the lower-end */
+                            double a_zmax,  /*!< z-coordinate of the higher-end */
+                            double a_x,     /*!< x-coordinate of the point to interpolate at */
+                            double a_y,     /*!< y-coordinate of the point to interpolate at */
+                            double a_z,     /*!< z-coordinate of the point to interpolate at */
+                            double *a_coeffs/*!< array of size 8 (pre-allocated) to store the coefficients in */
                           )
 {
-  double vol_inv = 1 / ((xmax-xmin)*(ymax-ymin)*(zmax-zmin));
-  double tldx1 = x - xmin;
-  double tldx2 = xmax - x;
-  double tldy1 = y - ymin;
-  double tldy2 = ymax - y;
-  double tldz1 = z - zmin;
-  double tldz2 = zmax - z;
+  double vol_inv = 1 / ((a_xmax-a_xmin)*(a_ymax-a_ymin)*(a_zmax-a_zmin));
+  double tldx1 = a_x - a_xmin;
+  double tldx2 = a_xmax - a_x;
+  double tldy1 = a_y - a_ymin;
+  double tldy2 = a_ymax - a_y;
+  double tldz1 = a_z - a_zmin;
+  double tldz2 = a_zmax - a_z;
 
-  coeffs[0] = tldz2 * tldy2 * tldx2 * vol_inv;
-  coeffs[1] = tldz2 * tldy2 * tldx1 * vol_inv;
-  coeffs[2] = tldz2 * tldy1 * tldx2 * vol_inv;
-  coeffs[3] = tldz2 * tldy1 * tldx1 * vol_inv;
-  coeffs[4] = tldz1 * tldy2 * tldx2 * vol_inv;
-  coeffs[5] = tldz1 * tldy2 * tldx1 * vol_inv;
-  coeffs[6] = tldz1 * tldy1 * tldx2 * vol_inv;
-  coeffs[7] = tldz1 * tldy1 * tldx1 * vol_inv;
+  a_coeffs[0] = tldz2 * tldy2 * tldx2 * vol_inv;
+  a_coeffs[1] = tldz2 * tldy2 * tldx1 * vol_inv;
+  a_coeffs[2] = tldz2 * tldy1 * tldx2 * vol_inv;
+  a_coeffs[3] = tldz2 * tldy1 * tldx1 * vol_inv;
+  a_coeffs[4] = tldz1 * tldy2 * tldx2 * vol_inv;
+  a_coeffs[5] = tldz1 * tldy2 * tldx1 * vol_inv;
+  a_coeffs[6] = tldz1 * tldy1 * tldx2 * vol_inv;
+  a_coeffs[7] = tldz1 * tldy1 * tldx1 * vol_inv;
 
   return;
 }

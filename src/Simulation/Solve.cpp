@@ -34,32 +34,32 @@ int OutputROMSolution(void*,int,double);   /*!< Write ROM solutions to file */
     time steps, and calculates the errors. After the specified number of iterations,
     it writes out some information to the screen and the solution to a file.
 */
-int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationObject */
-            int   nsims,  /*!< number of simulation objects */
-            int   rank,   /*!< MPI rank of this process */
+int Solve(  void  *a_s,     /*!< Array of simulation objects of type #SimulationObject */
+            int   a_nsims,  /*!< number of simulation objects */
+            int   a_rank,   /*!< MPI a_rank of this process */
             int   nproc   /*!< Number of MPI processes */
          )
 {
-  SimulationObject* sim = (SimulationObject*) s;
+  SimulationObject* sim = (SimulationObject*) a_s;
 
   /* make sure none of the simulation objects sent in the array
    * are "barebones" type */
-  for (int ns = 0; ns < nsims; ns++) {
+  for (int ns = 0; ns < a_nsims; ns++) {
     if (sim[ns].is_barebones == 1) {
-      fprintf(stderr, "Error in Solve(): simulation object %d on rank %d is barebones!\n",
-              ns, rank );
+      fprintf(stderr, "Error in Solve(): simulation object %d on a_rank %d is barebones!\n",
+              ns, a_rank );
       return 1;
     }
   }
 
   /* write out iblank to file for visualization */
-  for (int ns = 0; ns < nsims; ns++) {
+  for (int ns = 0; ns < a_nsims; ns++) {
     if (sim[ns].solver.m_flag_ib) {
 
       char fname_root[_MAX_STRING_SIZE_] = "iblank";
-      if (nsims > 1) {
+      if (a_nsims > 1) {
         char index[_MAX_STRING_SIZE_];
-        GetStringFromInteger(ns, index, (int)log10((nsims)+1));
+        GetStringFromInteger(ns, index, (int)log10((a_nsims)+1));
         strcat(fname_root, "_");
         strcat(fname_root, index);
       }
@@ -78,8 +78,8 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
   }
 
 #ifdef with_librom
-  if (!rank) printf("Setting up libROM interface.\n");
-  libROMInterface rom_interface( sim, nsims, rank, nproc, sim[0].solver.m_dt );
+  if (!a_rank) printf("Setting up libROM interface.\n");
+  libROMInterface rom_interface( sim, a_nsims, a_rank, nproc, sim[0].solver.m_dt );
   const std::string& rom_mode( rom_interface.mode() );
   std::vector<double> op_times_arr(0);
 #endif
@@ -89,23 +89,23 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 #endif
     /* Define and initialize the time-integration object */
     TimeIntegration TS;
-    if (!rank) printf("Setting up time integration.\n");
-    TimeInitialize(sim, nsims, rank, nproc, &TS);
+    if (!a_rank) printf("Setting up time integration.\n");
+    TimeInitialize(sim, a_nsims, a_rank, nproc, &TS);
     double ti_runtime = 0.0;
 
-    if (!rank) printf("Solving in time (from %d to %d iterations)\n",TS.m_restart_iter,TS.m_n_iter);
+    if (!a_rank) printf("Solving in time (from %d to %d iterations)\n",TS.m_restart_iter,TS.m_n_iter);
     for (TS.m_iter = TS.m_restart_iter; TS.m_iter < TS.m_n_iter; TS.m_iter++) {
 
       /* Write initial solution to file if this is the first iteration */
       if (!TS.m_iter) {
-        for (int ns = 0; ns < nsims; ns++) {
+        for (int ns = 0; ns < a_nsims; ns++) {
           if (sim[ns].solver.PhysicsOutput) {
             sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
                                           &(sim[ns].mpi),
                                           TS.m_waqt );
           }
         }
-        OutputSolution(sim, nsims, TS.m_waqt);
+        OutputSolution(sim, a_nsims, TS.m_waqt);
 #ifdef with_librom
         op_times_arr.push_back(TS.m_waqt);
 #endif
@@ -139,14 +139,14 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
       /* Write intermediate solution to file */
       if (      ((TS.m_iter+1)%sim[0].solver.m_file_op_iter == 0)
             &&  ((TS.m_iter+1) < TS.m_n_iter) ) {
-        for (int ns = 0; ns < nsims; ns++) {
+        for (int ns = 0; ns < a_nsims; ns++) {
           if (sim[ns].solver.PhysicsOutput) {
             sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
                                           &(sim[ns].mpi),
                                           TS.m_waqt );
           }
         }
-        OutputSolution(sim, nsims, TS.m_waqt);
+        OutputSolution(sim, a_nsims, TS.m_waqt);
 #ifdef with_librom
         op_times_arr.push_back(TS.m_waqt);
 #endif
@@ -157,32 +157,32 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     double t_final = TS.m_waqt;
     TimeCleanup(&TS);
 
-    if (!rank) {
+    if (!a_rank) {
       printf( "Completed time integration (Final time: %f), total wctime: %f (seconds).\n",
               t_final, ti_runtime );
-      if (nsims > 1) printf("\n");
+      if (a_nsims > 1) printf("\n");
     }
 
     /* calculate error if exact solution has been provided */
-    for (int ns = 0; ns < nsims; ns++) {
+    for (int ns = 0; ns < a_nsims; ns++) {
       CalculateError(&(sim[ns].solver),
                      &(sim[ns].mpi) );
     }
 
     /* write a final solution file */
-    for (int ns = 0; ns < nsims; ns++) {
+    for (int ns = 0; ns < a_nsims; ns++) {
       if (sim[ns].solver.PhysicsOutput) {
         sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
                                       &(sim[ns].mpi),
                                       t_final );
       }
     }
-    OutputSolution(sim, nsims, t_final);
+    OutputSolution(sim, a_nsims, t_final);
 
 #ifdef with_librom
     op_times_arr.push_back(TS.m_waqt);
 
-    for (int ns = 0; ns < nsims; ns++) {
+    for (int ns = 0; ns < a_nsims; ns++) {
       ResetFilenameIndex( sim[ns].solver.m_filename_index,
                           sim[ns].solver.m_index_length );
     }
@@ -190,7 +190,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
     if (rom_interface.mode() == _ROM_MODE_TRAIN_) {
 
       rom_interface.train();
-      if (!rank) printf("libROM: total training wallclock time: %f (seconds).\n",
+      if (!a_rank) printf("libROM: total training wallclock time: %f (seconds).\n",
                         rom_interface.trainWallclockTime() );
 
       double total_rom_predict_time = 0;
@@ -199,24 +199,24 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
         double waqt = op_times_arr[iter];
 
         rom_interface.predict(sim, waqt);
-        if (!rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n",
+        if (!a_rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n",
                             waqt, rom_interface.predictWallclockTime() );
         total_rom_predict_time += rom_interface.predictWallclockTime();
 
         /* calculate diff between ROM and PDE solutions */
         if (iter == (op_times_arr.size()-1)) {
-          if (!rank) printf("libROM:   Calculating diff between PDE and ROM solutions.\n");
-          for (int ns = 0; ns < nsims; ns++) {
+          if (!a_rank) printf("libROM:   Calculating diff between PDE and ROM solutions.\n");
+          for (int ns = 0; ns < a_nsims; ns++) {
             CalculateROMDiff(  &(sim[ns].solver),
                                &(sim[ns].mpi) );
           }
         }
         /* write the ROM solution to file */
-        OutputROMSolution(sim, nsims,waqt);
+        OutputROMSolution(sim, a_nsims,waqt);
 
       }
 
-      if (!rank) {
+      if (!a_rank) {
         printf( "libROM: total prediction/query wallclock time: %f (seconds).\n",
                 total_rom_predict_time );
       }
@@ -225,7 +225,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 
     } else {
 
-      for (int ns = 0; ns < nsims; ns++) {
+      for (int ns = 0; ns < a_nsims; ns++) {
         sim[ns].solver.m_rom_diff_norms[0]
           = sim[ns].solver.m_rom_diff_norms[1]
           = sim[ns].solver.m_rom_diff_norms[2]
@@ -236,7 +236,7 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
 
   } else if (rom_mode == _ROM_MODE_PREDICT_) {
 
-    for (int ns = 0; ns < nsims; ns++) {
+    for (int ns = 0; ns < a_nsims; ns++) {
       sim[ns].solver.m_rom_diff_norms[0]
         = sim[ns].solver.m_rom_diff_norms[1]
         = sim[ns].solver.m_rom_diff_norms[2]
@@ -273,29 +273,29 @@ int Solve(  void  *s,     /*!< Array of simulation objects of type #SimulationOb
       double waqt = op_times_arr[iter];
 
       rom_interface.predict(sim, waqt);
-      if (!rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n",
+      if (!a_rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n",
                           waqt, rom_interface.predictWallclockTime() );
       total_rom_predict_time += rom_interface.predictWallclockTime();
 
       /* write the solution to file */
-      for (int ns = 0; ns < nsims; ns++) {
+      for (int ns = 0; ns < a_nsims; ns++) {
         if (sim[ns].solver.PhysicsOutput) {
           sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
                                         &(sim[ns].mpi),
                                         waqt );
         }
       }
-      OutputSolution(sim, nsims, waqt);
+      OutputSolution(sim, a_nsims, waqt);
 
     }
 
     /* calculate error if exact solution has been provided */
-    for (int ns = 0; ns < nsims; ns++) {
+    for (int ns = 0; ns < a_nsims; ns++) {
       CalculateError(&(sim[ns].solver),
                      &(sim[ns].mpi) );
     }
 
-    if (!rank) {
+    if (!a_rank) {
       printf( "libROM: total prediction/query wallclock time: %f (seconds).\n",
               total_rom_predict_time );
     }

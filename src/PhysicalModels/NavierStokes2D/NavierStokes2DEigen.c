@@ -17,15 +17,15 @@
     to interpolation functions for a characteristic-based reconstruction.
 */
 int NavierStokes2DLeftEigenvectors(
-                                    double *u, /*!< Conserved solution at a grid point */
-                                    double *L, /*!< Array of size nvar^2 = 4^2 to save the matrix of
+                                    double *a_u, /*!< Conserved solution at a grid point */
+                                    double *a_L, /*!< Array of size nvar^2 = 4^2 to save the matrix of
                                                     left eigenvectors in (row-major format). */
-                                    void   *p, /*!< Object of type #NavierStokes2D with physics-related variables */
-                                    int    dir /*!< Spatial dimension (x or y) */
+                                    void   *a_p, /*!< Object of type #NavierStokes2D with physics-related variables */
+                                    int    a_dir /*!< Spatial dimension (x or y) */
                                   )
 {
-  NavierStokes2D *param  = (NavierStokes2D*)  p;
-  _NavierStokes2DLeftEigenvectors_(u,L,param->m_gamma,dir);
+  NavierStokes2D *param  = (NavierStokes2D*)  a_p;
+  _NavierStokes2DLeftEigenvectors_(a_u,a_L,param->m_gamma,a_dir);
   return(0);
 }
 
@@ -36,14 +36,14 @@ int NavierStokes2DLeftEigenvectors(
     to interpolation functions for a characteristic-based reconstruction.
 */
 int NavierStokes2DRightEigenvectors(
-                                      double  *u, /*!< Conserved solution at a grid point */
-                                      double  *R, /*!< Array of size nvar^2 = 4^2 to save the matrix of
+                                      double  *a_u, /*!< Conserved solution at a grid point */
+                                      double  *a_R, /*!< Array of size nvar^2 = 4^2 to save the matrix of
                                                        right eigenvectors in (row-major format). */
-                                      void    *p, /*!< Object of type #NavierStokes2D with physics-related variables */
-                                      int     dir /*!< Spatial dimension (x or y) */
+                                      void    *a_p, /*!< Object of type #NavierStokes2D with physics-related variables */
+                                      int     a_dir /*!< Spatial dimension (x or y) */
                                     )
 {
-  NavierStokes2D *param  = (NavierStokes2D*)  p;
-  _NavierStokes2DRightEigenvectors_(u,R,param->m_gamma,dir);
+  NavierStokes2D *param  = (NavierStokes2D*)  a_p;
+  _NavierStokes2DRightEigenvectors_(a_u,a_R,param->m_gamma,a_dir);
   return(0);
 }

@@ -42,9 +42,9 @@
   References:
   + Constantinescu, E. M., "Estimating Global Errors in Time Stepping.", Submitted, 2015 (http://arxiv.org/abs/1503.05166).
 */
-int TimeGLMGEE(void *ts /*!< Object of type #TimeIntegration */)
+int TimeGLMGEE(void *a_ts /*!< Object of type #TimeIntegration */)
 {
-  TimeIntegration* TS = (TimeIntegration*) ts;
+  TimeIntegration* TS = (TimeIntegration*) a_ts;
   SimulationObject* sim = (SimulationObject*) TS->m_simulation;
   GLMGEEParameters* params = (GLMGEEParameters*) sim[0].solver.m_msti;
   int ns, stage, i, j, nsims = TS->m_nsims;

@@ -28,18 +28,18 @@
 
 */
 int Euler1DUpwindRoe(
-                      double  *fI, /*!< Computed upwind interface flux */
-                      double  *fL, /*!< Left-biased reconstructed interface flux */
-                      double  *fR, /*!< Right-biased reconstructed interface flux */
-                      double  *uL, /*!< Left-biased reconstructed interface solution */
-                      double  *uR, /*!< Right-biased reconstructed interface solution */
-                      double  *u,  /*!< Cell-centered solution */
-                      int     dir, /*!< Spatial dimension (unused since this is a 1D system) */
-                      void    *s,  /*!< Solver object of type #HyPar */
-                      double  t    /*!< Current solution time */
+                      double  *a_fI, /*!< Computed upwind interface flux */
+                      double  *a_fL, /*!< Left-biased reconstructed interface flux */
+                      double  *a_fR, /*!< Right-biased reconstructed interface flux */
+                      double  *a_uL, /*!< Left-biased reconstructed interface solution */
+                      double  *a_uR, /*!< Right-biased reconstructed interface solution */
+                      double  *a_u,  /*!< Cell-centered solution */
+                      int     a_dir, /*!< Spatial dimension (unused since this is a 1D system) */
+                      void    *a_s,  /*!< Solver object of type #HyPar */
+                      double  a_t   /*!< Current solution time */
                     )
 {
-  HyPar     *solver = (HyPar*)    s;
+  HyPar     *solver = (HyPar*)    a_s;
   Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
@@ -49,29 +49,29 @@ int Euler1DUpwindRoe(
   int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
   static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_],
                 DL[_MODEL_NVARS_*_MODEL_NVARS_], modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
+      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[a_dir]--;
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
       double udiff[_MODEL_NVARS_], uavg[_MODEL_NVARS_],udiss[_MODEL_NVARS_];
 
-      /* Roe's upwinding scheme */
+      /* Roe'a_s upwinding scheme */
 
-      udiff[0] = 0.5 * (uR[_MODEL_NVARS_*p+0] - uL[_MODEL_NVARS_*p+0]);
-      udiff[1] = 0.5 * (uR[_MODEL_NVARS_*p+1] - uL[_MODEL_NVARS_*p+1]);
-      udiff[2] = 0.5 * (uR[_MODEL_NVARS_*p+2] - uL[_MODEL_NVARS_*p+2]);
+      udiff[0] = 0.5 * (a_uR[_MODEL_NVARS_*p+0] - a_uL[_MODEL_NVARS_*p+0]);
+      udiff[1] = 0.5 * (a_uR[_MODEL_NVARS_*p+1] - a_uL[_MODEL_NVARS_*p+1]);
+      udiff[2] = 0.5 * (a_uR[_MODEL_NVARS_*p+2] - a_uL[_MODEL_NVARS_*p+2]);
 
-      _Euler1DRoeAverage_         (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
+      _Euler1DRoeAverage_         (uavg,(a_u+_MODEL_NVARS_*pL),(a_u+_MODEL_NVARS_*pR),param);
       _Euler1DEigenvalues_        (uavg,D,param,0);
       _Euler1DLeftEigenvectors_   (uavg,L,param,0);
       _Euler1DRightEigenvectors_  (uavg,R,param,0);
@@ -88,9 +88,9 @@ int Euler1DUpwindRoe(
       udiss[1] = modA[1*_MODEL_NVARS_+0]*udiff[0] + modA[1*_MODEL_NVARS_+1]*udiff[1] + modA[1*_MODEL_NVARS_+2]*udiff[2];
       udiss[2] = modA[2*_MODEL_NVARS_+0]*udiff[0] + modA[2*_MODEL_NVARS_+1]*udiff[1] + modA[2*_MODEL_NVARS_+2]*udiff[2];
 
-      fI[_MODEL_NVARS_*p+0] = 0.5 * (fL[_MODEL_NVARS_*p+0]+fR[_MODEL_NVARS_*p+0]) - udiss[0];
-      fI[_MODEL_NVARS_*p+1] = 0.5 * (fL[_MODEL_NVARS_*p+1]+fR[_MODEL_NVARS_*p+1]) - udiss[1];
-      fI[_MODEL_NVARS_*p+2] = 0.5 * (fL[_MODEL_NVARS_*p+2]+fR[_MODEL_NVARS_*p+2]) - udiss[2];
+      a_fI[_MODEL_NVARS_*p+0] = 0.5 * (a_fL[_MODEL_NVARS_*p+0]+a_fR[_MODEL_NVARS_*p+0]) - udiss[0];
+      a_fI[_MODEL_NVARS_*p+1] = 0.5 * (a_fL[_MODEL_NVARS_*p+1]+a_fR[_MODEL_NVARS_*p+1]) - udiss[1];
+      a_fI[_MODEL_NVARS_*p+2] = 0.5 * (a_fL[_MODEL_NVARS_*p+2]+a_fR[_MODEL_NVARS_*p+2]) - udiss[2];
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
@@ -113,18 +113,18 @@ int Euler1DUpwindRoe(
     Note that this upwinding scheme cannot be used for solving flows with non-zero gravitational forces.
 */
 int Euler1DUpwindRF(
-                      double  *fI, /*!< Computed upwind interface flux */
-                      double  *fL, /*!< Left-biased reconstructed interface flux */
-                      double  *fR, /*!< Right-biased reconstructed interface flux */
-                      double  *uL, /*!< Left-biased reconstructed interface solution */
-                      double  *uR, /*!< Right-biased reconstructed interface solution */
-                      double  *u,  /*!< Cell-centered solution */
-                      int     dir, /*!< Spatial dimension (unused since this is a 1D system) */
-                      void    *s,  /*!< Solver object of type #HyPar */
-                      double  t    /*!< Current solution time */
+                      double  *a_fI, /*!< Computed upwind interface flux */
+                      double  *a_fL, /*!< Left-biased reconstructed interface flux */
+                      double  *a_fR, /*!< Right-biased reconstructed interface flux */
+                      double  *a_uL, /*!< Left-biased reconstructed interface solution */
+                      double  *a_uR, /*!< Right-biased reconstructed interface solution */
+                      double  *a_u,  /*!< Cell-centered solution */
+                      int     a_dir, /*!< Spatial dimension (unused since this is a 1D system) */
+                      void    *a_s,  /*!< Solver object of type #HyPar */
+                      double  a_t   /*!< Current solution time */
                     )
 {
-  HyPar     *solver = (HyPar*)    s;
+  HyPar     *solver = (HyPar*)    a_s;
   Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
@@ -134,16 +134,16 @@ int Euler1DUpwindRF(
   int ghosts  = solver->m_ghosts;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
   static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
+      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[a_dir]--;
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
@@ -153,22 +153,22 @@ int Euler1DUpwindRF(
 
       /* Roe-Fixed upwinding scheme */
 
-      _Euler1DRoeAverage_       (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
+      _Euler1DRoeAverage_       (uavg,(a_u+_MODEL_NVARS_*pL),(a_u+_MODEL_NVARS_*pR),param);
       _Euler1DEigenvalues_      (uavg,D,param,0);
       _Euler1DLeftEigenvectors_ (uavg,L,param,0);
       _Euler1DRightEigenvectors_(uavg,R,param,0);
 
       /* calculate characteristic fluxes and variables */
-      MatVecMult3(_MODEL_NVARS_,ucL,L,(uL+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,ucR,L,(uR+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,fcL,L,(fL+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,fcR,L,(fR+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,ucL,L,(a_uL+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,ucR,L,(a_uR+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,fcL,L,(a_fL+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,fcR,L,(a_fR+_MODEL_NVARS_*p));
 
       for (k = 0; k < _MODEL_NVARS_; k++) {
         double eigL,eigC,eigR;
-        _Euler1DEigenvalues_((u+_MODEL_NVARS_*pL),D,param,0);
+        _Euler1DEigenvalues_((a_u+_MODEL_NVARS_*pL),D,param,0);
         eigL = D[k*_MODEL_NVARS_+k];
-        _Euler1DEigenvalues_((u+_MODEL_NVARS_*pR),D,param,0);
+        _Euler1DEigenvalues_((a_u+_MODEL_NVARS_*pR),D,param,0);
         eigR = D[k*_MODEL_NVARS_+k];
         _Euler1DEigenvalues_(uavg,D,param,0);
         eigC = D[k*_MODEL_NVARS_+k];
@@ -183,7 +183,7 @@ int Euler1DUpwindRF(
       }
 
       /* calculate the interface flux from the characteristic flux */
-      MatVecMult3(_MODEL_NVARS_,(fI+_MODEL_NVARS_*p),R,fc);
+      MatVecMult3(_MODEL_NVARS_,(a_fI+_MODEL_NVARS_*p),R,fc);
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
@@ -210,18 +210,18 @@ int Euler1DUpwindRF(
 
 */
 int Euler1DUpwindLLF(
-                      double  *fI, /*!< Computed upwind interface flux */
-                      double  *fL, /*!< Left-biased reconstructed interface flux */
-                      double  *fR, /*!< Right-biased reconstructed interface flux */
-                      double  *uL, /*!< Left-biased reconstructed interface solution */
-                      double  *uR, /*!< Right-biased reconstructed interface solution */
-                      double  *u,  /*!< Cell-centered solution */
-                      int     dir, /*!< Spatial dimension (unused since this is a 1D system) */
-                      void    *s,  /*!< Solver object of type #HyPar */
-                      double  t    /*!< Current solution time */
+                      double  *a_fI, /*!< Computed upwind interface flux */
+                      double  *a_fL, /*!< Left-biased reconstructed interface flux */
+                      double  *a_fR, /*!< Right-biased reconstructed interface flux */
+                      double  *a_uL, /*!< Left-biased reconstructed interface solution */
+                      double  *a_uR, /*!< Right-biased reconstructed interface solution */
+                      double  *a_u,  /*!< Cell-centered solution */
+                      int     a_dir, /*!< Spatial dimension (unused since this is a 1D system) */
+                      void    *a_s,  /*!< Solver object of type #HyPar */
+                      double  a_t   /*!< Current solution time */
                     )
 {
-  HyPar     *solver = (HyPar*)    s;
+  HyPar     *solver = (HyPar*)    a_s;
   Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
@@ -231,16 +231,16 @@ int Euler1DUpwindLLF(
   int ghosts  = solver->m_ghosts;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
   static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
+      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[a_dir]--;
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
@@ -250,22 +250,22 @@ int Euler1DUpwindLLF(
 
       /* Local Lax-Friedrich upwinding scheme */
 
-      _Euler1DRoeAverage_       (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
+      _Euler1DRoeAverage_       (uavg,(a_u+_MODEL_NVARS_*pL),(a_u+_MODEL_NVARS_*pR),param);
       _Euler1DEigenvalues_      (uavg,D,param,0);
       _Euler1DLeftEigenvectors_ (uavg,L,param,0);
       _Euler1DRightEigenvectors_(uavg,R,param,0);
 
       /* calculate characteristic fluxes and variables */
-      MatVecMult3(_MODEL_NVARS_,ucL,L,(uL+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,ucR,L,(uR+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,fcL,L,(fL+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,fcR,L,(fR+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,ucL,L,(a_uL+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,ucR,L,(a_uR+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,fcL,L,(a_fL+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,fcR,L,(a_fR+_MODEL_NVARS_*p));
 
       for (k = 0; k < _MODEL_NVARS_; k++) {
         double eigL,eigC,eigR;
-        _Euler1DEigenvalues_((u+_MODEL_NVARS_*pL),D,param,0);
+        _Euler1DEigenvalues_((a_u+_MODEL_NVARS_*pL),D,param,0);
         eigL = D[k*_MODEL_NVARS_+k];
-        _Euler1DEigenvalues_((u+_MODEL_NVARS_*pR),D,param,0);
+        _Euler1DEigenvalues_((a_u+_MODEL_NVARS_*pR),D,param,0);
         eigR = D[k*_MODEL_NVARS_+k];
         _Euler1DEigenvalues_(uavg,D,param,0);
         eigC = D[k*_MODEL_NVARS_+k];
@@ -275,7 +275,7 @@ int Euler1DUpwindLLF(
       }
 
       /* calculate the interface flux from the characteristic flux */
-      MatVecMult3(_MODEL_NVARS_,(fI+_MODEL_NVARS_*p),R,fc);
+      MatVecMult3(_MODEL_NVARS_,(a_fI+_MODEL_NVARS_*p),R,fc);
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
@@ -291,18 +291,18 @@ int Euler1DUpwindLLF(
     Note that this method cannot be used for flows with non-zero gravitational forces.
 */
 int Euler1DUpwindSWFS(
-                      double  *fI, /*!< Computed upwind interface flux */
-                      double  *fL, /*!< Left-biased reconstructed interface flux */
-                      double  *fR, /*!< Right-biased reconstructed interface flux */
-                      double  *uL, /*!< Left-biased reconstructed interface solution */
-                      double  *uR, /*!< Right-biased reconstructed interface solution */
-                      double  *u,  /*!< Cell-centered solution */
-                      int     dir, /*!< Spatial dimension (unused since this is a 1D system) */
-                      void    *s,  /*!< Solver object of type #HyPar */
-                      double  t    /*!< Current solution time */
+                      double  *a_fI, /*!< Computed upwind interface flux */
+                      double  *a_fL, /*!< Left-biased reconstructed interface flux */
+                      double  *a_fR, /*!< Right-biased reconstructed interface flux */
+                      double  *a_uL, /*!< Left-biased reconstructed interface solution */
+                      double  *a_uR, /*!< Right-biased reconstructed interface solution */
+                      double  *a_u,  /*!< Cell-centered solution */
+                      int     a_dir, /*!< Spatial dimension (unused since this is a 1D system) */
+                      void    *a_s,  /*!< Solver object of type #HyPar */
+                      double  a_t   /*!< Current solution time */
                     )
 {
-  HyPar     *solver = (HyPar*)    s;
+  HyPar     *solver = (HyPar*)    a_s;
   Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done;
   _DECLARE_IERR_;
@@ -311,29 +311,29 @@ int Euler1DUpwindSWFS(
   int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
   static double fp[_MODEL_NVARS_], fm[_MODEL_NVARS_],uavg[_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
       double rho,v,e,P,c,gamma=param->m_gamma,term,Mach;
 
       /* Steger Warming flux splitting */
-      _Euler1DRoeAverage_(uavg,(uL+_MODEL_NVARS_*p),(uR+_MODEL_NVARS_*p),param);
+      _Euler1DRoeAverage_(uavg,(a_uL+_MODEL_NVARS_*p),(a_uR+_MODEL_NVARS_*p),param);
       _Euler1DGetFlowVar_(uavg,rho,v,e,P,param);
       Mach = v/sqrt(gamma*P/rho);
 
       if (Mach < -1.0) {
 
-        _ArrayCopy1D3_((fR+_MODEL_NVARS_*p),(fI+_MODEL_NVARS_*p),_MODEL_NVARS_);
+        _ArrayCopy1D3_((a_fR+_MODEL_NVARS_*p),(a_fI+_MODEL_NVARS_*p),_MODEL_NVARS_);
 
       } else if (Mach < 1.0) {
 
-        _Euler1DGetFlowVar_((uL+_MODEL_NVARS_*p),rho,v,e,P,param);
+        _Euler1DGetFlowVar_((a_uL+_MODEL_NVARS_*p),rho,v,e,P,param);
         c = sqrt(gamma*P/rho);
         term = rho/(2.0*gamma);
 
@@ -341,7 +341,7 @@ int Euler1DUpwindSWFS(
         fp[1] = term * (2*(gamma-1.0)*v*v + (v+c)*(v+c));
         fp[2] = term * ((gamma-1.0)*v*v*v + 0.5*(v+c)*(v+c)*(v+c) + ((3.0-gamma)*(v+c)*c*c)/(2.0*(gamma-1.0)));
 
-        _Euler1DGetFlowVar_((uR+_MODEL_NVARS_*p),rho,v,e,P,param);
+        _Euler1DGetFlowVar_((a_uR+_MODEL_NVARS_*p),rho,v,e,P,param);
         c = sqrt(gamma*P/rho);
         term = rho/(2.0*gamma);
 
@@ -349,11 +349,11 @@ int Euler1DUpwindSWFS(
         fm[1] = term * (v-c) * (v-c);
         fm[2] = term * (0.5*(v-c)*(v-c)*(v-c) + ((3.0-gamma)*(v-c)*c*c)/(2.0*(gamma-1.0)));
 
-        _ArrayAdd1D_((fI+_MODEL_NVARS_*p),fp,fm,_MODEL_NVARS_);
+        _ArrayAdd1D_((a_fI+_MODEL_NVARS_*p),fp,fm,_MODEL_NVARS_);
 
       } else {
 
-        _ArrayCopy1D3_((fL+_MODEL_NVARS_*p),(fI+_MODEL_NVARS_*p),_MODEL_NVARS_);
+        _ArrayCopy1D3_((a_fL+_MODEL_NVARS_*p),(a_fI+_MODEL_NVARS_*p),_MODEL_NVARS_);
 
       }
 
@@ -374,18 +374,18 @@ int Euler1DUpwindSWFS(
     Computational Mathematics and Mathematical Physics, Vol. 1, No. 2, 1962, pp. 304–320
 */
 int Euler1DUpwindRusanov(
-                          double  *fI, /*!< Computed upwind interface flux */
-                          double  *fL, /*!< Left-biased reconstructed interface flux */
-                          double  *fR, /*!< Right-biased reconstructed interface flux */
-                          double  *uL, /*!< Left-biased reconstructed interface solution */
-                          double  *uR, /*!< Right-biased reconstructed interface solution */
-                          double  *u,  /*!< Cell-centered solution */
-                          int     dir, /*!< Spatial dimension (unused since this is a 1D system) */
-                          void    *s,  /*!< Solver object of type #HyPar */
-                          double  t    /*!< Current solution time */
+                          double  *a_fI, /*!< Computed upwind interface flux */
+                          double  *a_fL, /*!< Left-biased reconstructed interface flux */
+                          double  *a_fR, /*!< Right-biased reconstructed interface flux */
+                          double  *a_uL, /*!< Left-biased reconstructed interface solution */
+                          double  *a_uR, /*!< Right-biased reconstructed interface solution */
+                          double  *a_u,  /*!< Cell-centered solution */
+                          int     a_dir, /*!< Spatial dimension (unused since this is a 1D system) */
+                          void    *a_s,  /*!< Solver object of type #HyPar */
+                          double  a_t   /*!< Current solution time */
                         )
 {
-  HyPar     *solver = (HyPar*)    s;
+  HyPar     *solver = (HyPar*)    a_s;
   Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
@@ -395,8 +395,8 @@ int Euler1DUpwindRusanov(
   int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
 
   static double udiff[_MODEL_NVARS_], uavg[_MODEL_NVARS_];
 
@@ -405,24 +405,24 @@ int Euler1DUpwindRusanov(
 
     _ArrayCopy1D_(index_outer,index_inter,ndims);
 
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
 
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
+      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[a_dir]--;
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
 
-      _Euler1DRoeAverage_(uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
-      for (k = 0; k < _MODEL_NVARS_; k++) udiff[k] = 0.5 * (uR[_MODEL_NVARS_*p+k] - uL[_MODEL_NVARS_*p+k]);
+      _Euler1DRoeAverage_(uavg,(a_u+_MODEL_NVARS_*pL),(a_u+_MODEL_NVARS_*pR),param);
+      for (k = 0; k < _MODEL_NVARS_; k++) udiff[k] = 0.5 * (a_uR[_MODEL_NVARS_*p+k] - a_uL[_MODEL_NVARS_*p+k]);
 
       double rho, uvel, E, P, c;
 
-      _Euler1DGetFlowVar_((u+_MODEL_NVARS_*pL),rho,uvel,E,P,param);
+      _Euler1DGetFlowVar_((a_u+_MODEL_NVARS_*pL),rho,uvel,E,P,param);
       c = param->m_gamma*P/rho;
       double alphaL = c + absolute(uvel);
 
-      _Euler1DGetFlowVar_((u+_MODEL_NVARS_*pR),rho,uvel,E,P,param);
+      _Euler1DGetFlowVar_((a_u+_MODEL_NVARS_*pR),rho,uvel,E,P,param);
       c = param->m_gamma*P/rho;
       double alphaR = c + absolute(uvel);
 
@@ -434,7 +434,7 @@ int Euler1DUpwindRusanov(
       double alpha = kappa*max3(alphaL,alphaR,alphaavg);
 
       for (k = 0; k < _MODEL_NVARS_; k++) {
-        fI[_MODEL_NVARS_*p+k] = 0.5 * (fL[_MODEL_NVARS_*p+k]+fR[_MODEL_NVARS_*p+k]) - alpha*udiff[k];
+        a_fI[_MODEL_NVARS_*p+k] = 0.5 * (a_fL[_MODEL_NVARS_*p+k]+a_fR[_MODEL_NVARS_*p+k]) - alpha*udiff[k];
       }
 
     }
@@ -451,49 +451,49 @@ int Euler1DUpwindRusanov(
     characteristic fields / eigen-modes corresponding to \f$ u\pm a\f$ are used.
 */
 int Euler1DUpwinddFRoe(
-                      double  *fI, /*!< Computed upwind interface flux */
-                      double  *fL, /*!< Left-biased reconstructed interface flux */
-                      double  *fR, /*!< Right-biased reconstructed interface flux */
-                      double  *uL, /*!< Left-biased reconstructed interface solution */
-                      double  *uR, /*!< Right-biased reconstructed interface solution */
-                      double  *u,  /*!< Cell-centered solution */
-                      int     dir, /*!< Spatial dimension (unused since this is a 1D system) */
-                      void    *s,  /*!< Solver object of type #HyPar */
-                      double  t    /*!< Current solution time */
+                      double  *a_fI, /*!< Computed upwind interface flux */
+                      double  *a_fL, /*!< Left-biased reconstructed interface flux */
+                      double  *a_fR, /*!< Right-biased reconstructed interface flux */
+                      double  *a_uL, /*!< Left-biased reconstructed interface solution */
+                      double  *a_uR, /*!< Right-biased reconstructed interface solution */
+                      double  *a_u,  /*!< Cell-centered solution */
+                      int     a_dir, /*!< Spatial dimension (unused since this is a 1D system) */
+                      void    *a_s,  /*!< Solver object of type #HyPar */
+                      double  a_t   /*!< Current solution time */
                     )
 {
-  HyPar     *solver = (HyPar*)    s;
+  HyPar     *solver = (HyPar*)    a_s;
   Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
 
   int     ndims = solver->m_ndims;
-  int     ghosts= solver->m_ghosts;
+  int     ghosts = solver->m_ghosts;
   int     *dim  = solver->m_dim_local;
   double  *uref = param->m_solution;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
   static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_],
                 DL[_MODEL_NVARS_*_MODEL_NVARS_], modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
+      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[a_dir]--;
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
       double udiff[_MODEL_NVARS_], uavg[_MODEL_NVARS_],udiss[_MODEL_NVARS_];
 
-      /* Roe's upwinding scheme */
+      /* Roe'a_s upwinding scheme */
 
-      udiff[0] = 0.5 * (uR[_MODEL_NVARS_*p+0] - uL[_MODEL_NVARS_*p+0]);
-      udiff[1] = 0.5 * (uR[_MODEL_NVARS_*p+1] - uL[_MODEL_NVARS_*p+1]);
-      udiff[2] = 0.5 * (uR[_MODEL_NVARS_*p+2] - uL[_MODEL_NVARS_*p+2]);
+      udiff[0] = 0.5 * (a_uR[_MODEL_NVARS_*p+0] - a_uL[_MODEL_NVARS_*p+0]);
+      udiff[1] = 0.5 * (a_uR[_MODEL_NVARS_*p+1] - a_uL[_MODEL_NVARS_*p+1]);
+      udiff[2] = 0.5 * (a_uR[_MODEL_NVARS_*p+2] - a_uL[_MODEL_NVARS_*p+2]);
 
       _Euler1DRoeAverage_         (uavg,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param);
       _Euler1DEigenvalues_        (uavg,D,param,0);
@@ -512,9 +512,9 @@ int Euler1DUpwinddFRoe(
       udiss[1] = modA[1*_MODEL_NVARS_+0]*udiff[0] + modA[1*_MODEL_NVARS_+1]*udiff[1] + modA[1*_MODEL_NVARS_+2]*udiff[2];
       udiss[2] = modA[2*_MODEL_NVARS_+0]*udiff[0] + modA[2*_MODEL_NVARS_+1]*udiff[1] + modA[2*_MODEL_NVARS_+2]*udiff[2];
 
-      fI[_MODEL_NVARS_*p+0] = 0.5 * (fL[_MODEL_NVARS_*p+0]+fR[_MODEL_NVARS_*p+0]) - udiss[0];
-      fI[_MODEL_NVARS_*p+1] = 0.5 * (fL[_MODEL_NVARS_*p+1]+fR[_MODEL_NVARS_*p+1]) - udiss[1];
-      fI[_MODEL_NVARS_*p+2] = 0.5 * (fL[_MODEL_NVARS_*p+2]+fR[_MODEL_NVARS_*p+2]) - udiss[2];
+      a_fI[_MODEL_NVARS_*p+0] = 0.5 * (a_fL[_MODEL_NVARS_*p+0]+a_fR[_MODEL_NVARS_*p+0]) - udiss[0];
+      a_fI[_MODEL_NVARS_*p+1] = 0.5 * (a_fL[_MODEL_NVARS_*p+1]+a_fR[_MODEL_NVARS_*p+1]) - udiss[1];
+      a_fI[_MODEL_NVARS_*p+2] = 0.5 * (a_fL[_MODEL_NVARS_*p+2]+a_fR[_MODEL_NVARS_*p+2]) - udiss[2];
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
@@ -532,38 +532,38 @@ int Euler1DUpwinddFRoe(
       38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369
 */
 int Euler1DUpwinddFRF(
-                      double  *fI, /*!< Computed upwind interface flux */
-                      double  *fL, /*!< Left-biased reconstructed interface flux */
-                      double  *fR, /*!< Right-biased reconstructed interface flux */
-                      double  *uL, /*!< Left-biased reconstructed interface solution */
-                      double  *uR, /*!< Right-biased reconstructed interface solution */
-                      double  *u,  /*!< Cell-centered solution */
-                      int     dir, /*!< Spatial dimension (unused since this is a 1D system) */
-                      void    *s,  /*!< Solver object of type #HyPar */
-                      double  t    /*!< Current solution time */
+                      double  *a_fI, /*!< Computed upwind interface flux */
+                      double  *a_fL, /*!< Left-biased reconstructed interface flux */
+                      double  *a_fR, /*!< Right-biased reconstructed interface flux */
+                      double  *a_uL, /*!< Left-biased reconstructed interface solution */
+                      double  *a_uR, /*!< Right-biased reconstructed interface solution */
+                      double  *a_u,  /*!< Cell-centered solution */
+                      int     a_dir, /*!< Spatial dimension (unused since this is a 1D system) */
+                      void    *a_s,  /*!< Solver object of type #HyPar */
+                      double  a_t   /*!< Current solution time */
                     )
 {
-  HyPar     *solver = (HyPar*)    s;
+  HyPar     *solver = (HyPar*)    a_s;
   Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
 
   int     ndims   = solver->m_ndims;
   int     *dim    = solver->m_dim_local;
-  int     ghosts  = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   double  *uref   = param->m_solution;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
   static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
+      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[a_dir]--;
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
@@ -579,16 +579,16 @@ int Euler1DUpwinddFRF(
       _Euler1DRightEigenvectors_(uavg,R,param,0);
 
       /* calculate characteristic fluxes and variables */
-      MatVecMult3(_MODEL_NVARS_,ucL,L,(uL+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,ucR,L,(uR+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,fcL,L,(fL+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,fcR,L,(fR+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,ucL,L,(a_uL+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,ucR,L,(a_uR+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,fcL,L,(a_fL+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,fcR,L,(a_fR+_MODEL_NVARS_*p));
 
       for (k = 0; k < _MODEL_NVARS_; k++) {
         double eigL,eigC,eigR;
-        _Euler1DEigenvalues_((u+_MODEL_NVARS_*pL),D,param,0);
+        _Euler1DEigenvalues_((a_u+_MODEL_NVARS_*pL),D,param,0);
         eigL = (k == 0? 0.0 : D[k*_MODEL_NVARS_+k]);
-        _Euler1DEigenvalues_((u+_MODEL_NVARS_*pR),D,param,0);
+        _Euler1DEigenvalues_((a_u+_MODEL_NVARS_*pR),D,param,0);
         eigR = (k == 0? 0.0 : D[k*_MODEL_NVARS_+k]);
         _Euler1DEigenvalues_(uavg,D,param,0);
         eigC = (k == 0? 0.0 : D[k*_MODEL_NVARS_+k]);
@@ -603,7 +603,7 @@ int Euler1DUpwinddFRF(
       }
 
       /* calculate the interface flux from the characteristic flux */
-      MatVecMult3(_MODEL_NVARS_,(fI+_MODEL_NVARS_*p),R,fc);
+      MatVecMult3(_MODEL_NVARS_,(a_fI+_MODEL_NVARS_*p),R,fc);
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
@@ -621,38 +621,38 @@ int Euler1DUpwinddFRF(
       38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369
 */
 int Euler1DUpwinddFLLF(
-                      double  *fI, /*!< Computed upwind interface flux */
-                      double  *fL, /*!< Left-biased reconstructed interface flux */
-                      double  *fR, /*!< Right-biased reconstructed interface flux */
-                      double  *uL, /*!< Left-biased reconstructed interface solution */
-                      double  *uR, /*!< Right-biased reconstructed interface solution */
-                      double  *u,  /*!< Cell-centered solution */
-                      int     dir, /*!< Spatial dimension (unused since this is a 1D system) */
-                      void    *s,  /*!< Solver object of type #HyPar */
-                      double  t    /*!< Current solution time */
+                      double  *a_fI, /*!< Computed upwind interface flux */
+                      double  *a_fL, /*!< Left-biased reconstructed interface flux */
+                      double  *a_fR, /*!< Right-biased reconstructed interface flux */
+                      double  *a_uL, /*!< Left-biased reconstructed interface solution */
+                      double  *a_uR, /*!< Right-biased reconstructed interface solution */
+                      double  *a_u,  /*!< Cell-centered solution */
+                      int     a_dir, /*!< Spatial dimension (unused since this is a 1D system) */
+                      void    *a_s,  /*!< Solver object of type #HyPar */
+                      double  a_t   /*!< Current solution time */
                     )
 {
-  HyPar     *solver = (HyPar*)    s;
+  HyPar     *solver = (HyPar*)    a_s;
   Euler1D   *param  = (Euler1D*)  solver->m_physics;
   int       done,k;
   _DECLARE_IERR_;
 
   int     ndims   = solver->m_ndims;
   int     *dim    = solver->m_dim_local;
-  int     ghosts  = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   double  *uref   = param->m_solution;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
   static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
+      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[a_dir]--;
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
@@ -668,16 +668,16 @@ int Euler1DUpwinddFLLF(
       _Euler1DRightEigenvectors_(uavg,R,param,0);
 
       /* calculate characteristic fluxes and variables */
-      MatVecMult3(_MODEL_NVARS_,ucL,L,(uL+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,ucR,L,(uR+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,fcL,L,(fL+_MODEL_NVARS_*p));
-      MatVecMult3(_MODEL_NVARS_,fcR,L,(fR+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,ucL,L,(a_uL+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,ucR,L,(a_uR+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,fcL,L,(a_fL+_MODEL_NVARS_*p));
+      MatVecMult3(_MODEL_NVARS_,fcR,L,(a_fR+_MODEL_NVARS_*p));
 
       for (k = 0; k < _MODEL_NVARS_; k++) {
         double eigL,eigC,eigR;
-        _Euler1DEigenvalues_((u+_MODEL_NVARS_*pL),D,param,0);
+        _Euler1DEigenvalues_((a_u+_MODEL_NVARS_*pL),D,param,0);
         eigL = (k == 0? 0.0 : D[k*_MODEL_NVARS_+k]);
-        _Euler1DEigenvalues_((u+_MODEL_NVARS_*pR),D,param,0);
+        _Euler1DEigenvalues_((a_u+_MODEL_NVARS_*pR),D,param,0);
         eigR = (k == 0? 0.0 : D[k*_MODEL_NVARS_+k]);
         _Euler1DEigenvalues_(uavg,D,param,0);
         eigC = (k == 0? 0.0 : D[k*_MODEL_NVARS_+k]);
@@ -687,7 +687,7 @@ int Euler1DUpwinddFLLF(
       }
 
       /* calculate the interface flux from the characteristic flux */
-      MatVecMult3(_MODEL_NVARS_,(fI+_MODEL_NVARS_*p),R,fc);
+      MatVecMult3(_MODEL_NVARS_,(a_fI+_MODEL_NVARS_*p),R,fc);
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }

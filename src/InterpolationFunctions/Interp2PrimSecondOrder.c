@@ -57,11 +57,11 @@ int Interp2PrimSecondOrder(
                             double  *fI,  /*!< Array of interpolated function values at the interfaces */
                             double  *fC,  /*!< Array of cell-centered values of the function \f${\bf f}\left({\bf u}\right)\f$ */
                             int     dir,  /*!< Spatial dimension along which to interpolation */
-                            void    *s,   /*!< Object of type #HyPar containing solver-related variables */
-                            void    *m    /*!< Object of type #MPIVariables containing MPI-related variables */
+                            void    *a_s,   /*!< Object of type #HyPar containing solver-related variables */
+                            void *a_m    /*!< Object of type #MPIVariables containing MPI-related variables */
                           )
 {
-  HyPar         *solver = (HyPar*)        s;
+  HyPar         *solver = (HyPar*) a_s;
 
   int ghosts = solver->m_ghosts;
   int ndims  = solver->m_ndims;

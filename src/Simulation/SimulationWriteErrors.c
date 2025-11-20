@@ -15,21 +15,21 @@
 /*! Writes out the errors and other data for each simulation.
 */
 
-void SimWriteErrors(void  *s,               /*!< Array of simulations of type #SimulationObject */
-                    int   nsims,            /*!< Number of simulations */
-                    int   rank,             /*!< MPI rank of this process */
-                    double solver_runtime,  /*!< Measured runtime of solver */
-                    double main_runtime     /*!< Measured total runtime */
+void SimWriteErrors(void  *a_s,               /*!< Array of simulations of type #SimulationObject */
+                    int   a_nsims,            /*!< Number of simulations */
+                    int   a_rank,             /*!< MPI rank of this process */
+                    double a_solver_runtime,  /*!< Measured runtime of solver */
+                    double a_main_runtime     /*!< Measured total runtime */
                    )
 {
-  SimulationObject* sim = (SimulationObject*) s;
+  SimulationObject* sim = (SimulationObject*) a_s;
   int n;
 
-  if (!rank) {
+  if (!a_rank) {
 
-    if (nsims > 1) printf("\n");
+    if (a_nsims > 1) printf("\n");
 
-    for (n = 0; n < nsims; n++) {
+    for (n = 0; n < a_nsims; n++) {
 
       char err_fname[_MAX_STRING_SIZE_],
            cons_fname[_MAX_STRING_SIZE_],
@@ -43,7 +43,7 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
 #endif
 
 
-      if (nsims > 1) {
+      if (a_nsims > 1) {
 
         strcat(err_fname,"_");
         strcat(cons_fname,"_");
@@ -53,7 +53,7 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
 #endif
 
         char index[_MAX_STRING_SIZE_];
-        GetStringFromInteger(n, index, (int)log10(nsims)+1);
+        GetStringFromInteger(n, index, (int)log10(a_nsims)+1);
 
         strcat(err_fname,index);
         strcat(cons_fname,index);
@@ -77,7 +77,7 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
       for (int d=0; d<sim[n].solver.m_ndims; d++) fprintf(out,"%4d ",sim[n].mpi.m_iproc[d]);
       fprintf(out,"%1.16E  ",sim[n].solver.m_dt);
       fprintf(out,"%1.16E %1.16E %1.16E   ",sim[n].solver.m_error[0],sim[n].solver.m_error[1],sim[n].solver.m_error[2]);
-      fprintf(out,"%1.16E %1.16E\n",solver_runtime,main_runtime);
+      fprintf(out,"%1.16E %1.16E\n",a_solver_runtime,a_main_runtime);
       fclose(out);
       /* write out conservation errors to file */
       out = fopen(cons_fname,"w");
@@ -108,7 +108,7 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
         for (int d=0; d<sim[n].solver.m_ndims; d++) fprintf(out,"%4d ",sim[n].mpi.m_iproc[d]);
         fprintf(out,"%1.16E  ",sim[n].solver.m_dt);
         fprintf(out,"%1.16E %1.16E %1.16E   ",sim[n].solver.m_rom_diff_norms[0],sim[n].solver.m_rom_diff_norms[1],sim[n].solver.m_rom_diff_norms[2]);
-        fprintf(out,"%1.16E %1.16E\n",solver_runtime,main_runtime);
+        fprintf(out,"%1.16E %1.16E\n",a_solver_runtime,a_main_runtime);
         fclose(out);
       }
 #endif
@@ -135,9 +135,9 @@ void SimWriteErrors(void  *s,               /*!< Array of simulations of type #S
 
     }
 
-    printf("Solver runtime (in seconds): %1.16E\n",solver_runtime);
-    printf("Total  runtime (in seconds): %1.16E\n",main_runtime);
-    if (nsims > 1) printf("\n");
+    printf("Solver runtime (in seconds): %1.16E\n",a_solver_runtime);
+    printf("Total  runtime (in seconds): %1.16E\n",a_main_runtime);
+    if (a_nsims > 1) printf("\n");
 
   }
 

@@ -32,9 +32,9 @@
 
   Note: In the code #TimeIntegration::Udot is equivalent to \f${\bf F}\left({\bf u}\right)\f$.
 */
-int TimeRK(void *ts /*!< Object of type #TimeIntegration */)
+int TimeRK(void *a_ts /*!< Object of type #TimeIntegration */)
 {
-  TimeIntegration* TS = (TimeIntegration*) ts;
+  TimeIntegration* TS = (TimeIntegration*) a_ts;
   SimulationObject* sim = (SimulationObject*) TS->m_simulation;
   ExplicitRKParameters *params = (ExplicitRKParameters*) sim[0].solver.m_msti;
   int ns, stage, i, nsims = TS->m_nsims;

@@ -14,14 +14,14 @@
     solution. The advection velocity is multiplied during upwinding FPPowerSystem3BusUpwind().
 */
 int FPPowerSystem3BusAdvection(
-                                double  *f,   /*!< Array to hold the computed flux vector (same layout as u) */
-                                double  *u,   /*!< Array with the solution vector */
-                                int     dir,  /*!< Spatial dimension for which to compute the flux */
-                                void    *s,   /*!< Solver object of type #HyPar */
-                                double  t     /*!< Current simulation time */
+                                double  *a_f,   /*!< Array to hold the computed flux vector (same layout as a_u) */
+                                double  *a_u,   /*!< Array with the solution vector */
+                                int     a_dir,  /*!< Spatial dimension for which to compute the flux */
+                                void    *a_s,   /*!< Solver object of type #HyPar */
+                                double  a_t   /*!< Current simulation time */
                               )
 {
-  HyPar *solver = (HyPar*) s;
-  _ArrayCopy1D_(u,f,solver->m_npoints_local_wghosts);
+  HyPar *solver = (HyPar*) a_s;
+  _ArrayCopy1D_(a_u,a_f,solver->m_npoints_local_wghosts);
   return(0);
 }

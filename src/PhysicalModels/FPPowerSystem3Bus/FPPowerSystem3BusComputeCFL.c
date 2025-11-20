@@ -17,17 +17,17 @@ int FPPowerSystem3BusDriftFunction(int,void*,double*,double,double*);
     is computed over the local domain on this processor only.
 */
 double FPPowerSystem3BusComputeCFL(
-                                    void    *s, /*!< Solver object of type #HyPar */
-                                    void    *m, /*!< MPI object of type #MPIVariables */
-                                    double  dt, /*!< Time step size for which to compute the CFL */
-                                    double  t   /*!< Time */
+                                    void    *a_s, /*!< Solver object of type #HyPar */
+                                    void    *a_m, /*!< MPI object of type #MPIVariables */
+                                    double  a_dt, /*!< Time step size for which to compute the CFL */
+                                    double  a_t   /*!< Time */
                                   )
 {
-  HyPar             *solver = (HyPar*)              s;
+  HyPar             *solver = (HyPar*)              a_s;
   FPPowerSystem3Bus *params = (FPPowerSystem3Bus*)  solver->m_physics;
 
   int     ndims  = solver->m_ndims;
-  int     ghosts = solver->m_ghosts;
+  int ghosts = solver->m_ghosts;
   int     *dim   = solver->m_dim_local;
 
   double  max_cfl = 0;
@@ -44,13 +44,13 @@ double FPPowerSystem3BusComputeCFL(
     _GetCoordinate_(2,index[2],dim,ghosts,solver->m_dxinv,dxinv[2]);
     _GetCoordinate_(3,index[3],dim,ghosts,solver->m_dxinv,dxinv[3]);
 
-    FPPowerSystem3BusDriftFunction(0,params,x,t,drift);
+    FPPowerSystem3BusDriftFunction(0,params,x,a_t,drift);
 
     double local_cfl[ndims];
-    local_cfl[0] = absolute(drift[0]) * dt * dxinv[0];
-    local_cfl[1] = absolute(drift[1]) * dt * dxinv[1];
-    local_cfl[2] = absolute(drift[2]) * dt * dxinv[2];
-    local_cfl[3] = absolute(drift[3]) * dt * dxinv[3];
+    local_cfl[0] = absolute(drift[0]) * a_dt * dxinv[0];
+    local_cfl[1] = absolute(drift[1]) * a_dt * dxinv[1];
+    local_cfl[2] = absolute(drift[2]) * a_dt * dxinv[2];
+    local_cfl[3] = absolute(drift[3]) * a_dt * dxinv[3];
 
     if (local_cfl[0] > max_cfl) max_cfl = local_cfl[0];
     if (local_cfl[1] > max_cfl) max_cfl = local_cfl[1];

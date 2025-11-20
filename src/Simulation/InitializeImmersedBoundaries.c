@@ -19,14 +19,14 @@
     + Identify and make a list of immersed boundary points on each rank.
     + For each immersed boundary point, find the "nearest" facet.
 */
-int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects of type #SimulationObject */
-                                  int   nsims /*!< Number of simulation objects */
+int InitializeImmersedBoundaries( void  *a_s,   /*!< Array of simulation objects of type #SimulationObject */
+                                  int   a_nsims /*!< Number of simulation objects */
                                 )
 {
-  SimulationObject* simobj = (SimulationObject*) s;
+  SimulationObject* simobj = (SimulationObject*) a_s;
   int n;
 
-  for (n = 0; n < nsims; n++) {
+  for (n = 0; n < a_nsims; n++) {
 
     HyPar        *solver = &(simobj[n].solver);
     MPIVariables *mpi    = &(simobj[n].mpi);
@@ -46,7 +46,7 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
     if (stat) {
       if (!mpi->m_rank) {
         fprintf(stderr,"Error in InitializeImmersedBoundaries(): Unable to ");
-        fprintf(stderr,"read immersed body from file %s.\n",solver->m_ib_filename);
+        fprintf(stderr,"read immersed body from file %a_s.\n",solver->m_ib_filename);
       }
       solver->m_flag_ib = 0;
       solver->m_ib = NULL;
@@ -173,15 +173,15 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
     /* Done */
     if (!mpi->m_rank) {
       double percentage;
-      printf("Immersed body read from %s:\n",solver->m_ib_filename);
-      if (nsims > 1) printf("For domain %d,\n", n);
+      printf("Immersed body read from %a_s:\n",solver->m_ib_filename);
+      if (a_nsims > 1) printf("For domain %d,\n", n);
       printf("    Number of facets: %d\n    Bounding box: [%3.1f,%3.1lf] X [%3.1f,%3.1lf] X [%3.1f,%3.1lf]\n",
              body->m_nfacets,body->m_xmin,body->m_xmax,body->m_ymin,body->m_ymax,body->m_zmin,body->m_zmax);
       percentage = ((double)count_inside_body)/((double)solver->m_npoints_global)*100.0;
       printf("    Number of grid points inside immersed body: %d (%4.1f%%).\n",count_inside_body,percentage);
       percentage = ((double)count_boundary_points)/((double)solver->m_npoints_global)*100.0;
       printf("    Number of immersed boundary points        : %d (%4.1f%%).\n",count_boundary_points,percentage);
-      printf("    Immersed body simulation mode             : %s.\n", ib->m_mode);
+      printf("    Immersed body simulation mode             : %a_s.\n", ib->m_mode);
     }
 
   }

@@ -49,21 +49,21 @@ int gpuHyperbolicFunction        (double*,double*,void*,void*,double,int,
     depending on user input. The specific functions used for spatial
     discretization, time integration, and solution output are set here.
 */
-int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #SimulationObject */
-                        int   nsims /*!< number of simulation objects */
+int InitializeSolvers(  void  *a_s,   /*!< Array of simulation objects of type #SimulationObject */
+                        int   a_nsims /*!< number of simulation objects */
                      )
 {
-  SimulationObject *sim = (SimulationObject*) s;
+  SimulationObject *sim = (SimulationObject*) a_s;
   int ns;
   _DECLARE_IERR_;
 
-  if (nsims == 0) return 0;
+  if (a_nsims == 0) return 0;
 
   if (!sim[0].mpi.m_rank) {
     printf("Initializing solvers.\n");
   }
 
-  for (ns = 0; ns < nsims; ns++) {
+  for (ns = 0; ns < a_nsims; ns++) {
 
     HyPar           *solver   = &(sim[ns].solver);
     MPIVariables    *mpi      = &(sim[ns].mpi);
@@ -101,7 +101,7 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         if (!strcmp(solver->m_spatial_scheme_par,_FOURTH_ORDER_CENTRAL_)) {
           solver->FirstDerivativePar = gpuFirstDerivativeFourthOrderCentral;
         } else {
-          fprintf(stderr,"ERROR (domain %d): scheme %s is not supported on GPU!",
+          fprintf(stderr,"ERROR (domain %d): scheme %a_s is not supported on GPU!",
                   ns, solver->m_spatial_scheme_par);
           return 1;
         }
@@ -119,9 +119,9 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         } else if (!strcmp(solver->m_spatial_scheme_par,_FOURTH_ORDER_CENTRAL_)) {
           solver->SecondDerivativePar      = SecondDerivativeFourthOrderCentral;
         } else {
-          fprintf(stderr,"Error (domain %d): %s is not a supported ",
+          fprintf(stderr,"Error (domain %d): %a_s is not a supported ",
                   ns, solver->m_spatial_scheme_par);
-          fprintf(stderr,"spatial scheme of type %s for the parabolic terms.\n",
+          fprintf(stderr,"spatial scheme of type %a_s for the parabolic terms.\n",
                   solver->m_spatial_type_par);
         }
 
@@ -140,9 +140,9 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
              4th order central approximation to the 2nd derivative! Some problems
              may show odd-even decoupling */
         } else {
-          fprintf(stderr,"Error (domain %d): %s is not a supported ",
+          fprintf(stderr,"Error (domain %d): %a_s is not a supported ",
                   ns, solver->m_spatial_scheme_par);
-          fprintf(stderr,"spatial scheme of type %s for the parabolic terms.\n",
+          fprintf(stderr,"spatial scheme of type %a_s for the parabolic terms.\n",
                 solver->m_spatial_type_par);
         }
 
@@ -156,9 +156,9 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
           solver->FirstDerivativePar       = FirstDerivativeFourthOrderCentral;
           solver->SecondDerivativePar      = SecondDerivativeFourthOrderCentral;
         } else {
-          fprintf(stderr,"Error (domain %d): %s is not a supported ",
+          fprintf(stderr,"Error (domain %d): %a_s is not a supported ",
                   ns, solver->m_spatial_scheme_par);
-          fprintf(stderr,"spatial scheme of type %s for the parabolic terms.\n",
+          fprintf(stderr,"spatial scheme of type %a_s for the parabolic terms.\n",
                 solver->m_spatial_type_par);
         }
 
@@ -168,15 +168,15 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         if (!strcmp(solver->m_spatial_scheme_par,_SECOND_ORDER_CENTRAL_)) {
           solver->InterpolateInterfacesPar = Interp2PrimSecondOrder;
         } else {
-          fprintf(stderr,"Error (domain %d): %s is not a supported ",
+          fprintf(stderr,"Error (domain %d): %a_s is not a supported ",
                   ns, solver->m_spatial_scheme_par);
-          fprintf(stderr,"spatial scheme of type %s for the parabolic terms.\n",
+          fprintf(stderr,"spatial scheme of type %a_s for the parabolic terms.\n",
                 solver->m_spatial_type_par);
         }
 
       } else {
 
-        fprintf(stderr,"Error (domain %d): %s is not a supported ",
+        fprintf(stderr,"Error (domain %d): %a_s is not a supported ",
                 ns, solver->m_spatial_type_par);
         fprintf(stderr,"spatial discretization type for the parabolic terms.\n");
         return(1);
@@ -194,7 +194,7 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
     solver->SetInterpLimiterVar   = NULL;
     solver->m_flag_nonlinearinterp  = 1;
     if (strcmp(solver->m_interp_type,_CHARACTERISTIC_) && strcmp(solver->m_interp_type,_COMPONENTS_)) {
-      fprintf(stderr,"Error in InitializeSolvers() (domain %d): %s is not a ",
+      fprintf(stderr,"Error in InitializeSolvers() (domain %d): %a_s is not a ",
               ns, solver->m_interp_type);
       fprintf(stderr,"supported interpolation type.\n");
       return(1);
@@ -221,7 +221,7 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
       } else {
 
         fprintf(stderr,
-                "Error (domain %d): %s is a not a supported spatial interpolation scheme on GPUs.\n",
+                "Error (domain %d): %a_s is a not a supported spatial interpolation scheme on GPUs.\n",
                 ns, solver->m_spatial_scheme_hyp);
         return 1;
       }
@@ -346,7 +346,7 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
 
       } else {
 
-        fprintf(stderr,"Error (domain %d): %s is a not a supported spatial interpolation scheme.\n",
+        fprintf(stderr,"Error (domain %d): %a_s is a not a supported spatial interpolation scheme.\n",
                 ns, solver->m_spatial_scheme_hyp);
         return(1);
       }
@@ -377,7 +377,7 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         IERR TimeGLMGEEInitialize(solver->m_time_scheme,solver->m_time_scheme_type,
                                   solver->m_msti,mpi); CHECKERR(ierr);
       } else {
-        fprintf(stderr,"Error (domain %d): %s is a not a supported time-integration scheme.\n",
+        fprintf(stderr,"Error (domain %d): %a_s is a not a supported time-integration scheme.\n",
                 ns, solver->m_time_scheme);
         return(1);
       }
@@ -397,7 +397,7 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
       IERR TimeGLMGEEInitialize(solver->m_time_scheme,solver->m_time_scheme_type,
                                 solver->m_msti,mpi); CHECKERR(ierr);
     } else {
-      fprintf(stderr,"Error (domain %d): %s is a not a supported time-integration scheme.\n",
+      fprintf(stderr,"Error (domain %d): %a_s is a not a supported time-integration scheme.\n",
               ns, solver->m_time_scheme);
       return(1);
     }
@@ -431,12 +431,12 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
       } else if (!strcmp(solver->m_op_file_format,"none")) {
         solver->WriteOutput = NULL;
       } else {
-        fprintf(stderr,"Error (domain %d): %s is not a supported file format.\n",
+        fprintf(stderr,"Error (domain %d): %a_s is not a supported file format.\n",
                 ns, solver->m_op_file_format);
         return(1);
       }
       if ((!strcmp(solver->m_op_overwrite,"no")) && solver->m_restart_iter) {
-        /* if it's a restart run, fast-forward the filename */
+        /* if it'a_s a restart run, fast-forward the filename */
         int t;
         for (t=0; t<solver->m_restart_iter; t++)
           if ((t+1)%solver->m_file_op_iter == 0) IncrementFilenameIndex(solver->m_filename_index,solver->m_index_length);
@@ -450,7 +450,7 @@ int InitializeSolvers(  void  *s,   /*!< Array of simulation objects of type #Si
         strcpy(solver->m_solnfilename_extn,".bin");
       }
     } else {
-      fprintf(stderr,"Error (domain %d): %s is not a supported output mode.\n",
+      fprintf(stderr,"Error (domain %d): %a_s is not a supported output mode.\n",
               ns, solver->m_output_mode);
       fprintf(stderr,"Should be \"serial\" or \"parallel\".    \n");
       return(1);

@@ -14,12 +14,12 @@
 #include <physicalmodels/shallowwater2d.h>
 
 /*! Write out the topography data to file */
-int ShallowWater2DWriteTopography(  void*   s,  /*!< Solver object of type #HyPar */
-                                    void*   m,  /*!< MPI object of type #MPIVariables */
+int ShallowWater2DWriteTopography(  void*   a_s,  /*!< Solver object of type #HyPar */
+                                    void*   a_m,  /*!< MPI object of type #MPIVariables */
                                     double  a_t /*!< Current simulation time */ )
 {
-  HyPar           *solver = (HyPar*)          s;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  HyPar           *solver = (HyPar*)          a_s;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
   ShallowWater2D  *params = (ShallowWater2D*) solver->m_physics;
   _DECLARE_IERR_;
 

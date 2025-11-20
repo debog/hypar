@@ -11,9 +11,9 @@
     method: This function frees the arrays used to store the Butcher
     tableaux
 */
-int TimeGLMGEECleanup(void *s /*!< Object of type #GLMGEEParameters*/)
+int TimeGLMGEECleanup(void *a_s /*!< Object of type #GLMGEEParameters*/)
 {
-  GLMGEEParameters *params = (GLMGEEParameters*) s;
+  GLMGEEParameters *params = (GLMGEEParameters*) a_s;
   if (params->A_yyt ) free(params->A_yyt);
   if (params->B_yyt ) free(params->B_yyt);
   if (params->C_yyt ) free(params->C_yyt);

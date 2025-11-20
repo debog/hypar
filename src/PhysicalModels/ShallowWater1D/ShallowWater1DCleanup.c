@@ -8,10 +8,10 @@
 
 /*! Function to clean up all physics-related allocations for the 1D shallow water equations */
 int ShallowWater1DCleanup(
-                   void *s /*!< Solver object of type #HyPar */
+                   void *a_s /*!< Solver object of type #HyPar */
                   )
 {
-  ShallowWater1D *param  = (ShallowWater1D*) s;
+  ShallowWater1D *param  = (ShallowWater1D*) a_s;
   free(param->m_b);
   return(0);
 }

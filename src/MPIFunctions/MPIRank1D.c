@@ -24,15 +24,15 @@
 
 */
 int MPIRank1D(
-                int ndims,    /*!< Number of spatial dimensions */
-                int *iproc,   /*!< Integer array whose elements are the number of MPI ranks along each dimension */
-                int *ip       /*!< Integer array whose elements are the rank of this process along each dimension */
+                int a_ndims,    /*!< Number of spatial dimensions */
+                int *a_iproc,   /*!< Integer array whose elements are the number of MPI ranks along each dimension */
+                int *a_ip       /*!< Integer array whose elements are the rank of this process along each dimension */
              )
 {
   int i,rank = 0, term = 1;
-  for (i=0; i<ndims; i++) {
-    rank += (ip[i]*term);
-    term *= iproc[i];
+  for (i=0; i<a_ndims; i++) {
+    rank += (a_ip[i]*term);
+    term *= a_iproc[i];
   }
 
   return(rank);

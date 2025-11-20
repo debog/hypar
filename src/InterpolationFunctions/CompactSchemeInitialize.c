@@ -15,13 +15,13 @@
   to store the tridiagonal system.
 */
 int CompactSchemeInitialize(
-                              void *s,      /*!< Solver object of type #HyPar */
-                              void *m,      /*!< MPI object of type #MPIVariables */
+                              void *a_s,      /*!< Solver object of type #HyPar */
+                              void *a_m,      /*!< MPI object of type #MPIVariables */
                               char *type    /*!< Type of interpolation */
                            )
 {
-  HyPar         *solver = (HyPar*) s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*) a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   CompactScheme *compact   = (CompactScheme*) solver->m_compact;
 
   int nvars = solver->m_nvars;

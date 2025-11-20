@@ -37,16 +37,16 @@ where the list of keywords are:\n
 
 */
 int TridiagLUInit(
-                    void *r,  /*!< Object of type TridiagLU_Params */
+                    void *a_r,  /*!< Object of type TridiagLU_Params */
                     void *c   /*!< MPI communicator */
                  )
 {
-  TridiagLU_Params *t = (TridiagLU_Params *) r;
+  TridiagLU_Params *t = (TridiagLU_Params *) a_r;
   int       rank,ierr;
 #ifdef serial
   rank  = 0;
 #else
-  MPI_Comm  *comm = (MPI_Comm*) c;
+  MPI_Comm  *comm = (MPI_Comm*) a_c;
   if (!comm) rank = 0;
   else MPI_Comm_rank(*comm,&rank);
 #endif
@@ -62,7 +62,7 @@ int TridiagLUInit(
   /* read from file, if available */
   if (!rank) {
     FILE *in;
-    in = fopen("lusolver.inp","r");
+    in = fopen("lusolver.inp","a_r");
     if (!in) {
       printf("tridiagLUInit: File \"lusolver.inp\" not found. Using default values.\n");
     } else {

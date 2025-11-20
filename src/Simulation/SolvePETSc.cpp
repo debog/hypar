@@ -47,12 +47,12 @@ int OutputROMSolution(void*,int,double);   /*!< Write ROM solutions to file */
     (usually googling with the function name shows the man page for that function
     on PETSc's website).
 */
-int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObject */
-                int   nsims,  /*!< number of simulation objects */
-                int   rank,   /*!< MPI rank of this process */
-                int   nproc   /*!< Number of MPI processes */ )
+int SolvePETSc( void* a_s, /*!< Array of simulation objects of type #SimulationObject */
+                int   a_nsims,  /*!< number of simulation objects */
+                int   a_rank,   /*!< MPI rank of this process */
+                int   a_nproc   /*!< Number of MPI processes */ )
 {
-  SimulationObject* sim = (SimulationObject*) s;
+  SimulationObject* sim = (SimulationObject*) a_s;
 
   DM              dm; /* data management object */
   TS              ts; /* time integration object */
@@ -70,17 +70,17 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
   PetscFunctionBegin;
 
   /* Register custom time-integration methods, if specified */
-  PetscRegisterTIMethods(rank);
-  if(!rank) printf("Setting up PETSc time integration... \n");
+  PetscRegisterTIMethods(a_rank);
+  if(!a_rank) printf("Setting up PETSc time integration... \n");
 
   /* create and set a PETSc context */
   PETScContext context;
 
-  context.m_rank = rank;
-  context.m_nproc = nproc;
+  context.m_rank = a_rank;
+  context.m_nproc = a_nproc;
 
   context.m_simobj = sim;
-  context.m_nsims = nsims;
+  context.m_nsims = a_nsims;
 
   /* default: everything explicit */
   context.m_flag_hyperbolic     = _EXPLICIT_;
@@ -100,11 +100,11 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
   context.m_stage_index = 0;
 
 #ifdef with_librom
-  if (!rank) printf("Setting up libROM interface.\n");
+  if (!a_rank) printf("Setting up libROM interface.\n");
   context.m_rom_interface = new libROMInterface( sim,
-                                               nsims,
-                                               rank,
-                                               nproc,
+                                               a_nsims,
+                                               a_rank,
+                                               a_nproc,
                                                sim[0].solver.m_dt );
   context.m_rom_mode = ((libROMInterface*)context.m_rom_interface)->mode();
   context.m_op_times_arr.clear();
@@ -128,8 +128,8 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
     VecSetSizes(Y,context.m_ndofs,PETSC_DECIDE);
     VecSetUp(Y);
 
-    /* copy initial solution to PETSc's vector */
-    for (int ns = 0; ns < nsims; ns++) {
+    /* copy initial solution to PETSc'a_s vector */
+    for (int ns = 0; ns < a_nsims; ns++) {
       TransferVecToPETSc( sim[ns].solver.m_u,
                           Y,
                           &context,
@@ -166,7 +166,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 #ifdef with_librom
     TSAdaptGetType(adapt,&adapt_type);
     if (strcmp(adapt_type, TSADAPTNONE)) {
-      if (!rank) printf("Warning: libROM interface not yet implemented for adaptive timestepping.\n");
+      if (!a_rank) printf("Warning: libROM interface not yet implemented for adaptive timestepping.\n");
     }
 #endif
 
@@ -236,9 +236,9 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
           }
           MatSetUp(A);
           /* check if Jacobian of the physical model is defined */
-          for (int ns = 0; ns < nsims; ns++) {
+          for (int ns = 0; ns < a_nsims; ns++) {
             if ((!sim[ns].solver.JFunction) && (!sim[ns].solver.KFunction)) {
-              if (!rank) {
+              if (!a_rank) {
                 fprintf(stderr,"Error in SolvePETSc(): solver->JFunction  or solver->KFunction ");
                 fprintf(stderr,"(point-wise Jacobians for hyperbolic or parabolic terms) must ");
                 fprintf(stderr,"be defined for preconditioning.\n");
@@ -298,7 +298,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
                         2*sim[0].solver.m_ndims*sim[0].solver.m_nvars, NULL,
                         &B);
           MatSetOption(B, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-          if (!rank) {
+          if (!a_rank) {
             printf("PETSc:    Setting Jacobian non-zero pattern (stencil width %d).\n",
                     stencil_width );
           }
@@ -309,8 +309,8 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
         } else {
 
-          if (!rank) {
-            fprintf(  stderr,"Invalid input for \"-pc_matrix_type\": %s.\n",
+          if (!a_rank) {
+            fprintf(  stderr,"Invalid input for \"-pc_matrix_type\": %a_s.\n",
                       context.m_precon_matrix_type.c_str());
           }
           PetscFunctionReturn(0);
@@ -415,7 +415,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
       }
 
       /* print out a summary of the treatment of each term */
-      if (!rank) {
+      if (!a_rank) {
         printf("Implicit-Explicit time-integration:-\n");
         if (!strcmp(sim[0].solver.m_split_hyperbolic_flux,"yes")) {
           if (context.m_flag_hyperbolic_f == _EXPLICIT_)  printf("Hyperbolic (f-df) term: Explicit\n");
@@ -503,9 +503,9 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
           }
           MatSetUp(A);
           /* check if Jacobian of the physical model is defined */
-          for (int ns = 0; ns < nsims; ns++) {
+          for (int ns = 0; ns < a_nsims; ns++) {
             if ((!sim[ns].solver.JFunction) && (!sim[ns].solver.KFunction)) {
-              if (!rank) {
+              if (!a_rank) {
                 fprintf(stderr,"Error in SolvePETSc(): solver->JFunction  or solver->KFunction ");
                 fprintf(stderr,"(point-wise Jacobians for hyperbolic or parabolic terms) must ");
                 fprintf(stderr,"be defined for preconditioning.\n");
@@ -565,7 +565,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
                         2*sim[0].solver.m_ndims*sim[0].solver.m_nvars, NULL,
                         &B);
           MatSetOption(B, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-          if (!rank) {
+          if (!a_rank) {
             printf("PETSc:    Setting Jacobian non-zero pattern (stencil width %d).\n",
                     stencil_width );
           }
@@ -576,8 +576,8 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
         } else {
 
-          if (!rank) {
-            fprintf(  stderr,"Invalid input for \"-pc_matrix_type\": %s.\n",
+          if (!a_rank) {
+            fprintf(  stderr,"Invalid input for \"-pc_matrix_type\": %a_s.\n",
                       context.m_precon_matrix_type.c_str());
           }
           PetscFunctionReturn(0);
@@ -622,8 +622,8 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
     } else {
 
-      if (!rank) {
-        fprintf(stderr, "Time integration type %s is not yet supported.\n", time_scheme);
+      if (!a_rank) {
+        fprintf(stderr, "Time integration type %a_s is not yet supported.\n", time_scheme);
       }
       PetscFunctionReturn(0);
 
@@ -641,21 +641,21 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
     /* Set application context */
     TSSetApplicationContext(ts,&context);
 
-    if (!rank) {
+    if (!a_rank) {
       if (context.m_flag_is_linear) printf("SolvePETSc(): Problem type is linear.\n");
       else                        printf("SolvePETSc(): Problem type is nonlinear.\n");
     }
 
-    if (!rank) printf("** Starting PETSc time integration **\n");
+    if (!a_rank) printf("** Starting PETSc time integration **\n");
     context.m_ti_runtime = 0.0;
     TSSolve(ts,Y);
-    if (!rank) {
+    if (!a_rank) {
       printf("** Completed PETSc time integration (Final time: %f), total wctime: %f (seconds) **\n",
               context.m_waqt, context.m_ti_runtime );
     }
 
     /* Get the number of time steps */
-    for (int ns = 0; ns < nsims; ns++) {
+    for (int ns = 0; ns < a_nsims; ns++) {
       TSGetStepNumber(ts,&(sim[ns].solver.m_n_iter));
     }
 
@@ -664,11 +664,11 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
     TSGetSolutionComponents(ts,&iAuxSize,NULL);
     if (iAuxSize) {
       if (iAuxSize > 10) iAuxSize = 10;
-      if (!rank) printf("Number of auxiliary solutions from time integration: %d\n",iAuxSize);
+      if (!a_rank) printf("Number of auxiliary solutions from time integration: %d\n",iAuxSize);
       VecDuplicate(Y,&Z);
       for (i=0; i<iAuxSize; i++) {
         TSGetSolutionComponents(ts,&i,&Z);
-        for (int ns = 0; ns < nsims; ns++) {
+        for (int ns = 0; ns < a_nsims; ns++) {
           TransferVecFromPETSc(sim[ns].solver.m_u,Z,&context,ns,context.m_offsets[ns]);
           WriteArray( sim[ns].solver.m_ndims,
                       sim[ns].solver.m_nvars,
@@ -689,8 +689,8 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
     /* if available, get error estimates */
     PetscTimeError(ts);
 
-    /* copy final solution from PETSc's vector */
-    for (int ns = 0; ns < nsims; ns++) {
+    /* copy final solution from PETSc'a_s vector */
+    for (int ns = 0; ns < a_nsims; ns++) {
       TransferVecFromPETSc(sim[ns].solver.m_u,Y,&context,ns,context.m_offsets[ns]);
     }
 
@@ -704,7 +704,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
     /* write a final solution file, if last iteration did not write one */
     if (context.m_tic) {
-      for (int ns = 0; ns < nsims; ns++) {
+      for (int ns = 0; ns < a_nsims; ns++) {
         HyPar* solver = &(sim[ns].solver);
         MPIVariables* mpi = &(sim[ns].mpi);
         if (solver->PhysicsOutput) {
@@ -712,10 +712,10 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
         }
         CalculateError(solver,mpi);
       }
-      OutputSolution(sim, nsims, context.m_waqt);
+      OutputSolution(sim, a_nsims, context.m_waqt);
     }
     /* calculate error if exact solution has been provided */
-    for (int ns = 0; ns < nsims; ns++) {
+    for (int ns = 0; ns < a_nsims; ns++) {
       CalculateError(&(sim[ns].solver), &(sim[ns].mpi));
     }
 
@@ -724,7 +724,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 #ifdef with_librom
     context.m_op_times_arr.push_back(context.m_waqt);
 
-    for (int ns = 0; ns < nsims; ns++) {
+    for (int ns = 0; ns < a_nsims; ns++) {
       ResetFilenameIndex( sim[ns].solver.m_filename_index,
                           sim[ns].solver.m_index_length );
     }
@@ -732,7 +732,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
     if (((libROMInterface*)context.m_rom_interface)->mode() == _ROM_MODE_TRAIN_) {
 
       ((libROMInterface*)context.m_rom_interface)->train();
-      if (!rank) printf("libROM: total training wallclock time: %f (seconds).\n",
+      if (!a_rank) printf("libROM: total training wallclock time: %f (seconds).\n",
                         ((libROMInterface*)context.m_rom_interface)->trainWallclockTime() );
 
       double total_rom_predict_time = 0;
@@ -741,24 +741,24 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
         double waqt = context.m_op_times_arr[iter];
 
         ((libROMInterface*)context.m_rom_interface)->predict(sim, waqt);
-        if (!rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n",
+        if (!a_rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n",
                             waqt, ((libROMInterface*)context.m_rom_interface)->predictWallclockTime() );
         total_rom_predict_time += ((libROMInterface*)context.m_rom_interface)->predictWallclockTime();
 
         /* calculate diff between ROM and PDE solutions */
         if (iter == (context.m_op_times_arr.size()-1)) {
-          if (!rank) printf("libROM:   Calculating diff between PDE and ROM solutions.\n");
-          for (int ns = 0; ns < nsims; ns++) {
+          if (!a_rank) printf("libROM:   Calculating diff between PDE and ROM solutions.\n");
+          for (int ns = 0; ns < a_nsims; ns++) {
             CalculateROMDiff(  &(sim[ns].solver),
                                &(sim[ns].mpi) );
           }
         }
         /* write the ROM solution to file */
-        OutputROMSolution(sim, nsims, waqt);
+        OutputROMSolution(sim, a_nsims, waqt);
 
       }
 
-      if (!rank) {
+      if (!a_rank) {
         printf( "libROM: total prediction/query wallclock time: %f (seconds).\n",
                 total_rom_predict_time );
       }
@@ -767,7 +767,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
     } else {
 
-      for (int ns = 0; ns < nsims; ns++) {
+      for (int ns = 0; ns < a_nsims; ns++) {
         sim[ns].solver.m_rom_diff_norms[0]
           = sim[ns].solver.m_rom_diff_norms[1]
           = sim[ns].solver.m_rom_diff_norms[2]
@@ -778,7 +778,7 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
 
   } else if (context.m_rom_mode == _ROM_MODE_PREDICT_) {
 
-    for (int ns = 0; ns < nsims; ns++) {
+    for (int ns = 0; ns < a_nsims; ns++) {
       sim[ns].solver.m_rom_diff_norms[0]
         = sim[ns].solver.m_rom_diff_norms[1]
         = sim[ns].solver.m_rom_diff_norms[2]
@@ -815,29 +815,29 @@ int SolvePETSc( void* s, /*!< Array of simulation objects of type #SimulationObj
       double waqt = context.m_op_times_arr[iter];
 
       ((libROMInterface*)context.m_rom_interface)->predict(sim, waqt);
-      if (!rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n",
+      if (!a_rank) printf(  "libROM: Predicted solution at time %1.4e using ROM, wallclock time: %f.\n",
                           waqt, ((libROMInterface*)context.m_rom_interface)->predictWallclockTime() );
       total_rom_predict_time += ((libROMInterface*)context.m_rom_interface)->predictWallclockTime();
 
       /* write the solution to file */
-      for (int ns = 0; ns < nsims; ns++) {
+      for (int ns = 0; ns < a_nsims; ns++) {
         if (sim[ns].solver.PhysicsOutput) {
           sim[ns].solver.PhysicsOutput( &(sim[ns].solver),
                                         &(sim[ns].mpi),
                                         waqt );
         }
       }
-      OutputSolution(sim, nsims, waqt);
+      OutputSolution(sim, a_nsims, waqt);
 
     }
 
     /* calculate error if exact solution has been provided */
-    for (int ns = 0; ns < nsims; ns++) {
+    for (int ns = 0; ns < a_nsims; ns++) {
       CalculateError(&(sim[ns].solver),
                      &(sim[ns].mpi) );
     }
 
-    if (!rank) {
+    if (!a_rank) {
       printf( "libROM: total prediction/query wallclock time: %f (seconds).\n",
               total_rom_predict_time );
     }

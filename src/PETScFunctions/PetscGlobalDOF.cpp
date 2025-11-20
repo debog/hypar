@@ -13,37 +13,37 @@
 #include <simulation_object.h>
 #include <petscinterface.h>
 
-static int ApplyPeriodicity(  int     dir,    /*!< Spatial dimension along which to apply periodicity */
-                              int     ndims,  /*!< Number of spatial dimensions */
-                              int     *size,  /*!< Integer array with the number of grid points in
+static int ApplyPeriodicity(  int     a_dir,    /*!< Spatial dimension along which to apply periodicity */
+                              int     a_ndims,  /*!< Number of spatial dimensions */
+                              int     *a_size,  /*!< Integer array with the number of grid points in
                                                    each spatial dimension */
-                              int     ghosts, /*!< Number of ghost points */
-                              double  *phi    /*!< The array on which to apply the boundary condition */ )
+                              int     a_ghosts, /*!< Number of ghost points */
+                              double  *a_phi    /*!< The array on which to apply the boundary condition */ )
 {
-  int bounds[ndims], index1[ndims], index2[ndims], offset[ndims],
+  int bounds[a_ndims], index1[a_ndims], index2[a_ndims], offset[a_ndims],
       done, p1 = 0, p2 = 0;
-  _ArrayCopy1D_(size,bounds,ndims); bounds[dir] = ghosts;
+  _ArrayCopy1D_(a_size,bounds,a_ndims); bounds[a_dir] = a_ghosts;
 
-  done = 0; _ArraySetValue_(index1,ndims,0);
+  done = 0; _ArraySetValue_(index1,a_ndims,0);
   while (!done) {
-    _ArraySetValue_(offset,ndims,0); offset[dir] = -ghosts;
-    _ArrayIndex1DWO_(ndims,size,index1,offset,ghosts,p1);
-    _ArrayCopy1D_(index1,index2,ndims);
-    index2[dir] = index1[dir] + size[dir]-ghosts;
-    _ArrayIndex1D_(ndims,size,index2,ghosts,p2);
+    _ArraySetValue_(offset,a_ndims,0); offset[a_dir] = -a_ghosts;
+    _ArrayIndex1DWO_(a_ndims,a_size,index1,offset,a_ghosts,p1);
+    _ArrayCopy1D_(index1,index2,a_ndims);
+    index2[a_dir] = index1[a_dir] + a_size[a_dir]-a_ghosts;
+    _ArrayIndex1D_(a_ndims,a_size,index2,a_ghosts,p2);
 
-    phi[p1] = phi[p2];
-    _ArrayIncrementIndex_(ndims,bounds,index1,done);
+    a_phi[p1] = a_phi[p2];
+    _ArrayIncrementIndex_(a_ndims,bounds,index1,done);
   }
 
-  done = 0; _ArraySetValue_(index1,ndims,0);
+  done = 0; _ArraySetValue_(index1,a_ndims,0);
   while (!done) {
-    _ArraySetValue_(offset,ndims,0); offset[dir] = size[dir];
-    _ArrayIndex1DWO_(ndims,size,index1,offset,ghosts,p1);
-    _ArrayIndex1D_(ndims,size,index1,ghosts,p2);
+    _ArraySetValue_(offset,a_ndims,0); offset[a_dir] = a_size[a_dir];
+    _ArrayIndex1DWO_(a_ndims,a_size,index1,offset,a_ghosts,p1);
+    _ArrayIndex1D_(a_ndims,a_size,index1,a_ghosts,p2);
 
-    phi[p1] = phi[p2];
-    _ArrayIncrementIndex_(ndims,bounds,index1,done);
+    a_phi[p1] = a_phi[p2];
+    _ArrayIncrementIndex_(a_ndims,bounds,index1,done);
   }
   return(0);
 }
@@ -66,9 +66,9 @@ static int ApplyPeriodicity(  int     dir,    /*!< Spatial dimension along which
     + Thus, ghost points corresponding to physical, non-periodic boundaries retain the
       initial value of -1.
 */
-int PetscGlobalDOF(void* c /*!< Object of type #PETScContext*/)
+int PetscGlobalDOF(void* a_c /*!< Object of type #PETScContext*/)
 {
-  PETScContext* ctxt = (PETScContext*) c;
+  PETScContext* ctxt = (PETScContext*) a_c;
   SimulationObject* sim = (SimulationObject*) ctxt->m_simobj;
   int nsims = ctxt->m_nsims;
 

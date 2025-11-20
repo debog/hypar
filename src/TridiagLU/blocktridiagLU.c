@@ -114,7 +114,7 @@ int BlockTridiagLU(
                     int     ns, /*!< Number of systems to solve */
                     int     bs, /*!< Block size */
                     void    *r, /*!< Object of type #TridiagLU_Params (contains wall times at exit) */
-                    void    *m  /*!< MPI communicator */
+                    void *a_m  /*!< MPI communicator */
                   )
 {
   TridiagLU_Params *params = (TridiagLU_Params *) r;

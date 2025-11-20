@@ -4,9 +4,9 @@
 #include <physicalmodels/euler2d.h>
 #include <hypar.h>
 
-int Euler2DFlux(double *f,double *u,int dir,void *s,double t)
+int Euler2DFlux(double *a_f,double *a_u,int a_dir,void *a_s,double a_t)
 {
-  HyPar   *solver = (HyPar*)   s;
+  HyPar   *solver = (HyPar*)   a_s;
   Euler2D *param  = (Euler2D*) solver->m_physics;
   int     i;
 
@@ -27,8 +27,8 @@ int Euler2DFlux(double *f,double *u,int dir,void *s,double t)
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double rho, vx, vy, e, P;
-    _Euler2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,vx,vy,e,P,param);
-    _Euler2DSetFlux_((f+_MODEL_NVARS_*p),rho,vx,vy,e,P,param,dir);
+    _Euler2DGetFlowVar_((a_u+_MODEL_NVARS_*p),rho,vx,vy,e,P,param);
+    _Euler2DSetFlux_((a_f+_MODEL_NVARS_*p),rho,vx,vy,e,P,param,a_dir);
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

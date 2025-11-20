@@ -38,15 +38,15 @@
     \sa ParabolicFunctionNC1_5Stage()
 */
 int ParabolicFunctionNC2Stage(
-                                double  *par, /*!< array to hold the computed parabolic term */
-                                double  *u,   /*!< solution */
-                                void    *s,   /*!< Solver object of type #HyPar */
-                                void    *m,   /*!< MPI object of type #MPIVariables */
-                                double  t     /*!< Current simulation time */
+                                double  *a_par, /*!< array to hold the computed parabolic term */
+                                double  *a_u,   /*!< solution */
+                                void    *a_s,   /*!< Solver object of type #HyPar */
+                                void    *a_m,   /*!< MPI object of type #MPIVariables */
+                                double  a_t     /*!< Current simulation time */
                              )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   double        *Func   = solver->m_flux_c;
   double        *Deriv1 = solver->m_deriv1;
   double        *Deriv2 = solver->m_deriv2;
@@ -67,13 +67,13 @@ int ParabolicFunctionNC2Stage(
   solver->m_count_par++;
 
   int index[ndims];
-  _ArraySetValue_(par,size*nvars,0.0);
+  _ArraySetValue_(a_par,size*nvars,0.0);
 
   for (d1 = 0; d1 < ndims; d1++) {
     for (d2 = 0; d2 < ndims; d2++) {
 
       /* calculate the diffusion function */
-      IERR solver->HFunction(Func,u,d1,d2,solver,t);                    CHECKERR(ierr);
+      IERR solver->HFunction(Func,a_u,d1,d2,solver,a_t);                    CHECKERR(ierr);
       IERR solver->FirstDerivativePar(Deriv1,Func  ,d1, 1,solver,mpi);  CHECKERR(ierr);
       IERR MPIExchangeBoundariesnD(ndims,nvars,dim,ghosts,mpi,Deriv1);  CHECKERR(ierr);
       IERR solver->FirstDerivativePar(Deriv2,Deriv1,d2,-1,solver,mpi);  CHECKERR(ierr);
@@ -84,13 +84,13 @@ int ParabolicFunctionNC2Stage(
         _ArrayIndex1D_(ndims,dim,index,ghosts,p);
         _GetCoordinate_(d1,index[d1],dim,ghosts,dxinv,dxinv1);
         _GetCoordinate_(d2,index[d2],dim,ghosts,dxinv,dxinv2);
-        for (v=0; v<nvars; v++) par[nvars*p+v] += (dxinv1*dxinv2 * Deriv2[nvars*p+v]);
+        for (v=0; v<nvars; v++) a_par[nvars*p+v] += (dxinv1*dxinv2 * Deriv2[nvars*p+v]);
         _ArrayIncrementIndex_(ndims,dim,index,done);
       }
 
     }
   }
 
-  if (solver->m_flag_ib) _ArrayBlockMultiply_(par,solver->m_iblank,size,nvars);
+  if (solver->m_flag_ib) _ArrayBlockMultiply_(a_par,solver->m_iblank,size,nvars);
   return(0);
 }

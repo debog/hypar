@@ -21,11 +21,11 @@
 int IBReadBodySTL(
                     Body3D **body,    /*!< 3D body to be allocated and read from file */
                     char   *filename, /*!< Filename */
-                    void   *m,        /*!< MPI object of type #MPIVariables */
+                    void *a_m,        /*!< MPI object of type #MPIVariables */
                     int    *stat      /*!< Status (0: success; non-0: failure) */
                  )
 {
-  MPIVariables  *mpi = (MPIVariables*) m;
+  MPIVariables  *mpi = (MPIVariables*)   a_m;
   int n, ierr;
   *stat = 0;
 

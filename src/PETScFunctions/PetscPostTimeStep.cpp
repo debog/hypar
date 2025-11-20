@@ -18,13 +18,13 @@ int OutputSolution (void*,int,double);   /*!< Write solutions to file */
 #define __FUNCT__ "PetscPostTimeStep"
 
 /*! Function called after every time step */
-PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
+PetscErrorCode PetscPostTimeStep(TS a_ts /*!< Time integrator object */)
 {
   PETScContext* context(nullptr);
 
   PetscFunctionBegin;
 
-  TSGetApplicationContext(ts,&context);
+  TSGetApplicationContext(a_ts,&context);
   if (!context) {
     fprintf(stderr,"Error in PetscPreTimeStep: Null context!\n");
     return(1);
@@ -33,14 +33,14 @@ PetscErrorCode PetscPostTimeStep(TS ts /*!< Time integrator object */)
   int nsims = context->m_nsims;
 
   Vec Y;
-  TSGetSolution(ts,&Y);
+  TSGetSolution(a_ts,&Y);
 
   double waqt;
-  TSGetTime(ts,&waqt);
+  TSGetTime(a_ts,&waqt);
   int iter;
-  TSGetStepNumber(ts,&iter);
+  TSGetStepNumber(a_ts,&iter);
   double dt;
-  TSGetTimeStep(ts,&dt);
+  TSGetTimeStep(a_ts,&dt);
 
   context->m_tic++;
 

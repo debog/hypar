@@ -30,15 +30,15 @@
  *
  *  The gradient calculation is currently first-order.
 */
-int IBComputeNormalGradient(void*               s,       /*!< Solver object of type #HyPar */
-                            void*               m,       /*!< MPI object of type #MPIVariables */
+int IBComputeNormalGradient(void* a_s,       /*!< Solver object of type #HyPar */
+                            void* a_m,       /*!< MPI object of type #MPIVariables */
                             const double* const var,     /*!< Variable to compute the gradient of */
                             int                 nvars,   /*!< Number of components in var */
                             double** const      grad_var /*!< Array to store the gradient; must be NULL at input */
                           )
 {
-  HyPar             *solver  = (HyPar*)          s;
-  MPIVariables      *mpi     = (MPIVariables*)   m;
+  HyPar             *solver  = (HyPar*) a_s;
+  MPIVariables      *mpi     = (MPIVariables*)   a_m;
   ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->m_ib;
 
   if (!solver->m_flag_ib) return(0);

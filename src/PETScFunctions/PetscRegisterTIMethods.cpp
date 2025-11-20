@@ -43,7 +43,7 @@
   To do:
   + Add support for TSGLEE when it gets merged to PETSc's master.
 */
-int PetscRegisterTIMethods(int rank /*!< MPI rank */)
+int PetscRegisterTIMethods(int a_rank /*!< MPI rank */)
 {
   PetscErrorCode ierr;
   int            ierr2;
@@ -88,8 +88,8 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
           else if (!strcmp(word,"pinterp")) { ierr2 = fscanf(in,"%d",&pinterp);if (ierr2 != 1) return(1); }
           else if (!strcmp(word,"At")) {
             if (s == 0) {
-              if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
-              if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
+              if (!a_rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
+              if (!a_rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
             } else {
               At = (PetscReal*) calloc (s*s, sizeof(PetscReal));
@@ -102,8 +102,8 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
             }
           } else if (!strcmp(word,"A")) {
             if (s == 0) {
-              if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
-              if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
+              if (!a_rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
+              if (!a_rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
             } else {
               A = (PetscReal*) calloc (s*s, sizeof(PetscReal));
@@ -116,8 +116,8 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
             }
           } else if (!strcmp(word,"bt")) {
             if (s == 0) {
-              if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
-              if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
+              if (!a_rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
+              if (!a_rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
             } else {
               bt = (PetscReal*) calloc (s, sizeof(PetscReal));
@@ -126,8 +126,8 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
             }
           } else if (!strcmp(word,"b")) {
             if (s == 0) {
-              if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
-              if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
+              if (!a_rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
+              if (!a_rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
             } else {
               b = (PetscReal*) calloc (s, sizeof(PetscReal));
@@ -136,8 +136,8 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
             }
           } else if (!strcmp(word,"ct")) {
             if (s == 0) {
-              if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
-              if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
+              if (!a_rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
+              if (!a_rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
             } else {
               ct = (PetscReal*) calloc (s, sizeof(PetscReal));
@@ -146,8 +146,8 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
             }
           } else if (!strcmp(word,"c")) {
             if (s == 0) {
-              if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
-              if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
+              if (!a_rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
+              if (!a_rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
             } else {
               c = (PetscReal*) calloc (s, sizeof(PetscReal));
@@ -156,8 +156,8 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
             }
           } else if (!strcmp(word,"bembt")) {
             if (s == 0) {
-              if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
-              if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
+              if (!a_rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
+              if (!a_rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
             } else {
               bembt = (PetscReal*) calloc (s, sizeof(PetscReal));
@@ -166,8 +166,8 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
             }
           } else if (!strcmp(word,"bemb")) {
             if (s == 0) {
-              if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
-              if (!rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
+              if (!a_rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages must be defined ");
+              if (!a_rank) fprintf(stderr,"before specifying the Butcher tableaux entries.\n"              );
               return(1);
             } else {
               bemb = (PetscReal*) calloc (s, sizeof(PetscReal));
@@ -176,8 +176,8 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
             }
           } else if (!strcmp(word,"bintt")) {
             if (s == 0 || pinterp == 0) {
-              if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages and pinterp must be " );
-              if (!rank) fprintf(stderr,"defined as positive values before specifying interpolation coeffs.\n");
+              if (!a_rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages and pinterp must be " );
+              if (!a_rank) fprintf(stderr,"defined as positive values before specifying interpolation coeffs.\n");
               return(1);
             } else {
               bintt = (PetscReal*) calloc (s*pinterp, sizeof(PetscReal));
@@ -190,8 +190,8 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
             }
           } else if (!strcmp(word,"bint")) {
             if (s == 0 || pinterp == 0) {
-              if (!rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages and pinterp must be " );
-              if (!rank) fprintf(stderr,"defined as positive values before specifying interpolation coeffs.\n");
+              if (!a_rank) fprintf(stderr,"Error in PetscRegisterTIMethods(): nstages and pinterp must be " );
+              if (!a_rank) fprintf(stderr,"defined as positive values before specifying interpolation coeffs.\n");
               return(1);
             } else {
               bint = (PetscReal*) calloc (s*pinterp, sizeof(PetscReal));
@@ -205,7 +205,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
           }
         }
       } else {
-        if (!rank) fprintf(stderr,"Error: Illegal format in file \"time_method.inp\" (expected keyword \"begin\").\n");
+        if (!a_rank) fprintf(stderr,"Error: Illegal format in file \"time_method.inp\" (expected keyword \"begin\").\n");
         return(1);
       }
 
@@ -213,7 +213,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
       if (!strcmp(type,"arkimex")) {
         if (A && At) {
           ierr = TSARKIMEXRegister(name,order,s,At,bt,ct,A,b,c,bembt,bemb,pinterp,bintt,bint); CHKERRQ(ierr);
-          if (!rank) {
+          if (!a_rank) {
             printf("\nRegistered custom ARKIMEX scheme \"%s\" with the following Butcher tableaux:-\n",name);
             int i,j;
             for (i = 0; i < s; i++) {
@@ -242,7 +242,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
             printf("\n\n");
           }
         } else {
-          if (!rank) {
+          if (!a_rank) {
             fprintf(stderr,"Warning in PetscRegisterTIMethods(): Failed to register method ");
             fprintf(stderr,"(A or At not defined).\n");
           }
@@ -250,7 +250,7 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
       } else if (!strcmp(type,"rk")) {
         if (A) {
           ierr = TSRKRegister(name,order,s,A,b,c,bemb,pinterp,bint); CHKERRQ(ierr);
-          if (!rank) {
+          if (!a_rank) {
             printf("\nRegistered custom RK scheme \"%s\" with the following Butcher tableaux:-\n",name);
             int i,j;
             for (i = 0; i < s; i++) {
@@ -268,13 +268,13 @@ int PetscRegisterTIMethods(int rank /*!< MPI rank */)
             printf("\n\n");
           }
         } else {
-          if (!rank) {
+          if (!a_rank) {
             fprintf(stderr,"Warning in PetscRegisterTIMethods(): Failed to register method ");
             fprintf(stderr,"(A not defined).\n");
           }
         }
       } else {
-        if (!rank){
+        if (!a_rank){
           fprintf(stderr,"Error in PetscRegisterTIMethods():  %s class of time-integration schemes ",type);
           fprintf(stderr,"does not support custom method registration and usage.\n");
         }

@@ -20,35 +20,35 @@
     boundary treatment, the sponge BC function is called.
 */
 int SourceFunction(
-                    double  *source,  /*!< the computed source term */
-                    double  *u,       /*!< solution */
-                    void    *s,       /*!< solver object of type #HyPar */
-                    void    *m,       /*!< MPI object of type #MPIVariables */
-                    double  t         /*!< Current simulation time */
+                    double  *a_source,  /*!< the computed source term */
+                    double  *a_u,       /*!< solution */
+                    void    *a_s,       /*!< solver object of type #HyPar */
+                    void    *a_m,       /*!< MPI object of type #MPIVariables */
+                    double  a_t         /*!< Current simulation time */
                   )
 {
-  HyPar           *solver   = (HyPar*)        s;
-  MPIVariables    *mpi      = (MPIVariables*) m;
+  HyPar           *solver   = (HyPar*)        a_s;
+  MPIVariables    *mpi      = (MPIVariables*) a_m;
 
   /* initialize to zero */
   int size = solver->m_ndof_cells_wghosts;
 #if defined(HAVE_CUDA)
   if (solver->m_use_gpu) {
-    gpuArraySetValue(source,size, 0.0);
+    gpuArraySetValue(a_source,size, 0.0);
   } else {
 #endif
-    _ArraySetValue_(source,size,0.0);
+    _ArraySetValue_(a_source,size,0.0);
 #if defined(HAVE_CUDA)
   }
 #endif
 
-  /* call the source function of the physics model, if available */
+  /* call the a_source function of the physics model, if available */
   if (solver->SFunction) {
-    solver->SFunction(source,u,solver,mpi,t);
+    solver->SFunction(a_source,a_u,solver,mpi,a_t);
     solver->m_count_sou++;
   }
 
-  /* Apart from other source terms, implement sponge BC as a source */
+  /* Apart from other a_source terms, implement sponge BC as a a_source */
   DomainBoundary* boundary = (DomainBoundary*) solver->m_boundary;
   int n;
   int nb = solver->m_n_boundary_zones;
@@ -69,8 +69,8 @@ int SourceFunction(
                         solver->m_ghosts,
                         solver->m_dim_local,
                         solver->m_x,
-                        u,
-                        source  );
+                        a_u,
+                        a_source  );
       }
     }
 #if defined(HAVE_CUDA)
