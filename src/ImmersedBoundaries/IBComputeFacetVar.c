@@ -17,7 +17,7 @@
  *  value.
  *
  *  The variable should be a grid variable with size/layout the
- *  same as the solution variable (#HyPar::u) with the appropriate
+ *  same as the solution variable (#HyPar::m_u) with the appropriate
  *  number of ghost points.
  *
  *  If the incoming variable has multiple components, this
@@ -30,29 +30,29 @@
  *
  *  The interpolation is bi/tri-linear (second-order).
 */
-int IBComputeFacetVar(void*               s,       /*!< Solver object of type #HyPar */
-                      void*               m,       /*!< MPI object of type #MPIVariables */
+int IBComputeFacetVar(void* a_s,       /*!< Solver object of type #HyPar */
+                      void*               a_m,       /*!< MPI object of type #MPIVariables */
                       const double* const var,     /*!< Variable to compute the interpolated value of */
                       int                 nvars,   /*!< Number of components in var */
                       double** const      face_var /*!< Array to store the interpolated value;
                                                         must be NULL at input */
                      )
 {
-  HyPar             *solver  = (HyPar*)          s;
-  MPIVariables      *mpi     = (MPIVariables*)   m;
-  ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->ib;
+  HyPar             *solver  = (HyPar*)          a_s;
+  MPIVariables      *mpi     = (MPIVariables*)   a_m;
+  ImmersedBoundary  *IB      = (ImmersedBoundary*) solver->m_ib;
 
-  if (!solver->flag_ib) return(0);
+  if (!solver->m_flag_ib) return(0);
 
   if ((*face_var) != NULL) {
     fprintf(stderr,"Error in IBComputeFacetVar()\n");
     fprintf(stderr," face_var is not NULL on rank %d\n",
-            mpi->rank );
+            mpi->m_rank );
     return 1;
   }
 
-  int nfacets_local = IB->nfacets_local;
-  FacetMap *fmap = IB->fmap;
+  int nfacets_local = IB->m_nfacets_local;
+  FacetMap *fmap = IB->m_fmap;
 
   if (nfacets_local > 0) {
     (*face_var) = (double*) calloc (nvars*nfacets_local, sizeof(double));
@@ -63,8 +63,8 @@ int IBComputeFacetVar(void*               s,       /*!< Solver object of type #H
       int    *nodes, j, k;
 
       double *v_c = (*face_var) + n*nvars;
-      alpha = &(fmap[n].interp_coeffs[0]);
-      nodes = &(fmap[n].interp_nodes[0]);
+      alpha = &(fmap[n].m_interp_coeffs[0]);
+      nodes = &(fmap[n].m_interp_nodes[0]);
       _ArraySetValue_(v_c,nvars,0.0);
       for (j=0; j<_IB_NNODES_; j++) {
         for (k=0; k<nvars; k++) {

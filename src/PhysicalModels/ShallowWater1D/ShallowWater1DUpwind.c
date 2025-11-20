@@ -29,48 +29,48 @@
 
 */
 int ShallowWater1DUpwindRoe(
-                            double  *fI, /*!< Computed upwind interface flux */
-                            double  *fL, /*!< Left-biased reconstructed interface flux */
-                            double  *fR, /*!< Right-biased reconstructed interface flux */
-                            double  *uL, /*!< Left-biased reconstructed interface solution */
-                            double  *uR, /*!< Right-biased reconstructed interface solution */
-                            double  *u,  /*!< Cell-centered solution */
-                            int     dir, /*!< Spatial dimension (unused since this is a 1D system) */
-                            void    *s,  /*!< Solver object of type #HyPar */
-                            double  t    /*!< Current solution time */
+                            double  *a_fI, /*!< Computed upwind interface flux */
+                            double  *a_fL, /*!< Left-biased reconstructed interface flux */
+                            double  *a_fR, /*!< Right-biased reconstructed interface flux */
+                            double  *a_uL, /*!< Left-biased reconstructed interface solution */
+                            double  *a_uR, /*!< Right-biased reconstructed interface solution */
+                            double  *a_u,  /*!< Cell-centered solution */
+                            int     a_dir, /*!< Spatial dimension (unused since this is a 1D system) */
+                            void    *a_s,  /*!< Solver object of type #HyPar */
+                            double  a_t   /*!< Current solution time */
                            )
 {
-  HyPar           *solver = (HyPar*) s;
-  ShallowWater1D  *param  = (ShallowWater1D*) solver->physics;
+  HyPar           *solver = (HyPar*) a_s;
+  ShallowWater1D  *param  = (ShallowWater1D*) solver->m_physics;
   int             done,k;
 
-  int ndims = solver->ndims;
-  int ghosts= solver->ghosts;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int ghosts= solver->m_ghosts;
+  int *dim  = solver->m_dim_local;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
   static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_],
                 DL[_MODEL_NVARS_*_MODEL_NVARS_], modA[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
+      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[a_dir]--;
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
       double udiff[_MODEL_NVARS_], uavg[_MODEL_NVARS_],udiss[_MODEL_NVARS_];
 
-      /* Roe's upwinding scheme */
+      /* Roe'a_s upwinding scheme */
 
-      udiff[0] = 0.5 * (uR[_MODEL_NVARS_*p+0] - uL[_MODEL_NVARS_*p+0]);
-      udiff[1] = 0.5 * (uR[_MODEL_NVARS_*p+1] - uL[_MODEL_NVARS_*p+1]);
+      udiff[0] = 0.5 * (a_uR[_MODEL_NVARS_*p+0] - a_uL[_MODEL_NVARS_*p+0]);
+      udiff[1] = 0.5 * (a_uR[_MODEL_NVARS_*p+1] - a_uL[_MODEL_NVARS_*p+1]);
 
-      _ShallowWater1DRoeAverage_         (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
+      _ShallowWater1DRoeAverage_         (uavg,(a_u+_MODEL_NVARS_*pL),(a_u+_MODEL_NVARS_*pR),param);
       _ShallowWater1DEigenvalues_        (uavg,D,param,0);
       _ShallowWater1DLeftEigenvectors_   (uavg,L,param,0);
       _ShallowWater1DRightEigenvectors_  (uavg,R,param,0);
@@ -84,8 +84,8 @@ int ShallowWater1DUpwindRoe(
       udiss[0] = modA[0*_MODEL_NVARS_+0]*udiff[0] + modA[0*_MODEL_NVARS_+1]*udiff[1];
       udiss[1] = modA[1*_MODEL_NVARS_+0]*udiff[0] + modA[1*_MODEL_NVARS_+1]*udiff[1];
 
-      fI[_MODEL_NVARS_*p+0] = 0.5 * (fL[_MODEL_NVARS_*p+0]+fR[_MODEL_NVARS_*p+0]) - udiss[0];
-      fI[_MODEL_NVARS_*p+1] = 0.5 * (fL[_MODEL_NVARS_*p+1]+fR[_MODEL_NVARS_*p+1]) - udiss[1];
+      a_fI[_MODEL_NVARS_*p+0] = 0.5 * (a_fL[_MODEL_NVARS_*p+0]+a_fR[_MODEL_NVARS_*p+0]) - udiss[0];
+      a_fI[_MODEL_NVARS_*p+1] = 0.5 * (a_fL[_MODEL_NVARS_*p+1]+a_fR[_MODEL_NVARS_*p+1]) - udiss[1];
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
@@ -112,36 +112,36 @@ int ShallowWater1DUpwindRoe(
       http://dx.doi.org/10.1016/j.jcp.2005.02.006
 */
 int ShallowWater1DUpwindLLF(
-                            double  *fI, /*!< Computed upwind interface flux */
-                            double  *fL, /*!< Left-biased reconstructed interface flux */
-                            double  *fR, /*!< Right-biased reconstructed interface flux */
-                            double  *uL, /*!< Left-biased reconstructed interface solution */
-                            double  *uR, /*!< Right-biased reconstructed interface solution */
-                            double  *u,  /*!< Cell-centered solution */
-                            int     dir, /*!< Spatial dimension (unused since this is a 1D system) */
-                            void    *s,  /*!< Solver object of type #HyPar */
-                            double  t    /*!< Current solution time */
+                            double  *a_fI, /*!< Computed upwind interface flux */
+                            double  *a_fL, /*!< Left-biased reconstructed interface flux */
+                            double  *a_fR, /*!< Right-biased reconstructed interface flux */
+                            double  *a_uL, /*!< Left-biased reconstructed interface solution */
+                            double  *a_uR, /*!< Right-biased reconstructed interface solution */
+                            double  *a_u,  /*!< Cell-centered solution */
+                            int     a_dir, /*!< Spatial dimension (unused since this is a 1D system) */
+                            void    *a_s,  /*!< Solver object of type #HyPar */
+                            double  a_t   /*!< Current solution time */
                            )
 {
-  HyPar           *solver = (HyPar*) s;
-  ShallowWater1D  *param  = (ShallowWater1D*) solver->physics;
+  HyPar           *solver = (HyPar*) a_s;
+  ShallowWater1D  *param  = (ShallowWater1D*) solver->m_physics;
   int             done,k;
 
-  int ndims   = solver->ndims;
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
+  int ndims   = solver->m_ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
 
   int index_outer[ndims], index_inter[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
   static double R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_], L[_MODEL_NVARS_*_MODEL_NVARS_];
 
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[dir]--;
+      int indexL[ndims]; _ArrayCopy1D_(index_inter,indexL,ndims); indexL[a_dir]--;
       int indexR[ndims]; _ArrayCopy1D_(index_inter,indexR,ndims);
       int pL; _ArrayIndex1D_(ndims,dim,indexL,ghosts,pL);
       int pR; _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
@@ -150,22 +150,22 @@ int ShallowWater1DUpwindLLF(
 
       /* Local Lax-Friedrich upwinding scheme */
 
-      _ShallowWater1DRoeAverage_       (uavg,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),param);
+      _ShallowWater1DRoeAverage_       (uavg,(a_u+_MODEL_NVARS_*pL),(a_u+_MODEL_NVARS_*pR),param);
       _ShallowWater1DEigenvalues_      (uavg,D,param,0);
       _ShallowWater1DLeftEigenvectors_ (uavg,L,param,0);
       _ShallowWater1DRightEigenvectors_(uavg,R,param,0);
 
       /* calculate characteristic fluxes and variables */
-      MatVecMult2(_MODEL_NVARS_,ucL,L,(uL+_MODEL_NVARS_*p));
-      MatVecMult2(_MODEL_NVARS_,ucR,L,(uR+_MODEL_NVARS_*p));
-      MatVecMult2(_MODEL_NVARS_,fcL,L,(fL+_MODEL_NVARS_*p));
-      MatVecMult2(_MODEL_NVARS_,fcR,L,(fR+_MODEL_NVARS_*p));
+      MatVecMult2(_MODEL_NVARS_,ucL,L,(a_uL+_MODEL_NVARS_*p));
+      MatVecMult2(_MODEL_NVARS_,ucR,L,(a_uR+_MODEL_NVARS_*p));
+      MatVecMult2(_MODEL_NVARS_,fcL,L,(a_fL+_MODEL_NVARS_*p));
+      MatVecMult2(_MODEL_NVARS_,fcR,L,(a_fR+_MODEL_NVARS_*p));
 
       for (k = 0; k < _MODEL_NVARS_; k++) {
         double eigL,eigC,eigR;
-        _ShallowWater1DEigenvalues_((u+_MODEL_NVARS_*pL),D,param,0);
+        _ShallowWater1DEigenvalues_((a_u+_MODEL_NVARS_*pL),D,param,0);
         eigL = D[k*_MODEL_NVARS_+k];
-        _ShallowWater1DEigenvalues_((u+_MODEL_NVARS_*pR),D,param,0);
+        _ShallowWater1DEigenvalues_((a_u+_MODEL_NVARS_*pR),D,param,0);
         eigR = D[k*_MODEL_NVARS_+k];
         _ShallowWater1DEigenvalues_(uavg,D,param,0);
         eigC = D[k*_MODEL_NVARS_+k];
@@ -175,7 +175,7 @@ int ShallowWater1DUpwindLLF(
       }
 
       /* calculate the interface flux from the characteristic flux */
-      MatVecMult2(_MODEL_NVARS_,(fI+_MODEL_NVARS_*p),R,fc);
+      MatVecMult2(_MODEL_NVARS_,(a_fI+_MODEL_NVARS_*p),R,fc);
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }

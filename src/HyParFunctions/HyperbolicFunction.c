@@ -29,12 +29,12 @@ static int DefaultUpwinding      (double*,double*,double*,double*,double*,double
     are computed using the function ReconstructHyperbolic().
 */
 int HyperbolicFunction(
-                        double  *hyp, /*!< Array to hold the computed hyperbolic term (shares the same layout as u */
-                        double  *u,   /*!< Solution array */
-                        void    *s,   /*!< Solver object of type #HyPar */
-                        void    *m,   /*!< MPI object of type #MPIVariables */
-                        double  t,    /*!< Current simulation time */
-                        int     LimFlag,  /*!< Flag to indicate if the nonlinear coefficients for solution-dependent
+                        double  *a_hyp, /*!< Array to hold the computed hyperbolic term (shares the same layout as u */
+                        double  *a_u,   /*!< Solution array */
+                        void    *a_s,   /*!< Solver object of type #HyPar */
+                        void    *a_m,   /*!< MPI object of type #MPIVariables */
+                        double  a_t,    /*!< Current simulation time */
+                        int     a_LimFlag,  /*!< Flag to indicate if the nonlinear coefficients for solution-dependent
                                                interpolation method should be recomputed (see ReconstructHyperbolic() for
                                                an explanation on why this is needed) */
                         /*! Function pointer to the flux function for the hyperbolic term */
@@ -43,28 +43,28 @@ int HyperbolicFunction(
                         int(*UpwindFunction)(double*,double*,double*,double*,double*,double*,int,void*,double)
                       )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   int           d, v, i, done;
-  double        *FluxI  = solver->fluxI; /* interface flux     */
-  double        *FluxC  = solver->fluxC; /* cell centered flux */
+  double        *FluxI  = solver->m_flux_i; /* interface flux     */
+  double        *FluxC  = solver->m_flux_c; /* cell centered flux */
   _DECLARE_IERR_;
 
-  int     ndims  = solver->ndims;
-  int     nvars  = solver->nvars;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
-  int     size   = solver->npoints_local_wghosts;
-  double  *x     = solver->x;
-  double  *dxinv = solver->dxinv;
+  int     ndims  = solver->m_ndims;
+  int     nvars  = solver->m_nvars;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
+  int     size   = solver->m_npoints_local_wghosts;
+  double  *x     = solver->m_x;
+  double  *dxinv = solver->m_dxinv;
   int     index[ndims], index1[ndims], index2[ndims], dim_interface[ndims];
 
-  LimFlag = (LimFlag && solver->flag_nonlinearinterp && solver->SetInterpLimiterVar);
+  a_LimFlag = (a_LimFlag && solver->m_flag_nonlinearinterp && solver->SetInterpLimiterVar);
 
-  _ArraySetValue_(hyp,size*nvars,0.0);
-  _ArraySetValue_(solver->StageBoundaryIntegral,2*ndims*nvars,0.0);
+  _ArraySetValue_(a_hyp,size*nvars,0.0);
+  _ArraySetValue_(solver->m_stage_boundary_integral,2*ndims*nvars,0.0);
   if (!FluxFunction) return(0); /* zero hyperbolic term */
-  solver->count_hyp++;
+  solver->m_count_hyp++;
 
 #if defined(CPU_STAT)
   double cpu_time = 0.0;
@@ -78,9 +78,9 @@ int HyperbolicFunction(
     int size_interface = 1; for (i = 0; i < ndims; i++) size_interface *= dim_interface[i];
 
     /* evaluate cell-centered flux */
-    IERR FluxFunction(FluxC,u,d,solver,t); CHECKERR(ierr);
+    IERR FluxFunction(FluxC,a_u,d,solver,a_t); CHECKERR(ierr);
     /* compute interface fluxes */
-    IERR ReconstructHyperbolic(FluxI,FluxC,u,x+offset,d,solver,mpi,t,LimFlag,UpwindFunction);
+    IERR ReconstructHyperbolic(FluxI,FluxC,a_u,x+offset,d,solver,mpi,a_t,a_LimFlag,UpwindFunction);
     CHECKERR(ierr);
 
     /* calculate the first derivative */
@@ -97,13 +97,13 @@ int HyperbolicFunction(
       _ArrayIndex1D_(ndims,dim          ,index ,ghosts,p);
       _ArrayIndex1D_(ndims,dim_interface,index1,0     ,p1);
       _ArrayIndex1D_(ndims,dim_interface,index2,0     ,p2);
-      for (v=0; v<nvars; v++) hyp[nvars*p+v] += dxinv[offset+ghosts+index[d]]
+      for (v=0; v<nvars; v++) a_hyp[nvars*p+v] += dxinv[offset+ghosts+index[d]]
                                               * (FluxI[nvars*p2+v]-FluxI[nvars*p1+v]);
       /* boundary flux integral */
       if (index[d] == 0)
-        for (v=0; v<nvars; v++) solver->StageBoundaryIntegral[(2*d+0)*nvars+v] -= FluxI[nvars*p1+v];
+        for (v=0; v<nvars; v++) solver->m_stage_boundary_integral[(2*d+0)*nvars+v] -= FluxI[nvars*p1+v];
       if (index[d] == dim[d]-1)
-        for (v=0; v<nvars; v++) solver->StageBoundaryIntegral[(2*d+1)*nvars+v] += FluxI[nvars*p2+v];
+        for (v=0; v<nvars; v++) solver->m_stage_boundary_integral[(2*d+1)*nvars+v] += FluxI[nvars*p2+v];
 
       _ArrayIncrementIndex_(ndims,dim,index,done);
     }
@@ -120,7 +120,7 @@ int HyperbolicFunction(
   printf("HyperbolicFunction CPU time = %8.6lf\n", cpu_time);
 #endif
 
-  if (solver->flag_ib) _ArrayBlockMultiply_(hyp,solver->iblank,size,nvars);
+  if (solver->m_flag_ib) _ArrayBlockMultiply_(a_hyp,solver->m_iblank,size,nvars);
 
   return(0);
 }
@@ -142,7 +142,7 @@ int HyperbolicFunction(
       \hat{\bf u}^L_{j+1/2} &= \mathcal{I}\left({\bf u}_j,+1\right), \\
       \hat{\bf u}^R_{j+1/2} &= \mathcal{I}\left({\bf u}_j,-1\right),
     \f}
-    The specific choice of \f$\mathcal{I}\f$ is set based on #HyPar::spatial_scheme_hyp.
+    The specific choice of \f$\mathcal{I}\f$ is set based on #HyPar::m_spatial_scheme_hyp.
 
     \b Upwinding: The final flux at the interface is computed as
     \f{equation}{
@@ -165,58 +165,58 @@ int HyperbolicFunction(
     + LimFlag = 0 means reuse the the previously computed coefficients.
 */
 int ReconstructHyperbolic(
-                            double  *fluxI,     /*!< Array to hold the computed interface fluxes. This array does not
+                            double  *a_fluxI,     /*!< Array to hold the computed interface fluxes. This array does not
                                                      have ghost points. The dimensions are the same as those of u without
-                                                     ghost points in all dimensions, except along dir, where it is one more */
-                            double  *fluxC,     /*!< Array of the flux function computed at the cell centers
-                                                     (same layout as u) */
-                            double  *u,         /*!< Solution array */
-                            double  *x,         /*!< Array of spatial coordinates */
-                            int     dir,        /*!< Spatial dimension along which to reconstruct the interface fluxes */
-                            void    *s,         /*!< Solver object of type #HyPar */
-                            void    *m,         /*!< MPI object of type #MPIVariables */
-                            double  t,          /*!< Current solution time */
-                            int     LimFlag,    /*!< Flag to indicate if the nonlinear coefficients for solution-dependent
+                                                     ghost points in all dimensions, except along a_dir, where it is one more */
+                            double  *a_fluxC,     /*!< Array of the flux function computed at the cell centers
+                                                     (same layout as a_u) */
+                            double  *a_u,         /*!< Solution array */
+                            double  *a_x,         /*!< Array of spatial coordinates */
+                            int     a_dir,        /*!< Spatial dimension along which to reconstruct the interface fluxes */
+                            void    *a_s,         /*!< Solver object of type #HyPar */
+                            void    *a_m,         /*!< MPI object of type #MPIVariables */
+                            double  a_t,          /*!< Current solution time */
+                            int     a_LimFlag,    /*!< Flag to indicate if the nonlinear coefficients for solution-dependent
                                                      interpolation method should be recomputed */
                             /*! Function pointer to the upwinding function for the interface flux computation. If NULL,
                                 DefaultUpwinding() will be used. */
                             int(*UpwindFunction)(double*,double*,double*,double*,double*,double*,int,void*,double)
                           )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   _DECLARE_IERR_;
 
   double *uC     = NULL;
-  double *uL     = solver->uL;
-  double *uR     = solver->uR;
-  double *fluxL  = solver->fL;
-  double *fluxR  = solver->fR;
+  double *uL     = solver->m_u_l;
+  double *uR     = solver->m_u_r;
+  double *fluxL  = solver->m_f_l;
+  double *fluxR  = solver->m_f_r;
 
   /*
     precalculate the non-linear interpolation coefficients if required
     else reuse the weights previously calculated
   */
 
-  if (LimFlag) IERR solver->SetInterpLimiterVar(fluxC,u,x,dir,solver,mpi);
+  if (a_LimFlag) IERR solver->SetInterpLimiterVar(a_fluxC,a_u,a_x,a_dir,solver,mpi);
 
-  /* if defined, calculate the modified u-function to be used for upwinding
+  /* if defined, calculate the modified a_u-function to be used for upwinding
      e.g.: used in well-balanced schemes for Euler/Navier-Stokes with gravity
-     otherwise, just copy u to uC */
+     otherwise, just copy a_u to uC */
   if (solver->UFunction) {
-    uC = solver->uC;
-    IERR solver->UFunction(uC,u,dir,solver,mpi,t); CHECKERR(ierr);
-  } else uC = u;
+    uC = solver->m_u_c;
+    IERR solver->UFunction(uC,a_u,a_dir,solver,mpi,a_t); CHECKERR(ierr);
+  } else uC = a_u;
 
   /* Interpolation -> to calculate left and right-biased interface flux and state variable*/
-  IERR solver->InterpolateInterfacesHyp(uL   ,uC   ,u,x, 1,dir,solver,mpi,1); CHECKERR(ierr);
-  IERR solver->InterpolateInterfacesHyp(uR   ,uC   ,u,x,-1,dir,solver,mpi,1); CHECKERR(ierr);
-  IERR solver->InterpolateInterfacesHyp(fluxL,fluxC,u,x, 1,dir,solver,mpi,0); CHECKERR(ierr);
-  IERR solver->InterpolateInterfacesHyp(fluxR,fluxC,u,x,-1,dir,solver,mpi,0); CHECKERR(ierr);
+  IERR solver->InterpolateInterfacesHyp(uL   ,uC   ,a_u,a_x, 1,a_dir,solver,mpi,1); CHECKERR(ierr);
+  IERR solver->InterpolateInterfacesHyp(uR   ,uC   ,a_u,a_x,-1,a_dir,solver,mpi,1); CHECKERR(ierr);
+  IERR solver->InterpolateInterfacesHyp(fluxL,a_fluxC,a_u,a_x, 1,a_dir,solver,mpi,0); CHECKERR(ierr);
+  IERR solver->InterpolateInterfacesHyp(fluxR,a_fluxC,a_u,a_x,-1,a_dir,solver,mpi,0); CHECKERR(ierr);
 
   /* Upwind -> to calculate the final interface flux */
-  if (UpwindFunction) { IERR UpwindFunction   (fluxI,fluxL,fluxR,uL  ,uR  ,u   ,dir,solver,t); CHECKERR(ierr); }
-  else                { IERR DefaultUpwinding (fluxI,fluxL,fluxR,NULL,NULL,NULL,dir,solver,t); CHECKERR(ierr); }
+  if (UpwindFunction) { IERR UpwindFunction   (a_fluxI,fluxL,fluxR,uL  ,uR  ,a_u   ,a_dir,solver,a_t); CHECKERR(ierr); }
+  else                { IERR DefaultUpwinding (a_fluxI,fluxL,fluxR,NULL,NULL,NULL,a_dir,solver,a_t); CHECKERR(ierr); }
 
   return(0);
 }
@@ -224,35 +224,35 @@ int ReconstructHyperbolic(
 /*! If no upwinding scheme is specified, this function defines the "upwind" flux as the
     arithmetic mean of the left- and right-biased fluxes. */
 int DefaultUpwinding(
-                      double  *fI,  /*!< Computed upwind interface flux */
-                      double  *fL,  /*!< Left-biased reconstructed interface flux */
-                      double  *fR,  /*!< Right-biased reconstructed interface flux */
-                      double  *uL,  /*!< Left-biased reconstructed interface solution */
-                      double  *uR,  /*!< Right-biased reconstructed interface solution */
-                      double  *u,   /*!< Cell-centered solution */
-                      int     dir,  /*!< Spatial dimension */
-                      void    *s,   /*!< Solver object of type #HyPar */
+                      double  *a_fI,  /*!< Computed upwind interface flux */
+                      double  *a_fL,  /*!< Left-biased reconstructed interface flux */
+                      double  *a_fR,  /*!< Right-biased reconstructed interface flux */
+                      double  *a_uL,  /*!< Left-biased reconstructed interface solution */
+                      double  *a_uR,  /*!< Right-biased reconstructed interface solution */
+                      double  *a_u,   /*!< Cell-centered solution */
+                      int     a_dir,  /*!< Spatial dimension */
+                      void    *a_s,   /*!< Solver object of type #HyPar */
                       double  t     /*!< Current solution time */
                     )
 {
-  HyPar *solver = (HyPar*)    s;
+  HyPar *solver = (HyPar*)    a_s;
   int   done;
 
-  int *dim  = solver->dim_local;
-  int ndims = solver->ndims;
-  int nvars = solver->nvars;
+  int *dim  = solver->m_dim_local;
+  int ndims = solver->m_ndims;
+  int nvars = solver->m_nvars;
 
   int bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
 
   done = 0; int index_outer[ndims], index_inter[ndims];
   _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,index_inter,ndims);
-    for (index_inter[dir] = 0; index_inter[dir] < bounds_inter[dir]; index_inter[dir]++) {
+    for (index_inter[a_dir] = 0; index_inter[a_dir] < bounds_inter[a_dir]; index_inter[a_dir]++) {
       int p; _ArrayIndex1D_(ndims,bounds_inter,index_inter,0,p);
-      int v; for (v=0; v<nvars; v++) fI[nvars*p+v] = 0.5 * (fL[nvars*p+v]+fR[nvars*p+v]);
+      int v; for (v=0; v<nvars; v++) a_fI[nvars*p+v] = 0.5 * (a_fL[nvars*p+v]+a_fR[nvars*p+v]);
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }

@@ -9,23 +9,23 @@
 
 /*! Initialize GPU-related arrays. */
 int gpuNavierStokes2DInitialize(
-    void *s,  /*!< Solver object of type #HyPar */
-    void *m   /*!< MPI object of type #MPIVariables */
+    void *a_s,  /*!< Solver object of type #HyPar */
+    void *a_m   /*!< MPI object of type #MPIVariables */
 )
 {
-    HyPar          *solver     = (HyPar*)          s;
-    NavierStokes2D *physics    = (NavierStokes2D*) solver->physics;
+    HyPar          *solver     = (HyPar*)          a_s;
+    NavierStokes2D *physics    = (NavierStokes2D*) solver->m_physics;
 
-    int *dim = solver->dim_local;
-    int ghosts = solver->ghosts;
+    int *dim = solver->m_dim_local;
+    int ghosts = solver->m_ghosts;
     int d, size = 1; for (d = 0; d <_MODEL_NDIMS_; d++) size *= (dim[d] + 2*ghosts);
 
     gpuMalloc((void**)&physics->gpu_grav_field_f, size*sizeof(double));
     gpuMalloc((void**)&physics->gpu_grav_field_g, size*sizeof(double));
     gpuMalloc((void**)&physics->gpu_fast_jac, 2*size*_MODEL_NVARS_*_MODEL_NVARS_*sizeof(double));
     gpuMalloc((void**)&physics->gpu_solution, size*_MODEL_NVARS_*sizeof(double));
-    gpuMemcpy(physics->gpu_grav_field_f, physics->grav_field_f, size*sizeof(double), gpuMemcpyHostToDevice);
-    gpuMemcpy(physics->gpu_grav_field_g, physics->grav_field_g, size*sizeof(double), gpuMemcpyHostToDevice);
+    gpuMemcpy(physics->gpu_grav_field_f, physics->m_grav_field_f, size*sizeof(double), gpuMemcpyHostToDevice);
+    gpuMemcpy(physics->gpu_grav_field_g, physics->m_grav_field_g, size*sizeof(double), gpuMemcpyHostToDevice);
     gpuMemset(physics->gpu_fast_jac, 0, 2*size*_MODEL_NVARS_*_MODEL_NVARS_*sizeof(double));
     gpuMemset(physics->gpu_solution, 0, size*_MODEL_NVARS_*sizeof(double));
 

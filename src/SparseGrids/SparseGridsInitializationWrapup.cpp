@@ -26,9 +26,9 @@ int SparseGridsSimulation::InitializationWrapup()
     HyPar* solver = &(m_sims_sg[n].solver);
     MPIVariables* mpi = &(m_sims_sg[n].mpi);
 
-    int nvars = solver->nvars;
-    int ghosts = solver->ghosts;
-    int *dim_local = solver->dim_local;
+    int nvars = solver->m_nvars;
+    int ghosts = solver->m_ghosts;
+    int *dim_local = solver->m_dim_local;
 
     /* exchange MPI-boundary values of u between processors */
     MPIExchangeBoundariesnD(  m_ndims,
@@ -36,24 +36,24 @@ int SparseGridsSimulation::InitializationWrapup()
                               dim_local,
                               ghosts,
                               mpi,
-                              solver->u  );
+                              solver->m_u  );
 
     /* calculate volume integral of the initial solution */
-    ierr = ::VolumeIntegral(solver->VolumeIntegralInitial,
-                            solver->u,
+    ierr = ::VolumeIntegral(solver->m_volume_integral_initial,
+                            solver->m_u,
                             solver,
                             mpi );
     if (ierr) return ierr;
 
-    if (!mpi->rank) {
+    if (!mpi->m_rank) {
       printf("  Volume integral of the initial solution on sparse grids domain %d:\n", n);
       for (int d=0; d<nvars; d++) {
-        printf("    %2d:  %1.16E\n",d,solver->VolumeIntegralInitial[d]);
+        printf("    %2d:  %1.16E\n",d,solver->m_volume_integral_initial[d]);
       }
     }
 
     /* Set initial total boundary flux integral to zero */
-    _ArraySetValue_( solver->TotalBoundaryIntegral, nvars, 0 );
+    _ArraySetValue_( solver->m_total_boundary_integral, nvars, 0 );
 
   }
 

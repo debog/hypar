@@ -14,21 +14,21 @@
       {\bf F}\left({\bf u}\right) = 0.5 {\bf u}^2
     \f}
 */
-int BurgersAdvection( double  *f,   /*!< Array to hold the computed flux (same size and layout as u) */
-                      double  *u,   /*!< Array containing the conserved solution */
-                      int     dir,  /*!< Spatial dimension */
-                      void    *s,   /*!< Solver object of type #HyPar */
-                      double  t     /*!< Current time */
+int BurgersAdvection( double  *a_f,   /*!< Array to hold the computed flux (same size and layout as a_u) */
+                      double  *a_u,   /*!< Array containing the conserved solution */
+                      int     a_dir,  /*!< Spatial dimension */
+                      void    *a_s,   /*!< Solver object of type #HyPar */
+                      double  a_t   /*!< Current time */
                     )
 {
-  HyPar     *solver = (HyPar*)   s;
-  Burgers   *param  = (Burgers*) solver->physics;
+  HyPar     *solver = (HyPar*)   a_s;
+  Burgers   *param  = (Burgers*) solver->m_physics;
   int        i, v;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -41,7 +41,7 @@ int BurgersAdvection( double  *f,   /*!< Array to hold the computed flux (same s
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    for (v = 0; v < nvars; v++) f[nvars*p+v] = 0.5 * u[nvars*p+v] * u[nvars*p+v];
+    for (v = 0; v < nvars; v++) a_f[nvars*p+v] = 0.5 * a_u[nvars*p+v] * a_u[nvars*p+v];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

@@ -9,7 +9,7 @@
 
 /*!
   Return auxiliary solution: Some time integrators may have the concept of
-  auxiliary solutions that they evolve along with the main solution #HyPar::u
+  auxiliary solutions that they evolve along with the main solution #HyPar::m_u
   (these may be used for error estimation, for example). This function returns
   a pointer to such an auxiliary solution. Note that the auxiliary solution has
   the same dimensions and array layout as the main solution.
@@ -27,28 +27,28 @@
     (see TimeGLMGEE(), TimeGLMGEEInitialize() ).
 */
 int TimeGetAuxSolutions(
-                          int     *N,      /*!< Number of auxiliary solutions */
-                          double  **uaux,  /*!< Pointer to the array holding the auxiliary solution */
-                          void    *s,      /*!< Solver object of type #HyPar */
-                          int     nu,      /*!< Index of the auxiliary solution to return */
-                          int     ns       /*!< Index of the simulation domain of which the auxiliary solution to return */
+                          int     *a_N,      /*!< Number of auxiliary solutions */
+                          double  **a_uaux,  /*!< Pointer to the array holding the auxiliary solution */
+                          void    *a_s,      /*!< Solver object of type #HyPar */
+                          int     a_nu,      /*!< Index of the auxiliary solution to return */
+                          int     a_ns       /*!< Index of the simulation domain of which the auxiliary solution to return */
                        )
 {
-  HyPar           *solver = (HyPar*) s;
-  TimeIntegration *TS     = (TimeIntegration*) solver->time_integrator;
+  HyPar           *solver = (HyPar*) a_s;
+  TimeIntegration *TS     = (TimeIntegration*) solver->m_time_integrator;
 
-  if (nu >= 0) {
-    if (!strcmp(solver->time_scheme,_GLM_GEE_)) {
-      GLMGEEParameters *params = (GLMGEEParameters*) solver->msti;
-      *uaux = (TS->U[params->r+nu] + TS->u_offsets[ns]);
+  if (a_nu >= 0) {
+    if (!strcmp(solver->m_time_scheme,_GLM_GEE_)) {
+      GLMGEEParameters *params = (GLMGEEParameters*) solver->m_msti;
+      *a_uaux = (TS->m_U[params->r+a_nu] + TS->m_u_offsets[a_ns]);
     }
   } else {
-    if (!TS) *N = 0;
+    if (!TS) *a_N = 0;
     else {
-      if (!strcmp(solver->time_scheme,_GLM_GEE_)) {
-        GLMGEEParameters *params = (GLMGEEParameters*) solver->msti;
-        *N = params->r - 1;
-      } else *N = 0;
+      if (!strcmp(solver->m_time_scheme,_GLM_GEE_)) {
+        GLMGEEParameters *params = (GLMGEEParameters*) solver->m_msti;
+        *a_N = params->r - 1;
+      } else *a_N = 0;
     }
   }
 

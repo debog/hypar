@@ -24,43 +24,43 @@
     respectively, along the spatial dimension of the sponge.
 */
 int BCSpongeSource(
-                    void    *b,     /*!< Boundary object of type #DomainBoundary */
-                    int     ndims,  /*!< Number of spatial dimensions */
-                    int     nvars,  /*!< Number of variables/DoFs per grid point */
-                    int     ghosts, /*!< Number of ghost points */
-                    int     *size,  /*!< Integer array with the number of grid points in each spatial dimension */
-                    double  *grid,  /*!< 1D array with the spatial coordinates of the grid points, one dimension after the other */
-                    double  *u,     /*!< Solution */
-                    double  *source /*!< Source term to which the sponge term is added */
+                    void    *a_b,     /*!< Boundary object of type #DomainBoundary */
+                    int     a_ndims,  /*!< Number of spatial dimensions */
+                    int     a_nvars,  /*!< Number of variables/DoFs per grid point */
+                    int     a_ghosts, /*!< Number of ghost points */
+                    int     *a_size,  /*!< Integer array with the number of grid points in each spatial dimension */
+                    double  *a_grid,  /*!< 1D array with the spatial coordinates of the grid points, one dimension after the other */
+                    double  *a_u,     /*!< Solution */
+                    double  *a_source /*!< Source term to which the sponge term is added */
                   )
 {
-  DomainBoundary *boundary = (DomainBoundary*) b;
-  int            dim       = boundary->dim;
-  int            face      = boundary->face;
-  double         *uref     = boundary->SpongeValue;
-  double         *xmin     = boundary->xmin;
-  double         *xmax     = boundary->xmax;
+  DomainBoundary *boundary = (DomainBoundary*) a_b;
+  int            dim       = boundary->m_dim;
+  int            face      = boundary->m_face;
+  double         *uref     = boundary->m_SpongeValue;
+  double         *xmin     = boundary->m_xmin;
+  double         *xmax     = boundary->m_xmax;
   int            v;
 
-  if (boundary->on_this_proc) {
-    int bounds[ndims], indexb[ndims];
-    _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
-    _ArraySetValue_(indexb,ndims,0);
+  if (boundary->m_on_this_proc) {
+    int bounds[a_ndims], indexb[a_ndims];
+    _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,a_ndims);
+    _ArraySetValue_(indexb,a_ndims,0);
     int done = 0;
     while (!done) {
-      int i = indexb[dim] + boundary->is[dim];
+      int i = indexb[dim] + boundary->m_is[dim];
       double x, xstart, xend;
-      _GetCoordinate_(dim,i,size,ghosts,grid,x);
+      _GetCoordinate_(dim,i,a_size,a_ghosts,a_grid,x);
       xstart = xmin[dim];
       xend   = xmax[dim];
       /* calculate sigma */
       double sigma;
       if (face > 0) sigma = (x - xstart) / (xend - xstart);
       else          sigma = (x - xend  ) / (xstart - xend);
-      /* add to the source term */
-      int p; _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p);
-      for (v=0; v<nvars; v++) source[nvars*p+v] -= (sigma * (u[nvars*p+v]-uref[v]));
-      _ArrayIncrementIndex_(ndims,bounds,indexb,done);
+      /* add to the a_source term */
+      int p; _ArrayIndex1DWO_(a_ndims,a_size,indexb,boundary->m_is,a_ghosts,p);
+      for (v=0; v<a_nvars; v++) a_source[a_nvars*p+v] -= (sigma * (a_u[a_nvars*p+v]-uref[v]));
+      _ArrayIncrementIndex_(a_ndims,bounds,indexb,done);
     }
   }
   return(0);
@@ -71,14 +71,14 @@ int BCSpongeSource(
     BCSpongeSource()
 */
 int BCSpongeUDummy(
-                    void    *b,     /*!< Boundary object of type #DomainBoundary */
-                    void    *m,     /*!< MPI object of type #MPIVariables */
-                    int     ndims,  /*!< Number of spatial dimensions */
-                    int     nvars,  /*!< Number of variables/DoFs per grid point */
-                    int     *size,  /*!< Integer array with the number of grid points in each spatial dimension */
-                    int     ghosts, /*!< Number of ghost points */
-                    double  *phi,   /*!< The solution array on which to apply the boundary condition */
-                    double  waqt    /*!< Current solution time */
+                    void    *a_b,     /*!< Boundary object of type #DomainBoundary */
+                    void    *a_m,     /*!< MPI object of type #MPIVariables */
+                    int     a_ndims,  /*!< Number of spatial dimensions */
+                    int     a_nvars,  /*!< Number of variables/DoFs per grid point */
+                    int     *a_size,  /*!< Integer array with the number of grid points in each spatial dimension */
+                    int     a_ghosts, /*!< Number of ghost points */
+                    double  *a_phi,   /*!< The solution array on which to apply the boundary condition */
+                    double  a_waqt    /*!< Current solution time */
                   )
 {
   return(0);

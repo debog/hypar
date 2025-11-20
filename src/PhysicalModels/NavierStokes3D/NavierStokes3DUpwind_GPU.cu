@@ -113,7 +113,7 @@ extern "C" int gpuNavierStokes3DUpwindRusanov(
 {
   HyPar           *solver = (HyPar*)          s;
   NavierStokes3D  *param  = (NavierStokes3D*) solver->physics;
-  int             *dim    = solver->dim_local;
+  int             *dim    = solver->m_dim_local;
 
   int bounds_inter[_MODEL_NDIMS_];
   _ArrayCopy1D_(dim,bounds_inter,_MODEL_NDIMS_); bounds_inter[dir] += 1;
@@ -121,7 +121,7 @@ extern "C" int gpuNavierStokes3DUpwindRusanov(
   int nblocks = (npoints_grid-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DUpwindRusanov_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    npoints_grid, dir, solver->ghosts, param->gamma, solver->gpu_dim_local,
+    npoints_grid, dir, solver->m_ghosts, param->gamma, solver->gpu_dim_local,
     param->gpu_grav_field_g, fL, fR, uL, uR, u, fI
   );
   cudaDeviceSynchronize();
@@ -234,7 +234,7 @@ extern "C" int gpuNavierStokes3DUpwindRoe(
 {
   HyPar           *solver = (HyPar*)          s;
   NavierStokes3D  *param  = (NavierStokes3D*) solver->physics;
-  int             *dim    = solver->dim_local;
+  int             *dim    = solver->m_dim_local;
 
   int bounds_inter[_MODEL_NDIMS_];
   _ArrayCopy1D3_(dim,bounds_inter,_MODEL_NDIMS_); bounds_inter[dir] += 1;
@@ -242,7 +242,7 @@ extern "C" int gpuNavierStokes3DUpwindRoe(
   int nblocks = (npoints_grid-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DUpwindRoe_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    npoints_grid, dir, solver->ghosts, param->gamma, solver->gpu_dim_local,
+    npoints_grid, dir, solver->m_ghosts, param->gamma, solver->gpu_dim_local,
     param->gpu_grav_field_g, fL, fR, uL, uR, u, fI
   );
   cudaDeviceSynchronize();
@@ -351,7 +351,7 @@ extern "C" int gpuNavierStokes3DUpwindRusanov(
 {
   HyPar           *solver = (HyPar*)          s;
   NavierStokes3D  *param  = (NavierStokes3D*) solver->physics;
-  int             *dim    = solver->dim_local;
+  int             *dim    = solver->m_dim_local;
 
   int bounds_inter[_MODEL_NDIMS_];
   _ArrayCopy1D_(dim,bounds_inter,_MODEL_NDIMS_); bounds_inter[dir] += 1;
@@ -359,7 +359,7 @@ extern "C" int gpuNavierStokes3DUpwindRusanov(
   int nblocks = (npoints_grid-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DUpwindRusanov_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    npoints_grid, solver->npoints_local_wghosts, dir, solver->ghosts, param->gamma, solver->gpu_dim_local,
+    npoints_grid, solver->npoints_local_wghosts, dir, solver->m_ghosts, param->gamma, solver->gpu_dim_local,
     param->gpu_grav_field_g, fL, fR, uL, uR, u, fI
   );
   cudaDeviceSynchronize();
@@ -471,7 +471,7 @@ extern "C" int gpuNavierStokes3DUpwindRoe(
 {
   HyPar           *solver = (HyPar*)          s;
   NavierStokes3D  *param  = (NavierStokes3D*) solver->physics;
-  int             *dim    = solver->dim_local;
+  int             *dim    = solver->m_dim_local;
 
   int bounds_inter[_MODEL_NDIMS_];
   _ArrayCopy1D3_(dim,bounds_inter,_MODEL_NDIMS_); bounds_inter[dir] += 1;
@@ -488,7 +488,7 @@ extern "C" int gpuNavierStokes3DUpwindRoe(
 #endif
 
   gpuNavierStokes3DUpwindRoe_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    npoints_grid, solver->npoints_local_wghosts, dir, solver->ghosts, param->gamma, solver->gpu_dim_local,
+    npoints_grid, solver->npoints_local_wghosts, dir, solver->m_ghosts, param->gamma, solver->gpu_dim_local,
     param->gpu_grav_field_g, fL, fR, uL, uR, u, fI
   );
 

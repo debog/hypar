@@ -17,26 +17,26 @@
     corresponding to the MPI rank.
 */
 void MPIGetFilename(
-                      char  *root,      /*!< filename root */
-                      void  *c,         /*!< MPI communicator */
-                      char  *filename   /*!< filename */
+                      char  *a_root,      /*!< filename root */
+                      void  *a_c,         /*!< MPI communicator */
+                      char  *a_filename   /*!< filename */
                    )
 {
   char  tail[_MAX_STRING_SIZE_]="";
   int   rank;
 
 #ifndef serial
-  MPI_Comm  comm = *((MPI_Comm*)c);
+  MPI_Comm  comm = *((MPI_Comm*)a_c);
   MPI_Comm_rank(comm,&rank);
 #else
   rank = 0;
 #endif
 
   GetStringFromInteger(rank,tail,4);
-  strcpy(filename,"");
-  strcat(filename,root);
-  strcat(filename,"." );
-  strcat(filename,tail);
+  strcpy(a_filename,"");
+  strcat(a_filename,a_root);
+  strcat(a_filename,"." );
+  strcat(a_filename,tail);
 
   return;
 }

@@ -18,74 +18,74 @@ static int ReadArrayMPI_IO    (int,int,int*,int*,int,void*,void*,double*,double*
 #endif
 
 /*! Read in a vector field from file: wrapper function that calls
-    the appropriate function depending on input mode (#HyPar::input_mode).\n\n
-    The mode and type of input are specified through #HyPar::input_mode and
-    #HyPar::ip_file_type. A vector field is read from file and stored in an array.
+    the appropriate function depending on input mode (#HyPar::m_input_mode).\n\n
+    The mode and type of input are specified through #HyPar::m_input_mode and
+    #HyPar::m_ip_file_type. A vector field is read from file and stored in an array.
 */
 int ReadArray(
-              int     ndims,        /*!< Number of spatial dimensions */
-              int     nvars,        /*!< Number of variables per grid point */
-              int     *dim_global,  /*!< Integer array of size ndims with global grid size in each dimension */
-              int     *dim_local,   /*!< Integer array of size ndims with local  grid size in each dimension */
-              int     ghosts,       /*!< Number of ghost points */
-              void    *s,           /*!< Solver object of type #HyPar */
-              void    *m,           /*!< MPI object of type #MPIVariables */
-              double  *x,           /*!< Grid associated with the array (can be NULL) */
-              double  *u,           /*!< Array to hold the vector field */
-              char    *fname_root,  /*!< Filename root */
-              int     *read_flag    /*!< Flag to indicate if the file was read */
+              int     a_ndims,        /*!< Number of spatial dimensions */
+              int     a_nvars,        /*!< Number of variables per grid point */
+              int     *a_dim_global,  /*!< Integer array of size ndims with global grid size in each dimension */
+              int     *a_dim_local,   /*!< Integer array of size ndims with local  grid size in each dimension */
+              int     a_ghosts,       /*!< Number of ghost points */
+              void    *a_s,           /*!< Solver object of type #HyPar */
+              void    *a_m,           /*!< MPI object of type #MPIVariables */
+              double  *a_x,           /*!< Grid associated with the array (can be NULL) */
+              double  *a_u,           /*!< Array to hold the vector field */
+              char    *a_fname_root,  /*!< Filename root */
+              int     *a_read_flag    /*!< Flag to indicate if the file was read */
              )
 {
-  HyPar         *solver = (HyPar*) s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*) a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   _DECLARE_IERR_;
 
-  if      (!strcmp(solver->input_mode,"serial")) {
-    IERR ReadArraySerial(ndims,nvars,dim_global,dim_local,ghosts,s,m,x,u,fname_root,read_flag);
+  if      (!strcmp(solver->m_input_mode,"serial")) {
+    IERR ReadArraySerial(a_ndims,a_nvars,a_dim_global,a_dim_local,a_ghosts,a_s,a_m,a_x,a_u,a_fname_root,a_read_flag);
     CHECKERR(ierr);
 #ifndef serial
-  } else if (!strcmp(solver->input_mode,"parallel")) {
-    ReadArrayParallel(ndims,nvars,dim_global,dim_local,ghosts,s,m,x,u,fname_root,read_flag);
+  } else if (!strcmp(solver->m_input_mode,"parallel")) {
+    ReadArrayParallel(a_ndims,a_nvars,a_dim_global,a_dim_local,a_ghosts,a_s,a_m,a_x,a_u,a_fname_root,a_read_flag);
     CHECKERR(ierr);
-  } else if (!strcmp(solver->input_mode,"mpi-io"  )) {
-    ReadArrayMPI_IO(ndims,nvars,dim_global,dim_local,ghosts,s,m,x,u,fname_root,read_flag);
+  } else if (!strcmp(solver->m_input_mode,"mpi-io"  )) {
+    ReadArrayMPI_IO(a_ndims,a_nvars,a_dim_global,a_dim_local,a_ghosts,a_s,a_m,a_x,a_u,a_fname_root,a_read_flag);
     CHECKERR(ierr);
 #endif
   } else {
-    fprintf(stderr,"Error: Illegal value (%s) for input_mode.\n",solver->input_mode);
+    fprintf(stderr,"Error: Illegal value (%a_s) for input_mode.\n",solver->m_input_mode);
     return(1);
   }
 
-  if (x) {
+  if (a_x) {
     int offset, d;
-    /* exchange MPI-boundary values of x between processors */
+    /* exchange MPI-boundary values of a_x between processors */
     offset = 0;
-    for (d = 0; d < ndims; d++) {
-      IERR MPIExchangeBoundaries1D(mpi,&x[offset],dim_local[d],
-                                   ghosts,d,ndims); CHECKERR(ierr);
-      offset  += (dim_local [d] + 2*ghosts);
+    for (d = 0; d < a_ndims; d++) {
+      IERR MPIExchangeBoundaries1D(mpi,&a_x[offset],a_dim_local[d],
+                                   a_ghosts,d,a_ndims); CHECKERR(ierr);
+      offset  += (a_dim_local [d] + 2*a_ghosts);
     }
-    /* fill in ghost values of x at physical boundaries by extrapolation */
+    /* fill in ghost values of a_x at physical boundaries by extrapolation */
     offset = 0;
-    for (d = 0; d < ndims; d++) {
-      double *X     = &x[offset];
-      int    *dim   = dim_local, i;
-      if (mpi->ip[d] == 0) {
+    for (d = 0; d < a_ndims; d++) {
+      double *X     = &a_x[offset];
+      int    *dim   = a_dim_local, i;
+      if (mpi->m_ip[d] == 0) {
         /* fill left boundary along this dimension */
-        for (i = 0; i < ghosts; i++) {
-          int delta = ghosts - i;
-          X[i] = X[ghosts] + ((double) delta) * (X[ghosts]-X[ghosts+1]);
+        for (i = 0; i < a_ghosts; i++) {
+          int delta = a_ghosts - i;
+          X[i] = X[a_ghosts] + ((double) delta) * (X[a_ghosts]-X[a_ghosts+1]);
         }
       }
-      if (mpi->ip[d] == mpi->iproc[d]-1) {
+      if (mpi->m_ip[d] == mpi->m_iproc[d]-1) {
         /* fill right boundary along this dimension */
-        for (i = dim[d]+ghosts; i < dim[d]+2*ghosts; i++) {
-          int delta = i - (dim[d]+ghosts-1);
-          X[i] =  X[dim[d]+ghosts-1]
-                  + ((double) delta) * (X[dim[d]+ghosts-1]-X[dim[d]+ghosts-2]);
+        for (i = dim[d]+a_ghosts; i < dim[d]+2*a_ghosts; i++) {
+          int delta = i - (dim[d]+a_ghosts-1);
+          X[i] =  X[dim[d]+a_ghosts-1]
+                  + ((double) delta) * (X[dim[d]+a_ghosts-1]-X[dim[d]+a_ghosts-2]);
         }
       }
-      offset  += (dim[d] + 2*ghosts);
+      offset  += (dim[d] + 2*a_ghosts);
     }
   }
 
@@ -148,96 +148,96 @@ int ReadArray(
     For serial runs, this is the only input mode (of course!).
 */
 int ReadArraySerial(
-                      int     ndims,        /*!< Number of spatial dimensions */
-                      int     nvars,        /*!< Number of variables per grid point */
-                      int     *dim_global,  /*!< Integer array of size ndims with global grid size in each dimension */
-                      int     *dim_local,   /*!< Integer array of size ndims with local  grid size in each dimension */
-                      int     ghosts,       /*!< Number of ghost points */
-                      void    *s,           /*!< Solver object of type #HyPar */
-                      void    *m,           /*!< MPI object of type #MPIVariables */
-                      double  *x,           /*!< Grid associated with the array (can be NULL) */
-                      double  *u,           /*!< Array to hold the vector field being read */
-                      char    *fname_root,  /*!< Filename root */
-                      int     *read_flag    /*!< Flag to indicate if the file was read */
+                      int     a_ndims,        /*!< Number of spatial dimensions */
+                      int     a_nvars,        /*!< Number of variables per grid point */
+                      int     *a_dim_global,  /*!< Integer array of size ndims with global grid size in each dimension */
+                      int     *a_dim_local,   /*!< Integer array of size ndims with local  grid size in each dimension */
+                      int     a_ghosts,       /*!< Number of ghost points */
+                      void    *a_s,           /*!< Solver object of type #HyPar */
+                      void    *a_m,           /*!< MPI object of type #MPIVariables */
+                      double  *a_x,           /*!< Grid associated with the array (can be NULL) */
+                      double  *a_u,           /*!< Array to hold the vector field being read */
+                      char    *a_fname_root,  /*!< Filename root */
+                      int     *a_read_flag    /*!< Flag to indicate if the file was read */
                     )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
-  int           i, d, ferr, index[ndims];
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
+  int           i, d, ferr, index[a_ndims];
   double        *ug = NULL, *xg = NULL;
   _DECLARE_IERR_;
 
-  *read_flag = 0;
+  *a_read_flag = 0;
   /* Only root process reads from the file */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 
-    if (!strcmp(solver->ip_file_type,"ascii")) {
+    if (!strcmp(solver->m_ip_file_type,"ascii")) {
       char filename[_MAX_STRING_SIZE_];
-      strcpy(filename,fname_root);
+      strcpy(filename,a_fname_root);
       strcat(filename,".inp");
       FILE *in; in = fopen(filename,"r");
-      if (!in) *read_flag = 0;
+      if (!in) *a_read_flag = 0;
       else {
-        *read_flag = 1;
+        *a_read_flag = 1;
         /* Reading from file */
-        printf("Reading array from ASCII file %s (Serial mode).\n",filename);
+        printf("Reading array from ASCII file %a_s (Serial mode).\n",filename);
         int size,offset;
         /* allocate global solution array */
-        size  = 1; for (d=0; d<ndims; d++) size *= dim_global[d]; size *= nvars;
+        size  = 1; for (d=0; d<a_ndims; d++) size *= a_dim_global[d]; size *= a_nvars;
         ug    = (double*) calloc(size,sizeof(double));
-        size  = 0; for (d=0; d<ndims; d++) size += dim_global[d];
+        size  = 0; for (d=0; d<a_ndims; d++) size += a_dim_global[d];
         xg    = (double*) calloc(size,sizeof(double));
 
         /* read grid */
         offset = 0;
-        for (d = 0; d < ndims; d++) {
-          for (i = 0; i < dim_global[d]; i++) {
+        for (d = 0; d < a_ndims; d++) {
+          for (i = 0; i < a_dim_global[d]; i++) {
             ferr = fscanf(in,"%lf",&xg[i+offset]);
             if (ferr != 1) {
               printf("Error in ReadArraySerial(): unable to read data. ferr=%d\n", ferr);
               exit(1);
             }
           }
-          offset += dim_global[d];
+          offset += a_dim_global[d];
         }
 
         /* read solution */
-        for (i = 0; i < nvars; i++) {
-          int done = 0; _ArraySetValue_(index,ndims,0);
+        for (i = 0; i < a_nvars; i++) {
+          int done = 0; _ArraySetValue_(index,a_ndims,0);
           while (!done) {
-            int p; _ArrayIndex1D_(ndims,dim_global,index,0,p);
-            ferr = fscanf(in,"%lf",&ug[p*nvars+i]);
+            int p; _ArrayIndex1D_(a_ndims,a_dim_global,index,0,p);
+            ferr = fscanf(in,"%lf",&ug[p*a_nvars+i]);
             if (ferr != 1) {
               printf("Error in ReadArraySerial(): unable to read data. ferr=%d\n", ferr);
               exit(1);
             }
-            _ArrayIncrementIndex_(ndims,dim_global,index,done);
+            _ArrayIncrementIndex_(a_ndims,a_dim_global,index,done);
           }
         }
 
         fclose(in);
       }
-    } else if ((!strcmp(solver->ip_file_type,"bin")) || (!strcmp(solver->ip_file_type,"binary"))) {
+    } else if ((!strcmp(solver->m_ip_file_type,"bin")) || (!strcmp(solver->m_ip_file_type,"binary"))) {
 
       char filename[_MAX_STRING_SIZE_];
-      strcpy(filename,fname_root);
+      strcpy(filename,a_fname_root);
       strcat(filename,".inp");
       FILE *in; in = fopen(filename,"rb");
-      if (!in) *read_flag = 0;
+      if (!in) *a_read_flag = 0;
       else {
-        *read_flag = 1;
-        printf("Reading array from binary file %s (Serial mode).\n",filename);
+        *a_read_flag = 1;
+        printf("Reading array from binary file %a_s (Serial mode).\n",filename);
         size_t bytes;
         int size;
         /* allocate global solution array */
-        size  = 1; for (d=0; d<ndims; d++) size *= dim_global[d]; size *= nvars;
+        size  = 1; for (d=0; d<a_ndims; d++) size *= a_dim_global[d]; size *= a_nvars;
         ug = (double*) calloc(size,sizeof(double));
-        size = 0; for (d=0; d<ndims; d++) size += dim_global[d];
+        size = 0; for (d=0; d<a_ndims; d++) size += a_dim_global[d];
         xg      = (double*) calloc(size,sizeof(double));
 
         /* read grid */
         size = 0;
-        for (d = 0; d < ndims; d++) size += dim_global[d];
+        for (d = 0; d < a_ndims; d++) size += a_dim_global[d];
         bytes = fread(xg, sizeof(double), size, in);
         if ((int)bytes != size) {
           fprintf(stderr,"Error in ReadArray(): Unable to read grid. Expected %d, Read %d.\n",
@@ -246,7 +246,7 @@ int ReadArraySerial(
 
         /* read solution */
         size = 1;
-        for (d = 0; d < ndims; d++) size *= dim_global[d]; size *= nvars;
+        for (d = 0; d < a_ndims; d++) size *= a_dim_global[d]; size *= a_nvars;
         bytes = fread(ug, sizeof(double), size, in);
         if ((int)bytes != size) {
           fprintf(stderr,"Error in ReadArray(): Unable to read solution. Expected %d, Read %d.\n",
@@ -259,29 +259,29 @@ int ReadArraySerial(
     }
   }
 
-  /* Broadcast read_flag to all processes */
-  IERR MPIBroadcast_integer(read_flag,1,0,&mpi->world); CHECKERR(ierr);
+  /* Broadcast a_read_flag to all processes */
+  IERR MPIBroadcast_integer(a_read_flag,1,0,&mpi->m_world); CHECKERR(ierr);
 
-  if (*read_flag) {
+  if (*a_read_flag) {
 
     /* partition global array to all processes */
-    IERR MPIPartitionArraynD(ndims,mpi,(mpi->rank?NULL:ug),u,dim_global,
-                             dim_local,ghosts,nvars); CHECKERR(ierr);
+    IERR MPIPartitionArraynD(a_ndims,mpi,(mpi->m_rank?NULL:ug),a_u,a_dim_global,
+                             a_dim_local,a_ghosts,a_nvars); CHECKERR(ierr);
 
-    if (x) {
-      /* partition x vector across the processes */
+    if (a_x) {
+      /* partition a_x vector across the processes */
       int offset_global = 0, offset_local = 0;
-      for (d=0; d<ndims; d++) {
-        IERR MPIPartitionArray1D(mpi,(mpi->rank?NULL:&xg[offset_global]),
-                                 &x[offset_local+ghosts],
-                                 mpi->is[d],mpi->ie[d],dim_local[d],0); CHECKERR(ierr);
-        offset_global += dim_global[d];
-        offset_local  += dim_local [d] + 2*ghosts;
+      for (d=0; d<a_ndims; d++) {
+        IERR MPIPartitionArray1D(mpi,(mpi->m_rank?NULL:&xg[offset_global]),
+                                 &a_x[offset_local+a_ghosts],
+                                 mpi->m_is[d],mpi->m_ie[d],a_dim_local[d],0); CHECKERR(ierr);
+        offset_global += a_dim_global[d];
+        offset_local  += a_dim_local [d] + 2*a_ghosts;
       }
     }
 
     /* free global arrays */
-    if (!mpi->rank) {
+    if (!mpi->m_rank) {
       free(ug);
       free(xg);
     }
@@ -339,98 +339,98 @@ int ReadArraySerial(
      the input file "solver.inp" is set to "parallel n" where n is the number of IO ranks.
 */
 int ReadArrayParallel(
-                      int     ndims,        /*!< Number of spatial dimensions */
-                      int     nvars,        /*!< Number of variables per grid point */
-                      int     *dim_global,  /*!< Integer array of size ndims with global grid size in each dimension */
-                      int     *dim_local,   /*!< Integer array of size ndims with local  grid size in each dimension */
-                      int     ghosts,       /*!< Number of ghost points */
-                      void    *s,           /*!< Solver object of type #HyPar */
-                      void    *m,           /*!< MPI object of type #MPIVariables */
-                      double  *x,           /*!< Grid associated with the array (can be NULL) */
-                      double  *u,           /*!< Array to hold the vector field being read */
-                      char    *fname_root,  /*!< Filename root */
-                      int     *read_flag    /*!< Flag to indicate if file was read */
+                      int     a_ndims,        /*!< Number of spatial dimensions */
+                      int     a_nvars,        /*!< Number of variables per grid point */
+                      int     *a_dim_global,  /*!< Integer array of size ndims with global grid size in each dimension */
+                      int     *a_dim_local,   /*!< Integer array of size ndims with local  grid size in each dimension */
+                      int     a_ghosts,       /*!< Number of ghost points */
+                      void    *a_s,           /*!< Solver object of type #HyPar */
+                      void    *a_m,           /*!< MPI object of type #MPIVariables */
+                      double  *a_x,           /*!< Grid associated with the array (can be NULL) */
+                      double  *a_u,           /*!< Array to hold the vector field being read */
+                      char    *a_fname_root,  /*!< Filename root */
+                      int     *a_read_flag    /*!< Flag to indicate if file was read */
                      )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   int           proc,d;
   _DECLARE_IERR_;
 
-  *read_flag = 1;
+  *a_read_flag = 1;
   char filename_root[_MAX_STRING_SIZE_];
-  strcpy(filename_root,fname_root);
+  strcpy(filename_root,a_fname_root);
   strcat(filename_root,"_par.inp");
 
   /* check for existence of the file */
-  if (mpi->IOParticipant) {
+  if (mpi->m_IOParticipant) {
     FILE *in;
     char filename[_MAX_STRING_SIZE_];
-    MPIGetFilename(filename_root,&mpi->IOWorld,filename);
+    MPIGetFilename(filename_root,&mpi->m_IOWorld,filename);
     in = fopen(filename,"rb");
-    if (!in)  *read_flag = 0;
+    if (!in)  *a_read_flag = 0;
     else {
-      *read_flag = 1;
+      *a_read_flag = 1;
       fclose(in);
     }
   }
-  IERR MPIMin_integer(read_flag,read_flag,1,&mpi->world);
+  IERR MPIMin_integer(a_read_flag,a_read_flag,1,&mpi->m_world);
 
-  if (*read_flag) {
+  if (*a_read_flag) {
 
-    if (!mpi->rank) printf("Reading from binary file %s.xxx (parallel mode).\n",filename_root);
+    if (!mpi->m_rank) printf("Reading from binary file %a_s.xxx (parallel mode).\n",filename_root);
 
     /* calculate size of the local grid on this rank */
-    int sizex = 0;     for (d=0; d<ndims; d++) sizex += dim_local[d];
-    int sizeu = nvars; for (d=0; d<ndims; d++) sizeu *= dim_local[d];
+    int sizex = 0;     for (d=0; d<a_ndims; d++) sizex += a_dim_local[d];
+    int sizeu = a_nvars; for (d=0; d<a_ndims; d++) sizeu *= a_dim_local[d];
 
     /* allocate buffer arrays to read in grid and solution */
     double *buffer = (double*) calloc (sizex+sizeu, sizeof(double));
 
-    if (mpi->IOParticipant) {
+    if (mpi->m_IOParticipant) {
 
       /* if this rank is responsible for file I/O */
       double *read_buffer = NULL;
       int     read_size_x, read_size_u, read_total_size;
-      int     is[ndims], ie[ndims];
+      int     is[a_ndims], ie[a_ndims];
 
       /* open the file */
       FILE *in;
       int  bytes;
       char filename[_MAX_STRING_SIZE_];
-      MPIGetFilename(filename_root,&mpi->IOWorld,filename);
+      MPIGetFilename(filename_root,&mpi->m_IOWorld,filename);
 
       in = fopen(filename,"rb");
       if (!in) {
-        fprintf(stderr,"Error in ReadArrayParallel(): File %s could not be opened.\n",filename);
+        fprintf(stderr,"Error in ReadArrayParallel(): File %a_s could not be opened.\n",filename);
         return(1);
       }
 
       /* Read own data */
       bytes = fread(buffer,sizeof(double),(sizex+sizeu),in);
       if (bytes != (sizex+sizeu)) {
-        fprintf(stderr,"Error in ReadArrayParallel(): File %s contains insufficient data.\n",filename);
+        fprintf(stderr,"Error in ReadArrayParallel(): File %a_s contains insufficient data.\n",filename);
         return(1);
       }
 
-      /* read and send the data for the other processors in this IO rank's group */
-      for (proc=mpi->GroupStartRank+1; proc<mpi->GroupEndRank; proc++) {
+      /* read and send the data for the other processors in this IO rank'a_s group */
+      for (proc=mpi->m_GroupStartRank+1; proc<mpi->m_GroupEndRank; proc++) {
         /* get the local domain limits for process proc */
-        IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie);
+        IERR MPILocalDomainLimits(a_ndims,proc,mpi,a_dim_global,is,ie);
         /* calculate the size of its local data and allocate read buffer */
-        read_size_x = 0;      for (d=0; d<ndims; d++) read_size_x += (ie[d]-is[d]);
-        read_size_u = nvars;  for (d=0; d<ndims; d++) read_size_u *= (ie[d]-is[d]);
+        read_size_x = 0;      for (d=0; d<a_ndims; d++) read_size_x += (ie[d]-is[d]);
+        read_size_u = a_nvars;  for (d=0; d<a_ndims; d++) read_size_u *= (ie[d]-is[d]);
         read_total_size = read_size_x + read_size_u;
         read_buffer = (double*) calloc (read_total_size, sizeof(double));
         /* read the data */
         bytes = fread(read_buffer,sizeof(double),read_total_size,in);
         if (bytes != read_total_size) {
-          fprintf(stderr,"Error in ReadArrayParallel(): File %s contains insufficient data.\n",filename);
+          fprintf(stderr,"Error in ReadArrayParallel(): File %a_s contains insufficient data.\n",filename);
           return(1);
         }
         /* send the data */
         MPI_Request req = MPI_REQUEST_NULL;
-        MPI_Isend(read_buffer,read_total_size,MPI_DOUBLE,proc,1100,mpi->world,&req);
+        MPI_Isend(read_buffer,read_total_size,MPI_DOUBLE,proc,1100,mpi->m_world,&req);
         MPI_Wait(&req,MPI_STATUS_IGNORE);
         free(read_buffer);
       }
@@ -443,24 +443,24 @@ int ReadArrayParallel(
       /* all other processes, just receive the data from
        * the rank responsible for file I/O */
       MPI_Request req = MPI_REQUEST_NULL;
-      MPI_Irecv(buffer,(sizex+sizeu),MPI_DOUBLE,mpi->IORank,1100,mpi->world,&req);
+      MPI_Irecv(buffer,(sizex+sizeu),MPI_DOUBLE,mpi->m_IORank,1100,mpi->m_world,&req);
       MPI_Wait(&req,MPI_STATUS_IGNORE);
 
     }
 
     /* copy the grid */
-    if (x) {
+    if (a_x) {
       int offset1 = 0, offset2 = 0;
-      for (d = 0; d < ndims; d++) {
-        _ArrayCopy1D_((buffer+offset2),(x+offset1+ghosts),dim_local[d]);
-        offset1 += (dim_local[d]+2*ghosts);
-        offset2 +=  dim_local[d];
+      for (d = 0; d < a_ndims; d++) {
+        _ArrayCopy1D_((buffer+offset2),(a_x+offset1+a_ghosts),a_dim_local[d]);
+        offset1 += (a_dim_local[d]+2*a_ghosts);
+        offset2 +=  a_dim_local[d];
       }
     }
 
     /* copy the solution */
-    int index[ndims];
-    IERR ArrayCopynD(ndims,(buffer+sizex),u,dim_local,0,ghosts,index,nvars);
+    int index[a_ndims];
+    IERR ArrayCopynD(a_ndims,(buffer+sizex),a_u,a_dim_local,0,a_ghosts,index,a_nvars);
     CHECKERR(ierr);
 
     /* free buffers */
@@ -511,69 +511,69 @@ int ReadArrayParallel(
      the input file "solver.inp" is set to "mpi-io n" where n is the number of IO ranks.
 */
 int ReadArrayMPI_IO(
-                      int     ndims,        /*!< Number of spatial dimensions */
-                      int     nvars,        /*!< Number of variables per grid point */
-                      int     *dim_global,  /*!< Integer array of size ndims with global grid size in each dimension */
-                      int     *dim_local,   /*!< Integer array of size ndims with local  grid size in each dimension */
-                      int     ghosts,       /*!< Number of ghost points */
-                      void    *s,           /*!< Solver object of type #HyPar */
-                      void    *m,           /*!< MPI object of type #MPIVariables */
-                      double  *x,           /*!< Grid associated with the array (can be NULL) */
-                      double  *u,           /*!< Array to hold the vector field being read */
-                      char    *fname_root,  /*!< Filename root */
-                      int     *read_flag    /*!< Flag to indicate if file was read */
+                      int     a_ndims,        /*!< Number of spatial dimensions */
+                      int     a_nvars,        /*!< Number of variables per grid point */
+                      int     *a_dim_global,  /*!< Integer array of size ndims with global grid size in each dimension */
+                      int     *a_dim_local,   /*!< Integer array of size ndims with local  grid size in each dimension */
+                      int     a_ghosts,       /*!< Number of ghost points */
+                      void    *a_s,           /*!< Solver object of type #HyPar */
+                      void    *a_m,           /*!< MPI object of type #MPIVariables */
+                      double  *a_x,           /*!< Grid associated with the array (can be NULL) */
+                      double  *a_u,           /*!< Array to hold the vector field being read */
+                      char    *a_fname_root,  /*!< Filename root */
+                      int     *a_read_flag    /*!< Flag to indicate if file was read */
                    )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   int           proc,d;
   _DECLARE_IERR_;
 
-  *read_flag = 0;
+  *a_read_flag = 0;
   char filename[_MAX_STRING_SIZE_];
-  strcpy(filename,fname_root);
+  strcpy(filename,a_fname_root);
   strcat(filename,"_mpi.inp");
 
   /* check for existence of file */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     FILE *in;
     in = fopen(filename,"rb");
-    if (!in)  *read_flag = 0;
+    if (!in)  *a_read_flag = 0;
     else {
-      *read_flag = 1;
+      *a_read_flag = 1;
       fclose(in);
     }
   }
-  IERR MPIBroadcast_integer(read_flag,1,0,&mpi->world);
+  IERR MPIBroadcast_integer(a_read_flag,1,0,&mpi->m_world);
 
-  if (*read_flag) {
+  if (*a_read_flag) {
 
-    if (!mpi->rank) printf("Reading from binary file %s (MPI-IO mode).\n",filename);
+    if (!mpi->m_rank) printf("Reading from binary file %a_s (MPI-IO mode).\n",filename);
 
     /* calculate size of the local grid on this rank */
-    int sizex = 0;     for (d=0; d<ndims; d++) sizex += dim_local[d];
-    int sizeu = nvars; for (d=0; d<ndims; d++) sizeu *= dim_local[d];
+    int sizex = 0;     for (d=0; d<a_ndims; d++) sizex += a_dim_local[d];
+    int sizeu = a_nvars; for (d=0; d<a_ndims; d++) sizeu *= a_dim_local[d];
 
     /* allocate buffer arrays to read in grid and solution */
     double *buffer = (double*) calloc (sizex+sizeu, sizeof(double));
 
-    if (mpi->IOParticipant) {
+    if (mpi->m_IOParticipant) {
 
       /* if this rank is responsible for file I/O */
       double *read_buffer = NULL;
       int     read_size_x, read_size_u, read_total_size;
-      int     is[ndims], ie[ndims], size;
+      int     is[a_ndims], ie[a_ndims], size;
 
       /* calculate offset */
       long long offset = 0;
-      for (proc=0; proc < mpi->rank; proc++) {
+      for (proc=0; proc < mpi->m_rank; proc++) {
         /* get the local domain limits for process proc */
-        IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie);
+        IERR MPILocalDomainLimits(a_ndims,proc,mpi,a_dim_global,is,ie);
         /* calculate the size of its local grid */
-        size = 0; for (d=0; d<ndims; d++) size += (ie[d]-is[d]);
+        size = 0; for (d=0; d<a_ndims; d++) size += (ie[d]-is[d]);
         offset += size;
         /* calculate the size of the local solution */
-        size = nvars; for (d=0; d<ndims; d++) size *= (ie[d]-is[d]);
+        size = a_nvars; for (d=0; d<a_ndims; d++) size *= (ie[d]-is[d]);
         offset += size;
       }
 
@@ -581,9 +581,9 @@ int ReadArrayMPI_IO(
       MPI_Status  status;
       MPI_File    in;
       int         error;
-      error = MPI_File_open(mpi->IOWorld,filename,MPI_MODE_RDONLY,MPI_INFO_NULL,&in);
+      error = MPI_File_open(mpi->m_IOWorld,filename,MPI_MODE_RDONLY,MPI_INFO_NULL,&in);
       if (error != MPI_SUCCESS) {
-        fprintf(stderr,"Error in ReadArrayMPI_IO(): Unable to open %s.\n",filename);
+        fprintf(stderr,"Error in ReadArrayMPI_IO(): Unable to open %a_s.\n",filename);
         return(1);
       }
 
@@ -594,20 +594,20 @@ int ReadArrayMPI_IO(
       /* Read own data */
       MPI_File_read(in,buffer,(sizex+sizeu)*sizeof(double),MPI_BYTE,&status);
 
-      /* read and send the data for the other processors in this IO rank's group */
-      for (proc=mpi->GroupStartRank+1; proc<mpi->GroupEndRank; proc++) {
+      /* read and send the data for the other processors in this IO rank'a_s group */
+      for (proc=mpi->m_GroupStartRank+1; proc<mpi->m_GroupEndRank; proc++) {
         /* get the local domain limits for process proc */
-        IERR MPILocalDomainLimits(ndims,proc,mpi,dim_global,is,ie);
+        IERR MPILocalDomainLimits(a_ndims,proc,mpi,a_dim_global,is,ie);
         /* calculate the size of its local data and allocate read buffer */
-        read_size_x = 0;      for (d=0; d<ndims; d++) read_size_x += (ie[d]-is[d]);
-        read_size_u = nvars;  for (d=0; d<ndims; d++) read_size_u *= (ie[d]-is[d]);
+        read_size_x = 0;      for (d=0; d<a_ndims; d++) read_size_x += (ie[d]-is[d]);
+        read_size_u = a_nvars;  for (d=0; d<a_ndims; d++) read_size_u *= (ie[d]-is[d]);
         read_total_size = read_size_x + read_size_u;
         read_buffer = (double*) calloc (read_total_size, sizeof(double));
         /* read the data */
         MPI_File_read(in,read_buffer,read_total_size*sizeof(double),MPI_BYTE,&status);
         /* send the data */
         MPI_Request req = MPI_REQUEST_NULL;
-        MPI_Isend(read_buffer,read_total_size,MPI_DOUBLE,proc,1100,mpi->world,&req);
+        MPI_Isend(read_buffer,read_total_size,MPI_DOUBLE,proc,1100,mpi->m_world,&req);
         MPI_Wait(&req,MPI_STATUS_IGNORE);
         free(read_buffer);
       }
@@ -620,24 +620,24 @@ int ReadArrayMPI_IO(
       /* all other processes, just receive the data from
        * the rank responsible for file I/O */
       MPI_Request req = MPI_REQUEST_NULL;
-      MPI_Irecv(buffer,(sizex+sizeu),MPI_DOUBLE,mpi->IORank,1100,mpi->world,&req);
+      MPI_Irecv(buffer,(sizex+sizeu),MPI_DOUBLE,mpi->m_IORank,1100,mpi->m_world,&req);
       MPI_Wait(&req,MPI_STATUS_IGNORE);
 
     }
 
     /* copy the grid */
-    if (x) {
+    if (a_x) {
       int offset1 = 0, offset2 = 0;
-      for (d = 0; d < ndims; d++) {
-        _ArrayCopy1D_((buffer+offset2),(x+offset1+ghosts),dim_local[d]);
-        offset1 += (dim_local[d]+2*ghosts);
-        offset2 +=  dim_local[d];
+      for (d = 0; d < a_ndims; d++) {
+        _ArrayCopy1D_((buffer+offset2),(a_x+offset1+a_ghosts),a_dim_local[d]);
+        offset1 += (a_dim_local[d]+2*a_ghosts);
+        offset2 +=  a_dim_local[d];
       }
     }
 
     /* copy the solution */
-    int index[ndims];
-    IERR ArrayCopynD(ndims,(buffer+sizex),u,dim_local,0,ghosts,index,nvars);
+    int index[a_ndims];
+    IERR ArrayCopynD(a_ndims,(buffer+sizex),a_u,a_dim_local,0,a_ghosts,index,a_nvars);
     CHECKERR(ierr);
 
     /* free buffers */

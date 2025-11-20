@@ -28,68 +28,68 @@
   given the solution \f${\bf u}\f$ and the current simulation time.
 */
 int TimeRHSFunctionExplicit(
-                              double  *rhs, /*!< Array to hold the computed right-hand-side */
-                              double  *u,   /*!< Array holding the solution */
-                              void    *s,   /*!< Solver object of type #HyPar */
-                              void    *m,   /*!< MPI object of type #MPIVariables */
-                              double  t     /*!< Current simulation time */
+                              double  *a_rhs, /*!< Array to hold the computed right-hand-side */
+                              double  *a_u,   /*!< Array holding the solution */
+                              void    *a_s,   /*!< Solver object of type #HyPar */
+                              void    *a_m,   /*!< MPI object of type #MPIVariables */
+                              double  a_t     /*!< Current simulation time */
                            )
 {
-  HyPar           *solver = (HyPar*)        s;
-  MPIVariables    *mpi    = (MPIVariables*) m;
+  HyPar           *solver = (HyPar*)        a_s;
+  MPIVariables    *mpi    = (MPIVariables*) a_m;
   int             d;
 
   int size = 1;
-  for (d=0; d<solver->ndims; d++) size *= (solver->dim_local[d]+2*solver->ghosts);
+  for (d=0; d<solver->m_ndims; d++) size *= (solver->m_dim_local[d]+2*solver->m_ghosts);
 
   /* apply boundary conditions and exchange data over MPI interfaces */
-  solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);
-  solver->ApplyIBConditions(solver,mpi,u,t);
+  solver->ApplyBoundaryConditions(solver,mpi,a_u,NULL,a_t);
+  solver->ApplyIBConditions(solver,mpi,a_u,a_t);
 
   /* Evaluate hyperbolic, parabolic and source terms  and the RHS */
 #if defined(HAVE_CUDA)
-  if (solver->use_gpu) {
-    gpuMPIExchangeBoundariesnD( solver->ndims,
-                                solver->nvars,
-                                solver->gpu_dim_local,
-                                solver->ghosts,
+  if (solver->m_use_gpu) {
+    gpuMPIExchangeBoundariesnD( solver->m_ndims,
+                                solver->m_nvars,
+                                solver->m_gpu_dim_local,
+                                solver->m_ghosts,
                                 mpi,
-                                u );
+                                a_u );
   } else {
 #endif
-    MPIExchangeBoundariesnD(  solver->ndims,
-                              solver->nvars,
-                              solver->dim_local,
-                              solver->ghosts,
+    MPIExchangeBoundariesnD(  solver->m_ndims,
+                              solver->m_nvars,
+                              solver->m_dim_local,
+                              solver->m_ghosts,
                               mpi,
-                              u);
+                              a_u);
 #if defined(HAVE_CUDA)
   }
 #endif
 
-    solver->HyperbolicFunction( solver->hyp,
-                                u,
+    solver->HyperbolicFunction( solver->m_hyp,
+                                a_u,
                                 solver,
                                 mpi,
-                                t,
+                                a_t,
                                 1,
                                 solver->FFunction,
                                 solver->Upwind );
-    solver->ParabolicFunction(solver->par,u,solver,mpi,t);
-    solver->SourceFunction(solver->source,u,solver,mpi,t);
+    solver->ParabolicFunction(solver->m_par,a_u,solver,mpi,a_t);
+    solver->SourceFunction(solver->m_source,a_u,solver,mpi,a_t);
 
 #if defined(HAVE_CUDA)
-  if (solver->use_gpu) {
-    gpuArraySetValue(rhs, size*solver->nvars, 0.0);
-    gpuArrayAXPY(solver->hyp,    -1.0, rhs, size*solver->nvars);
-    gpuArrayAXPY(solver->par,     1.0, rhs, size*solver->nvars);
-    gpuArrayAXPY(solver->source,  1.0, rhs, size*solver->nvars);
+  if (solver->m_use_gpu) {
+    gpuArraySetValue(a_rhs, size*solver->m_nvars, 0.0);
+    gpuArrayAXPY(solver->m_hyp,    -1.0, a_rhs, size*solver->m_nvars);
+    gpuArrayAXPY(solver->m_par,     1.0, a_rhs, size*solver->m_nvars);
+    gpuArrayAXPY(solver->m_source,  1.0, a_rhs, size*solver->m_nvars);
   } else {
 #endif
-    _ArraySetValue_(rhs,size*solver->nvars,0.0);
-    _ArrayAXPY_(solver->hyp   ,-1.0,rhs,size*solver->nvars);
-    _ArrayAXPY_(solver->par   , 1.0,rhs,size*solver->nvars);
-    _ArrayAXPY_(solver->source, 1.0,rhs,size*solver->nvars);
+    _ArraySetValue_(a_rhs,size*solver->m_nvars,0.0);
+    _ArrayAXPY_(solver->m_hyp   ,-1.0,a_rhs,size*solver->m_nvars);
+    _ArrayAXPY_(solver->m_par   , 1.0,a_rhs,size*solver->m_nvars);
+    _ArrayAXPY_(solver->m_source, 1.0,a_rhs,size*solver->m_nvars);
 #if defined(HAVE_CUDA)
   }
 #endif

@@ -10,7 +10,7 @@
 
   Parallel direct solver for tridiagonal systems
 
-  tridiagLU  (a,b,c,x,n,ns,r,m) - Parallel tridiagonal solver
+  TridiagLU(a,b,c,x,n,ns,r,m) - Parallel tridiagonal solver
 
     Solves the tridiagonal system in parallel by reordering the
     points such that the first point of each subdomain is placed
@@ -24,7 +24,7 @@
     solve (tridiagLUGS) or the recursive-doubling (tridiagLURD)
     algorithms.
 
-  tridiagLUGS(a,b,c,x,n,ns,r,m) - Tridiagonal solver based on
+  TridiagLUGS(a,b,c,x,n,ns,r,m) - Tridiagonal solver based on
                                   "gather and solve"
 
     Each of the "ns" systems is gathered on one processor,
@@ -70,7 +70,7 @@
 
 */
 
-/*! Jacobi method \sa tridiagIterJacobi(), blocktridiagIterJacobi() */
+/*! Jacobi method \sa TridiagIterJacobi(), BlockTridiagIterJacobi() */
 #define _TRIDIAG_JACOBI_  "jacobi"
 /*! "Gather-and-solve" method \sa tridiagLUGS */
 #define _TRIDIAG_GS_      "gather-and-solve"
@@ -83,46 +83,46 @@
 */
 typedef struct _tridiagLU_ {
 
-  /* Parameters for tridiagLU() */
+  /* Parameters for TridiagLU() */
 
   /*! Choice of solver for solving the reduced system. May be #_TRIDIAG_JACOBI_
       or #_TRIDIAG_GS_.
   */
-  char reducedsolvetype[50];
+  char m_reducedsolvetype[50];
 
-  int     evaluate_norm;  /*!< calculate norm at each iteration? (relevant only for iterative solvers) */
-  int     maxiter;        /*!< maximum number of iterations (relevant only for iterative solvers)      */
-  double  atol,           /*!< absolute tolerance (relevant only for iterative solvers)                */
-          rtol;           /*!< relative tolerace (relevant only for iterative solvers)                 */
-  int     exititer;       /*!< number of iterations it ran for (relevant only for iterative solvers)   */
-  double  exitnorm;       /*!< error norm at exit (relevant only for iterative solvers)                */
-  int     verbose;        /*!< print iterations and norms (relevant only for iterative solvers)        */
+  int     m_evaluate_norm;  /*!< calculate norm at each iteration? (relevant only for iterative solvers) */
+  int     m_maxiter;        /*!< maximum number of iterations (relevant only for iterative solvers)      */
+  double  m_atol,           /*!< absolute tolerance (relevant only for iterative solvers)                */
+          m_rtol;           /*!< relative tolerace (relevant only for iterative solvers)                 */
+  int     m_exititer;       /*!< number of iterations it ran for (relevant only for iterative solvers)   */
+  double  m_exitnorm;       /*!< error norm at exit (relevant only for iterative solvers)                */
+  int     m_verbose;        /*!< print iterations and norms (relevant only for iterative solvers)        */
 
-  double  total_time;     /*!< Total wall time in seconds */
-  double  stage1_time;    /*!< Wall time (in seconds) for stage 1 of tridiagLU() or blocktridiagLU() */
-  double  stage2_time;    /*!< Wall time (in seconds) for stage 2 of tridiagLU() or blocktridiagLU() */
-  double  stage3_time;    /*!< Wall time (in seconds) for stage 3 of tridiagLU() or blocktridiagLU() */
-  double  stage4_time;    /*!< Wall time (in seconds) for stage 4 of tridiagLU() or blocktridiagLU() */
+  double  m_total_time;     /*!< Total wall time in seconds */
+  double  m_stage1_time;    /*!< Wall time (in seconds) for stage 1 of TridiagLU() or BlockTridiagLU() */
+  double  m_stage2_time;    /*!< Wall time (in seconds) for stage 2 of TridiagLU() or BlockTridiagLU() */
+  double  m_stage3_time;    /*!< Wall time (in seconds) for stage 3 of TridiagLU() or BlockTridiagLU() */
+  double  m_stage4_time;    /*!< Wall time (in seconds) for stage 4 of TridiagLU() or BlockTridiagLU() */
 
 #ifdef with_scalapack
-  int blacs_ctxt;         /*!< Context variable for ScaLAPACK (relevant if compiled with ScaLAPACK
+  int m_blacs_ctxt;         /*!< Context variable for ScaLAPACK (relevant if compiled with ScaLAPACK
                                support (-Dwith_scalapack) \sa tridiagScaLPK */
 #endif
 
-} TridiagLU;
+} TridiagLU_Params;
 
-int tridiagLU         (double*,double*,double*,double*,int,int,void*,void*);
-int tridiagLUGS       (double*,double*,double*,double*,int,int,void*,void*);
-int tridiagIterJacobi (double*,double*,double*,double*,int,int,void*,void*);
-int tridiagLUInit     (void*,void*);
+int TridiagLU(double*,double*,double*,double*,int,int,void*,void*);
+int TridiagLUGS(double*,double*,double*,double*,int,int,void*,void*);
+int TridiagIterJacobi(double*,double*,double*,double*,int,int,void*,void*);
+int TridiagLUInit(void*,void*);
 
 /* Block solvers */
-int blocktridiagLU         (double*,double*,double*,double*,int,int,int,void*,void*);
-int blocktridiagIterJacobi (double*,double*,double*,double*,int,int,int,void*,void*);
+int BlockTridiagLU(double*,double*,double*,double*,int,int,int,void*,void*);
+int BlockTridiagIterJacobi(double*,double*,double*,double*,int,int,int,void*,void*);
 
 #ifdef with_scalapack
 /* ScaLAPACK interface */
-int tridiagScaLPK     (double*,double*,double*,double*,int,int,void*,void*);
+int TridiagScaLPK(double*,double*,double*,double*,int,int,void*,void*);
 #endif
 
 #endif

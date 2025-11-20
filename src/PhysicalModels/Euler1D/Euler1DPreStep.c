@@ -14,16 +14,16 @@
     \sa #_Euler1DSetLinearizedStiffFlux_, #_Euler1DSetStiffJac_, #Euler1DStiffFlux
 */
 int Euler1DPreStep(
-                    double  *u,   /*!< Solution (conserved variables) */
-                    void    *s,   /*!< Solver object of type #HyPar */
-                    void    *m,   /*!< MPI object of type #MPIVariables */
+                    double  *a_u,   /*!< Solution (conserved variables) */
+                    void    *a_s,   /*!< Solver object of type #HyPar */
+                    void    *a_m,   /*!< MPI object of type #MPIVariables */
                     double  waqt  /*!< Current solution time */
                   )
 {
-  HyPar             *solver = (HyPar*)   s;
-  Euler1D           *param  = (Euler1D*) solver->physics;
-  int               *dim    = solver->dim_local;
-  int               ghosts  = solver->ghosts;
+  HyPar             *solver = (HyPar*)   a_s;
+  Euler1D           *param  = (Euler1D*) solver->m_physics;
+  int               *dim    = solver->m_dim_local;
+  int               ghosts  = solver->m_ghosts;
   static const int  ndims   = _MODEL_NDIMS_;
   static const int  JacSize = _MODEL_NVARS_*_MODEL_NVARS_;
   static int        index[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_], offset[_MODEL_NDIMS_];
@@ -33,14 +33,14 @@ int Euler1DPreStep(
   /* set offset such that index is compatible with ghost point arrangement */
   _ArraySetValue_(offset,ndims,-ghosts);
   /* copy the solution to act as a reference for linearization */
-  _ArrayCopy1D_(u,param->solution,(solver->npoints_local_wghosts*_MODEL_NVARS_));
+  _ArrayCopy1D_(a_u,param->m_solution,(solver->m_npoints_local_wghosts*_MODEL_NVARS_));
 
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double rho, v, e, P;
-    _Euler1DGetFlowVar_((u+_MODEL_NVARS_*p),rho,v,e,P,param);
-    _Euler1DSetStiffJac_((param->fast_jac+JacSize*p),rho,v,e,P,param->gamma);
+    _Euler1DGetFlowVar_((a_u+_MODEL_NVARS_*p),rho,v,e,P,param);
+    _Euler1DSetStiffJac_((param->m_fast_jac+JacSize*p),rho,v,e,P,param->m_gamma);
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

@@ -130,7 +130,7 @@
   { \
     double h,uvel,vvel,c; \
     _ShallowWater2DGetFlowVar_(u,h,uvel,vvel); \
-    c = sqrt(p->g*h); \
+    c = sqrt(p->m_g*h); \
     if (dir == _XDIR_) { \
       D[0*_MODEL_NVARS_+0] = uvel-c; D[0*_MODEL_NVARS_+1] = 0;      D[0*_MODEL_NVARS_+2] = 0;      \
       D[1*_MODEL_NVARS_+0] = 0;      D[1*_MODEL_NVARS_+1] = uvel;   D[1*_MODEL_NVARS_+2] = 0;      \
@@ -155,7 +155,7 @@
   { \
     double h,uvel,vvel,c; \
     _ShallowWater2DGetFlowVar_(u,h,uvel,vvel); \
-    c    = sqrt(p->g*h); \
+    c    = sqrt(p->m_g*h); \
     \
     if (dir == _XDIR_) { \
       L[0*_MODEL_NVARS_+0] = 0.5 + uvel/(2*c); \
@@ -198,7 +198,7 @@
   { \
     double h,uvel,vvel,c; \
     _ShallowWater2DGetFlowVar_(u,h,uvel,vvel); \
-    c    = sqrt(p->g*h); \
+    c    = sqrt(p->m_g*h); \
     \
     if (dir == _XDIR_) { \
       R[0*_MODEL_NVARS_+0] = 1.0; \
@@ -238,14 +238,14 @@
  *  specific to the 2D ShallowWater equations.
 */
 typedef struct shallowwater2d_parameters {
-  int     bt_type,   /*!< 1 -> bottom topography is periodic, 0 -> bottom topography is not periodic */
-          topo_flag; /*!< Flag to indicate if topography file was provided */
-  double  g,         /*!< Acceleration due to gravity */
-          *b,        /*!< Array to store the bottom topography \f$b(x,y)\f$ */
+  int     m_bt_type,   /*!< 1 -> bottom topography is periodic, 0 -> bottom topography is not periodic */
+          m_topo_flag; /*!< Flag to indicate if topography file was provided */
+  double  m_g,         /*!< Acceleration due to gravity */
+          *m_b,        /*!< Array to store the bottom topography \f$b(x,y)\f$ */
           fhat,      /*!< Coriolis parameter */
-          beta,      /*!< beta-plane approximation parameter for Coriolis force */
+          m_beta,      /*!< beta-plane approximation parameter for Coriolis force */
           D;         /*!< Channel width for Coriolis force calculation */
-  char    upw_choice[_MAX_STRING_SIZE_]; /*!< Choice of upwinding scheme.\sa #_ROE_, #_LLF_*/
+  char    m_upw_choice[_MAX_STRING_SIZE_]; /*!< Choice of upwinding scheme.\sa #_ROE_, #_LLF_*/
   /*! Function pointer to the function that computes the "upwinding" step in source term computation. To
       understand the implementation of the gravitational source terms, see:
       + Xing, Y., Shu, C.-W., "High order finite difference WENO schemes with the

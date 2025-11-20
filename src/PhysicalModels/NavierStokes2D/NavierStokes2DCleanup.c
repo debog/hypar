@@ -8,13 +8,13 @@
 /*! Function to clean up all allocations in the 2D Navier
     Stokes module.
 */
-int NavierStokes2DCleanup(void *s /*!< Object of type #NavierStokes2D*/)
+int NavierStokes2DCleanup(void *a_s /*!< Object of type #NavierStokes2D*/)
 {
-  NavierStokes2D  *param  = (NavierStokes2D*) s;
+  NavierStokes2D  *param  = (NavierStokes2D*) a_s;
 
-  free(param->grav_field_f);
-  free(param->grav_field_g);
-  free(param->fast_jac);
+  free(param->m_grav_field_f);
+  free(param->m_grav_field_g);
+  free(param->m_fast_jac);
   free(param->solution);
   return(0);
 }

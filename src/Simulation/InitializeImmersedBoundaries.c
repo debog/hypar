@@ -19,14 +19,14 @@
     + Identify and make a list of immersed boundary points on each rank.
     + For each immersed boundary point, find the "nearest" facet.
 */
-int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects of type #SimulationObject */
-                                  int   nsims /*!< Number of simulation objects */
+int InitializeImmersedBoundaries( void  *a_s,   /*!< Array of simulation objects of type #SimulationObject */
+                                  int   a_nsims /*!< Number of simulation objects */
                                 )
 {
-  SimulationObject* simobj = (SimulationObject*) s;
+  SimulationObject* simobj = (SimulationObject*) a_s;
   int n;
 
-  for (n = 0; n < nsims; n++) {
+  for (n = 0; n < a_nsims; n++) {
 
     HyPar        *solver = &(simobj[n].solver);
     MPIVariables *mpi    = &(simobj[n].mpi);
@@ -34,38 +34,38 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
     ImmersedBoundary *ib       = NULL;
     Body3D           *body     = NULL;
 
-    int stat, d, ndims = solver->ndims;
+    int stat, d, ndims = solver->m_ndims;
 
-    if ((!solver->flag_ib) || (ndims != _IB_NDIMS_)) {
-      solver->ib = NULL;
+    if ((!solver->m_flag_ib) || (ndims != _IB_NDIMS_)) {
+      solver->m_ib = NULL;
       continue;
     }
 
     /* Read in immersed body from file */
-    IBReadBodySTL(&body,solver->ib_filename,mpi,&stat);
+    IBReadBodySTL(&body,solver->m_ib_filename,mpi,&stat);
     if (stat) {
-      if (!mpi->rank) {
+      if (!mpi->m_rank) {
         fprintf(stderr,"Error in InitializeImmersedBoundaries(): Unable to ");
-        fprintf(stderr,"read immersed body from file %s.\n",solver->ib_filename);
+        fprintf(stderr,"read immersed body from file %a_s.\n",solver->m_ib_filename);
       }
-      solver->flag_ib = 0;
-      solver->ib = NULL;
+      solver->m_flag_ib = 0;
+      solver->m_ib = NULL;
       return(1);
     }
     IBComputeBoundingBox(body);
 
     /* allocate immersed boundary object and set it up */
     ib = (ImmersedBoundary*) calloc (1, sizeof(ImmersedBoundary));
-    ib->tolerance = 1e-12;
-    ib->delta     = 1e-6;
-    ib->itr_max   = 500;
-    ib->body      = body;
-    solver->ib    = ib;
+    ib->m_tolerance = 1e-12;
+    ib->m_delta     = 1e-6;
+    ib->m_itr_max   = 500;
+    ib->m_body      = body;
+    solver->m_ib    = ib;
 
     int     offset_global, offset_local,
-            *dim_local  = solver->dim_local,
-            *dim_global = solver->dim_global,
-            ghosts      = solver->ghosts,
+            *dim_local  = solver->m_dim_local,
+            *dim_global = solver->m_dim_global,
+            ghosts      = solver->m_ghosts,
             size        = dim_global[0] + dim_global[1] + dim_global[2],
             count       = 0;
     double  *Xg         = (double*) calloc(size,sizeof(double));
@@ -73,22 +73,22 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
     /* assemble the global grid on rank 0 */
     offset_global = offset_local = 0;
     for (d=0; d<ndims; d++) {
-      IERR MPIGatherArray1D(mpi,(mpi->rank?NULL:&Xg[offset_global]),
-                            &solver->x[offset_local+ghosts],
-                            mpi->is[d],mpi->ie[d],dim_local[d],0); CHECKERR(ierr);
+      IERR MPIGatherArray1D(mpi,(mpi->m_rank?NULL:&Xg[offset_global]),
+                            &solver->m_x[offset_local+ghosts],
+                            mpi->m_is[d],mpi->m_ie[d],dim_local[d],0); CHECKERR(ierr);
       offset_global += dim_global[d];
       offset_local  += dim_local [d] + 2*ghosts;
     }
     /* send the global grid to other ranks */
-    MPIBroadcast_double(Xg,size,0,&mpi->world);
+    MPIBroadcast_double(Xg,size,0,&mpi->m_world);
 
     /* identify whether this is a 3D or "pseudo-2D" simulation */
-    IBIdentifyMode(Xg,dim_global,solver->ib);
+    IBIdentifyMode(Xg,dim_global,solver->m_ib);
 
     /* identify grid points inside the immersed body */
     int count_inside_body = 0;
-    count = IBIdentifyBody(solver->ib,dim_global,dim_local,ghosts,mpi,Xg,solver->iblank);
-    MPISum_integer(&count_inside_body,&count,1,&mpi->world);
+    count = IBIdentifyBody(solver->m_ib,dim_global,dim_local,ghosts,mpi,Xg,solver->m_iblank);
+    MPISum_integer(&count_inside_body,&count,1,&mpi->m_world);
     free(Xg);
 
     /* At ghost points corresponding to the physical boundary, extrapolate from the interior
@@ -98,7 +98,7 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
     int indexb[ndims], indexi[ndims], bounds[ndims], offset[ndims];
     for (d = 0; d < ndims; d++) {
       /* left boundary */
-      if (!mpi->ip[d]) {
+      if (!mpi->m_ip[d]) {
         _ArrayCopy1D_(dim_local,bounds,ndims); bounds[d] = ghosts;
         _ArraySetValue_(offset,ndims,0); offset[d] = -ghosts;
         int done = 0; _ArraySetValue_(indexb,ndims,0);
@@ -106,12 +106,12 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
           _ArrayCopy1D_(indexb,indexi,ndims); indexi[d] = ghosts-1-indexb[d];
           int p1; _ArrayIndex1DWO_(ndims,dim_local,indexb,offset,ghosts,p1);
           int p2; _ArrayIndex1D_  (ndims,dim_local,indexi,ghosts,p2);
-          solver->iblank[p1] = solver->iblank[p2];
+          solver->m_iblank[p1] = solver->m_iblank[p2];
           _ArrayIncrementIndex_(ndims,bounds,indexb,done);
         }
       }
       /* right boundary */
-      if (mpi->ip[d] == mpi->iproc[d]-1) {
+      if (mpi->m_ip[d] == mpi->m_iproc[d]-1) {
         _ArrayCopy1D_(dim_local,bounds,ndims); bounds[d] = ghosts;
         _ArraySetValue_(offset,ndims,0); offset[d] = dim_local[d];
         int done = 0; _ArraySetValue_(indexb,ndims,0);
@@ -119,69 +119,69 @@ int InitializeImmersedBoundaries( void  *s,   /*!< Array of simulation objects o
           _ArrayCopy1D_(indexb,indexi,ndims); indexi[d] = dim_local[d]-1-indexb[d];
           int p1; _ArrayIndex1DWO_(ndims,dim_local,indexb,offset,ghosts,p1);
           int p2; _ArrayIndex1D_  (ndims,dim_local,indexi,ghosts,p2);
-          solver->iblank[p1] = solver->iblank[p2];
+          solver->m_iblank[p1] = solver->m_iblank[p2];
           _ArrayIncrementIndex_(ndims,bounds,indexb,done);
         }
       }
     }
-    MPIExchangeBoundariesnD(ndims,1,dim_local,ghosts,mpi,solver->iblank);
+    MPIExchangeBoundariesnD(ndims,1,dim_local,ghosts,mpi,solver->m_iblank);
 
     /* identify and create a list of immersed boundary points on each rank */
     int count_boundary_points = 0;
-    count = IBIdentifyBoundary(solver->ib,mpi,dim_local,ghosts,solver->iblank);
-    MPISum_integer(&count_boundary_points,&count,1,&mpi->world);
+    count = IBIdentifyBoundary(solver->m_ib,mpi,dim_local,ghosts,solver->m_iblank);
+    MPISum_integer(&count_boundary_points,&count,1,&mpi->m_world);
 
     /* find the nearest facet for each immersed boundary point */
     double ld = 0, xmin, xmax, ymin, ymax, zmin, zmax;
-    _GetCoordinate_(0,0             ,dim_local,ghosts,solver->x,xmin);
-    _GetCoordinate_(0,dim_local[0]-1,dim_local,ghosts,solver->x,xmax);
-    _GetCoordinate_(1,0             ,dim_local,ghosts,solver->x,ymin);
-    _GetCoordinate_(1,dim_local[1]-1,dim_local,ghosts,solver->x,ymax);
-    _GetCoordinate_(2,0             ,dim_local,ghosts,solver->x,zmin);
-    _GetCoordinate_(2,dim_local[2]-1,dim_local,ghosts,solver->x,zmax);
+    _GetCoordinate_(0,0             ,dim_local,ghosts,solver->m_x,xmin);
+    _GetCoordinate_(0,dim_local[0]-1,dim_local,ghosts,solver->m_x,xmax);
+    _GetCoordinate_(1,0             ,dim_local,ghosts,solver->m_x,ymin);
+    _GetCoordinate_(1,dim_local[1]-1,dim_local,ghosts,solver->m_x,ymax);
+    _GetCoordinate_(2,0             ,dim_local,ghosts,solver->m_x,zmin);
+    _GetCoordinate_(2,dim_local[2]-1,dim_local,ghosts,solver->m_x,zmax);
     double xlen = xmax - xmin;
     double ylen = ymax - ymin;
     double zlen = zmax - zmin;
     ld = max3(xlen,ylen,zlen);
-    count = IBNearestFacetNormal(solver->ib,mpi,solver->x,ld,dim_local,ghosts);
+    count = IBNearestFacetNormal(solver->m_ib,mpi,solver->m_x,ld,dim_local,ghosts);
     if (count) {
       fprintf(stderr, "Error in InitializeImmersedBoundaries():\n");
       fprintf(stderr, "  IBNearestFacetNormal() returned with error code %d on rank %d.\n",
-              count, mpi->rank);
+              count, mpi->m_rank);
       return(count);
     }
 
     /* For the immersed boundary points, find the interior points for extrapolation,
        and compute their interpolation coefficients */
-    count = IBInterpCoeffs(solver->ib,mpi,solver->x,dim_local,ghosts,solver->iblank);
+    count = IBInterpCoeffs(solver->m_ib,mpi,solver->m_x,dim_local,ghosts,solver->m_iblank);
     if (count) {
       fprintf(stderr, "Error in InitializeImmersedBoundaries():\n");
       fprintf(stderr, "  IBInterpCoeffs() returned with error code %d on rank %d.\n",
-              count, mpi->rank);
+              count, mpi->m_rank);
       return(count);
     }
 
     /* Create facet mapping */;
-    count = IBCreateFacetMapping(ib,mpi,solver->x,dim_local,ghosts);
+    count = IBCreateFacetMapping(ib,mpi,solver->m_x,dim_local,ghosts);
     if (count) {
       fprintf(stderr, "Error in InitializeImmersedBoundaries():\n");
       fprintf(stderr, "  IBCreateFacetMapping() returned with error code %d on rank %d.\n",
-              count, mpi->rank);
+              count, mpi->m_rank);
       return(count);
     }
 
     /* Done */
-    if (!mpi->rank) {
+    if (!mpi->m_rank) {
       double percentage;
-      printf("Immersed body read from %s:\n",solver->ib_filename);
-      if (nsims > 1) printf("For domain %d,\n", n);
+      printf("Immersed body read from %a_s:\n",solver->m_ib_filename);
+      if (a_nsims > 1) printf("For domain %d,\n", n);
       printf("    Number of facets: %d\n    Bounding box: [%3.1f,%3.1lf] X [%3.1f,%3.1lf] X [%3.1f,%3.1lf]\n",
-             body->nfacets,body->xmin,body->xmax,body->ymin,body->ymax,body->zmin,body->zmax);
-      percentage = ((double)count_inside_body)/((double)solver->npoints_global)*100.0;
+             body->m_nfacets,body->m_xmin,body->m_xmax,body->m_ymin,body->m_ymax,body->m_zmin,body->m_zmax);
+      percentage = ((double)count_inside_body)/((double)solver->m_npoints_global)*100.0;
       printf("    Number of grid points inside immersed body: %d (%4.1f%%).\n",count_inside_body,percentage);
-      percentage = ((double)count_boundary_points)/((double)solver->npoints_global)*100.0;
+      percentage = ((double)count_boundary_points)/((double)solver->m_npoints_global)*100.0;
       printf("    Number of immersed boundary points        : %d (%4.1f%%).\n",count_boundary_points,percentage);
-      printf("    Immersed body simulation mode             : %s.\n", ib->mode);
+      printf("    Immersed body simulation mode             : %a_s.\n", ib->m_mode);
     }
 
   }

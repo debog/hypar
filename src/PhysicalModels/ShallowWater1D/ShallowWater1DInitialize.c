@@ -35,56 +35,56 @@ int    ShallowWater1DWriteTopography   (void*,void*,double);
     and set the physics-related function pointers in #HyPar.
 */
 int ShallowWater1DInitialize(
-                      void *s, /*!< Solver object of type #HyPar */
-                      void *m  /*!< Object of type #MPIVariables containing MPI-related info */
+                      void *a_s, /*!< Solver object of type #HyPar */
+                      void *a_m  /*!< Object of type #MPIVariables containing MPI-related info */
                      )
 {
-  HyPar           *solver  = (HyPar*)         s;
-  MPIVariables    *mpi     = (MPIVariables*)  m;
-  ShallowWater1D  *physics = (ShallowWater1D*)       solver->physics;
+  HyPar           *solver  = (HyPar*)         a_s;
+  MPIVariables    *mpi     = (MPIVariables*)  a_m;
+  ShallowWater1D  *physics = (ShallowWater1D*)       solver->m_physics;
   int             ferr, d;
 
   static int count = 0;
 
-  if (solver->nvars != _MODEL_NVARS_) {
+  if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in ShallowWater1DInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
     return(1);
   }
-  if (solver->ndims != _MODEL_NDIMS_) {
+  if (solver->m_ndims != _MODEL_NDIMS_) {
     fprintf(stderr,"Error in ShallowWater1DInitialize(): ndims has to be %d.\n",_MODEL_NDIMS_);
     return(1);
   }
 
   /* default values */
-  physics->g       = 1.0;
-  physics->bt_type = 0;
-  strcpy(physics->upw_choice,"roe");
+  physics->m_g       = 1.0;
+  physics->m_bt_type = 0;
+  strcpy(physics->m_upw_choice,"roe");
 
   /* reading physical model specific inputs */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     FILE *in;
     if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "gravity")) {
-            ferr = fscanf(in,"%lf",&physics->g);
+            ferr = fscanf(in,"%lf",&physics->m_g);
             if (ferr != 1) return(1);
           } else if (!strcmp(word, "topography_type")) {
-            ferr = fscanf(in,"%d",&physics->bt_type);
+            ferr = fscanf(in,"%d",&physics->m_bt_type);
             if (ferr != 1) return(1);
           } else if (!strcmp(word,"upwinding")) {
-            ferr = fscanf(in,"%s",physics->upw_choice);
+            ferr = fscanf(in,"%a_s",physics->m_upw_choice);
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",word,useless);
+            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
@@ -97,9 +97,9 @@ int ShallowWater1DInitialize(
   }
 
 #ifndef serial
-  IERR MPIBroadcast_double    (&physics->g        ,1,0,&mpi->world);                  CHECKERR(ierr);
-  IERR MPIBroadcast_integer   (&physics->bt_type  ,1,0,&mpi->world);                  CHECKERR(ierr);
-  IERR MPIBroadcast_character (physics->upw_choice,_MAX_STRING_SIZE_,0,&mpi->world);  CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_g        ,1,0,&mpi->m_world);                  CHECKERR(ierr);
+  IERR MPIBroadcast_integer   (&physics->m_bt_type  ,1,0,&mpi->m_world);                  CHECKERR(ierr);
+  IERR MPIBroadcast_character (physics->m_upw_choice,_MAX_STRING_SIZE_,0,&mpi->m_world);  CHECKERR(ierr);
 #endif
 
   /* initializing physical model-specific functions */
@@ -108,11 +108,11 @@ int ShallowWater1DInitialize(
   solver->SFunction  = ShallowWater1DSource;
   solver->UFunction  = ShallowWater1DModifiedSolution;
   solver->JFunction  = ShallowWater1DJacobian;
-  if      (!strcmp(physics->upw_choice,_ROE_ )) solver->Upwind = ShallowWater1DUpwindRoe;
-  else if (!strcmp(physics->upw_choice,_LLF_ )) solver->Upwind = ShallowWater1DUpwindLLF;
+  if      (!strcmp(physics->m_upw_choice,_ROE_ )) solver->Upwind = ShallowWater1DUpwindRoe;
+  else if (!strcmp(physics->m_upw_choice,_LLF_ )) solver->Upwind = ShallowWater1DUpwindLLF;
   else {
-    if (!mpi->rank) fprintf(stderr,"Error in ShallowWater1DInitialize(): %s is not a valid upwinding scheme.\n",
-                            physics->upw_choice);
+    if (!mpi->m_rank) fprintf(stderr,"Error in ShallowWater1DInitialize(): %a_s is not a valid upwinding scheme.\n",
+                            physics->m_upw_choice);
     return(1);
   }
   solver->AveragingFunction     = ShallowWater1DRoeAverage;
@@ -120,11 +120,11 @@ int ShallowWater1DInitialize(
   solver->GetRightEigenvectors  = ShallowWater1DRightEigenvectors;
   solver->PhysicsOutput         = ShallowWater1DWriteTopography;
 
-  if      (!strcmp(physics->upw_choice,_LLF_ )) physics->SourceUpwind = ShallowWater1DSourceUpwindLLF;
-  else if (!strcmp(physics->upw_choice,_ROE_ )) physics->SourceUpwind = ShallowWater1DSourceUpwindRoe;
+  if      (!strcmp(physics->m_upw_choice,_LLF_ )) physics->SourceUpwind = ShallowWater1DSourceUpwindLLF;
+  else if (!strcmp(physics->m_upw_choice,_ROE_ )) physics->SourceUpwind = ShallowWater1DSourceUpwindRoe;
 
   /* allocate array to hold the bottom topography field */
-  physics->b = (double*) calloc (solver->npoints_local_wghosts, sizeof(double));
+  physics->m_b = (double*) calloc (solver->m_npoints_local_wghosts, sizeof(double));
   /* set function pointer to read this topography */
   solver->PhysicsInput = ShallowWater1DTopography;
 

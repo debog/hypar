@@ -24,7 +24,7 @@
   + \a offset indicates the location in #WENOParameters::w1,#WENOParameters::w2, and #WENOParameters::w3
     from where the chunk of memory with the weights for the spatial dimension \a dir starts.
   + This chunk of memory (1D array) represents a multidimensional array of the following size:
-    4 X (number of interfaces) X (number of solution components #HyPar::nvars). The factor 4 comes from the
+    4 X (number of interfaces) X (number of solution components #HyPar::m_nvars). The factor 4 comes from the
     fact that the array stores weights for the interpolation of left-biased flux function, left-biased
     solution, right-biased flux function, and right-biased solution, one after the other, in this order.
   + The weights are initialized to their optimal values so that, if no limiting is specified
@@ -34,30 +34,30 @@ int WENOFifthOrderInitializeWeights(  double* const a_w1, /*!< Weight array */
                                       double* const a_w2, /*!< Weight array */
                                       double* const a_w3, /*!< Weight array */
                                       const int* const a_offset, /*!< Offset array */
-                                      int   dir,  /*!< Spatial dimension */
-                                      void  *s,   /*!< Solver object of type #HyPar */
-                                      void  *m    /*!< MPI object of type #MPIVariables */
+                                      int   a_dir,  /*!< Spatial dimension */
+                                      void  *a_s,   /*!< Solver object of type #HyPar */
+                                      void *a_m    /*!< MPI object of type #MPIVariables */
                                    )
 {
-  HyPar           *solver = (HyPar*)          s;
-  WENOParameters  *weno   = (WENOParameters*) solver->interp;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
+  HyPar           *solver = (HyPar*)          a_s;
+  WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
   int             done;
   double          *ww1, *ww2, *ww3;
 
 
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
 
   /* calculate dimension offset */
-  int offset = a_offset[dir];
+  int offset = a_offset[a_dir];
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
-     dimension "dir"                                                                    */
+     dimension "a_dir"                                                                    */
   int indexI[ndims], index_outer[ndims], bounds_outer[ndims], bounds_inter[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
-  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
+  _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[a_dir] += 1;
 
   /* calculate weights for a left-biased interpolation */
   ww1 = a_w1 + offset;
@@ -66,15 +66,15 @@ int WENOFifthOrderInitializeWeights(  double* const a_w1, /*!< Weight array */
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,indexI,ndims);
-    for (indexI[dir] = 0; indexI[dir] < dim[dir]+1; indexI[dir]++) {
+    for (indexI[a_dir] = 0; indexI[a_dir] < dim[a_dir]+1; indexI[a_dir]++) {
       int p, v;
       _ArrayIndex1D_(ndims,bounds_inter,indexI,0,p);
       for (v=0; v<nvars; v++)  {
         /* optimal weights*/
         double c1, c2, c3;
-        if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-          if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-              || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+        if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+          if (   ((mpi->m_ip[a_dir] == 0                ) && (indexI[a_dir] == 0       ))
+              || ((mpi->m_ip[a_dir] == mpi->m_iproc[a_dir]-1) && (indexI[a_dir] == dim[a_dir])) ) {
             /* Use WENO5 at the physical boundaries */
             c1 = _WENO_OPTIMAL_WEIGHT_1_;
             c2 = _WENO_OPTIMAL_WEIGHT_2_;
@@ -101,22 +101,22 @@ int WENOFifthOrderInitializeWeights(  double* const a_w1, /*!< Weight array */
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
 
-  ww1 = a_w1 + weno->size + offset;
-  ww2 = a_w2 + weno->size + offset;
-  ww3 = a_w3 + weno->size + offset;
+  ww1 = a_w1 + weno->m_size + offset;
+  ww2 = a_w2 + weno->m_size + offset;
+  ww3 = a_w3 + weno->m_size + offset;
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,indexI,ndims);
-    for (indexI[dir] = 0; indexI[dir] < dim[dir]+1; indexI[dir]++) {
+    for (indexI[a_dir] = 0; indexI[a_dir] < dim[a_dir]+1; indexI[a_dir]++) {
       int p, v;
       _ArrayIndex1D_(ndims,bounds_inter,indexI,0,p);
       for (v=0; v<nvars; v++)  {
 
         /* optimal weights*/
         double c1, c2, c3;
-        if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-          if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-              || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+        if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+          if (   ((mpi->m_ip[a_dir] == 0                ) && (indexI[a_dir] == 0       ))
+              || ((mpi->m_ip[a_dir] == mpi->m_iproc[a_dir]-1) && (indexI[a_dir] == dim[a_dir])) ) {
             /* Use WENO5 at the physical boundaries */
             c1 = _WENO_OPTIMAL_WEIGHT_1_;
             c2 = _WENO_OPTIMAL_WEIGHT_2_;
@@ -144,22 +144,22 @@ int WENOFifthOrderInitializeWeights(  double* const a_w1, /*!< Weight array */
   }
 
   /* calculate weights for a right-biased interpolation */
-  ww1 = a_w1 + 2*weno->size + offset;
-  ww2 = a_w2 + 2*weno->size + offset;
-  ww3 = a_w3 + 2*weno->size + offset;
+  ww1 = a_w1 + 2*weno->m_size + offset;
+  ww2 = a_w2 + 2*weno->m_size + offset;
+  ww3 = a_w3 + 2*weno->m_size + offset;
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,indexI,ndims);
-    for (indexI[dir] = 0; indexI[dir] < dim[dir]+1; indexI[dir]++) {
+    for (indexI[a_dir] = 0; indexI[a_dir] < dim[a_dir]+1; indexI[a_dir]++) {
       int p, v;
       _ArrayIndex1D_(ndims,bounds_inter,indexI,0,p);
       for (v=0; v<nvars; v++)  {
 
         /* optimal weights*/
         double c1, c2, c3;
-        if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-          if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-              || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+        if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+          if (   ((mpi->m_ip[a_dir] == 0                ) && (indexI[a_dir] == 0       ))
+              || ((mpi->m_ip[a_dir] == mpi->m_iproc[a_dir]-1) && (indexI[a_dir] == dim[a_dir])) ) {
             /* Use WENO5 at the physical boundaries */
             c1 = _WENO_OPTIMAL_WEIGHT_1_;
             c2 = _WENO_OPTIMAL_WEIGHT_2_;
@@ -186,22 +186,22 @@ int WENOFifthOrderInitializeWeights(  double* const a_w1, /*!< Weight array */
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }
 
-  ww1 = a_w1 + 2*weno->size + weno->size + offset;
-  ww2 = a_w2 + 2*weno->size + weno->size + offset;
-  ww3 = a_w3 + 2*weno->size + weno->size + offset;
+  ww1 = a_w1 + 2*weno->m_size + weno->m_size + offset;
+  ww2 = a_w2 + 2*weno->m_size + weno->m_size + offset;
+  ww3 = a_w3 + 2*weno->m_size + weno->m_size + offset;
   done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,indexI,ndims);
-    for (indexI[dir] = 0; indexI[dir] < dim[dir]+1; indexI[dir]++) {
+    for (indexI[a_dir] = 0; indexI[a_dir] < dim[a_dir]+1; indexI[a_dir]++) {
       int p, v;
       _ArrayIndex1D_(ndims,bounds_inter,indexI,0,p);
       for (v=0; v<nvars; v++)  {
 
         /* optimal weights*/
         double c1, c2, c3;
-        if (!strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
-          if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-              || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+        if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
+          if (   ((mpi->m_ip[a_dir] == 0                ) && (indexI[a_dir] == 0       ))
+              || ((mpi->m_ip[a_dir] == mpi->m_iproc[a_dir]-1) && (indexI[a_dir] == dim[a_dir])) ) {
             /* Use WENO5 at the physical boundaries */
             c1 = _WENO_OPTIMAL_WEIGHT_1_;
             c2 = _WENO_OPTIMAL_WEIGHT_2_;

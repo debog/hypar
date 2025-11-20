@@ -10,10 +10,10 @@
 /*!
   Advance one time step.
 */
-int TimeStep(void *ts /*!< Object of type #TimeIntegration */)
+int TimeStep(void *a_ts /*!< Object of type #TimeIntegration */)
 {
-  TimeIntegration *TS  = (TimeIntegration*) ts;
-  SimulationObject* sim = (SimulationObject*) TS->simulation;
+  TimeIntegration *TS  = (TimeIntegration*) a_ts;
+  SimulationObject* sim = (SimulationObject*) TS->m_simulation;
 
   if (TS->TimeIntegrate) { TS->TimeIntegrate(TS); }
 

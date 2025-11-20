@@ -10,13 +10,13 @@
 #include <mathfunctions.h>
 
 /*! Is the input number an integer power of 2? */
-static int isPowerOfTwo(int x)
+static int isPowerOfTwo(int a_x)
 {
-  if (x == 0)  return 0;
+  if (a_x == 0)  return 0;
 
-  while (x > 1) {
-    if (x%2 != 0) return 0;
-    x /= 2;
+  while (a_x > 1) {
+    if (a_x%2 != 0) return 0;
+    a_x /= 2;
   }
   return 1;
 }
@@ -374,7 +374,7 @@ int InterpolateGlobalnDVar( const int* const  a_dim_dst, /*!< grid dimensions to
       u_to = (double*) calloc (size, sizeof(double));
     }
 
-    fillGhostCells( dim_from,
+    FillGhostCells( dim_from,
                     a_ghosts,
                     u_from,
                     a_nvars,

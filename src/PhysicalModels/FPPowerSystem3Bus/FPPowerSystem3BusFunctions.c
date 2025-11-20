@@ -12,15 +12,15 @@
 
 /*! Compute the electrical power of each generator, given their phases and other system parameters */
 static void ComputeElectricalPower(
-                                    double theta1,  /*!< Phase of generator 1 */
-                                    double theta2,  /*!< Phase of generator 2 */
-                                    void   *p,      /*!< Object of type #FPPowerSystem3Bus */
-                                    double *Pe1,    /*!< Electrical power of generator 1 */
-                                    double *Pe2,    /*!< Electrical power of generator 2 */
-                                    double *Pe3     /*!< Electrical power of generator 3 */
+                                    double a_theta1,  /*!< Phase of generator 1 */
+                                    double a_theta2,  /*!< Phase of generator 2 */
+                                    void   *a_p,      /*!< Object of type #FPPowerSystem3Bus */
+                                    double *a_Pe1,    /*!< Electrical power of generator 1 */
+                                    double *a_Pe2,    /*!< Electrical power of generator 2 */
+                                    double *a_Pe3     /*!< Electrical power of generator 3 */
                                   )
 {
-  FPPowerSystem3Bus *params = (FPPowerSystem3Bus*) p;
+  FPPowerSystem3Bus *params = (FPPowerSystem3Bus*) a_p;
 
   double E1 = params->E1;
   double E2 = params->E2;
@@ -30,8 +30,8 @@ static void ComputeElectricalPower(
   double *B = params->B;
 
   double Eph[3][2];
-  Eph[0][0] = E1*cos(theta1);   Eph[0][1] = E1*sin(theta1);
-  Eph[1][0] = E2*cos(theta2);   Eph[1][1] = E2*sin(theta2);
+  Eph[0][0] = E1*cos(a_theta1);   Eph[0][1] = E1*sin(a_theta1);
+  Eph[1][0] = E2*cos(a_theta2);   Eph[1][1] = E2*sin(a_theta2);
   Eph[2][0] = E3;               Eph[2][1] = 0.0;
 
   double Y[3][3][2];
@@ -67,26 +67,26 @@ static void ComputeElectricalPower(
   YEph[1][1] = - YEph[1][1];
   YEph[2][1] = - YEph[2][1];
 
-  *Pe1 = Eph[0][0]*YEph[0][0] - Eph[0][1]*YEph[0][1];
-  *Pe2 = Eph[1][0]*YEph[1][0] - Eph[1][1]*YEph[1][1];
-  *Pe3 = Eph[2][0]*YEph[2][0] - Eph[2][1]*YEph[2][1];
+  *a_Pe1 = Eph[0][0]*YEph[0][0] - Eph[0][1]*YEph[0][1];
+  *a_Pe2 = Eph[1][0]*YEph[1][0] - Eph[1][1]*YEph[1][1];
+  *a_Pe3 = Eph[2][0]*YEph[2][0] - Eph[2][1]*YEph[2][1];
 }
 
 /*! Compute the drift (advection) coefficients for the 3-bus power system */
 int FPPowerSystem3BusDriftFunction(
-                                    int     dir,    /*!< Spatial dimension (not used) */
-                                    void    *p,     /*!< Object of type #FPPowerSystem3Bus */
-                                    double  *x,     /*!< Spatial coordinates */
-                                    double  t,      /*!< Current simulation time */
-                                    double  *drift  /*!< Array to hold the drift velocities */
+                                    int     a_dir,    /*!< Spatial dimension (not used) */
+                                    void    *a_p,     /*!< Object of type #FPPowerSystem3Bus */
+                                    double  *a_x,     /*!< Spatial coordinates */
+                                    double  a_t,      /*!< Current simulation time */
+                                    double  *a_drift  /*!< Array to hold the drift velocities */
                                   )
 {
-  FPPowerSystem3Bus *params = (FPPowerSystem3Bus*) p;
+  FPPowerSystem3Bus *params = (FPPowerSystem3Bus*) a_p;
 
-  double theta1 = x[0];
-  double theta2 = x[1];
-  double Omega1 = x[2];
-  double Omega2 = x[3];
+  double theta1 = a_x[0];
+  double theta2 = a_x[1];
+  double Omega1 = a_x[2];
+  double Omega2 = a_x[3];
 
   double omegaB     = params->omegaB;
   double Pm1_avg    = params->Pm1_avg;
@@ -95,7 +95,7 @@ int FPPowerSystem3BusDriftFunction(
   double H1         = params->H1;
   double H2         = params->H2;
   double Href       = params->Href;
-  double gamma      = params->gamma;
+  double gamma      = params->m_gamma;
 
   double Pe1, Pe2, Peref;
   ComputeElectricalPower(theta1,theta2,params,&Pe1,&Pe2,&Peref);
@@ -105,26 +105,26 @@ int FPPowerSystem3BusDriftFunction(
   double S1 = Pe1 / (2*H1) - Peref / (2*Href);
   double S2 = Pe2 / (2*H2) - Peref / (2*Href);
 
-  drift[0] = omegaB * Omega1;
-  drift[1] = omegaB * Omega2;
-  drift[2] = F1 - gamma*Omega1 - S1;
-  drift[3] = F2 - gamma*Omega2 - S2;
+  a_drift[0] = omegaB * Omega1;
+  a_drift[1] = omegaB * Omega2;
+  a_drift[2] = F1 - gamma*Omega1 - S1;
+  a_drift[3] = F2 - gamma*Omega2 - S2;
 
   return(0);
 }
 
 /*! Compute the dissipation coefficient for the 3-bus power system */
 int FPPowerSystem3BusDissipationFunction(
-                                          int     dir1,   /*!< First spatial dimension for the dissipation coefficient */
-                                          int     dir2,   /*!< Second spatial dimension for the dissipation coefficient */
-                                          void    *p,     /*!< Object of type #FPPowerSystem3Bus */
-                                          double  t,      /*!< Current simulation time */
-                                          double  *dissp  /*!< Matrix of size ndims*ndims to hold the dissipation
+                                          int     a_dir1,   /*!< First spatial dimension for the dissipation coefficient */
+                                          int     a_dir2,   /*!< Second spatial dimension for the dissipation coefficient */
+                                          void    *a_p,     /*!< Object of type #FPPowerSystem3Bus */
+                                          double  a_t,      /*!< Current simulation time */
+                                          double  *a_dissp  /*!< Matrix of size ndims*ndims to hold the dissipation
                                                                coefficients (row-major format)*/
                                         )
 {
-  FPPowerSystem3Bus *params = (FPPowerSystem3Bus*) p;
-  _ArraySetValue_(dissp,_MODEL_NDIMS_*_MODEL_NDIMS_,0.0);
+  FPPowerSystem3Bus *params = (FPPowerSystem3Bus*) a_p;
+  _ArraySetValue_(a_dissp,_MODEL_NDIMS_*_MODEL_NDIMS_,0.0);
 
   double sigma11 = params->sigma[0][0];
   double sigma12 = params->sigma[0][1];
@@ -136,32 +136,32 @@ int FPPowerSystem3BusDissipationFunction(
   double lambda21 = params->lambda[1][0];
   double lambda22 = params->lambda[1][1];
 
-  double gamma  = params->gamma;
+  double gamma  = params->m_gamma;
   double omegaB = params->omegaB;
 
 #if 0
   /* steady state coefficients */
-  dissp[2*_MODEL_NDIMS_+0] = sigma11*sigma11*lambda11*lambda11*omegaB;
-  dissp[2*_MODEL_NDIMS_+1] = sigma12*sigma12*lambda12*lambda12*omegaB;
-  dissp[3*_MODEL_NDIMS_+0] = sigma21*sigma21*lambda21*lambda21*omegaB;
-  dissp[3*_MODEL_NDIMS_+1] = sigma22*sigma22*lambda22*lambda22*omegaB;
+  a_dissp[2*_MODEL_NDIMS_+0] = sigma11*sigma11*lambda11*lambda11*omegaB;
+  a_dissp[2*_MODEL_NDIMS_+1] = sigma12*sigma12*lambda12*lambda12*omegaB;
+  a_dissp[3*_MODEL_NDIMS_+0] = sigma21*sigma21*lambda21*lambda21*omegaB;
+  a_dissp[3*_MODEL_NDIMS_+1] = sigma22*sigma22*lambda22*lambda22*omegaB;
 
-  dissp[2*_MODEL_NDIMS_+2] = sigma11*sigma11*lambda11*(1.0-gamma*lambda11);
-  dissp[2*_MODEL_NDIMS_+3] = sigma12*sigma12*lambda12*(1.0-gamma*lambda12);
-  dissp[3*_MODEL_NDIMS_+2] = sigma21*sigma21*lambda21*(1.0-gamma*lambda21);
-  dissp[3*_MODEL_NDIMS_+3] = sigma22*sigma22*lambda22*(1.0-gamma*lambda22);
+  a_dissp[2*_MODEL_NDIMS_+2] = sigma11*sigma11*lambda11*(1.0-gamma*lambda11);
+  a_dissp[2*_MODEL_NDIMS_+3] = sigma12*sigma12*lambda12*(1.0-gamma*lambda12);
+  a_dissp[3*_MODEL_NDIMS_+2] = sigma21*sigma21*lambda21*(1.0-gamma*lambda21);
+  a_dissp[3*_MODEL_NDIMS_+3] = sigma22*sigma22*lambda22*(1.0-gamma*lambda22);
 #endif
 
   /* time-dependent coefficients */
-  dissp[2*_MODEL_NDIMS_+0] = sigma11*sigma11*lambda11*omegaB*(lambda11*(1-exp(-t/lambda11))-t*exp(-t/lambda11));
-  dissp[2*_MODEL_NDIMS_+1] = sigma12*sigma12*lambda12*omegaB*(lambda12*(1-exp(-t/lambda12))-t*exp(-t/lambda12));
-  dissp[3*_MODEL_NDIMS_+0] = sigma21*sigma21*lambda21*omegaB*(lambda21*(1-exp(-t/lambda21))-t*exp(-t/lambda21));
-  dissp[3*_MODEL_NDIMS_+1] = sigma22*sigma22*lambda22*omegaB*(lambda22*(1-exp(-t/lambda22))-t*exp(-t/lambda22));
+  a_dissp[2*_MODEL_NDIMS_+0] = sigma11*sigma11*lambda11*omegaB*(lambda11*(1-exp(-a_t/lambda11))-a_t*exp(-a_t/lambda11));
+  a_dissp[2*_MODEL_NDIMS_+1] = sigma12*sigma12*lambda12*omegaB*(lambda12*(1-exp(-a_t/lambda12))-a_t*exp(-a_t/lambda12));
+  a_dissp[3*_MODEL_NDIMS_+0] = sigma21*sigma21*lambda21*omegaB*(lambda21*(1-exp(-a_t/lambda21))-a_t*exp(-a_t/lambda21));
+  a_dissp[3*_MODEL_NDIMS_+1] = sigma22*sigma22*lambda22*omegaB*(lambda22*(1-exp(-a_t/lambda22))-a_t*exp(-a_t/lambda22));
 
-  dissp[2*_MODEL_NDIMS_+2] = sigma11*sigma11*(lambda11*(1-exp(-t/lambda11))+gamma*lambda11*(t*exp(-t/lambda11)-lambda11*(1-exp(-t/lambda11))));
-  dissp[2*_MODEL_NDIMS_+3] = sigma12*sigma12*(lambda12*(1-exp(-t/lambda12))+gamma*lambda12*(t*exp(-t/lambda12)-lambda12*(1-exp(-t/lambda12))));
-  dissp[3*_MODEL_NDIMS_+2] = sigma21*sigma21*(lambda21*(1-exp(-t/lambda21))+gamma*lambda21*(t*exp(-t/lambda21)-lambda21*(1-exp(-t/lambda21))));
-  dissp[3*_MODEL_NDIMS_+3] = sigma22*sigma22*(lambda22*(1-exp(-t/lambda22))+gamma*lambda22*(t*exp(-t/lambda22)-lambda22*(1-exp(-t/lambda22))));
+  a_dissp[2*_MODEL_NDIMS_+2] = sigma11*sigma11*(lambda11*(1-exp(-a_t/lambda11))+gamma*lambda11*(a_t*exp(-a_t/lambda11)-lambda11*(1-exp(-a_t/lambda11))));
+  a_dissp[2*_MODEL_NDIMS_+3] = sigma12*sigma12*(lambda12*(1-exp(-a_t/lambda12))+gamma*lambda12*(a_t*exp(-a_t/lambda12)-lambda12*(1-exp(-a_t/lambda12))));
+  a_dissp[3*_MODEL_NDIMS_+2] = sigma21*sigma21*(lambda21*(1-exp(-a_t/lambda21))+gamma*lambda21*(a_t*exp(-a_t/lambda21)-lambda21*(1-exp(-a_t/lambda21))));
+  a_dissp[3*_MODEL_NDIMS_+3] = sigma22*sigma22*(lambda22*(1-exp(-a_t/lambda22))+gamma*lambda22*(a_t*exp(-a_t/lambda22)-lambda22*(1-exp(-a_t/lambda22))));
 
   return(0);
 }

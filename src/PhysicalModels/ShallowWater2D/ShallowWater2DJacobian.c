@@ -12,32 +12,32 @@
     is returned as a 1D array (double) of 4 elements in row-major format.
 */
 int ShallowWater2DJacobian(
-                    double  *Jac, /*!< Jacobian matrix: 1D array of size nvar^2 = 9 */
-                    double  *u,   /*!< solution at a grid point (array of size nvar = 3) */
-                    void    *p,   /*!< object containing the physics-related parameters */
-                    int     dir,  /*!< spatial dimension (x/y) */
-                    int     nvars,/*!< number of vector components */
-                    int     upw   /*!< 0 -> send back complete Jacobian,
+                    double  *a_Jac, /*!< Jacobian matrix: 1D array of size nvar^2 = 9 */
+                    double  *a_u,   /*!< solution at a grid point (array of size nvar = 3) */
+                    void    *a_p,   /*!< object containing the physics-related parameters */
+                    int     a_dir,  /*!< spatial dimension (x/y) */
+                    int     a_nvars,/*!< number of vector components */
+                    int     a_upw   /*!< 0 -> send back complete Jacobian,
                                        1 -> send back Jacobian of right(+)-moving flux,
                                       -1 -> send back Jacobian of left(-)-moving flux */
                    )
 {
-  ShallowWater2D  *param = (ShallowWater2D*) p;
+  ShallowWater2D  *param = (ShallowWater2D*) a_p;
   static double   R[_MODEL_NVARS_*_MODEL_NVARS_], D[_MODEL_NVARS_*_MODEL_NVARS_],
                   L[_MODEL_NVARS_*_MODEL_NVARS_], DL[_MODEL_NVARS_*_MODEL_NVARS_];
 
   /* get the eigenvalues and left,right eigenvectors */
-  _ShallowWater2DEigenvalues_      (u,D,param,dir);
-  _ShallowWater2DLeftEigenvectors_ (u,L,param,dir);
-  _ShallowWater2DRightEigenvectors_(u,R,param,dir);
+  _ShallowWater2DEigenvalues_      (a_u,D,param,a_dir);
+  _ShallowWater2DLeftEigenvectors_ (a_u,L,param,a_dir);
+  _ShallowWater2DRightEigenvectors_(a_u,R,param,a_dir);
 
-  int aupw = absolute(upw), k;
-  k = 0; D[k] = absolute( (1-aupw)*D[k] + 0.5*aupw*(1+upw)*max(0,D[k]) + 0.5*aupw*(1-upw)*min(0,D[k]) );
-  k = 4; D[k] = absolute( (1-aupw)*D[k] + 0.5*aupw*(1+upw)*max(0,D[k]) + 0.5*aupw*(1-upw)*min(0,D[k]) );
-  k = 8; D[k] = absolute( (1-aupw)*D[k] + 0.5*aupw*(1+upw)*max(0,D[k]) + 0.5*aupw*(1-upw)*min(0,D[k]) );
+  int aupw = absolute(a_upw), k;
+  k = 0; D[k] = absolute( (1-aupw)*D[k] + 0.5*aupw*(1+a_upw)*max(0,D[k]) + 0.5*aupw*(1-a_upw)*min(0,D[k]) );
+  k = 4; D[k] = absolute( (1-aupw)*D[k] + 0.5*aupw*(1+a_upw)*max(0,D[k]) + 0.5*aupw*(1-a_upw)*min(0,D[k]) );
+  k = 8; D[k] = absolute( (1-aupw)*D[k] + 0.5*aupw*(1+a_upw)*max(0,D[k]) + 0.5*aupw*(1-a_upw)*min(0,D[k]) );
 
   MatMult3(_MODEL_NVARS_,DL,D,L);
-  MatMult3(_MODEL_NVARS_,Jac,R,DL);
+  MatMult3(_MODEL_NVARS_,a_Jac,R,DL);
 
   return(0);
 }

@@ -104,7 +104,7 @@ extern "C" int gpuNavierStokes2DUpwindRusanov(
 {
     HyPar          *solver = (HyPar *) s;
     NavierStokes2D *param  = (NavierStokes2D*) solver->physics;
-    int            *dim    = solver->dim_local;
+    int            *dim    = solver->m_dim_local;
 
     int bounds_outer[2];
     bounds_outer[0] = dim[0]; bounds_outer[1] = dim[1]; bounds_outer[dir] = 1;
@@ -118,7 +118,7 @@ extern "C" int gpuNavierStokes2DUpwindRusanov(
 
     cpu_start = clock();
     NavierStokes2DUpwindRusanov_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-        ngrid_points, dir, solver->ghosts, param->gamma, solver->dim_local,
+        ngrid_points, dir, solver->m_ghosts, param->gamma, solver->m_dim_local,
         param->gpu_grav_field_g, fL, fR, uL, uR, u, fI);
     cudaDeviceSynchronize();
     cpu_end = clock();

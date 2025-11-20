@@ -14,10 +14,10 @@
       doi:10.1016/0021-9991(79)90145-1
 */
 double LimiterGeneralizedMinMod (
-                                  double r /*!< Input slope ratio */
+                                  double a_r /*!< Input slope ratio */
                                 )
 {
   double theta = 1.0;
-  double retval = max(0.0,min3(theta*r,0.5*(1.0+r),theta));
+  double retval = max(0.0,min3(theta*a_r,0.5*(1.0+a_r),theta));
   return retval;
 }

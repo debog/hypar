@@ -17,46 +17,46 @@
 
 /*! Compute the norms of the error estimate, if the PETSc time integrator
     has it (for example TSGLEE) */
-int PetscTimeError(TS  ts /*!< Time integrator object of PETSc type TS */)
+int PetscTimeError(TS  a_ts /*!< Time integrator object of PETSc type TS */)
 {
   PetscErrorCode ierr;
 
   PETScContext* context(nullptr);
-  ierr = TSGetApplicationContext(ts,&context); CHKERRQ(ierr);
+  ierr = TSGetApplicationContext(a_ts,&context); CHKERRQ(ierr);
   if (!context) {
     fprintf(stderr,"Error in PetscError: Null context!\n");
     return(1);
   }
 
-  SimulationObject* sim( (SimulationObject*)context->simobj );
-  int nsims( context->nsims );
+  SimulationObject* sim( (SimulationObject*)context->m_simobj );
+  int nsims( context->m_nsims );
 
   double dt;
-  ierr = TSGetTimeStep(ts,&dt); CHKERRQ(ierr);
+  ierr = TSGetTimeStep(a_ts,&dt); CHKERRQ(ierr);
   TSType time_scheme;
-  ierr = TSGetType(ts,&time_scheme); CHKERRQ(ierr);
+  ierr = TSGetType(a_ts,&time_scheme); CHKERRQ(ierr);
   Vec Y;
-  ierr = TSGetSolution(ts,&Y); CHKERRQ(ierr);
+  ierr = TSGetSolution(a_ts,&Y); CHKERRQ(ierr);
 
   for (int ns = 0; ns < nsims; ns++) {
-    TransferVecFromPETSc( sim[ns].solver.u,
+    TransferVecFromPETSc( sim[ns].solver.m_u,
                           Y,
                           context,
                           ns,
-                          context->offsets[ns] );
+                          context->m_offsets[ns] );
   }
 
   if (std::string(time_scheme) == std::string(TSGLEE)) {
 
     Vec Z;
     ierr = VecDuplicate(Y,&Z); CHKERRQ(ierr);
-    ierr = TSGetTimeError(ts,0,&Z);CHKERRQ(ierr);
+    ierr = TSGetTimeError(a_ts,0,&Z);CHKERRQ(ierr);
     for (int ns = 0; ns < nsims; ns++) {
-      TransferVecFromPETSc( sim[ns].solver.uref,
+      TransferVecFromPETSc( sim[ns].solver.m_uref,
                             Z,
                             context,
                             ns,
-                            context->offsets[ns] );
+                            context->m_offsets[ns] );
     }
     ierr = VecDestroy(&Z); CHKERRQ(ierr);
 
@@ -65,44 +65,44 @@ int PetscTimeError(TS  ts /*!< Time integrator object of PETSc type TS */)
       HyPar* solver = &(sim[ns].solver);
       MPIVariables* mpi = &(sim[ns].mpi);
 
-      int size = solver->npoints_local_wghosts * solver->nvars;
+      int size = solver->m_npoints_local_wghosts * solver->m_nvars;
       double  sum = 0.0,
               global_sum = 0.0,
-              *Uerr = solver->uref,
+              *Uerr = solver->m_uref,
               error[3] = {0,0,0};
 
       /* calculate solution norm for relative errors */
       double sol_norm[3] = {0.0,0.0,0.0};
       /* L1 */
-      sum = ArraySumAbsnD   (solver->nvars,solver->ndims,solver->dim_local,
-                             solver->ghosts,solver->index,solver->u);
-      global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-      sol_norm[0] = global_sum/((double)solver->npoints_global);
+      sum = ArraySumAbsnD   (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                             solver->m_ghosts,solver->m_index,solver->m_u);
+      global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+      sol_norm[0] = global_sum/((double)solver->m_npoints_global);
       /* L2 */
-      sum = ArraySumSquarenD(solver->nvars,solver->ndims,solver->dim_local,
-                             solver->ghosts,solver->index,solver->u);
-      global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-      sol_norm[1] = sqrt(global_sum/((double)solver->npoints_global));
+      sum = ArraySumSquarenD(solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                             solver->m_ghosts,solver->m_index,solver->m_u);
+      global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+      sol_norm[1] = sqrt(global_sum/((double)solver->m_npoints_global));
       /* Linf */
-      sum = ArrayMaxnD      (solver->nvars,solver->ndims,solver->dim_local,
-                             solver->ghosts,solver->index,solver->u);
-      global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
+      sum = ArrayMaxnD      (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                             solver->m_ghosts,solver->m_index,solver->m_u);
+      global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->m_world);
       sol_norm[2] = global_sum;
 
       /* calculate L1 norm of error */
-      sum = ArraySumAbsnD   (solver->nvars,solver->ndims,solver->dim_local,
-                             solver->ghosts,solver->index,Uerr);
-      global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-      error[0] = global_sum/((double)solver->npoints_global);
+      sum = ArraySumAbsnD   (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                             solver->m_ghosts,solver->m_index,Uerr);
+      global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+      error[0] = global_sum/((double)solver->m_npoints_global);
       /* calculate L2 norm of error */
-      sum = ArraySumSquarenD(solver->nvars,solver->ndims,solver->dim_local,
-                             solver->ghosts,solver->index,Uerr);
-      global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-      error[1] = sqrt(global_sum/((double)solver->npoints_global));
+      sum = ArraySumSquarenD(solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                             solver->m_ghosts,solver->m_index,Uerr);
+      global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+      error[1] = sqrt(global_sum/((double)solver->m_npoints_global));
       /* calculate Linf norm of error */
-      sum = ArrayMaxnD      (solver->nvars,solver->ndims,solver->dim_local,
-                             solver->ghosts,solver->index,Uerr);
-      global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
+      sum = ArrayMaxnD      (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                             solver->m_ghosts,solver->m_index,Uerr);
+      global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->m_world);
       error[2] = global_sum;
 
       if (   (sol_norm[0] > _MACHINE_ZERO_)
@@ -114,7 +114,7 @@ int PetscTimeError(TS  ts /*!< Time integrator object of PETSc type TS */)
       }
 
       /* write to file */
-      if (!mpi->rank) {
+      if (!mpi->m_rank) {
         std::string fname = "glm_err";
         if (nsims > 1) {
           char idx_string[16];

@@ -36,7 +36,7 @@
     \f{align}{
       \frac{3}{10}\hat{\bf f}_{j-1/2} + \frac{6}{10}\hat{\bf f}_{j+1/2} + \frac{1}{10}\hat{\bf f}_{j+3/2} = \frac{1}{30}{\bf f}_{j-1} + \frac{19}{30}{\bf f}_j + \frac{1}{3}{\bf f}_{j+1}.
     \f}
-    The resulting tridiagonal system is solved using tridiagLU() (see also #TridiagLU, tridiagLU.h).
+    The resulting tridiagonal system is solved using TridiagLU() (see also #TridiagLU, tridiagLU.h).
 
     \b Implementation \b Notes:
     + This method assumes a uniform grid in the spatial dimension corresponding to the interpolation.
@@ -55,11 +55,11 @@
     --------- | --------- | ---------------------------------------------
     fI        | double*   | Array to hold the computed interpolant at the grid interfaces. This array must have the same layout as the solution, but with \b no \b ghost \b points. Its size should be the same as u in all dimensions, except dir (the dimension along which to interpolate) along which it should be larger by 1 (number of interfaces is 1 more than the number of interior cell centers).
     fC        | double*   | Array with the cell-centered values of the flux function \f${\bf f}\left({\bf u}\right)\f$. This array must have the same layout and size as the solution, \b with \b ghost \b points.
-    u         | double*   | The solution array \f${\bf u}\f$ (with ghost points). If the interpolation is characteristic based, this is needed to compute the eigendecomposition. For a multidimensional problem, the layout is as follows: u is a contiguous 1D array of size (nvars*dim[0]*dim[1]*...*dim[D-1]) corresponding to the multi-dimensional solution, with the following ordering - nvars, dim[0], dim[1], ..., dim[D-1], where nvars is the number of solution components (#HyPar::nvars), dim is the local size (#HyPar::dim_local), D is the number of spatial dimensions.
+    u         | double*   | The solution array \f${\bf u}\f$ (with ghost points). If the interpolation is characteristic based, this is needed to compute the eigendecomposition. For a multidimensional problem, the layout is as follows: u is a contiguous 1D array of size (nvars*dim[0]*dim[1]*...*dim[D-1]) corresponding to the multi-dimensional solution, with the following ordering - nvars, dim[0], dim[1], ..., dim[D-1], where nvars is the number of solution components (#HyPar::m_nvars), dim is the local size (#HyPar::m_dim_local), D is the number of spatial dimensions.
     x         | double*   | The grid array (with ghost points). This is used only by non-uniform-grid interpolation methods. For multidimensional problems, the layout is as follows: x is a contiguous 1D array of size (dim[0]+dim[1]+...+dim[D-1]), with the spatial coordinates along dim[0] stored from 0,...,dim[0]-1, the spatial coordinates along dim[1] stored along dim[0],...,dim[0]+dim[1]-1, and so forth.
     upw       | int       | Upwinding direction: if positive, a left-biased interpolant will be computed; if negative, a right-biased interpolant will be computed. If the interpolation method is central, then this has no effect.
     dir       | int       | Spatial dimension along which to interpolate (eg: 0 for 1D; 0 or 1 for 2D; 0,1 or 2 for 3D)
-    s         | void*     | Solver object of type #HyPar: the following variables are needed - #HyPar::ghosts, #HyPar::ndims, #HyPar::nvars, #HyPar::dim_local.
+    s         | void*     | Solver object of type #HyPar: the following variables are needed - #HyPar::m_ghosts, #HyPar::m_ndims, #HyPar::m_nvars, #HyPar::m_dim_local.
     m         | void*     | MPI object of type #MPIVariables: this is needed only by compact interpolation method that need to solve a global implicit system across MPI ranks.
     uflag     | int       | A flag indicating if the function being interpolated \f${\bf f}\f$ is the solution itself \f${\bf u}\f$ (if 1, \f${\bf f}\left({\bf u}\right) \equiv {\bf u}\f$).
 
@@ -76,23 +76,23 @@ int Interp1PrimFifthOrderCompactUpwind(
                                         double *x,   /*!< Grid coordinates */
                                         int    upw,  /*!< Upwind direction (left or right biased) */
                                         int    dir,  /*!< Spatial dimension along which to interpolation */
-                                        void   *s,   /*!< Object of type #HyPar containing solver-related variables */
-                                        void   *m,   /*!< Object of type #MPIVariables containing MPI-related variables */
+                                        void   *a_s,   /*!< Object of type #HyPar containing solver-related variables */
+                                        void *a_m,   /*!< Object of type #MPIVariables containing MPI-related variables */
                                         int    uflag /*!< Flag to indicate if \f$f(u) \equiv u\f$, i.e, if the solution is being reconstructed */
                                       )
 {
-  HyPar           *solver = (HyPar*)          s;
-  MPIVariables    *mpi    = (MPIVariables*)   m;
-  CompactScheme   *compact= (CompactScheme*)  solver->compact;
-  TridiagLU       *lu     = (TridiagLU*)      solver->lusolver;
+  HyPar           *solver = (HyPar*) a_s;
+  MPIVariables    *mpi    = (MPIVariables*)   a_m;
+  CompactScheme   *compact= (CompactScheme*)  solver->m_compact;
+  TridiagLU_Params *lu     = (TridiagLU_Params *)      solver->m_lusolver;
   int             sys,Nsys,d,v;
   _DECLARE_IERR_;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
-  int *stride= solver->stride_with_ghosts;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
+  int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
   static const double one_third            = 1.0/3.0,
@@ -117,10 +117,10 @@ int Interp1PrimFifthOrderCompactUpwind(
   _ArrayProduct1D_(bounds_outer,ndims,Nsys); Nsys *= nvars;
 
   /* Allocate arrays for tridiagonal system */
-  double *A = compact->A;
-  double *B = compact->B;
-  double *C = compact->C;
-  double *R = compact->R;
+  double *A = compact->m_A;
+  double *B = compact->m_B;
+  double *C = compact->m_C;
+  double *R = compact->m_R;
 
 #pragma omp parallel for schedule(auto) default(shared) private(sys,d,index_outer,indexC,indexI)
   for (sys=0; sys < N_outer; sys++) {
@@ -152,8 +152,8 @@ int Interp1PrimFifthOrderCompactUpwind(
       fp1 = fC+qp1*nvars;
       fp2 = fC+qp2*nvars;
 
-      if (   ((mpi->ip[dir] == 0                ) && (indexI[dir] == 0       ))
-          || ((mpi->ip[dir] == mpi->iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
+      if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
+          || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
 
         /* Use 5th order upwind at the physical boundaries */
         _ArraySetValue_((A+Nsys*indexI[dir]+sys*nvars),nvars,0.0)
@@ -191,25 +191,25 @@ int Interp1PrimFifthOrderCompactUpwind(
 #ifdef serial
 
   /* Solve the tridiagonal system */
-  IERR tridiagLU(A,B,C,R,dim[dir]+1,Nsys,lu,NULL); CHECKERR(ierr);
+  IERR TridiagLU(A,B,C,R,dim[dir]+1,Nsys,lu,NULL); CHECKERR(ierr);
 
 #else
 
   /* Solve the tridiagonal system */
   /* all processes except the last will solve without the last interface to avoid overlap */
-  if (mpi->ip[dir] != mpi->iproc[dir]-1)  { IERR tridiagLU(A,B,C,R,dim[dir]  ,Nsys,lu,&mpi->comm[dir]); CHECKERR(ierr); }
-  else                                    { IERR tridiagLU(A,B,C,R,dim[dir]+1,Nsys,lu,&mpi->comm[dir]); CHECKERR(ierr); }
+  if (mpi->m_ip[dir] != mpi->m_iproc[dir]-1)  { IERR TridiagLU(A,B,C,R,dim[dir]  ,Nsys,lu,&mpi->m_comm[dir]); CHECKERR(ierr); }
+  else                                    { IERR TridiagLU(A,B,C,R,dim[dir]+1,Nsys,lu,&mpi->m_comm[dir]); CHECKERR(ierr); }
 
   /* Now get the solution to the last interface from the next proc */
-  double *sendbuf = compact->sendbuf;
-  double *recvbuf = compact->recvbuf;
+  double *sendbuf = compact->m_sendbuf;
+  double *recvbuf = compact->m_recvbuf;
   MPI_Request req[2] = {MPI_REQUEST_NULL,MPI_REQUEST_NULL};
-  if (mpi->ip[dir]) for (d=0; d<Nsys; d++) sendbuf[d] = R[d];
-  if (mpi->ip[dir] != mpi->iproc[dir]-1) MPI_Irecv(recvbuf,Nsys,MPI_DOUBLE,mpi->ip[dir]+1,214,mpi->comm[dir],&req[0]);
-  if (mpi->ip[dir])                      MPI_Isend(sendbuf,Nsys,MPI_DOUBLE,mpi->ip[dir]-1,214,mpi->comm[dir],&req[1]);
+  if (mpi->m_ip[dir]) for (d=0; d<Nsys; d++) sendbuf[d] = R[d];
+  if (mpi->m_ip[dir] != mpi->m_iproc[dir]-1) MPI_Irecv(recvbuf,Nsys,MPI_DOUBLE,mpi->m_ip[dir]+1,214,mpi->m_comm[dir],&req[0]);
+  if (mpi->m_ip[dir])                      MPI_Isend(sendbuf,Nsys,MPI_DOUBLE,mpi->m_ip[dir]-1,214,mpi->m_comm[dir],&req[1]);
   MPI_Status status_arr[2];
   MPI_Waitall(2,&req[0],status_arr);
-  if (mpi->ip[dir] != mpi->iproc[dir]-1) for (d=0; d<Nsys; d++) R[d+Nsys*dim[dir]] = recvbuf[d];
+  if (mpi->m_ip[dir] != mpi->m_iproc[dir]-1) for (d=0; d<Nsys; d++) R[d+Nsys*dim[dir]] = recvbuf[d];
 
 #endif
 

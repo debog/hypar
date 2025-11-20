@@ -25,7 +25,7 @@ void SparseGridsSimulation::CombinationTechnique(SimulationObject* const a_sim /
   double** u_sg = (double**) calloc (m_nsims_sg, sizeof(double*));
   std::vector<double> coeffs(m_nsims_sg, 0.0);
   for (int n=0; n<m_nsims_sg; n++) {
-    u_sg[n] = m_sims_sg[n].solver.u;
+    u_sg[n] = m_sims_sg[n].solver.m_u;
     coeffs[n] = m_combination[n]._coeff_;
   }
 
@@ -33,7 +33,7 @@ void SparseGridsSimulation::CombinationTechnique(SimulationObject* const a_sim /
                       u_sg,
                       m_nsims_sg,
                       a_sim,
-                      a_sim->solver.u,
+                      a_sim->solver.m_u,
                       coeffs.data() );
 
   /* done */

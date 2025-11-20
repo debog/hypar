@@ -18,7 +18,7 @@ int TimeExplicitRKInitialize(
                               char *class,  /*!< Name of time integrator class; must match #_RK_ */
                               char *type,   /*!< Type of explicit Runge-Kutta method */
                               void *s,      /*!< Object of type #ExplicitRKParameters */
-                              void *m       /*!< Unused argument */
+                              void *a_m       /*!< Unused argument */
                             )
 {
   ExplicitRKParameters *params = (ExplicitRKParameters*) s;

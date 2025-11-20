@@ -32,25 +32,25 @@
       through all grid lines along \b dir.
 */
 int SecondDerivativeSecondOrderCentral(
-                                        double  *D2f, /*!< Array to hold the computed second derivative (with ghost points)
-                                                           (same size and layout as f) */
-                                        double  *f,   /*!< Array containing the grid point function values whose first
+                                        double  *a_D2f, /*!< Array to hold the computed second derivative (with ghost points)
+                                                           (same size and layout as a_f) */
+                                        double  *a_f,   /*!< Array containing the grid point function values whose first
                                                            derivative is to be computed (with ghost points) */
-                                        int     dir,  /*!< The spatial dimension along which the derivative is computed */
-                                        void    *s,   /*!< Solver object of type #HyPar */
-                                        void    *m    /*!< MPI object of type #MPIVariables */
+                                        int     a_dir,  /*!< The spatial dimension along which the derivative is computed */
+                                        void    *a_s,   /*!< Solver object of type #HyPar */
+                                        void *a_m    /*!< MPI object of type #MPIVariables */
                                       )
 {
-  HyPar         *solver = (HyPar*) s;
+  HyPar         *solver = (HyPar*) a_s;
   int           i, v;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
 
 
-  if ((!D2f) || (!f)) {
+  if ((!a_D2f) || (!a_f)) {
     fprintf(stderr, "Error in SecondDerivativeSecondOrder(): input arrays not allocated.\n");
     return(1);
   }
@@ -60,19 +60,19 @@ int SecondDerivativeSecondOrderCentral(
   }
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
-     dimension "dir"                                                                    */
+     dimension "a_dir"                                                                    */
   int indexC[ndims], index_outer[ndims], bounds_outer[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
 
   int done = 0; _ArraySetValue_(index_outer,ndims,0);
   while (!done) {
     _ArrayCopy1D_(index_outer,indexC,ndims);
-    for (i = 0; i < dim[dir]; i++) {
+    for (i = 0; i < dim[a_dir]; i++) {
       int qL, qC, qR;
-      indexC[dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL);
-      indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC);
-      indexC[dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR);
-      for (v=0; v<nvars; v++)  D2f[qC*nvars+v] = f[qL*nvars+v]-2*f[qC*nvars+v]+f[qR*nvars+v];
+      indexC[a_dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL);
+      indexC[a_dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC);
+      indexC[a_dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR);
+      for (v=0; v<nvars; v++)  a_D2f[qC*nvars+v] = a_f[qL*nvars+v]-2*a_f[qC*nvars+v]+a_f[qR*nvars+v];
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }

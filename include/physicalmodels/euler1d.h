@@ -80,7 +80,7 @@
 */
 #define _Euler1DGetFlowVar_(u,rho,v,e,P,p) \
   { \
-    double gamma = p->gamma; \
+    double gamma = p->m_gamma; \
     rho = u[0]; \
     v   = u[1] / rho; \
     e   = u[2]; \
@@ -171,7 +171,7 @@
     double rho ,v ,e ,P ,H ,csq; \
     double rhoL,vL,eL,PL,HL,cLsq; \
     double rhoR,vR,eR,PR,HR,cRsq; \
-    double gamma = p->gamma; \
+    double gamma = p->m_gamma; \
     rhoL = uL[0]; \
     vL   = uL[1] / rhoL; \
     eL   = uL[2]; \
@@ -206,7 +206,7 @@
 */
 #define _Euler1DEigenvalues_(u,D,p,dir) \
   { \
-    double gamma   = p->gamma; \
+    double gamma   = p->m_gamma; \
     double rho,v,e,P,c; \
     rho = u[0]; \
     v   = u[1] / rho; \
@@ -224,7 +224,7 @@
 */
 #define _Euler1DLeftEigenvectors_(u,L,p,dir) \
   { \
-    double gamma = p->gamma; \
+    double gamma = p->m_gamma; \
     double rho,v,e,P,c; \
     rho = u[0]; \
     v   = u[1] / rho; \
@@ -248,7 +248,7 @@
 */
 #define _Euler1DRightEigenvectors_(u,R,p,dir) \
   { \
-    double gamma   = p->gamma; \
+    double gamma   = p->m_gamma; \
     double rho,v,e,P,c; \
     rho = u[0]; \
     v   = u[1] / rho; \
@@ -271,8 +271,8 @@
  *  specific to the 1D Euler equations.
 */
 typedef struct euler1d_parameters {
-  double  gamma;        /*!< Ratio of heat capacities (\f$\gamma\f$) */
-  double  grav;         /*!< acceleration due to gravity */
+  double  m_gamma;        /*!< Ratio of heat capacities (\f$\gamma\f$) */
+  double  m_grav;         /*!< acceleration due to gravity */
 
   /*! type of gravitational field
       (0 is isothermal with constant potential,
@@ -283,12 +283,12 @@ typedef struct euler1d_parameters {
           Journal of Scientific Computing, 54, 2013, pp. 645-662.
           http://dx.doi.org/10.1007/s10915-012-9585-8
   */
-  int     grav_type;
+  int     m_grav_type;
 
-  double  *grav_field;  /*!< Array to store the gravity potential field */
-  double  *fast_jac;    /*!< Array to store the linearized fast-waves Jacobian over the whole domain */
-  double  *solution;    /*!< Array to store the reference solution for linearization */
-  char    upw_choice[_MAX_STRING_SIZE_]; /*!< Choice of upwinding scheme.\sa #_ROE_,#_LLF_,#_RF_,#_SWFS_ */
+  double  *m_grav_field;  /*!< Array to store the gravity potential field */
+  double  *m_fast_jac;    /*!< Array to store the linearized fast-waves Jacobian over the whole domain */
+  double  *m_solution;    /*!< Array to store the reference solution for linearization */
+  char    m_upw_choice[_MAX_STRING_SIZE_]; /*!< Choice of upwinding scheme.\sa #_ROE_,#_LLF_,#_RF_,#_SWFS_ */
 
   /*! Function pointer to the function that computes the "upwinding" step in source term computation. To
       understand the implementation of the gravitational source terms, see:

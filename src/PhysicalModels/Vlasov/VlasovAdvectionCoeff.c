@@ -25,34 +25,34 @@
 
     \b Note: this function assumes that the electric field has already been set.
 */
-double VlasovAdvectionCoeff(int*  idx, /*!< grid index */
-                            int   dir, /*!< Spatial dimension */
-                            void* s    /*!< Solver object of type #HyPar */
+double VlasovAdvectionCoeff(int*  a_idx, /*!< grid index */
+                            int   a_dir, /*!< Spatial dimension */
+                            void* a_s    /*!< Solver object of type #HyPar */
                            )
 {
 
-  HyPar  *solver = (HyPar*)  s;
-  Vlasov *param  = (Vlasov*) solver->physics;
+  HyPar  *solver = (HyPar*)  a_s;
+  Vlasov *param  = (Vlasov*) solver->m_physics;
 
-  int* dim    = solver->dim_local;
-  int  ghosts = solver->ghosts;
+  int* dim    = solver->m_dim_local;
+  int  ghosts = solver->m_ghosts;
 
   double retval = DBL_MAX;
 
-  if (dir < param->ndims_x) {
+  if (a_dir < param->m_ndims_x) {
 
-    int veldim = dir + param->ndims_x;
-    _GetCoordinate_(veldim,idx[veldim],dim,ghosts,solver->x,retval);
+    int veldim = a_dir + param->m_ndims_x;
+    _GetCoordinate_(veldim,a_idx[veldim],dim,ghosts,solver->m_x,retval);
 
   }  else {
 
-    int ndims_x = param->ndims_x;
+    int ndims_x = param->m_ndims_x;
     int dim_x[ndims_x]; _ArrayCopy1D_(dim, dim_x, ndims_x);
 
     int idx_x[ndims_x];
-    _ArrayCopy1D_(idx, idx_x, ndims_x);
+    _ArrayCopy1D_(a_idx, idx_x, ndims_x);
     int p; _ArrayIndex1D_(ndims_x, dim_x, idx_x, ghosts, p);
-    retval = param->e_field[ndims_x*p+(dir-ndims_x)];
+    retval = param->m_e_field[ndims_x*p+(a_dir-ndims_x)];
 
   }
 

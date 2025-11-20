@@ -172,7 +172,7 @@ extern "C" int gpuBCSlipWallU(
 
   if (ndims == 2) {
 
-    if (boundary->on_this_proc) {
+    if (boundary->m_on_this_proc) {
       int bounds[ndims];
       _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
       int ngrid_points = 1; for(int i = 0; i < ndims; i++) ngrid_points *= bounds[i];
@@ -188,7 +188,7 @@ extern "C" int gpuBCSlipWallU(
 
   } else if (ndims == 3) {
 
-    if (boundary->on_this_proc) {
+    if (boundary->m_on_this_proc) {
       int bounds[ndims];
       _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
       int ngrid_points = 1; for(int i = 0; i < ndims; i++) ngrid_points *= bounds[i];
@@ -309,7 +309,7 @@ extern "C" int gpuBCSlipWallU(
 
   if (ndims == 3) {
 
-    if (boundary->on_this_proc) {
+    if (boundary->m_on_this_proc) {
       int nblocks = (boundary->gpu_npoints_bounds - 1) / GPU_THREADS_PER_BLOCK + 1;
 
       BCSlipWallU_dim3_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(

@@ -18,15 +18,15 @@
     to interpolation functions for a characteristic-based reconstruction.
 */
 int NavierStokes3DLeftEigenvectors(
-                                    double *u, /*!< Conserved solution at a grid point */
-                                    double *L, /*!< Array of size nvar^2 = 5^2 to save the matrix of
+                                    double *a_u, /*!< Conserved solution at a grid point */
+                                    double *a_L, /*!< Array of size nvar^2 = 5^2 to save the matrix of
                                                     left eigenvectors in (row-major format). */
-                                    void   *p, /*!< Object of type #NavierStokes3D with physics-related variables */
-                                    int    dir /*!< Spatial dimension (x, y, or z) */
+                                    void   *a_p, /*!< Object of type #NavierStokes3D with physics-related variables */
+                                    int     a_dir   /*!< Spatial dimension (x, y, or z) */
                                   )
 {
-  NavierStokes3D *param  = (NavierStokes3D*)  p;
-  _NavierStokes3DLeftEigenvectors_(u,_NavierStokes3D_stride_,L,param->gamma,dir);
+  NavierStokes3D *param  = (NavierStokes3D*)  a_p;
+  _NavierStokes3DLeftEigenvectors_(a_u,_NavierStokes3D_stride_,a_L,param->m_gamma,a_dir);
   return(0);
 }
 
@@ -37,14 +37,14 @@ int NavierStokes3DLeftEigenvectors(
     to interpolation functions for a characteristic-based reconstruction.
 */
 int NavierStokes3DRightEigenvectors(
-                                      double  *u, /*!< Conserved solution at a grid point */
-                                      double  *R, /*!< Array of size nvar^2 = 5^2 to save the matrix of
+                                      double  *a_u, /*!< Conserved solution at a grid point */
+                                      double  *a_R, /*!< Array of size nvar^2 = 5^2 to save the matrix of
                                                        right eigenvectors in (row-major format). */
-                                      void    *p, /*!< Object of type #NavierStokes3D with physics-related variables */
-                                      int     dir /*!< Spatial dimension (x, y, or z) */
+                                      void    *a_p, /*!< Object of type #NavierStokes3D with physics-related variables */
+                                      int     a_dir   /*!< Spatial dimension (x, y, or z) */
                                    )
 {
-  NavierStokes3D *param  = (NavierStokes3D*)  p;
-  _NavierStokes3DRightEigenvectors_(u,_NavierStokes3D_stride_,R,param->gamma,dir);
+  NavierStokes3D *param  = (NavierStokes3D*)  a_p;
+  _NavierStokes3DRightEigenvectors_(a_u,_NavierStokes3D_stride_,a_R,param->m_gamma,a_dir);
   return(0);
 }

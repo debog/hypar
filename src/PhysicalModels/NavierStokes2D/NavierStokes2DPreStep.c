@@ -31,16 +31,16 @@
       38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369.
 */
 int NavierStokes2DPreStep(
-                            double  *u,   /*!< Solution vector */
-                            void    *s,   /*!< Solver object of type #HyPar */
-                            void    *m,   /*!< MPI object of type #MPIVariables */
+                            double  *a_u,   /*!< Solution vector */
+                            void    *a_s,   /*!< Solver object of type #HyPar */
+                            void    *a_m,   /*!< MPI object of type #MPIVariables */
                             double  waqt  /*!< Current simulation time */
                          )
 {
-  HyPar             *solver = (HyPar*)   s;
-  NavierStokes2D    *param  = (NavierStokes2D*) solver->physics;
-  int               *dim    = solver->dim_local;
-  int               ghosts  = solver->ghosts, dir, p;
+  HyPar             *solver = (HyPar*)   a_s;
+  NavierStokes2D    *param  = (NavierStokes2D*) solver->m_physics;
+  int               *dim    = solver->m_dim_local;
+  int               ghosts  = solver->m_ghosts, dir, p;
   double            *A;
   static const int  ndims   = _MODEL_NDIMS_;
   static const int  JacSize = _MODEL_NVARS_*_MODEL_NVARS_;
@@ -53,30 +53,30 @@ int NavierStokes2DPreStep(
   /* set offset such that index is compatible with ghost point arrangement */
   _ArraySetValue_(offset,ndims,-ghosts);
   /* copy the solution to act as a reference for linearization */
-  _ArrayCopy1D_(u,param->solution,(solver->npoints_local_wghosts*_MODEL_NVARS_));
+  _ArrayCopy1D_(a_u,param->solution,(solver->m_npoints_local_wghosts*_MODEL_NVARS_));
 
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
 
     dir = _XDIR_;
-    A = (param->fast_jac + 2*JacSize*p + dir*JacSize);
+    A = (param->m_fast_jac + 2*JacSize*p + dir*JacSize);
     /* get the eigenvalues, and left & right eigenvectors */
-    _NavierStokes2DEigenvalues_      ((u+_MODEL_NVARS_*p),D,param->gamma,dir);
-    _NavierStokes2DLeftEigenvectors_ ((u+_MODEL_NVARS_*p),L,param->gamma,dir);
-    _NavierStokes2DRightEigenvectors_((u+_MODEL_NVARS_*p),R,param->gamma,dir);
-    /* remove the entropy modes (corresponding to eigenvalues u) */
+    _NavierStokes2DEigenvalues_      ((a_u+_MODEL_NVARS_*p),D,param->m_gamma,dir);
+    _NavierStokes2DLeftEigenvectors_ ((a_u+_MODEL_NVARS_*p),L,param->m_gamma,dir);
+    _NavierStokes2DRightEigenvectors_((a_u+_MODEL_NVARS_*p),R,param->m_gamma,dir);
+    /* remove the entropy modes (corresponding to eigenvalues a_u) */
     D[2*_MODEL_NVARS_+2] = D[3*_MODEL_NVARS_+3] = 0.0;
     /* assemble the Jacobian */
     MatMult4(_MODEL_NVARS_,DL,D,L );
     MatMult4(_MODEL_NVARS_,A ,R,DL);
 
     dir = _YDIR_;
-    A = (param->fast_jac + 2*JacSize*p + dir*JacSize);
+    A = (param->m_fast_jac + 2*JacSize*p + dir*JacSize);
     /* get the eigenvalues, and left & right eigenvectors */
-    _NavierStokes2DEigenvalues_      ((u+_MODEL_NVARS_*p),D,param->gamma,dir)
-    _NavierStokes2DLeftEigenvectors_ ((u+_MODEL_NVARS_*p),L,param->gamma,dir);
-    _NavierStokes2DRightEigenvectors_((u+_MODEL_NVARS_*p),R,param->gamma,dir);
+    _NavierStokes2DEigenvalues_      ((a_u+_MODEL_NVARS_*p),D,param->m_gamma,dir)
+    _NavierStokes2DLeftEigenvectors_ ((a_u+_MODEL_NVARS_*p),L,param->m_gamma,dir);
+    _NavierStokes2DRightEigenvectors_((a_u+_MODEL_NVARS_*p),R,param->m_gamma,dir);
     /* remove the entropy modes (corresponding to eigenvalues v) */
     D[1*_MODEL_NVARS_+1] = D[3*_MODEL_NVARS_+3] = 0.0;
     /* assemble the Jacobian */

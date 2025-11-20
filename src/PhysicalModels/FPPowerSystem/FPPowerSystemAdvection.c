@@ -4,16 +4,16 @@
 #include <physicalmodels/fppowersystem.h>
 #include <hypar.h>
 
-int FPPowerSystemAdvection(double *f,double *u,int dir,void *s,double t)
+int FPPowerSystemAdvection(double *a_f,double *a_u,int a_dir,void *a_s,double a_t)
 {
-  HyPar         *solver = (HyPar*)        s;
-//  FPPowerSystem *params = (FPPowerSystem*)solver->physics;
+  HyPar         *solver = (HyPar*)        a_s;
+//  FPPowerSystem *params = (FPPowerSystem*)solver->m_physics;
   int           i, v;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -26,7 +26,7 @@ int FPPowerSystemAdvection(double *f,double *u,int dir,void *s,double t)
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    for (v = 0; v < nvars; v++) f[nvars*p+v] = u[nvars*p+v];
+    for (v = 0; v < nvars; v++) a_f[nvars*p+v] = a_u[nvars*p+v];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

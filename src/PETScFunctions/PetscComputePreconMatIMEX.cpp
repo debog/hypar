@@ -14,12 +14,12 @@
 
 /*! Compute and assemble the preconditioning matrix for the implicit-explicit (IMEX) time integration
     of the governing equations: Right now, it just calls PetscComputePreconMatImpl() */
-int PetscComputePreconMatIMEX(Mat Pmat,   /*!< Preconditioning matrix to construct */
-                              Vec Y,      /*!< Solution vector */
-                              void *ctxt  /*!< Application context */ )
+int PetscComputePreconMatIMEX(Mat a_Pmat,   /*!< Preconditioning matrix to construct */
+                              Vec a_Y,      /*!< Solution vector */
+                              void *a_ctxt  /*!< Application context */ )
 {
   /* Same implementation as PetscComputePreconMatImpl() */
-  return(PetscComputePreconMatImpl(Pmat,Y,ctxt));
+  return(PetscComputePreconMatImpl(a_Pmat,a_Y,a_ctxt));
 }
 
 #endif

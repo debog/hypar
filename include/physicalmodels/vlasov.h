@@ -57,42 +57,42 @@
 typedef struct vlasov_parameters {
 
   /*! Use a self-consistent electric field? Requires FFTW library */
-  int self_consistent_electric_field;
+  int m_self_consistent_electric_field;
 
   /*! Number of spatial dimensions */
-  int ndims_x;
+  int m_ndims_x;
 
   /*! Number of velocity dimensions */
-  int ndims_v;
+  int m_ndims_v;
 
   /*! Number of spatial grid points (local) */
-  int npts_local_x;
+  int m_npts_local_x;
 
   /*! Number of spatial grid points (global) */
   long npts_global_x;
 
   /*! Number of spatial grid points with ghosts (local) */
-  int npts_local_x_wghosts;
+  int m_npts_local_x_wghosts;
 
   /*! Number of spatial grid points with ghosts (global) */
   long npts_global_x_wghosts;
 
   /*! electric field */
-  double *e_field;
+  double *m_e_field;
 
   /*! potential field */
-  double *potential;
+  double *m_potential;
 
   /*! Pointer to MPI object of type #MPIVariables */
-  void  *m;
+  void  *m_m_mpi;
 
   /*! Solve Vlasov equation in the log form */
-  int use_log_form;
+  int m_use_log_form;
 
 #ifdef fftw
 
   /*! Buffer sum */
-  double *sum_buffer;
+  double *m_sum_buffer;
   /*! Forward FFT plan */
   fftw_plan plan_forward_e;
   /*! Backward FFT plan */

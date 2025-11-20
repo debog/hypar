@@ -139,9 +139,9 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
 
     m_vec_size.resize(m_nsims);
     for (int ns = 0; ns < m_nsims; ns++) {
-      m_vec_size[ns] = (sim[ns].solver.npoints_local);
+      m_vec_size[ns] = (sim[ns].solver.m_npoints_local);
       if (m_comp_mode == _ROM_COMP_MODE_MONOLITHIC_) {
-        m_vec_size[ns] *= (sim[ns].solver.nvars);
+        m_vec_size[ns] *= (sim[ns].solver.m_nvars);
       }
     }
 
@@ -161,8 +161,8 @@ void libROMInterface::define( void*   a_s, /*!< Array of simulation objects of t
       }
     } else if (m_comp_mode == _ROM_COMP_MODE_COMPONENTWISE_) {
       for (int ns = 0; ns < m_nsims; ns++) {
-        m_ncomps.push_back(sim[ns].solver.nvars);
-        for (int v = 0; v < sim[ns].solver.nvars; v++) {
+        m_ncomps.push_back(sim[ns].solver.m_nvars);
+        for (int v = 0; v < sim[ns].solver.m_nvars; v++) {
           if (m_rom_type == _ROM_TYPE_DMD_) {
             m_rom.push_back(new DMDROMObject( m_vec_size[ns],
                                               m_sampling_freq*a_dt,
@@ -421,38 +421,38 @@ void libROMInterface::copyFromHyPar(  std::vector<CAROM::Vector*>& a_U,  /*!< wo
 
     for (int ns = 0; ns < m_nsims; ns++) {
       double* vec = a_U[ns]->getData();
-      const double* u = sim[ns].solver.u;
+      const double* u = sim[ns].solver.m_u;
 
-      std::vector<int> index(sim[ns].solver.ndims);
+      std::vector<int> index(sim[ns].solver.m_ndims);
 
-      ArrayCopynD(  sim[ns].solver.ndims,
+      ArrayCopynD(  sim[ns].solver.m_ndims,
                     u,
                     vec,
-                    sim[ns].solver.dim_local,
-                    sim[ns].solver.ghosts,
+                    sim[ns].solver.m_dim_local,
+                    sim[ns].solver.m_ghosts,
                     0,
                     index.data(),
-                    sim[ns].solver.nvars );
+                    sim[ns].solver.m_nvars );
     }
 
   } else if (m_comp_mode == _ROM_COMP_MODE_COMPONENTWISE_) {
 
     int count(0);
     for (int ns = 0; ns < m_nsims; ns++) {
-      for (int v = 0; v < sim[ns].solver.nvars; v++) {
+      for (int v = 0; v < sim[ns].solver.m_nvars; v++) {
         double* vec = a_U[count]->getData();
-        const double* u = sim[ns].solver.u;
+        const double* u = sim[ns].solver.m_u;
 
-        std::vector<int> index(sim[ns].solver.ndims);
+        std::vector<int> index(sim[ns].solver.m_ndims);
 
-        ArrayCopynDComponent( sim[ns].solver.ndims,
+        ArrayCopynDComponent( sim[ns].solver.m_ndims,
                               u,
                               vec,
-                              sim[ns].solver.dim_local,
-                              sim[ns].solver.ghosts,
+                              sim[ns].solver.m_dim_local,
+                              sim[ns].solver.m_ghosts,
                               0,
                               index.data(),
-                              sim[ns].solver.nvars,
+                              sim[ns].solver.m_nvars,
                               1,
                               v,
                               0 );
@@ -481,20 +481,20 @@ void libROMInterface::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vecto
 
   double* u;
   if (m_mode == _ROM_MODE_TRAIN_) {
-    u = sim[a_idx].solver.u_rom_predicted;
+    u = sim[a_idx].solver.m_u_rom_predicted;
   } else {
-    u = sim[a_idx].solver.u;
+    u = sim[a_idx].solver.m_u;
   }
-  std::vector<int> index(sim[a_idx].solver.ndims);
+  std::vector<int> index(sim[a_idx].solver.m_ndims);
 
-  ArrayCopynD(  sim[a_idx].solver.ndims,
+  ArrayCopynD(  sim[a_idx].solver.m_ndims,
                 a_vec.getData(),
                 u,
-                sim[a_idx].solver.dim_local,
+                sim[a_idx].solver.m_dim_local,
                 0,
-                sim[a_idx].solver.ghosts,
+                sim[a_idx].solver.m_ghosts,
                 index.data(),
-                sim[a_idx].solver.nvars );
+                sim[a_idx].solver.m_nvars );
 
   return;
 }
@@ -516,21 +516,21 @@ void libROMInterface::copyToHyPar(  const CAROM::Vector& a_vec,  /*!< Work vecto
 
   double* u;
   if (m_mode == _ROM_MODE_TRAIN_) {
-    u = sim[a_idx].solver.u_rom_predicted;
+    u = sim[a_idx].solver.m_u_rom_predicted;
   } else {
-    u = sim[a_idx].solver.u;
+    u = sim[a_idx].solver.m_u;
   }
-  std::vector<int> index(sim[a_idx].solver.ndims);
+  std::vector<int> index(sim[a_idx].solver.m_ndims);
 
-  ArrayCopynDComponent(  sim[a_idx].solver.ndims,
+  ArrayCopynDComponent(  sim[a_idx].solver.m_ndims,
                         a_vec.getData(),
                         u,
-                        sim[a_idx].solver.dim_local,
+                        sim[a_idx].solver.m_dim_local,
                         0,
-                        sim[a_idx].solver.ghosts,
+                        sim[a_idx].solver.m_ghosts,
                         index.data(),
                         1,
-                        sim[a_idx].solver.nvars,
+                        sim[a_idx].solver.m_nvars,
                         0,
                         a_var );
 

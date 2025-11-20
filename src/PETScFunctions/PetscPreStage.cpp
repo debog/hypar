@@ -11,7 +11,7 @@
 #define __FUNCT__ "PetscPreStage"
 
 /*! Function called before a stage in multi-stage time-integration methods */
-PetscErrorCode PetscPreStage( TS        ts,   /*!< Time integration object */
+PetscErrorCode PetscPreStage( TS        a_ts,   /*!< Time integration object */
                               PetscReal waqt  /*!< Current simulation time */ )
 {
   PetscFunctionBegin;

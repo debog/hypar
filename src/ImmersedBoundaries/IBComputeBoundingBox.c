@@ -6,37 +6,37 @@
 #include <immersedboundaries.h>
 
 /*! Compute the bounding box for a given body. */
-int IBComputeBoundingBox(Body3D *b /*!< The body */)
+int IBComputeBoundingBox(Body3D *a_b /*!< The body */)
 {
-  b->xmin = b->xmax = b->surface[0].x1;
-  b->ymin = b->ymax = b->surface[0].y1;
-  b->zmin = b->zmax = b->surface[0].z1;
+  a_b->m_xmin = a_b->m_xmax = a_b->m_surface[0].m_x1;
+  a_b->m_ymin = a_b->m_ymax = a_b->m_surface[0].m_y1;
+  a_b->m_zmin = a_b->m_zmax = a_b->m_surface[0].m_z1;
 
   int n;
-  for (n = 0; n < b->nfacets; n++) {
-    if (b->surface[n].x1 < b->xmin) b->xmin = b->surface[n].x1;
-    if (b->surface[n].x2 < b->xmin) b->xmin = b->surface[n].x2;
-    if (b->surface[n].x3 < b->xmin) b->xmin = b->surface[n].x3;
+  for (n = 0; n < a_b->m_nfacets; n++) {
+    if (a_b->m_surface[n].m_x1 < a_b->m_xmin) a_b->m_xmin = a_b->m_surface[n].m_x1;
+    if (a_b->m_surface[n].m_x2 < a_b->m_xmin) a_b->m_xmin = a_b->m_surface[n].m_x2;
+    if (a_b->m_surface[n].m_x3 < a_b->m_xmin) a_b->m_xmin = a_b->m_surface[n].m_x3;
 
-    if (b->surface[n].y1 < b->ymin) b->ymin = b->surface[n].y1;
-    if (b->surface[n].y2 < b->ymin) b->ymin = b->surface[n].y2;
-    if (b->surface[n].y3 < b->ymin) b->ymin = b->surface[n].y3;
+    if (a_b->m_surface[n].m_y1 < a_b->m_ymin) a_b->m_ymin = a_b->m_surface[n].m_y1;
+    if (a_b->m_surface[n].m_y2 < a_b->m_ymin) a_b->m_ymin = a_b->m_surface[n].m_y2;
+    if (a_b->m_surface[n].m_y3 < a_b->m_ymin) a_b->m_ymin = a_b->m_surface[n].m_y3;
 
-    if (b->surface[n].z1 < b->zmin) b->zmin = b->surface[n].z1;
-    if (b->surface[n].z2 < b->zmin) b->zmin = b->surface[n].z2;
-    if (b->surface[n].z3 < b->zmin) b->zmin = b->surface[n].z3;
+    if (a_b->m_surface[n].m_z1 < a_b->m_zmin) a_b->m_zmin = a_b->m_surface[n].m_z1;
+    if (a_b->m_surface[n].m_z2 < a_b->m_zmin) a_b->m_zmin = a_b->m_surface[n].m_z2;
+    if (a_b->m_surface[n].m_z3 < a_b->m_zmin) a_b->m_zmin = a_b->m_surface[n].m_z3;
 
-    if (b->surface[n].x1 > b->xmax) b->xmax = b->surface[n].x1;
-    if (b->surface[n].x2 > b->xmax) b->xmax = b->surface[n].x2;
-    if (b->surface[n].x3 > b->xmax) b->xmax = b->surface[n].x3;
+    if (a_b->m_surface[n].m_x1 > a_b->m_xmax) a_b->m_xmax = a_b->m_surface[n].m_x1;
+    if (a_b->m_surface[n].m_x2 > a_b->m_xmax) a_b->m_xmax = a_b->m_surface[n].m_x2;
+    if (a_b->m_surface[n].m_x3 > a_b->m_xmax) a_b->m_xmax = a_b->m_surface[n].m_x3;
 
-    if (b->surface[n].y1 > b->ymax) b->ymax = b->surface[n].y1;
-    if (b->surface[n].y2 > b->ymax) b->ymax = b->surface[n].y2;
-    if (b->surface[n].y3 > b->ymax) b->ymax = b->surface[n].y3;
+    if (a_b->m_surface[n].m_y1 > a_b->m_ymax) a_b->m_ymax = a_b->m_surface[n].m_y1;
+    if (a_b->m_surface[n].m_y2 > a_b->m_ymax) a_b->m_ymax = a_b->m_surface[n].m_y2;
+    if (a_b->m_surface[n].m_y3 > a_b->m_ymax) a_b->m_ymax = a_b->m_surface[n].m_y3;
 
-    if (b->surface[n].z1 > b->zmax) b->zmax = b->surface[n].z1;
-    if (b->surface[n].z2 > b->zmax) b->zmax = b->surface[n].z2;
-    if (b->surface[n].z3 > b->zmax) b->zmax = b->surface[n].z3;
+    if (a_b->m_surface[n].m_z1 > a_b->m_zmax) a_b->m_zmax = a_b->m_surface[n].m_z1;
+    if (a_b->m_surface[n].m_z2 > a_b->m_zmax) a_b->m_zmax = a_b->m_surface[n].m_z2;
+    if (a_b->m_surface[n].m_z3 > a_b->m_zmax) a_b->m_zmax = a_b->m_surface[n].m_z3;
   }
   return(0);
 }

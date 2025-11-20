@@ -20,28 +20,28 @@
 
     \sa TransferVecToPETSc()
 */
-int TransferVecFromPETSc( double* const u, /*!< HyPar::u type array (with ghost points) */
-                          const Vec Y, /*!< PETSc vector */
-                          void* ctxt, /*!< Object of type #PETScContext */
-                          const int sim_idx,/*!< Simulation object index */
-                          const int offset  /*!< Offset */ )
+int TransferVecFromPETSc( double* const a_u, /*!< HyPar::u type array (with ghost points) */
+                          const Vec a_Y, /*!< PETSc vector */
+                          void* a_ctxt, /*!< Object of type #PETScContext */
+                          const int a_sim_idx,/*!< Simulation object index */
+                          const int a_offset  /*!< Offset */ )
 {
-  PETScContext* context = (PETScContext*) ctxt;
-  SimulationObject* sim = (SimulationObject*) context->simobj;
+  PETScContext* context = (PETScContext*) a_ctxt;
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
   const double* Yarr;
 
   PetscFunctionBegin;
-  VecGetArrayRead(Y,&Yarr);
-  std::vector<int> index(sim[sim_idx].solver.ndims,0);
-  ArrayCopynD(  sim[sim_idx].solver.ndims,
-                (Yarr+offset),
-                u,
-                sim[sim_idx].solver.dim_local,
+  VecGetArrayRead(a_Y,&Yarr);
+  std::vector<int> index(sim[a_sim_idx].solver.m_ndims,0);
+  ArrayCopynD(  sim[a_sim_idx].solver.m_ndims,
+                (Yarr+a_offset),
+                a_u,
+                sim[a_sim_idx].solver.m_dim_local,
                 0,
-                sim[sim_idx].solver.ghosts,
+                sim[a_sim_idx].solver.m_ghosts,
                 index.data(),
-                sim[sim_idx].solver.nvars );
-  VecRestoreArrayRead(Y,&Yarr);
+                sim[a_sim_idx].solver.m_nvars );
+  VecRestoreArrayRead(a_Y,&Yarr);
 
   PetscFunctionReturn(0);
 }

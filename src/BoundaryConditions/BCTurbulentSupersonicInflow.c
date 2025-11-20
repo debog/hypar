@@ -19,61 +19,61 @@
     interaction problem (for which this boundary condition was written).
 */
 int BCTurbulentSupersonicInflowU(
-                                  void    *b,     /*!< Boundary object of type #DomainBoundary */
-                                  void    *m,     /*!< MPI object of type #MPIVariables */
-                                  int     ndims,  /*!< Number of spatial dimensions */
-                                  int     nvars,  /*!< Number of variables/DoFs per grid point */
-                                  int     *size,  /*!< Integer array with the number of grid points in each spatial dimension */
-                                  int     ghosts, /*!< Number of ghost points */
-                                  double  *phi,   /*!< The solution array on which to apply the boundary condition */
-                                  double  waqt    /*!< Current solution time */
+                                  void    *a_b,     /*!< Boundary object of type #DomainBoundary */
+                                  void    *a_m,     /*!< MPI object of type #MPIVariables */
+                                  int     a_ndims,  /*!< Number of spatial dimensions */
+                                  int     a_nvars,  /*!< Number of variables/DoFs per grid point */
+                                  int     *a_size,  /*!< Integer array with the number of grid points in each spatial dimension */
+                                  int     a_ghosts, /*!< Number of ghost points */
+                                  double  *a_phi,   /*!< The solution array on which to apply the boundary condition */
+                                  double  a_waqt    /*!< Current solution time */
                                 )
 {
-  DomainBoundary *boundary = (DomainBoundary*) b;
+  DomainBoundary *boundary = (DomainBoundary*) a_b;
 
-  int dim   = boundary->dim;
+  int dim   = boundary->m_dim;
 
-  double *inflow_data = boundary->UnsteadyDirichletData;
-  int    *inflow_size = boundary->UnsteadyDirichletSize;
+  double *inflow_data = boundary->m_UnsteadyDirichletData;
+  int    *inflow_size = boundary->m_UnsteadyDirichletSize;
 
-  if (ndims == 3) {
+  if (a_ndims == 3) {
 
     /* create a fake physics object */
     double gamma;
-    gamma = boundary->gamma;
+    gamma = boundary->m_gamma;
     double inv_gamma_m1 = 1.0/(gamma-1.0);
 
-    if (boundary->on_this_proc) {
+    if (boundary->m_on_this_proc) {
       /* the following bit is hardcoded for the inflow data
        * representing fluctuations in a domain of length 2pi */
-      double  xt = boundary->FlowVelocity[dim] * waqt;
+      double  xt = boundary->m_FlowVelocity[dim] * a_waqt;
       int     N  = inflow_size[dim];
       double  L  = 2.0 * (4.0*atan(1.0));
       int     it = ((int) ((xt/L) * ((double)N))) % N;
 
-      int bounds[ndims], indexb[ndims];
-      _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
-      _ArraySetValue_(indexb,ndims,0);
+      int bounds[a_ndims], indexb[a_ndims];
+      _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,a_ndims);
+      _ArraySetValue_(indexb,a_ndims,0);
       int done = 0;
       while (!done) {
-        int p1; _ArrayIndex1DWO_(ndims,size,indexb,boundary->is,ghosts,p1);
+        int p1; _ArrayIndex1DWO_(a_ndims,a_size,indexb,boundary->m_is,a_ghosts,p1);
 
         /* set the ghost point values - mean flow */
         double rho_gpt, uvel_gpt, vvel_gpt, wvel_gpt, energy_gpt, pressure_gpt;
-        rho_gpt      = boundary->FlowDensity;
-        pressure_gpt = boundary->FlowPressure;
-        uvel_gpt     = boundary->FlowVelocity[0];
-        vvel_gpt     = boundary->FlowVelocity[1];
-        wvel_gpt     = boundary->FlowVelocity[2];
+        rho_gpt      = boundary->m_FlowDensity;
+        pressure_gpt = boundary->m_FlowPressure;
+        uvel_gpt     = boundary->m_FlowVelocity[0];
+        vvel_gpt     = boundary->m_FlowVelocity[1];
+        wvel_gpt     = boundary->m_FlowVelocity[2];
 
         /* calculate the turbulent fluctuations */
         double duvel , dvvel , dwvel ;
-        int index1[ndims]; _ArrayCopy1D_(indexb,index1,ndims);
+        int index1[a_ndims]; _ArrayCopy1D_(indexb,index1,a_ndims);
         index1[dim] = it;
-        int q; _ArrayIndex1D_(ndims,inflow_size,index1,0,q);
-        duvel = inflow_data[q*nvars+1];
-        dvvel = inflow_data[q*nvars+2];
-        dwvel = inflow_data[q*nvars+3];
+        int q; _ArrayIndex1D_(a_ndims,inflow_size,index1,0,q);
+        duvel = inflow_data[q*a_nvars+1];
+        dvvel = inflow_data[q*a_nvars+2];
+        dwvel = inflow_data[q*a_nvars+3];
 
         /* add the turbulent fluctuations to the velocity field */
         uvel_gpt      += duvel;
@@ -84,13 +84,13 @@ int BCTurbulentSupersonicInflowU(
         energy_gpt   = inv_gamma_m1*pressure_gpt
                        + 0.5 * rho_gpt
                        * (uvel_gpt*uvel_gpt + vvel_gpt*vvel_gpt + wvel_gpt*wvel_gpt);
-        phi[nvars*p1+0] = rho_gpt;
-        phi[nvars*p1+1] = rho_gpt * uvel_gpt;
-        phi[nvars*p1+2] = rho_gpt * vvel_gpt;
-        phi[nvars*p1+3] = rho_gpt * wvel_gpt;
-        phi[nvars*p1+4] = energy_gpt;
+        a_phi[a_nvars*p1+0] = rho_gpt;
+        a_phi[a_nvars*p1+1] = rho_gpt * uvel_gpt;
+        a_phi[a_nvars*p1+2] = rho_gpt * vvel_gpt;
+        a_phi[a_nvars*p1+3] = rho_gpt * wvel_gpt;
+        a_phi[a_nvars*p1+4] = energy_gpt;
 
-        _ArrayIncrementIndex_(ndims,bounds,indexb,done);
+        _ArrayIncrementIndex_(a_ndims,bounds,indexb,done);
       }
     }
 

@@ -18,32 +18,32 @@
   originally written by Dr. Jay Sitaraman.
 */
 int IBIdentifyBody(
-                    void   *ib,     /*!< Immersed boundary object of type #ImmersedBoundary */
-                    int    *dim_g,  /*!< global dimensions */
-                    int    *dim_l,  /*!< local dimensions */
-                    int    ghosts,  /*!< number of ghost points */
-                    void   *m,      /*!< MPI object of type #MPIVariables */
-                    double *X,      /*!< Array of global spatial coordinates */
-                    double *blank   /*!< Blanking array: for grid points within the
+                    void   *a_ib,     /*!< Immersed boundary object of type #ImmersedBoundary */
+                    int    *a_dim_g,  /*!< global dimensions */
+                    int    *a_dim_l,  /*!< local dimensions */
+                    int    a_ghosts,  /*!< number of ghost points */
+                    void   *a_m,      /*!< MPI object of type #MPIVariables */
+                    double *a_X,      /*!< Array of global spatial coordinates */
+                    double *a_blank   /*!< Blanking array: for grid points within the
                                          body, this value will be set to 0 */
                   )
 {
-  ImmersedBoundary  *IB     = (ImmersedBoundary*) ib;
-  MPIVariables      *mpi    = (MPIVariables*) m;
-  Body3D            *body   = IB->body;
-  double            *x      = X,
-                    *y      = X+dim_g[0],
-                    *z      = X+dim_g[0]+dim_g[1],
-                    eps     = IB->tolerance;
-  int               itr_max = IB->itr_max,
+  ImmersedBoundary  *IB     = (ImmersedBoundary*) a_ib;
+  MPIVariables      *mpi    = (MPIVariables*) a_m;
+  Body3D            *body   = IB->m_body;
+  double            *x      = a_X,
+                    *y      = a_X+a_dim_g[0],
+                    *z      = a_X+a_dim_g[0]+a_dim_g[1],
+                    eps     = IB->m_tolerance;
+  int               itr_max = IB->m_itr_max,
                     i, j, k, n, v;
 
-  double xmax = body->xmax,
-         xmin = body->xmin,
-         ymax = body->ymax,
-         ymin = body->ymin,
-         zmax = body->zmax,
-         zmin = body->zmin;
+  double xmax = body->m_xmax,
+         xmin = body->m_xmin,
+         ymax = body->m_ymax,
+         ymin = body->m_ymin,
+         zmax = body->m_zmax,
+         zmin = body->m_zmin;
 
   double fac = 1.5;
   double Lx, Ly, Lz;
@@ -62,12 +62,12 @@ int IBIdentifyBody(
   zmin = zc - fac * Lz/2;
 
   int imin, imax, jmin, jmax, kmin, kmax;
-  imin = dim_g[0]-1;  imax = 0;
-  jmin = dim_g[1]-1;  jmax = 0;
-  kmin = dim_g[2]-1;  kmax = 0;
-  for (i = 0; i < dim_g[0]; i++) {
-    for (j = 0; j < dim_g[1]; j++) {
-      for (k = 0; k < dim_g[2]; k++) {
+  imin = a_dim_g[0]-1;  imax = 0;
+  jmin = a_dim_g[1]-1;  jmax = 0;
+  kmin = a_dim_g[2]-1;  kmax = 0;
+  for (i = 0; i < a_dim_g[0]; i++) {
+    for (j = 0; j < a_dim_g[1]; j++) {
+      for (k = 0; k < a_dim_g[2]; k++) {
         if (   ((x[i]-xmin)*(x[i]-xmax) < 0)
             && ((y[j]-ymin)*(y[j]-ymax) < 0)
             && ((z[k]-zmin)*(z[k]-zmax) < 0)) {
@@ -85,13 +85,13 @@ int IBIdentifyBody(
   double *cof[5], *xd, *dist;
   xd    = (double*) calloc (itr_max,sizeof(double));
   dist  = (double*) calloc (itr_max,sizeof(double));
-  for (v = 0; v < 5; v++) cof[v] = (double*) calloc(body->nfacets, sizeof(double));
+  for (v = 0; v < 5; v++) cof[v] = (double*) calloc(body->m_nfacets, sizeof(double));
 
-  for (n = 0; n < body->nfacets; n++) {
-    cof[0][n] = body->surface[n].y1 - body->surface[n].y3;
-    cof[1][n] = body->surface[n].y2 - body->surface[n].y3;
-    cof[2][n] = body->surface[n].z1 - body->surface[n].z3;
-    cof[3][n] = body->surface[n].z2 - body->surface[n].z3;
+  for (n = 0; n < body->m_nfacets; n++) {
+    cof[0][n] = body->m_surface[n].m_y1 - body->m_surface[n].m_y3;
+    cof[1][n] = body->m_surface[n].m_y2 - body->m_surface[n].m_y3;
+    cof[2][n] = body->m_surface[n].m_z1 - body->m_surface[n].m_z3;
+    cof[3][n] = body->m_surface[n].m_z2 - body->m_surface[n].m_z3;
     double den = cof[0][n]*cof[3][n] - cof[1][n]*cof[2][n];
     if (absolute(den) > eps)  cof[4][n] = 1.0 / den;
     else                      cof[4][n] = 0;
@@ -101,24 +101,24 @@ int IBIdentifyBody(
   for (j = jmin; j <= jmax; j++) {
     for (k = kmin; k <= kmax; k++) {
       int itr = 0;
-      for (n = 0; n < body->nfacets; n++) {
+      for (n = 0; n < body->m_nfacets; n++) {
         if (cof[4][n] != 0) {
           double yy, zz;
-          yy = body->surface[n].y3 - y[j];
-          zz = body->surface[n].z3 - z[k];
+          yy = body->m_surface[n].m_y3 - y[j];
+          zz = body->m_surface[n].m_z3 - z[k];
           double l1, l2, l3;
           l1 = (cof[1][n]*zz - cof[3][n]*yy) * cof[4][n];
           l2 = (cof[2][n]*yy - cof[0][n]*zz) * cof[4][n];
           l3 = 1 - l1 - l2;
           if ((l1 > -eps) && (l2 > -eps) && (l3 > -eps)){
-            xd[itr]   = l1*body->surface[n].x1 + l2*body->surface[n].x2 + l3*body->surface[n].x3;
+            xd[itr]   = l1*body->m_surface[n].m_x1 + l2*body->m_surface[n].m_x2 + l3*body->m_surface[n].m_x3;
             dist[itr] = absolute(x[imin]-xd[itr]);
             itr++;
           }
         }
       }
       if (itr > itr_max) {
-        if (!mpi->rank) {
+        if (!mpi->m_rank) {
           fprintf(stderr,"Error: In IBIdentyBody() - itr > %d. Recompilation of code needed.\n",itr_max);
           fprintf(stderr,"Increase the value of \"itr_max\" in IBIdentyBody().\n");
         }
@@ -160,17 +160,17 @@ int IBIdentifyBody(
             inside = 1;
             /* this point is inside                      */
             /* check if (i,j,k) lies within this process */
-            /* if so, set blank                          */
-            if (   ((i-mpi->is[0])*(i-mpi->ie[0]) <= 0)
-                && ((j-mpi->is[1])*(j-mpi->ie[1]) <= 0)
-                && ((k-mpi->is[2])*(k-mpi->ie[2]) <= 0)) {
+            /* if so, set a_blank                          */
+            if (   ((i-mpi->m_is[0])*(i-mpi->m_ie[0]) <= 0)
+                && ((j-mpi->m_is[1])*(j-mpi->m_ie[1]) <= 0)
+                && ((k-mpi->m_is[2])*(k-mpi->m_ie[2]) <= 0)) {
               /* calculate local indices */
               int index[_IB_NDIMS_];
-              index[0] = i-mpi->is[0];
-              index[1] = j-mpi->is[1];
-              index[2] = k-mpi->is[2];
-              int p; _ArrayIndex1D_(_IB_NDIMS_,dim_l,index,ghosts,p);
-              blank[p] = 0;
+              index[0] = i-mpi->m_is[0];
+              index[1] = j-mpi->m_is[1];
+              index[2] = k-mpi->m_is[2];
+              int p; _ArrayIndex1D_(_IB_NDIMS_,a_dim_l,index,a_ghosts,p);
+              a_blank[p] = 0;
               count++;
             }
           } else {

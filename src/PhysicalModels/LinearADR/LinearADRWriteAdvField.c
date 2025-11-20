@@ -15,43 +15,43 @@
 #include <physicalmodels/linearadr.h>
 
 /*! Write out the advection field to file */
-int LinearADRWriteAdvField( void*   s,    /*!< Solver object of type #HyPar */
-                            void*   m,    /*!< MPI object of type #MPIVariables */
+int LinearADRWriteAdvField( void*   a_s,    /*!< Solver object of type #HyPar */
+                            void*   a_m,    /*!< MPI object of type #MPIVariables */
                             double  a_t   /*!< Current simulation time */ )
 {
-  HyPar         *solver = (HyPar*)          s;
-  MPIVariables  *mpi    = (MPIVariables*)   m;
-  LinearADR     *param  = (LinearADR*) solver->physics;
+  HyPar         *solver = (HyPar*)          a_s;
+  MPIVariables  *mpi    = (MPIVariables*)   a_m;
+  LinearADR     *param  = (LinearADR*) solver->m_physics;
 
-  if (param->constant_advection == 0) {
+  if (param->m_constant_advection == 0) {
 
     char fname_root[_MAX_STRING_SIZE_] = "advection_field";
-    if (solver->nsims > 1) {
+    if (solver->m_nsims > 1) {
       char index[_MAX_STRING_SIZE_];
-      GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
+      GetStringFromInteger(solver->m_my_idx, index, (int)log10(solver->m_nsims)+1);
       strcat(fname_root, "_");
       strcat(fname_root, index);
     }
 
-    int adv_nvar = solver->ndims * solver->nvars;
-    WriteArray(  solver->ndims,
+    int adv_nvar = solver->m_ndims * solver->m_nvars;
+    WriteArray(  solver->m_ndims,
                  adv_nvar,
-                 solver->dim_global,
-                 solver->dim_local,
-                 solver->ghosts,
-                 solver->x,
-                 param->a,
+                 solver->m_dim_global,
+                 solver->m_dim_local,
+                 solver->m_ghosts,
+                 solver->m_x,
+                 param->m_a,
                  solver,mpi,
                  fname_root );
 
-    if (!strcmp(solver->plot_solution, "yes")) {
-      PlotArray( solver->ndims,
+    if (!strcmp(solver->m_plot_solution, "yes")) {
+      PlotArray( solver->m_ndims,
                  adv_nvar,
-                 solver->dim_global,
-                 solver->dim_local,
-                 solver->ghosts,
-                 solver->x,
-                 param->a,
+                 solver->m_dim_global,
+                 solver->m_dim_local,
+                 solver->m_ghosts,
+                 solver->m_x,
+                 param->m_a,
                  a_t,
                  solver,mpi,
                  fname_root );

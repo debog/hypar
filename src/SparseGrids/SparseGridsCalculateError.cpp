@@ -23,7 +23,7 @@ void SparseGridsSimulation::CalculateError()
   {
     HyPar* solver = &(m_sim_fg->solver);
     MPIVariables* mpi = &(m_sim_fg->mpi);
-    long size = solver->nvars * solver->npoints_local_wghosts;
+    long size = solver->m_nvars * solver->m_npoints_local_wghosts;
     uex = (double*) calloc (size, sizeof(double));
 
     char fname_root[_MAX_STRING_SIZE_] = "exact";
@@ -44,14 +44,14 @@ void SparseGridsSimulation::CalculateError()
 
     /* No exact solution available */
     for (int n=0; n<m_nsims_sg; n++) {
-      m_sims_sg[n].solver.error[0]
-        = m_sims_sg[n].solver.error[1]
-        = m_sims_sg[n].solver.error[2]
+      m_sims_sg[n].solver.m_error[0]
+        = m_sims_sg[n].solver.m_error[1]
+        = m_sims_sg[n].solver.m_error[2]
         = -1;
     }
-    m_sim_fg->solver.error[0]
-      = m_sim_fg->solver.error[1]
-      = m_sim_fg->solver.error[2]
+    m_sim_fg->solver.m_error[0]
+      = m_sim_fg->solver.m_error[1]
+      = m_sim_fg->solver.m_error[2]
       = -1;
 
   } else {
@@ -64,8 +64,8 @@ void SparseGridsSimulation::CalculateError()
     double *uex2 = NULL;
 
     if (m_print_sg_errors == 1) {
-      long size =   m_sim_fg->solver.nvars
-                  * m_sim_fg->solver.npoints_local_wghosts;
+      long size =   m_sim_fg->solver.m_nvars
+                  * m_sim_fg->solver.m_npoints_local_wghosts;
       uex2 = (double*) calloc(size, sizeof(double));
       _ArrayCopy1D_(uex, uex2, size);
     }
@@ -78,27 +78,27 @@ void SparseGridsSimulation::CalculateError()
       for (int n = 0; n < m_nsims_sg; n++) {
 
         GridDimensions dim_fg(m_ndims,0);
-        StdVecOps::copyFrom(dim_fg, m_sim_fg->solver.dim_global, m_ndims);
+        StdVecOps::copyFrom(dim_fg, m_sim_fg->solver.m_dim_global, m_ndims);
 
         GridDimensions dim_sg(m_ndims,0);
-        StdVecOps::copyFrom(dim_sg, m_sims_sg[n].solver.dim_global, m_ndims);
+        StdVecOps::copyFrom(dim_sg, m_sims_sg[n].solver.m_dim_global, m_ndims);
 
         /* assemble the global exact solution on full grid */
         double *uex_global_fg = NULL;
         if (!m_rank) {
           allocateDataArrays( dim_fg,
-                              m_sim_fg->solver.nvars,
+                              m_sim_fg->solver.m_nvars,
                               &uex_global_fg,
-                              m_sim_fg->solver.ghosts);
+                              m_sim_fg->solver.m_ghosts);
         }
         MPIGatherArraynDwGhosts( m_ndims,
                                  (void*) &(m_sim_fg->mpi),
                                  uex_global_fg,
                                  uex2,
-                                 m_sim_fg->solver.dim_global,
-                                 m_sim_fg->solver.dim_local,
-                                 m_sim_fg->solver.ghosts,
-                                 m_sim_fg->solver.nvars );
+                                 m_sim_fg->solver.m_dim_global,
+                                 m_sim_fg->solver.m_dim_local,
+                                 m_sim_fg->solver.m_ghosts,
+                                 m_sim_fg->solver.m_nvars );
 
         /* interpolate to sparse grid -
          * this will delete the full grid array*/
@@ -108,8 +108,8 @@ void SparseGridsSimulation::CalculateError()
                                                 &uex_global_sg,
                                                 dim_fg.data(),
                                                 uex_global_fg,
-                                                m_sims_sg[n].solver.nvars,
-                                                m_sims_sg[n].solver.ghosts,
+                                                m_sims_sg[n].solver.m_nvars,
+                                                m_sims_sg[n].solver.m_ghosts,
                                                 m_ndims,
                                                 periodic_arr.data() );
           if (ierr) {
@@ -119,8 +119,8 @@ void SparseGridsSimulation::CalculateError()
         }
 
         /* allocate local exact solution on this sparse grid */
-        long size = m_sims_sg[n].solver.nvars
-                    * m_sims_sg[n].solver.npoints_local_wghosts;
+        long size = m_sims_sg[n].solver.m_nvars
+                    * m_sims_sg[n].solver.m_npoints_local_wghosts;
         double* uex_sg = (double*) calloc(size, sizeof(double));
 
         /* partition the global exact solution to local on this sparse grid */
@@ -128,10 +128,10 @@ void SparseGridsSimulation::CalculateError()
                                     (void*) &(m_sims_sg[n].mpi),
                                     (m_rank ? NULL : uex_global_sg),
                                     uex_sg,
-                                    m_sims_sg[n].solver.dim_global,
-                                    m_sims_sg[n].solver.dim_local,
-                                    m_sims_sg[n].solver.ghosts,
-                                    m_sims_sg[n].solver.nvars );
+                                    m_sims_sg[n].solver.m_dim_global,
+                                    m_sims_sg[n].solver.m_dim_local,
+                                    m_sims_sg[n].solver.m_ghosts,
+                                    m_sims_sg[n].solver.m_nvars );
 
         /* delete the global exact solution array */
         if (!m_rank) free(uex_global_sg);
@@ -170,42 +170,42 @@ void SparseGridsSimulation::computeError( SimulationObject& a_sim,  /*!< Simulat
   double sum, global_sum;
   double solution_norm[3] = {0.0,0.0,0.0};
   /* L1 */
-  sum = ArraySumAbsnD   (solver->nvars,solver->ndims,solver->dim_local,
-                         solver->ghosts,solver->index,a_uex);
-  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-  solution_norm[0] = global_sum/((double)solver->npoints_global);
+  sum = ArraySumAbsnD   (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                         solver->m_ghosts,solver->m_index,a_uex);
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+  solution_norm[0] = global_sum/((double)solver->m_npoints_global);
   /* L2 */
-  sum = ArraySumSquarenD(solver->nvars,solver->ndims,solver->dim_local,
-                         solver->ghosts,solver->index,a_uex);
-  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-  solution_norm[1] = sqrt(global_sum/((double)solver->npoints_global));
+  sum = ArraySumSquarenD(solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                         solver->m_ghosts,solver->m_index,a_uex);
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+  solution_norm[1] = sqrt(global_sum/((double)solver->m_npoints_global));
   /* Linf */
-  sum = ArrayMaxnD      (solver->nvars,solver->ndims,solver->dim_local,
-                         solver->ghosts,solver->index,a_uex);
-  global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
+  sum = ArrayMaxnD      (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                         solver->m_ghosts,solver->m_index,a_uex);
+  global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->m_world);
   solution_norm[2] = global_sum;
 
   /* compute error = difference between exact and numerical solution */
-  long size = solver->nvars*solver->npoints_local_wghosts;
-  _ArrayAXPY_(solver->u,-1.0,a_uex,size);
+  long size = solver->m_nvars*solver->m_npoints_local_wghosts;
+  _ArrayAXPY_(solver->m_u,-1.0,a_uex,size);
 
   /* calculate L1 norm of error */
-  sum = ArraySumAbsnD   (solver->nvars,solver->ndims,solver->dim_local,
-                         solver->ghosts,solver->index,a_uex);
-  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-  solver->error[0] = global_sum/((double)solver->npoints_global);
+  sum = ArraySumAbsnD   (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                         solver->m_ghosts,solver->m_index,a_uex);
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+  solver->m_error[0] = global_sum/((double)solver->m_npoints_global);
 
   /* calculate L2 norm of error */
-  sum = ArraySumSquarenD(solver->nvars,solver->ndims,solver->dim_local,
-                         solver->ghosts,solver->index,a_uex);
-  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-  solver->error[1] = sqrt(global_sum/((double)solver->npoints_global));
+  sum = ArraySumSquarenD(solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                         solver->m_ghosts,solver->m_index,a_uex);
+  global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+  solver->m_error[1] = sqrt(global_sum/((double)solver->m_npoints_global));
 
   /* calculate Linf norm of error */
-  sum = ArrayMaxnD      (solver->nvars,solver->ndims,solver->dim_local,
-                         solver->ghosts,solver->index,a_uex);
-  global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
-  solver->error[2] = global_sum;
+  sum = ArrayMaxnD      (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                         solver->m_ghosts,solver->m_index,a_uex);
+  global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->m_world);
+  solver->m_error[2] = global_sum;
 
   /*
     decide whether to normalize and report relative errors,
@@ -214,9 +214,9 @@ void SparseGridsSimulation::computeError( SimulationObject& a_sim,  /*!< Simulat
   if (    (solution_norm[0] > tolerance)
       &&  (solution_norm[1] > tolerance)
       &&  (solution_norm[2] > tolerance) ) {
-    solver->error[0] /= solution_norm[0];
-    solver->error[1] /= solution_norm[1];
-    solver->error[2] /= solution_norm[2];
+    solver->m_error[0] /= solution_norm[0];
+    solver->m_error[1] /= solution_norm[1];
+    solver->m_error[2] /= solution_norm[2];
   }
 
   return;

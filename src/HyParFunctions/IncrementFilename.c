@@ -44,30 +44,30 @@
     can be of arbitrary length.
 */
 void IncrementFilenameIndex(
-                              char *f,  /*!< Character string representing the integer */
-                              int len   /*!< Length of the string */
+                              char *a_f,  /*!< Character string representing the integer */
+                              int a_len   /*!< Length of the string */
                            )
 {
   int i;
-  for (i=len-1; i>=0; i--) {
-    if (f[i] == '9') {
-      f[i] = '0';
+  for (i=a_len-1; i>=0; i--) {
+    if (a_f[i] == '9') {
+      a_f[i] = '0';
       if (!i) fprintf(stderr,"Warning: file increment hit max limit. Resetting to zero.\n");
     } else {
-      f[i]++;
+      a_f[i]++;
       break;
     }
   }
 }
 
 /*! Resets the index to "0000..." of a desired length. */
-void ResetFilenameIndex(  char *f,  /*!< Character string representing the integer */
-                          int len   /*!< Length of the string */ )
+void ResetFilenameIndex(  char *a_f,  /*!< Character string representing the integer */
+                          int a_len   /*!< Length of the string */ )
 {
-  if (!f) return;
+  if (!a_f) return;
   int i;
-  for (i = 0; i < len; i++) {
-    f[i] = '0';
+  for (i = 0; i < a_len; i++) {
+    a_f[i] = '0';
   }
   return;
 }

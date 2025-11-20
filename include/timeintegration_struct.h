@@ -28,69 +28,69 @@
 */
 typedef struct time_integration_variables {
   /*! Current iteration number */
-  int     iter;
+  int     m_iter;
   /*! Total number of iterations */
-  int     n_iter;
+  int     m_n_iter;
   /*! Restart iteration number (0 for a non-restart simulation) */
-  int     restart_iter;
+  int     m_restart_iter;
   /*! Current solution time */
-  double  waqt;
+  double  m_waqt;
   /*! Time step size */
-  double  dt;
+  double  m_dt;
   /*! Norm of the change in the solution at a time step */
-  double  norm;
+  double  m_norm;
   /*! Maximum CFL at a time step */
-  double  max_cfl;
+  double  m_max_cfl;
   /*! Maximum diffusion number at a time step */
-  double  max_diff;
+  double  m_max_diff;
 
   /*! Array of simulation objects of type #SimulationObject */
-  void    *simulation;
+  void    *m_simulation;
   /*! Number of simulation objects */
-  int     nsims;
+  int     m_nsims;
 
   /*! Offsets (positions) for the solution of each simulation domain in
    *  the big array containing all the solutions */
-  long    *u_offsets;
+  long    *m_u_offsets;
 
   /*! Local size of the solution of each simulation domain */
-  long    *u_sizes;
+  long    *m_u_sizes;
 
   /*! Offsets (positions) for the boundary flux of each simulation domain in
    *  the big array containing all the boundary fluxes */
-  int     *bf_offsets;
+  int     *m_bf_offsets;
 
   /*! Size of  the boundary flux of each simulation domain */
-  int     *bf_sizes;
+  int     *m_bf_sizes;
 
   /*! Array to store the current solution */
-  double  *u;
+  double  *m_u;
 
   /*! Array to store the right-hand side */
-  double  *rhs;
+  double  *m_rhs;
 
   /*! Local size of the solution vector */
-  long    u_size_total;
+  long    m_u_size_total;
 
   /*! Local size of the boundary flux vector */
-  long    bf_size_total;
+  long    m_bf_size_total;
 
   /*! Arrays to store stage values for a multi-stage time-integration method */
-  double  **U;
+  double  **m_U;
   /*! Arrays to store stage right-hand-sides for a multi-stage time-integration method */
-  double  **Udot;
+  double  **m_Udot;
 
   /*! MPI rank of this process */
-  int     rank;
+  int     m_rank;
   /*! Number of MPI processes */
-  int     nproc;
+  int     m_nproc;
 
   /*! Array to store the flux integral at the physical boundary at each stage of
       a multi-stage time-integration method (to compute conservation errors) */
-  double **BoundaryFlux;
+  double **m_BoundaryFlux;
 
   /*! Pointer to file to write residual history if required */
-  void *ResidualFile;
+  void *m_ResidualFile;
 
   /*! Pointer to the function that takes one time step using the desired method */
   int (*TimeIntegrate) (void*);
@@ -98,21 +98,21 @@ typedef struct time_integration_variables {
   int (*RHSFunction)   (double*,double*,void*,void*,double);
 
   /*! iteration start time */
-  struct timeval iter_start_time;
+  struct timeval m_iter_start_time;
   /*! iteration end time */
-  struct timeval iter_end_time;
+  struct timeval m_iter_end_time;
   /*! iteration wallclock time (in seconds) */
-  double iter_wctime;
-  double iter_wctime_total;
+  double m_iter_wctime;
+  double m_iter_wctime_total;
 
 #if defined(HAVE_CUDA)
   /*! Arrays to store stage values for a multi-stage time-integration method */
-  double *gpu_U;
+  double *m_gpu_U;
   /*! Arrays to store stage right-hand-sides for a multi-stage time-integration method */
-  double *gpu_Udot;
+  double *m_gpu_Udot;
   /*! Array to store the flux integral at the physical boundary at each stage of
       a multi-stage time-integration method (to compute conservation errors) */
-  double *gpu_BoundaryFlux;
+  double *m_gpu_BoundaryFlux;
 #endif
 
 } TimeIntegration;

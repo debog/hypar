@@ -21,49 +21,49 @@
 extern "C" void IncrementFilenameIndex(char*,int);
 
 /*! Write out the ROM solution to file */
-int OutputROMSolution(  void*   s,      /*!< Array of simulation objects of type #SimulationObject */
-                        int     nsims,  /*!< Number of simulation objects */
+int OutputROMSolution(  void*   a_s,      /*!< Array of simulation objects of type #SimulationObject */
+                        int     a_nsims,  /*!< Number of simulation objects */
                         double  a_time  /*!< Current simulation time */)
 {
-  SimulationObject* simobj = (SimulationObject*) s;
+  SimulationObject* simobj = (SimulationObject*) a_s;
   int ns;
 
-  for (ns = 0; ns < nsims; ns++) {
+  for (ns = 0; ns < a_nsims; ns++) {
 
     HyPar*        solver = &(simobj[ns].solver);
     MPIVariables* mpi    = &(simobj[ns].mpi);
 
-    if ((!solver->WriteOutput) && (strcmp(solver->plot_solution,"yes"))) continue;
+    if ((!solver->WriteOutput) && (strcmp(solver->m_plot_solution,"yes"))) continue;
 
     char fname_root[_MAX_STRING_SIZE_];
-    strcpy(fname_root, solver->op_rom_fname_root);
+    strcpy(fname_root, solver->m_op_rom_fname_root);
 
-    if (nsims > 1) {
+    if (a_nsims > 1) {
       char index[_MAX_STRING_SIZE_];
-      GetStringFromInteger(ns, index, (int)log10(nsims)+1);
+      GetStringFromInteger(ns, index, (int)log10(a_nsims)+1);
       strcat(fname_root, "_");
       strcat(fname_root, index);
     }
 
-    WriteArray( solver->ndims,
-                solver->nvars,
-                solver->dim_global,
-                solver->dim_local,
-                solver->ghosts,
-                solver->x,
-                solver->u_rom_predicted,
+    WriteArray( solver->m_ndims,
+                solver->m_nvars,
+                solver->m_dim_global,
+                solver->m_dim_local,
+                solver->m_ghosts,
+                solver->m_x,
+                solver->m_u_rom_predicted,
                 solver,
                 mpi,
                 fname_root );
 
-    if (!strcmp(solver->plot_solution, "yes")) {
-      PlotArray(   solver->ndims,
-                   solver->nvars,
-                   solver->dim_global,
-                   solver->dim_local,
-                   solver->ghosts,
-                   solver->x,
-                   solver->u,
+    if (!strcmp(solver->m_plot_solution, "yes")) {
+      PlotArray(   solver->m_ndims,
+                   solver->m_nvars,
+                   solver->m_dim_global,
+                   solver->m_dim_local,
+                   solver->m_ghosts,
+                   solver->m_x,
+                   solver->m_u,
                    a_time,
                    solver,
                    mpi,
@@ -71,8 +71,8 @@ int OutputROMSolution(  void*   s,      /*!< Array of simulation objects of type
     }
 
     /* increment the index string, if required */
-    if ((!strcmp(solver->output_mode,"serial")) && (!strcmp(solver->op_overwrite,"no"))) {
-      IncrementFilenameIndex(solver->filename_index,solver->index_length);
+    if ((!strcmp(solver->m_output_mode,"serial")) && (!strcmp(solver->m_op_overwrite,"no"))) {
+      IncrementFilenameIndex(solver->m_filename_index,solver->m_index_length);
     }
 
   }

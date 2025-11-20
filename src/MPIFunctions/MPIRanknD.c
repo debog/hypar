@@ -25,18 +25,18 @@
     must be equal to the number of spatial dimensions.
 */
 int MPIRanknD(
-                int ndims,    /*!< Number of spatial dimensions */
-                int rank,     /*!< 1D rank*/
-                int *iproc,   /*!< Integer array whose elements are the number of MPI ranks along each dimension */
-                int *ip       /*!< Integer array whose elements are the rank of this process along each dimesion */
+                int a_ndims,    /*!< Number of spatial dimensions */
+                int a_rank,     /*!< 1D rank*/
+                int *a_iproc,   /*!< Integer array whose elements are the number of MPI ranks along each dimension */
+                int *a_ip /*!< Integer array whose elements are the rank of this process along each dimesion */
              )
 {
   int i,term    = 1;
-  for (i=0; i<ndims; i++) term *= iproc[i];
-  for (i=ndims-1; i>=0; i--) {
-    term /= iproc[i];
-    ip[i] = rank/term;
-    rank -= ip[i]*term;
+  for (i=0; i<a_ndims; i++) term *= a_iproc[i];
+  for (i=a_ndims-1; i>=0; i--) {
+    term /= a_iproc[i];
+    a_ip[i] = a_rank/term;
+    a_rank -= a_ip[i]*term;
   }
   return(0);
 }

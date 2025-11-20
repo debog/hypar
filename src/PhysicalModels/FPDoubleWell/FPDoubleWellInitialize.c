@@ -16,27 +16,27 @@ int    FPDoubleWellUpwind            (double*,double*,double*,double*,
 int    FPDoubleWellPostStep          (double*,void*,void*,double,int);
 int    FPDoubleWellPrintStep         (void*,void*,double);
 
-int FPDoubleWellInitialize(void *s,void *m)
+int FPDoubleWellInitialize(void *a_s,void *a_m)
 {
-  HyPar         *solver  = (HyPar*)         s;
-  MPIVariables  *mpi     = (MPIVariables*)  m;
-  FPDoubleWell  *physics = (FPDoubleWell*)  solver->physics;
+  HyPar         *solver  = (HyPar*)         a_s;
+  MPIVariables  *mpi     = (MPIVariables*)  a_m;
+  FPDoubleWell  *physics = (FPDoubleWell*)  solver->m_physics;
   int           ferr     = 0;
   _DECLARE_IERR_;
 
   static int count = 0;
 
-  if (solver->nvars != _MODEL_NVARS_) {
+  if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in FPDoubleWellInitializeO(): nvars has to be %d.\n",_MODEL_NVARS_);
     return(1);
   }
-  if (solver->ndims != _MODEL_NDIMS_) {
+  if (solver->m_ndims != _MODEL_NDIMS_) {
     fprintf(stderr,"Error in FPDoubleWellInitializeO(): ndims has to be %d.\n",_MODEL_NDIMS_);
     return(1);
   }
 
   /* reading physical model specific inputs - all processes */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     FILE *in;
     if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
@@ -45,18 +45,18 @@ int FPDoubleWellInitialize(void *s,void *m)
       return(1);
     } else {
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "q")) {
             /* read diffusion coefficient */
-            ferr = fscanf(in,"%lf",&physics->q);
+            ferr = fscanf(in,"%lf",&physics->m_q);
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",word,useless);
+            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
@@ -69,11 +69,11 @@ int FPDoubleWellInitialize(void *s,void *m)
   }
 
 #ifndef serial
-  IERR MPIBroadcast_double(&physics->q,1,0,&mpi->world); CHECKERR(ierr);
+  IERR MPIBroadcast_double(&physics->m_q,1,0,&mpi->m_world); CHECKERR(ierr);
 #endif
 
-  if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-    if (!mpi->rank) {
+  if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in FPDoubleWellInitialize: This physical model does not have a splitting ");
       fprintf(stderr,"of the hyperbolic term defined.\n");
     }
@@ -90,7 +90,7 @@ int FPDoubleWellInitialize(void *s,void *m)
   solver->PrintStep          = FPDoubleWellPrintStep;
 
   /* Calculate and print the PDF integral of the initial solution */
-  IERR FPDoubleWellPostStep(solver->u,solver,mpi,0.0,0);CHECKERR(ierr);
+  IERR FPDoubleWellPostStep(solver->m_u,solver,mpi,0.0,0);CHECKERR(ierr);
   IERR FPDoubleWellPrintStep(solver,mpi,0.0);           CHECKERR(ierr);
 
   count++;

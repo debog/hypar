@@ -37,7 +37,7 @@ int TemplateModelInitialize(void *s, /*!< Solver object of type #HyPar */
 {
   HyPar          *solver  = (HyPar*)          s;
   MPIVariables   *mpi     = (MPIVariables*)   m;
-  TemplateModel  *physics = (TemplateModel*)  solver->physics;
+  TemplateModel  *physics = (TemplateModel*)  solver->m_physics;
   int            ferr, i;
 
   static int count = 0;
@@ -128,7 +128,7 @@ int TemplateModelInitialize(void *s, /*!< Solver object of type #HyPar */
   }
 
   /* Check for incompatible solver options */
-  if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
+  if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
     if (!mpi->rank) {
       fprintf(stderr,"Error in TemplateModelInitialize: ");
       fprintf(stderr,"This physical model does not have flux splitting defined.\n");
@@ -148,11 +148,11 @@ int TemplateModelInitialize(void *s, /*!< Solver object of type #HyPar */
   /* [REPLACE] Allocate model-specific arrays if needed */
   /* Example: allocate field array based on grid size
   int size = 1;
-  for (i=0; i<solver->ndims; i++) {
-    size *= (solver->dim_local[i] + 2*solver->ghosts);
+  for (i=0; i<solver->m_ndims; i++) {
+    size *= (solver->m_dim_local[i] + 2*solver->m_ghosts);
   }
   physics->field_size = size;
-  physics->field_array = (double*) calloc(size*solver->nvars, sizeof(double));
+  physics->field_array = (double*) calloc(size*solver->m_nvars, sizeof(double));
   */
 
   /* Register required function pointers with solver */

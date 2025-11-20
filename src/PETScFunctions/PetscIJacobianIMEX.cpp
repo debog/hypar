@@ -58,25 +58,25 @@
       the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
       or variable name yields the specific doc page dealing with that function/variable.
 */
-PetscErrorCode PetscIJacobianIMEX(TS ts,        /*!< Time stepping object (see PETSc TS)*/
-                                  PetscReal t,  /*!< Current time */
-                                  Vec Y,        /*!< Solution vector */
-                                  Vec Ydot,     /*!< Time-derivative of solution vector */
-                                  PetscReal a,  /*!< Shift */
-                                  Mat A,        /*!< Jacobian matrix */
-                                  Mat B,        /*!< Preconditioning matrix */
-                                  void *ctxt    /*!< Application context */ )
+PetscErrorCode PetscIJacobianIMEX(TS a_ts,        /*!< Time stepping object (see PETSc TS)*/
+                                  PetscReal a_t,  /*!< Current time */
+                                  Vec a_Y,        /*!< Solution vector */
+                                  Vec a_Ydot,     /*!< Time-derivative of solution vector */
+                                  PetscReal a_a,  /*!< Shift */
+                                  Mat a_A,        /*!< Jacobian matrix */
+                                  Mat a_B,        /*!< Preconditioning matrix */
+                                  void *a_ctxt    /*!< Application context */ )
 {
-  PETScContext* context = (PETScContext*) ctxt;
+  PETScContext* context = (PETScContext*) a_ctxt;
 
   PetscFunctionBegin;
-  for (int ns = 0; ns < context->nsims; ns++) {
-    ((SimulationObject*)context->simobj)[ns].solver.count_IJacobian++;
+  for (int ns = 0; ns < context->m_nsims; ns++) {
+    ((SimulationObject*)context->m_simobj)[ns].solver.m_count_i_jacobian++;
   }
-  context->shift = a;
-  context->waqt  = t;
+  context->m_shift = a_a;
+  context->m_waqt  = a_t;
   /* Construct preconditioning matrix */
-  if (context->flag_use_precon) PetscComputePreconMatIMEX(B,Y,context);
+  if (context->m_flag_use_precon) PetscComputePreconMatIMEX(a_B,a_Y,context);
 
   PetscFunctionReturn(0);
 }
@@ -106,7 +106,7 @@ PetscErrorCode PetscIJacobianIMEX(TS ts,        /*!< Time stepping object (see P
     \f{equation}{
       {\bf f} = \alpha {\bf y} - \frac{1}{\epsilon} \left[ {\bf G}\left({\bf U}_0+\epsilon{\bf y}\right)-{\bf G}\left({\bf U}_0\right) \right]
     \f}
-    In the code, \f${\bf y}\f$ is \a Y, \f$\bf f\f$ is \a F, and \f${\bf U}_0\f$ is \a #HyPar::uref (the reference solution at which the
+    In the code, \f${\bf y}\f$ is \a Y, \f$\bf f\f$ is \a F, and \f${\bf U}_0\f$ is \a #HyPar::m_uref (the reference solution at which the
     nonlinear Jacobian is computed). See papers on Jacobian-free Newton-Krylov (JFNK) methods to understand how \f$\epsilon\f$ is computed.
 
     Note that \f${\bf G}\left({\bf U}\right)\f$ represents all terms that the user has indicated to be
@@ -125,108 +125,108 @@ PetscErrorCode PetscIJacobianIMEX(TS ts,        /*!< Time stepping object (see P
       the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
       or variable name yields the specific doc page dealing with that function/variable.
 */
-PetscErrorCode PetscJacobianFunctionIMEX_JFNK(Mat Jacobian, /*!< Jacobian matrix */
-                                              Vec Y,/*!< Input vector */
-                                              Vec F /*!< Output vector (Jacobian times input vector */ )
+PetscErrorCode PetscJacobianFunctionIMEX_JFNK(Mat a_Jacobian, /*!< Jacobian matrix */
+                                              Vec a_Y,/*!< Input vector */
+                                              Vec a_F /*!< Output vector (Jacobian times input vector */ )
 {
   PETScContext* context(nullptr);
 
   PetscFunctionBegin;
 
-  MatShellGetContext(Jacobian,&context);
-  SimulationObject* sim = (SimulationObject*) context->simobj;
-  int nsims = context->nsims;
+  MatShellGetContext(a_Jacobian,&context);
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
+  int nsims = context->m_nsims;
 
   double normY;
-  VecNorm(Y,NORM_2,&normY);
+  VecNorm(a_Y,NORM_2,&normY);
 
   if (normY < 1e-16) {
 
-    /* F = 0 */
-    VecZeroEntries(F);
-    /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->shift,0,Y);
+    /* a_F = 0 */
+    VecZeroEntries(a_F);
+    /* [J]a_Y = aY - a_F(a_Y) */
+    VecAXPBY(a_F,context->m_shift,0,a_Y);
 
   } else {
 
-    double epsilon =  context->jfnk_eps / normY;
-    double t = context->waqt; /* current stage/step time */
+    double epsilon =  context->m_jfnk_eps / normY;
+    double t = context->m_waqt; /* current stage/step time */
 
     for (int ns = 0; ns < nsims; ns++) {
 
       HyPar* solver = &(sim[ns].solver);
       MPIVariables* mpi = &(sim[ns].mpi);
-      solver->count_IJacFunction++;
+      solver->m_count_i_jac_function++;
 
-      int size = solver->npoints_local_wghosts;
+      int size = solver->m_npoints_local_wghosts;
 
-      double *u       = solver->u;
-      double *uref    = solver->uref;
-      double *rhsref  = solver->rhsref;
-      double *rhs     = solver->rhs;
+      double *u       = solver->m_u;
+      double *uref    = solver->m_uref;
+      double *rhsref  = solver->m_rhsref;
+      double *rhs     = solver->m_rhs;
 
       /* copy solution from PETSc vector */
-      TransferVecFromPETSc(u,Y,context,ns,context->offsets[ns]);
-      _ArrayAYPX_(uref,epsilon,u,size*solver->nvars);
+      TransferVecFromPETSc(u,a_Y,context,ns,context->m_offsets[ns]);
+      _ArrayAYPX_(uref,epsilon,u,size*solver->m_nvars);
       /* apply boundary conditions and exchange data over MPI interfaces */
       solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);
-      MPIExchangeBoundariesnD(  solver->ndims,
-                                solver->nvars,
-                                solver->dim_local,
-                                solver->ghosts,
+      MPIExchangeBoundariesnD(  solver->m_ndims,
+                                solver->m_nvars,
+                                solver->m_dim_local,
+                                solver->m_ghosts,
                                 mpi,
                                 u );
 
       /* Evaluate hyperbolic, parabolic and source terms  and the RHS for U+dU */
-      _ArraySetValue_(rhs,size*solver->nvars,0.0);
-      if ((!strcmp(solver->SplitHyperbolicFlux,"yes")) && solver->flag_fdf_specified) {
-        if (context->flag_hyperbolic_f == _IMPLICIT_) {
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+      _ArraySetValue_(rhs,size*solver->m_nvars,0.0);
+      if ((!strcmp(solver->m_split_hyperbolic_flux,"yes")) && solver->m_flag_fdf_specified) {
+        if (context->m_flag_hyperbolic_f == _IMPLICIT_) {
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->FdFFunction,solver->UpwindFdF);
-          _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+          _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
         }
-        if (context->flag_hyperbolic_df == _IMPLICIT_) {
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+        if (context->m_flag_hyperbolic_df == _IMPLICIT_) {
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->dFFunction,solver->UpwinddF);
-          _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+          _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
         }
-      } else if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-        if (context->flag_hyperbolic_f == _IMPLICIT_) {
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+      } else if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
+        if (context->m_flag_hyperbolic_f == _IMPLICIT_) {
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->FFunction,solver->Upwind);
-          _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+          _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->dFFunction,solver->UpwinddF);
-          _ArrayAXPY_(solver->hyp, 1.0,rhs,size*solver->nvars);
+          _ArrayAXPY_(solver->m_hyp, 1.0,rhs,size*solver->m_nvars);
         }
-        if (context->flag_hyperbolic_df == _IMPLICIT_) {
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+        if (context->m_flag_hyperbolic_df == _IMPLICIT_) {
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->dFFunction,solver->UpwinddF);
-          _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+          _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
         }
       } else {
-        if (context->flag_hyperbolic == _IMPLICIT_) {
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+        if (context->m_flag_hyperbolic == _IMPLICIT_) {
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->FFunction,solver->Upwind);
-          _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+          _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
         }
       }
-      if (context->flag_parabolic == _IMPLICIT_) {
-        solver->ParabolicFunction (solver->par,u,solver,mpi,t);
-        _ArrayAXPY_(solver->par, 1.0,rhs,size*solver->nvars);
+      if (context->m_flag_parabolic == _IMPLICIT_) {
+        solver->ParabolicFunction (solver->m_par,u,solver,mpi,t);
+        _ArrayAXPY_(solver->m_par, 1.0,rhs,size*solver->m_nvars);
       }
-      if (context->flag_source == _IMPLICIT_) {
-        solver->SourceFunction (solver->source,u,solver,mpi,t);
-        _ArrayAXPY_(solver->source, 1.0,rhs,size*solver->nvars);
+      if (context->m_flag_source == _IMPLICIT_) {
+        solver->SourceFunction (solver->m_source,u,solver,mpi,t);
+        _ArrayAXPY_(solver->m_source, 1.0,rhs,size*solver->m_nvars);
       }
 
-      _ArrayAXPY_(rhsref,-1.0,rhs,size*solver->nvars);
+      _ArrayAXPY_(rhsref,-1.0,rhs,size*solver->m_nvars);
       /* Transfer RHS to PETSc vector */
-      TransferVecToPETSc(rhs,F,context,ns,context->offsets[ns]);
+      TransferVecToPETSc(rhs,a_F,context,ns,context->m_offsets[ns]);
     }
 
-    /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->shift,(-1.0/epsilon),Y);
+    /* [J]a_Y = aY - a_F(a_Y) */
+    VecAXPBY(a_F,context->m_shift,(-1.0/epsilon),a_Y);
 
   }
 
@@ -259,7 +259,7 @@ PetscErrorCode PetscJacobianFunctionIMEX_JFNK(Mat Jacobian, /*!< Jacobian matrix
     \f{equation}{
       {\bf f} = \alpha {\bf y} - \left[ {\bf G}\left({\bf U}_0+{\bf y}\right)-{\bf G}\left({\bf U}_0\right) \right]
     \f}
-    In the code, \f${\bf y}\f$ is \a Y, \f$\bf f\f$ is \a F, and \f${\bf U}_0\f$ is \a #HyPar::uref (the reference solution at which the
+    In the code, \f${\bf y}\f$ is \a Y, \f$\bf f\f$ is \a F, and \f${\bf U}_0\f$ is \a #HyPar::m_uref (the reference solution at which the
     nonlinear Jacobian is computed).
 
     Since \f$\mathcal{F}\f$ is linear,
@@ -287,108 +287,108 @@ PetscErrorCode PetscJacobianFunctionIMEX_JFNK(Mat Jacobian, /*!< Jacobian matrix
       the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
       or variable name yields the specific doc page dealing with that function/variable.
 */
-PetscErrorCode PetscJacobianFunctionIMEX_Linear(Mat Jacobian, /*!< Jacobian matrix */
-                                                Vec Y,/*!<  Input vector */
-                                                Vec F /*!<  Output vector
+PetscErrorCode PetscJacobianFunctionIMEX_Linear(Mat a_Jacobian, /*!< Jacobian matrix */
+                                                Vec a_Y,/*!<  Input vector */
+                                                Vec a_F /*!<  Output vector
                                                             (Jacobian times input vector */)
 {
   PETScContext* context(nullptr);
 
   PetscFunctionBegin;
 
-  MatShellGetContext(Jacobian,&context);
-  SimulationObject* sim = (SimulationObject*) context->simobj;
-  int nsims = context->nsims;
+  MatShellGetContext(a_Jacobian,&context);
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
+  int nsims = context->m_nsims;
 
   double normY;
-  VecNorm(Y,NORM_2,&normY);
+  VecNorm(a_Y,NORM_2,&normY);
 
   if (normY < 1e-16) {
 
-    /* F = 0 */
-    VecZeroEntries(F);
-    /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->shift,0,Y);
+    /* a_F = 0 */
+    VecZeroEntries(a_F);
+    /* [J]a_Y = aY - a_F(a_Y) */
+    VecAXPBY(a_F,context->m_shift,0,a_Y);
 
   } else {
 
-    double t = context->waqt; /* current stage/step time */
+    double t = context->m_waqt; /* current stage/step time */
 
     for (int ns = 0; ns < nsims; ns++) {
 
       HyPar* solver = &(sim[ns].solver);
       MPIVariables* mpi = &(sim[ns].mpi);
-      solver->count_IJacFunction++;
+      solver->m_count_i_jac_function++;
 
-      int size = solver->npoints_local_wghosts;
+      int size = solver->m_npoints_local_wghosts;
 
-      double *u       = solver->u;
-      double *uref    = solver->uref;
-      double *rhsref  = solver->rhsref;
-      double *rhs     = solver->rhs;
+      double *u       = solver->m_u;
+      double *uref    = solver->m_uref;
+      double *rhsref  = solver->m_rhsref;
+      double *rhs     = solver->m_rhs;
 
       /* copy solution from PETSc vector */
-      TransferVecFromPETSc(u,Y,context,ns,context->offsets[ns]);
-      _ArrayAYPX_(uref,1.0,u,size*solver->nvars);
+      TransferVecFromPETSc(u,a_Y,context,ns,context->m_offsets[ns]);
+      _ArrayAYPX_(uref,1.0,u,size*solver->m_nvars);
       /* apply boundary conditions and exchange data over MPI interfaces */
       solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);
-      MPIExchangeBoundariesnD(  solver->ndims,
-                                solver->nvars,
-                                solver->dim_local,
-                                solver->ghosts,
+      MPIExchangeBoundariesnD(  solver->m_ndims,
+                                solver->m_nvars,
+                                solver->m_dim_local,
+                                solver->m_ghosts,
                                 mpi,
                                 u );
 
       /* Evaluate hyperbolic, parabolic and source terms  and the RHS for U+dU */
-      _ArraySetValue_(rhs,size*solver->nvars,0.0);
-      if ((!strcmp(solver->SplitHyperbolicFlux,"yes")) && solver->flag_fdf_specified) {
-        if (context->flag_hyperbolic_f == _IMPLICIT_) {
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+      _ArraySetValue_(rhs,size*solver->m_nvars,0.0);
+      if ((!strcmp(solver->m_split_hyperbolic_flux,"yes")) && solver->m_flag_fdf_specified) {
+        if (context->m_flag_hyperbolic_f == _IMPLICIT_) {
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->FdFFunction,solver->UpwindFdF);
-          _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+          _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
         }
-        if (context->flag_hyperbolic_df == _IMPLICIT_) {
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+        if (context->m_flag_hyperbolic_df == _IMPLICIT_) {
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->dFFunction,solver->UpwinddF);
-          _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+          _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
         }
-      } else if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-        if (context->flag_hyperbolic_f == _IMPLICIT_) {
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+      } else if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
+        if (context->m_flag_hyperbolic_f == _IMPLICIT_) {
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->FFunction,solver->Upwind);
-          _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+          _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->dFFunction,solver->UpwinddF);
-          _ArrayAXPY_(solver->hyp, 1.0,rhs,size*solver->nvars);
+          _ArrayAXPY_(solver->m_hyp, 1.0,rhs,size*solver->m_nvars);
         }
-        if (context->flag_hyperbolic_df == _IMPLICIT_) {
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+        if (context->m_flag_hyperbolic_df == _IMPLICIT_) {
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->dFFunction,solver->UpwinddF);
-          _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+          _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
         }
       } else {
-        if (context->flag_hyperbolic == _IMPLICIT_) {
-          solver->HyperbolicFunction( solver->hyp,u,solver,mpi,t,0,
+        if (context->m_flag_hyperbolic == _IMPLICIT_) {
+          solver->HyperbolicFunction( solver->m_hyp,u,solver,mpi,t,0,
                                       solver->FFunction,solver->Upwind);
-          _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+          _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
         }
       }
-      if (context->flag_parabolic == _IMPLICIT_) {
-        solver->ParabolicFunction (solver->par,u,solver,mpi,t);
-        _ArrayAXPY_(solver->par, 1.0,rhs,size*solver->nvars);
+      if (context->m_flag_parabolic == _IMPLICIT_) {
+        solver->ParabolicFunction (solver->m_par,u,solver,mpi,t);
+        _ArrayAXPY_(solver->m_par, 1.0,rhs,size*solver->m_nvars);
       }
-      if (context->flag_source == _IMPLICIT_) {
-        solver->SourceFunction (solver->source,u,solver,mpi,t);
-        _ArrayAXPY_(solver->source, 1.0,rhs,size*solver->nvars);
+      if (context->m_flag_source == _IMPLICIT_) {
+        solver->SourceFunction (solver->m_source,u,solver,mpi,t);
+        _ArrayAXPY_(solver->m_source, 1.0,rhs,size*solver->m_nvars);
       }
 
-      _ArrayAXPY_(rhsref,-1.0,rhs,size*solver->nvars);
+      _ArrayAXPY_(rhsref,-1.0,rhs,size*solver->m_nvars);
       /* Transfer RHS to PETSc vector */
-      TransferVecToPETSc(rhs,F,context,ns,context->offsets[ns]);
+      TransferVecToPETSc(rhs,a_F,context,ns,context->m_offsets[ns]);
     }
 
-    /* [J]Y = aY - F(Y) */
-    VecAXPBY(F,context->shift,-1.0,Y);
+    /* [J]a_Y = aY - a_F(a_Y) */
+    VecAXPBY(a_F,context->m_shift,-1.0,a_Y);
 
   }
 

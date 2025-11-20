@@ -153,10 +153,10 @@ int gpuFirstDerivativeFourthOrderCentral(
 {
   SolverContext *solver = (SolverContext*) s;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
 
   if ((!Df) || (!f)) {
     fprintf(stderr, "Error in FirstDerivativeFourthOrder(): input arrays not allocated.\n");
@@ -361,10 +361,10 @@ int gpuFirstDerivativeFourthOrderCentral(
 {
   SolverContext *solver = (SolverContext*) s;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
 
   if ((!Df) || (!f)) {
     fprintf(stderr, "Error in FirstDerivativeFourthOrder(): input arrays not allocated.\n");

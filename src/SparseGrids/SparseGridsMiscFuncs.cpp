@@ -23,7 +23,7 @@ extern "C" void IncrementFilenameIndex(char*,int);
 */
 int SparseGridsSimulation::ComputeSGDimsAndCoeffs()
 {
-  m_n_fg = log2(m_sim_fg->solver.dim_global[0]);
+  m_n_fg = log2(m_sim_fg->solver.m_dim_global[0]);
   int d = m_ndims;
 
   double c1 = 1;
@@ -155,31 +155,31 @@ int SparseGridsSimulation::CleanupBarebones( SimulationObject *sim /*!< simulati
   MPIVariables* mpi = &(sim->mpi);
 
   /* Free the communicators created */
-  IERR MPIFreeCommunicators(solver->ndims,mpi); CHECKERR(ierr);
+  IERR MPIFreeCommunicators(solver->m_ndims,mpi); CHECKERR(ierr);
 
   /* These variables are allocated in Initialize.c */
-  free(solver->dim_global);
-  free(solver->dim_global_ex);
-  free(solver->dim_local);
-  free(solver->index);
-  free(solver->isPeriodic);
-  free(solver->u);
-  free(solver->x);
-  free(solver->dxinv);
-  free(mpi->iproc);
-  free(mpi->ip);
-  free(mpi->is);
-  free(mpi->ie);
-  free(mpi->bcperiodic);
-  free(mpi->sendbuf);
-  free(mpi->recvbuf);
-  free(solver->VolumeIntegral);
-  free(solver->VolumeIntegralInitial);
-  free(solver->TotalBoundaryIntegral);
-  free(solver->ConservationError);
-  free(solver->stride_with_ghosts);
-  free(solver->stride_without_ghosts);
-  if (solver->filename_index) free(solver->filename_index);
+  free(solver->m_dim_global);
+  free(solver->m_dim_global_ex);
+  free(solver->m_dim_local);
+  free(solver->m_index);
+  free(solver->m_is_periodic);
+  free(solver->m_u);
+  free(solver->m_x);
+  free(solver->m_dxinv);
+  free(mpi->m_iproc);
+  free(mpi->m_ip);
+  free(mpi->m_is);
+  free(mpi->m_ie);
+  free(mpi->m_bcperiodic);
+  free(mpi->m_sendbuf);
+  free(mpi->m_recvbuf);
+  free(solver->m_volume_integral);
+  free(solver->m_volume_integral_initial);
+  free(solver->m_total_boundary_integral);
+  free(solver->m_conservation_error);
+  free(solver->m_stride_with_ghosts);
+  free(solver->m_stride_without_ghosts);
+  if (solver->m_filename_index) free(solver->m_filename_index);
 
   return(0);
 }
@@ -200,38 +200,38 @@ int SparseGridsSimulation::InitializeBarebones( SimulationObject *simobj /*!< si
   MPIVariables* mpi = &(simobj->mpi);
 
   /* allocations */
-  mpi->ip             = (int*) calloc (m_ndims,sizeof(int));
-  mpi->is             = (int*) calloc (m_ndims,sizeof(int));
-  mpi->ie             = (int*) calloc (m_ndims,sizeof(int));
-  mpi->bcperiodic     = (int*) calloc (m_ndims,sizeof(int));
-  solver->dim_local   = (int*) calloc (m_ndims,sizeof(int));
-  solver->isPeriodic  = (int*) calloc (m_ndims,sizeof(int));
+  mpi->m_ip             = (int*) calloc (m_ndims,sizeof(int));
+  mpi->m_is             = (int*) calloc (m_ndims,sizeof(int));
+  mpi->m_ie             = (int*) calloc (m_ndims,sizeof(int));
+  mpi->m_bcperiodic     = (int*) calloc (m_ndims,sizeof(int));
+  solver->m_dim_local   = (int*) calloc (m_ndims,sizeof(int));
+  solver->m_is_periodic  = (int*) calloc (m_ndims,sizeof(int));
 
 #ifndef serial
   /* Domain partitioning */
   int total_proc = 1;
-  for (int i=0; i<m_ndims; i++) total_proc *= mpi->iproc[i];
+  for (int i=0; i<m_ndims; i++) total_proc *= mpi->m_iproc[i];
 
   /* calculate ndims-D rank of each process (ip[]) from rank in MPI_COMM_WORLD */
   IERR MPIRanknD( m_ndims,
                   m_rank,
-                  mpi->iproc,
-                  mpi->ip ); CHECKERR(ierr);
+                  mpi->m_iproc,
+                  mpi->m_ip ); CHECKERR(ierr);
 
   /* calculate local domain sizes along each dimension */
   for (int i=0; i<m_ndims; i++) {
-    solver->dim_local[i] = MPIPartition1D( solver->dim_global[i],
-                                           mpi->iproc[i],
-                                           mpi->ip[i] );
+    solver->m_dim_local[i] = MPIPartition1D( solver->m_dim_global[i],
+                                           mpi->m_iproc[i],
+                                           mpi->m_ip[i] );
   }
 
   /* calculate local domain limits in terms of global domain */
   IERR MPILocalDomainLimits(  m_ndims,
                               m_rank,
                               &(simobj->mpi),
-                              solver->dim_global,
-                              mpi->is,
-                              mpi->ie  );
+                              solver->m_dim_global,
+                              mpi->m_is,
+                              mpi->m_ie  );
   CHECKERR(ierr);
 
   /* create sub-communicators for parallel computations
@@ -239,7 +239,7 @@ int SparseGridsSimulation::InitializeBarebones( SimulationObject *simobj /*!< si
    IERR MPICreateCommunicators(m_ndims,&(simobj->mpi)); CHECKERR(ierr);
 
   /* initialize periodic BC flags to zero */
-  for (int i=0; i<solver->ndims; i++) mpi->bcperiodic[i] = 0;
+  for (int i=0; i<solver->m_ndims; i++) mpi->m_bcperiodic[i] = 0;
 
   /* create communication groups */
   IERR MPICreateIOGroups(&(simobj->mpi)); CHECKERR(ierr);
@@ -247,73 +247,73 @@ int SparseGridsSimulation::InitializeBarebones( SimulationObject *simobj /*!< si
 #else
 
   for (int i=0; i<m_ndims; i++) {
-    mpi->ip[i]            = 0;
-    solver->dim_local[i]  = solver->dim_global[i];
-    mpi->iproc[i]         = 1;
-    mpi->is[i]            = 0;
-    mpi->ie[i]            = solver->dim_local[i];
-    mpi->bcperiodic[i]    = 0;
+    mpi->m_ip[i]            = 0;
+    solver->m_dim_local[i]  = solver->m_dim_global[i];
+    mpi->m_iproc[i]         = 1;
+    mpi->m_is[i]            = 0;
+    mpi->m_ie[i]            = solver->m_dim_local[i];
+    mpi->m_bcperiodic[i]    = 0;
   }
 
 #endif
 
-  solver->npoints_global
-    = solver->npoints_local
-    = solver->npoints_local_wghosts
+  solver->m_npoints_global
+    = solver->m_npoints_local
+    = solver->m_npoints_local_wghosts
     = 1;
   for (int i=0; i<m_ndims; i++) {
-    solver->npoints_global *= solver->dim_global[i];
-    solver->npoints_local *= solver->dim_local [i];
-    solver->npoints_local_wghosts *= (solver->dim_local[i]+2*solver->ghosts);
+    solver->m_npoints_global *= solver->m_dim_global[i];
+    solver->m_npoints_local *= solver->m_dim_local [i];
+    solver->m_npoints_local_wghosts *= (solver->m_dim_local[i]+2*solver->m_ghosts);
   }
 
   /* Allocations */
   if (!m_rank) printf("Allocating data arrays for full grid.\n");
-  solver->index = (int*) calloc (m_ndims,sizeof(int));
-  solver->stride_with_ghosts = (int*) calloc (solver->ndims,sizeof(int));
-  solver->stride_without_ghosts = (int*) calloc (solver->ndims,sizeof(int));
+  solver->m_index = (int*) calloc (m_ndims,sizeof(int));
+  solver->m_stride_with_ghosts = (int*) calloc (solver->m_ndims,sizeof(int));
+  solver->m_stride_without_ghosts = (int*) calloc (solver->m_ndims,sizeof(int));
   int accu1 = 1, accu2 = 1;
-  for (int i=0; i<solver->ndims; i++) {
-    solver->stride_with_ghosts[i]    = accu1;
-    solver->stride_without_ghosts[i] = accu2;
-    accu1 *= (solver->dim_local[i]+2*solver->ghosts);
-    accu2 *=  solver->dim_local[i];
+  for (int i=0; i<solver->m_ndims; i++) {
+    solver->m_stride_with_ghosts[i]    = accu1;
+    solver->m_stride_without_ghosts[i] = accu2;
+    accu1 *= (solver->m_dim_local[i]+2*solver->m_ghosts);
+    accu2 *=  solver->m_dim_local[i];
   }
 
 
   int size;
   /* state variables */
   size = 1;
-  for (int i=0; i<m_ndims; i++) size *= (solver->dim_local[i]+2*solver->ghosts);
-  solver->u = (double*) calloc (solver->nvars*size,sizeof(double));
+  for (int i=0; i<m_ndims; i++) size *= (solver->m_dim_local[i]+2*solver->m_ghosts);
+  solver->m_u = (double*) calloc (solver->m_nvars*size,sizeof(double));
 
   /* grid */
   size = 0;
-  for (int i=0; i<m_ndims; i++) size += (solver->dim_local[i]+2*solver->ghosts);
-  solver->x     = (double*) calloc (size,sizeof(double));
-  solver->dxinv = (double*) calloc (size,sizeof(double));
+  for (int i=0; i<m_ndims; i++) size += (solver->m_dim_local[i]+2*solver->m_ghosts);
+  solver->m_x     = (double*) calloc (size,sizeof(double));
+  solver->m_dxinv = (double*) calloc (size,sizeof(double));
 
   /* allocate MPI send/receive buffer arrays */
-  int bufdim[solver->ndims], maxbuf = 0;
-  for (int d = 0; d < solver->ndims; d++) {
+  int bufdim[solver->m_ndims], maxbuf = 0;
+  for (int d = 0; d < solver->m_ndims; d++) {
     bufdim[d] = 1;
-    for (int i = 0; i < solver->ndims; i++) {
-      if (i == d) bufdim[d] *= solver->ghosts;
-      else        bufdim[d] *= solver->dim_local[i];
+    for (int i = 0; i < solver->m_ndims; i++) {
+      if (i == d) bufdim[d] *= solver->m_ghosts;
+      else        bufdim[d] *= solver->m_dim_local[i];
     }
     if (bufdim[d] > maxbuf) maxbuf = bufdim[d];
   }
-  maxbuf *= solver->nvars;
-  mpi->maxbuf  = maxbuf;
-  mpi->sendbuf = (double*) calloc (2*solver->ndims*maxbuf,sizeof(double));
-  mpi->recvbuf = (double*) calloc (2*solver->ndims*maxbuf,sizeof(double));
+  maxbuf *= solver->m_nvars;
+  mpi->m_maxbuf  = maxbuf;
+  mpi->m_sendbuf = (double*) calloc (2*solver->m_ndims*maxbuf,sizeof(double));
+  mpi->m_recvbuf = (double*) calloc (2*solver->m_ndims*maxbuf,sizeof(double));
 
-  solver->VolumeIntegral        = (double*) calloc (solver->nvars,sizeof(double));
-  solver->VolumeIntegralInitial = (double*) calloc (solver->nvars,sizeof(double));
-  solver->TotalBoundaryIntegral = (double*) calloc (solver->nvars,sizeof(double));
-  solver->ConservationError     = (double*) calloc (solver->nvars,sizeof(double));
+  solver->m_volume_integral        = (double*) calloc (solver->m_nvars,sizeof(double));
+  solver->m_volume_integral_initial = (double*) calloc (solver->m_nvars,sizeof(double));
+  solver->m_total_boundary_integral = (double*) calloc (solver->m_nvars,sizeof(double));
+  solver->m_conservation_error     = (double*) calloc (solver->m_nvars,sizeof(double));
 
-  for (int i=0; i<solver->nvars; i++) solver->ConservationError[i] = -1;
+  for (int i=0; i<solver->m_nvars; i++) solver->m_conservation_error[i] = -1;
 
   return(0);
 }
@@ -338,88 +338,88 @@ int SparseGridsSimulation::InitializeSolversBarebones( SimulationObject *sim /*!
   solver->FirstDerivativePar        = NULL;
   solver->InterpolateInterfacesPar  = NULL;
 
-  solver->interp                = NULL;
-  solver->compact               = NULL;
-  solver->lusolver              = NULL;
+  solver->m_interp                = NULL;
+  solver->m_compact               = NULL;
+  solver->m_lusolver              = NULL;
   solver->SetInterpLimiterVar   = NULL;
-  solver->flag_nonlinearinterp  = 0;
-  solver->time_integrator = NULL;
-  solver->msti = NULL;
+  solver->m_flag_nonlinearinterp  = 0;
+  solver->m_time_integrator = NULL;
+  solver->m_msti = NULL;
 
   /* Solution output function */
   solver->WriteOutput    = NULL; /* default - no output */
-  solver->filename_index = NULL;
-  if (!strcmp(solver->output_mode,"serial")) {
-    solver->index_length = 5;
-    solver->filename_index = (char*) calloc (solver->index_length+1,sizeof(char));
-    int i; for (i=0; i<solver->index_length; i++) solver->filename_index[i] = '0';
-    solver->filename_index[solver->index_length] = (char) 0;
-    if (!strcmp(solver->op_file_format,"text")) {
+  solver->m_filename_index = NULL;
+  if (!strcmp(solver->m_output_mode,"serial")) {
+    solver->m_index_length = 5;
+    solver->m_filename_index = (char*) calloc (solver->m_index_length+1,sizeof(char));
+    int i; for (i=0; i<solver->m_index_length; i++) solver->m_filename_index[i] = '0';
+    solver->m_filename_index[solver->m_index_length] = (char) 0;
+    if (!strcmp(solver->m_op_file_format,"text")) {
       solver->WriteOutput = WriteText;
-      strcpy(solver->solnfilename_extn,".dat");
-    } else if (!strcmp(solver->op_file_format,"tecplot2d")) {
+      strcpy(solver->m_solnfilename_extn,".dat");
+    } else if (!strcmp(solver->m_op_file_format,"tecplot2d")) {
       solver->WriteOutput = WriteTecplot2D;
-      strcpy(solver->solnfilename_extn,".dat");
-    } else if (!strcmp(solver->op_file_format,"tecplot3d")) {
+      strcpy(solver->m_solnfilename_extn,".dat");
+    } else if (!strcmp(solver->m_op_file_format,"tecplot3d")) {
       solver->WriteOutput = WriteTecplot3D;
-      strcpy(solver->solnfilename_extn,".dat");
-    } else if ((!strcmp(solver->op_file_format,"binary")) || (!strcmp(solver->op_file_format,"bin"))) {
+      strcpy(solver->m_solnfilename_extn,".dat");
+    } else if ((!strcmp(solver->m_op_file_format,"binary")) || (!strcmp(solver->m_op_file_format,"bin"))) {
       solver->WriteOutput = WriteBinary;
-      strcpy(solver->solnfilename_extn,".bin");
-    } else if (!strcmp(solver->op_file_format,"none")) {
+      strcpy(solver->m_solnfilename_extn,".bin");
+    } else if (!strcmp(solver->m_op_file_format,"none")) {
       solver->WriteOutput = NULL;
     } else {
       fprintf(stderr,"Error (domain %d): %s is not a supported file format.\n",
-              ns, solver->op_file_format);
+              ns, solver->m_op_file_format);
       return(1);
     }
-    if ((!strcmp(solver->op_overwrite,"no")) && solver->restart_iter) {
+    if ((!strcmp(solver->m_op_overwrite,"no")) && solver->m_restart_iter) {
       /* if it's a restart run, fast-forward the filename */
       int t;
-      for (t=0; t<solver->restart_iter; t++)
-        if ((t+1)%solver->file_op_iter == 0) IncrementFilenameIndex(solver->filename_index,solver->index_length);
+      for (t=0; t<solver->m_restart_iter; t++)
+        if ((t+1)%solver->m_file_op_iter == 0) IncrementFilenameIndex(solver->m_filename_index,solver->m_index_length);
     }
-  } else if (!strcmp(solver->output_mode,"parallel")) {
-    if (!strcmp(solver->op_file_format,"none")) solver->WriteOutput = NULL;
+  } else if (!strcmp(solver->m_output_mode,"parallel")) {
+    if (!strcmp(solver->m_op_file_format,"none")) solver->WriteOutput = NULL;
     else {
       /* only binary file writing supported in parallel mode */
       /* use post-processing scripts to convert              */
       solver->WriteOutput = WriteBinary;
-      strcpy(solver->solnfilename_extn,".bin");
+      strcpy(solver->m_solnfilename_extn,".bin");
     }
   } else {
 
     fprintf(stderr,"Error (domain %d): %s is not a supported output mode.\n",
-            ns, solver->output_mode);
+            ns, solver->m_output_mode);
     fprintf(stderr,"Should be \"serial\" or \"parallel\".    \n");
     return(1);
 
   }
 
   /* Solution plotting function */
-  strcpy(solver->plotfilename_extn,".png");
+  strcpy(solver->m_plotfilename_extn,".png");
 #ifdef with_python
-  solver->py_plt_func = NULL;
-  solver->py_plt_func_args = NULL;
+  solver->m_py_plt_func = NULL;
+  solver->m_py_plt_func_args = NULL;
   {
     char python_plotting_fname[_MAX_STRING_SIZE_] = "plotSolution";
     PyObject* py_plot_name = PyUnicode_DecodeFSDefault(python_plotting_fname);
     PyObject* py_plot_module = PyImport_Import(py_plot_name);
     Py_DECREF(py_plot_name);
     if (py_plot_module) {
-      solver->py_plt_func = PyObject_GetAttrString(py_plot_module, "plotSolution");
-      if (!solver->py_plt_func) {
-        if (!mpi->rank) {
+      solver->m_py_plt_func = PyObject_GetAttrString(py_plot_module, "plotSolution");
+      if (!solver->m_py_plt_func) {
+        if (!mpi->m_rank) {
           printf("Unable to load plotSolution function from Python module.\n");
         }
       } else {
-        if (!mpi->rank) {
+        if (!mpi->m_rank) {
           printf("Loaded Python module for plotting.\n");
           printf("Loaded plotSolution function from Python module.\n");
         }
       }
     } else {
-      if (!mpi->rank) {
+      if (!mpi->m_rank) {
         printf("Unable to load Python module for plotting.\n");
       }
     }

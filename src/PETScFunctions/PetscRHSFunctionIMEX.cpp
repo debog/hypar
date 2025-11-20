@@ -46,17 +46,17 @@
     the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
     or variable name yields the specific doc page dealing with that function/variable.
 */
-PetscErrorCode PetscRHSFunctionIMEX(  TS        ts,   /*!< Time integration object */
-                                      PetscReal t,    /*!< Current simulation time */
-                                      Vec       Y,    /*!< State vector (input) */
-                                      Vec       F,    /*!< The computed right-hand-side vector */
-                                      void      *ctxt /*!< Object of type #PETScContext */ )
+PetscErrorCode PetscRHSFunctionIMEX(  TS        a_ts,   /*!< Time integration object */
+                                      PetscReal a_t,    /*!< Current simulation time */
+                                      Vec       a_Y,    /*!< State vector (input) */
+                                      Vec       a_F,    /*!< The computed right-hand-side vector */
+                                      void *a_ctxt /*!< Object of type #PETScContext */ )
 {
-  PETScContext* context = (PETScContext*) ctxt;
-  SimulationObject* sim = (SimulationObject*) context->simobj;
-  int nsims = context->nsims;
+  PETScContext* context = (PETScContext*) a_ctxt;
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
+  int nsims = context->m_nsims;
 
-  context->waqt = t;
+  context->m_waqt = a_t;
 
   PetscFunctionBegin;
   for (int ns = 0; ns < nsims; ns++) {
@@ -64,60 +64,60 @@ PetscErrorCode PetscRHSFunctionIMEX(  TS        ts,   /*!< Time integration obje
     HyPar* solver = &(sim[ns].solver);
     MPIVariables* mpi = &(sim[ns].mpi);
 
-    solver->count_RHSFunction++;
+    solver->m_count_rhs_function++;
 
-    int size = solver->npoints_local_wghosts;
-    double *u = solver->u;
-    double *rhs = solver->rhs;
+    int size = solver->m_npoints_local_wghosts;
+    double *u = solver->m_u;
+    double *rhs = solver->m_rhs;
 
     /* copy solution from PETSc vector */
-    TransferVecFromPETSc(u,Y,context,ns,context->offsets[ns]);
+    TransferVecFromPETSc(u,a_Y,context,ns,context->m_offsets[ns]);
     /* apply boundary conditions and exchange data over MPI interfaces */
-    solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);
-    MPIExchangeBoundariesnD(solver->ndims,solver->nvars,solver->dim_local,
-                                 solver->ghosts,mpi,u);
+    solver->ApplyBoundaryConditions(solver,mpi,u,NULL,a_t);
+    MPIExchangeBoundariesnD(solver->m_ndims,solver->m_nvars,solver->m_dim_local,
+                                 solver->m_ghosts,mpi,u);
 
     /* initialize right-hand side to zero */
-    _ArraySetValue_(rhs,size*solver->nvars,0.0);
+    _ArraySetValue_(rhs,size*solver->m_nvars,0.0);
 
     /* Evaluate hyperbolic, parabolic and source terms  and the RHS */
-    if ((!strcmp(solver->SplitHyperbolicFlux,"yes")) && solver->flag_fdf_specified) {
-      if (context->flag_hyperbolic_f == _EXPLICIT_) {
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->FdFFunction,solver->UpwindFdF);
-        _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+    if ((!strcmp(solver->m_split_hyperbolic_flux,"yes")) && solver->m_flag_fdf_specified) {
+      if (context->m_flag_hyperbolic_f == _EXPLICIT_) {
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->FdFFunction,solver->UpwindFdF);
+        _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
       }
-      if (context->flag_hyperbolic_df == _EXPLICIT_) {
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF);
-        _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+      if (context->m_flag_hyperbolic_df == _EXPLICIT_) {
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->dFFunction,solver->UpwinddF);
+        _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
       }
-    } else if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-      if (context->flag_hyperbolic_f == _EXPLICIT_) {
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->FFunction,solver->Upwind);
-        _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF);
-        _ArrayAXPY_(solver->hyp, 1.0,rhs,size*solver->nvars);
+    } else if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
+      if (context->m_flag_hyperbolic_f == _EXPLICIT_) {
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->FFunction,solver->Upwind);
+        _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->dFFunction,solver->UpwinddF);
+        _ArrayAXPY_(solver->m_hyp, 1.0,rhs,size*solver->m_nvars);
       }
-      if (context->flag_hyperbolic_df == _EXPLICIT_) {
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->dFFunction,solver->UpwinddF);
-        _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+      if (context->m_flag_hyperbolic_df == _EXPLICIT_) {
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->dFFunction,solver->UpwinddF);
+        _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
       }
     } else {
-      if (context->flag_hyperbolic == _EXPLICIT_) {
-        solver->HyperbolicFunction(solver->hyp,u,solver,mpi,t,0,solver->FFunction,solver->Upwind);
-        _ArrayAXPY_(solver->hyp,-1.0,rhs,size*solver->nvars);
+      if (context->m_flag_hyperbolic == _EXPLICIT_) {
+        solver->HyperbolicFunction(solver->m_hyp,u,solver,mpi,a_t,0,solver->FFunction,solver->Upwind);
+        _ArrayAXPY_(solver->m_hyp,-1.0,rhs,size*solver->m_nvars);
       }
     }
-    if (context->flag_parabolic == _EXPLICIT_) {
-      solver->ParabolicFunction (solver->par,u,solver,mpi,t);
-      _ArrayAXPY_(solver->par, 1.0,rhs,size*solver->nvars);
+    if (context->m_flag_parabolic == _EXPLICIT_) {
+      solver->ParabolicFunction (solver->m_par,u,solver,mpi,a_t);
+      _ArrayAXPY_(solver->m_par, 1.0,rhs,size*solver->m_nvars);
     }
-    if (context->flag_source == _EXPLICIT_) {
-      solver->SourceFunction    (solver->source,u,solver,mpi,t);
-      _ArrayAXPY_(solver->source, 1.0,rhs,size*solver->nvars);
+    if (context->m_flag_source == _EXPLICIT_) {
+      solver->SourceFunction    (solver->m_source,u,solver,mpi,a_t);
+      _ArrayAXPY_(solver->m_source, 1.0,rhs,size*solver->m_nvars);
     }
 
     /* Transfer RHS to PETSc vector */
-    TransferVecToPETSc(rhs,F,context,ns,context->offsets[ns]);
+    TransferVecToPETSc(rhs,a_F,context,ns,context->m_offsets[ns]);
   }
 
   PetscFunctionReturn(0);

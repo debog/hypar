@@ -6,16 +6,16 @@
 
 double FPPowerSystemDissipationFunction(int,void*,double);
 
-int FPPowerSystemDiffusion(double *f,double *u,int dir,void *s,double t)
+int FPPowerSystemDiffusion(double *a_f,double *a_u,int a_dir,void *a_s,double a_t)
 {
-  HyPar         *solver = (HyPar*)        s;
-  FPPowerSystem *params = (FPPowerSystem*) solver->physics;
+  HyPar         *solver = (HyPar*)        a_s;
+  FPPowerSystem *params = (FPPowerSystem*) solver->m_physics;
   int           i, v;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -28,8 +28,8 @@ int FPPowerSystemDiffusion(double *f,double *u,int dir,void *s,double t)
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    double dissipation = FPPowerSystemDissipationFunction(dir,params,t);
-    for (v = 0; v < nvars; v++) f[nvars*p+v] = dissipation * u[nvars*p+v];
+    double dissipation = FPPowerSystemDissipationFunction(a_dir,params,a_t);
+    for (v = 0; v < nvars; v++) a_f[nvars*p+v] = dissipation * a_u[nvars*p+v];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

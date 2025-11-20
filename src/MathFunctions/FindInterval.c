@@ -17,30 +17,30 @@
     Note: This function handles 1-dimensional intervals and grids only.
 */
 void FindInterval(
-                  double  a,      /*!< Lower bound of interval */
-                  double  b,      /*!< Upper bound of interval */
-                  double  *x,     /*!< Array of spatial coordinates representing a grid */
-                  int     N,      /*!< Number of grid points / size of x */
-                  int     *imin,  /*!< Lowest grid index within [a,b] */
-                  int     *imax   /*!< Highest grid index within [a,b] */
+                  double  a_a,      /*!< Lower bound of interval */
+                  double  a_b,      /*!< Upper bound of interval */
+                  double  *a_x,     /*!< Array of spatial coordinates representing a grid */
+                  int     a_N,      /*!< Number of grid points / size of x */
+                  int     *a_imin,  /*!< Lowest grid index within [a_a,b] */
+                  int     *a_imax   /*!< Highest grid index within [a_a,b] */
                  )
 {
   int i;
-  *imax = -1;
-  *imin =  N;
+  *a_imax = -1;
+  *a_imin =  a_N;
 
-  double min_dx = x[1] - x[0];
-  for (i = 2; i < N; i++) {
-    double dx = x[i] - x[i-1];
+  double min_dx = a_x[1] - a_x[0];
+  for (i = 2; i < a_N; i++) {
+    double dx = a_x[i] - a_x[i-1];
     if (dx < min_dx) min_dx = dx;
   }
   double tol = 1e-10 * min_dx;
 
-  for (i = 0; i < N; i++) {
-    if (x[i] <= (b+tol)) *imax = i+1;
+  for (i = 0; i < a_N; i++) {
+    if (a_x[i] <= (a_b+tol)) *a_imax = i+1;
   }
-  for (i = N-1; i > -1; i--) {
-    if (x[i] >= (a-tol)) *imin = i;
+  for (i = a_N-1; i > -1; i--) {
+    if (a_x[i] >= (a_a-tol)) *a_imin = i;
   }
 
   return;

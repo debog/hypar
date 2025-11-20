@@ -35,34 +35,34 @@ typedef HyPar         SolverContext;
       through all grid lines along \b dir.
 */
 int FirstDerivativeFirstOrder(
-                                double  *Df,  /*!< Array to hold the computed first derivative (with ghost points) */
-                                double  *f,   /*!< Array containing the grid point function values whose first
+                                double  *a_Df,  /*!< Array to hold the computed first derivative (with ghost points) */
+                                double  *a_f,   /*!< Array containing the grid point function values whose first
                                                    derivative is to be computed (with ghost points) */
-                                int     dir,  /*!< The spatial dimension along which the derivative is computed */
-                                int     bias, /*!< Forward or backward differencing for non-central
+                                int     a_dir,  /*!< The spatial dimension along which the derivative is computed */
+                                int     a_bias, /*!< Forward or backward differencing for non-central
                                                    finite-difference schemes (-1: backward, 1: forward)*/
-                                void    *s,   /*!< Solver object of type #SolverContext */
-                                void    *m    /*!< MPI object of type #MPIContext */
+                                void    *a_s,   /*!< Solver object of type #SolverContext */
+                                void *a_m    /*!< MPI object of type #MPIContext */
                              )
 {
-  SolverContext *solver = (SolverContext*) s;
+  SolverContext *solver = (SolverContext*) a_s;
   int           i, j, v;
 
-  int ghosts = solver->ghosts;
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int *dim   = solver->dim_local;
+  int ghosts = solver->m_ghosts;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int *dim   = solver->m_dim_local;
 
 
-  if ((!Df) || (!f)) {
+  if ((!a_Df) || (!a_f)) {
     fprintf(stderr, "Error in FirstDerivativeSecondOrder(): input arrays not allocated.\n");
     return(1);
   }
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
-     dimension "dir"                                                                    */
+     dimension "a_dir"                                                                    */
   int indexC[ndims], index_outer[ndims], bounds_outer[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
+  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[a_dir] =  1;
   int N_outer; _ArrayProduct1D_(bounds_outer,ndims,N_outer);
 
 #pragma omp parallel for schedule(auto) default(shared) private(i,j,v,index_outer,indexC)
@@ -72,24 +72,24 @@ int FirstDerivativeFirstOrder(
     /* left boundary */
     for (i = -ghosts; i < -ghosts+1; i++) {
       int qC, qR;
-      indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
-      indexC[dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR );
-      for (v=0; v<nvars; v++)  Df[qC*nvars+v] = f[qR*nvars+v]-f[qC*nvars+v];
+      indexC[a_dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
+      indexC[a_dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR );
+      for (v=0; v<nvars; v++)  a_Df[qC*nvars+v] = a_f[qR*nvars+v]-a_f[qC*nvars+v];
     }
     /* interior */
-    for (i = -ghosts+1; i < dim[dir]+ghosts-1; i++) {
+    for (i = -ghosts+1; i < dim[a_dir]+ghosts-1; i++) {
       int qC, qL, qR;
-      indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
-      indexC[dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL);
-      indexC[dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR);
-      for (v=0; v<nvars; v++)  Df[qC*nvars+v] = max(bias,0)*f[qR*nvars+v]-bias*f[qC*nvars+v]+min(bias,0)*f[qL*nvars+v];
+      indexC[a_dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
+      indexC[a_dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL);
+      indexC[a_dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR);
+      for (v=0; v<nvars; v++)  a_Df[qC*nvars+v] = max(a_bias,0)*a_f[qR*nvars+v]-a_bias*a_f[qC*nvars+v]+min(a_bias,0)*a_f[qL*nvars+v];
     }
     /* right boundary */
-    for (i = dim[dir]+ghosts-1; i < dim[dir]+ghosts; i++) {
+    for (i = dim[a_dir]+ghosts-1; i < dim[a_dir]+ghosts; i++) {
       int qL, qC;
-      indexC[dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL );
-      indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
-      for (v=0; v<nvars; v++)  Df[qC*nvars+v] = f[qC*nvars+v]-f[qL*nvars+v];
+      indexC[a_dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL );
+      indexC[a_dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
+      for (v=0; v<nvars; v++)  a_Df[qC*nvars+v] = a_f[qC*nvars+v]-a_f[qL*nvars+v];
     }
   }
 

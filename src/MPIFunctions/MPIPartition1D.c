@@ -12,16 +12,16 @@
   computes the size of the local part of the 1D array on \a rank.
 */
 int MPIPartition1D(
-                    int nglobal,  /*!< Global size */
-                    int nproc,    /*!< Total number of ranks */
-                    int rank      /*!< Rank */
+                    int a_nglobal,  /*!< Global size */
+                    int a_nproc,    /*!< Total number of ranks */
+                    int a_rank      /*!< Rank */
                   )
 {
   int nlocal;
-  if (nglobal%nproc == 0) nlocal = nglobal/nproc;
+  if (a_nglobal%a_nproc == 0) nlocal = a_nglobal/a_nproc;
   else {
-    if (rank == nproc-1)  nlocal = nglobal/nproc + nglobal%nproc;
-    else                  nlocal = nglobal/nproc;
+    if (a_rank == a_nproc-1)  nlocal = a_nglobal/a_nproc + a_nglobal%a_nproc;
+    else                  nlocal = a_nglobal/a_nproc;
   }
   return(nlocal);
 }

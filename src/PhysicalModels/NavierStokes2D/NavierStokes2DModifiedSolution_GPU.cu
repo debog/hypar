@@ -68,9 +68,9 @@ extern "C" int gpuNavierStokes2DModifiedSolution(
     HyPar           *solver = (HyPar*)          s;
     NavierStokes2D  *param  = (NavierStokes2D*) solver->physics;
 
-    int     ghosts  = solver->ghosts;
-    int     *dim    = solver->dim_local;
-    int     ndims   = solver->ndims;
+    int     ghosts  = solver->m_ghosts;
+    int     *dim    = solver->m_dim_local;
+    int     ndims   = solver->m_ndims;
 
     int size = 1; for (int i=0; i <ndims; i++) size *= (dim[i] + 2*ghosts);
     int nblocks = (size - 1) / GPU_THREADS_PER_BLOCK + 1;

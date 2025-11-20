@@ -51,44 +51,44 @@ void SparseGridsSimulation::WriteErrors(double solver_runtime,  /*!< Measured ru
         /* write out solution errors and wall times to file */
         int d;
         out = fopen(err_fname,"w");
-        for (d=0; d<m_sims_sg[n].solver.ndims; d++) fprintf(out,"%4d ",m_sims_sg[n].solver.dim_global[d]);
-        for (d=0; d<m_sims_sg[n].solver.ndims; d++) fprintf(out,"%4d ",m_sims_sg[n].mpi.iproc[d]);
-        fprintf(out,"%1.16E  ",m_sims_sg[n].solver.dt);
-        fprintf(out,"%1.16E %1.16E %1.16E   ",m_sims_sg[n].solver.error[0],m_sims_sg[n].solver.error[1],m_sims_sg[n].solver.error[2]);
+        for (d=0; d<m_sims_sg[n].solver.m_ndims; d++) fprintf(out,"%4d ",m_sims_sg[n].solver.m_dim_global[d]);
+        for (d=0; d<m_sims_sg[n].solver.m_ndims; d++) fprintf(out,"%4d ",m_sims_sg[n].mpi.m_iproc[d]);
+        fprintf(out,"%1.16E  ",m_sims_sg[n].solver.m_dt);
+        fprintf(out,"%1.16E %1.16E %1.16E   ",m_sims_sg[n].solver.m_error[0],m_sims_sg[n].solver.m_error[1],m_sims_sg[n].solver.m_error[2]);
         fprintf(out,"%1.16E %1.16E\n",solver_runtime,main_runtime);
         fclose(out);
         /* write out conservation errors to file */
         out = fopen(cons_fname,"w");
-        for (d=0; d<m_sims_sg[n].solver.ndims; d++) fprintf(out,"%4d ",m_sims_sg[n].solver.dim_global[d]);
-        for (d=0; d<m_sims_sg[n].solver.ndims; d++) fprintf(out,"%4d ",m_sims_sg[n].mpi.iproc[d]);
-        fprintf(out,"%1.16E  ",m_sims_sg[n].solver.dt);
-        for (d=0; d<m_sims_sg[n].solver.nvars; d++) fprintf(out,"%1.16E ",m_sims_sg[n].solver.ConservationError[d]);
+        for (d=0; d<m_sims_sg[n].solver.m_ndims; d++) fprintf(out,"%4d ",m_sims_sg[n].solver.m_dim_global[d]);
+        for (d=0; d<m_sims_sg[n].solver.m_ndims; d++) fprintf(out,"%4d ",m_sims_sg[n].mpi.m_iproc[d]);
+        fprintf(out,"%1.16E  ",m_sims_sg[n].solver.m_dt);
+        for (d=0; d<m_sims_sg[n].solver.m_nvars; d++) fprintf(out,"%1.16E ",m_sims_sg[n].solver.m_conservation_error[d]);
         fprintf(out,"\n");
         fclose(out);
         /* write out function call counts to file */
         out = fopen(fc_fname,"w");
-        fprintf(out,"%d\n",m_sims_sg[n].solver.n_iter);
-        fprintf(out,"%d\n",m_sims_sg[n].solver.count_hyp);
-        fprintf(out,"%d\n",m_sims_sg[n].solver.count_par);
-        fprintf(out,"%d\n",m_sims_sg[n].solver.count_sou);
+        fprintf(out,"%d\n",m_sims_sg[n].solver.m_n_iter);
+        fprintf(out,"%d\n",m_sims_sg[n].solver.m_count_hyp);
+        fprintf(out,"%d\n",m_sims_sg[n].solver.m_count_par);
+        fprintf(out,"%d\n",m_sims_sg[n].solver.m_count_sou);
   #ifdef with_petsc
-        fprintf(out,"%d\n",m_sims_sg[n].solver.count_RHSFunction);
-        fprintf(out,"%d\n",m_sims_sg[n].solver.count_IFunction);
-        fprintf(out,"%d\n",m_sims_sg[n].solver.count_IJacobian);
-        fprintf(out,"%d\n",m_sims_sg[n].solver.count_IJacFunction);
+        fprintf(out,"%d\n",m_sims_sg[n].solver.m_count_rhs_function);
+        fprintf(out,"%d\n",m_sims_sg[n].solver.m_count_i_function);
+        fprintf(out,"%d\n",m_sims_sg[n].solver.m_count_i_jacobian);
+        fprintf(out,"%d\n",m_sims_sg[n].solver.m_count_i_jac_function);
   #endif
         fclose(out);
 
         /* print solution errors, conservation errors, and wall times to screen */
-        if (m_sims_sg[n].solver.error[0] >= 0) {
+        if (m_sims_sg[n].solver.m_error[0] >= 0) {
           printf("Computed errors for sparse grids domain %d:\n", n);
-          printf("  L1   Error: %1.16E\n",m_sims_sg[n].solver.error[0]);
-          printf("  L2   Error: %1.16E\n",m_sims_sg[n].solver.error[1]);
-          printf("  Linf Error: %1.16E\n",m_sims_sg[n].solver.error[2]);
+          printf("  L1   Error: %1.16E\n",m_sims_sg[n].solver.m_error[0]);
+          printf("  L2   Error: %1.16E\n",m_sims_sg[n].solver.m_error[1]);
+          printf("  Linf Error: %1.16E\n",m_sims_sg[n].solver.m_error[2]);
         }
-        if (!strcmp(m_sims_sg[n].solver.ConservationCheck,"yes")) {
+        if (!strcmp(m_sims_sg[n].solver.m_conservation_check,"yes")) {
           printf("Conservation Errors:\n");
-          for (d=0; d<m_sims_sg[n].solver.nvars; d++) printf("\t%1.16E\n",m_sims_sg[n].solver.ConservationError[d]);
+          for (d=0; d<m_sims_sg[n].solver.m_nvars; d++) printf("\t%1.16E\n",m_sims_sg[n].solver.m_conservation_error[d]);
           printf("\n");
         }
 
@@ -105,19 +105,19 @@ void SparseGridsSimulation::WriteErrors(double solver_runtime,  /*!< Measured ru
       /* write out solution errors and wall times to file */
       int d;
       out = fopen(err_fname,"w");
-      for (d=0; d<m_sim_fg->solver.ndims; d++) fprintf(out,"%4d ",m_sim_fg->solver.dim_global[d]);
-      for (d=0; d<m_sim_fg->solver.ndims; d++) fprintf(out,"%4d ",m_sim_fg->mpi.iproc[d]);
-      fprintf(out,"%1.16E  ",m_sim_fg->solver.dt);
-      fprintf(out,"%1.16E %1.16E %1.16E   ",m_sim_fg->solver.error[0],m_sim_fg->solver.error[1],m_sim_fg->solver.error[2]);
+      for (d=0; d<m_sim_fg->solver.m_ndims; d++) fprintf(out,"%4d ",m_sim_fg->solver.m_dim_global[d]);
+      for (d=0; d<m_sim_fg->solver.m_ndims; d++) fprintf(out,"%4d ",m_sim_fg->mpi.m_iproc[d]);
+      fprintf(out,"%1.16E  ",m_sim_fg->solver.m_dt);
+      fprintf(out,"%1.16E %1.16E %1.16E   ",m_sim_fg->solver.m_error[0],m_sim_fg->solver.m_error[1],m_sim_fg->solver.m_error[2]);
       fprintf(out,"%1.16E %1.16E\n",solver_runtime,main_runtime);
       fclose(out);
 
       /* print solution errors, conservation errors, and wall times to screen */
-      if (m_sim_fg->solver.error[0] >= 0) {
+      if (m_sim_fg->solver.m_error[0] >= 0) {
         printf("Computed errors for full grid solution:\n");
-        printf("  L1   Error: %1.16E\n",m_sim_fg->solver.error[0]);
-        printf("  L2   Error: %1.16E\n",m_sim_fg->solver.error[1]);
-        printf("  Linf Error: %1.16E\n",m_sim_fg->solver.error[2]);
+        printf("  L1   Error: %1.16E\n",m_sim_fg->solver.m_error[0]);
+        printf("  L2   Error: %1.16E\n",m_sim_fg->solver.m_error[1]);
+        printf("  Linf Error: %1.16E\n",m_sim_fg->solver.m_error[2]);
       }
     }
 

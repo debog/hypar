@@ -30,7 +30,7 @@
       where \a n is the size of the matrix, followed by all the non-zero
       elements (each line contains the indices \a i,\a j and the value \a val
       of one non-zero element).
-    + This function is called after #HyPar::file_op_iter iterations (i.e.
+    + This function is called after #HyPar::m_file_op_iter iterations (i.e.
       the same frequency at which solution files are written).
     + If a splitting for the hyperbolic flux is defined, then the Jacobians
       of the complete hyperbolic term, as well as the split terms are computed.
@@ -41,65 +41,65 @@
       \b -Dcompute_rhs_operators, and run on a single processor. This
       is very slow for larger domains, and should be used only for
       the numerical analysis of test cases.
-    + The current solution stored in #HyPar::u is used as the reference state
+    + The current solution stored in #HyPar::m_u is used as the reference state
       at which the Jacobians are computed (this is relevant to know for
       non-linear right-hand-sides functions).
 
    Note: Parabolic terms have not yet been included.
 */
 int ComputeRHSOperators(
-                          void *s,  /*!< Solver object of type #HyPar */
-                          void *m,  /*!< MPI object of type MPIVariables */
+                          void *a_s,  /*!< Solver object of type #HyPar */
+                          void *a_m,  /*!< MPI object of type MPIVariables */
                           double t  /*!< Current simulation time */
                        )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
   int           i, j, size, ndof;
   double        *f, *f0, *u, *u0, *rhs, *drhs;
   FILE          *fout;
   char          filename[_MAX_STRING_SIZE_];
 
-  if (mpi->nproc > 1) return(0);
+  if (mpi->m_nproc > 1) return(0);
 
-  int ndims  = solver->ndims;
-  int nvars  = solver->nvars;
-  int ghosts = solver->ghosts;
-  int *dim   = solver->dim_local;
+  int ndims  = solver->m_ndims;
+  int nvars  = solver->m_nvars;
+  int ghosts = solver->m_ghosts;
+  int *dim   = solver->m_dim_local;
   int index[ndims];
 
   double epsilon = 1e-6;
   double tolerance = 1e-15;
 
   /* allocate arrays */
-  size = solver->npoints_local_wghosts * nvars;
+  size = solver->m_npoints_local_wghosts * nvars;
   u    = (double*) calloc (size,sizeof(double));
   u0   = (double*) calloc (size,sizeof(double));
   rhs  = (double*) calloc (size,sizeof(double));
   drhs = (double*) calloc (size,sizeof(double));
-  ndof = solver->npoints_local * nvars;
+  ndof = solver->m_npoints_local * nvars;
   f    = (double*) calloc (ndof,sizeof(double));
   f0   = (double*) calloc (ndof,sizeof(double));
 
   /* copy the current solution to u0 */
-  _ArrayCopy1D_(solver->u,u0,size);
+  _ArrayCopy1D_(solver->m_u,u0,size);
   /* apply boundary conditions to the solution u0 */
-  IERR solver->ApplyBoundaryConditions(solver,mpi,u0,NULL,t);CHECKERR(ierr);
-  IERR solver->ApplyIBConditions(solver,mpi,u0,t);CHECKERR(ierr);
+  IERR solver->ApplyBoundaryConditions(solver,mpi,u0,NULL,a_t);CHECKERR(ierr);
+  IERR solver->ApplyIBConditions(solver,mpi,u0,a_t);CHECKERR(ierr);
   IERR MPIExchangeBoundariesnD(ndims,nvars,dim,ghosts,mpi,u0); CHECKERR(ierr);
 
   /* compute linearized matrix for the hyperbolic FFunction */
   if (solver->FFunction) {
     strcpy(filename,"Mat_FFunction_");
-    strcat(filename,solver->filename_index);
+    strcat(filename,solver->m_filename_index);
     strcat(filename,".dat");
     printf("ComputeRHSOperators(): Computing linearized matrix operator for FFunction. ndof=%d.\n",ndof);
-    printf("ComputeRHSOperators(): Writing to sparse matrix file %s.\n",filename);
+    printf("ComputeRHSOperators(): Writing to sparse matrix file %a_s.\n",filename);
     fout = fopen(filename,"w");
     fprintf(fout,"%d\n",ndof);
     /* compute the FFunction of u0 */
     _ArraySetValue_(f0,ndof,0.0);
-    IERR solver->HyperbolicFunction(rhs,u0,solver,mpi,t,1,solver->FFunction,
+    IERR solver->HyperbolicFunction(rhs,u0,solver,mpi,a_t,1,solver->FFunction,
                                     solver->Upwind); CHECKERR(ierr);
     _ArrayScale1D_(rhs,-1.0,size);
     /* transfer to an array f0 which as no ghost points */
@@ -117,11 +117,11 @@ int ComputeRHSOperators(
       /* add a perturbation */
       u[nvars*p+v] += epsilon;
       /* apply boundary conditions to the perturbed solution u */
-      IERR solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);CHECKERR(ierr);
-      IERR solver->ApplyIBConditions(solver,mpi,u,t);CHECKERR(ierr);
+      IERR solver->ApplyBoundaryConditions(solver,mpi,u,NULL,a_t);CHECKERR(ierr);
+      IERR solver->ApplyIBConditions(solver,mpi,u,a_t);CHECKERR(ierr);
       IERR MPIExchangeBoundariesnD(ndims,nvars,dim,ghosts,mpi,u); CHECKERR(ierr);
       /* compute the FFunction of u */
-      IERR solver->HyperbolicFunction(rhs,u,solver,mpi,t,1,solver->FFunction,
+      IERR solver->HyperbolicFunction(rhs,u,solver,mpi,a_t,1,solver->FFunction,
                                       solver->Upwind); CHECKERR(ierr);
       _ArrayScale1D_(rhs,-1.0,size);
       /* transfer to an array f which as no ghost points */
@@ -142,22 +142,22 @@ int ComputeRHSOperators(
      functions, if dFFunction is available */
   if (solver->dFFunction) {
     strcpy(filename,"Mat_FdFFunction_");
-    strcat(filename,solver->filename_index);
+    strcat(filename,solver->m_filename_index);
     strcat(filename,".dat");
     printf("ComputeRHSOperators(): Computing linearized matrix operator for (FFunction-dFFunction). ndof=%d.\n",ndof);
-    printf("ComputeRHSOperators(): Writing to sparse matrix file %s.\n",filename);
+    printf("ComputeRHSOperators(): Writing to sparse matrix file %a_s.\n",filename);
     fout = fopen(filename,"w");
     fprintf(fout,"%d\n",ndof);
     /* compute the FFunction of u0 */
     _ArraySetValue_(f0,ndof,0.0);
-    if (solver->flag_fdf_specified) {
-      IERR solver->HyperbolicFunction(rhs,u0,solver,mpi,t,1,solver->FdFFunction,
+    if (solver->m_flag_fdf_specified) {
+      IERR solver->HyperbolicFunction(rhs,u0,solver,mpi,a_t,1,solver->FdFFunction,
                                       solver->UpwindFdF); CHECKERR(ierr);
       _ArrayScale1D_(rhs,-1.0,size);
     } else {
-      IERR solver->HyperbolicFunction(rhs,u0,solver,mpi,t,1,solver->FFunction,
+      IERR solver->HyperbolicFunction(rhs,u0,solver,mpi,a_t,1,solver->FFunction,
                                       solver->Upwind); CHECKERR(ierr);
-      IERR solver->HyperbolicFunction(drhs,u0,solver,mpi,t,0,solver->dFFunction,
+      IERR solver->HyperbolicFunction(drhs,u0,solver,mpi,a_t,0,solver->dFFunction,
                                       solver->UpwinddF); CHECKERR(ierr);
       _ArrayScale1D_(rhs,-1.0,size);
       _ArrayAXPY_(drhs,1.0,rhs,size);
@@ -177,18 +177,18 @@ int ComputeRHSOperators(
       /* add a perturbation */
       u[nvars*p+v] += epsilon;
       /* apply boundary conditions to the perturbed solution u */
-      IERR solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);CHECKERR(ierr);
-      IERR solver->ApplyIBConditions(solver,mpi,u,t);CHECKERR(ierr);
+      IERR solver->ApplyBoundaryConditions(solver,mpi,u,NULL,a_t);CHECKERR(ierr);
+      IERR solver->ApplyIBConditions(solver,mpi,u,a_t);CHECKERR(ierr);
       IERR MPIExchangeBoundariesnD(ndims,nvars,dim,ghosts,mpi,u); CHECKERR(ierr);
       /* compute the FFunction of u */
-      if (solver->flag_fdf_specified) {
-        IERR solver->HyperbolicFunction(rhs,u,solver,mpi,t,1,solver->FdFFunction,
+      if (solver->m_flag_fdf_specified) {
+        IERR solver->HyperbolicFunction(rhs,u,solver,mpi,a_t,1,solver->FdFFunction,
                                         solver->UpwindFdF); CHECKERR(ierr);
         _ArrayScale1D_(rhs,-1.0,size);
       } else {
-        IERR solver->HyperbolicFunction(rhs,u,solver,mpi,t,1,solver->FFunction,
+        IERR solver->HyperbolicFunction(rhs,u,solver,mpi,a_t,1,solver->FFunction,
                                         solver->Upwind); CHECKERR(ierr);
-        IERR solver->HyperbolicFunction(drhs,u,solver,mpi,t,0,solver->dFFunction,
+        IERR solver->HyperbolicFunction(drhs,u,solver,mpi,a_t,0,solver->dFFunction,
                                         solver->UpwinddF); CHECKERR(ierr);
         _ArrayScale1D_(rhs,-1.0,size);
         _ArrayAXPY_(drhs,1.0,rhs,size);
@@ -208,15 +208,15 @@ int ComputeRHSOperators(
     fclose(fout);
 
     strcpy(filename,"Mat_dFFunction_");
-    strcat(filename,solver->filename_index);
+    strcat(filename,solver->m_filename_index);
     strcat(filename,".dat");
     printf("ComputeRHSOperators(): Computing linearized matrix operator for dFFunction. ndof=%d.\n",ndof);
-    printf("ComputeRHSOperators(): Writing to sparse matrix file %s.\n",filename);
+    printf("ComputeRHSOperators(): Writing to sparse matrix file %a_s.\n",filename);
     fout = fopen(filename,"w");
     fprintf(fout,"%d\n",ndof);
     /* compute the FFunction of u0 */
     _ArraySetValue_(f0,ndof,0.0);
-    IERR solver->HyperbolicFunction(rhs,u0,solver,mpi,t,0,solver->dFFunction,
+    IERR solver->HyperbolicFunction(rhs,u0,solver,mpi,a_t,0,solver->dFFunction,
                                     solver->UpwinddF); CHECKERR(ierr);
     _ArrayScale1D_(rhs,-1.0,size);
     /* transfer to an array f0 which as no ghost points */
@@ -234,11 +234,11 @@ int ComputeRHSOperators(
       /* add a perturbation */
       u[nvars*p+v] += epsilon;
       /* apply boundary conditions to the perturbed solution u */
-      IERR solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);CHECKERR(ierr);
-      IERR solver->ApplyIBConditions(solver,mpi,u,t);CHECKERR(ierr);
+      IERR solver->ApplyBoundaryConditions(solver,mpi,u,NULL,a_t);CHECKERR(ierr);
+      IERR solver->ApplyIBConditions(solver,mpi,u,a_t);CHECKERR(ierr);
       IERR MPIExchangeBoundariesnD(ndims,nvars,dim,ghosts,mpi,u); CHECKERR(ierr);
       /* compute the FFunction of u */
-      IERR solver->HyperbolicFunction(rhs,u,solver,mpi,t,0,solver->dFFunction,
+      IERR solver->HyperbolicFunction(rhs,u,solver,mpi,a_t,0,solver->dFFunction,
                                       solver->UpwinddF); CHECKERR(ierr);
       _ArrayScale1D_(rhs,-1.0,size);
       /* transfer to an array f which as no ghost points */
@@ -259,15 +259,15 @@ int ComputeRHSOperators(
   /* compute linearized matrix for the source SFunction */
   if (solver->SFunction) {
     strcpy(filename,"Mat_SFunction_");
-    strcat(filename,solver->filename_index);
+    strcat(filename,solver->m_filename_index);
     strcat(filename,".dat");
     printf("ComputeRHSOperators(): Computing linearized matrix operator for SFunction. ndof=%d.\n",ndof);
-    printf("ComputeRHSOperators(): Writing to sparse matrix file %s.\n",filename);
+    printf("ComputeRHSOperators(): Writing to sparse matrix file %a_s.\n",filename);
     fout = fopen(filename,"w");
     fprintf(fout,"%d\n",ndof);
     /* compute the FFunction of u0 */
     _ArraySetValue_(f0,ndof,0.0);
-    IERR solver->SourceFunction(rhs,u0,solver,mpi,t); CHECKERR(ierr);
+    IERR solver->SourceFunction(rhs,u0,solver,mpi,a_t); CHECKERR(ierr);
     /* transfer to an array f0 which as no ghost points */
     IERR ArrayCopynD(ndims,rhs,f0,dim,ghosts,0,index,nvars); CHECKERR(ierr);
     for (i=0; i<ndof; i++) {
@@ -283,11 +283,11 @@ int ComputeRHSOperators(
       /* add a perturbation */
       u[nvars*p+v] += epsilon;
       /* apply boundary conditions to the perturbed solution u */
-      IERR solver->ApplyBoundaryConditions(solver,mpi,u,NULL,t);CHECKERR(ierr);
-      IERR solver->ApplyIBConditions(solver,mpi,u,t);CHECKERR(ierr);
+      IERR solver->ApplyBoundaryConditions(solver,mpi,u,NULL,a_t);CHECKERR(ierr);
+      IERR solver->ApplyIBConditions(solver,mpi,u,a_t);CHECKERR(ierr);
       IERR MPIExchangeBoundariesnD(ndims,nvars,dim,ghosts,mpi,u); CHECKERR(ierr);
       /* compute the SFunction of u */
-      IERR solver->SourceFunction(rhs,u,solver,mpi,t); CHECKERR(ierr);
+      IERR solver->SourceFunction(rhs,u,solver,mpi,a_t); CHECKERR(ierr);
       /* transfer to an array f which as no ghost points */
       _ArraySetValue_(f,ndof,0.0);
       IERR ArrayCopynD(ndims,rhs,f,dim,ghosts,0,index,nvars); CHECKERR(ierr);

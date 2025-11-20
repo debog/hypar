@@ -158,10 +158,10 @@ extern "C" int gpuInterp1PrimFifthOrderWENO(
     HyPar           *solver = (HyPar*)          s;
     WENOParameters  *weno   = (WENOParameters*) solver->interp;
 
-    int ghosts = solver->ghosts;
-    int ndims  = solver->ndims;
-    int nvars  = solver->nvars;
-    int *dim   = solver->dim_local;
+    int ghosts = solver->m_ghosts;
+    int ndims  = solver->m_ndims;
+    int nvars  = solver->m_nvars;
+    int *dim   = solver->m_dim_local;
     int *stride= solver->stride_with_ghosts;
 
     /* calculate dimension offset */
@@ -364,10 +364,10 @@ extern "C" int gpuInterp1PrimFifthOrderWENO(
     HyPar           *solver = (HyPar*)          s;
     WENOParameters  *weno   = (WENOParameters*) solver->interp;
 
-    int ghosts = solver->ghosts;
-    int ndims  = solver->ndims;
-    int nvars  = solver->nvars;
-    int *dim   = solver->dim_local;
+    int ghosts = solver->m_ghosts;
+    int ndims  = solver->m_ndims;
+    int nvars  = solver->m_nvars;
+    int *dim   = solver->m_dim_local;
     int *stride= solver->stride_with_ghosts;
 
     /* calculate dimension offset */

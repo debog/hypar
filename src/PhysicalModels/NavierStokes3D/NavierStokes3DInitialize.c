@@ -113,90 +113,90 @@ int gpuNavierStokes3DPreStep             (double*,void*,void*,double);
 
     \b Note: "physics.inp" is \b optional; if absent, default values will be used.
 */
-int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
-                              void *m  /*!< MPI object of type #MPIVariables */
+int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
+                              void *a_m  /*!< MPI object of type #MPIVariables */
                             )
 {
-  HyPar           *solver  = (HyPar*)          s;
-  MPIVariables    *mpi     = (MPIVariables*)   m;
-  NavierStokes3D  *physics = (NavierStokes3D*) solver->physics;
+  HyPar           *solver  = (HyPar*)          a_s;
+  MPIVariables    *mpi     = (MPIVariables*)   a_m;
+  NavierStokes3D  *physics = (NavierStokes3D*) solver->m_physics;
   int             ferr     = 0;
 
   static int count = 0;
 
-  if (solver->nvars != _MODEL_NVARS_) {
+  if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in NavierStokes3DInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
     return(1);
   }
-  if (solver->ndims != _MODEL_NDIMS_) {
+  if (solver->m_ndims != _MODEL_NDIMS_) {
     fprintf(stderr,"Error in NavierStokes3DInitialize(): ndims has to be %d.\n",_MODEL_NDIMS_);
     return(1);
   }
 
   /* default values */
-  physics->gamma     = 1.4;
-  physics->Pr        = 0.72;
-  physics->Re        = -1;
+  physics->m_gamma     = 1.4;
+  physics->m_Pr        = 0.72;
+  physics->m_Re        = -1;
   physics->Minf      = 1.0;
   physics->C1        = 1.458e-6;
   physics->C2        = 110.4;
-  physics->grav_x    = 0.0;
-  physics->grav_y    = 0.0;
-  physics->grav_z    = 0.0;
-  physics->rho0      = 1.0;
-  physics->p0        = 1.0;
+  physics->m_grav_x    = 0.0;
+  physics->m_grav_y    = 0.0;
+  physics->m_grav_z    = 0.0;
+  physics->m_rho0      = 1.0;
+  physics->m_p0        = 1.0;
   physics->HB        = 1;
-  physics->R         = 1.0;
+  physics->m_R         = 1.0;
   physics->N_bv      = 0.0;
   physics->T_ib_wall = -DBL_MAX;
-  physics->t_ib_ramp = -1.0;
-  physics->t_ib_width= 0.05;
+  physics->m_t_ib_ramp = -1.0;
+  physics->m_t_ib_width= 0.05;
   physics->ib_T_tol  = 5;
-  strcpy(physics->upw_choice,"roe");
-  strcpy(physics->ib_write_surface_data,"yes");
-  strcpy(physics->ib_wall_type,"adiabatic");
-  strcpy(physics->ib_ramp_type,"linear");
+  strcpy(physics->m_upw_choice,"roe");
+  strcpy(physics->m_ib_write_surface_data,"yes");
+  strcpy(physics->m_ib_wall_type,"adiabatic");
+  strcpy(physics->m_ib_ramp_type,"linear");
 
   /* reading physical model specific inputs - all processes */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     FILE *in;
     if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word);
+      ferr = fscanf(in,"%a_s",word);
       if (ferr != 1) {
         fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
         return 1;
       }
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%s",word);
+          ferr = fscanf(in,"%a_s",word);
           if (ferr != 1) {
             fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
             return 1;
           }
           if (!strcmp(word, "gamma")) {
-            ferr = fscanf(in,"%lf",&physics->gamma);
+            ferr = fscanf(in,"%lf",&physics->m_gamma);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
           } else if (!strcmp(word,"upwinding")) {
-            ferr = fscanf(in,"%s",physics->upw_choice);
+            ferr = fscanf(in,"%a_s",physics->m_upw_choice);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
           } else if (!strcmp(word,"Pr")) {
-            ferr = fscanf(in,"%lf",&physics->Pr);
+            ferr = fscanf(in,"%lf",&physics->m_Pr);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
           } else if (!strcmp(word,"Re")) {
-            ferr = fscanf(in,"%lf",&physics->Re);
+            ferr = fscanf(in,"%lf",&physics->m_Re);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
@@ -208,29 +208,29 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
               return 1;
             }
           } else if (!strcmp(word,"gravity")) {
-            ferr = fscanf(in,"%lf",&physics->grav_x);
+            ferr = fscanf(in,"%lf",&physics->m_grav_x);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
-            ferr = fscanf(in,"%lf",&physics->grav_y);
+            ferr = fscanf(in,"%lf",&physics->m_grav_y);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
-            ferr = fscanf(in,"%lf",&physics->grav_z);
+            ferr = fscanf(in,"%lf",&physics->m_grav_z);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
           } else if (!strcmp(word,"rho_ref")) {
-            ferr = fscanf(in,"%lf",&physics->rho0);
+            ferr = fscanf(in,"%lf",&physics->m_rho0);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
           } else if (!strcmp(word,"p_ref")) {
-            ferr = fscanf(in,"%lf",&physics->p0);
+            ferr = fscanf(in,"%lf",&physics->m_p0);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
@@ -249,61 +249,61 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
               }
             }
           } else if (!strcmp(word,"R")) {
-            ferr = fscanf(in,"%lf",&physics->R);
+            ferr = fscanf(in,"%lf",&physics->m_R);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
           } else if (!strcmp(word,"ib_surface_data")) {
-            ferr = fscanf(in,"%s",physics->ib_write_surface_data);
+            ferr = fscanf(in,"%a_s",physics->m_ib_write_surface_data);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
           } else if (!strcmp(word,"ib_wall_type")) {
-            ferr = fscanf(in,"%s",physics->ib_wall_type);
+            ferr = fscanf(in,"%a_s",physics->m_ib_wall_type);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
-            if (!strcmp(physics->ib_wall_type,_IB_ISOTHERMAL_)) {
+            if (!strcmp(physics->m_ib_wall_type,_IB_ISOTHERMAL_)) {
               ferr = fscanf(in,"%lf",&physics->T_ib_wall);
               if (ferr != 1) {
                 fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
                 return 1;
               }
             }
-            if (!solver->flag_ib) {
+            if (!solver->m_flag_ib) {
               printf("Warning: in NavierStokes3DInitialize().\n");
               printf("Warning: no immersed body present; specification of ib_wall_type unnecessary.\n");
             }
           } else if (!strcmp(word,"ib_ramp_time")) {
-            ferr = fscanf(in,"%lf",&physics->t_ib_ramp);
+            ferr = fscanf(in,"%lf",&physics->m_t_ib_ramp);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
-            if (!solver->flag_ib) {
+            if (!solver->m_flag_ib) {
               printf("Warning: in NavierStokes3DInitialize().\n");
               printf("Warning: no immersed body present; specification of ib_ramp_time unnecessary.\n");
             }
           } else if (!strcmp(word,"ib_ramp_width")) {
-            ferr = fscanf(in,"%lf",&physics->t_ib_width);
+            ferr = fscanf(in,"%lf",&physics->m_t_ib_width);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
-            if (!solver->flag_ib) {
+            if (!solver->m_flag_ib) {
               printf("Warning: in NavierStokes3DInitialize().\n");
               printf("Warning: no immersed body present; specification of ib_ramp_width unnecessary.\n");
             }
           } else if (!strcmp(word,"ib_ramp_type")) {
-            ferr = fscanf(in,"%s",physics->ib_ramp_type);
+            ferr = fscanf(in,"%a_s",physics->m_ib_ramp_type);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
-            if (!solver->flag_ib) {
+            if (!solver->m_flag_ib) {
               printf("Warning: in NavierStokes3DInitialize().\n");
               printf("Warning: no immersed body present; specification of ib_ramp_type unnecessary.\n");
             }
@@ -313,14 +313,14 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
-            if (!solver->flag_ib) {
+            if (!solver->m_flag_ib) {
               printf("Warning: in NavierStokes3DInitialize().\n");
               printf("Warning: no immersed body present; specification of ib_T_tolerance unnecessary.\n");
             }
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",word,useless);
+            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
@@ -332,61 +332,61 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
     fclose(in);
   }
 
-  IERR MPIBroadcast_character (physics->upw_choice            ,_MAX_STRING_SIZE_,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_character (physics->ib_write_surface_data ,_MAX_STRING_SIZE_,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_character (physics->ib_wall_type          ,_MAX_STRING_SIZE_,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_character (physics->ib_ramp_type          ,_MAX_STRING_SIZE_,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->gamma                ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->Pr                   ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->Re                   ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->Minf                 ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->grav_x               ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->grav_y               ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->grav_z               ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->rho0                 ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->p0                   ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->R                    ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->N_bv                 ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->T_ib_wall            ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->t_ib_ramp            ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->t_ib_width           ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_double    (&physics->ib_T_tol             ,1                ,0,&mpi->world); CHECKERR(ierr);
-  IERR MPIBroadcast_integer   (&physics->HB                   ,1                ,0,&mpi->world); CHECKERR(ierr);
+  IERR MPIBroadcast_character (physics->m_upw_choice            ,_MAX_STRING_SIZE_,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_character (physics->m_ib_write_surface_data ,_MAX_STRING_SIZE_,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_character (physics->m_ib_wall_type          ,_MAX_STRING_SIZE_,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_character (physics->m_ib_ramp_type          ,_MAX_STRING_SIZE_,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_gamma                ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_Pr                   ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_Re                   ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->Minf                 ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_grav_x               ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_grav_y               ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_grav_z               ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_rho0                 ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_p0                   ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_R                    ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->N_bv                 ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->T_ib_wall            ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_t_ib_ramp            ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->m_t_ib_width           ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_double    (&physics->ib_T_tol             ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+  IERR MPIBroadcast_integer   (&physics->HB                   ,1                ,0,&mpi->m_world); CHECKERR(ierr);
 
   /* if file output is disabled in HyPar, respect that */
-  if (!strcmp(solver->op_file_format,"none")) {
-    if (!strcmp(physics->ib_write_surface_data,"yes")) {
-      if (!mpi->rank) {
-        printf("Warning from NavierStokes3DInitialize(): solver->op_file_format is set to \"none\", thus ");
-        printf("setting physics->ib_write_surface_data to \"no\" (no solution files will be written).\n");
+  if (!strcmp(solver->m_op_file_format,"none")) {
+    if (!strcmp(physics->m_ib_write_surface_data,"yes")) {
+      if (!mpi->m_rank) {
+        printf("Warning from NavierStokes3DInitialize(): solver->m_op_file_format is set to \"none\", thus ");
+        printf("setting physics->m_ib_write_surface_data to \"no\" (no solution files will be written).\n");
       }
     }
-    strcpy(physics->ib_write_surface_data,"no");
+    strcpy(physics->m_ib_write_surface_data,"no");
   }
 
   /* Scaling Re by M_inf */
-  physics->Re /= physics->Minf;
+  physics->m_Re /= physics->Minf;
 
   /* check that a well-balanced upwinding scheme is being used for cases with gravity */
-  if (   ((physics->grav_x != 0.0) || (physics->grav_y != 0.0) || (physics->grav_z != 0.0) )
-      && (strcmp(physics->upw_choice,_RUSANOV_)) ) {
-    if (!mpi->rank) {
-      fprintf(stderr,"Error in NavierStokes3DInitialize: %s upwinding is needed for flows ",_RUSANOV_);
+  if (   ((physics->m_grav_x != 0.0) || (physics->m_grav_y != 0.0) || (physics->m_grav_z != 0.0) )
+      && (strcmp(physics->m_upw_choice,_RUSANOV_)) ) {
+    if (!mpi->m_rank) {
+      fprintf(stderr,"Error in NavierStokes3DInitialize: %a_s upwinding is needed for flows ",_RUSANOV_);
       fprintf(stderr,"with gravitational forces.\n");
     }
     return(1);
   }
   /* check that solver has the correct choice of diffusion formulation, if viscous flow */
-  if (strcmp(solver->spatial_type_par,_NC_2STAGE_) && (physics->Re > 0)) {
-    if (!mpi->rank) {
-      fprintf(stderr,"Error in NavierStokes3DInitialize(): Parabolic term spatial discretization must be \"%s\"\n",_NC_2STAGE_);
+  if (strcmp(solver->m_spatial_type_par,_NC_2STAGE_) && (physics->m_Re > 0)) {
+    if (!mpi->m_rank) {
+      fprintf(stderr,"Error in NavierStokes3DInitialize(): Parabolic term spatial discretization must be \"%a_s\"\n",_NC_2STAGE_);
     }
     return(1);
   }
 
   /* initializing physical model-specific functions */
 #if defined(HAVE_CUDA)
-  if (solver->use_gpu) {
+  if (solver->m_use_gpu) {
     solver->PreStep     = gpuNavierStokes3DPreStep;
     solver->FFunction   = gpuNavierStokes3DFlux;
     solver->SFunction   = gpuNavierStokes3DSource;
@@ -405,40 +405,40 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
   }
 #endif
 
-  if (solver->flag_ib) {
-    if (!strcmp(physics->ib_wall_type,_IB_ADIABATIC_)) {
+  if (solver->m_flag_ib) {
+    if (!strcmp(physics->m_ib_wall_type,_IB_ADIABATIC_)) {
       solver->IBFunction = NavierStokes3DIBAdiabatic;
-    } else if (!strcmp(physics->ib_wall_type,_IB_ISOTHERMAL_)) {
+    } else if (!strcmp(physics->m_ib_wall_type,_IB_ISOTHERMAL_)) {
       solver->IBFunction = NavierStokes3DIBIsothermal;
     } else {
       fprintf(stderr, "Error in NavierStokes3DInitialize()\n");
-      fprintf(stderr, "  invalid value for IB wall type (%s).\n",
-              physics->ib_wall_type );
+      fprintf(stderr, "  invalid value for IB wall type (%a_s).\n",
+              physics->m_ib_wall_type );
     }
-    if (!strcmp(physics->ib_write_surface_data,"yes")) {
+    if (!strcmp(physics->m_ib_write_surface_data,"yes")) {
       solver->PhysicsOutput = NavierStokes3DIBForces;
     }
   }
 
 #if defined(HAVE_CUDA)
-  if (solver->use_gpu) {
+  if (solver->m_use_gpu) {
 
-    if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-      if (!mpi->rank) {
+    if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
+      if (!mpi->m_rank) {
         fprintf(stderr,"Error in NavierStokes3DInitialize(): Not available on GPU!");
       }
       return 1;
     } else {
       solver->JFunction = NavierStokes3DJacobian;
-      if (!strcmp(physics->upw_choice,_ROE_    )) {
+      if (!strcmp(physics->m_upw_choice,_ROE_    )) {
         solver->Upwind = gpuNavierStokes3DUpwindRoe;
-      } else if (!strcmp(physics->upw_choice,_RUSANOV_)) {
+      } else if (!strcmp(physics->m_upw_choice,_RUSANOV_)) {
         solver->Upwind = gpuNavierStokes3DUpwindRusanov;
       } else {
-        if (!mpi->rank) {
-          fprintf(stderr,"Error in NavierStokes3DInitialize(): %s is not a valid upwinding scheme on GPU. ",
-                  physics->upw_choice);
-          fprintf(stderr,"Choices are %s and %s.\n",_ROE_,_RUSANOV_);
+        if (!mpi->m_rank) {
+          fprintf(stderr,"Error in NavierStokes3DInitialize(): %a_s is not a valid upwinding scheme on GPU. ",
+                  physics->m_upw_choice);
+          fprintf(stderr,"Choices are %a_s and %a_s.\n",_ROE_,_RUSANOV_);
         }
         return(1);
       }
@@ -447,38 +447,38 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
   } else {
 #endif
 
-    if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
+    if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
       solver->FdFFunction = NavierStokes3DNonStiffFlux;
       solver->dFFunction  = NavierStokes3DStiffFlux;
       solver->JFunction   = NavierStokes3DStiffJacobian;
-      if (!strcmp(physics->upw_choice,_ROE_)) {
+      if (!strcmp(physics->m_upw_choice,_ROE_)) {
         solver->Upwind    = NavierStokes3DUpwindRoe;
         solver->UpwinddF  = NavierStokes3DUpwinddFRoe;
         solver->UpwindFdF = NavierStokes3DUpwindFdFRoe;
-      } else if (!strcmp(physics->upw_choice,_RUSANOV_)) {
+      } else if (!strcmp(physics->m_upw_choice,_RUSANOV_)) {
         solver->Upwind    = NavierStokes3DUpwindRusanovModified;
         solver->UpwinddF  = NavierStokes3DUpwinddFRusanovModified;
         solver->UpwindFdF = NavierStokes3DUpwindFdFRusanovModified;
       } else {
-        if (!mpi->rank) {
-          fprintf(stderr,"Error in NavierStokes3DInitialize(): %s is not a valid upwinding scheme ",
-                  physics->upw_choice);
-          fprintf(stderr,"for use with split hyperbolic flux form. Use %s or %s.\n",
+        if (!mpi->m_rank) {
+          fprintf(stderr,"Error in NavierStokes3DInitialize(): %a_s is not a valid upwinding scheme ",
+                  physics->m_upw_choice);
+          fprintf(stderr,"for use with split hyperbolic flux form. Use %a_s or %a_s.\n",
                   _ROE_,_RUSANOV_);
         }
         return(1);
       }
     } else {
       solver->JFunction      = NavierStokes3DJacobian;
-      if      (!strcmp(physics->upw_choice,_ROE_    )) solver->Upwind = NavierStokes3DUpwindRoe;
-      else if (!strcmp(physics->upw_choice,_RF_     )) solver->Upwind = NavierStokes3DUpwindRF;
-      else if (!strcmp(physics->upw_choice,_LLF_    )) solver->Upwind = NavierStokes3DUpwindLLF;
-      else if (!strcmp(physics->upw_choice,_RUSANOV_)) solver->Upwind = NavierStokes3DUpwindRusanov;
+      if      (!strcmp(physics->m_upw_choice,_ROE_    )) solver->Upwind = NavierStokes3DUpwindRoe;
+      else if (!strcmp(physics->m_upw_choice,_RF_     )) solver->Upwind = NavierStokes3DUpwindRF;
+      else if (!strcmp(physics->m_upw_choice,_LLF_    )) solver->Upwind = NavierStokes3DUpwindLLF;
+      else if (!strcmp(physics->m_upw_choice,_RUSANOV_)) solver->Upwind = NavierStokes3DUpwindRusanov;
       else {
-        if (!mpi->rank) {
-          fprintf(stderr,"Error in NavierStokes3DInitialize(): %s is not a valid upwinding scheme. ",
-                  physics->upw_choice);
-          fprintf(stderr,"Choices are %s, %s, %s, and %s.\n",_ROE_,_RF_,_LLF_,_RUSANOV_);
+        if (!mpi->m_rank) {
+          fprintf(stderr,"Error in NavierStokes3DInitialize(): %a_s is not a valid upwinding scheme. ",
+                  physics->m_upw_choice);
+          fprintf(stderr,"Choices are %a_s, %a_s, %a_s, and %a_s.\n",_ROE_,_RF_,_LLF_,_RUSANOV_);
         }
         return(1);
       }
@@ -490,14 +490,14 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
 
   /* set the value of gamma in all the boundary objects */
   int n;
-  DomainBoundary  *boundary = (DomainBoundary*) solver->boundary;
-  for (n = 0; n < solver->nBoundaryZones; n++)  boundary[n].gamma = physics->gamma;
+  DomainBoundary  *boundary = (DomainBoundary*) solver->m_boundary;
+  for (n = 0; n < solver->m_n_boundary_zones; n++)  boundary[n].m_gamma = physics->m_gamma;
 
-  /* finally, hijack the main solver's dissipation function pointer
-   * to this model's own function, since it's difficult to express
+  /* finally, hijack the main solver'a_s dissipation function pointer
+   * to this model'a_s own function, since it'a_s difficult to express
    * the dissipation terms in the general form                      */
 #if defined(HAVE_CUDA)
-  if (solver->use_gpu) {
+  if (solver->m_use_gpu) {
     solver->ParabolicFunction = gpuNavierStokes3DParabolicFunction;
   } else {
 #endif
@@ -507,19 +507,19 @@ int NavierStokes3DInitialize( void *s, /*!< Solver object of type #HyPar */
 #endif
 
   /* allocate array to hold the gravity field */
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
   int d, size = 1; for (d=0; d<_MODEL_NDIMS_; d++) size *= (dim[d] + 2*ghosts);
-  physics->grav_field_f = (double*) calloc (size, sizeof(double));
-  physics->grav_field_g = (double*) calloc (size, sizeof(double));
+  physics->m_grav_field_f = (double*) calloc (size, sizeof(double));
+  physics->m_grav_field_g = (double*) calloc (size, sizeof(double));
   /* allocate arrays to hold the fast Jacobian for split form of the hyperbolic flux */
-  physics->fast_jac     = (double*) calloc (_MODEL_NDIMS_*size*_MODEL_NVARS_*_MODEL_NVARS_,sizeof(double));
+  physics->m_fast_jac     = (double*) calloc (_MODEL_NDIMS_*size*_MODEL_NVARS_*_MODEL_NVARS_,sizeof(double));
   physics->solution     = (double*) calloc (size*_MODEL_NVARS_,sizeof(double));
   /* initialize the gravity fields */
   IERR NavierStokes3DGravityField(solver,mpi); CHECKERR(ierr);
 
 #if defined(HAVE_CUDA)
-  if (solver->use_gpu) gpuNavierStokes3DInitialize(s,m);
+  if (solver->m_use_gpu) gpuNavierStokes3DInitialize(a_s,a_m);
 #endif
 
   count++;

@@ -13,22 +13,22 @@
   \f{equation}{
     \frac{d{\bf u}}{dt} = {\bf F} \left({\bf u}\right)
   \f}
-  by one time step of size #HyPar::dt using the forward Euler method
+  by one time step of size #HyPar::m_dt using the forward Euler method
   given by
   \f{equation}{
     {\bf u}^{n+1} = {\bf u}^n + \Delta t {\bf F}\left( {\bf u}^n \right)
   \f}
   where the superscript represents the time level, \f$\Delta t\f$ is the
-  time step size #HyPar::dt, and \f${\bf F}\left({\bf u}\right)\f$ is
+  time step size #HyPar::m_dt, and \f${\bf F}\left({\bf u}\right)\f$ is
   computed by #TimeIntegration::RHSFunction.
 */
 int TimeForwardEuler(
-                      void *ts /*!< Time integrator object of type #TimeIntegration */
+                      void *a_ts /*!< Time integrator object of type #TimeIntegration */
                     )
 {
-  TimeIntegration* TS = (TimeIntegration*) ts;
-  SimulationObject* sim = (SimulationObject*) TS->simulation;
-  int ns, nsims = TS->nsims;
+  TimeIntegration* TS = (TimeIntegration*) a_ts;
+  SimulationObject* sim = (SimulationObject*) TS->m_simulation;
+  int ns, nsims = TS->m_nsims;
   _DECLARE_IERR_;
 
   for (ns = 0; ns < nsims; ns++) {
@@ -36,25 +36,25 @@ int TimeForwardEuler(
     HyPar* solver = &(sim[ns].solver);
     MPIVariables* mpi = &(sim[ns].mpi);
 
-    double* rhs = TS->rhs + TS->u_offsets[ns];
+    double* rhs = TS->m_rhs + TS->m_u_offsets[ns];
 
     /* Evaluate right-hand side */
     IERR TS->RHSFunction( rhs,
-                          solver->u,
+                          solver->m_u,
                           solver,
                           mpi,
-                          TS->waqt  );   CHECKERR(ierr);
+                          TS->m_waqt  );   CHECKERR(ierr);
 
     /* update solution */
     _ArrayAXPY_(  rhs,
-                  TS->dt,
-                  solver->u,
-                  TS->u_sizes[ns] );
+                  TS->m_dt,
+                  solver->m_u,
+                  TS->m_u_sizes[ns] );
 
-    _ArrayScaleCopy1D_( solver->StageBoundaryIntegral,
-                        TS->dt,
-                        solver->StepBoundaryIntegral,
-                        TS->bf_sizes[ns] );
+    _ArrayScaleCopy1D_( solver->m_stage_boundary_integral,
+                        TS->m_dt,
+                        solver->m_step_boundary_integral,
+                        TS->m_bf_sizes[ns] );
   }
 
   return(0);

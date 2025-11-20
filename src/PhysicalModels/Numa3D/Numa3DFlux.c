@@ -4,15 +4,15 @@
 #include <physicalmodels/numa3d.h>
 #include <hypar.h>
 
-int Numa3DFlux(double *f,double *u,int dir,void *s,double t)
+int Numa3DFlux(double *a_f,double *a_u,int a_dir,void *a_s,double a_t)
 {
-  HyPar  *solver = (HyPar*)   s;
-  Numa3D *param  = (Numa3D*) solver->physics;
+  HyPar  *solver = (HyPar*)   a_s;
+  Numa3D *param  = (Numa3D*) solver->m_physics;
   int     i;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -27,12 +27,12 @@ int Numa3DFlux(double *f,double *u,int dir,void *s,double t)
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double drho,uvel,vvel,wvel,dT,dP,rho0,T0,P0,EP,zcoord;
 
-    _GetCoordinate_(_ZDIR_,index[_ZDIR_]-ghosts,dim,ghosts,solver->x,zcoord);
+    _GetCoordinate_(_ZDIR_,index[_ZDIR_]-ghosts,dim,ghosts,solver->m_x,zcoord);
     param->StandardAtmosphere(param,zcoord,&EP,&P0,&rho0,&T0);
 
-    _Numa3DGetFlowVars_     ((u+_MODEL_NVARS_*p),drho,uvel,vvel,wvel,dT,rho0);
+    _Numa3DGetFlowVars_     ((a_u+_MODEL_NVARS_*p),drho,uvel,vvel,wvel,dT,rho0);
     _Numa3DComputePressure_ (param,T0,dT,P0,dP);
-    _Numa3DSetFlux_         ((f+_MODEL_NVARS_*p),dir,drho,uvel,vvel,wvel,dT,dP,rho0,T0);
+    _Numa3DSetFlux_         ((a_f+_MODEL_NVARS_*p),a_dir,drho,uvel,vvel,wvel,dT,dP,rho0,T0);
 
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
@@ -40,15 +40,15 @@ int Numa3DFlux(double *f,double *u,int dir,void *s,double t)
   return(0);
 }
 
-int Numa3DStiffFlux(double *f,double *u,int dir,void *s,double t)
+int Numa3DStiffFlux(double *a_f,double *a_u,int a_dir,void *a_s,double a_t)
 {
-  HyPar  *solver = (HyPar*)   s;
-  Numa3D *param  = (Numa3D*) solver->physics;
+  HyPar  *solver = (HyPar*)   a_s;
+  Numa3D *param  = (Numa3D*) solver->m_physics;
   int     i;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -63,12 +63,12 @@ int Numa3DStiffFlux(double *f,double *u,int dir,void *s,double t)
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double drho,uvel,vvel,wvel,dT,dP,rho0,T0,P0,EP,zcoord;
 
-    _GetCoordinate_(_ZDIR_,index[_ZDIR_]-ghosts,dim,ghosts,solver->x,zcoord);
+    _GetCoordinate_(_ZDIR_,index[_ZDIR_]-ghosts,dim,ghosts,solver->m_x,zcoord);
     param->StandardAtmosphere(param,zcoord,&EP,&P0,&rho0,&T0);
 
-    _Numa3DGetFlowVars_               ((u+_MODEL_NVARS_*p),drho,uvel,vvel,wvel,dT,rho0);
+    _Numa3DGetFlowVars_               ((a_u+_MODEL_NVARS_*p),drho,uvel,vvel,wvel,dT,rho0);
     _Numa3DComputeLinearizedPressure_ (param,T0,dT,P0,dP);
-    _Numa3DSetLinearFlux_             ((f+_MODEL_NVARS_*p),dir,drho,uvel,vvel,wvel,dT,dP,rho0,T0);
+    _Numa3DSetLinearFlux_             ((a_f+_MODEL_NVARS_*p),a_dir,drho,uvel,vvel,wvel,dT,dP,rho0,T0);
 
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }

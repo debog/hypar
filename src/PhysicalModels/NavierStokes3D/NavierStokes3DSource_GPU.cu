@@ -156,7 +156,7 @@ int gpuNavierStokes3DSourceUpwind(
 )
 {
   HyPar *solver = (HyPar*) s;
-  int   *dim    = solver->dim_local;
+  int   *dim    = solver->m_dim_local;
   _DECLARE_IERR_;
 
   int bounds_inter[_MODEL_NDIMS_];
@@ -216,7 +216,7 @@ extern "C" int gpuNavierStokes3DSource(
   double  *SourceL = solver->fL;
   double  *SourceR = solver->fR;
 
-  int     ghosts  = solver->ghosts;
+  int     ghosts  = solver->m_ghosts;
   int     *dim    = solver->gpu_dim_local;
   double  *x      = solver->gpu_x;
   double  *dxinv  = solver->gpu_dxinv;
@@ -368,7 +368,7 @@ int gpuNavierStokes3DSourceFunction(
   int             nblocks = (solver->npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DSourceFunction_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    solver->npoints_local_wghosts, solver->ghosts, dir, solver->gpu_dim_local, param->gpu_grav_field_g, f
+    solver->npoints_local_wghosts, solver->m_ghosts, dir, solver->gpu_dim_local, param->gpu_grav_field_g, f
   );
   cudaDeviceSynchronize();
 
@@ -398,7 +398,7 @@ int gpuNavierStokes3DSourceUpwind(
 )
 {
   HyPar *solver = (HyPar*) s;
-  int   *dim    = solver->dim_local;
+  int   *dim    = solver->m_dim_local;
 
   int bounds_inter[_MODEL_NDIMS_];
   _ArrayCopy1D_(dim,bounds_inter,_MODEL_NDIMS_); bounds_inter[dir] += 1;
@@ -457,7 +457,7 @@ extern "C" int gpuNavierStokes3DSource(
   double  *SourceL = solver->fL;
   double  *SourceR = solver->fR;
 
-  int     ghosts  = solver->ghosts;
+  int     ghosts  = solver->m_ghosts;
   int     *dim    = solver->gpu_dim_local;
   double  *x      = solver->gpu_x;
   double  *dxinv  = solver->gpu_dxinv;
@@ -472,7 +472,7 @@ extern "C" int gpuNavierStokes3DSource(
   for (dir = 0; dir < _MODEL_NDIMS_; dir++) {
     if (grav[dir] != 0.0) {
       int bounds_inter[_MODEL_NDIMS_];
-      _ArrayCopy1D_(solver->dim_local,bounds_inter,_MODEL_NDIMS_); bounds_inter[dir] += 1;
+      _ArrayCopy1D_(solver->m_dim_local,bounds_inter,_MODEL_NDIMS_); bounds_inter[dir] += 1;
       int npoints_fluxI; _ArrayProduct1D_(bounds_inter,_MODEL_NDIMS_,npoints_fluxI);
 
       /* calculate the split source function exp(-phi/RT) */

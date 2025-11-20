@@ -2,13 +2,13 @@
 #include <mathfunctions.h>
 #include <physicalmodels/numa2d.h>
 
-int Numa2DCalculateStandardAtmosphere_1(void *p,double z,double *ExnerP,double *P,double *rho,double *T)
+int Numa2DCalculateStandardAtmosphere_1(void *a_p,double a_z,double *a_ExnerP,double *a_P,double *a_rho,double *a_T)
 {
-  Numa2D *physics = (Numa2D*) p;
+  Numa2D *physics = (Numa2D*) a_p;
 
-  double R      = physics->R;
-  double gamma  = physics->gamma;
-  double g      = physics->g;
+  double R      = physics->m_R;
+  double gamma  = physics->m_gamma;
+  double g      = physics->m_g;
 
   /* reference quantities at zero altitude */
   double P0, T0;
@@ -19,21 +19,21 @@ int Numa2DCalculateStandardAtmosphere_1(void *p,double z,double *ExnerP,double *
   double Cp = gamma * inv_gamma_m1 * R;
 
   double theta  = T0;
-  *ExnerP = 1.0 - (g/(Cp*theta))*z;
-  *P      = P0 * raiseto((*ExnerP),gamma*inv_gamma_m1);
-  *rho    = (P0/(R*theta)) * raiseto((*ExnerP),inv_gamma_m1);
-  *T      = (*rho) * theta;
+  *a_ExnerP = 1.0 - (g/(Cp*theta))*a_z;
+  *a_P      = P0 * raiseto((*a_ExnerP),gamma*inv_gamma_m1);
+  *a_rho    = (P0/(R*theta)) * raiseto((*a_ExnerP),inv_gamma_m1);
+  *a_T      = (*a_rho) * theta;
 
   return(0);
 }
 
-int Numa2DCalculateStandardAtmosphere_2(void *p,double z,double *ExnerP,double *P,double *rho,double *T)
+int Numa2DCalculateStandardAtmosphere_2(void *a_p,double a_z,double *a_ExnerP,double *a_P,double *a_rho,double *a_T)
 {
-  Numa2D *physics = (Numa2D*) p;
+  Numa2D *physics = (Numa2D*) a_p;
 
-  double R      = physics->R;
-  double gamma  = physics->gamma;
-  double g      = physics->g;
+  double R      = physics->m_R;
+  double gamma  = physics->m_gamma;
+  double g      = physics->m_g;
 
   /* reference quantities at zero altitude */
   double P0, T0;
@@ -44,12 +44,12 @@ int Numa2DCalculateStandardAtmosphere_2(void *p,double z,double *ExnerP,double *
   double inv_gamma_m1 = 1.0/(gamma-1.0);
   double Cp = gamma * inv_gamma_m1 * R;
 
-  double term   = BV*BV*z/g;
+  double term   = BV*BV*a_z/g;
   double theta  = T0 * exp(term);
-  *ExnerP = 1.0 + (g*g/(Cp*T0*BV*BV)) * (exp(-term) - 1.0);
-  *P      = P0 * raiseto((*ExnerP),gamma*inv_gamma_m1);
-  *rho    = (P0/(R*theta)) * raiseto((*ExnerP),inv_gamma_m1);
-  *T      = (*rho) * theta;
+  *a_ExnerP = 1.0 + (g*g/(Cp*T0*BV*BV)) * (exp(-term) - 1.0);
+  *a_P      = P0 * raiseto((*a_ExnerP),gamma*inv_gamma_m1);
+  *a_rho    = (P0/(R*theta)) * raiseto((*a_ExnerP),inv_gamma_m1);
+  *a_T      = (*a_rho) * theta;
 
   return(0);
 }

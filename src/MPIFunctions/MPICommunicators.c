@@ -33,34 +33,34 @@
   instead of MPI_WORLD.
 */
 int MPICreateCommunicators(
-                            int   ndims,  /*!< Number of spatial dimensions */
-                            void  *m      /*!< MPI object of type #MPIVariables */
+                            int   a_ndims,  /*!< Number of spatial dimensions */
+                            void  *a_m      /*!< MPI object of type #MPIVariables */
                           )
 {
-  MPIVariables *mpi = (MPIVariables*) m;
+  MPIVariables *mpi = (MPIVariables*) a_m;
 #ifdef serial
-  mpi->comm = NULL;
+  mpi->m_comm = NULL;
 #else
   int          i,n,color,key;
   int          *ip,*iproc;
 
-  mpi->comm = (MPI_Comm*) calloc (ndims, sizeof(MPI_Comm));
-  if (ndims == 1) MPI_Comm_dup(mpi->world,mpi->comm);
+  mpi->m_comm = (MPI_Comm*) calloc (a_ndims, sizeof(MPI_Comm));
+  if (a_ndims == 1) MPI_Comm_dup(mpi->m_world,mpi->m_comm);
   else {
-    ip    = (int*) calloc (ndims-1,sizeof(int));
-    iproc = (int*) calloc (ndims-1,sizeof(int));
-    for (n=0; n<ndims; n++) {
+    ip    = (int*) calloc (a_ndims-1,sizeof(int));
+    iproc = (int*) calloc (a_ndims-1,sizeof(int));
+    for (n=0; n<a_ndims; n++) {
       int tick=0;
-      for (i=0; i<ndims; i++) {
+      for (i=0; i<a_ndims; i++) {
         if (i != n) {
-          ip[tick]    = mpi->ip[i];
-          iproc[tick] = mpi->iproc[i];
+          ip[tick]    = mpi->m_ip[i];
+          iproc[tick] = mpi->m_iproc[i];
           tick++;
         }
       }
-      _ArrayIndex1D_(ndims-1,iproc,ip,0,color);
-      key   = mpi->ip[n];
-      MPI_Comm_split(mpi->world,color,key,&mpi->comm[n]);
+      _ArrayIndex1D_(a_ndims-1,iproc,ip,0,color);
+      key   = mpi->m_ip[n];
+      MPI_Comm_split(mpi->m_world,color,key,&mpi->m_comm[n]);
     }
     free(ip);
     free(iproc);
@@ -73,17 +73,17 @@ int MPICreateCommunicators(
   Free the subcommunicators created in MPICreateCommunicators().
 */
 int MPIFreeCommunicators(
-                          int   ndims,  /*!< Number of spatial dimensions */
-                          void  *m      /*!< MPI object of type #MPIVariables */
+                          int   a_ndims,  /*!< Number of spatial dimensions */
+                          void  *a_m      /*!< MPI object of type #MPIVariables */
                         )
 {
 #ifndef serial
-  MPIVariables *mpi = (MPIVariables*) m;
+  MPIVariables *mpi = (MPIVariables*) a_m;
   int          n;
-  for (n=0; n<ndims; n++) MPI_Comm_free(&mpi->comm[n]);
-  free(mpi->comm);
-  if (mpi->IOParticipant) MPI_Comm_free(&mpi->IOWorld);
-  MPI_Comm_free(&mpi->world);
+  for (n=0; n<a_ndims; n++) MPI_Comm_free(&mpi->m_comm[n]);
+  free(mpi->m_comm);
+  if (mpi->m_IOParticipant) MPI_Comm_free(&mpi->m_IOWorld);
+  MPI_Comm_free(&mpi->m_world);
 #endif
   return(0);
 }

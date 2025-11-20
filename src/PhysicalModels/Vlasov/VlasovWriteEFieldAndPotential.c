@@ -20,27 +20,27 @@ int VlasovWriteSpatialField( void*, void*, double*, char* );
 int VlasovPlotSpatialField( void*, void*, double*, double, char* );
 
 /*! Write out the electric field and potential to file */
-int VlasovWriteEFieldAndPotential(  void*   s,    /*!< Solver object of type #HyPar */
-                                    void*   m,    /*!< MPI object of type #MPIVariables */
+int VlasovWriteEFieldAndPotential(  void*   a_s,    /*!< Solver object of type #HyPar */
+                                    void*   a_m,    /*!< MPI object of type #MPIVariables */
                                     double  a_t   /*!< Current simulation time */ )
 {
-  HyPar         *solver = (HyPar*)        s;
-  MPIVariables  *mpi    = (MPIVariables*) m;
-  Vlasov        *param  = (Vlasov*)       solver->physics;
+  HyPar         *solver = (HyPar*)        a_s;
+  MPIVariables  *mpi    = (MPIVariables*) a_m;
+  Vlasov        *param  = (Vlasov*)       solver->m_physics;
 
   {
     char fname_root[_MAX_STRING_SIZE_] = "efield";
-    VlasovWriteSpatialField( solver, mpi, param->e_field, fname_root );
-    if (!strcmp(solver->plot_solution,"yes")) {
-      VlasovPlotSpatialField( solver, mpi, param->e_field, a_t, fname_root );
+    VlasovWriteSpatialField( solver, mpi, param->m_e_field,fname_root);
+    if (!strcmp(solver->m_plot_solution,"yes")) {
+      VlasovPlotSpatialField( solver, mpi, param->m_e_field, a_t,fname_root);
     }
   }
 
-  if (param->self_consistent_electric_field) {
+  if (param->m_self_consistent_electric_field) {
     char fname_root[_MAX_STRING_SIZE_] = "potential";
-    VlasovWriteSpatialField( solver, mpi, param->potential, fname_root );
-    if (!strcmp(solver->plot_solution,"yes")) {
-      VlasovPlotSpatialField( solver, mpi, param->potential, a_t, fname_root );
+    VlasovWriteSpatialField( solver, mpi, param->m_potential,fname_root);
+    if (!strcmp(solver->m_plot_solution,"yes")) {
+      VlasovPlotSpatialField( solver, mpi, param->m_potential, a_t,fname_root);
     }
   }
 

@@ -37,18 +37,18 @@
     normal. \sa https://en.wikipedia.org/wiki/STL_(file_format)
 */
 typedef struct _facet_3d_{
-  double x1, /*!< x-coordinate of vertex 1 */
-         x2, /*!< x-coordinate of vertex 2 */
-         x3, /*!< x-coordinate of vertex 3 */
-         y1, /*!< y-coordinate of vertex 1 */
-         y2, /*!< y-coordinate of vertex 2 */
-         y3, /*!< y-coordinate of vertex 3 */
-         z1, /*!< z-coordinate of vertex 1 */
-         z2, /*!< z-coordinate of vertex 2 */
-         z3, /*!< z-coordinate of vertex 3 */
-         nx, /*!< x-component of surface normal */
-         ny, /*!< y-component of surface normal */
-         nz; /*!< z-component of surface normal */
+  double m_x1, /*!< x-coordinate of vertex 1 */
+         m_x2, /*!< x-coordinate of vertex 2 */
+         m_x3, /*!< x-coordinate of vertex 3 */
+         m_y1, /*!< y-coordinate of vertex 1 */
+         m_y2, /*!< y-coordinate of vertex 2 */
+         m_y3, /*!< y-coordinate of vertex 3 */
+         m_z1, /*!< z-coordinate of vertex 1 */
+         m_z2, /*!< z-coordinate of vertex 2 */
+         m_z3, /*!< z-coordinate of vertex 3 */
+         m_nx, /*!< x-component of surface normal */
+         m_ny, /*!< y-component of surface normal */
+         m_nz; /*!< z-component of surface normal */
 } Facet3D;
 
 /*! \def FacetMap
@@ -65,23 +65,23 @@ typedef struct _facet_3d_{
     rank.
 */
 typedef struct _facet_map_{
-  Facet3D   *facet; /*!< pointer to the facet */
-  int       index;  /*!< index of this facet in the array #Body3D::surface */
-  int       interp_nodes    [_IB_NNODES_];/*!< indices of grid points surrounding the facet centroid */
-  double    interp_coeffs   [_IB_NNODES_];/*!< interpolation coefficients corresponding to #FacetMap::interp_nodes */
-  int       interp_nodes_ns [_IB_NNODES_];/*!< indices of grid points surrounding the "near-surface" point near the centroid */
-  double    interp_coeffs_ns[_IB_NNODES_];/*!< interpolation coefficients corresponding to #FacetMap::interp_nodes_ns */
+  Facet3D   *m_facet; /*!< pointer to the facet */
+  int       m_index;  /*!< index of this facet in the array #Body3D::m_surface */
+  int       m_interp_nodes    [_IB_NNODES_];/*!< indices of grid points surrounding the facet centroid */
+  double    m_interp_coeffs   [_IB_NNODES_];/*!< interpolation coefficients corresponding to #FacetMap::m_interp_nodes */
+  int       m_interp_nodes_ns [_IB_NNODES_];/*!< indices of grid points surrounding the "near-surface" point near the centroid */
+  double    m_interp_coeffs_ns[_IB_NNODES_];/*!< interpolation coefficients corresponding to #FacetMap::m_interp_nodes_ns */
 
-  double    xc, /*!< x-coordinate of centroid of #FacetMap::facet */
-            yc, /*!< y-coordinate of centroid of #FacetMap::facet */
-            zc, /*!< z-coordinate of centroid of #FacetMap::facet */
-            xns,/*!< x-coordinate of "near surface" point of #FacetMap::facet */
-            yns,/*!< y-coordinate of "near surface" point of #FacetMap::facet */
-            zns;/*!< z-coordinate of "near surface" point of #FacetMap::facet */
+  double    m_xc, /*!< x-coordinate of centroid of #FacetMap::m_facet */
+            m_yc, /*!< y-coordinate of centroid of #FacetMap::m_facet */
+            m_zc, /*!< z-coordinate of centroid of #FacetMap::m_facet */
+            m_xns,/*!< x-coordinate of "near surface" point of #FacetMap::m_facet */
+            m_yns,/*!< y-coordinate of "near surface" point of #FacetMap::m_facet */
+            m_zns;/*!< z-coordinate of "near surface" point of #FacetMap::m_facet */
 
-  double    dx, /*!< #FacetMap::xns - #FacetMap::xc */
-            dy, /*!< #FacetMap::yns - #FacetMap::yc */
-            dz; /*!< #FacetMap::zns - #FacetMap::zc */
+  double    m_dx, /*!< #FacetMap::m_xns - #FacetMap::m_xc */
+            m_dy, /*!< #FacetMap::m_yns - #FacetMap::m_yc */
+            m_dz; /*!< #FacetMap::m_zns - #FacetMap::m_zc */
 } FacetMap;
 
 /*! \def Body3D
@@ -98,15 +98,15 @@ typedef struct _facet_map_{
     \sa https://en.wikipedia.org/wiki/STL_(file_format)
 */
 typedef struct _body_3d_{
-  int     nfacets;    /*!< number of surface facets   */
-  Facet3D *surface;   /*!< array of surface facets    */
+  int     m_nfacets;    /*!< number of surface facets   */
+  Facet3D *m_surface;   /*!< array of surface facets    */
   /* coordinates of bounding box */
-  double xmin, /*!< x-coordinate of lower end of bounding box */
-         xmax, /*!< x-coordinate of higher end of bounding box */
-         ymin, /*!< y-coordinate of lower end of bounding box */
-         ymax, /*!< y-coordinate of higher end of bounding box */
-         zmin, /*!< z-coordinate of lower end of bounding box */
-         zmax; /*!< z-coordinate of higher end of bounding box */
+  double m_xmin, /*!< x-coordinate of lower end of bounding box */
+         m_xmax, /*!< x-coordinate of higher end of bounding box */
+         m_ymin, /*!< y-coordinate of lower end of bounding box */
+         m_ymax, /*!< y-coordinate of higher end of bounding box */
+         m_zmin, /*!< z-coordinate of lower end of bounding box */
+         m_zmax; /*!< z-coordinate of higher end of bounding box */
 } Body3D;
 
 /*! \def IBNode
@@ -123,19 +123,19 @@ typedef struct _body_3d_{
     the body.
 */
 typedef struct _boundary_node_{
-  int     i,      /*!< grid index along x */
-          j,      /*!< grid index along y */
-          k,      /*!< grid index along z */
-          p;      /*!< array index of this point */
-  double  x,      /*!< x-coordinate of the boundary node */
-          y,      /*!< y-coordinate of the boundary node */
-          z;      /*!< z-coordinate of the boundary node */
-  Facet3D *face;  /*!< the nearest facet of #ImmersedBoundary::body */
+  int     m_i,      /*!< grid index along x */
+          m_j,      /*!< grid index along y */
+          m_k,      /*!< grid index along z */
+          m_p;      /*!< array index of this point */
+  double  m_x,      /*!< x-coordinate of the boundary node */
+          m_y,      /*!< y-coordinate of the boundary node */
+          m_z;      /*!< z-coordinate of the boundary node */
+  Facet3D *m_face;  /*!< the nearest facet of #ImmersedBoundary::m_body */
 
-  int     interp_nodes[_IB_NNODES_];   /*!< indices of interior nodes from which to extrapolate */
-  double  interp_coeffs[_IB_NNODES_],  /*!< interpolation coefficients corresponding to #IBNode::interp_nodes */
-          interp_node_distance,        /*!< Distance from the immersed body surface to the interior node from which to extrapolate */
-          surface_distance;            /*!< Distance from this node to the immersed body surface */
+  int     m_interp_nodes[_IB_NNODES_];   /*!< indices of interior nodes from which to extrapolate */
+  double  m_interp_coeffs[_IB_NNODES_],  /*!< interpolation coefficients corresponding to #IBNode::m_interp_nodes */
+          m_interp_node_distance,        /*!< Distance from the immersed body surface to the interior node from which to extrapolate */
+          m_surface_distance;            /*!< Distance from this node to the immersed body surface */
 
 } IBNode;
 
@@ -151,17 +151,17 @@ typedef struct _boundary_node_{
     boundaries.
 */
 typedef struct immersed_boundary{
-  Body3D    *body;      /*!< immersed body */
-  IBNode    *boundary;  /*!< immersed boundary nodes */
-  FacetMap  *fmap;      /*!< list of "local" facets */
+  Body3D    *m_body;      /*!< immersed body */
+  IBNode    *m_boundary;  /*!< immersed boundary nodes */
+  FacetMap  *m_fmap;      /*!< list of "local" facets */
 
-  double  tolerance; /*!< zero tolerance */
-  double  delta;     /*!< small number */
-  int     itr_max;   /*!< maximum intersections in ray-tracing method */
-  int     n_boundary_nodes; /*!< number of immersed boundary nodes */
-  int     nfacets_local;    /*!< number of "local" facets */
+  double  m_tolerance; /*!< zero tolerance */
+  double  m_delta;     /*!< small number */
+  int     m_itr_max;   /*!< maximum intersections in ray-tracing method */
+  int     m_n_boundary_nodes; /*!< number of immersed boundary nodes */
+  int     m_nfacets_local;    /*!< number of "local" facets */
 
-  char    mode[_MAX_STRING_SIZE_]; /*!< identifies if the simulation is 2D along a plane
+  char    m_mode[_MAX_STRING_SIZE_]; /*!< identifies if the simulation is 2D along a plane
                                         or truly 3D. \sa IBIdentifyMode() */
 } ImmersedBoundary;
 

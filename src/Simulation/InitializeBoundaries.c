@@ -33,15 +33,15 @@ static int CalculateLocalExtent(void*,void*);
     Note that boundary conditions are implemented as boundary objects of the
     type #DomainBoundary.
 */
-int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #SimulationObject */
-                          int   nsims /*!< number of simulation objects */
+int InitializeBoundaries( void  *a_s,   /*!< Array of simulation objects of type #SimulationObject */
+                          int   a_nsims /*!< number of simulation objects */
                         )
 {
-  SimulationObject *sim = (SimulationObject*) s;
+  SimulationObject *sim = (SimulationObject*) a_s;
   int ns;
   _DECLARE_IERR_;
 
-  for (ns = 0; ns < nsims; ns++) {
+  for (ns = 0; ns < a_nsims; ns++) {
 
     DomainBoundary  *boundary = NULL;
     HyPar           *solver   = &(sim[ns].solver);
@@ -49,13 +49,13 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
     int nb, ferr;
 
     /* root process reads boundary condition file */
-    if (!mpi->rank) {
+    if (!mpi->m_rank) {
 
       char filename[_MAX_STRING_SIZE_] = "boundary";
       char filename_backup[_MAX_STRING_SIZE_] = "boundary";
-      if (nsims > 1) {
+      if (a_nsims > 1) {
         char index[_MAX_STRING_SIZE_];
-        GetStringFromInteger(ns, index, (int)log10(nsims)+1);
+        GetStringFromInteger(ns, index, (int)log10(a_nsims)+1);
         strcat(filename, "_");
         strcat(filename, index);
       }
@@ -67,277 +67,277 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
       if (!in) {
         in = fopen(filename_backup, "r");
         if (!in) {
-          fprintf(stderr,"Error: boundary condition file %s or %s not found.\n",
+          fprintf(stderr,"Error: boundary condition file %a_s or %a_s not found.\n",
                   filename, filename_backup );
           return(1);
         } else {
-          if (nsims > 1) printf("Domain %d: ", ns);
-          printf("Reading boundary conditions from %s.\n", filename_backup);
+          if (a_nsims > 1) printf("Domain %d: ", ns);
+          printf("Reading boundary conditions from %a_s.\n", filename_backup);
         }
       } else {
-        if (nsims > 1) printf("Domain %d: ", ns);
-        printf("Reading boundary conditions from %s.\n", filename);
+        if (a_nsims > 1) printf("Domain %d: ", ns);
+        printf("Reading boundary conditions from %a_s.\n", filename);
       }
 
       /* read number of boundary conditions and allocate */
-      ferr = fscanf(in,"%d",&solver->nBoundaryZones); if (ferr != 1) return(1);
-      boundary = (DomainBoundary*) calloc (solver->nBoundaryZones,sizeof(DomainBoundary));
-      for (nb = 0; nb < solver->nBoundaryZones; nb++) {
-        boundary[nb].DirichletValue = boundary[nb].SpongeValue
-                                   = boundary[nb].FlowVelocity
-                                   = boundary[nb].UnsteadyDirichletData
+      ferr = fscanf(in,"%d",&solver->m_n_boundary_zones); if (ferr != 1) return(1);
+      boundary = (DomainBoundary*) calloc (solver->m_n_boundary_zones,sizeof(DomainBoundary));
+      for (nb = 0; nb < solver->m_n_boundary_zones; nb++) {
+        boundary[nb].m_DirichletValue = boundary[nb].m_SpongeValue
+                                   = boundary[nb].m_FlowVelocity
+                                   = boundary[nb].m_UnsteadyDirichletData
                                    = NULL;
-        boundary[nb].UnsteadyDirichletSize = NULL;
+        boundary[nb].m_UnsteadyDirichletSize = NULL;
       }
 
       /* read each boundary condition */
-      for (nb = 0; nb < solver->nBoundaryZones; nb++) {
+      for (nb = 0; nb < solver->m_n_boundary_zones; nb++) {
         int d, v;
-        boundary[nb].xmin = (double*) calloc (solver->ndims,sizeof(double)); /* deallocated in BCCleanup.c */
-        boundary[nb].xmax = (double*) calloc (solver->ndims,sizeof(double)); /* deallocated in BCCleanup.c */
+        boundary[nb].m_xmin = (double*) calloc (solver->m_ndims,sizeof(double)); /* deallocated in BCCleanup.c */
+        boundary[nb].m_xmax = (double*) calloc (solver->m_ndims,sizeof(double)); /* deallocated in BCCleanup.c */
 
-        ferr = fscanf(in,"%s",boundary[nb].bctype); if (ferr != 1) return(1);
-        ferr = fscanf(in,"%d",&boundary[nb].dim  ); if (ferr != 1) return(1);
-        ferr = fscanf(in,"%d",&boundary[nb].face ); if (ferr != 1) return(1);
-        for (d=0; d < solver->ndims; d++) {
-          ferr = fscanf(in,"%lf %lf", &boundary[nb].xmin[d], &boundary[nb].xmax[d]);
+        ferr = fscanf(in,"%a_s",boundary[nb].m_bctype); if (ferr != 1) return(1);
+        ferr = fscanf(in,"%d",&boundary[nb].m_dim  ); if (ferr != 1) return(1);
+        ferr = fscanf(in,"%d",&boundary[nb].m_face ); if (ferr != 1) return(1);
+        for (d=0; d < solver->m_ndims; d++) {
+          ferr = fscanf(in,"%lf %lf", &boundary[nb].m_xmin[d], &boundary[nb].m_xmax[d]);
           if (ferr != 2) return(1);
         }
 
         /* read in boundary type-specific additional data if required */
 
-        if (!strcmp(boundary[nb].bctype,_DIRICHLET_)) {
-          boundary[nb].DirichletValue = (double*) calloc (solver->nvars,sizeof(double));
+        if (!strcmp(boundary[nb].m_bctype,_DIRICHLET_)) {
+          boundary[nb].m_DirichletValue = (double*) calloc (solver->m_nvars,sizeof(double));
                                        /* deallocated in BCCleanup.c */
           /* read the Dirichlet value for each variable on this boundary */
-          for (v = 0; v < solver->nvars; v++) ferr = fscanf(in,"%lf",&boundary[nb].DirichletValue[v]);
+          for (v = 0; v < solver->m_nvars; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_DirichletValue[v]);
         }
 
-        if (!strcmp(boundary[nb].bctype,_SPONGE_)) {
-          boundary[nb].SpongeValue = (double*) calloc (solver->nvars,sizeof(double));
+        if (!strcmp(boundary[nb].m_bctype,_SPONGE_)) {
+          boundary[nb].m_SpongeValue = (double*) calloc (solver->m_nvars,sizeof(double));
                                        /* deallocated in BCCleanup.c */
           /* read the sponge value for each variable on this boundary */
-          for (v = 0; v < solver->nvars; v++) ferr = fscanf(in,"%lf",&boundary[nb].SpongeValue[v]);
+          for (v = 0; v < solver->m_nvars; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_SpongeValue[v]);
         }
 
-        if (    (!strcmp(boundary[nb].bctype,_SLIP_WALL_))
-            ||  (!strcmp(boundary[nb].bctype,_NOSLIP_WALL_)) ) {
-          boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
+        if (    (!strcmp(boundary[nb].m_bctype,_SLIP_WALL_))
+            ||  (!strcmp(boundary[nb].m_bctype,_NOSLIP_WALL_)) ) {
+          boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
                                        /* deallocated in BCCleanup.c */
           /* read the wall velocity */
-          for (v = 0; v < solver->ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].FlowVelocity[v]);
+          for (v = 0; v < solver->m_ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_FlowVelocity[v]);
         }
 
-        if (    (!strcmp(boundary[nb].bctype,_SW_SLIP_WALL_))
-            ||  (!strcmp(boundary[nb].bctype,_SW_NOSLIP_WALL_)) ) {
-          boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
+        if (    (!strcmp(boundary[nb].m_bctype,_SW_SLIP_WALL_))
+            ||  (!strcmp(boundary[nb].m_bctype,_SW_NOSLIP_WALL_)) ) {
+          boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
                                        /* deallocated in BCCleanup.c */
           /* read the wall velocity */
-          for (v = 0; v < solver->ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].FlowVelocity[v]);
+          for (v = 0; v < solver->m_ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_FlowVelocity[v]);
         }
 
-        if (!strcmp(boundary[nb].bctype,_SUBSONIC_INFLOW_)) {
-          boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
+        if (!strcmp(boundary[nb].m_bctype,_SUBSONIC_INFLOW_)) {
+          boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
                                        /* deallocated in BCCleanup.c */
           /* read in the inflow density and velocity */
-          ferr = fscanf(in,"%lf",&boundary[nb].FlowDensity);
-          for (v = 0; v < solver->ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].FlowVelocity[v]);
+          ferr = fscanf(in,"%lf",&boundary[nb].m_FlowDensity);
+          for (v = 0; v < solver->m_ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_FlowVelocity[v]);
         }
 
-        if (!strcmp(boundary[nb].bctype,_SUBSONIC_OUTFLOW_)) {
+        if (!strcmp(boundary[nb].m_bctype,_SUBSONIC_OUTFLOW_)) {
           /* read in the outflow pressure */
-          ferr = fscanf(in,"%lf",&boundary[nb].FlowPressure);
+          ferr = fscanf(in,"%lf",&boundary[nb].m_FlowPressure);
         }
 
-        if (!strcmp(boundary[nb].bctype,_SUBSONIC_AMBIVALENT_)) {
-          boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
+        if (!strcmp(boundary[nb].m_bctype,_SUBSONIC_AMBIVALENT_)) {
+          boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
                                        /* deallocated in BCCleanup.c */
           /* read in the inflow density, velocity, and pressure */
-          ferr = fscanf(in,"%lf",&boundary[nb].FlowDensity);
-          for (v = 0; v < solver->ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].FlowVelocity[v]);
-          ferr = fscanf(in,"%lf",&boundary[nb].FlowPressure);
+          ferr = fscanf(in,"%lf",&boundary[nb].m_FlowDensity);
+          for (v = 0; v < solver->m_ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_FlowVelocity[v]);
+          ferr = fscanf(in,"%lf",&boundary[nb].m_FlowPressure);
         }
 
-        if (!strcmp(boundary[nb].bctype,_SUPERSONIC_INFLOW_)) {
-          boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
+        if (!strcmp(boundary[nb].m_bctype,_SUPERSONIC_INFLOW_)) {
+          boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
                                        /* deallocated in BCCleanup.c */
           /* read in the inflow density, velocity and pressure */
-          ferr = fscanf(in,"%lf",&boundary[nb].FlowDensity);
-          for (v = 0; v < solver->ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].FlowVelocity[v]);
-          ferr = fscanf(in,"%lf",&boundary[nb].FlowPressure);
+          ferr = fscanf(in,"%lf",&boundary[nb].m_FlowDensity);
+          for (v = 0; v < solver->m_ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_FlowVelocity[v]);
+          ferr = fscanf(in,"%lf",&boundary[nb].m_FlowPressure);
         }
 
-        if (!strcmp(boundary[nb].bctype,_TURBULENT_SUPERSONIC_INFLOW_)) {
-          boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
+        if (!strcmp(boundary[nb].m_bctype,_TURBULENT_SUPERSONIC_INFLOW_)) {
+          boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
                                        /* deallocated in BCCleanup.c */
           /* read in the inflow density, velocity and pressure */
-          ferr = fscanf(in,"%lf",&boundary[nb].FlowDensity);
-          for (v = 0; v < solver->ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].FlowVelocity[v]);
-          ferr = fscanf(in,"%lf",&boundary[nb].FlowPressure);
-          ferr = fscanf(in,"%s" , boundary[nb].UnsteadyDirichletFilename);
+          ferr = fscanf(in,"%lf",&boundary[nb].m_FlowDensity);
+          for (v = 0; v < solver->m_ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_FlowVelocity[v]);
+          ferr = fscanf(in,"%lf",&boundary[nb].m_FlowPressure);
+          ferr = fscanf(in,"%a_s" , boundary[nb].m_UnsteadyDirichletFilename);
         }
 
-        if (    (!strcmp(boundary[nb].bctype,_THERMAL_SLIP_WALL_))
-            ||  (!strcmp(boundary[nb].bctype,_THERMAL_NOSLIP_WALL_)) ){
-          boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
+        if (    (!strcmp(boundary[nb].m_bctype,_THERMAL_SLIP_WALL_))
+            ||  (!strcmp(boundary[nb].m_bctype,_THERMAL_NOSLIP_WALL_)) ){
+          boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
                                        /* deallocated in BCCleanup.c */
           /* read the wall velocity */
-          for (v = 0; v < solver->ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].FlowVelocity[v]);
+          for (v = 0; v < solver->m_ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_FlowVelocity[v]);
           /* read in the filename where temperature data is available */
-          ferr = fscanf(in,"%s" , boundary[nb].UnsteadyTemperatureFilename);
+          ferr = fscanf(in,"%a_s" , boundary[nb].m_UnsteadyTemperatureFilename);
         }
 
         /* if boundary is periodic, let the MPI and HyPar know */
-        if (!strcmp(boundary[nb].bctype,_PERIODIC_)) {
-          solver->isPeriodic[boundary[nb].dim] = 1;
+        if (!strcmp(boundary[nb].m_bctype,_PERIODIC_)) {
+          solver->m_is_periodic[boundary[nb].m_dim] = 1;
         }
         /*
           The MPI function to exchange internal (MPI) boundary information will handle
           periodic boundaries ONLY IF number of process along that dimension is more
           than 1.
         */
-        if ((!strcmp(boundary[nb].bctype,_PERIODIC_)) && (mpi->iproc[boundary[nb].dim] > 1)) {
-          mpi->bcperiodic[boundary[nb].dim] = 1;
+        if ((!strcmp(boundary[nb].m_bctype,_PERIODIC_)) && (mpi->m_iproc[boundary[nb].m_dim] > 1)) {
+          mpi->m_bcperiodic[boundary[nb].m_dim] = 1;
         }
 
         /* some checks */
-        if (boundary[nb].dim >= solver->ndims) {
+        if (boundary[nb].m_dim >= solver->m_ndims) {
           fprintf(stderr,"Error in reading boundary condition %d: dim %d is invalid (ndims = %d).\n",
-                  nb,boundary[nb].dim,solver->ndims);
+                  nb,boundary[nb].m_dim,solver->m_ndims);
           return(1);
         }
         printf("  Boundary %30s:  Along dimension %2d and face %+1d\n",
-                  boundary[nb].bctype,boundary[nb].dim,boundary[nb].face);
+                  boundary[nb].m_bctype,boundary[nb].m_dim,boundary[nb].m_face);
       }
 
       fclose(in);
-      printf("%d boundary condition(s) read.\n",solver->nBoundaryZones);
+      printf("%d boundary condition(a_s) read.\n",solver->m_n_boundary_zones);
     }
 
     /* tell other processes how many BCs are there and let them allocate */
-    IERR MPIBroadcast_integer(&solver->nBoundaryZones,1,0,&mpi->world); CHECKERR(ierr);
-    if (mpi->rank) {
-      boundary = (DomainBoundary*) calloc (solver->nBoundaryZones,sizeof(DomainBoundary));
-      for (nb = 0; nb < solver->nBoundaryZones; nb++) {
-        boundary[nb].xmin = (double*) calloc (solver->ndims,sizeof(double)); /* deallocated in BCCleanup.c */
-        boundary[nb].xmax = (double*) calloc (solver->ndims,sizeof(double)); /* deallocated in BCCleanup.c */
-        boundary[nb].DirichletValue = boundary[nb].SpongeValue
-                                   = boundary[nb].FlowVelocity
-                                   = boundary[nb].UnsteadyDirichletData
+    IERR MPIBroadcast_integer(&solver->m_n_boundary_zones,1,0,&mpi->m_world); CHECKERR(ierr);
+    if (mpi->m_rank) {
+      boundary = (DomainBoundary*) calloc (solver->m_n_boundary_zones,sizeof(DomainBoundary));
+      for (nb = 0; nb < solver->m_n_boundary_zones; nb++) {
+        boundary[nb].m_xmin = (double*) calloc (solver->m_ndims,sizeof(double)); /* deallocated in BCCleanup.c */
+        boundary[nb].m_xmax = (double*) calloc (solver->m_ndims,sizeof(double)); /* deallocated in BCCleanup.c */
+        boundary[nb].m_DirichletValue = boundary[nb].m_SpongeValue
+                                   = boundary[nb].m_FlowVelocity
+                                   = boundary[nb].m_UnsteadyDirichletData
                                    = NULL;
-        boundary[nb].UnsteadyDirichletSize = NULL;
+        boundary[nb].m_UnsteadyDirichletSize = NULL;
       }
     }
 
     /* communicate BC data to other processes */
-    for (nb = 0; nb < solver->nBoundaryZones; nb++) {
-      IERR MPIBroadcast_character(boundary[nb].bctype,_MAX_STRING_SIZE_,0,&mpi->world); CHECKERR(ierr);
-      IERR MPIBroadcast_integer  (&boundary[nb].dim  ,1                ,0,&mpi->world); CHECKERR(ierr);
-      IERR MPIBroadcast_integer  (&boundary[nb].face ,1                ,0,&mpi->world); CHECKERR(ierr);
-      IERR MPIBroadcast_double   (boundary[nb].xmin  ,solver->ndims    ,0,&mpi->world); CHECKERR(ierr);
-      IERR MPIBroadcast_double   (boundary[nb].xmax  ,solver->ndims    ,0,&mpi->world); CHECKERR(ierr);
+    for (nb = 0; nb < solver->m_n_boundary_zones; nb++) {
+      IERR MPIBroadcast_character(boundary[nb].m_bctype,_MAX_STRING_SIZE_,0,&mpi->m_world); CHECKERR(ierr);
+      IERR MPIBroadcast_integer  (&boundary[nb].m_dim  ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+      IERR MPIBroadcast_integer  (&boundary[nb].m_face ,1                ,0,&mpi->m_world); CHECKERR(ierr);
+      IERR MPIBroadcast_double   (boundary[nb].m_xmin  ,solver->m_ndims    ,0,&mpi->m_world); CHECKERR(ierr);
+      IERR MPIBroadcast_double   (boundary[nb].m_xmax  ,solver->m_ndims    ,0,&mpi->m_world); CHECKERR(ierr);
     }
-    IERR MPIBroadcast_integer(solver->isPeriodic,solver->ndims,0,&mpi->world);CHECKERR(ierr);
+    IERR MPIBroadcast_integer(solver->m_is_periodic,solver->m_ndims,0,&mpi->m_world);CHECKERR(ierr);
 
     /* broadcast periodic boundary info for MPI to all processes */
-    IERR MPIBroadcast_integer(mpi->bcperiodic,solver->ndims,0,&mpi->world);CHECKERR(ierr);
+    IERR MPIBroadcast_integer(mpi->m_bcperiodic,solver->m_ndims,0,&mpi->m_world);CHECKERR(ierr);
 
     /* On other processes, if necessary, allocate and receive boundary-type-specific data */
-    for (nb = 0; nb < solver->nBoundaryZones; nb++) {
-      if (!strcmp(boundary[nb].bctype,_DIRICHLET_)) {
-        if (mpi->rank)  boundary[nb].DirichletValue = (double*) calloc (solver->nvars,sizeof(double));
-        IERR MPIBroadcast_double(boundary[nb].DirichletValue,solver->nvars,0,&mpi->world); CHECKERR(ierr);
+    for (nb = 0; nb < solver->m_n_boundary_zones; nb++) {
+      if (!strcmp(boundary[nb].m_bctype,_DIRICHLET_)) {
+        if (mpi->m_rank)  boundary[nb].m_DirichletValue = (double*) calloc (solver->m_nvars,sizeof(double));
+        IERR MPIBroadcast_double(boundary[nb].m_DirichletValue,solver->m_nvars,0,&mpi->m_world); CHECKERR(ierr);
       }
 
-      if (!strcmp(boundary[nb].bctype,_SPONGE_)) {
-        if (mpi->rank)  boundary[nb].SpongeValue = (double*) calloc (solver->nvars,sizeof(double));
-        IERR MPIBroadcast_double(boundary[nb].SpongeValue,solver->nvars,0,&mpi->world); CHECKERR(ierr);
+      if (!strcmp(boundary[nb].m_bctype,_SPONGE_)) {
+        if (mpi->m_rank)  boundary[nb].m_SpongeValue = (double*) calloc (solver->m_nvars,sizeof(double));
+        IERR MPIBroadcast_double(boundary[nb].m_SpongeValue,solver->m_nvars,0,&mpi->m_world); CHECKERR(ierr);
       }
 
-      if (    (!strcmp(boundary[nb].bctype,_SLIP_WALL_))
-          ||  (!strcmp(boundary[nb].bctype,_NOSLIP_WALL_)) ) {
-        if (mpi->rank) boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
-        IERR MPIBroadcast_double(boundary[nb].FlowVelocity,solver->ndims,0,&mpi->world); CHECKERR(ierr);
+      if (    (!strcmp(boundary[nb].m_bctype,_SLIP_WALL_))
+          ||  (!strcmp(boundary[nb].m_bctype,_NOSLIP_WALL_)) ) {
+        if (mpi->m_rank) boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
+        IERR MPIBroadcast_double(boundary[nb].m_FlowVelocity,solver->m_ndims,0,&mpi->m_world); CHECKERR(ierr);
       }
 
-      if (    (!strcmp(boundary[nb].bctype,_SW_SLIP_WALL_))
-          ||  (!strcmp(boundary[nb].bctype,_SW_NOSLIP_WALL_)) ) {
-        if (mpi->rank) boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
-        IERR MPIBroadcast_double(boundary[nb].FlowVelocity,solver->ndims,0,&mpi->world); CHECKERR(ierr);
+      if (    (!strcmp(boundary[nb].m_bctype,_SW_SLIP_WALL_))
+          ||  (!strcmp(boundary[nb].m_bctype,_SW_NOSLIP_WALL_)) ) {
+        if (mpi->m_rank) boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
+        IERR MPIBroadcast_double(boundary[nb].m_FlowVelocity,solver->m_ndims,0,&mpi->m_world); CHECKERR(ierr);
       }
 
-      if (!strcmp(boundary[nb].bctype,_SUBSONIC_INFLOW_)) {
-        if (mpi->rank) boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
-        IERR MPIBroadcast_double(&boundary[nb].FlowDensity,1            ,0,&mpi->world); CHECKERR(ierr);
-        IERR MPIBroadcast_double(boundary[nb].FlowVelocity,solver->ndims,0,&mpi->world); CHECKERR(ierr);
+      if (!strcmp(boundary[nb].m_bctype,_SUBSONIC_INFLOW_)) {
+        if (mpi->m_rank) boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
+        IERR MPIBroadcast_double(&boundary[nb].m_FlowDensity,1            ,0,&mpi->m_world); CHECKERR(ierr);
+        IERR MPIBroadcast_double(boundary[nb].m_FlowVelocity,solver->m_ndims,0,&mpi->m_world); CHECKERR(ierr);
       }
 
-      if (!strcmp(boundary[nb].bctype,_SUBSONIC_OUTFLOW_)) {
-        IERR MPIBroadcast_double(&boundary[nb].FlowPressure,1,0,&mpi->world); CHECKERR(ierr);
+      if (!strcmp(boundary[nb].m_bctype,_SUBSONIC_OUTFLOW_)) {
+        IERR MPIBroadcast_double(&boundary[nb].m_FlowPressure,1,0,&mpi->m_world); CHECKERR(ierr);
       }
 
-      if (!strcmp(boundary[nb].bctype,_SUBSONIC_AMBIVALENT_)) {
-        if (mpi->rank) boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
-        IERR MPIBroadcast_double(&boundary[nb].FlowDensity,1            ,0,&mpi->world); CHECKERR(ierr);
-        IERR MPIBroadcast_double(boundary[nb].FlowVelocity,solver->ndims,0,&mpi->world); CHECKERR(ierr);
-        IERR MPIBroadcast_double(&boundary[nb].FlowPressure,1,0,&mpi->world); CHECKERR(ierr);
+      if (!strcmp(boundary[nb].m_bctype,_SUBSONIC_AMBIVALENT_)) {
+        if (mpi->m_rank) boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
+        IERR MPIBroadcast_double(&boundary[nb].m_FlowDensity,1            ,0,&mpi->m_world); CHECKERR(ierr);
+        IERR MPIBroadcast_double(boundary[nb].m_FlowVelocity,solver->m_ndims,0,&mpi->m_world); CHECKERR(ierr);
+        IERR MPIBroadcast_double(&boundary[nb].m_FlowPressure,1,0,&mpi->m_world); CHECKERR(ierr);
       }
 
-      if (!strcmp(boundary[nb].bctype,_SUPERSONIC_INFLOW_)) {
-        if (mpi->rank) boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
-        IERR MPIBroadcast_double(&boundary[nb].FlowDensity ,1            ,0,&mpi->world); CHECKERR(ierr);
-        IERR MPIBroadcast_double(boundary[nb].FlowVelocity ,solver->ndims,0,&mpi->world); CHECKERR(ierr);
-        IERR MPIBroadcast_double(&boundary[nb].FlowPressure,1            ,0,&mpi->world); CHECKERR(ierr);
+      if (!strcmp(boundary[nb].m_bctype,_SUPERSONIC_INFLOW_)) {
+        if (mpi->m_rank) boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
+        IERR MPIBroadcast_double(&boundary[nb].m_FlowDensity ,1            ,0,&mpi->m_world); CHECKERR(ierr);
+        IERR MPIBroadcast_double(boundary[nb].m_FlowVelocity ,solver->m_ndims,0,&mpi->m_world); CHECKERR(ierr);
+        IERR MPIBroadcast_double(&boundary[nb].m_FlowPressure,1            ,0,&mpi->m_world); CHECKERR(ierr);
       }
 
-      if (!strcmp(boundary[nb].bctype,_TURBULENT_SUPERSONIC_INFLOW_)) {
-        if (mpi->rank) boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
-        IERR MPIBroadcast_double(&boundary[nb].FlowDensity ,1            ,0,&mpi->world); CHECKERR(ierr);
-        IERR MPIBroadcast_double(boundary[nb].FlowVelocity ,solver->ndims,0,&mpi->world); CHECKERR(ierr);
-        IERR MPIBroadcast_double(&boundary[nb].FlowPressure,1            ,0,&mpi->world); CHECKERR(ierr);
+      if (!strcmp(boundary[nb].m_bctype,_TURBULENT_SUPERSONIC_INFLOW_)) {
+        if (mpi->m_rank) boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
+        IERR MPIBroadcast_double(&boundary[nb].m_FlowDensity ,1            ,0,&mpi->m_world); CHECKERR(ierr);
+        IERR MPIBroadcast_double(boundary[nb].m_FlowVelocity ,solver->m_ndims,0,&mpi->m_world); CHECKERR(ierr);
+        IERR MPIBroadcast_double(&boundary[nb].m_FlowPressure,1            ,0,&mpi->m_world); CHECKERR(ierr);
         /* allocate arrays and read in unsteady boundary data */
-        IERR BCReadTurbulentInflowData(&boundary[nb],mpi,solver->ndims,solver->nvars,solver->dim_local); CHECKERR(ierr);
+        IERR BCReadTurbulentInflowData(&boundary[nb],mpi,solver->m_ndims,solver->m_nvars,solver->m_dim_local); CHECKERR(ierr);
       }
 
-      if (    (!strcmp(boundary[nb].bctype,_THERMAL_SLIP_WALL_))
-          ||  (!strcmp(boundary[nb].bctype,_THERMAL_NOSLIP_WALL_)) ) {
-        if (mpi->rank) boundary[nb].FlowVelocity = (double*) calloc (solver->ndims,sizeof(double));
-        IERR MPIBroadcast_double(boundary[nb].FlowVelocity,solver->ndims,0,&mpi->world); CHECKERR(ierr);
+      if (    (!strcmp(boundary[nb].m_bctype,_THERMAL_SLIP_WALL_))
+          ||  (!strcmp(boundary[nb].m_bctype,_THERMAL_NOSLIP_WALL_)) ) {
+        if (mpi->m_rank) boundary[nb].m_FlowVelocity = (double*) calloc (solver->m_ndims,sizeof(double));
+        IERR MPIBroadcast_double(boundary[nb].m_FlowVelocity,solver->m_ndims,0,&mpi->m_world); CHECKERR(ierr);
         /* allocate arrays and read in boundary temperature data */
-        IERR BCReadTemperatureData(&boundary[nb],mpi,solver->ndims,solver->nvars,solver->dim_local); CHECKERR(ierr);
+        IERR BCReadTemperatureData(&boundary[nb],mpi,solver->m_ndims,solver->m_nvars,solver->m_dim_local); CHECKERR(ierr);
       }
 
     }
 
-    solver->boundary = boundary;
+    solver->m_boundary = boundary;
 
     /* each process calculates its own part of these boundaries */
     IERR CalculateLocalExtent(solver,mpi); CHECKERR(ierr);
 
 #if defined(HAVE_CUDA)
     int bounds[GPU_MAX_NDIMS];
-    if (sim[0].solver.use_gpu) {
-      for (nb = 0; nb < solver->nBoundaryZones; nb++) {
-        _ArraySubtract1D_(bounds,boundary[nb].ie,boundary[nb].is,solver->ndims);
+    if (sim[0].solver.m_use_gpu) {
+      for (nb = 0; nb < solver->m_n_boundary_zones; nb++) {
+        _ArraySubtract1D_(bounds,boundary[nb].m_ie,boundary[nb].m_is,solver->m_ndims);
 
-        _ArrayProduct1D_(bounds,solver->ndims,boundary[nb].gpu_npoints_bounds);
-        boundary[nb].gpu_npoints_local_wghosts = solver->npoints_local_wghosts;
+        _ArrayProduct1D_(bounds,solver->m_ndims,boundary[nb].m_gpu_npoints_bounds);
+        boundary[nb].m_gpu_npoints_local_wghosts = solver->m_npoints_local_wghosts;
 
-        _ArrayProduct1D_(bounds,solver->ndims,boundary[nb].gpu_npoints_bounds);
-        boundary[nb].gpu_npoints_local_wghosts = solver->npoints_local_wghosts;
+        _ArrayProduct1D_(bounds,solver->m_ndims,boundary[nb].m_gpu_npoints_bounds);
+        boundary[nb].m_gpu_npoints_local_wghosts = solver->m_npoints_local_wghosts;
 
-        gpuMalloc((void**)&boundary[nb].gpu_is, solver->ndims*sizeof(int));
-        gpuMalloc((void**)&boundary[nb].gpu_ie, solver->ndims*sizeof(int));
-        gpuMalloc((void**)&boundary[nb].gpu_bounds, solver->ndims*sizeof(int));
-        gpuMemcpy(boundary[nb].gpu_is, boundary[nb].is, solver->ndims*sizeof(int), gpuMemcpyHostToDevice);
-        gpuMemcpy(boundary[nb].gpu_ie, boundary[nb].ie, solver->ndims*sizeof(int), gpuMemcpyHostToDevice);
-        gpuMemcpy(boundary[nb].gpu_bounds, bounds, solver->ndims*sizeof(int), gpuMemcpyHostToDevice);
-        if (   (!strcmp(boundary[nb].bctype,_SLIP_WALL_))
-            || (!strcmp(boundary[nb].bctype,_NOSLIP_WALL_)) ) {
-            gpuMalloc((void**)&boundary[nb].gpu_FlowVelocity, solver->ndims*sizeof(double));
-            gpuMemcpy(  boundary[nb].gpu_FlowVelocity,
-                        boundary[nb].FlowVelocity,
-                        solver->ndims*sizeof(double),
+        gpuMalloc((void**)&boundary[nb].m_gpu_is, solver->m_ndims*sizeof(int));
+        gpuMalloc((void**)&boundary[nb].m_gpu_ie, solver->m_ndims*sizeof(int));
+        gpuMalloc((void**)&boundary[nb].m_gpu_bounds, solver->m_ndims*sizeof(int));
+        gpuMemcpy(boundary[nb].m_gpu_is, boundary[nb].m_is, solver->m_ndims*sizeof(int), gpuMemcpyHostToDevice);
+        gpuMemcpy(boundary[nb].m_gpu_ie, boundary[nb].m_ie, solver->m_ndims*sizeof(int), gpuMemcpyHostToDevice);
+        gpuMemcpy(boundary[nb].m_gpu_bounds, bounds, solver->m_ndims*sizeof(int), gpuMemcpyHostToDevice);
+        if (   (!strcmp(boundary[nb].m_bctype,_SLIP_WALL_))
+            || (!strcmp(boundary[nb].m_bctype,_NOSLIP_WALL_)) ) {
+            gpuMalloc((void**)&boundary[nb].m_gpu_FlowVelocity, solver->m_ndims*sizeof(double));
+            gpuMemcpy(  boundary[nb].m_gpu_FlowVelocity,
+                        boundary[nb].m_FlowVelocity,
+                        solver->m_ndims*sizeof(double),
                         gpuMemcpyHostToDevice);
         }
       }
@@ -345,9 +345,9 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
 #endif
 
     /* initialize function pointers for each boundary condition */
-    for (nb = 0; nb < solver->nBoundaryZones; nb++) {
+    for (nb = 0; nb < solver->m_n_boundary_zones; nb++) {
 #if defined(HAVE_CUDA)
-      BCInitialize(&boundary[nb], solver->use_gpu);
+      BCInitialize(&boundary[nb], solver->m_use_gpu);
 #else
       BCInitialize(&boundary[nb], 0);
 #endif
@@ -363,81 +363,81 @@ int InitializeBoundaries( void  *s,   /*!< Array of simulation objects of type #
     that boundary), and accordingly set the bounding grid indices.
 */
 int CalculateLocalExtent(
-                          void *s, /*!< Solver object of type #HyPar */
-                          void *m  /*!< MPI object of type #MPIVariables */
+                          void *a_s, /*!< Solver object of type #HyPar */
+                          void *a_m  /*!< MPI object of type #MPIVariables */
                         )
 {
-  HyPar           *solver   = (HyPar*)        s;
-  MPIVariables    *mpi      = (MPIVariables*) m;
-  DomainBoundary  *boundary = solver->boundary;
+  HyPar           *solver   = (HyPar*)        a_s;
+  MPIVariables    *mpi      = (MPIVariables*) a_m;
+  DomainBoundary  *boundary = solver->m_boundary;
 
   int n;
-  for (n = 0; n < solver->nBoundaryZones; n++) {
+  for (n = 0; n < solver->m_n_boundary_zones; n++) {
     /* allocate */
-    boundary[n].is   = (int*) calloc (solver->ndims,sizeof(int)); /* deallocated in BCCleanup.c */
-    boundary[n].ie   = (int*) calloc (solver->ndims,sizeof(int)); /* deallocated in BCCleanup.c */
+    boundary[n].m_is   = (int*) calloc (solver->m_ndims,sizeof(int)); /* deallocated in BCCleanup.c */
+    boundary[n].m_ie   = (int*) calloc (solver->m_ndims,sizeof(int)); /* deallocated in BCCleanup.c */
 
-    int d,dim = boundary[n].dim;
+    int d,dim = boundary[n].m_dim;
 
-    if (!strcmp(boundary[n].bctype,_SPONGE_)) {
+    if (!strcmp(boundary[n].m_bctype,_SPONGE_)) {
       /* Sponge boundary condition */
-      boundary[n].on_this_proc = 1;
+      boundary[n].m_on_this_proc = 1;
       int offset = 0;
-      for (d=0; d<solver->ndims; d++) {
+      for (d=0; d<solver->m_ndims; d++) {
         int is, ie;
-        FindInterval(boundary[n].xmin[d],boundary[n].xmax[d],
-                     &solver->x[offset+solver->ghosts],
-                     solver->dim_local[d],&is,&ie);
-        boundary[n].is[d] = is;
-        boundary[n].ie[d] = ie;
-        if ((ie-is) <= 0) boundary[n].on_this_proc = 0;
-        offset += solver->dim_local[d] + 2*solver->ghosts;
+        FindInterval(boundary[n].m_xmin[d],boundary[n].m_xmax[d],
+                     &solver->m_x[offset+solver->m_ghosts],
+                     solver->m_dim_local[d],&is,&ie);
+        boundary[n].m_is[d] = is;
+        boundary[n].m_ie[d] = ie;
+        if ((ie-is) <= 0) boundary[n].m_on_this_proc = 0;
+        offset += solver->m_dim_local[d] + 2*solver->m_ghosts;
       }
     } else {
       /* other boundary conditions */
-      if (boundary[n].face == 1) {
+      if (boundary[n].m_face == 1) {
 
-        if (mpi->ip[dim] == 0) {
-          boundary[n].on_this_proc = 1;
+        if (mpi->m_ip[dim] == 0) {
+          boundary[n].m_on_this_proc = 1;
           int offset = 0;
-          for (d=0; d<solver->ndims; d++) {
+          for (d=0; d<solver->m_ndims; d++) {
             if (d == dim) {
-              boundary[n].is[d] = -solver->ghosts;
-              boundary[n].ie[d] = 0;
+              boundary[n].m_is[d] = -solver->m_ghosts;
+              boundary[n].m_ie[d] = 0;
             } else {
               int is, ie;
-              FindInterval(boundary[n].xmin[d],boundary[n].xmax[d],
-                           &solver->x[offset+solver->ghosts],
-                           solver->dim_local[d],&is,&ie);
-              boundary[n].is[d] = is;
-              boundary[n].ie[d] = ie;
-              if ((ie-is) <= 0) boundary[n].on_this_proc = 0;
+              FindInterval(boundary[n].m_xmin[d],boundary[n].m_xmax[d],
+                           &solver->m_x[offset+solver->m_ghosts],
+                           solver->m_dim_local[d],&is,&ie);
+              boundary[n].m_is[d] = is;
+              boundary[n].m_ie[d] = ie;
+              if ((ie-is) <= 0) boundary[n].m_on_this_proc = 0;
             }
-            offset += solver->dim_local[d] + 2*solver->ghosts;
+            offset += solver->m_dim_local[d] + 2*solver->m_ghosts;
           }
-        } else  boundary[n].on_this_proc = 0;
+        } else  boundary[n].m_on_this_proc = 0;
 
-      } else if (boundary[n].face == -1) {
+      } else if (boundary[n].m_face == -1) {
 
-        if (mpi->ip[dim] == mpi->iproc[dim]-1) {
-          boundary[n].on_this_proc = 1;
+        if (mpi->m_ip[dim] == mpi->m_iproc[dim]-1) {
+          boundary[n].m_on_this_proc = 1;
           int offset = 0;
-          for (d=0; d<solver->ndims; d++) {
+          for (d=0; d<solver->m_ndims; d++) {
             if (d == dim) {
-              boundary[n].is[d] = solver->dim_local[dim];
-              boundary[n].ie[d] = solver->dim_local[dim] + solver->ghosts;
+              boundary[n].m_is[d] = solver->m_dim_local[dim];
+              boundary[n].m_ie[d] = solver->m_dim_local[dim] + solver->m_ghosts;
             } else {
               int is, ie;
-              FindInterval(boundary[n].xmin[d],boundary[n].xmax[d],
-                           &solver->x[offset+solver->ghosts],
-                           solver->dim_local[d],&is,&ie);
-              boundary[n].is[d] = is;
-              boundary[n].ie[d] = ie;
-              if ((ie-is) <= 0) boundary[n].on_this_proc = 0;
+              FindInterval(boundary[n].m_xmin[d],boundary[n].m_xmax[d],
+                           &solver->m_x[offset+solver->m_ghosts],
+                           solver->m_dim_local[d],&is,&ie);
+              boundary[n].m_is[d] = is;
+              boundary[n].m_ie[d] = ie;
+              if ((ie-is) <= 0) boundary[n].m_on_this_proc = 0;
             }
-            offset += solver->dim_local[d] + 2*solver->ghosts;
+            offset += solver->m_dim_local[d] + 2*solver->m_ghosts;
           }
-        } else  boundary[n].on_this_proc = 0;
+        } else  boundary[n].m_on_this_proc = 0;
       }
     }
 

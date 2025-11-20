@@ -33,18 +33,18 @@ int SparseGridsSimulation::InitialSolution()
     HyPar* solver = &(m_sims_sg[n].solver);
     MPIVariables* mpi = &(m_sims_sg[n].mpi);
 
-    int nvars = solver->nvars;
-    int ghosts = solver->ghosts;
-    int *dim_local = solver->dim_local;
+    int nvars = solver->m_nvars;
+    int ghosts = solver->m_ghosts;
+    int *dim_local = solver->m_dim_local;
 
     /* calculate dxinv */
     {
       int offset = 0;
       for (int d = 0; d < m_ndims; d++) {
         for (int i = 0; i < dim_local[d]; i++) {
-          solver->dxinv[i+offset+ghosts]
-            = 2.0 / (   solver->x[i+1+offset+ghosts]
-                      - solver->x[i-1+offset+ghosts]  );
+          solver->m_dxinv[i+offset+ghosts]
+            = 2.0 / (   solver->m_x[i+1+offset+ghosts]
+                      - solver->m_x[i-1+offset+ghosts]  );
         }
         offset += (dim_local[d] + 2*ghosts);
       }
@@ -55,7 +55,7 @@ int SparseGridsSimulation::InitialSolution()
       int offset = 0;
       for (int d = 0; d < m_ndims; d++) {
         ierr = MPIExchangeBoundaries1D( mpi,
-                                        &(solver->dxinv[offset]),
+                                        &(solver->m_dxinv[offset]),
                                         dim_local[d],
                                         ghosts,
                                         d,
@@ -69,13 +69,13 @@ int SparseGridsSimulation::InitialSolution()
     {
       int offset = 0;
       for (int d = 0; d < m_ndims; d++) {
-        double *dxinv = &(solver->dxinv[offset]);
+        double *dxinv = &(solver->m_dxinv[offset]);
         int    *dim = dim_local;
-        if (mpi->ip[d] == 0) {
+        if (mpi->m_ip[d] == 0) {
           /* fill left boundary along this dimension */
           for (int i = 0; i < ghosts; i++) dxinv[i] = dxinv[ghosts];
         }
-        if (mpi->ip[d] == mpi->iproc[d]-1) {
+        if (mpi->m_ip[d] == mpi->m_iproc[d]-1) {
           /* fill right boundary along this dimension */
           for (int i = dim[d]+ghosts; i < dim[d]+2*ghosts; i++) {
             dxinv[i] = dxinv[dim[d]+ghosts-1];

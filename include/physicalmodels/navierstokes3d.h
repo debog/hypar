@@ -480,28 +480,28 @@
  *  the 3D Navier-Stokes equations.
 */
 typedef struct navierstokes3d_parameters {
-  double  gamma;  /*!< Ratio of heat capacities */
-  double  Re;     /*!< Reynolds number */
-  double  Pr;     /*!< Prandtl  number */
+  double  m_gamma;  /*!< Ratio of heat capacities */
+  double  m_Re;     /*!< Reynolds number */
+  double  m_Pr;     /*!< Prandtl  number */
   double  Minf;   /*!< Freestream Mach number */
   double  C1,     /*!< Sutherlands law constant */
           C2;     /*!< Sutherlands law constant */
-  double  grav_x,                         /*!< acceleration due to gravity in x */
-          grav_y,                         /*!< acceleration due to gravity in y */
-          grav_z;                         /*!< acceleration due to gravity in z */
-  double  rho0;                           /*!< reference density  at zero altitude for flows with gravity */
-  double  p0;                             /*!< reference pressure at zero altitude for flows with gravity */
-  double  R;                              /*!< universal Gas constant */
-  char    upw_choice[_MAX_STRING_SIZE_]; /*!< choice of upwinding */
+  double  m_grav_x,                         /*!< acceleration due to gravity in x */
+          m_grav_y,                         /*!< acceleration due to gravity in y */
+          m_grav_z;                         /*!< acceleration due to gravity in z */
+  double  m_rho0;                           /*!< reference density  at zero altitude for flows with gravity */
+  double  m_p0;                             /*!< reference pressure at zero altitude for flows with gravity */
+  double  m_R;                              /*!< universal Gas constant */
+  char    m_upw_choice[_MAX_STRING_SIZE_]; /*!< choice of upwinding */
 
-  double  *grav_field_f, /*!< density variation function (\f$\varrho\f$) for hydrostatic equilibrium for flows with gravity */
-          *grav_field_g; /*!< pressure variation function (\f$\varrho\f$) for hydrostatic equilibrium for flows with gravity */
+  double  *m_grav_field_f, /*!< density variation function (\f$\varrho\f$) for hydrostatic equilibrium for flows with gravity */
+          *m_grav_field_g; /*!< pressure variation function (\f$\varrho\f$) for hydrostatic equilibrium for flows with gravity */
 
-  double *fast_jac, /*!< "Fast" Jacobian of the flux function (comprising the acoustic modes) */
+  double *m_fast_jac, /*!< "Fast" Jacobian of the flux function (comprising the acoustic modes) */
          *solution; /*!< array to store the solution at the beginning of each time step */
 
   /*! Type of immersed boundary wall: isothermal or adiabatic */
-  char ib_wall_type[_MAX_STRING_SIZE_];
+  char m_ib_wall_type[_MAX_STRING_SIZE_];
   /*! Immersed body wall temperature, if isothermal */
   double T_ib_wall;
 
@@ -514,21 +514,21 @@ typedef struct navierstokes3d_parameters {
                                                                     3 - stratified atmosphere with a Brunt-Vaisala frequency) */;
   double N_bv; /*!< the Brunt-Vaisala frequency for #NavierStokes3D::HB = 3 */
 
-  char ib_write_surface_data[_MAX_STRING_SIZE_]; /*!< Flag to indicate whether to analyze and write surface data for
-                                                      immersed body, if present. Applicable only if #HyPar::flag_ib is 1 */
+  char m_ib_write_surface_data[_MAX_STRING_SIZE_]; /*!< Flag to indicate whether to analyze and write surface data for
+                                                      immersed body, if present. Applicable only if #HyPar::m_flag_ib is 1 */
 
   /*! Time scale to ramp up the application of immersed boundary conditions,
-      applicable only if #HyPar::flag_ib is 1 */
-  double t_ib_ramp;
+      applicable only if #HyPar::m_flag_ib is 1 */
+  double m_t_ib_ramp;
 
   /*! The "gentleness" with which to ramp up the application of immersed boundary conditions,
-      applicable only if #HyPar::flag_ib is 1 */
-  double t_ib_width;
+      applicable only if #HyPar::m_flag_ib is 1 */
+  double m_t_ib_width;
 
   /*! Type of ramp up the application of immersed boundary conditions
       (linear, exponential, etc.),
-      applicable only if #HyPar::flag_ib is 1 */
-  char ib_ramp_type[_MAX_STRING_SIZE_];
+      applicable only if #HyPar::m_flag_ib is 1 */
+  char m_ib_ramp_type[_MAX_STRING_SIZE_];
 
   /*! Isothermal immersed boundary temperature tolerance: if ghost point temperature
       differs from wall temperature by more than this factor, set it to the wall
@@ -542,10 +542,10 @@ typedef struct navierstokes3d_parameters {
   double *gpu_QDerivZ;
   double *gpu_FViscous;
   double *gpu_FDeriv;
-  double *gpu_grav_field_f;
-  double *gpu_grav_field_g;
-  double *gpu_fast_jac;
-  double *gpu_solution;
+  double *m_gpu_grav_field_f;
+  double *m_gpu_grav_field_g;
+  double *m_gpu_fast_jac;
+  double *m_gpu_solution;
 #endif
 } NavierStokes3D;
 

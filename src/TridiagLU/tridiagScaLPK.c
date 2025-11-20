@@ -68,18 +68,18 @@ extern void pddtsv_();
   + The input array \a x contains the right-hand-side on entering the function, and the
     solution on exiting it.
 */
-int tridiagScaLPK(
+int TridiagScaLPK(
                     double  *a, /*!< Array containing the sub-diagonal elements */
                     double  *b, /*!< Array containing the diagonal elements */
                     double  *c, /*!< Array containing the super-diagonal elements */
                     double  *x, /*!< Right-hand side; will contain the solution on exit */
                     int     n,  /*!< Local size of the system on this processor */
                     int     ns, /*!< Number of systems to solve */
-                    void    *r, /*!< Object of type #TridiagLU */
-                    void    *m  /*!< MPI communicator */
+                    void    *r, /*!< Object of type #TridiagLU_Params */
+                    void *a_m  /*!< MPI communicator */
                  )
 {
-  TridiagLU       *params = (TridiagLU*) r;
+  TridiagLU_Params *params = (TridiagLU_Params *) r;
   int             rank,nproc,nglobal,nrhs,i,s,ia,ib,desca[9],descb[9],ierr,
                   lwork;
   double          *dl,*d,*du,*rhs,*work;
@@ -112,7 +112,7 @@ int tridiagScaLPK(
   }
 
   if (!params) {
-    fprintf(stderr,"Error in tridiagLU(): NULL pointer passed for parameters.\n");
+    fprintf(stderr,"Error in TridiagLU(): NULL pointer passed for parameters.\n");
     return(1);
   }
 
@@ -124,7 +124,7 @@ int tridiagScaLPK(
   lwork = (12*nproc+3*n) + ( (8*nproc) > (10*nproc+4*nrhs) ? (8*nproc) : (10*nproc+4*nrhs) );
 
   desca[0] = 501;
-  desca[1] = params->blacs_ctxt;
+  desca[1] = params->m_blacs_ctxt;
   desca[2] = nglobal;
   desca[3] = n;
   desca[4] = 0;
@@ -134,7 +134,7 @@ int tridiagScaLPK(
   desca[8] = 0;
 
   descb[0] = 502;
-  descb[1] = params->blacs_ctxt;
+  descb[1] = params->m_blacs_ctxt;
   descb[2] = nglobal;
   descb[3] = n;
   descb[4] = 0;
@@ -149,11 +149,11 @@ int tridiagScaLPK(
   rhs   = (double*) calloc (n,sizeof(double));
   work  = (double*) calloc(lwork,sizeof(double));
 
-  params->total_time = 0.0;
-  params->stage1_time = 0.0;
-  params->stage2_time = 0.0;
-  params->stage3_time = 0.0;
-  params->stage4_time = 0.0;
+  params->m_total_time = 0.0;
+  params->m_stage1_time = 0.0;
+  params->m_stage2_time = 0.0;
+  params->m_stage3_time = 0.0;
+  params->m_stage4_time = 0.0;
   for (s=0; s<ns; s++) {
 
     for (i=0; i<n; i++) {
@@ -173,7 +173,7 @@ int tridiagScaLPK(
 
     long long walltime;
     walltime = ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
-    params->total_time += (double) walltime / 1000000.0;
+    params->m_total_time += (double) walltime / 1000000.0;
   }
 
 

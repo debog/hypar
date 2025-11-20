@@ -17,7 +17,7 @@ int SparseGridsSimulation::Initialize()
   int ierr;
 
   /* find out the number of spatial dimensions */
-  m_ndims = m_sim_fg->solver.ndims;
+  m_ndims = m_sim_fg->solver.m_ndims;
 
   /* make sure full grid simulation object is allocated */
   if (m_sim_fg == NULL) {
@@ -29,14 +29,14 @@ int SparseGridsSimulation::Initialize()
   /* set full grid processor distribution based on grid size and
    * number of MPI ranks */
   GridDimensions dim_fg(m_ndims);
-  for (int d=0; d<m_ndims; d++) dim_fg[d] = m_sim_fg->solver.dim_global[d];
+  for (int d=0; d<m_ndims; d++) dim_fg[d] = m_sim_fg->solver.m_dim_global[d];
   ProcDistribution iproc_fg;
   ComputeProcessorDistribution(iproc_fg, dim_fg);
-  for (int d=0; d<m_ndims; d++) m_sim_fg->mpi.iproc[d] = iproc_fg[d];
-  MPIBroadcast_integer( m_sim_fg->mpi.iproc,
+  for (int d=0; d<m_ndims; d++) m_sim_fg->mpi.m_iproc[d] = iproc_fg[d];
+  MPIBroadcast_integer( m_sim_fg->mpi.m_iproc,
                         m_ndims,
                         0,
-                        &(m_sim_fg->mpi.world)); CHECKERR(ierr);
+                        &(m_sim_fg->mpi.m_world)); CHECKERR(ierr);
 
   ::WriteInputs( (void*) m_sim_fg, 1, m_rank);
   if (!m_rank) {
@@ -103,7 +103,7 @@ int SparseGridsSimulation::Initialize()
   /* set the solver parameters for the sparse grids sim objects */
   for (int i = 0; i < m_nsims_sg; i++) {
 #ifndef serial
-    MPI_Comm_dup(MPI_COMM_WORLD, &(m_sims_sg[i].mpi.world));
+    MPI_Comm_dup(MPI_COMM_WORLD, &(m_sims_sg[i].mpi.m_world));
 #endif
     ierr = SetSolverParameters( m_sims_sg[i],
                                 m_combination[i]._dim_,
@@ -121,9 +121,9 @@ int SparseGridsSimulation::Initialize()
   /* compute and report total NDOFs for sparse grids */
   long ndof_sg = 0;
   for (int i = 0; i < m_nsims_sg; i++) {
-    ndof_sg += m_sims_sg[i].solver.npoints_global;
+    ndof_sg += m_sims_sg[i].solver.m_npoints_global;
   }
-  long ndof_fg = m_sim_fg->solver.npoints_global;
+  long ndof_fg = m_sim_fg->solver.m_npoints_global;
   if (!m_rank) {
     printf("Total number of DOFs:-\n");
     printf("  using sparse grids: %d\n", (int)ndof_sg);

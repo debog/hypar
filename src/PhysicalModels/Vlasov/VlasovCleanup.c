@@ -7,15 +7,15 @@
 #include <physicalmodels/vlasov.h>
 
 /*! Function to clean up all physics-related allocations for the Vlasov equations */
-int VlasovCleanup(void *s /*!< Solver object of type #HyPar */)
+int VlasovCleanup(void *a_s /*!< Solver object of type #HyPar */)
 {
-  Vlasov *physics = (Vlasov*) s;
+  Vlasov *physics = (Vlasov*) a_s;
 
-  free(physics->e_field);
-  free(physics->potential);
+  free(physics->m_e_field);
+  free(physics->m_potential);
 
 #ifdef fftw
-  if(physics->self_consistent_electric_field) {
+  if(physics->m_self_consistent_electric_field) {
     free(physics->sum_buffer);
 
     fftw_destroy_plan(physics->plan_forward_e);

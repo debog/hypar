@@ -23,66 +23,66 @@
     is defined in.
 */
 int IBNearestFacetNormal(
-                          void    *ib, /*!< Immersed boundary object of type #ImmersedBoundary */
-                          void    *m,  /*!< MPI object of type #MPIVariables */
-                          double  *X,  /*!< Array of (local) spatial coordinates */
-                          double  large_distance, /*!< A large distance */
-                          int     *dim_l, /*!< Integer array of local grid size in each spatial dimension */
-                          int     ghosts /*!< Number of ghost points */
+                          void    *a_ib, /*!< Immersed boundary object of type #ImmersedBoundary */
+                          void    *a_m,  /*!< MPI object of type #MPIVariables */
+                          double  *a_X,  /*!< Array of (local) spatial coordinates */
+                          double  a_large_distance, /*!< A large distance */
+                          int     *a_dim_l, /*!< Integer array of local grid size in each spatial dimension */
+                          int     a_ghosts /*!< Number of ghost points */
                         )
 {
-  ImmersedBoundary  *IB       = (ImmersedBoundary*) ib;
-  MPIVariables      *mpi      = (MPIVariables*) m;
-  Body3D            *body     = IB->body;
-  Facet3D           *surface  = body->surface;
-  IBNode            *boundary = IB->boundary;
+  ImmersedBoundary  *IB       = (ImmersedBoundary*) a_ib;
+  MPIVariables      *mpi      = (MPIVariables*) a_m;
+  Body3D            *body     = IB->m_body;
+  Facet3D           *surface  = body->m_surface;
+  IBNode            *boundary = IB->m_boundary;
 
-  double  eps = IB->tolerance;
-  int     nb  = IB->n_boundary_nodes,
-          nf  = body->nfacets;
+  double  eps = IB->m_tolerance;
+  int     nb  = IB->m_n_boundary_nodes,
+          nf  = body->m_nfacets;
 
   int i, j, k, dg, n;
   for (dg = 0; dg < nb; dg++) {
-    i = boundary[dg].i;
-    j = boundary[dg].j;
-    k = boundary[dg].k;
+    i = boundary[dg].m_i;
+    j = boundary[dg].m_j;
+    k = boundary[dg].m_k;
 
     double xp, yp, zp;
-    _GetCoordinate_(0,i,dim_l,ghosts,X,xp);
-    _GetCoordinate_(1,j,dim_l,ghosts,X,yp);
-    _GetCoordinate_(2,k,dim_l,ghosts,X,zp);
-    boundary[dg].x = xp;
-    boundary[dg].y = yp;
-    boundary[dg].z = zp;
+    _GetCoordinate_(0,i,a_dim_l,a_ghosts,a_X,xp);
+    _GetCoordinate_(1,j,a_dim_l,a_ghosts,a_X,yp);
+    _GetCoordinate_(2,k,a_dim_l,a_ghosts,a_X,zp);
+    boundary[dg].m_x = xp;
+    boundary[dg].m_y = yp;
+    boundary[dg].m_z = zp;
 
-    double  dist_min = large_distance;
+    double  dist_min = a_large_distance;
     int     n_min    = -1;
 
     for (n = 0; n < nf; n++) {
       double x1, x2, x3;
       double y1, y2, y3;
       double z1, z2, z3;
-      x1 = surface[n].x1;  x2 = surface[n].x2;  x3 = surface[n].x3;
-      y1 = surface[n].y1;  y2 = surface[n].y2;  y3 = surface[n].y3;
-      z1 = surface[n].z1;  z2 = surface[n].z2;  z3 = surface[n].z3;
-      double dist =   surface[n].nx*(xp-surface[n].x1)
-                    + surface[n].ny*(yp-surface[n].y1)
-                    + surface[n].nz*(zp-surface[n].z1);
+      x1 = surface[n].m_x1;  x2 = surface[n].m_x2;  x3 = surface[n].m_x3;
+      y1 = surface[n].m_y1;  y2 = surface[n].m_y2;  y3 = surface[n].m_y3;
+      z1 = surface[n].m_z1;  z2 = surface[n].m_z2;  z3 = surface[n].m_z3;
+      double dist =   surface[n].m_nx*(xp-surface[n].m_x1)
+                    + surface[n].m_ny*(yp-surface[n].m_y1)
+                    + surface[n].m_nz*(zp-surface[n].m_z1);
       if (dist > 0)  continue;
       if (absolute(dist) < dist_min) {
         short   is_it_in = 0;
         double  x_int, y_int, z_int;
-        x_int = xp - dist * surface[n].nx;
-        y_int = yp - dist * surface[n].ny;
-        z_int = zp - dist * surface[n].nz;
-        if (absolute(surface[n].nx) > eps) {
+        x_int = xp - dist * surface[n].m_nx;
+        y_int = yp - dist * surface[n].m_ny;
+        z_int = zp - dist * surface[n].m_nz;
+        if (absolute(surface[n].m_nx) > eps) {
           double den = (z2-z3)*(y1-y3)-(y2-y3)*(z1-z3);
           double l1, l2, l3;
           l1 = ((y2-y3)*(z3-z_int)-(z2-z3)*(y3-y_int)) / den;
           l2 = ((z1-z3)*(y3-y_int)-(y1-y3)*(z3-z_int)) / den;
           l3 = 1 - l1 - l2;
           if ((l1 > -eps) && (l2 > -eps) && (l3 > -eps))  is_it_in = 1;
-        } else if (absolute(surface[n].ny) > eps) {
+        } else if (absolute(surface[n].m_ny) > eps) {
           double den = (x2-x3)*(z1-z3)-(z2-z3)*(x1-x3);
           double l1, l2, l3;
           l1 = ((z2-z3)*(x3-x_int)-(x2-x3)*(z3-z_int)) / den;
@@ -105,9 +105,9 @@ int IBNearestFacetNormal(
     }
     if (n_min == -1) {
       for (n = 0; n < nf; n++) {
-        double dist =   surface[n].nx*(xp-surface[n].x1)
-                      + surface[n].ny*(yp-surface[n].y1)
-                      + surface[n].nz*(zp-surface[n].z1);
+        double dist =   surface[n].m_nx*(xp-surface[n].m_x1)
+                      + surface[n].m_ny*(yp-surface[n].m_y1)
+                      + surface[n].m_nz*(zp-surface[n].m_z1);
         if (dist > eps)  continue;
         else {
           if (absolute(dist) < dist_min) {
@@ -120,9 +120,9 @@ int IBNearestFacetNormal(
 
     if (n_min == -1)  {
       fprintf(stderr,"Error in IBNearestFacetNormal(): no nearest normal found for boundary node (%d,%d,%d) ",i,j,k);
-      fprintf(stderr,"on rank %d.\n",mpi->rank);
+      fprintf(stderr,"on rank %d.\n",mpi->m_rank);
       return(1);
-    } else boundary[dg].face = &surface[n_min];
+    } else boundary[dg].m_face = &surface[n_min];
   }
 
   return(0);

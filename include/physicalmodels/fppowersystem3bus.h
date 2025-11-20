@@ -61,11 +61,11 @@ typedef struct fp_power_system__3bus_parameters {
           omegaB,           /*!< Rotor base angular frequency \f$\omega_B\f$ */
           sigma[2][2],      /*!< Covariance matrix \f$\sigma\f$ */
           lambda[2][2],     /*!< Correlation time \f$\lambda\f$ */
-          gamma,            /*!< Damping rate \f$ \gamma \f$ */
+          m_gamma,            /*!< Damping rate \f$ \gamma \f$ */
           *G,               /*!< Conductance matrix \f$ G \f$ */
           *B;               /*!< Susceptance matrix \f$ B \f$ */
 
-  double pdf_integral;      /*!< Integral of the probability density function over the domain */
+  double m_pdf_integral;      /*!< Integral of the probability density function over the domain */
 
 } FPPowerSystem3Bus;
 

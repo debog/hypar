@@ -68,48 +68,48 @@
 typedef struct domain_boundaries {
 
   /*! Type of boundary (#_PERIODIC_, #_EXTRAPOLATE_, #_DIRICHLET_, etc) */
-  char    bctype [_MAX_STRING_SIZE_];
+  char    m_bctype [_MAX_STRING_SIZE_];
   /*! Dimension along which this BC applies (For an \a n -dimensional problem, dimensions are indexed \a 0 to \a n-1 ) */
-  int     dim;
+  int     m_dim;
   /*! Face on which this BC applies (1 -> left/min, or -1 -> right/max) */
-  int     face;
+  int     m_face;
   /*! Spatial extent of this boundary condition: \a xmin is an array of size \a n for a \a n -dimensional problem containing the starting spatial coordinates of the zone where this boundary applies */
-  double  *xmin;
+  double  *m_xmin;
   /*! Spatial extent of this boundary condition: \a xmax is an array of size \a n for a \a n -dimensional problem containing the ending spatial coordinates of the zone where this boundary applies */
-  double  *xmax;
+  double  *m_xmax;
 
-  int on_this_proc;   /*!< Flag indicating if this BC is applicable on this process  (not an input) */
-  int *is, *ie;       /*!< Index range on which to apply this BC on this process (not an input) */
+  int m_on_this_proc;   /*!< Flag indicating if this BC is applicable on this process  (not an input) */
+  int *m_is, *m_ie;       /*!< Index range on which to apply this BC on this process (not an input) */
 
   /*! Pointer to the specific boundary condition function for the solution vector U */
   int (*BCFunctionU) (void*,void*,int,int,int*,int,double*,double);
 
-  double *DirichletValue;   /*!< Specified value for steady Dirichlet BC */
-  double *SpongeValue;      /*!< Specified value for steady Sponge    BC */
+  double *m_DirichletValue;   /*!< Specified value for steady Dirichlet BC */
+  double *m_SpongeValue;      /*!< Specified value for steady Sponge    BC */
 
-  int    *UnsteadyDirichletSize; /*!< Size of array to hold unsteady Dirichlet data */
-  double *UnsteadyDirichletData; /*!< Array to hold unsteady Dirichlet data         */
+  int    *m_UnsteadyDirichletSize; /*!< Size of array to hold unsteady Dirichlet data */
+  double *m_UnsteadyDirichletData; /*!< Array to hold unsteady Dirichlet data         */
   /*! Filename to read in unsteady Dirichlet data from */
-  char    UnsteadyDirichletFilename[_MAX_STRING_SIZE_];
+  char    m_UnsteadyDirichletFilename[_MAX_STRING_SIZE_];
 
   /* variables specific to Navier-Stokes/Euler equations BCs */
-  double gamma,                                   /*!< Ratio of specific heats (specific to Euler/Navier-Stokes) */
-         FlowDensity,                             /*!< Boundary flow density (specific to Euler/Navier-Stokes) */
-         *FlowVelocity,                           /*!< Boundary flow velocity (specific to Euler/Navier-Stokes) */
-         FlowPressure;                            /*!< Boundary flow pressure (specific to Euler/Navier-Stokes) */
+  double m_gamma,                                   /*!< Ratio of specific heats (specific to Euler/Navier-Stokes) */
+         m_FlowDensity,                             /*!< Boundary flow density (specific to Euler/Navier-Stokes) */
+         *m_FlowVelocity,                           /*!< Boundary flow velocity (specific to Euler/Navier-Stokes) */
+         m_FlowPressure;                            /*!< Boundary flow pressure (specific to Euler/Navier-Stokes) */
 
   /* variables specific to the thermal slip-wall boundary condition */
-  int    *UnsteadyTemperatureSize; /*!< Size of array to hold unsteady temperature data for BCThermalSlipWallU() and BCThermalNoslipWallU() */
-  double *UnsteadyTimeLevels;      /*!< Array to hold the time levels for unsteady temperature data for BCThermalSlipWallU() and BCThermalNoslipWallU() */
-  double *UnsteadyTemperatureData; /*!< Array to hold unsteady temperature data for BCThermalSlipWallU() and BCThermalNoslipWallU() */
+  int    *m_UnsteadyTemperatureSize; /*!< Size of array to hold unsteady temperature data for BCThermalSlipWallU() and BCThermalNoslipWallU() */
+  double *m_UnsteadyTimeLevels;      /*!< Array to hold the time levels for unsteady temperature data for BCThermalSlipWallU() and BCThermalNoslipWallU() */
+  double *m_UnsteadyTemperatureData; /*!< Array to hold unsteady temperature data for BCThermalSlipWallU() and BCThermalNoslipWallU() */
   /*! Filename to read in unsteady temperature data from for the BCThermalSlipWallU() and BCThermalNoslipWallU() boundary condition */
-  char  UnsteadyTemperatureFilename[_MAX_STRING_SIZE_];
+  char  m_UnsteadyTemperatureFilename[_MAX_STRING_SIZE_];
 
 #if defined(HAVE_CUDA)
-  int gpu_npoints_bounds;
-  int gpu_npoints_local_wghosts;
-  int *gpu_bounds, *gpu_is, *gpu_ie;
-  double *gpu_FlowVelocity;
+  int m_gpu_npoints_bounds;
+  int m_gpu_npoints_local_wghosts;
+  int *m_gpu_bounds, *m_gpu_is, *m_gpu_ie;
+  double *m_gpu_FlowVelocity;
 #endif
 
 } DomainBoundary;

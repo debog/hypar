@@ -37,24 +37,24 @@
 typedef struct linearadr_parameters {
 
   /*! Is the advection field constant (1) or spatially-varying (0) */
-  int constant_advection;
+  int m_constant_advection;
 
   /*! Filename of file to read in spatially-varying advection field from */
-  char adv_filename[_MAX_STRING_SIZE_];
+  char m_adv_filename[_MAX_STRING_SIZE_];
 
   /*! Size of the advection array: depends on whether advection coeff
       is constant or spatially-varying */
-  int adv_arr_size;
+  int m_adv_arr_size;
 
   /*! advection speed for each variable along each dimension */
-  double *a;
+  double *m_a;
 
   /*! diffusion coefficient for each variable along each dimension */
-  double *d;
+  double *m_d;
 
   /*! turn off upwinding and just take arithmetic average of left
       and right biased fluxes? */
-  char centered_flux[_MAX_STRING_SIZE_];
+  char m_centered_flux[_MAX_STRING_SIZE_];
 
 } LinearADR;
 

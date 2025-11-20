@@ -24,8 +24,8 @@ Reference:
 #define _MODEL_NVARS_ 1
 
 typedef struct fp_double_well_parameters {
-  double q;            /* diffusion coefficient */
-  double pdf_integral; /* not an input          */
+  double m_q;            /* diffusion coefficient */
+  double m_pdf_integral; /* not an input          */
 } FPDoubleWell;
 
 #define drift(x) (4.0*(x)*(1.0-(x)*(x)))

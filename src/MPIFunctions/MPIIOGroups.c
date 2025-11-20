@@ -34,15 +34,15 @@
     multiple of the specified number of I/O groups (#MPIVariables::N_IORanks),
     then only 1 rank is used.
 */
-int MPICreateIOGroups(void *m /*!< MPI object of type #MPIVariables*/)
+int MPICreateIOGroups(void *a_m /*!< MPI object of type #MPIVariables*/)
 {
-  MPIVariables *mpi = (MPIVariables*) m;
+  MPIVariables *mpi = (MPIVariables*) a_m;
 
 #ifndef serial
 
-  int nproc         = mpi->nproc;
-  int rank          = mpi->rank;
-  int N_IORanks     = mpi->N_IORanks;
+  int nproc         = mpi->m_nproc;
+  int rank          = mpi->m_rank;
+  int N_IORanks     = mpi->m_N_IORanks;
 
   int GroupSize;
   if (nproc%N_IORanks==0) GroupSize = nproc/N_IORanks;
@@ -60,25 +60,25 @@ int MPICreateIOGroups(void *m /*!< MPI object of type #MPIVariables*/)
     GroupSize = nproc;
   }
 
-  mpi->CommGroup  = rank/GroupSize;
-  mpi->IORank     = mpi->CommGroup * GroupSize;
+  mpi->m_CommGroup  = rank/GroupSize;
+  mpi->m_IORank     = mpi->m_CommGroup * GroupSize;
 
   /* set flag for whether this rank does file I/O */
-  if (rank == mpi->IORank)  mpi->IOParticipant = 1;
-  else                      mpi->IOParticipant = 0;
+  if (rank == mpi->m_IORank)  mpi->m_IOParticipant = 1;
+  else                      mpi->m_IOParticipant = 0;
 
   /* save the first and last process of this group */
-  mpi->GroupStartRank = mpi->IORank;
-  mpi->GroupEndRank   = (mpi->CommGroup+1)*GroupSize;
+  mpi->m_GroupStartRank = mpi->m_IORank;
+  mpi->m_GroupEndRank   = (mpi->m_CommGroup+1)*GroupSize;
 
   /* create a new communicator with the IO participants */
   int i,*FileIORanks;
   MPI_Group WorldGroup, IOGroup;
   FileIORanks = (int*) calloc (N_IORanks,sizeof(int));
   for (i=0; i<N_IORanks; i++) FileIORanks[i] = i*GroupSize;
-  MPI_Comm_group(mpi->world,&WorldGroup);
+  MPI_Comm_group(mpi->m_world,&WorldGroup);
   MPI_Group_incl(WorldGroup,N_IORanks,FileIORanks,&IOGroup);
-  MPI_Comm_create(mpi->world,IOGroup,&mpi->IOWorld);
+  MPI_Comm_create(mpi->m_world,IOGroup,&mpi->m_IOWorld);
   MPI_Group_free(&IOGroup);
   MPI_Group_free(&WorldGroup);
   free(FileIORanks);

@@ -56,28 +56,28 @@ int    LinearADRDiffusionJacobian (double*,double*,void*,int,int);
     + "physics.inp" is \b optional; if absent, default values will be used.
     + Please do *not* specify both "advection" and "advection_filename"!
 */
-int LinearADRInitialize(void *s, /*!< Solver object of type #HyPar */
-                        void *m  /*!< Object of type #MPIVariables containing MPI-related info */ )
+int LinearADRInitialize(void *a_s, /*!< Solver object of type #HyPar */
+                        void *a_m  /*!< Object of type #MPIVariables containing MPI-related info */ )
 {
-  HyPar         *solver  = (HyPar*)         s;
-  MPIVariables  *mpi     = (MPIVariables*)  m;
-  LinearADR     *physics = (LinearADR*)     solver->physics;
+  HyPar         *solver  = (HyPar*)         a_s;
+  MPIVariables  *mpi     = (MPIVariables*)  a_m;
+  LinearADR     *physics = (LinearADR*)     solver->m_physics;
   int           i,ferr;
 
   static int count = 0;
 
   /* default values */
-  physics->constant_advection = -1;
-  strcpy(physics->adv_filename,"none");
-  physics->a = NULL;
-  physics->adv_arr_size = -1;
-  strcpy(physics->centered_flux,"no");
+  physics->m_constant_advection = -1;
+  strcpy(physics->m_adv_filename,"none");
+  physics->m_a = NULL;
+  physics->m_adv_arr_size = -1;
+  strcpy(physics->m_centered_flux,"no");
 
-  physics->d = (double*) calloc (solver->ndims*solver->nvars,sizeof(double));
-  _ArraySetValue_(physics->d,solver->ndims*solver->nvars,0.0);
+  physics->m_d = (double*) calloc (solver->m_ndims*solver->m_nvars,sizeof(double));
+  _ArraySetValue_(physics->m_d,solver->m_ndims*solver->m_nvars,0.0);
 
   /* reading physical model specific inputs - all processes */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 
     FILE *in;
     if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
@@ -91,49 +91,49 @@ int LinearADRInitialize(void *s, /*!< Solver object of type #HyPar */
     } else {
 
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")) {
         while (strcmp(word, "end")) {
 
-          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
 
           if (!strcmp(word, "advection_filename")) {
-            if (physics->constant_advection != -1) {
+            if (physics->m_constant_advection != -1) {
               fprintf(stderr,"Error in LinearADRInitialize():\n");
               fprintf(stderr,"Maybe advection_filename and advection are both specified.\n");
               return 1;
             } else {
               /* read filename for spatially-varying advection field */
-              physics->constant_advection = 0;
-              physics->adv_arr_size = solver->npoints_local_wghosts*solver->ndims*solver->nvars;
-              physics->a = (double*) calloc ( physics->adv_arr_size, sizeof(double) );
-              _ArraySetValue_(physics->a, physics->adv_arr_size, 0.0);
-              ferr = fscanf(in,"%s",physics->adv_filename); if (ferr != 1) return(ferr);
+              physics->m_constant_advection = 0;
+              physics->m_adv_arr_size = solver->m_npoints_local_wghosts*solver->m_ndims*solver->m_nvars;
+              physics->m_a = (double*) calloc ( physics->m_adv_arr_size, sizeof(double) );
+              _ArraySetValue_(physics->m_a, physics->m_adv_arr_size, 0.0);
+              ferr = fscanf(in,"%a_s",physics->m_adv_filename); if (ferr != 1) return(ferr);
             }
           } else if (!strcmp(word, "advection")) {
-            if (physics->constant_advection != -1) {
+            if (physics->m_constant_advection != -1) {
               fprintf(stderr,"Error in LinearADRInitialize():\n");
               fprintf(stderr,"Maybe advection_filename and advection are both specified.\n");
               return 1;
             } else {
               /* read advection coefficients */
-              physics->constant_advection = 1;
-              physics->adv_arr_size = solver->ndims*solver->nvars;
-              physics->a = (double*) calloc ( physics->adv_arr_size, sizeof(double) );
-              for (i=0; i<solver->ndims*solver->nvars; i++) ferr = fscanf(in,"%lf",&physics->a[i]);
+              physics->m_constant_advection = 1;
+              physics->m_adv_arr_size = solver->m_ndims*solver->m_nvars;
+              physics->m_a = (double*) calloc ( physics->m_adv_arr_size, sizeof(double) );
+              for (i=0; i<solver->m_ndims*solver->m_nvars; i++) ferr = fscanf(in,"%lf",&physics->m_a[i]);
               if (ferr != 1) return(1);
             }
           } else if (!strcmp(word, "diffusion")) {
             /* read diffusion coefficients */
-            for (i=0; i<solver->ndims*solver->nvars; i++) ferr = fscanf(in,"%lf",&physics->d[i]);
+            for (i=0; i<solver->m_ndims*solver->m_nvars; i++) ferr = fscanf(in,"%lf",&physics->m_d[i]);
             if (ferr != 1) return(1);
           } else if (!strcmp(word, "centered_flux")) {
-            ferr = fscanf(in, "%s", physics->centered_flux);
+            ferr = fscanf(in, "%a_s", physics->m_centered_flux);
             if (ferr != 1) return(ferr);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",word,useless);
+            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
@@ -151,32 +151,32 @@ int LinearADRInitialize(void *s, /*!< Solver object of type #HyPar */
   }
 
 #ifndef serial
-  MPIBroadcast_integer(&physics->constant_advection,1,0,&mpi->world);
-  MPIBroadcast_integer(&physics->adv_arr_size,1,0,&mpi->world);
+  MPIBroadcast_integer(&physics->m_constant_advection,1,0,&mpi->m_world);
+  MPIBroadcast_integer(&physics->m_adv_arr_size,1,0,&mpi->m_world);
 #endif
 
-  if (mpi->rank) {
-    physics->a = (double*) calloc (physics->adv_arr_size,sizeof(double));
-    _ArraySetValue_(physics->a, physics->adv_arr_size, 0.0);
+  if (mpi->m_rank) {
+    physics->m_a = (double*) calloc (physics->m_adv_arr_size,sizeof(double));
+    _ArraySetValue_(physics->m_a, physics->m_adv_arr_size, 0.0);
   }
 
-  if (physics->constant_advection == 1) {
+  if (physics->m_constant_advection == 1) {
 #ifndef serial
-    MPIBroadcast_double(physics->a,physics->adv_arr_size,0,&mpi->world);
+    MPIBroadcast_double(physics->m_a,physics->m_adv_arr_size,0,&mpi->m_world);
 #endif
-  } else if (physics->constant_advection == 0) {
+  } else if (physics->m_constant_advection == 0) {
 #ifndef serial
-    MPIBroadcast_character(physics->adv_filename, _MAX_STRING_SIZE_,0,&mpi->world);
+    MPIBroadcast_character(physics->m_adv_filename, _MAX_STRING_SIZE_,0,&mpi->m_world);
 #endif
   }
 
 #ifndef serial
-  MPIBroadcast_double(physics->d,solver->ndims*solver->nvars,0,&mpi->world);
-  MPIBroadcast_character(physics->centered_flux, _MAX_STRING_SIZE_,0,&mpi->world);
+  MPIBroadcast_double(physics->m_d,solver->m_ndims*solver->m_nvars,0,&mpi->m_world);
+  MPIBroadcast_character(physics->m_centered_flux, _MAX_STRING_SIZE_,0,&mpi->m_world);
 #endif
 
-  if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-    if (!mpi->rank) {
+  if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in LinearADRInitialize: This physical model does not have a splitting ");
       fprintf(stderr,"of the hyperbolic term defined.\n");
     }
@@ -193,13 +193,13 @@ int LinearADRInitialize(void *s, /*!< Solver object of type #HyPar */
   solver->JFunction          = LinearADRAdvectionJacobian;
   solver->KFunction          = LinearADRDiffusionJacobian;
 
-  if (!strcmp(physics->centered_flux,"no")) {
+  if (!strcmp(physics->m_centered_flux,"no")) {
     solver->Upwind = LinearADRUpwind;
   } else {
     solver->Upwind = LinearADRCenteredFlux;
   }
 
-  if (physics->constant_advection == 0) {
+  if (physics->m_constant_advection == 0) {
     solver->PhysicsInput = LinearADRAdvectionField;
     solver->PhysicsOutput = LinearADRWriteAdvField;
   } else {

@@ -35,13 +35,13 @@ double TemplateModelComputeCFL(
 )
 {
   HyPar         *solver  = (HyPar*)         s;
-  TemplateModel *physics = (TemplateModel*) solver->physics;
+  TemplateModel *physics = (TemplateModel*) solver->m_physics;
 
-  int     ndims  = solver->ndims;
-  int     nvars  = solver->nvars;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
-  double  *u     = solver->u;
+  int     ndims  = solver->m_ndims;
+  int     nvars  = solver->m_nvars;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
+  double  *u     = solver->m_u;
 
   double max_cfl = 0.0;
   int index[ndims];
@@ -65,7 +65,7 @@ double TemplateModelComputeCFL(
 
         /* Get inverse grid spacing in this direction */
         double dxinv;
-        _GetCoordinate_(dir,index[dir],dim,ghosts,solver->dxinv,dxinv);
+        _GetCoordinate_(dir,index[dir],dim,ghosts,solver->m_dxinv,dxinv);
 
         /* [REPLACE] Calculate wave speed (eigenvalue) */
 

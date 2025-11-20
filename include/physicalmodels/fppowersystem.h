@@ -52,21 +52,21 @@ Reference:
 typedef struct fp_power_system_parameters {
 
   /* input parameters */
-  double O_s;
+  double m_O_s;
   double H;
-  double E;
-  double V;
-  double g1,g2;
+  double m_E;
+  double m_V;
+  double m_g1,m_g2;
   double D;
   double Pm;
-  double l;
-  double q;
-  double tf, tcl;
+  double m_l;
+  double m_q;
+  double m_tf, tcl;
 
   /* computed/constant parameters */
   double Pmax;
 
-  double pdf_integral; /* not an input          */
+  double m_pdf_integral; /* not an input          */
 } FPPowerSystem;
 
 int FPPowerSystemInitialize    (void*,void*);

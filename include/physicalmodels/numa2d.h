@@ -72,22 +72,22 @@
   { \
     s[0] =  0.0; \
     s[1] =  0.0; \
-    s[2] = -param->g*drho; \
+    s[2] = -param->m_g*drho; \
     s[3] =  0.0; \
   }
 
 #define _Numa2DComputePressure_(params,T0,dT,P0,dP) \
   { \
-    double gamma    = params->gamma; \
+    double gamma    = params->m_gamma; \
     double Pref     = params->Pref; \
-    double R        = params->R; \
+    double R        = params->m_R; \
     double P_total  = Pref * raiseto((R*(T0+dT)/Pref),gamma); \
     dP  = P_total - P0; \
   }
 
 #define _Numa2DComputeLinearizedPressure_(params,T0,dT,P0,dP) \
   { \
-    double gamma    = params->gamma; \
+    double gamma    = params->m_gamma; \
     dP  = (gamma*P0/T0) * dT; \
   }
 
@@ -107,11 +107,11 @@
   }
 
 typedef struct numa2d_parameters {
-  double  gamma;      /* Ratio of heat capacities         */
-  double  R;          /* Universal gas constant           */
-  double  g;          /* acceleration due to gravity      */
-  int     init_atmos; /* choice of initial atmosphere     */
-  double  mu;         /* coefficient of dynamic viscosity */
+  double  m_gamma;      /* Ratio of heat capacities         */
+  double  m_R;          /* Universal gas constant           */
+  double  m_g;          /* acceleration due to gravity      */
+  int     m_init_atmos; /* choice of initial atmosphere     */
+  double  m_mu;         /* coefficient of dynamic viscosity */
 
   /* pressure & temperature at zero altitude */
   double Pref, Tref;
@@ -120,7 +120,7 @@ typedef struct numa2d_parameters {
   void (*StandardAtmosphere)(void*,double,double*,double*,double*,double*);
 
   /* choice of upwinding scheme */
-  char upwind[_MAX_STRING_SIZE_];
+  char m_upwind[_MAX_STRING_SIZE_];
 } Numa2D;
 
 int Numa2DInitialize (void*,void*);

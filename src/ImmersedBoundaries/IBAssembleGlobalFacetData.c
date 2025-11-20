@@ -19,25 +19,25 @@
  *  (#Body3D::nfacets X nvars) at output on rank 0;
  *  it will remain NULL on other ranks.
 */
-int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of type #MPIVariables */
+int IBAssembleGlobalFacetData(void*               a_m,          /*!< MPI object of type #MPIVariables */
                               void*               ib,         /*!< Immersed boundary object of type #ImmersedBoundary */
                               const double* const local_var,  /*!< Local array */
                               double** const      global_var, /*!< Array to store the gradient; must be NULL at input */
                               int                 nvars       /*!< Number of components in var */
                              )
 {
-  MPIVariables     *mpi = (MPIVariables*) m;
+  MPIVariables     *mpi = (MPIVariables*)   a_m;
   ImmersedBoundary *IB  = (ImmersedBoundary*) ib;
 
   if ((*global_var) != NULL) {
     fprintf(stderr,"Error in IBAssembleGlobalFacetData()\n");
     fprintf(stderr," global_var is not NULL on rank %d\n",
-            mpi->rank );
+            mpi->m_rank );
     return 1;
   }
 
-  int nfacets_local = IB->nfacets_local;
-  FacetMap *fmap = IB->fmap;
+  int nfacets_local = IB->m_nfacets_local;
+  FacetMap *fmap = IB->m_fmap;
 
   if ((nfacets_local == 0) && (local_var != NULL)) {
     fprintf(stderr, "Error in IBAssembleGlobalFacetData()\n");
@@ -54,9 +54,9 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
   MPI_Status status;
 #endif
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 
-    int nfacets_global = IB->body->nfacets;
+    int nfacets_global = IB->m_body->m_nfacets;
 
     /* allocate arrays for whole domain */
     *global_var = (double*) calloc (nfacets_global*nvars, sizeof(double));
@@ -68,12 +68,12 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
 
     /* local data */
     for (int n = 0; n < nfacets_local; n++) {
-      _ArrayAXPY_((local_var+n), 1.0, ((*global_var)+fmap[n].index), nvars);
-      check[fmap[n].index]++;
+      _ArrayAXPY_((local_var+n), 1.0, ((*global_var)+fmap[n].m_index), nvars);
+      check[fmap[n].m_index]++;
     }
 
 #ifndef serial
-    for (int proc = 1; proc < mpi->nproc; proc++) {
+    for (int proc = 1; proc < mpi->m_nproc; proc++) {
 
       int nf_incoming;
       MPI_Recv(&nf_incoming, 1, MPI_INT, proc, 98927, MPI_COMM_WORLD, &status);
@@ -83,8 +83,8 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
         int    *indices_incoming = (int*)    calloc(nf_incoming, sizeof(int));
         double *var_incoming     = (double*) calloc(nf_incoming*nvars, sizeof(double));
 
-        MPI_Recv(indices_incoming, nf_incoming, MPI_INT, proc, 98928, mpi->world, &status);
-        MPI_Recv(var_incoming, nf_incoming*nvars, MPI_DOUBLE, proc, 98929, mpi->world, &status);
+        MPI_Recv(indices_incoming, nf_incoming, MPI_INT, proc, 98928, mpi->m_world, &status);
+        MPI_Recv(var_incoming, nf_incoming*nvars, MPI_DOUBLE, proc, 98929, mpi->m_world, &status);
 
         for (int n = 0; n < nf_incoming; n++) {
           _ArrayAXPY_((var_incoming+n), 1.0, ((*global_var)+indices_incoming[n]), nvars);
@@ -116,10 +116,10 @@ int IBAssembleGlobalFacetData(void*               m,          /*!< MPI object of
     if (nfacets_local > 0) {
 
       int i, *indices = (int*) calloc (nfacets_local, sizeof(int));
-      for (i = 0; i < nfacets_local; i++) indices[i] = fmap[i].index;
+      for (i = 0; i < nfacets_local; i++) indices[i] = fmap[i].m_index;
 
-      MPI_Send(indices, nfacets_local, MPI_INT, 0, 98928, mpi->world);
-      MPI_Send(local_var, nfacets_local*nvars, MPI_DOUBLE, 0, 98929, mpi->world);
+      MPI_Send(indices, nfacets_local, MPI_INT, 0, 98928, mpi->m_world);
+      MPI_Send(local_var, nfacets_local*nvars, MPI_DOUBLE, 0, 98929, mpi->m_world);
 
       free(indices);
     }

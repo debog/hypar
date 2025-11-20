@@ -372,23 +372,23 @@
  *  the 2D Navier-Stokes equations.
 */
 typedef struct navierstokes2d_parameters {
-  double  gamma;                          /*!< Ratio of heat capacities */
-  char    upw_choice[_MAX_STRING_SIZE_];  /*!< choice of upwinding */
-  double  grav_x,                         /*!< acceleration due to gravity in x */
-          grav_y;                         /*!< acceleration due to gravity in y */
-  double  rho0;                           /*!< reference density  at zero altitude for flows with gravity */
-  double  p0;                             /*!< reference pressure at zero altitude for flows with gravity */
-  double  Re;                             /*!< Reynolds number */
-  double  Pr;                             /*!< Prandtl  number */
+  double  m_gamma;                          /*!< Ratio of heat capacities */
+  char    m_upw_choice[_MAX_STRING_SIZE_];  /*!< choice of upwinding */
+  double  m_grav_x,                         /*!< acceleration due to gravity in x */
+          m_grav_y;                         /*!< acceleration due to gravity in y */
+  double  m_rho0;                           /*!< reference density  at zero altitude for flows with gravity */
+  double  m_p0;                             /*!< reference pressure at zero altitude for flows with gravity */
+  double  m_Re;                             /*!< Reynolds number */
+  double  m_Pr;                             /*!< Prandtl  number */
   double  Minf;                           /*!< Freestream Mach number */
   double  C1,                             /*!< Sutherlands law constants */
           C2;                             /*!< Sutherlands law constants */
-  double  R;                              /*!< universal Gas constant */
+  double  m_R;                              /*!< universal Gas constant */
 
-  double  *grav_field_f, /*!< density variation function (\f$\varrho\f$) for hydrostatic equilibrium for flows with gravity */
-          *grav_field_g; /*!< pressure variation function (\f$\varrho\f$) for hydrostatic equilibrium for flows with gravity */
+  double  *m_grav_field_f, /*!< density variation function (\f$\varrho\f$) for hydrostatic equilibrium for flows with gravity */
+          *m_grav_field_g; /*!< pressure variation function (\f$\varrho\f$) for hydrostatic equilibrium for flows with gravity */
 
-  double *fast_jac, /*!< "Fast" Jacobian of the flux function (comprising the acoustic modes) */
+  double *m_fast_jac, /*!< "Fast" Jacobian of the flux function (comprising the acoustic modes) */
          *solution; /*!< array to store the solution at the beginning of each time step */
 
   /* choice of hydrostatic balance                              */
@@ -401,10 +401,10 @@ typedef struct navierstokes2d_parameters {
   double N_bv; /*!< the Brunt-Vaisala frequency for #NavierStokes2D::HB = 3 */
 
 #if defined(HAVE_CUDA)
-  double *gpu_grav_field_f;
-  double *gpu_grav_field_g;
-  double *gpu_fast_jac;
-  double *gpu_solution;
+  double *m_gpu_grav_field_f;
+  double *m_gpu_grav_field_g;
+  double *m_gpu_fast_jac;
+  double *m_gpu_solution;
 #endif
 } NavierStokes2D;
 

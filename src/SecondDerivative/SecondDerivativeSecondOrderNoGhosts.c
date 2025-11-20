@@ -36,76 +36,76 @@ typedef MPIVariables  MPIContext;
       function can be used when the ghost values at physical boundaries are not filled. The ghost values at
       internal (MPI) boundaries are still needed.
 */
-int SecondDerivativeSecondOrderCentralNoGhosts( double*  D2f,   /*!< Array to hold the computed second derivative (with ghost points)
-                                                                     (same size and layout as f) */
-                                                double*  f,     /*!< Array containing the grid point function values whose second
+int SecondDerivativeSecondOrderCentralNoGhosts( double*  a_D2f,   /*!< Array to hold the computed second derivative (with ghost points)
+                                                                     (same size and layout as a_f) */
+                                                double*  a_f,     /*!< Array containing the grid point function values whose second
                                                                      derivative is to be computed (with ghost points) */
-                                                int     dir,    /*!< The spatial dimension along which the derivative is computed */
-                                                int     ndims,  /*!< Number of spatial/coordinate dimensions */
-                                                int*    dim,    /*!< Local dimensions */
-                                                int     ghosts, /*!< Number of ghost points */
-                                                int     nvars,  /*!< Number of vector components at each grid points */
-                                                void*   m       /*!< MPI object of type #MPIContext */)
+                                                int     a_dir,    /*!< The spatial dimension along which the derivative is computed */
+                                                int     a_ndims,  /*!< Number of spatial/coordinate dimensions */
+                                                int*    a_dim,    /*!< Local dimensions */
+                                                int     a_ghosts, /*!< Number of ghost points */
+                                                int     a_nvars,  /*!< Number of vector components at each grid points */
+                                                void*   a_m      /*!< MPI object of type #MPIContext */)
 {
-  MPIContext* mpi = (MPIContext*) m;
+  MPIContext* mpi = (MPIContext*) a_m;
   int i, v;
 
-  if ((!D2f) || (!f)) {
+  if ((!a_D2f) || (!a_f)) {
     fprintf(stderr, "Error in SecondDerivativeSecondOrder(): input arrays not allocated.\n");
     return(1);
   }
-  if (ghosts < _MINIMUM_GHOSTS_) {
-    fprintf(stderr, "Error in SecondDerivativeSecondOrderNoGhosts(): insufficient number of ghosts.\n");
+  if (a_ghosts < _MINIMUM_GHOSTS_) {
+    fprintf(stderr, "Error in SecondDerivativeSecondOrderNoGhosts(): insufficient number of a_ghosts.\n");
     return(1);
   }
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
-     dimension "dir"                                                                    */
-  int indexC[ndims], index_outer[ndims], bounds_outer[ndims];
-  _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;
+     dimension "a_dir"                                                                    */
+  int indexC[a_ndims], index_outer[a_ndims], bounds_outer[a_ndims];
+  _ArrayCopy1D_(a_dim,bounds_outer,a_ndims); bounds_outer[a_dir] =  1;
 
-  int done = 0; _ArraySetValue_(index_outer,ndims,0);
+  int done = 0; _ArraySetValue_(index_outer,a_ndims,0);
   while (!done) {
-    _ArrayCopy1D_(index_outer,indexC,ndims);
-    for (i = 0; i < dim[dir]; i++) {
+    _ArrayCopy1D_(index_outer,indexC,a_ndims);
+    for (i = 0; i < a_dim[a_dir]; i++) {
       int qL, qC, qR;
-      indexC[dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL);
-      indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC);
-      indexC[dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR);
-      for (v=0; v<nvars; v++)  D2f[qC*nvars+v] = f[qL*nvars+v]-2*f[qC*nvars+v]+f[qR*nvars+v];
+      indexC[a_dir] = i-1; _ArrayIndex1D_(a_ndims,a_dim,indexC,a_ghosts,qL);
+      indexC[a_dir] = i  ; _ArrayIndex1D_(a_ndims,a_dim,indexC,a_ghosts,qC);
+      indexC[a_dir] = i+1; _ArrayIndex1D_(a_ndims,a_dim,indexC,a_ghosts,qR);
+      for (v=0; v<a_nvars; v++)  a_D2f[qC*a_nvars+v] = a_f[qL*a_nvars+v]-2*a_f[qC*a_nvars+v]+a_f[qR*a_nvars+v];
     }
-    _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
+    _ArrayIncrementIndex_(a_ndims,bounds_outer,index_outer,done);
   }
 
-  if (mpi->ip[dir] == 0) {
+  if (mpi->m_ip[a_dir] == 0) {
     /* left physical boundary: overwrite the leftmost value with biased finite-difference */
-    int done = 0; _ArraySetValue_(index_outer,ndims,0);
+    int done = 0; _ArraySetValue_(index_outer,a_ndims,0);
     while (!done) {
-      _ArrayCopy1D_(index_outer,indexC,ndims);
+      _ArrayCopy1D_(index_outer,indexC,a_ndims);
       i = 0;
       int qC, qR, qR2, qR3;
-      indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC);
-      indexC[dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR);
-      indexC[dir] = i+2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR2);
-      indexC[dir] = i+3; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qR3);
-      for (v=0; v<nvars; v++)  D2f[qC*nvars+v] = 2*f[qC*nvars+v]-5*f[qR*nvars+v]+4*f[qR2*nvars+v]-f[qR3*nvars+v];
-      _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
+      indexC[a_dir] = i  ; _ArrayIndex1D_(a_ndims,a_dim,indexC,a_ghosts,qC);
+      indexC[a_dir] = i+1; _ArrayIndex1D_(a_ndims,a_dim,indexC,a_ghosts,qR);
+      indexC[a_dir] = i+2; _ArrayIndex1D_(a_ndims,a_dim,indexC,a_ghosts,qR2);
+      indexC[a_dir] = i+3; _ArrayIndex1D_(a_ndims,a_dim,indexC,a_ghosts,qR3);
+      for (v=0; v<a_nvars; v++)  a_D2f[qC*a_nvars+v] = 2*a_f[qC*a_nvars+v]-5*a_f[qR*a_nvars+v]+4*a_f[qR2*a_nvars+v]-a_f[qR3*a_nvars+v];
+      _ArrayIncrementIndex_(a_ndims,bounds_outer,index_outer,done);
     }
   }
 
-  if (mpi->ip[dir] == (mpi->iproc[dir]-1)) {
+  if (mpi->m_ip[a_dir] == (mpi->m_iproc[a_dir]-1)) {
     /* right physical boundary: overwrite the rightmost value with biased finite-difference */
-    int done = 0; _ArraySetValue_(index_outer,ndims,0);
+    int done = 0; _ArraySetValue_(index_outer,a_ndims,0);
     while (!done) {
-      _ArrayCopy1D_(index_outer,indexC,ndims);
-      i = dim[dir]-1;
+      _ArrayCopy1D_(index_outer,indexC,a_ndims);
+      i = a_dim[a_dir]-1;
       int qL3, qL2, qL, qC;
-      indexC[dir] = i-3; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL3);
-      indexC[dir] = i-2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL2);
-      indexC[dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qL);
-      indexC[dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC);
-      for (v=0; v<nvars; v++)  D2f[qC*nvars+v] = 2*f[qC*nvars+v]-5*f[qL*nvars+v]+4*f[qL2*nvars+v]-f[qL3*nvars+v];
-      _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
+      indexC[a_dir] = i-3; _ArrayIndex1D_(a_ndims,a_dim,indexC,a_ghosts,qL3);
+      indexC[a_dir] = i-2; _ArrayIndex1D_(a_ndims,a_dim,indexC,a_ghosts,qL2);
+      indexC[a_dir] = i-1; _ArrayIndex1D_(a_ndims,a_dim,indexC,a_ghosts,qL);
+      indexC[a_dir] = i  ; _ArrayIndex1D_(a_ndims,a_dim,indexC,a_ghosts,qC);
+      for (v=0; v<a_nvars; v++)  a_D2f[qC*a_nvars+v] = 2*a_f[qC*a_nvars+v]-5*a_f[qL*a_nvars+v]+4*a_f[qL2*a_nvars+v]-a_f[qL3*a_nvars+v];
+      _ArrayIncrementIndex_(a_ndims,bounds_outer,index_outer,done);
     }
   }
 

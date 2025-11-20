@@ -50,8 +50,8 @@ extern "C" int gpuNavierStokes2DFlux(
 {
   HyPar           *solver = (HyPar*)   s;
   NavierStokes2D  *param  = (NavierStokes2D*) solver->physics;
-  int             *dim    = solver->dim_local;
-  int             ghosts  = solver->ghosts;
+  int             *dim    = solver->m_dim_local;
+  int             ghosts  = solver->m_ghosts;
 
   int ngrid_points = 1; for (int i=0; i<_MODEL_NDIMS_; i++) ngrid_points *= (dim[i]+2*ghosts);
   int nblocks = (ngrid_points - 1) / GPU_THREADS_PER_BLOCK + 1;

@@ -14,45 +14,45 @@
 
 /*! Read in the exact solution, if available. */
 int ExactSolution(
-                    void   *s,     /*!< Solver object of type #HyPar */
-                    void   *m,     /*!< MPI object of type #MPIVariables */
-                    double *uex,   /*!< Array to hold the exact solution, if available */
-                    char   *fname, /*!< Filename root from which to read exact solution */
-                    int    *flag   /*!< Flag to indicate if exact solution was available */
+                    void   *a_s,     /*!< Solver object of type #HyPar */
+                    void   *a_m,     /*!< MPI object of type #MPIVariables */
+                    double *a_uex,   /*!< Array to hold the exact solution, if available */
+                    char   *a_fname, /*!< Filename root from which to read exact solution */
+                    int    *a_flag   /*!< Flag to indicate if exact solution was available */
                  )
 {
-  HyPar  *solver = (HyPar*) s;
+  HyPar  *solver = (HyPar*) a_s;
 
   int same_size = 1;
-  for (int i=0; i<solver->ndims; i++) {
-    if (solver->dim_global[i] != solver->dim_global_ex[i]) same_size = 0;
+  for (int i=0; i<solver->m_ndims; i++) {
+    if (solver->m_dim_global[i] != solver->m_dim_global_ex[i]) same_size = 0;
   }
 
   if (same_size) {
-    ReadArray( solver->ndims,
-               solver->nvars,
-               solver->dim_global,
-               solver->dim_local,
-               solver->ghosts,
+    ReadArray( solver->m_ndims,
+               solver->m_nvars,
+               solver->m_dim_global,
+               solver->m_dim_local,
+               solver->m_ghosts,
                solver,
-               m,
+               a_m,
                NULL,
-               uex,
-               fname,
-               flag);
+               a_uex,
+               a_fname,
+               a_flag);
   } else {
-    ReadArraywInterp( solver->ndims,
-                      solver->nvars,
-                      solver->dim_global,
-                      solver->dim_local,
-                      solver->dim_global_ex,
-                      solver->ghosts,
+    ReadArraywInterp( solver->m_ndims,
+                      solver->m_nvars,
+                      solver->m_dim_global,
+                      solver->m_dim_local,
+                      solver->m_dim_global_ex,
+                      solver->m_ghosts,
                       solver,
-                      m,
+                      a_m,
                       NULL,
-                      uex,
-                      fname,
-                      flag);
+                      a_uex,
+                      a_fname,
+                      a_flag);
   }
 
   return(0);

@@ -16,12 +16,12 @@
  * This structure contains all the variables for defining a banded block matrix.
 */
 typedef struct banded_matrix {
-  int nbands;                     /*!< number of block bands                  */
-  int nrows_local;                /*!< number of block rows (local)           */
-  int BlockSize;                  /*!< block size                             */
-  int *ncol;                      /*!< global column numbers for each block   */
-  int *nrow;                      /*!< global row numbers for each block      */
-  double *data;                   /*!< array containing the matrix elements   */
+  int m_nbands;                     /*!< number of block bands                  */
+  int m_nrows_local;                /*!< number of block rows (local)           */
+  int m_BlockSize;                  /*!< block size                             */
+  int *m_ncol;                      /*!< global column numbers for each block   */
+  int *m_nrow;                      /*!< global row numbers for each block      */
+  double *m_data;                   /*!< array containing the matrix elements   */
 } BandedMatrix;
 
 int BandedMatrixDestroy     (void*);  /*!< Destroy a banded block matrix object */

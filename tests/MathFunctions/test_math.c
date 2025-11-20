@@ -217,7 +217,7 @@ int test_fill_ghost_cells_periodic() {
   }
 
   /* Fill ghost cells */
-  fillGhostCells(dim, ghosts, u, nvars, ndims, periodic);
+  FillGhostCells(dim, ghosts, u, nvars, ndims, periodic);
 
   int test_result = TEST_PASS;
 
@@ -285,7 +285,7 @@ int test_fill_ghost_cells_extrapolation() {
   double u_0 = u[p_0];
 
   /* Fill ghost cells using extrapolation */
-  fillGhostCells(dim, ghosts, u, nvars, ndims, periodic);
+  FillGhostCells(dim, ghosts, u, nvars, ndims, periodic);
 
   int test_result = TEST_PASS;
 

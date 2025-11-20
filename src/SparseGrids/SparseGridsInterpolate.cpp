@@ -18,11 +18,11 @@ void SparseGridsSimulation::interpolate(  SimulationObject* const       a_dst,  
 {
   /* get the destination grid dimensions */
   GridDimensions dim_dst;
-  StdVecOps::copyFrom(dim_dst, a_dst->solver.dim_global, m_ndims);
+  StdVecOps::copyFrom(dim_dst, a_dst->solver.m_dim_global, m_ndims);
 
   /* get number of vector components */
-  int nvars = a_src->solver.nvars;
-  if (nvars != a_dst->solver.nvars) {
+  int nvars = a_src->solver.m_nvars;
+  if (nvars != a_dst->solver.m_nvars) {
     fprintf(stderr, "Error in SparseGridsSimulation::interpolate(): unequal nvars\n");
     exit(1);
   }
@@ -33,11 +33,11 @@ void SparseGridsSimulation::interpolate(  SimulationObject* const       a_dst,  
   /* partition the destination */
   MPIPartitionArraynDwGhosts( m_ndims,
                               (void*) &(a_dst->mpi),
-                              (a_dst->mpi.rank ? NULL : ug_dst),
-                              a_dst->solver.u,
-                              a_dst->solver.dim_global,
-                              a_dst->solver.dim_local,
-                              a_dst->solver.ghosts,
+                              (a_dst->mpi.m_rank ? NULL : ug_dst),
+                              a_dst->solver.m_u,
+                              a_dst->solver.m_dim_global,
+                              a_dst->solver.m_dim_local,
+                              a_dst->solver.m_ghosts,
                               nvars);
 
   if (!m_rank) {
@@ -73,21 +73,21 @@ void SparseGridsSimulation::interpolate(const GridDimensions& a_dim_dst, /*!< gr
 
   /* get the source grid dimensions */
   GridDimensions dim_src;
-  StdVecOps::copyFrom(dim_src, a_src->solver.dim_global, m_ndims);
+  StdVecOps::copyFrom(dim_src, a_src->solver.m_dim_global, m_ndims);
 
   /* get number of vector components and number of ghost points*/
-  int nvars = a_src->solver.nvars;
-  int ghosts = a_src->solver.ghosts;
+  int nvars = a_src->solver.m_nvars;
+  int ghosts = a_src->solver.m_ghosts;
 
   /* gather the source on rank 0 */
   double *ug_src = NULL;
-  if (!m_rank) allocateDataArrays(dim_src, nvars, &ug_src, ghosts);
+  if (!m_rank) allocateDataArrays(dim_src, nvars, &ug_src,ghosts);
   MPIGatherArraynDwGhosts( m_ndims,
                            (void*) &(a_src->mpi),
                            ug_src,
-                           a_src->solver.u,
-                           a_src->solver.dim_global,
-                           a_src->solver.dim_local,
+                           a_src->solver.m_u,
+                           a_src->solver.m_dim_global,
+                           a_src->solver.m_dim_local,
                            ghosts,
                            nvars );
 

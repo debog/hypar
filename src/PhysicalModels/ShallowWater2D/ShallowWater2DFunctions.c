@@ -14,13 +14,13 @@
     to interpolation functions for a characteristic-based reconstruction.
 */
 int ShallowWater2DRoeAverage(
-                      double  *uavg, /*!< The computed Roe-averaged state */
-                      double  *uL,   /*!< Left state (conserved variables)*/
-                      double  *uR,   /*!< Right state (conserved variables)*/
-                      void    *p     /*!< Object of type #ShallowWater2D with physics-related variables */
+                      double  *a_uavg, /*!< The computed Roe-averaged state */
+                      double  *a_uL,   /*!< Left state (conserved variables)*/
+                      double  *a_uR,   /*!< Right state (conserved variables)*/
+                      void    *a_p     /*!< Object of type #ShallowWater2D with physics-related variables */
                      )
 {
-  ShallowWater2D *param  = (ShallowWater2D*) p;
-  _ShallowWater2DRoeAverage_(uavg,uL,uR,param);
+  ShallowWater2D *param  = (ShallowWater2D*) a_p;
+  _ShallowWater2DRoeAverage_(a_uavg,a_uL,a_uR,param);
   return(0);
 }

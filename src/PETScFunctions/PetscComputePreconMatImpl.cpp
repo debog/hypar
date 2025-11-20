@@ -56,47 +56,47 @@
     the PETSc documentation (https://petsc.org/release/docs/). Usually, googling with the function
     or variable name yields the specific doc page dealing with that function/variable.
 */
-int PetscComputePreconMatImpl(  Mat Pmat,   /*!< Preconditioning matrix to construct */
-                                Vec Y,      /*!< Solution vector */
-                                void *ctxt  /*!< Application context */ )
+int PetscComputePreconMatImpl(  Mat a_Pmat,   /*!< Preconditioning matrix to construct */
+                                Vec a_Y,      /*!< Solution vector */
+                                void *a_ctxt  /*!< Application context */ )
 {
   PetscErrorCode ierr;
-  PETScContext* context = (PETScContext*) ctxt;
-  SimulationObject* sim = (SimulationObject*) context->simobj;
-  int nsims = context->nsims;
+  PETScContext* context = (PETScContext*) a_ctxt;
+  SimulationObject* sim = (SimulationObject*) context->m_simobj;
+  int nsims = context->m_nsims;
 
   PetscFunctionBegin;
   /* initialize preconditioning matrix to zero */
-  MatZeroEntries(Pmat);
+  MatZeroEntries(a_Pmat);
 
   /* copy solution from PETSc vector */
   for (int ns = 0; ns < nsims; ns++) {
 
-    TransferVecFromPETSc( sim[ns].solver.u,
-                          Y,
+    TransferVecFromPETSc( sim[ns].solver.m_u,
+                          a_Y,
                           context,
                           ns,
-                          context->offsets[ns]);
+                          context->m_offsets[ns]);
 
     HyPar* solver( &(sim[ns].solver) );
     MPIVariables* mpi( &(sim[ns].mpi) );
 
-    int ndims = solver->ndims,
-        nvars = solver->nvars,
-        npoints = solver->npoints_local,
-        ghosts = solver->ghosts,
-        *dim = solver->dim_local,
-        *isPeriodic = solver->isPeriodic,
-        *points = context->points[ns],
+    int ndims = solver->m_ndims,
+        nvars = solver->m_nvars,
+        npoints = solver->m_npoints_local,
+        ghosts = solver->m_ghosts,
+        *dim = solver->m_dim_local,
+        *isPeriodic = solver->m_is_periodic,
+        *points = context->m_points[ns],
         index[ndims],indexL[ndims],indexR[ndims],
         rows[nvars],cols[nvars];
 
-    double *u = solver->u,
-           *iblank = solver->iblank,
+    double *u = solver->m_u,
+           *iblank = solver->m_iblank,
            dxinv, values[nvars*nvars];
 
     /* apply boundary conditions and exchange data over MPI interfaces */
-    solver->ApplyBoundaryConditions(solver,mpi,u,NULL,context->waqt);
+    solver->ApplyBoundaryConditions(solver,mpi,u,NULL,context->m_waqt);
     MPIExchangeBoundariesnD(ndims,nvars,dim,ghosts,mpi,u);
 
     /* loop through all computational points */
@@ -105,7 +105,7 @@ int PetscComputePreconMatImpl(  Mat Pmat,   /*!< Preconditioning matrix to const
       int p = this_point[ndims];
       int index[ndims]; _ArrayCopy1D_(this_point,index,ndims);
 
-      double iblank = solver->iblank[p];
+      double iblank = solver->m_iblank[p];
 
       /* compute the contributions from the hyperbolic flux derivatives along each dimension */
       if (solver->JFunction) {
@@ -119,33 +119,33 @@ int PetscComputePreconMatImpl(  Mat Pmat,   /*!< Preconditioning matrix to const
           int pR;  _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
 
           int pg, pgL, pgR;
-          pg  = (int) context->globalDOF[ns][p];
-          pgL = (int) context->globalDOF[ns][pL];
-          pgR = (int) context->globalDOF[ns][pR];
+          pg  = (int) context->m_globalDOF[ns][p];
+          pgL = (int) context->m_globalDOF[ns][pL];
+          pgR = (int) context->m_globalDOF[ns][pR];
 
           /* Retrieve 1/delta-x at this grid point */
-          _GetCoordinate_(dir,index[dir],dim,ghosts,solver->dxinv,dxinv);
+          _GetCoordinate_(dir,index[dir],dim,ghosts,solver->m_dxinv,dxinv);
 
           /* diagonal element */
           for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pg + v; }
-          solver->JFunction(values,(u+nvars*p),solver->physics,dir,nvars,0);
+          solver->JFunction(values,(u+nvars*p),solver->m_physics,dir,nvars,0);
           _ArrayScale1D_(values,(dxinv*iblank),(nvars*nvars));
-          MatSetValues(Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
+          MatSetValues(a_Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
 
           /* left neighbor */
           if (pgL >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgL + v; }
-            solver->JFunction(values,(u+nvars*pL),solver->physics,dir,nvars,1);
+            solver->JFunction(values,(u+nvars*pL),solver->m_physics,dir,nvars,1);
             _ArrayScale1D_(values,(-dxinv*iblank),(nvars*nvars));
-            MatSetValues(Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
+            MatSetValues(a_Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
           }
 
           /* right neighbor */
           if (pgR >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgR + v; }
-            solver->JFunction(values,(u+nvars*pR),solver->physics,dir,nvars,-1);
+            solver->JFunction(values,(u+nvars*pR),solver->m_physics,dir,nvars,-1);
             _ArrayScale1D_(values,(-dxinv*iblank),(nvars*nvars));
-            MatSetValues(Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
+            MatSetValues(a_Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
           }
         }
       }
@@ -162,43 +162,43 @@ int PetscComputePreconMatImpl(  Mat Pmat,   /*!< Preconditioning matrix to const
           int pR;  _ArrayIndex1D_(ndims,dim,indexR,ghosts,pR);
 
           int pg, pgL, pgR;
-          pg  = (int) context->globalDOF[ns][p];
-          pgL = (int) context->globalDOF[ns][pL];
-          pgR = (int) context->globalDOF[ns][pR];
+          pg  = (int) context->m_globalDOF[ns][p];
+          pgL = (int) context->m_globalDOF[ns][pL];
+          pgR = (int) context->m_globalDOF[ns][pR];
 
           /* Retrieve 1/delta-x at this grid point */
-          _GetCoordinate_(dir,index[dir],dim,ghosts,solver->dxinv,dxinv);
+          _GetCoordinate_(dir,index[dir],dim,ghosts,solver->m_dxinv,dxinv);
 
           /* diagonal element */
           for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pg + v; }
-          solver->KFunction(values,(u+nvars*p),solver->physics,dir,nvars);
+          solver->KFunction(values,(u+nvars*p),solver->m_physics,dir,nvars);
           _ArrayScale1D_(values,(-2*dxinv*dxinv*iblank),(nvars*nvars));
-          MatSetValues(Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
+          MatSetValues(a_Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
 
           /* left neighbor */
           if (pgL >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgL + v; }
-            solver->KFunction(values,(u+nvars*pL),solver->physics,dir,nvars);
+            solver->KFunction(values,(u+nvars*pL),solver->m_physics,dir,nvars);
             _ArrayScale1D_(values,(dxinv*dxinv*iblank),(nvars*nvars));
-            MatSetValues(Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
+            MatSetValues(a_Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
           }
 
           /* right neighbor */
           if (pgR >= 0) {
             for (int v=0; v<nvars; v++) { rows[v] = nvars*pg + v; cols[v] = nvars*pgR + v; }
-            solver->KFunction(values,(u+nvars*pR),solver->physics,dir,nvars);
+            solver->KFunction(values,(u+nvars*pR),solver->m_physics,dir,nvars);
             _ArrayScale1D_(values,(dxinv*dxinv*iblank),(nvars*nvars));
-            MatSetValues(Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
+            MatSetValues(a_Pmat,nvars,rows,nvars,cols,values,ADD_VALUES);
           }
         }
       }
     }
   }
 
-  MatAssemblyBegin(Pmat,MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd  (Pmat,MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(a_Pmat,MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd  (a_Pmat,MAT_FINAL_ASSEMBLY);
 
-  MatShift(Pmat,context->shift);
+  MatShift(a_Pmat,context->m_shift);
   PetscFunctionReturn(0);
 }
 

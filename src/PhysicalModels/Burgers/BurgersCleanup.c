@@ -7,9 +7,9 @@
 #include <physicalmodels/burgers.h>
 
 /*! Function to clean up all physics-related allocations for the Burgers equations */
-int BurgersCleanup(void *s /*!< Solver object of type #HyPar */)
+int BurgersCleanup(void *a_s /*!< Solver object of type #HyPar */)
 {
-  Burgers *physics = (Burgers*) s;
+  Burgers *physics = (Burgers*) a_s;
 
   return(0);
 }

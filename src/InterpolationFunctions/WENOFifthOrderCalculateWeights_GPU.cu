@@ -210,10 +210,10 @@ int gpuWENOFifthOrderCalculateWeightsM(
     WENOParameters  *weno   = (WENOParameters*) solver->interp;
     MPIVariables    *mpi    = (MPIVariables*)   m;
 
-    int ghosts = solver->ghosts;
-    int ndims  = solver->ndims;
-    int nvars  = solver->nvars;
-    int *dim   = solver->dim_local;
+    int ghosts = solver->m_ghosts;
+    int ndims  = solver->m_ndims;
+    int nvars  = solver->m_nvars;
+    int *dim   = solver->m_dim_local;
     int *stride= solver->stride_with_ghosts;
 
     /* calculate dimension offset */
@@ -224,8 +224,8 @@ int gpuWENOFifthOrderCalculateWeightsM(
     int nblocks = (npoints_grid-1) / GPU_THREADS_PER_BLOCK + 1;
 
     int is_crweno      = (strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_) == 0) ? 1 : 0;
-    int is_mpi_ip_zero = (mpi->ip[dir] == 0) ? 1 : 0;
-    int is_mpi_ip_proc = (mpi->ip[dir] == mpi->iproc[dir]-1) ? 1 : 0;
+    int is_mpi_ip_zero = (mpi->m_ip[dir] == 0) ? 1 : 0;
+    int is_mpi_ip_proc = (mpi->m_ip[dir] == mpi->m_iproc[dir]-1) ? 1 : 0;
 
 #if defined(GPU_STAT)
     cudaEvent_t startEvent, stopEvent;
@@ -430,10 +430,10 @@ int gpuWENOFifthOrderCalculateWeightsYC(
     WENOParameters  *weno   = (WENOParameters*) solver->interp;
     MPIVariables    *mpi    = (MPIVariables*)   m;
 
-    int ghosts = solver->ghosts;
-    int ndims  = solver->ndims;
-    int nvars  = solver->nvars;
-    int *dim   = solver->dim_local;
+    int ghosts = solver->m_ghosts;
+    int ndims  = solver->m_ndims;
+    int nvars  = solver->m_nvars;
+    int *dim   = solver->m_dim_local;
     int *stride= solver->stride_with_ghosts;
 
     /* calculate dimension offset */
@@ -445,8 +445,8 @@ int gpuWENOFifthOrderCalculateWeightsYC(
     int nblocks = (ngrid_points - 1) / 256 + 1;
 
     int is_crweno      = (strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_) == 0) ? 1 : 0;
-    int is_mpi_ip_zero = (mpi->ip[dir] == 0) ? 1 : 0;
-    int is_mpi_ip_proc = (mpi->ip[dir] == mpi->iproc[dir]-1) ? 1 : 0;
+    int is_mpi_ip_zero = (mpi->m_ip[dir] == 0) ? 1 : 0;
+    int is_mpi_ip_proc = (mpi->m_ip[dir] == mpi->m_iproc[dir]-1) ? 1 : 0;
 
     cudaEvent_t startEvent, stopEvent;
     float milliseconds = 0;
@@ -657,10 +657,10 @@ int gpuWENOFifthOrderCalculateWeightsM(
     WENOParameters  *weno   = (WENOParameters*) solver->interp;
     MPIVariables    *mpi    = (MPIVariables*)   m;
 
-    int ghosts = solver->ghosts;
-    int ndims  = solver->ndims;
-    int nvars  = solver->nvars;
-    int *dim   = solver->dim_local;
+    int ghosts = solver->m_ghosts;
+    int ndims  = solver->m_ndims;
+    int nvars  = solver->m_nvars;
+    int *dim   = solver->m_dim_local;
     int *stride= solver->stride_with_ghosts;
 
     /* calculate dimension offset */
@@ -671,8 +671,8 @@ int gpuWENOFifthOrderCalculateWeightsM(
     int nblocks = (npoints_grid-1) / GPU_THREADS_PER_BLOCK + 1;
 
     int is_crweno      = (strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_) == 0) ? 1 : 0;
-    int is_mpi_ip_zero = (mpi->ip[dir] == 0) ? 1 : 0;
-    int is_mpi_ip_proc = (mpi->ip[dir] == mpi->iproc[dir]-1) ? 1 : 0;
+    int is_mpi_ip_zero = (mpi->m_ip[dir] == 0) ? 1 : 0;
+    int is_mpi_ip_proc = (mpi->m_ip[dir] == mpi->m_iproc[dir]-1) ? 1 : 0;
 
 #if defined(GPU_STAT)
     cudaEvent_t startEvent, stopEvent;
@@ -894,10 +894,10 @@ int gpuWENOFifthOrderCalculateWeightsYC(
     WENOParameters  *weno   = (WENOParameters*) solver->interp;
     MPIVariables    *mpi    = (MPIVariables*)   m;
 
-    int ghosts = solver->ghosts;
-    int ndims  = solver->ndims;
-    int nvars  = solver->nvars;
-    int *dim   = solver->dim_local;
+    int ghosts = solver->m_ghosts;
+    int ndims  = solver->m_ndims;
+    int nvars  = solver->m_nvars;
+    int *dim   = solver->m_dim_local;
     int *stride= solver->stride_with_ghosts;
 
     /* calculate dimension offset */
@@ -908,8 +908,8 @@ int gpuWENOFifthOrderCalculateWeightsYC(
     int nblocks = (npoints_grid-1) / GPU_THREADS_PER_BLOCK + 1;
 
     int is_crweno      = (strcmp(solver->spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_) == 0) ? 1 : 0;
-    int is_mpi_ip_zero = (mpi->ip[dir] == 0) ? 1 : 0;
-    int is_mpi_ip_proc = (mpi->ip[dir] == mpi->iproc[dir]-1) ? 1 : 0;
+    int is_mpi_ip_zero = (mpi->m_ip[dir] == 0) ? 1 : 0;
+    int is_mpi_ip_proc = (mpi->m_ip[dir] == mpi->m_iproc[dir]-1) ? 1 : 0;
 
 #if defined(GPU_STAT)
     cudaEvent_t startEvent, stopEvent;

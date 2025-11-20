@@ -14,9 +14,9 @@
       doi:10.1146/annurev.fl.18.010186.002005
 */
 double LimiterMinMod(
-                      double r /*!< Input slope ratio */
+                      double a_r /*!< Input slope ratio */
                     )
 {
-  double retval = max(0.0,min(1.0,r));
+  double retval = max(0.0,min(1.0,a_r));
   return retval;
 }

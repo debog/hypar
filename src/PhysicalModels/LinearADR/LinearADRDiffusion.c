@@ -23,21 +23,21 @@
     \sum_d \frac {\partial^2} {\partial x_d^2} \left( \nu_d u \right)
     \f}
 */
-int LinearADRDiffusionG(  double  *f, /*!< Array to hold the computed diffusion term (same size and layout as u) */
-                          double  *u, /*!< Array containing the solution */
-                          int     dir,/*!< Spatial dimension (unused since this is a 1D system) */
-                          void    *s, /*!< Solver object of type #HyPar */
-                          double  t   /*!< Current time */
+int LinearADRDiffusionG(  double  *a_f, /*!< Array to hold the computed diffusion term (same size and layout as a_u) */
+                          double  *a_u, /*!< Array containing the solution */
+                          int     a_dir,/*!< Spatial dimension (unused since this is a 1D system) */
+                          void    *a_s, /*!< Solver object of type #HyPar */
+                          double  a_t   /*!< Current time */
                        )
 {
-  HyPar     *solver = (HyPar*)     s;
-  LinearADR *param  = (LinearADR*) solver->physics;
+  HyPar     *solver = (HyPar*)     a_s;
+  LinearADR *param  = (LinearADR*) solver->m_physics;
   int       i, v;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
   int index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -50,7 +50,7 @@ int LinearADRDiffusionG(  double  *f, /*!< Array to hold the computed diffusion 
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-    for (v = 0; v < nvars; v++) f[nvars*p+v] = param->d[nvars*dir+v] * u[nvars*p+v];
+    for (v = 0; v < nvars; v++) a_f[nvars*p+v] = param->m_d[nvars*a_dir+v] * a_u[nvars*p+v];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 
@@ -71,27 +71,27 @@ int LinearADRDiffusionG(  double  *f, /*!< Array to hold the computed diffusion 
 
     \b Note: it's not correctly implemented. Will implement when necessary.
 */
-int LinearADRDiffusionH(  double  *f,   /*!< Array to hold the computed diffusion term (same size and layout as u) */
-                          double  *u,   /*!< Array containing the solution */
-                          int     dir1, /*!< First spatial dimension of the double derivative \f$d_1\f$ */
-                          int     dir2, /*!< Second spatial dimension of the double derivative \f$d_2\f$ */
-                          void    *s,   /*!< Solver object of type #HyPar */
-                          double  t     /*!< Current time */
+int LinearADRDiffusionH(  double  *a_f,   /*!< Array to hold the computed diffusion term (same size and layout as a_u) */
+                          double  *a_u,   /*!< Array containing the solution */
+                          int     a_dir1, /*!< First spatial dimension of the double derivative \f$d_1\f$ */
+                          int     a_dir2, /*!< Second spatial dimension of the double derivative \f$d_2\f$ */
+                          void    *a_s,   /*!< Solver object of type #HyPar */
+                          double  a_t   /*!< Current time */
                         )
 {
-  HyPar     *solver = (HyPar*)     s;
-  LinearADR *param  = (LinearADR*) solver->physics;
+  HyPar     *solver = (HyPar*)     a_s;
+  LinearADR *param  = (LinearADR*) solver->m_physics;
   int       i, v;
 
-  int *dim    = solver->dim_local;
-  int ghosts  = solver->ghosts;
-  int ndims   = solver->ndims;
-  int nvars   = solver->nvars;
+  int *dim    = solver->m_dim_local;
+  int ghosts  = solver->m_ghosts;
+  int ndims   = solver->m_ndims;
+  int nvars   = solver->m_nvars;
   int index[ndims], bounds[ndims], offset[ndims];
 
-  if (dir1 == dir2) {
+  if (a_dir1 == a_dir2) {
 
-    int dir = dir1;
+    int dir = a_dir1;
 
     /* set bounds for array index to include ghost points */
     _ArrayCopy1D_(dim,bounds,ndims);
@@ -103,11 +103,11 @@ int LinearADRDiffusionH(  double  *f,   /*!< Array to hold the computed diffusio
     int done = 0; _ArraySetValue_(index,ndims,0);
     while (!done) {
       int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
-      for (v = 0; v < nvars; v++) f[nvars*p+v] = param->d[nvars*dir+v] * u[nvars*p+v];
+      for (v = 0; v < nvars; v++) a_f[nvars*p+v] = param->m_d[nvars*dir+v] * a_u[nvars*p+v];
       _ArrayIncrementIndex_(ndims,bounds,index,done);
     }
 
-  } else _ArraySetValue_(f,solver->npoints_local_wghosts*nvars,0.0);
+  } else _ArraySetValue_(a_f,solver->m_npoints_local_wghosts*nvars,0.0);
 
 
   return(0);

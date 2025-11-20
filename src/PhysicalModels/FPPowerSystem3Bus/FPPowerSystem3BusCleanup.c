@@ -8,10 +8,10 @@
 
 /*! Clean up allocations in the #FPPowerSystem3Bus system */
 int FPPowerSystem3BusCleanup(
-                              void *s /*!< Object of type #FPPowerSystem3Bus */
+                              void *a_s /*!< Object of type #FPPowerSystem3Bus */
                             )
 {
-  FPPowerSystem3Bus *physics = (FPPowerSystem3Bus*) s;
+  FPPowerSystem3Bus *physics = (FPPowerSystem3Bus*) a_s;
   free(physics->G);
   free(physics->B);
   return(0);

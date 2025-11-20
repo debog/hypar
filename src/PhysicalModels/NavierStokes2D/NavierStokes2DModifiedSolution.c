@@ -29,20 +29,20 @@
       for Atmospheric Flows, AIAA Journal, 54 (4), 2016, pp. 1370-1385, http://dx.doi.org/10.2514/1.J054580.
 */
 int NavierStokes2DModifiedSolution(
-                                    double  *uC,  /*!< Array to hold the computed modified solution */
-                                    double  *u,   /*!< Solution vector array */
-                                    int     d,    /*!< spatial dimension (not used) */
-                                    void    *s,   /*!< Solver object of type #HyPar */
-                                    void    *m,   /*!< MPI object of time #MPIVariables */
+                                    double  *a_uC,  /*!< Array to hold the computed modified solution */
+                                    double  *a_u,   /*!< Solution vector array */
+                                    int     a_d,    /*!< spatial dimension (not used) */
+                                    void    *a_s,   /*!< Solver object of type #HyPar */
+                                    void    *a_m,   /*!< MPI object of time #MPIVariables */
                                     double waqt   /*!< Current simulation time */
                                   )
 {
-  HyPar           *solver = (HyPar*)          s;
-  NavierStokes2D  *param  = (NavierStokes2D*) solver->physics;
+  HyPar           *solver = (HyPar*)          a_s;
+  NavierStokes2D  *param  = (NavierStokes2D*) solver->m_physics;
 
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  int     ndims   = solver->ndims;
+  int ghosts = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -53,16 +53,16 @@ int NavierStokes2DModifiedSolution(
   _ArraySetValue_(offset,ndims,-ghosts);
 
   int done = 0; _ArraySetValue_(index,ndims,0);
-  double inv_gamma_m1 = 1.0 / (param->gamma-1.0);
+  double inv_gamma_m1 = 1.0 / (param->m_gamma-1.0);
 
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double rho, uvel, vvel, E, P;
-    _NavierStokes2DGetFlowVar_((u+_MODEL_NVARS_*p),rho,uvel,vvel,E,P,param->gamma);
-    uC[_MODEL_NVARS_*p+0] = u[_MODEL_NVARS_*p+0] * param->grav_field_f[p];
-    uC[_MODEL_NVARS_*p+1] = u[_MODEL_NVARS_*p+1] * param->grav_field_f[p];
-    uC[_MODEL_NVARS_*p+2] = u[_MODEL_NVARS_*p+2] * param->grav_field_f[p];
-    uC[_MODEL_NVARS_*p+3] = (P*inv_gamma_m1)*(1.0/param->grav_field_g[p]) + (0.5*rho*(uvel*uvel+vvel*vvel))*param->grav_field_f[p];
+    _NavierStokes2DGetFlowVar_((a_u+_MODEL_NVARS_*p),rho,uvel,vvel,E,P,param->m_gamma);
+    a_uC[_MODEL_NVARS_*p+0] = a_u[_MODEL_NVARS_*p+0] * param->m_grav_field_f[p];
+    a_uC[_MODEL_NVARS_*p+1] = a_u[_MODEL_NVARS_*p+1] * param->m_grav_field_f[p];
+    a_uC[_MODEL_NVARS_*p+2] = a_u[_MODEL_NVARS_*p+2] * param->m_grav_field_f[p];
+    a_uC[_MODEL_NVARS_*p+3] = (P*inv_gamma_m1)*(1.0/param->m_grav_field_g[p]) + (0.5*rho*(uvel*uvel+vvel*vvel))*param->m_grav_field_f[p];
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

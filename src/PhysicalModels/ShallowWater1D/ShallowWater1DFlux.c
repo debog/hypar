@@ -14,17 +14,17 @@
     \f}
 */
 int ShallowWater1DFlux(
-                        double  *f, /*!< Array to hold the computed flux (same size and layout as u) */
-                        double  *u, /*!< Array containing the conserved solution */
-                        int     dir,/*!< Spatial dimension (unused since this is a 1D system) */
-                        void    *s, /*!< Solver object of type #HyPar */
-                        double  t   /*!< Current time */
+                        double  *a_f, /*!< Array to hold the computed flux (same size and layout as a_u) */
+                        double  *a_u, /*!< Array containing the conserved solution */
+                        int     a_dir,/*!< Spatial dimension (unused since this is a 1D system) */
+                        void    *a_s, /*!< Solver object of type #HyPar */
+                        double  a_t   /*!< Current time */
                       )
 {
-  HyPar             *solver = (HyPar*)   s;
-  ShallowWater1D    *param  = (ShallowWater1D*) solver->physics;
-  int               *dim    = solver->dim_local;
-  int               ghosts  = solver->ghosts;
+  HyPar             *solver = (HyPar*)   a_s;
+  ShallowWater1D    *param  = (ShallowWater1D*) solver->m_physics;
+  int               *dim    = solver->m_dim_local;
+  int               ghosts  = solver->m_ghosts;
   static const int  ndims   = _MODEL_NDIMS_;
   static const int  nvars   = _MODEL_NVARS_;
   static int        index[_MODEL_NDIMS_], bounds[_MODEL_NDIMS_], offset[_MODEL_NDIMS_];
@@ -38,8 +38,8 @@ int ShallowWater1DFlux(
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p);
     double h, v;
-    _ShallowWater1DGetFlowVar_((u+nvars*p),h,v);
-    _ShallowWater1DSetFlux_((f+nvars*p),h,v,param->g);
+    _ShallowWater1DGetFlowVar_((a_u+nvars*p),h,v);
+    _ShallowWater1DSetFlux_((a_f+nvars*p),h,v,param->m_g);
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
 

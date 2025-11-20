@@ -18,21 +18,21 @@ int    FPPowerSystem1BusUpwind            (double*,double*,double*,double*,
 int    FPPowerSystem1BusPostStep          (double*,void*,void*,double,int);
 int    FPPowerSystem1BusPrintStep         (void*,void*,double);
 
-int FPPowerSystem1BusInitialize(void *s,void *m)
+int FPPowerSystem1BusInitialize(void *a_s,void *a_m)
 {
-  HyPar               *solver  = (HyPar*)             s;
-  MPIVariables        *mpi     = (MPIVariables*)      m;
-  FPPowerSystem1Bus   *physics = (FPPowerSystem1Bus*) solver->physics;
+  HyPar               *solver  = (HyPar*)             a_s;
+  MPIVariables        *mpi     = (MPIVariables*)      a_m;
+  FPPowerSystem1Bus   *physics = (FPPowerSystem1Bus*) solver->m_physics;
   int                 ferr;
   _DECLARE_IERR_;
 
   static int count = 0;
 
-  if (solver->nvars != _MODEL_NVARS_) {
+  if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in FPPowerSystem1BusInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
     return(1);
   }
-  if (solver->ndims != _MODEL_NDIMS_) {
+  if (solver->m_ndims != _MODEL_NDIMS_) {
     fprintf(stderr,"Error in FPPowerSystem1BusInitialize(): ndims has to be %d.\n",_MODEL_NDIMS_);
     return(1);
   }
@@ -48,17 +48,17 @@ int FPPowerSystem1BusInitialize(void *s,void *m)
   physics->lambda = 100.0 / physics->omegaB;
 
   /* reading physical model specific inputs */
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
     FILE *in;
     if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
           if      (!strcmp(word, "omegaS")) {ferr=fscanf(in,"%lf",&physics->omegaS);if(ferr!=1)return(1);}
           else if (!strcmp(word, "omegaB")) {ferr=fscanf(in,"%lf",&physics->omegaB);if(ferr!=1)return(1);}
           else if (!strcmp(word, "H"     )) {ferr=fscanf(in,"%lf",&physics->H     );if(ferr!=1)return(1);}
@@ -77,18 +77,18 @@ int FPPowerSystem1BusInitialize(void *s,void *m)
   }
 
 #ifndef serial
-  IERR MPIBroadcast_double(&physics->omegaS,1,0,&mpi->world);                        CHECKERR(ierr);
-  IERR MPIBroadcast_double(&physics->omegaB,1,0,&mpi->world);                        CHECKERR(ierr);
-  IERR MPIBroadcast_double(&physics->H     ,1,0,&mpi->world);                        CHECKERR(ierr);
-  IERR MPIBroadcast_double(&physics->D     ,1,0,&mpi->world);                        CHECKERR(ierr);
-  IERR MPIBroadcast_double(&physics->Pm_avg,1,0,&mpi->world);                        CHECKERR(ierr);
-  IERR MPIBroadcast_double(&physics->Pmax  ,1,0,&mpi->world);                        CHECKERR(ierr);
-  IERR MPIBroadcast_double(&physics->sigma ,1,0,&mpi->world);                        CHECKERR(ierr);
-  IERR MPIBroadcast_double(&physics->lambda,1,0,&mpi->world);                        CHECKERR(ierr);
+  IERR MPIBroadcast_double(&physics->omegaS,1,0,&mpi->m_world);                        CHECKERR(ierr);
+  IERR MPIBroadcast_double(&physics->omegaB,1,0,&mpi->m_world);                        CHECKERR(ierr);
+  IERR MPIBroadcast_double(&physics->H     ,1,0,&mpi->m_world);                        CHECKERR(ierr);
+  IERR MPIBroadcast_double(&physics->D     ,1,0,&mpi->m_world);                        CHECKERR(ierr);
+  IERR MPIBroadcast_double(&physics->Pm_avg,1,0,&mpi->m_world);                        CHECKERR(ierr);
+  IERR MPIBroadcast_double(&physics->Pmax  ,1,0,&mpi->m_world);                        CHECKERR(ierr);
+  IERR MPIBroadcast_double(&physics->sigma ,1,0,&mpi->m_world);                        CHECKERR(ierr);
+  IERR MPIBroadcast_double(&physics->lambda,1,0,&mpi->m_world);                        CHECKERR(ierr);
 #endif
 
-  if (!strcmp(solver->SplitHyperbolicFlux,"yes")) {
-    if (!mpi->rank) {
+  if (!strcmp(solver->m_split_hyperbolic_flux,"yes")) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in FPPowerSystem1BusInitialize: This physical model does not have a splitting ");
       fprintf(stderr,"of the hyperbolic term defined.\n");
     }
@@ -107,10 +107,10 @@ int FPPowerSystem1BusInitialize(void *s,void *m)
 
   /* check that solver is using the correct diffusion formulation */
 /*
-  if ((strcmp(solver->spatial_type_par,_NC_2STAGE_)) && (strcmp(solver->spatial_type_par,_NC_1_5STAGE_))) {
-    if (!mpi->rank) {
+  if ((strcmp(solver->m_spatial_type_par,_NC_2STAGE_)) && (strcmp(solver->m_spatial_type_par,_NC_1_5STAGE_))) {
+    if (!mpi->m_rank) {
       fprintf(stderr,"Error in FPPowerSystem1BusInitialize(): Parabolic term spatial discretization must be ");
-      fprintf(stderr,"\"%s\" or \"%s\".\n",_NC_2STAGE_,_NC_1_5STAGE_);
+      fprintf(stderr,"\"%a_s\" or \"%a_s\".\n",_NC_2STAGE_,_NC_1_5STAGE_);
     }
     return(1);
   }

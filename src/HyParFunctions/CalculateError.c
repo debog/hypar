@@ -23,26 +23,26 @@ int ExactSolution(void*,void*,double*,char*,int*);
     in the same format as the initial solution.
 */
 int CalculateError(
-                    void *s, /*!< Solver object of type #HyPar */
-                    void *m  /*!< MPI object of type #MPIVariables */
+                    void *a_s, /*!< Solver object of type #HyPar */
+                    void *a_m  /*!< MPI object of type #MPIVariables */
                   )
 {
-  HyPar         *solver     = (HyPar*)        s;
-  MPIVariables  *mpi        = (MPIVariables*) m;
+  HyPar         *solver     = (HyPar*)        a_s;
+  MPIVariables  *mpi        = (MPIVariables*) a_m;
   int           exact_flag  = 0, i, size;
   double        sum         = 0, global_sum = 0;
   double        *uex        = NULL;
   _DECLARE_IERR_;
 
-  size = solver->nvars;
-  for (i = 0; i < solver->ndims; i++)
-    size *= (solver->dim_local[i]+2*solver->ghosts);
+  size = solver->m_nvars;
+  for (i = 0; i < solver->m_ndims; i++)
+    size *= (solver->m_dim_local[i]+2*solver->m_ghosts);
   uex = (double*) calloc (size, sizeof(double));
 
   char fname_root[_MAX_STRING_SIZE_] = "exact";
-  if (solver->nsims > 1) {
+  if (solver->m_nsims > 1) {
     char index[_MAX_STRING_SIZE_];
-    GetStringFromInteger(solver->my_idx, index, (int)log10(solver->nsims)+1);
+    GetStringFromInteger(solver->m_my_idx, index, (int)log10(solver->m_nsims)+1);
     strcat(fname_root, "_");
     strcat(fname_root, index);
   }
@@ -58,7 +58,7 @@ int CalculateError(
 
     /* No exact solution */
     IERR TimeError(solver,mpi,NULL); CHECKERR(ierr);
-    solver->error[0] = solver->error[1] = solver->error[2] = -1;
+    solver->m_error[0] = solver->m_error[1] = solver->m_error[2] = -1;
 
   } else {
 
@@ -67,41 +67,41 @@ int CalculateError(
     /* calculate solution norms (for relative error) */
     double solution_norm[3] = {0.0,0.0,0.0};
     /* L1 */
-    sum = ArraySumAbsnD   (solver->nvars,solver->ndims,solver->dim_local,
-                           solver->ghosts,solver->index,uex);
-    global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-    solution_norm[0] = global_sum/((double)solver->npoints_global);
+    sum = ArraySumAbsnD   (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                           solver->m_ghosts,solver->m_index,uex);
+    global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+    solution_norm[0] = global_sum/((double)solver->m_npoints_global);
     /* L2 */
-    sum = ArraySumSquarenD(solver->nvars,solver->ndims,solver->dim_local,
-                           solver->ghosts,solver->index,uex);
-    global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-    solution_norm[1] = sqrt(global_sum/((double)solver->npoints_global));
+    sum = ArraySumSquarenD(solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                           solver->m_ghosts,solver->m_index,uex);
+    global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+    solution_norm[1] = sqrt(global_sum/((double)solver->m_npoints_global));
     /* Linf */
-    sum = ArrayMaxnD      (solver->nvars,solver->ndims,solver->dim_local,
-                           solver->ghosts,solver->index,uex);
-    global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
+    sum = ArrayMaxnD      (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                           solver->m_ghosts,solver->m_index,uex);
+    global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->m_world);
     solution_norm[2] = global_sum;
 
     /* compute error = difference between exact and numerical solution */
-    _ArrayAXPY_(solver->u,-1.0,uex,size);
+    _ArrayAXPY_(solver->m_u,-1.0,uex,size);
 
     /* calculate L1 norm of error */
-    sum = ArraySumAbsnD   (solver->nvars,solver->ndims,solver->dim_local,
-                           solver->ghosts,solver->index,uex);
-    global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-    solver->error[0] = global_sum/((double)solver->npoints_global);
+    sum = ArraySumAbsnD   (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                           solver->m_ghosts,solver->m_index,uex);
+    global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+    solver->m_error[0] = global_sum/((double)solver->m_npoints_global);
 
     /* calculate L2 norm of error */
-    sum = ArraySumSquarenD(solver->nvars,solver->ndims,solver->dim_local,
-                           solver->ghosts,solver->index,uex);
-    global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->world);
-    solver->error[1] = sqrt(global_sum/((double)solver->npoints_global));
+    sum = ArraySumSquarenD(solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                           solver->m_ghosts,solver->m_index,uex);
+    global_sum = 0; MPISum_double(&global_sum,&sum,1,&mpi->m_world);
+    solver->m_error[1] = sqrt(global_sum/((double)solver->m_npoints_global));
 
     /* calculate Linf norm of error */
-    sum = ArrayMaxnD      (solver->nvars,solver->ndims,solver->dim_local,
-                           solver->ghosts,solver->index,uex);
-    global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->world);
-    solver->error[2] = global_sum;
+    sum = ArrayMaxnD      (solver->m_nvars,solver->m_ndims,solver->m_dim_local,
+                           solver->m_ghosts,solver->m_index,uex);
+    global_sum = 0; MPIMax_double(&global_sum,&sum,1,&mpi->m_world);
+    solver->m_error[2] = global_sum;
 
     /*
       decide whether to normalize and report relative errors,
@@ -110,9 +110,9 @@ int CalculateError(
     if (    (solution_norm[0] > tolerance)
         &&  (solution_norm[1] > tolerance)
         &&  (solution_norm[2] > tolerance) ) {
-      solver->error[0] /= solution_norm[0];
-      solver->error[1] /= solution_norm[1];
-      solver->error[2] /= solution_norm[2];
+      solver->m_error[0] /= solution_norm[0];
+      solver->m_error[1] /= solution_norm[1];
+      solver->m_error[2] /= solution_norm[2];
     }
   }
 

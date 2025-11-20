@@ -16,27 +16,27 @@
     (i=start; i<=end; i++).
 */
 int MPILocalDomainLimits(
-                          int   ndims,        /*!< Number of spatial dimensions */
-                          int   p,            /*!< MPI rank */
-                          void  *m,           /*!< MPI object of type #MPIVariables */
-                          int   *dim_global,  /*!< Integer array with elements as global size in each spatial dimension */
-                          int   *is,          /*!< Integer array whose elements will contain the starting index of the local domain on rank \a p */
-                          int   *ie           /*!< Integer array whose elements will contain the ending index of the local domain on rank \a p */
+                          int   a_ndims,        /*!< Number of spatial dimensions */
+                          int   a_p,            /*!< MPI rank */
+                          void  *a_m,           /*!< MPI object of type #MPIVariables */
+                          int   *a_dim_global,  /*!< Integer array with elements as global size in each spatial dimension */
+                          int   *a_is,          /*!< Integer array whose elements will contain the starting index of the local domain on rank \a p */
+                          int   *a_ie           /*!< Integer array whose elements will contain the ending index of the local domain on rank \a p */
                         )
 {
-  MPIVariables *mpi = (MPIVariables*) m;
+  MPIVariables *mpi = (MPIVariables*) a_m;
   int          i;
   _DECLARE_IERR_;
 
-  int ip[ndims];
-  IERR MPIRanknD(ndims,p,mpi->iproc,ip); CHECKERR(ierr);
+  int ip[a_ndims];
+  IERR MPIRanknD(a_ndims,a_p,mpi->m_iproc,ip); CHECKERR(ierr);
 
-  for (i=0; i<ndims; i++) {
+  for (i=0; i<a_ndims; i++) {
     int imax_local, isize, root = 0;
-    imax_local = MPIPartition1D(dim_global[i],mpi->iproc[i],root );
-    isize      = MPIPartition1D(dim_global[i],mpi->iproc[i],ip[i]);
-    if (is)  is[i] = ip[i]*imax_local;
-    if (ie)  ie[i] = ip[i]*imax_local + isize;
+    imax_local = MPIPartition1D(a_dim_global[i],mpi->m_iproc[i],root );
+    isize      = MPIPartition1D(a_dim_global[i],mpi->m_iproc[i],ip[i]);
+    if (a_is)  a_is[i] = ip[i]*imax_local;
+    if (a_ie)  a_ie[i] = ip[i]*imax_local + isize;
   }
   return(0);
 }

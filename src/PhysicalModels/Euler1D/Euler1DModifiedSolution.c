@@ -21,20 +21,20 @@
     Page 651 on why this modification is needed.
 */
 int Euler1DModifiedSolution(
-                            double  *uC, /*!< The modified solution (same array size and layout as u) */
-                            double  *u,  /*!< The solution (conserved variables) */
-                            int     d,   /*!< Spatial dimension (unused since this is a 1D system) */
-                            void    *s,  /*!< Solver object of type #HyPar */
-                            void    *m,  /*!< MPI object of type #MPIVariables */
+                            double  *a_uC, /*!< The modified solution (same array size and layout as a_u) */
+                            double  *a_u,  /*!< The solution (conserved variables) */
+                            int     a_d,   /*!< Spatial dimension (unused since this is a 1D system) */
+                            void    *a_s,  /*!< Solver object of type #HyPar */
+                            void    *a_m,  /*!< MPI object of type #MPIVariables */
                             double  waqt /*!< Current solution time */
                            )
 {
-  HyPar         *solver = (HyPar*)         s;
-  Euler1D       *param  = (Euler1D*)       solver->physics;
+  HyPar         *solver = (HyPar*)         a_s;
+  Euler1D       *param  = (Euler1D*)       solver->m_physics;
 
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  int     ndims   = solver->ndims;
+  int ghosts = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  int     ndims   = solver->m_ndims;
   int     index[ndims], bounds[ndims], offset[ndims];
 
   /* set bounds for array index to include ghost points */
@@ -47,7 +47,7 @@ int Euler1DModifiedSolution(
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
     int p; _ArrayIndex1DWO_(ndims,dim,index,offset,ghosts,p); p *= _MODEL_NVARS_;
-    _ArrayScaleCopy1D_((u+p),(1.0/param->grav_field[p/_MODEL_NVARS_]),(uC+p),_MODEL_NVARS_);
+    _ArrayScaleCopy1D_((a_u+p),(1.0/param->m_grav_field[p/_MODEL_NVARS_]),(a_uC+p),_MODEL_NVARS_);
     _ArrayIncrementIndex_(ndims,bounds,index,done);
   }
   return(0);

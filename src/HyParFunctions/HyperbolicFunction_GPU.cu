@@ -202,10 +202,10 @@ extern "C" int gpuHyperbolicFunction(
     double        *gpu_FluxI  = solver->fluxI; /* interface flux     */
     double        *gpu_FluxC  = solver->fluxC; /* cell centered flux */
 
-    int     ndims     = solver->ndims;
-    int     nvars     = solver->nvars;
-    int     ghosts    = solver->ghosts;
-    int     *dim      = solver->dim_local;
+    int     ndims     = solver->m_ndims;
+    int     nvars     = solver->m_nvars;
+    int     ghosts    = solver->m_ghosts;
+    int     *dim      = solver->m_dim_local;
     int     size      = solver->npoints_local_wghosts;
     double  *gpu_x     = solver->gpu_x;
     double  *gpu_dxinv = solver->gpu_dxinv;
@@ -492,10 +492,10 @@ extern "C" int gpuHyperbolicFunction(
     double        *FluxI  = solver->fluxI; /* interface flux     */
     double        *FluxC  = solver->fluxC; /* cell centered flux */
 
-    int     ndims     = solver->ndims;
-    int     nvars     = solver->nvars;
-    int     ghosts    = solver->ghosts;
-    int     *dim      = solver->dim_local;
+    int     ndims     = solver->m_ndims;
+    int     nvars     = solver->m_nvars;
+    int     ghosts    = solver->m_ghosts;
+    int     *dim      = solver->m_dim_local;
     int     size      = solver->npoints_local_wghosts;
     double  *x        = solver->gpu_x;
     double  *dxinv    = solver->gpu_dxinv;
@@ -703,9 +703,9 @@ int DefaultUpwinding(
   HyPar *solver = (HyPar*)    s;
   int   done;
 
-  int *dim  = solver->dim_local;
-  int ndims = solver->ndims;
-  int nvars = solver->nvars;
+  int *dim  = solver->m_dim_local;
+  int ndims = solver->m_ndims;
+  int nvars = solver->m_nvars;
 
   int bounds_outer[ndims], bounds_inter[ndims];
   _ArrayCopy1D_(dim,bounds_outer,ndims); bounds_outer[dir] =  1;

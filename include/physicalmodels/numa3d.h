@@ -94,24 +94,24 @@
 #define _Numa3DSetSource_(s,param,uvel,vvel,drho,rho0) \
   { \
     s[0] =  0.0; \
-    s[1] =  2.0*param->Omega*vvel*(rho0+drho); \
-    s[2] = -2.0*param->Omega*uvel*(rho0+drho); \
-    s[3] = -param->g*drho; \
+    s[1] =  2.0*param->m_Omega*vvel*(rho0+drho); \
+    s[2] = -2.0*param->m_Omega*uvel*(rho0+drho); \
+    s[3] = -param->m_g*drho; \
     s[4] =  0.0; \
   }
 
 #define _Numa3DComputePressure_(params,T0,dT,P0,dP) \
   { \
-    double gamma    = params->gamma; \
+    double gamma    = params->m_gamma; \
     double Pref     = params->Pref; \
-    double R        = params->R; \
+    double R        = params->m_R; \
     double P_total  = Pref * raiseto((R*(T0+dT)/Pref),gamma); \
     dP  = P_total - P0; \
   }
 
 #define _Numa3DComputeLinearizedPressure_(params,T0,dT,P0,dP) \
   { \
-    double gamma    = params->gamma; \
+    double gamma    = params->m_gamma; \
     dP  = (gamma*P0/T0) * dT; \
   }
 
@@ -126,11 +126,11 @@
   }
 
 typedef struct numa3d_parameters {
-  double  gamma;      /* Ratio of heat capacities       */
-  double  R;          /* Universal gas constant         */
-  double  Omega;      /* Angular speed of Earth         */
-  double  g;          /* acceleration due to gravity    */
-  int     init_atmos; /* choice of initial atmosphere   */
+  double  m_gamma;      /* Ratio of heat capacities       */
+  double  m_R;          /* Universal gas constant         */
+  double  m_Omega;      /* Angular speed of Earth         */
+  double  m_g;          /* acceleration due to gravity    */
+  int     m_init_atmos; /* choice of initial atmosphere   */
 
   /* pressure & temperature at zero altitude */
   double Pref, Tref;
@@ -139,7 +139,7 @@ typedef struct numa3d_parameters {
   void (*StandardAtmosphere)(void*,double,double*,double*,double*,double*);
 
   /* choice of upwinding scheme */
-  char upwind[_MAX_STRING_SIZE_];
+  char m_upwind[_MAX_STRING_SIZE_];
 } Numa3D;
 
 int Numa3DInitialize (void*,void*);

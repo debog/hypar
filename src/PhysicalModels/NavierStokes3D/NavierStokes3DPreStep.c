@@ -30,16 +30,16 @@
       38 (3), 2016, A1848-A1875, http://dx.doi.org/10.1137/15M1044369.
 */
 int NavierStokes3DPreStep(
-                            double  *u,   /*!< Solution vector */
-                            void    *s,   /*!< Solver object of type #HyPar */
-                            void    *m,   /*!< MPI object of type #MPIVariables */
+                            double  *a_u,   /*!< Solution vector */
+                            void    *a_s,   /*!< Solver object of type #HyPar */
+                            void    *a_m,   /*!< MPI object of type #MPIVariables */
                             double  waqt  /*!< Current simulation time */
                          )
 {
-  HyPar             *solver = (HyPar*)   s;
-  NavierStokes3D    *param  = (NavierStokes3D*) solver->physics;
-  int               *dim    = solver->dim_local;
-  int               ghosts  = solver->ghosts, dir, p;
+  HyPar             *solver = (HyPar*)   a_s;
+  NavierStokes3D    *param  = (NavierStokes3D*) solver->m_physics;
+  int               *dim    = solver->m_dim_local;
+  int               ghosts  = solver->m_ghosts, dir, p;
   double            *A;
 
   static const int  ndims   = _MODEL_NDIMS_;
@@ -53,7 +53,7 @@ int NavierStokes3DPreStep(
   /* set offset such that index is compatible with ghost point arrangement */
   _ArraySetValue_(offset,ndims,-ghosts);
   /* copy the solution to act as a reference for linearization */
-  _ArrayCopy1D_(u,param->solution,(solver->npoints_local_wghosts*_MODEL_NVARS_));
+  _ArrayCopy1D_(a_u,param->solution,(solver->m_npoints_local_wghosts*_MODEL_NVARS_));
 
   int done = 0; _ArraySetValue_(index,ndims,0);
   while (!done) {
@@ -61,23 +61,23 @@ int NavierStokes3DPreStep(
     int q = _MODEL_NVARS_*p;
 
     dir = _XDIR_;
-    A = (param->fast_jac + _MODEL_NDIMS_*JacSize*p + dir*JacSize);
+    A = (param->m_fast_jac + _MODEL_NDIMS_*JacSize*p + dir*JacSize);
     /* get the eigenvalues, and left & right eigenvectors */
-    _NavierStokes3DEigenvalues_      ((u+q),_NavierStokes3D_stride_,D,param->gamma,dir);
-    _NavierStokes3DLeftEigenvectors_ ((u+q),_NavierStokes3D_stride_,L,param->gamma,dir);
-    _NavierStokes3DRightEigenvectors_((u+q),_NavierStokes3D_stride_,R,param->gamma,dir);
-    /* remove the entropy modes (corresponding to eigenvalues u) */
+    _NavierStokes3DEigenvalues_      ((a_u+q),_NavierStokes3D_stride_,D,param->m_gamma,dir);
+    _NavierStokes3DLeftEigenvectors_ ((a_u+q),_NavierStokes3D_stride_,L,param->m_gamma,dir);
+    _NavierStokes3DRightEigenvectors_((a_u+q),_NavierStokes3D_stride_,R,param->m_gamma,dir);
+    /* remove the entropy modes (corresponding to eigenvalues a_u) */
     D[0] = D[12] = D[18] = 0.0;
     /* assemble the Jacobian */
     MatMult5(_MODEL_NVARS_,DL,D,L );
     MatMult5(_MODEL_NVARS_,A ,R,DL);
 
     dir = _YDIR_;
-    A = (param->fast_jac + _MODEL_NDIMS_*JacSize*p + dir*JacSize);
+    A = (param->m_fast_jac + _MODEL_NDIMS_*JacSize*p + dir*JacSize);
     /* get the eigenvalues, and left & right eigenvectors */
-    _NavierStokes3DEigenvalues_      ((u+q),_NavierStokes3D_stride_,D,param->gamma,dir);
-    _NavierStokes3DLeftEigenvectors_ ((u+q),_NavierStokes3D_stride_,L,param->gamma,dir);
-    _NavierStokes3DRightEigenvectors_((u+q),_NavierStokes3D_stride_,R,param->gamma,dir);
+    _NavierStokes3DEigenvalues_      ((a_u+q),_NavierStokes3D_stride_,D,param->m_gamma,dir);
+    _NavierStokes3DLeftEigenvectors_ ((a_u+q),_NavierStokes3D_stride_,L,param->m_gamma,dir);
+    _NavierStokes3DRightEigenvectors_((a_u+q),_NavierStokes3D_stride_,R,param->m_gamma,dir);
     /* remove the entropy modes (corresponding to eigenvalues v) */
     D[0] = D[6] = D[18] = 0.0;
     /* assemble the Jacobian */
@@ -85,11 +85,11 @@ int NavierStokes3DPreStep(
     MatMult5(_MODEL_NVARS_,A ,R,DL);
 
     dir = _ZDIR_;
-    A = (param->fast_jac + _MODEL_NDIMS_*JacSize*p + dir*JacSize);
+    A = (param->m_fast_jac + _MODEL_NDIMS_*JacSize*p + dir*JacSize);
     /* get the eigenvalues, and left & right eigenvectors */
-    _NavierStokes3DEigenvalues_      ((u+q),_NavierStokes3D_stride_,D,param->gamma,dir);
-    _NavierStokes3DLeftEigenvectors_ ((u+q),_NavierStokes3D_stride_,L,param->gamma,dir);
-    _NavierStokes3DRightEigenvectors_((u+q),_NavierStokes3D_stride_,R,param->gamma,dir);
+    _NavierStokes3DEigenvalues_      ((a_u+q),_NavierStokes3D_stride_,D,param->m_gamma,dir);
+    _NavierStokes3DLeftEigenvectors_ ((a_u+q),_NavierStokes3D_stride_,L,param->m_gamma,dir);
+    _NavierStokes3DRightEigenvectors_((a_u+q),_NavierStokes3D_stride_,R,param->m_gamma,dir);
     /* remove the entropy modes (corresponding to eigenvalues v) */
     D[0] = D[6] = D[12] = 0.0;
     /* assemble the Jacobian */

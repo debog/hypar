@@ -301,7 +301,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   MPIVariables    *mpi      = (MPIVariables*) m;
   NavierStokes3D  *physics  = (NavierStokes3D*) solver->physics;
 
-  int ghosts = solver->ghosts;
+  int ghosts = solver->m_ghosts;
   int *dim   = solver->gpu_dim_local;
   int size   = solver->npoints_local_wghosts;
 
@@ -356,11 +356,11 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   solver->FirstDerivativePar(QDerivZ,Q,_ZDIR_,1,solver,mpi);
 
   gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
-                             solver->ghosts,mpi,QDerivX);
+                             solver->m_ghosts,mpi,QDerivX);
   gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
-                             solver->ghosts,mpi,QDerivY);
+                             solver->m_ghosts,mpi,QDerivY);
   gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
-                             solver->ghosts,mpi,QDerivY);
+                             solver->m_ghosts,mpi,QDerivY);
 
 #if defined(GPU_STAT)
   checkCuda( cudaEventRecord(startEvent, 0) );
@@ -792,7 +792,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   MPIVariables    *mpi      = (MPIVariables*) m;
   NavierStokes3D  *physics  = (NavierStokes3D*) solver->physics;
 
-  int ghosts = solver->ghosts;
+  int ghosts = solver->m_ghosts;
   int *dim   = solver->gpu_dim_local;
   int size   = solver->npoints_local_wghosts;
 
@@ -845,11 +845,11 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   solver->FirstDerivativePar(QDerivZ,Q,_ZDIR_,1,solver,mpi);
 
   gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
-                             solver->ghosts,mpi,QDerivX);
+                             solver->m_ghosts,mpi,QDerivX);
   gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
-                             solver->ghosts,mpi,QDerivY);
+                             solver->m_ghosts,mpi,QDerivY);
   gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
-                              solver->ghosts,mpi,QDerivY);
+                              solver->m_ghosts,mpi,QDerivY);
 
 #if defined(GPU_STAT)
   checkCuda( cudaEventRecord(startEvent, 0) );

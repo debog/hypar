@@ -88,8 +88,8 @@ extern "C" int gpuNavierStokes2DPreStep(
 {
     HyPar             *solver    = (HyPar*)   s;
     NavierStokes2D    *param     = (NavierStokes2D*) solver->physics;
-    int               *dim       = solver->dim_local;
-    int               ghosts     = solver->ghosts;
+    int               *dim       = solver->m_dim_local;
+    int               ghosts     = solver->m_ghosts;
 
     static int bounds[_MODEL_NDIMS_];
     _ArrayAddCopy1D_(dim,(2*ghosts),bounds,_MODEL_NDIMS_);

@@ -24,64 +24,64 @@
     and overwrites that portion with the latest data sent.
 */
 int MPIGatherArray1D(
-                      void    *m,       /*!< MPI object of type #MPIVariables */
-                      double  *xg,      /*!< Global 1D array (must be preallocated) without ghost points */
-                      double  *x,       /*!< Local 1D array to be gathered */
-                      int     istart,   /*!< Starting index (global) of this rank's portion of the array */
-                      int     iend,     /*!< Ending index (global) of this rank's portion of the array + 1 */
-                      int     N_local,  /*!< Local size of the array */
-                      int     ghosts    /*!< Number of ghost points */
+                      void    *a_m,       /*!< MPI object of type #MPIVariables */
+                      double  *a_xg,      /*!< Global 1D array (must be preallocated) without ghost points */
+                      double  *a_x,       /*!< Local 1D array to be gathered */
+                      int     a_istart,   /*!< Starting index (global) of this rank's portion of the array */
+                      int     a_iend,     /*!< Ending index (global) of this rank's portion of the array + 1 */
+                      int     a_N_local,  /*!< Local size of the array */
+                      int     a_ghosts    /*!< Number of ghost points */
                     )
 {
-  MPIVariables *mpi = (MPIVariables*) m;
+  MPIVariables *mpi = (MPIVariables*) a_m;
   int          ierr = 0;
 
-  /* xg should be non-null only on root */
-  if (mpi->rank && xg) {
+  /* a_xg should be non-null only on root */
+  if (mpi->m_rank && a_xg) {
     fprintf(stderr,"Error in MPIGatherArray1D(): global array exists on non-root processors (rank %d).\n",
-            mpi->rank);
+            mpi->m_rank);
     ierr = 1;
   }
-  if ((!mpi->rank) && (!xg)) {
+  if ((!mpi->m_rank) && (!a_xg)) {
     fprintf(stderr,"Error in MPIGatherArray1D(): global array is not allocated on root processor.\n");
     ierr = 1;
   }
 
   /* create and copy data to a buffer to send to the root process */
-  double *buffer = (double*) calloc (N_local,sizeof(double));
-  _ArrayCopy1D_((x+ghosts),(buffer),N_local);
+  double *buffer = (double*) calloc (a_N_local,sizeof(double));
+  _ArrayCopy1D_((a_x+a_ghosts),(buffer),a_N_local);
 
-  if (!mpi->rank) {
+  if (!mpi->m_rank) {
 #ifndef serial
     MPI_Status status;
 #endif
     int proc;
-    for (proc = 0; proc < mpi->nproc; proc++) {
+    for (proc = 0; proc < mpi->m_nproc; proc++) {
       /* Find out the domain limits for each process */
       int is,ie;
       if (proc) {
 #ifndef serial
-        MPI_Recv(&is,1,MPI_INT,proc,1442,mpi->world,&status);
-        MPI_Recv(&ie,1,MPI_INT,proc,1443,mpi->world,&status);
+        MPI_Recv(&is,1,MPI_INT,proc,1442,mpi->m_world,&status);
+        MPI_Recv(&ie,1,MPI_INT,proc,1443,mpi->m_world,&status);
 #endif
-      } else { is = istart; ie = iend; }
+      } else { is = a_istart; ie = a_iend; }
       int size = ie - is;
       if (proc) {
 #ifndef serial
         double *recvbuf = (double*) calloc (size,sizeof(double));
-        MPI_Recv(recvbuf,size,MPI_DOUBLE,proc,1916,mpi->world,&status);
-        _ArrayCopy1D_((recvbuf),(xg+is),size);
+        MPI_Recv(recvbuf,size,MPI_DOUBLE,proc,1916,mpi->m_world,&status);
+        _ArrayCopy1D_((recvbuf),(a_xg+is),size);
         free(recvbuf);
 #endif
-      } else _ArrayCopy1D_(buffer,(xg+is),size);
+      } else _ArrayCopy1D_(buffer,(a_xg+is),size);
     }
 
   } else {
 #ifndef serial
     /* Meanwhile, on other processes - send stuff to root */
-    MPI_Send(&istart,1      ,MPI_INT   ,0,1442,mpi->world);
-    MPI_Send(&iend  ,1      ,MPI_INT   ,0,1443,mpi->world);
-    MPI_Send(buffer ,N_local,MPI_DOUBLE,0,1916,mpi->world);
+    MPI_Send(&a_istart,1      ,MPI_INT   ,0,1442,mpi->m_world);
+    MPI_Send(&a_iend  ,1      ,MPI_INT   ,0,1443,mpi->m_world);
+    MPI_Send(buffer ,a_N_local,MPI_DOUBLE,0,1916,mpi->m_world);
 #endif
   }
 
