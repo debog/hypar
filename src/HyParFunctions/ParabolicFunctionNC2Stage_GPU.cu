@@ -81,10 +81,10 @@ int ParabolicFunctionNC2Stage_GPU(
   int           d1, d2;
   _DECLARE_IERR_;
 
-  int     ndims  = solver->ndims;
-  int     nvars  = solver->nvars;
-  int     ghosts = solver->ghosts;
-  int     *dim   = solver->dim_local;
+  int     ndims  = solver->m_ndims;
+  int     nvars  = solver->m_nvars;
+  int     ghosts = solver->m_ghosts;
+  int     *dim   = solver->m_dim_local;
   int     size   = solver->npoints_local_wghosts;
 
   if (!solver->HFunction) return(0); /* zero parabolic terms */

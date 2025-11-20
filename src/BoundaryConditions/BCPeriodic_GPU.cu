@@ -72,7 +72,7 @@ extern "C" int gpuBCPeriodicU(
   int dim   = boundary->dim;
   int face  = boundary->face;
 
-  if ((boundary->on_this_proc) && (mpi->iproc[dim] == 1)) {
+  if ((boundary->m_on_this_proc) && (mpi->m_iproc[dim] == 1)) {
     int nblocks;
     nblocks = (boundary->gpu_npoints_bounds-1) / GPU_THREADS_PER_BLOCK + 1;
 
@@ -178,7 +178,7 @@ extern "C" int gpuBCPeriodicU(
   int dim   = boundary->dim;
   int face  = boundary->face;
 
-  if ((boundary->on_this_proc) && (mpi->iproc[dim] == 1)) {
+  if ((boundary->m_on_this_proc) && (mpi->m_iproc[dim] == 1)) {
     int nblocks;
     nblocks = (boundary->gpu_npoints_bounds-1) / GPU_THREADS_PER_BLOCK + 1;
 

@@ -169,9 +169,9 @@ extern "C" int gpuNavierStokes2DSource(
   double  *SourceL = solver->fL;
   double  *SourceR = solver->fR;
 
-  int     ndims      = solver->ndims;
-  int     ghosts     = solver->ghosts;
-  int     *dim       = solver->dim_local;
+  int     ndims      = solver->m_ndims;
+  int     ghosts     = solver->m_ghosts;
+  int     *dim       = solver->m_dim_local;
   double  *gpu_x      = solver->gpu_x;
   double  *gpu_dxinv  = solver->gpu_dxinv;
   double  RT         = param->p0 / param->rho0;
@@ -250,9 +250,9 @@ int gpuNavierStokes2DSourceFunction(
   HyPar           *solver = (HyPar* )         s;
   NavierStokes2D  *param  = (NavierStokes2D*) solver->physics;
 
-  int     ghosts  = solver->ghosts;
-  int     *dim    = solver->dim_local;
-  int     ndims   = solver->ndims;
+  int     ghosts  = solver->m_ghosts;
+  int     *dim    = solver->m_dim_local;
+  int     ndims   = solver->m_ndims;
 
   double cpu_time = 0.0;
   clock_t cpu_start, cpu_end;
@@ -295,8 +295,8 @@ int gpuNavierStokes2DSourceUpwind(
   HyPar           *solver = (HyPar*) s;
   _DECLARE_IERR_;
 
-  int ndims = solver->ndims;
-  int *dim  = solver->dim_local;
+  int ndims = solver->m_ndims;
+  int *dim  = solver->m_dim_local;
   int bounds_inter[ndims];
 
   double cpu_time = 0.0;

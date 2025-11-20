@@ -70,10 +70,10 @@ extern "C" int gpuNavierStokes2DParabolicFunction(
   NavierStokes2D  *physics  = (NavierStokes2D*) solver->physics;
   _DECLARE_IERR_;
 
-  int ghosts = solver->ghosts;
-  int imax   = solver->dim_local[0];
-  int jmax   = solver->dim_local[1];
-  int nvars  = solver->nvars;
+  int ghosts = solver->m_ghosts;
+  int imax   = solver->m_dim_local[0];
+  int jmax   = solver->m_dim_local[1];
+  int nvars  = solver->m_nvars;
   int size   = (imax+2*ghosts)*(jmax+2*ghosts)*nvars;
 
   gpuArraySetValue(par, size, 0.0);
