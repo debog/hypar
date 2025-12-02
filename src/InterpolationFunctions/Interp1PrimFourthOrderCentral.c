@@ -93,8 +93,8 @@ int Interp1PrimFourthOrderCentral(
   _ArrayCopy1D_(dim,bounds_inter,ndims); bounds_inter[dir] += 1;
   int N_outer; _ArrayProduct1D_(bounds_outer,ndims,N_outer);
 
-  static const double c1 = 7.0 / 12.0;
-  static const double c2 = -1.0 / 12.0;
+  static const double s_c1 = 7.0 / 12.0;
+  static const double s_c2 = -1.0 / 12.0;
 
   int i;
 #pragma omp parallel for schedule(auto) default(shared) private(i,index_outer,indexL,indexR,indexI)
@@ -118,10 +118,10 @@ int Interp1PrimFourthOrderCentral(
       int qRR;  _ArrayIndex1D_(ndims,dim         ,indexRR,ghosts,qRR);
 
       int v; for (v=0; v<nvars; v++)  {
-        fI[p*nvars+v] =   c2 * fC[qLL*nvars+v]
-                        + c1 * fC[qL *nvars+v]
-                        + c1 * fC[qR *nvars+v]
-                        + c2 * fC[qRR*nvars+v];
+        fI[p*nvars+v] =   s_c2 * fC[qLL*nvars+v]
+                        + s_c1 * fC[qL *nvars+v]
+                        + s_c1 * fC[qR *nvars+v]
+                        + s_c2 * fC[qRR*nvars+v];
       }
     }
   }

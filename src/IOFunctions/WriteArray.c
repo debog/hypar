@@ -210,7 +210,7 @@ int WriteArrayParallel(
   int           proc,d;
   _DECLARE_IERR_;
 
-  static int count = 0;
+  static int s_count = 0;
 
   char filename_root[_MAX_STRING_SIZE_];
   strcpy(filename_root,a_fname_root);
@@ -250,7 +250,7 @@ int WriteArrayParallel(
     MPIGetFilename(filename_root,&mpi->m_IOWorld,filename);
 
     if (!strcmp(solver->m_op_overwrite,"no")) {
-      if ((!count) && (!solver->m_restart_iter)) {
+      if ((!s_count) && (!solver->m_restart_iter)) {
         /* open a new file, since this function is being called the first time
            and this is not a restart run*/
         out = fopen(filename,"wb");
@@ -274,7 +274,7 @@ int WriteArrayParallel(
         return(1);
       }
     }
-    count++;
+    s_count++;
 
     /* Write own data and free buffer */
     bytes = fwrite(buffer,sizeof(double),(sizex+sizeu),out);

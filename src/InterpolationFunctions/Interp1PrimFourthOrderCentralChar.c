@@ -107,8 +107,8 @@ int Interp1PrimFourthOrderCentralChar(
   /* allocate arrays for the averaged state, eigenvectors and characteristic interpolated f */
   double R[nvars*nvars], L[nvars*nvars], uavg[nvars], fchar[nvars];
 
-  static const double c1 = 7.0 / 12.0;
-  static const double c2 = -1.0 / 12.0;
+  static const double s_c1 = 7.0 / 12.0;
+  static const double s_c2 = -1.0 / 12.0;
 
 #pragma omp parallel for schedule(auto) default(shared) private(i,k,v,R,L,uavg,fchar,index_outer,indexC,indexI)
   for (i=0; i<N_outer; i++) {
@@ -146,7 +146,7 @@ int Interp1PrimFourthOrderCentralChar(
         }
 
         /* first order upwind approximation of the characteristic flux */
-        fchar[v] = c2*fcLL + c1*fcL + c1*fcR + c2*fcRR;
+        fchar[v] = s_c2*fcLL + s_c1*fcL + s_c1*fcR + s_c2*fcRR;
 
       }
 

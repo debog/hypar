@@ -31,14 +31,14 @@ int BurgersInitialize(void *a_s, /*!< Solver object of type #HyPar */
   Burgers       *physics = (Burgers*)      solver->m_physics;
   int           i, ferr;
 
-  static int count = 0;
+  static int s_count = 0;
 
   /* reading physical model specific inputs - all processes */
   if (!mpi->m_rank) {
     FILE *in;
     in = fopen("physics.inp","r");
     if (in) {
-      if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
+      if (!s_count) printf("Reading physical model inputs from file \"physics.inp\".\n");
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
@@ -76,6 +76,6 @@ int BurgersInitialize(void *a_s, /*!< Solver object of type #HyPar */
   solver->FFunction  = BurgersAdvection;
   solver->Upwind     = BurgersUpwind;
 
-  count++;
+  s_count++;
   return(0);
 }

@@ -74,7 +74,7 @@ void gpuNavierStokes3DParabolicFunction_QDeriv_kernel(
 __global__
 void gpuNavierStokes3DParabolicFunction_Xdir_kernel(
     int npoints_grid,
-    double two_third,
+    double s_two_third,
     double inv_gamma_m1,
     double inv_Re,
     double inv_Pr,
@@ -109,7 +109,7 @@ void gpuNavierStokes3DParabolicFunction_Xdir_kernel(
         /* calculate viscosity coeff based on Sutherland's law */
         double mu = raiseto(T, 0.76);
         double tau_xx, tau_xy, tau_xz, qx;
-        tau_xx = two_third * (mu*inv_Re) * (2*ux - vy - wz);
+        tau_xx = s_two_third * (mu*inv_Re) * (2*ux - vy - wz);
         tau_xy = (mu*inv_Re) * (uy + vx);
         tau_xz = (mu*inv_Re) * (uz + wx);
         qx     = ( mu*inv_Re * inv_gamma_m1 * inv_Pr ) * Tx;
@@ -127,7 +127,7 @@ void gpuNavierStokes3DParabolicFunction_Xdir_kernel(
 __global__
 void gpuNavierStokes3DParabolicFunction_Ydir_kernel(
     int npoints_grid,
-    double two_third,
+    double s_two_third,
     double inv_gamma_m1,
     double inv_Re,
     double inv_Pr,
@@ -163,7 +163,7 @@ void gpuNavierStokes3DParabolicFunction_Ydir_kernel(
 
         double tau_yx, tau_yy, tau_yz, qy;
         tau_yx = (mu*inv_Re) * (uy + vx);
-        tau_yy = two_third * (mu*inv_Re) * (-ux + 2*vy - wz);
+        tau_yy = s_two_third * (mu*inv_Re) * (-ux + 2*vy - wz);
         tau_yz = (mu*inv_Re) * (vz + wy);
         qy     = ( mu*inv_Re * inv_gamma_m1 * inv_Pr ) * Ty;
 
@@ -180,7 +180,7 @@ void gpuNavierStokes3DParabolicFunction_Ydir_kernel(
 __global__
 void gpuNavierStokes3DParabolicFunction_Zdir_kernel(
     int npoints_grid,
-    double two_third,
+    double s_two_third,
     double inv_gamma_m1,
     double inv_Re,
     double inv_Pr,
@@ -217,7 +217,7 @@ void gpuNavierStokes3DParabolicFunction_Zdir_kernel(
         double tau_zx, tau_zy, tau_zz, qz;
         tau_zx = (mu*inv_Re) * (uz + wx);
         tau_zy = (mu*inv_Re) * (vz + wy);
-        tau_zz = two_third * (mu*inv_Re) * (-ux - vy + 2*wz);
+        tau_zz = s_two_third * (mu*inv_Re) * (-ux - vy + 2*wz);
         qz     = ( mu*inv_Re * inv_gamma_m1 * inv_Pr ) * Tz;
 
         (FViscous+p)[0] = 0.0;
@@ -309,7 +309,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   if (physics->Re <= 0) return (0); /* inviscid flow */
   solver->count_par++;
 
-  static double two_third    = 2.0/3.0;
+  static double s_two_third    = 2.0/3.0;
   double        inv_gamma_m1 = 1.0 / (physics->gamma-1.0);
   double        inv_Re       = 1.0 / physics->Re;
   double        inv_Pr       = 1.0 / physics->Pr;
@@ -396,7 +396,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 #endif
 
   gpuNavierStokes3DParabolicFunction_Xdir_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-      size, two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
+      size, s_two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
       QDerivX, QDerivY, QDerivZ, FViscous
   );
   cudaDeviceSynchronize();
@@ -440,7 +440,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 #endif
 
   gpuNavierStokes3DParabolicFunction_Ydir_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-      size, two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
+      size, s_two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
       QDerivX, QDerivY, QDerivZ, FViscous
   );
   cudaDeviceSynchronize();
@@ -468,7 +468,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 #endif
 
   gpuNavierStokes3DParabolicFunction_Zdir_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-      size, two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
+      size, s_two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
       QDerivX, QDerivY, QDerivZ, FViscous
   );
   cudaDeviceSynchronize();
@@ -568,7 +568,7 @@ void gpuNavierStokes3DParabolicFunction_QDeriv_kernel(
 __global__
 void gpuNavierStokes3DParabolicFunction_Xdir_kernel(
     int npoints_grid,
-    double two_third,
+    double s_two_third,
     double inv_gamma_m1,
     double inv_Re,
     double inv_Pr,
@@ -601,7 +601,7 @@ void gpuNavierStokes3DParabolicFunction_Xdir_kernel(
         /* calculate viscosity coeff based on Sutherland's law */
         double mu = raiseto(T, 0.76);
         double tau_xx, tau_xy, tau_xz, qx;
-        tau_xx = two_third * (mu*inv_Re) * (2*ux - vy - wz);
+        tau_xx = s_two_third * (mu*inv_Re) * (2*ux - vy - wz);
         tau_xy = (mu*inv_Re) * (uy + vx);
         tau_xz = (mu*inv_Re) * (uz + wx);
         qx     = ( mu*inv_Re * inv_gamma_m1 * inv_Pr ) * Tx;
@@ -619,7 +619,7 @@ void gpuNavierStokes3DParabolicFunction_Xdir_kernel(
 __global__
 void gpuNavierStokes3DParabolicFunction_Ydir_kernel(
     int npoints_grid,
-    double two_third,
+    double s_two_third,
     double inv_gamma_m1,
     double inv_Re,
     double inv_Pr,
@@ -653,7 +653,7 @@ void gpuNavierStokes3DParabolicFunction_Ydir_kernel(
 
         double tau_yx, tau_yy, tau_yz, qy;
         tau_yx = (mu*inv_Re) * (uy + vx);
-        tau_yy = two_third * (mu*inv_Re) * (-ux + 2*vy - wz);
+        tau_yy = s_two_third * (mu*inv_Re) * (-ux + 2*vy - wz);
         tau_yz = (mu*inv_Re) * (vz + wy);
         qy     = ( mu*inv_Re * inv_gamma_m1 * inv_Pr ) * Ty;
 
@@ -670,7 +670,7 @@ void gpuNavierStokes3DParabolicFunction_Ydir_kernel(
 __global__
 void gpuNavierStokes3DParabolicFunction_Zdir_kernel(
     int npoints_grid,
-    double two_third,
+    double s_two_third,
     double inv_gamma_m1,
     double inv_Re,
     double inv_Pr,
@@ -705,7 +705,7 @@ void gpuNavierStokes3DParabolicFunction_Zdir_kernel(
         double tau_zx, tau_zy, tau_zz, qz;
         tau_zx = (mu*inv_Re) * (uz + wx);
         tau_zy = (mu*inv_Re) * (vz + wy);
-        tau_zz = two_third * (mu*inv_Re) * (-ux - vy + 2*wz);
+        tau_zz = s_two_third * (mu*inv_Re) * (-ux - vy + 2*wz);
         qz     = ( mu*inv_Re * inv_gamma_m1 * inv_Pr ) * Tz;
 
         (FViscous+p)[0] = 0.0;
@@ -800,7 +800,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   if (physics->Re <= 0) return (0); /* inviscid flow */
   solver->count_par++;
 
-  static double two_third    = 2.0/3.0;
+  static double s_two_third    = 2.0/3.0;
   double        inv_gamma_m1 = 1.0 / (physics->gamma-1.0);
   double        inv_Re       = 1.0 / physics->Re;
   double        inv_Pr       = 1.0 / physics->Pr;
@@ -883,7 +883,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 #endif
 
   gpuNavierStokes3DParabolicFunction_Xdir_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-      size, two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
+      size, s_two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
       QDerivX, QDerivY, QDerivZ, FViscous
   );
   cudaDeviceSynchronize();
@@ -928,7 +928,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 #endif
 
   gpuNavierStokes3DParabolicFunction_Ydir_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-      size, two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
+      size, s_two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
       QDerivX, QDerivY, QDerivZ, FViscous
   );
   cudaDeviceSynchronize();
@@ -956,7 +956,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 #endif
 
   gpuNavierStokes3DParabolicFunction_Zdir_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-      size, two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
+      size, s_two_third, inv_gamma_m1, inv_Re, inv_Pr, Q,
       QDerivX, QDerivY, QDerivZ, FViscous
   );
   cudaDeviceSynchronize();

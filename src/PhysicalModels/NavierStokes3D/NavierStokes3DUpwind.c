@@ -15,7 +15,7 @@
 #include <time.h>
 #endif
 
-static const int dummy = 1;
+static const int s_dummy = 1;
 
 /*! Roe's upwinding scheme.
     \f{equation}{
@@ -88,9 +88,9 @@ int NavierStokes3DUpwindRoe(
       udiff[4] = 0.5 * (a_uR[_MODEL_NVARS_*p+4] - a_uL[_MODEL_NVARS_*p+4]);
 
       _NavierStokes3DRoeAverage_        (uavg,_NavierStokes3D_stride_,(a_u+_MODEL_NVARS_*pL),(a_u+_MODEL_NVARS_*pR),param->m_gamma);
-      _NavierStokes3DEigenvalues_       (uavg,dummy,D,param->m_gamma,a_dir);
-      _NavierStokes3DLeftEigenvectors_  (uavg,dummy,L,param->m_gamma,a_dir);
-      _NavierStokes3DRightEigenvectors_ (uavg,dummy,R,param->m_gamma,a_dir);
+      _NavierStokes3DEigenvalues_       (uavg,s_dummy,D,param->m_gamma,a_dir);
+      _NavierStokes3DLeftEigenvectors_  (uavg,s_dummy,L,param->m_gamma,a_dir);
+      _NavierStokes3DRightEigenvectors_ (uavg,s_dummy,R,param->m_gamma,a_dir);
 
       /* Harten'a_s Entropy Fix - Page 362 of Leveque */
       int k;
@@ -172,8 +172,8 @@ int NavierStokes3DUpwindRF(
 
       _NavierStokes3DRoeAverage_(uavg,_NavierStokes3D_stride_,(a_uL+_MODEL_NVARS_*p),(a_uR+_MODEL_NVARS_*p),param->m_gamma);
 
-      _NavierStokes3DLeftEigenvectors_(uavg,dummy,L,param->m_gamma,a_dir);
-      _NavierStokes3DRightEigenvectors_(uavg,dummy,R,param->m_gamma,a_dir);
+      _NavierStokes3DLeftEigenvectors_(uavg,s_dummy,L,param->m_gamma,a_dir);
+      _NavierStokes3DRightEigenvectors_(uavg,s_dummy,R,param->m_gamma,a_dir);
 
       /* calculate characteristic fluxes and variables */
       MatVecMult5(_MODEL_NVARS_,ucL,L,(a_uL+_MODEL_NVARS_*p));
@@ -194,7 +194,7 @@ int NavierStokes3DUpwindRF(
       eigR[2] = D[12];
       eigR[3] = D[18];
       eigR[4] = D[24];
-      _NavierStokes3DEigenvalues_(uavg,dummy,D,param->m_gamma,a_dir);
+      _NavierStokes3DEigenvalues_(uavg,s_dummy,D,param->m_gamma,a_dir);
       eigC[0] = D[0];
       eigC[1] = D[6];
       eigC[2] = D[12];
@@ -276,8 +276,8 @@ int NavierStokes3DUpwindLLF(
 
       _NavierStokes3DRoeAverage_(uavg,_NavierStokes3D_stride_,(a_uL+_MODEL_NVARS_*p),(a_uR+_MODEL_NVARS_*p),param->m_gamma);
 
-      _NavierStokes3DLeftEigenvectors_(uavg,dummy,L,param->m_gamma,a_dir);
-      _NavierStokes3DRightEigenvectors_(uavg,dummy,R,param->m_gamma,a_dir);
+      _NavierStokes3DLeftEigenvectors_(uavg,s_dummy,L,param->m_gamma,a_dir);
+      _NavierStokes3DRightEigenvectors_(uavg,s_dummy,R,param->m_gamma,a_dir);
 
       /* calculate characteristic fluxes and variables */
       MatVecMult5(_MODEL_NVARS_,ucL,L,(a_uL+_MODEL_NVARS_*p));
@@ -298,7 +298,7 @@ int NavierStokes3DUpwindLLF(
       eigR[2] = D[12];
       eigR[3] = D[18];
       eigR[4] = D[24];
-      _NavierStokes3DEigenvalues_(uavg,dummy,D,param->m_gamma,a_dir);
+      _NavierStokes3DEigenvalues_(uavg,s_dummy,D,param->m_gamma,a_dir);
       eigC[0] = D[0];
       eigC[1] = D[6];
       eigC[2] = D[12];
@@ -400,7 +400,7 @@ int NavierStokes3DUpwindRusanov(
       _NavierStokes3DGetFlowVar_((a_u+_MODEL_NVARS_*pR),_NavierStokes3D_stride_,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
       c = sqrt(param->m_gamma*P/rho);
       double alphaR = c + absolute(vel[a_dir]);
-      _NavierStokes3DGetFlowVar_(uavg,dummy,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
+      _NavierStokes3DGetFlowVar_(uavg,s_dummy,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
       c = sqrt(param->m_gamma*P/rho);
       double alphaavg = c + absolute(vel[a_dir]);
 
@@ -473,9 +473,9 @@ int NavierStokes3DUpwinddFRoe(
       udiff[4] = 0.5 * (a_uR[_MODEL_NVARS_*p+4] - a_uL[_MODEL_NVARS_*p+4]);
 
       _NavierStokes3DRoeAverage_        (uavg,_NavierStokes3D_stride_,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->m_gamma);
-      _NavierStokes3DEigenvalues_       (uavg,dummy,D,param->m_gamma,a_dir);
-      _NavierStokes3DLeftEigenvectors_  (uavg,dummy,L,param->m_gamma,a_dir);
-      _NavierStokes3DRightEigenvectors_ (uavg,dummy,R,param->m_gamma,a_dir);
+      _NavierStokes3DEigenvalues_       (uavg,s_dummy,D,param->m_gamma,a_dir);
+      _NavierStokes3DLeftEigenvectors_  (uavg,s_dummy,L,param->m_gamma,a_dir);
+      _NavierStokes3DRightEigenvectors_ (uavg,s_dummy,R,param->m_gamma,a_dir);
 
       /* Harten'a_s Entropy Fix - Page 362 of Leveque */
       int k;
@@ -574,9 +574,9 @@ int NavierStokes3DUpwindFdFRoe(
 
       /* Compute total dissipation */
       _NavierStokes3DRoeAverage_        (uavg,_NavierStokes3D_stride_,(a_u+_MODEL_NVARS_*pL),(a_u+_MODEL_NVARS_*pR),param->m_gamma);
-      _NavierStokes3DEigenvalues_       (uavg,dummy,D,param->m_gamma,a_dir);
-      _NavierStokes3DLeftEigenvectors_  (uavg,dummy,L,param->m_gamma,a_dir);
-      _NavierStokes3DRightEigenvectors_ (uavg,dummy,R,param->m_gamma,a_dir);
+      _NavierStokes3DEigenvalues_       (uavg,s_dummy,D,param->m_gamma,a_dir);
+      _NavierStokes3DLeftEigenvectors_  (uavg,s_dummy,L,param->m_gamma,a_dir);
+      _NavierStokes3DRightEigenvectors_ (uavg,s_dummy,R,param->m_gamma,a_dir);
       k=0;  D[k] = (absolute(D[k]) < delta ? (D[k]*D[k]+delta2)/(2*delta) : absolute(D[k]) );
       k=6;  D[k] = (absolute(D[k]) < delta ? (D[k]*D[k]+delta2)/(2*delta) : absolute(D[k]) );
       k=12; D[k] = (absolute(D[k]) < delta ? (D[k]*D[k]+delta2)/(2*delta) : absolute(D[k]) );
@@ -588,9 +588,9 @@ int NavierStokes3DUpwindFdFRoe(
 
       /* Compute dissipation corresponding to acoustic modes */
       _NavierStokes3DRoeAverage_        (uavg,_NavierStokes3D_stride_,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->m_gamma);
-      _NavierStokes3DEigenvalues_       (uavg,dummy,D,param->m_gamma,a_dir);
-      _NavierStokes3DLeftEigenvectors_  (uavg,dummy,L,param->m_gamma,a_dir);
-      _NavierStokes3DRightEigenvectors_ (uavg,dummy,R,param->m_gamma,a_dir);
+      _NavierStokes3DEigenvalues_       (uavg,s_dummy,D,param->m_gamma,a_dir);
+      _NavierStokes3DLeftEigenvectors_  (uavg,s_dummy,L,param->m_gamma,a_dir);
+      _NavierStokes3DRightEigenvectors_ (uavg,s_dummy,R,param->m_gamma,a_dir);
       if (a_dir == _XDIR_) {
         k=0;  D[k] = 0.0;
         k=6;  D[k] = (absolute(D[k]) < delta ? (D[k]*D[k]+delta2)/(2*delta) : absolute(D[k]) );
@@ -685,8 +685,8 @@ int NavierStokes3DUpwindRusanovModified(
       udiff[4] = 0.5 * (a_uR[q+4] - a_uL[q+4]);
 
       _NavierStokes3DRoeAverage_        (uavg,_NavierStokes3D_stride_,(a_u+_MODEL_NVARS_*pL),(a_u+_MODEL_NVARS_*pR),param->m_gamma);
-      _NavierStokes3DLeftEigenvectors_  (uavg,dummy,L,param->m_gamma,a_dir);
-      _NavierStokes3DRightEigenvectors_ (uavg,dummy,R,param->m_gamma,a_dir);
+      _NavierStokes3DLeftEigenvectors_  (uavg,s_dummy,L,param->m_gamma,a_dir);
+      _NavierStokes3DRightEigenvectors_ (uavg,s_dummy,R,param->m_gamma,a_dir);
 
       double c, vel[_MODEL_NDIMS_], rho,E,P;
 
@@ -700,7 +700,7 @@ int NavierStokes3DUpwindRusanovModified(
       double alphaR = c + absolute(vel[a_dir]);
       double betaR = absolute(vel[a_dir]);
 
-      _NavierStokes3DGetFlowVar_(uavg,dummy,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
+      _NavierStokes3DGetFlowVar_(uavg,s_dummy,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
       c = sqrt(param->m_gamma*P/rho);
       double alphaavg = c + absolute(vel[a_dir]);
       double betaavg = absolute(vel[a_dir]);
@@ -804,8 +804,8 @@ int NavierStokes3DUpwinddFRusanovModified(
       udiff[4] = 0.5 * (a_uR[q+4] - a_uL[q+4]);
 
       _NavierStokes3DRoeAverage_        (uavg,_NavierStokes3D_stride_,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->m_gamma);
-      _NavierStokes3DLeftEigenvectors_  (uavg,dummy,L,param->m_gamma,a_dir);
-      _NavierStokes3DRightEigenvectors_ (uavg,dummy,R,param->m_gamma,a_dir);
+      _NavierStokes3DLeftEigenvectors_  (uavg,s_dummy,L,param->m_gamma,a_dir);
+      _NavierStokes3DRightEigenvectors_ (uavg,s_dummy,R,param->m_gamma,a_dir);
 
       double c, vel[_MODEL_NDIMS_], rho,E,P;
 
@@ -817,7 +817,7 @@ int NavierStokes3DUpwinddFRusanovModified(
       c = sqrt(param->m_gamma*P/rho);
       double alphaR = c + absolute(vel[a_dir]);
 
-      _NavierStokes3DGetFlowVar_(uavg,dummy,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
+      _NavierStokes3DGetFlowVar_(uavg,s_dummy,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
       c = sqrt(param->m_gamma*P/rho);
       double alphaavg = c + absolute(vel[a_dir]);
 
@@ -917,8 +917,8 @@ int NavierStokes3DUpwindFdFRusanovModified(
 
       /* Compute total dissipation */
       _NavierStokes3DRoeAverage_        (uavg,_NavierStokes3D_stride_,(a_u+_MODEL_NVARS_*pL),(a_u+_MODEL_NVARS_*pR),param->m_gamma);
-      _NavierStokes3DLeftEigenvectors_  (uavg,dummy,L,param->m_gamma,a_dir);
-      _NavierStokes3DRightEigenvectors_ (uavg,dummy,R,param->m_gamma,a_dir);
+      _NavierStokes3DLeftEigenvectors_  (uavg,s_dummy,L,param->m_gamma,a_dir);
+      _NavierStokes3DRightEigenvectors_ (uavg,s_dummy,R,param->m_gamma,a_dir);
 
       _NavierStokes3DGetFlowVar_((a_u+_MODEL_NVARS_*pL),_NavierStokes3D_stride_,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
       c = sqrt(param->m_gamma*P/rho);
@@ -930,7 +930,7 @@ int NavierStokes3DUpwindFdFRusanovModified(
       alphaR = c + absolute(vel[a_dir]);
       betaR = absolute(vel[a_dir]);
 
-      _NavierStokes3DGetFlowVar_(uavg,dummy,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
+      _NavierStokes3DGetFlowVar_(uavg,s_dummy,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
       c = sqrt(param->m_gamma*P/rho);
       alphaavg = c + absolute(vel[a_dir]);
       betaavg = absolute(vel[a_dir]);
@@ -965,8 +965,8 @@ int NavierStokes3DUpwindFdFRusanovModified(
 
       /* Compute dissipation for the linearized acoustic modes */
       _NavierStokes3DRoeAverage_        (uavg,_NavierStokes3D_stride_,(uref+_MODEL_NVARS_*pL),(uref+_MODEL_NVARS_*pR),param->m_gamma);
-      _NavierStokes3DLeftEigenvectors_  (uavg,dummy,L,param->m_gamma,a_dir);
-      _NavierStokes3DRightEigenvectors_ (uavg,dummy,R,param->m_gamma,a_dir);
+      _NavierStokes3DLeftEigenvectors_  (uavg,s_dummy,L,param->m_gamma,a_dir);
+      _NavierStokes3DRightEigenvectors_ (uavg,s_dummy,R,param->m_gamma,a_dir);
 
       _NavierStokes3DGetFlowVar_((uref+_MODEL_NVARS_*pL),_NavierStokes3D_stride_,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
       c = sqrt(param->m_gamma*P/rho);
@@ -976,7 +976,7 @@ int NavierStokes3DUpwindFdFRusanovModified(
       c = sqrt(param->m_gamma*P/rho);
       alphaR = c + absolute(vel[a_dir]);
 
-      _NavierStokes3DGetFlowVar_(uavg,dummy,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
+      _NavierStokes3DGetFlowVar_(uavg,s_dummy,rho,vel[0],vel[1],vel[2],E,P,param->m_gamma);
       c = sqrt(param->m_gamma*P/rho);
       alphaavg = c + absolute(vel[a_dir]);
 

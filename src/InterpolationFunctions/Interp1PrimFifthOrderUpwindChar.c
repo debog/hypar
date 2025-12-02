@@ -103,7 +103,7 @@ int Interp1PrimFifthOrderUpwindChar(
   int *dim   = solver->m_dim_local;
 
   /* define some constants */
-  static const double one_by_thirty        = 1.0/30.0,
+  static const double s_one_by_thirty        = 1.0/30.0,
                       thirteen_by_sixty    = 13.0/60.0,
                       fortyseven_by_sixty  = 47.0/60.0,
                       twentyseven_by_sixty = 27.0/60.0,
@@ -168,7 +168,7 @@ int Interp1PrimFifthOrderUpwindChar(
         }
 
         /* fifth order upwind approximation of the characteristic flux */
-        fchar[v] =    one_by_thirty         * fm3
+        fchar[v] =    s_one_by_thirty         * fm3
                    -  thirteen_by_sixty     * fm2
                    +  fortyseven_by_sixty   * fm1
                    +  twentyseven_by_sixty  * fp1

@@ -72,7 +72,7 @@ int NavierStokes3DParabolicFunction(
   if (physics->m_Re <= 0) return(0); /* inviscid flow */
   solver->m_count_par++;
 
-  static double two_third    = 2.0/3.0;
+  static double s_two_third    = 2.0/3.0;
   double        inv_gamma_m1 = 1.0 / (physics->m_gamma-1.0);
   double        inv_Re       = 1.0 / physics->m_Re;
   double        inv_Pr       = 1.0 / physics->m_Pr;
@@ -180,7 +180,7 @@ int NavierStokes3DParabolicFunction(
         */
 
         double tau_xx, tau_xy, tau_xz, qx;
-        tau_xx = two_third * (mu*inv_Re) * (2*ux - vy - wz);
+        tau_xx = s_two_third * (mu*inv_Re) * (2*ux - vy - wz);
         tau_xy = (mu*inv_Re) * (uy + vx);
         tau_xz = (mu*inv_Re) * (uz + wx);
         qx     = ( mu*inv_Re * inv_gamma_m1 * inv_Pr ) * Tx;
@@ -234,7 +234,7 @@ int NavierStokes3DParabolicFunction(
 
         double tau_yx, tau_yy, tau_yz, qy;
         tau_yx = (mu*inv_Re) * (uy + vx);
-        tau_yy = two_third * (mu*inv_Re) * (-ux + 2*vy - wz);
+        tau_yy = s_two_third * (mu*inv_Re) * (-ux + 2*vy - wz);
         tau_yz = (mu*inv_Re) * (vz + wy);
         qy     = ( mu*inv_Re * inv_gamma_m1 * inv_Pr ) * Ty;
 
@@ -288,7 +288,7 @@ int NavierStokes3DParabolicFunction(
         double tau_zx, tau_zy, tau_zz, qz;
         tau_zx = (mu*inv_Re) * (uz + wx);
         tau_zy = (mu*inv_Re) * (vz + wy);
-        tau_zz = two_third * (mu*inv_Re) * (-ux - vy + 2*wz);
+        tau_zz = s_two_third * (mu*inv_Re) * (-ux - vy + 2*wz);
         qz     = ( mu*inv_Re * inv_gamma_m1 * inv_Pr ) * Tz;
 
         (FViscous+p)[0] = 0.0;

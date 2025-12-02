@@ -78,7 +78,7 @@ int Euler1DInitialize(
   Euler1D       *physics = (Euler1D*)       solver->m_physics;
   int           ferr, d;
 
-  static int count = 0;
+  static int s_count = 0;
 
   if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in Euler1DInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
@@ -98,7 +98,7 @@ int Euler1DInitialize(
   /* reading physical model specific inputs */
   if (!mpi->m_rank) {
     FILE *in;
-    if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
+    if (!s_count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
@@ -201,6 +201,6 @@ int Euler1DInitialize(
   physics->m_solution   = (double*) calloc (size*_MODEL_NVARS_, sizeof(double));
   IERR Euler1DGravityField(solver,mpi); CHECKERR(ierr);
 
-  count++;
+  s_count++;
   return(0);
 }

@@ -131,8 +131,8 @@ int WENOFifthOrderCalculateWeightsJS(
   int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
-  static const double thirteen_by_twelve = 13.0/12.0;
-  static const double one_fourth         = 1.0/4.0;
+  static const double s_thirteen_by_twelve = 13.0/12.0;
+  static const double s_one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
   int offset = weno->m_offset[dir];
@@ -203,32 +203,32 @@ int WENOFifthOrderCalculateWeightsJS(
       p2RU = (uC+qp2R*nvars);
 
       /* optimal weights*/
-      double c1, c2, c3;
+      double s_c1, s_c2, c3;
       if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
         if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
             || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         } else {
           /* CRWENO5 at the interior points */
-          c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-          c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
           c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
         }
       } else {
         /* WENO5 and HCWENO5 */
-        c1 = _WENO_OPTIMAL_WEIGHT_1_;
-        c2 = _WENO_OPTIMAL_WEIGHT_2_;
+        s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+        s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
         c3 = _WENO_OPTIMAL_WEIGHT_3_;
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
-      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
-      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
-      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -285,8 +285,8 @@ int WENOFifthOrderCalculateWeightsM(
   int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
-  static const double thirteen_by_twelve = 13.0/12.0;
-  static const double one_fourth         = 1.0/4.0;
+  static const double s_thirteen_by_twelve = 13.0/12.0;
+  static const double s_one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
   int offset = weno->m_offset[dir];
@@ -364,32 +364,32 @@ int WENOFifthOrderCalculateWeightsM(
       p2RU = (uC+qp2R*nvars);
 
       /* optimal weights*/
-      double c1, c2, c3;
+      double s_c1, s_c2, c3;
       if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
         if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
             || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         } else {
           /* CRWENO5 at the interior points */
-          c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-          c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
           c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
         }
       } else {
         /* WENO5 and HCWENO5 */
-        c1 = _WENO_OPTIMAL_WEIGHT_1_;
-        c2 = _WENO_OPTIMAL_WEIGHT_2_;
+        s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+        s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
         c3 = _WENO_OPTIMAL_WEIGHT_3_;
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
-      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
-      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
-      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -454,8 +454,8 @@ int WENOFifthOrderCalculateWeightsZ(
   int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
-  static const double thirteen_by_twelve = 13.0/12.0;
-  static const double one_fourth         = 1.0/4.0;
+  static const double s_thirteen_by_twelve = 13.0/12.0;
+  static const double s_one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
   int offset = weno->m_offset[dir];
@@ -526,32 +526,32 @@ int WENOFifthOrderCalculateWeightsZ(
       p2RU = (uC+qp2R*nvars);
 
       /* optimal weights*/
-      double c1, c2, c3;
+      double s_c1, s_c2, c3;
       if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
         if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
             || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         } else {
           /* CRWENO5 at the interior points */
-          c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-          c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
           c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
         }
       } else {
         /* WENO5 and HCWENO5 */
-        c1 = _WENO_OPTIMAL_WEIGHT_1_;
-        c2 = _WENO_OPTIMAL_WEIGHT_2_;
+        s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+        s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
         c3 = _WENO_OPTIMAL_WEIGHT_3_;
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
-      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
-      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
-      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -610,8 +610,8 @@ int WENOFifthOrderCalculateWeightsYC(
   int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
-  static const double thirteen_by_twelve = 13.0/12.0;
-  static const double one_fourth         = 1.0/4.0;
+  static const double s_thirteen_by_twelve = 13.0/12.0;
+  static const double s_one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
   int offset = weno->m_offset[dir];
@@ -688,32 +688,32 @@ int WENOFifthOrderCalculateWeightsYC(
       p2RU = (uC+qp2R*nvars);
 
       /* optimal weights*/
-      double c1, c2, c3;
+      double s_c1, s_c2, c3;
       if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
         if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
             || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         } else {
           /* CRWENO5 at the interior points */
-          c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-          c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
           c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
         }
       } else {
         /* WENO5 and HCWENO5 */
-        c1 = _WENO_OPTIMAL_WEIGHT_1_;
-        c2 = _WENO_OPTIMAL_WEIGHT_2_;
+        s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+        s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
         c3 = _WENO_OPTIMAL_WEIGHT_3_;
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
-      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
-      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
-      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -780,8 +780,8 @@ int WENOFifthOrderCalculateWeightsCharJS(
   int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
-  static const double thirteen_by_twelve = 13.0/12.0;
-  static const double one_fourth         = 1.0/4.0;
+  static const double s_thirteen_by_twelve = 13.0/12.0;
+  static const double s_one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
   int offset = weno->m_offset[dir];
@@ -863,32 +863,32 @@ int WENOFifthOrderCalculateWeightsCharJS(
       MatVecMult(nvars,p2RU,L,(uC+nvars*qp2R));
 
       /* optimal weights*/
-      double c1, c2, c3;
+      double s_c1, s_c2, c3;
       if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
         if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
             || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         } else {
           /* CRWENO5 at the interior points */
-          c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-          c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
           c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
         }
       } else {
         /* WENO5 and HCWENO5 */
-        c1 = _WENO_OPTIMAL_WEIGHT_1_;
-        c2 = _WENO_OPTIMAL_WEIGHT_2_;
+        s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+        s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
         c3 = _WENO_OPTIMAL_WEIGHT_3_;
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
-      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
-      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
-      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_JS_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -950,8 +950,8 @@ int WENOFifthOrderCalculateWeightsCharM(
   int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
-  static const double thirteen_by_twelve = 13.0/12.0;
-  static const double one_fourth         = 1.0/4.0;
+  static const double s_thirteen_by_twelve = 13.0/12.0;
+  static const double s_one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
   int offset = weno->m_offset[dir];
@@ -1033,32 +1033,32 @@ int WENOFifthOrderCalculateWeightsCharM(
       MatVecMult(nvars,p2RU,L,(uC+nvars*qp2R));
 
       /* optimal weights*/
-      double c1, c2, c3;
+      double s_c1, s_c2, c3;
       if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
         if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
             || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         } else {
           /* CRWENO5 at the interior points */
-          c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-          c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
           c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
         }
       } else {
         /* WENO5 and HCWENO5 */
-        c1 = _WENO_OPTIMAL_WEIGHT_1_;
-        c2 = _WENO_OPTIMAL_WEIGHT_2_;
+        s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+        s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
         c3 = _WENO_OPTIMAL_WEIGHT_3_;
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
-      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
-      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
-      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -1121,8 +1121,8 @@ int WENOFifthOrderCalculateWeightsCharZ(
   int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
-  static const double thirteen_by_twelve = 13.0/12.0;
-  static const double one_fourth         = 1.0/4.0;
+  static const double s_thirteen_by_twelve = 13.0/12.0;
+  static const double s_one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
   int offset = weno->m_offset[dir];
@@ -1204,32 +1204,32 @@ int WENOFifthOrderCalculateWeightsCharZ(
       MatVecMult(nvars,p2RU,L,(uC+nvars*qp2R));
 
       /* optimal weights*/
-      double c1, c2, c3;
+      double s_c1, s_c2, c3;
       if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
         if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
             || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         } else {
           /* CRWENO5 at the interior points */
-          c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-          c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
           c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
         }
       } else {
         /* WENO5 and HCWENO5 */
-        c1 = _WENO_OPTIMAL_WEIGHT_1_;
-        c2 = _WENO_OPTIMAL_WEIGHT_2_;
+        s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+        s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
         c3 = _WENO_OPTIMAL_WEIGHT_3_;
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
-      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
-      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
-      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_Z_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 
@@ -1292,8 +1292,8 @@ int WENOFifthOrderCalculateWeightsCharYC(
   int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
-  static const double thirteen_by_twelve = 13.0/12.0;
-  static const double one_fourth         = 1.0/4.0;
+  static const double s_thirteen_by_twelve = 13.0/12.0;
+  static const double s_one_fourth         = 1.0/4.0;
 
   /* calculate dimension offset */
   int offset = weno->m_offset[dir];
@@ -1375,32 +1375,32 @@ int WENOFifthOrderCalculateWeightsCharYC(
       MatVecMult(nvars,p2RU,L,(uC+nvars*qp2R));
 
       /* optimal weights*/
-      double c1, c2, c3;
+      double s_c1, s_c2, c3;
       if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
         if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
             || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         } else {
           /* CRWENO5 at the interior points */
-          c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-          c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
           c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
         }
       } else {
         /* WENO5 and HCWENO5 */
-        c1 = _WENO_OPTIMAL_WEIGHT_1_;
-        c2 = _WENO_OPTIMAL_WEIGHT_2_;
+        s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+        s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
         c3 = _WENO_OPTIMAL_WEIGHT_3_;
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
-      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
-      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
-      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno->m_eps,nvars);
+      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno->m_eps,nvars);
     }
   }
 

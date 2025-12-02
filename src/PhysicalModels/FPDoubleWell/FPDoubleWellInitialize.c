@@ -24,7 +24,7 @@ int FPDoubleWellInitialize(void *a_s,void *a_m)
   int           ferr     = 0;
   _DECLARE_IERR_;
 
-  static int count = 0;
+  static int s_count = 0;
 
   if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in FPDoubleWellInitializeO(): nvars has to be %d.\n",_MODEL_NVARS_);
@@ -38,7 +38,7 @@ int FPDoubleWellInitialize(void *a_s,void *a_m)
   /* reading physical model specific inputs - all processes */
   if (!mpi->m_rank) {
     FILE *in;
-    if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
+    if (!s_count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) {
       fprintf(stderr,"Error: File \"physics.inp\" not found.\n");
@@ -93,6 +93,6 @@ int FPDoubleWellInitialize(void *a_s,void *a_m)
   IERR FPDoubleWellPostStep(solver->m_u,solver,mpi,0.0,0);CHECKERR(ierr);
   IERR FPDoubleWellPrintStep(solver,mpi,0.0);           CHECKERR(ierr);
 
-  count++;
+  s_count++;
   return(0);
 }

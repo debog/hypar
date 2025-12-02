@@ -71,30 +71,30 @@ int WENOFifthOrderInitializeWeights(  double* const a_w1, /*!< Weight array */
       _ArrayIndex1D_(ndims,bounds_inter,indexI,0,p);
       for (v=0; v<nvars; v++)  {
         /* optimal weights*/
-        double c1, c2, c3;
+        double s_c1, s_c2, c3;
         if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
           if (   ((mpi->m_ip[a_dir] == 0                ) && (indexI[a_dir] == 0       ))
               || ((mpi->m_ip[a_dir] == mpi->m_iproc[a_dir]-1) && (indexI[a_dir] == dim[a_dir])) ) {
             /* Use WENO5 at the physical boundaries */
-            c1 = _WENO_OPTIMAL_WEIGHT_1_;
-            c2 = _WENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
             c3 = _WENO_OPTIMAL_WEIGHT_3_;
           } else {
             /* CRWENO5 at the interior points */
-            c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-            c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
             c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
           }
         } else {
           /* WENO5 and HCWENO5 */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         }
 
         /* save the weights */
-        *(ww1+p*nvars+v) = c1;
-        *(ww2+p*nvars+v) = c2;
+        *(ww1+p*nvars+v) = s_c1;
+        *(ww2+p*nvars+v) = s_c2;
         *(ww3+p*nvars+v) = c3;
       }
     }
@@ -113,30 +113,30 @@ int WENOFifthOrderInitializeWeights(  double* const a_w1, /*!< Weight array */
       for (v=0; v<nvars; v++)  {
 
         /* optimal weights*/
-        double c1, c2, c3;
+        double s_c1, s_c2, c3;
         if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
           if (   ((mpi->m_ip[a_dir] == 0                ) && (indexI[a_dir] == 0       ))
               || ((mpi->m_ip[a_dir] == mpi->m_iproc[a_dir]-1) && (indexI[a_dir] == dim[a_dir])) ) {
             /* Use WENO5 at the physical boundaries */
-            c1 = _WENO_OPTIMAL_WEIGHT_1_;
-            c2 = _WENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
             c3 = _WENO_OPTIMAL_WEIGHT_3_;
           } else {
             /* CRWENO5 at the interior points */
-            c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-            c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
             c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
           }
         } else {
           /* WENO5 and HCWENO5 */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         }
 
         /* save the weights */
-        *(ww1+p*nvars+v) = c1;
-        *(ww2+p*nvars+v) = c2;
+        *(ww1+p*nvars+v) = s_c1;
+        *(ww2+p*nvars+v) = s_c2;
         *(ww3+p*nvars+v) = c3;
       }
     }
@@ -156,30 +156,30 @@ int WENOFifthOrderInitializeWeights(  double* const a_w1, /*!< Weight array */
       for (v=0; v<nvars; v++)  {
 
         /* optimal weights*/
-        double c1, c2, c3;
+        double s_c1, s_c2, c3;
         if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
           if (   ((mpi->m_ip[a_dir] == 0                ) && (indexI[a_dir] == 0       ))
               || ((mpi->m_ip[a_dir] == mpi->m_iproc[a_dir]-1) && (indexI[a_dir] == dim[a_dir])) ) {
             /* Use WENO5 at the physical boundaries */
-            c1 = _WENO_OPTIMAL_WEIGHT_1_;
-            c2 = _WENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
             c3 = _WENO_OPTIMAL_WEIGHT_3_;
           } else {
             /* CRWENO5 at the interior points */
-            c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-            c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
             c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
           }
         } else {
           /* WENO5 and HCWENO5 */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         }
 
         /* save the weights */
-        *(ww1+p*nvars+v) = c1;
-        *(ww2+p*nvars+v) = c2;
+        *(ww1+p*nvars+v) = s_c1;
+        *(ww2+p*nvars+v) = s_c2;
         *(ww3+p*nvars+v) = c3;
       }
     }
@@ -198,30 +198,30 @@ int WENOFifthOrderInitializeWeights(  double* const a_w1, /*!< Weight array */
       for (v=0; v<nvars; v++)  {
 
         /* optimal weights*/
-        double c1, c2, c3;
+        double s_c1, s_c2, c3;
         if (!strcmp(solver->m_spatial_scheme_hyp,_FIFTH_ORDER_CRWENO_)) {
           if (   ((mpi->m_ip[a_dir] == 0                ) && (indexI[a_dir] == 0       ))
               || ((mpi->m_ip[a_dir] == mpi->m_iproc[a_dir]-1) && (indexI[a_dir] == dim[a_dir])) ) {
             /* Use WENO5 at the physical boundaries */
-            c1 = _WENO_OPTIMAL_WEIGHT_1_;
-            c2 = _WENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
             c3 = _WENO_OPTIMAL_WEIGHT_3_;
           } else {
             /* CRWENO5 at the interior points */
-            c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-            c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
             c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
           }
         } else {
           /* WENO5 and HCWENO5 */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         }
 
         /* save the weights */
-        *(ww1+p*nvars+v) = c1;
-        *(ww2+p*nvars+v) = c2;
+        *(ww1+p*nvars+v) = s_c1;
+        *(ww2+p*nvars+v) = s_c2;
         *(ww3+p*nvars+v) = c3;
       }
     }

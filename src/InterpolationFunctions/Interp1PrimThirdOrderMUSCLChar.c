@@ -111,8 +111,8 @@ int Interp1PrimThirdOrderMUSCLChar(
   int *dim   = solver->m_dim_local;
 
   /* define some constants */
-  double one_third = 1.0/3.0;
-  double one_sixth = 1.0/6.0;
+  double s_one_third = 1.0/3.0;
+  double s_one_sixth = 1.0/6.0;
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -164,7 +164,7 @@ int Interp1PrimThirdOrderMUSCLChar(
           double bdiff = m1 - m2;
           double limit =  (3*fdiff*bdiff + muscl->m_eps)
                         / (2*(fdiff-bdiff)*(fdiff-bdiff) + 3*fdiff*bdiff + muscl->m_eps);
-          fchar[v] = m1 +  limit * (one_third*fdiff + one_sixth*bdiff);
+          fchar[v] = m1 +  limit * (s_one_third*fdiff + s_one_sixth*bdiff);
         }
 
         /* calculate the interface u from the characteristic u */
@@ -211,7 +211,7 @@ int Interp1PrimThirdOrderMUSCLChar(
           double bdiff = p1 - m1;
           double limit =  (3*fdiff*bdiff + muscl->m_eps)
                         / (2*(fdiff-bdiff)*(fdiff-bdiff) + 3*fdiff*bdiff + muscl->m_eps);
-          fchar[v] = p1 -  limit * (one_third*fdiff + one_sixth*bdiff);
+          fchar[v] = p1 -  limit * (s_one_third*fdiff + s_one_sixth*bdiff);
         }
 
         /* calculate the interface u from the characteristic u */

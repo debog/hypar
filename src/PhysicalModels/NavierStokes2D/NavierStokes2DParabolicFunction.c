@@ -61,7 +61,7 @@ int NavierStokes2DParabolicFunction(
   if (physics->m_Re <= 0) return(0); /* inviscid flow */
   solver->m_count_par++;
 
-  static double two_third = 2.0/3.0;
+  static double s_two_third = 2.0/3.0;
   double        inv_gamma_m1 = 1.0 / (physics->m_gamma-1.0);
   double        inv_Re       = 1.0 / physics->m_Re;
   double        inv_Pr       = 1.0 / physics->m_Pr;
@@ -125,7 +125,7 @@ int NavierStokes2DParabolicFunction(
       double mu = raiseto(T, 0.76);
 
       double tau_xx, tau_xy, qx;
-      tau_xx = two_third * (mu*inv_Re) * (2*ux - vy);
+      tau_xx = s_two_third * (mu*inv_Re) * (2*ux - vy);
       tau_xy = (mu*inv_Re) * (uy + vx);
       qx     = ( (mu*inv_Re) * inv_gamma_m1 * inv_Pr ) * Tx;
 
@@ -167,7 +167,7 @@ int NavierStokes2DParabolicFunction(
 
       double tau_yx, tau_yy, qy;
       tau_yx = (mu*inv_Re) * (uy + vx);
-      tau_yy = two_third * (mu*inv_Re) * (-ux + 2*vy);
+      tau_yy = s_two_third * (mu*inv_Re) * (-ux + 2*vy);
       qy     = ( (mu*inv_Re) * inv_gamma_m1 * inv_Pr ) * Ty;
 
       (FViscous+p)[0] = 0.0;

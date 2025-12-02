@@ -95,14 +95,14 @@ int Interp1PrimFifthOrderCompactUpwind(
   int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
-  static const double one_third            = 1.0/3.0,
+  static const double s_one_third            = 1.0/3.0,
                       thirteen_by_sixty    = 13.0/60.0,
                       fortyseven_by_sixty  = 47.0/60.0,
                       twentyseven_by_sixty = 27.0/60.0,
                       one_by_twenty        = 1.0/20.0,
-                      one_by_thirty        = 1.0/30.0,
+                      s_one_by_thirty        = 1.0/30.0,
                       nineteen_by_thirty   = 19.0/30.0,
-                      three_by_ten         = 3.0/10.0,
+                      s_three_by_ten         = 3.0/10.0,
                       six_by_ten           = 6.0/10.0,
                       one_by_ten           = 1.0/10.0;
 
@@ -160,7 +160,7 @@ int Interp1PrimFifthOrderCompactUpwind(
         _ArraySetValue_((B+Nsys*indexI[dir]+sys*nvars),nvars,1.0)
         _ArraySetValue_((C+Nsys*indexI[dir]+sys*nvars),nvars,0.0)
         for (v=0; v<nvars; v++) {
-          (R+Nsys*indexI[dir]+sys*nvars)[v] =   one_by_thirty         * fm3[v]
+          (R+Nsys*indexI[dir]+sys*nvars)[v] =   s_one_by_thirty         * fm3[v]
                                               - thirteen_by_sixty     * fm2[v]
                                               + fortyseven_by_sixty   * fm1[v]
                                               + twentyseven_by_sixty  * fp1[v]
@@ -171,18 +171,18 @@ int Interp1PrimFifthOrderCompactUpwind(
 
         /* Use 5th order upwind at the physical boundaries */
         if (upw > 0) {
-          _ArraySetValue_((A+Nsys*indexI[dir]+sys*nvars),nvars,three_by_ten);
+          _ArraySetValue_((A+Nsys*indexI[dir]+sys*nvars),nvars,s_three_by_ten);
           _ArraySetValue_((B+Nsys*indexI[dir]+sys*nvars),nvars,six_by_ten  );
           _ArraySetValue_((C+Nsys*indexI[dir]+sys*nvars),nvars,one_by_ten  );
         } else {
-          _ArraySetValue_((C+Nsys*indexI[dir]+sys*nvars),nvars,three_by_ten);
+          _ArraySetValue_((C+Nsys*indexI[dir]+sys*nvars),nvars,s_three_by_ten);
           _ArraySetValue_((B+Nsys*indexI[dir]+sys*nvars),nvars,six_by_ten  );
           _ArraySetValue_((A+Nsys*indexI[dir]+sys*nvars),nvars,one_by_ten  );
         }
         for (v=0; v<nvars; v++) {
-          (R+Nsys*indexI[dir]+sys*nvars)[v] =   one_by_thirty      * fm2[v]
+          (R+Nsys*indexI[dir]+sys*nvars)[v] =   s_one_by_thirty      * fm2[v]
                                               + nineteen_by_thirty * fm1[v]
-                                              + one_third          * fp1[v];
+                                              + s_one_third          * fp1[v];
         }
       }
     }

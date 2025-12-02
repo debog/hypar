@@ -119,15 +119,15 @@ void SparseGridsSimulation::FillGhostCells( const GridDimensions& a_dim, /*!< gr
 
           double alpha = - (double) (a_ngpt - index[d]);
           double c0 = -((-2.0 + alpha)*(-1.0 + alpha)*alpha)/6.0;
-          double c1 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
-          double c2 = (alpha*(2.0 + alpha - alpha*alpha))/2.0;
+          double s_c1 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
+          double s_c2 = (alpha*(2.0 + alpha - alpha*alpha))/2.0;
           double c3 = (alpha*(-1.0 + alpha*alpha))/6.0;
 
           for (int v = 0; v < a_nvars; v++) {
 
             a_u[p_gpt*a_nvars+v] =    c0 * a_u[p_int_0*a_nvars+v]
-                                    + c1 * a_u[p_int_1*a_nvars+v]
-                                    + c2 * a_u[p_int_2*a_nvars+v]
+                                    + s_c1 * a_u[p_int_1*a_nvars+v]
+                                    + s_c2 * a_u[p_int_2*a_nvars+v]
                                     + c3 * a_u[p_int_3*a_nvars+v];
 
           }
@@ -162,15 +162,15 @@ void SparseGridsSimulation::FillGhostCells( const GridDimensions& a_dim, /*!< gr
 
           double alpha = - (double) (index[d]+1);
           double c0 = -((-2.0 + alpha)*(-1.0 + alpha)*alpha)/6.0;
-          double c1 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
-          double c2 = (alpha*(2.0 + alpha - alpha*alpha))/2.0;
+          double s_c1 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
+          double s_c2 = (alpha*(2.0 + alpha - alpha*alpha))/2.0;
           double c3 = (alpha*(-1.0 + alpha*alpha))/6.0;
 
           for (int v = 0; v < a_nvars; v++) {
 
             a_u[p_gpt*a_nvars+v] =    c0 * a_u[p_int_0*a_nvars+v]
-                                    + c1 * a_u[p_int_1*a_nvars+v]
-                                    + c2 * a_u[p_int_2*a_nvars+v]
+                                    + s_c1 * a_u[p_int_1*a_nvars+v]
+                                    + s_c2 * a_u[p_int_2*a_nvars+v]
                                     + c3 * a_u[p_int_3*a_nvars+v];
 
           }

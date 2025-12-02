@@ -64,7 +64,7 @@ int LinearADRInitialize(void *a_s, /*!< Solver object of type #HyPar */
   LinearADR     *physics = (LinearADR*)     solver->m_physics;
   int           i,ferr;
 
-  static int count = 0;
+  static int s_count = 0;
 
   /* default values */
   physics->m_constant_advection = -1;
@@ -80,7 +80,7 @@ int LinearADRInitialize(void *a_s, /*!< Solver object of type #HyPar */
   if (!mpi->m_rank) {
 
     FILE *in;
-    if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
+    if (!s_count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
 
     if (!in) {
@@ -207,6 +207,6 @@ int LinearADRInitialize(void *a_s, /*!< Solver object of type #HyPar */
     solver->PhysicsOutput = NULL;
   }
 
-  count++;
+  s_count++;
   return(0);
 }

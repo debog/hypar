@@ -58,7 +58,7 @@ int FirstDerivativeFourthOrderCentral(
     return(1);
   }
 
-  static double one_twelve = 1.0/12.0;
+  static double s_one_twelve = 1.0/12.0;
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "a_dir"                                                                    */
@@ -79,7 +79,7 @@ int FirstDerivativeFourthOrderCentral(
       indexC[a_dir] = i+3; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp3);
       indexC[a_dir] = i+4; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp4);
       for (v=0; v<nvars; v++)
-        a_Df[qC*nvars+v] = (-25*a_f[qC*nvars+v]+48*a_f[qp1*nvars+v]-36*a_f[qp2*nvars+v]+16*a_f[qp3*nvars+v]-3*a_f[qp4*nvars+v])*one_twelve;
+        a_Df[qC*nvars+v] = (-25*a_f[qC*nvars+v]+48*a_f[qp1*nvars+v]-36*a_f[qp2*nvars+v]+16*a_f[qp3*nvars+v]-3*a_f[qp4*nvars+v])*s_one_twelve;
     }
     for (i = -ghosts+1; i < -ghosts+2; i++) {
       int qC, qm1, qp1, qp2, qp3;
@@ -89,7 +89,7 @@ int FirstDerivativeFourthOrderCentral(
       indexC[a_dir] = i+2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp2);
       indexC[a_dir] = i+3; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp3);
       for (v=0; v<nvars; v++)
-        a_Df[qC*nvars+v] = (-3*a_f[qm1*nvars+v]-10*a_f[qC*nvars+v]+18*a_f[qp1*nvars+v]-6*a_f[qp2*nvars+v]+a_f[qp3*nvars+v])*one_twelve;
+        a_Df[qC*nvars+v] = (-3*a_f[qm1*nvars+v]-10*a_f[qC*nvars+v]+18*a_f[qp1*nvars+v]-6*a_f[qp2*nvars+v]+a_f[qp3*nvars+v])*s_one_twelve;
     }
     /* interior */
     for (i = -ghosts+2; i < dim[a_dir]+ghosts-2; i++) {
@@ -100,7 +100,7 @@ int FirstDerivativeFourthOrderCentral(
       indexC[a_dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp1);
       indexC[a_dir] = i+2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp2);
       for (v=0; v<nvars; v++)
-        a_Df[qC*nvars+v] = (a_f[qm2*nvars+v]-8*a_f[qm1*nvars+v]+8*a_f[qp1*nvars+v]-a_f[qp2*nvars+v])*one_twelve;
+        a_Df[qC*nvars+v] = (a_f[qm2*nvars+v]-8*a_f[qm1*nvars+v]+8*a_f[qp1*nvars+v]-a_f[qp2*nvars+v])*s_one_twelve;
     }
     /* right boundary */
     for (i = dim[a_dir]+ghosts-2; i < dim[a_dir]+ghosts-1; i++) {
@@ -111,7 +111,7 @@ int FirstDerivativeFourthOrderCentral(
       indexC[a_dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
       indexC[a_dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp1);
       for (v=0; v<nvars; v++)
-        a_Df[qC*nvars+v] = (-a_f[qm3*nvars+v]+6*a_f[qm2*nvars+v]-18*a_f[qm1*nvars+v]+10*a_f[qC*nvars+v]+3*a_f[qp1*nvars+v])*one_twelve;
+        a_Df[qC*nvars+v] = (-a_f[qm3*nvars+v]+6*a_f[qm2*nvars+v]-18*a_f[qm1*nvars+v]+10*a_f[qC*nvars+v]+3*a_f[qp1*nvars+v])*s_one_twelve;
     }
     for (i = dim[a_dir]+ghosts-1; i < dim[a_dir]+ghosts; i++) {
       int qC, qm4, qm3, qm2, qm1;
@@ -121,7 +121,7 @@ int FirstDerivativeFourthOrderCentral(
       indexC[a_dir] = i-1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qm1);
       indexC[a_dir] = i  ; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qC );
       for (v=0; v<nvars; v++)
-        a_Df[qC*nvars+v] = (3*a_f[qm4*nvars+v]-16*a_f[qm3*nvars+v]+36*a_f[qm2*nvars+v]-48*a_f[qm1*nvars+v]+25*a_f[qC*nvars+v])*one_twelve;
+        a_Df[qC*nvars+v] = (3*a_f[qm4*nvars+v]-16*a_f[qm3*nvars+v]+36*a_f[qm2*nvars+v]-48*a_f[qm1*nvars+v]+25*a_f[qC*nvars+v])*s_one_twelve;
     }
   }
 

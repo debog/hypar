@@ -64,19 +64,19 @@ static int coarsen1D( const int* const    a_dim_src, /*!< Grid size of source da
   }
 
   /* set interpolation coefficients depending on desired order */
-  double c0, c1, c2, c3, c4, c5;
+  double c0, s_c1, s_c2, c3, c4, c5;
 //  if (a_interp_order == 2) {
 //    c0 = c5 = 0.0;
-//    c1 = c4 = 0.0;
-//    c2 = c3 = 0.5;
+//    s_c1 = c4 = 0.0;
+//    s_c2 = c3 = 0.5;
 //  } else if (a_interp_order == 4) {
 //    c0 = c5 = 0.0;
-//    c1 = c4 = -1.0/16.0;
-//    c2 = c3 = 9.0/16.0;
+//    s_c1 = c4 = -1.0/16.0;
+//    s_c2 = c3 = 9.0/16.0;
 //  } else if (a_interp_order == 6) {
     c0 = c5 = 3.0/256.0;
-    c1 = c4 = -25.0/256.0;
-    c2 = c3 = 150.0/256.0;
+    s_c1 = c4 = -25.0/256.0;
+    s_c2 = c3 = 150.0/256.0;
 //  } else {
 //    fprintf(stderr,"Invalid value of interpolation order!\n");
 //    return 1;
@@ -135,8 +135,8 @@ static int coarsen1D( const int* const    a_dim_src, /*!< Grid size of source da
 
       for (int v = 0; v < a_nvars; v++) {
         double val =    c0 * a_u_src[p_m3*a_nvars+v]
-                      + c1 * a_u_src[p_m2*a_nvars+v]
-                      + c2 * a_u_src[p_m1*a_nvars+v]
+                      + s_c1 * a_u_src[p_m2*a_nvars+v]
+                      + s_c2 * a_u_src[p_m1*a_nvars+v]
                       + c3 * a_u_src[p_p1*a_nvars+v]
                       + c4 * a_u_src[p_p2*a_nvars+v]
                       + c5 * a_u_src[p_p3*a_nvars+v];
@@ -254,25 +254,25 @@ static int refine1D(const int* const     a_dim_src, /*!< Grid size of source dat
       int q5; _ArrayIndex1D_(a_ndims, a_dim_src, index_src5, a_ngpt, q5);
 
       /* set interpolation coefficients depending on desired order */
-      double c0, c1, c2, c3, c4, c5;
+      double c0, s_c1, s_c2, c3, c4, c5;
 //      if (a_interp_order == 2) {
 //        c0 = 0.0;
-//        c1 = 0.0;
-//        c2 = (1.0-alpha);
+//        s_c1 = 0.0;
+//        s_c2 = (1.0-alpha);
 //        c3 = alpha;
 //        c4 = 0.0;
 //        c5 = 0.0;
 //      } else if (a_interp_order == 4) {
 //        c0 = 0.0;
-//        c1 = -((-2.0 + alpha)*(-1.0 + alpha)*alpha)/6.0;
-//        c2 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
+//        s_c1 = -((-2.0 + alpha)*(-1.0 + alpha)*alpha)/6.0;
+//        s_c2 = ((-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha))/2.0;
 //        c3 = (alpha*(2.0 + alpha - alpha*alpha))/2.0;
 //        c4 = (alpha*(-1.0 + alpha*alpha))/6.0;
 //        c5 = 0.0;
 //      } else if (a_interp_order == 6) {
         c0 = -((-3.0 + alpha)*(-2.0 + alpha)*(-1.0 + alpha)*alpha*(1.0 + alpha))/120.0;
-        c1 = ((-3.0 + alpha)*(-2.0 + alpha)*(-1.0 + alpha)*alpha*(2.0 + alpha))/24.0;
-        c2 = -((-3.0 + alpha)*(-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha)*(2.0 + alpha))/12.0;
+        s_c1 = ((-3.0 + alpha)*(-2.0 + alpha)*(-1.0 + alpha)*alpha*(2.0 + alpha))/24.0;
+        s_c2 = -((-3.0 + alpha)*(-2.0 + alpha)*(-1.0 + alpha)*(1.0 + alpha)*(2.0 + alpha))/12.0;
         c3 = ((-3.0 + alpha)*(-2.0 + alpha)*alpha*(1.0 + alpha)*(2.0 + alpha))/12.0;
         c4 = -((-3.0 + alpha)*(-1.0 + alpha)*alpha*(1.0 + alpha)*(2.0 + alpha))/24.0;
         c5 = (alpha*(4.0 - 5.0*alpha*alpha + alpha*alpha*alpha*alpha))/120.0;
@@ -284,8 +284,8 @@ static int refine1D(const int* const     a_dim_src, /*!< Grid size of source dat
       for (int v = 0; v < a_nvars; v++) {
 
         a_u_dst[p*a_nvars+v] =    c0 * a_u_src[q0*a_nvars+v]
-                                + c1 * a_u_src[q1*a_nvars+v]
-                                + c2 * a_u_src[q2*a_nvars+v]
+                                + s_c1 * a_u_src[q1*a_nvars+v]
+                                + s_c2 * a_u_src[q2*a_nvars+v]
                                 + c3 * a_u_src[q3*a_nvars+v]
                                 + c4 * a_u_src[q4*a_nvars+v]
                                 + c5 * a_u_src[q5*a_nvars+v];

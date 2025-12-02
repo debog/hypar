@@ -155,7 +155,7 @@ void SparseGridsSimulation::CalculateError()
 void SparseGridsSimulation::computeError( SimulationObject& a_sim,  /*!< Simulation object */
                                           double* const     a_uex   /*!< Exact solution */ )
 {
-  static const double tolerance = 1e-15;
+  static const double s_tolerance = 1e-15;
 
   HyPar* solver = &(a_sim.solver);
   MPIVariables* mpi = &(a_sim.mpi);
@@ -211,9 +211,9 @@ void SparseGridsSimulation::computeError( SimulationObject& a_sim,  /*!< Simulat
     decide whether to normalize and report relative errors,
     or report absolute errors.
   */
-  if (    (solution_norm[0] > tolerance)
-      &&  (solution_norm[1] > tolerance)
-      &&  (solution_norm[2] > tolerance) ) {
+  if (    (solution_norm[0] > s_tolerance)
+      &&  (solution_norm[1] > s_tolerance)
+      &&  (solution_norm[2] > s_tolerance) ) {
     solver->m_error[0] /= solution_norm[0];
     solver->m_error[1] /= solution_norm[1];
     solver->m_error[2] /= solution_norm[2];

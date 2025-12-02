@@ -28,7 +28,7 @@ int Numa3DInitialize(void *a_s,void *a_m)
   Numa3D          *physics = (Numa3D*)        solver->m_physics;
   int             ferr     = 0;
 
-  static int count = 0;
+  static int s_count = 0;
 
   if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in Numa3DInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
@@ -56,7 +56,7 @@ int Numa3DInitialize(void *a_s,void *a_m)
   /* reading physical model specific inputs - all processes */
   if (!mpi->m_rank) {
     FILE *in;
-    if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
+    if (!s_count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
@@ -142,6 +142,6 @@ int Numa3DInitialize(void *a_s,void *a_m)
   DomainBoundary  *boundary = (DomainBoundary*) solver->m_boundary;
   for (n = 0; n < solver->m_n_boundary_zones; n++)  boundary[n].m_gamma = physics->m_gamma;
 
-  count++;
+  s_count++;
   return(0);
 }

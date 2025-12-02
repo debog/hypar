@@ -86,9 +86,9 @@ int Interp1PrimFifthOrderHCWENO(
   int *dim   = solver->m_dim_local;
 
   /* define some constants */
-  static const double one_half           = 1.0/2.0;
-  static const double one_third          = 1.0/3.0;
-  static const double one_sixth          = 1.0/6.0;
+  static const double s_one_half           = 1.0/2.0;
+  static const double s_one_third          = 1.0/3.0;
+  static const double s_one_sixth          = 1.0/6.0;
 
   double *ww1, *ww2, *ww3;
   ww1 = weno->m_w1 + (upw < 0 ? 2*weno->m_size : 0) + (uflag ? weno->m_size : 0) + weno->m_offset[dir];
@@ -144,9 +144,9 @@ int Interp1PrimFifthOrderHCWENO(
 
         /* Candidate stencils and their optimal weights*/
         double f1, f2, f3;
-        f1 = (2*one_sixth)*fm3 - (7.0*one_sixth)*fm2 + (11.0*one_sixth)*fm1;
-        f2 = (-one_sixth)*fm2 + (5.0*one_sixth)*fm1 + (2*one_sixth)*fp1;
-        f3 = (2*one_sixth)*fm1 + (5*one_sixth)*fp1 - (one_sixth)*fp2;
+        f1 = (2*s_one_sixth)*fm3 - (7.0*s_one_sixth)*fm2 + (11.0*s_one_sixth)*fm1;
+        f2 = (-s_one_sixth)*fm2 + (5.0*s_one_sixth)*fm1 + (2*s_one_sixth)*fp1;
+        f3 = (2*s_one_sixth)*fm1 + (5*s_one_sixth)*fp1 - (s_one_sixth)*fp2;
 
         /* calculate WENO weights */
         double w1,w2,w3;
@@ -173,18 +173,18 @@ int Interp1PrimFifthOrderHCWENO(
         }
 
         if (upw > 0) {
-          A[sys*nvars+v+Nsys*indexI[dir]] = one_half  * sigma;
+          A[sys*nvars+v+Nsys*indexI[dir]] = s_one_half  * sigma;
           B[sys*nvars+v+Nsys*indexI[dir]] = 1.0;
-          C[sys*nvars+v+Nsys*indexI[dir]] = one_sixth * sigma;
+          C[sys*nvars+v+Nsys*indexI[dir]] = s_one_sixth * sigma;
         } else {
-          C[sys*nvars+v+Nsys*indexI[dir]] = one_half  * sigma;
+          C[sys*nvars+v+Nsys*indexI[dir]] = s_one_half  * sigma;
           B[sys*nvars+v+Nsys*indexI[dir]] = 1.0;
-          A[sys*nvars+v+Nsys*indexI[dir]] = one_sixth * sigma;
+          A[sys*nvars+v+Nsys*indexI[dir]] = s_one_sixth * sigma;
         }
 
         double fWENO, fCompact;
         fWENO    = w1*f1 + w2*f2 + w3*f3;
-        fCompact = one_sixth * (one_third*fm2 + 19.0*one_third*fm1 + 10.0*one_third*fp1);
+        fCompact = s_one_sixth * (s_one_third*fm2 + 19.0*s_one_third*fm1 + 10.0*s_one_third*fp1);
         R[sys*nvars+v+Nsys*indexI[dir]] =   sigma*fCompact + (1.0-sigma)*fWENO;
       }
     }

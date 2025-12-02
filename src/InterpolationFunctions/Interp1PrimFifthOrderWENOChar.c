@@ -106,7 +106,7 @@ int Interp1PrimFifthOrderWENOChar(
   int *dim   = solver->m_dim_local;
 
   /* define some constants */
-  static const double one_sixth          = 1.0/6.0;
+  static const double s_one_sixth          = 1.0/6.0;
 
   double *ww1, *ww2, *ww3;
   ww1 = weno->m_w1 + (upw < 0 ? 2*weno->m_size : 0) + (uflag ? weno->m_size : 0) + weno->m_offset[dir];
@@ -173,9 +173,9 @@ int Interp1PrimFifthOrderWENOChar(
 
         /* Candidate stencils and their optimal weights*/
         double f1, f2, f3;
-        f1 = (2*one_sixth)*fm3 - (7.0*one_sixth)*fm2 + (11.0*one_sixth)*fm1;
-        f2 = (-one_sixth)*fm2 + (5.0*one_sixth)*fm1 + (2*one_sixth)*fp1;
-        f3 = (2*one_sixth)*fm1 + (5*one_sixth)*fp1 - (one_sixth)*fp2;
+        f1 = (2*s_one_sixth)*fm3 - (7.0*s_one_sixth)*fm2 + (11.0*s_one_sixth)*fm1;
+        f2 = (-s_one_sixth)*fm2 + (5.0*s_one_sixth)*fm1 + (2*s_one_sixth)*fp1;
+        f3 = (2*s_one_sixth)*fm1 + (5*s_one_sixth)*fp1 - (s_one_sixth)*fp2;
 
         /* calculate WENO weights */
         double w1,w2,w3;

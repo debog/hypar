@@ -28,7 +28,7 @@ int CalculateROMDiff( void *a_s, /*!< Solver object of type #HyPar */
   MPIVariables* mpi = (MPIVariables*) a_m;
   double sum = 0, global_sum = 0;
 
-  static const double tolerance = 1e-15;
+  static const double s_tolerance = 1e-15;
 
   int size = solver->m_npoints_local_wghosts * solver->m_nvars;
   double* u_diff = (double*) calloc (size, sizeof(double));
@@ -100,9 +100,9 @@ int CalculateROMDiff( void *a_s, /*!< Solver object of type #HyPar */
 
   /* decide whether to normalize and report relative diff norms,
     or report absolute diff norms. */
-  if (    (solution_norm[0] > tolerance)
-      &&  (solution_norm[1] > tolerance)
-      &&  (solution_norm[2] > tolerance) ) {
+  if (    (solution_norm[0] > s_tolerance)
+      &&  (solution_norm[1] > s_tolerance)
+      &&  (solution_norm[2] > s_tolerance) ) {
     solver->m_rom_diff_norms[0] /= solution_norm[0];
     solver->m_rom_diff_norms[1] /= solution_norm[1];
     solver->m_rom_diff_norms[2] /= solution_norm[2];

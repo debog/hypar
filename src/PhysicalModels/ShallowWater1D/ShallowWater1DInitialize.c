@@ -44,7 +44,7 @@ int ShallowWater1DInitialize(
   ShallowWater1D  *physics = (ShallowWater1D*)       solver->m_physics;
   int             ferr, d;
 
-  static int count = 0;
+  static int s_count = 0;
 
   if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in ShallowWater1DInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
@@ -63,7 +63,7 @@ int ShallowWater1DInitialize(
   /* reading physical model specific inputs */
   if (!mpi->m_rank) {
     FILE *in;
-    if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
+    if (!s_count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
@@ -128,6 +128,6 @@ int ShallowWater1DInitialize(
   /* set function pointer to read this topography */
   solver->PhysicsInput = ShallowWater1DTopography;
 
-  count++;
+  s_count++;
   return(0);
 }

@@ -116,8 +116,8 @@ int Interp1PrimFifthOrderCRWENOChar(
   int *dim   = solver->m_dim_local;
 
   /* define some constants */
-  static const double one_third          = 1.0/3.0;
-  static const double one_sixth          = 1.0/6.0;
+  static const double s_one_third          = 1.0/3.0;
+  static const double s_one_sixth          = 1.0/6.0;
 
   double *ww1, *ww2, *ww3;
   ww1 = weno->m_w1 + (upw < 0 ? 2*weno->m_size : 0) + (uflag ? weno->m_size : 0) + weno->m_offset[dir];
@@ -191,14 +191,14 @@ int Interp1PrimFifthOrderCRWENOChar(
         if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
             || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
-          f1 = (2*one_sixth)*fm3 - (7.0*one_sixth)*fm2 + (11.0*one_sixth)*fm1;
-          f2 = (-one_sixth)*fm2 + (5.0*one_sixth)*fm1 + (2*one_sixth)*fp1;
-          f3 = (2*one_sixth)*fm1 + (5*one_sixth)*fp1 - (one_sixth)*fp2;
+          f1 = (2*s_one_sixth)*fm3 - (7.0*s_one_sixth)*fm2 + (11.0*s_one_sixth)*fm1;
+          f2 = (-s_one_sixth)*fm2 + (5.0*s_one_sixth)*fm1 + (2*s_one_sixth)*fp1;
+          f3 = (2*s_one_sixth)*fm1 + (5*s_one_sixth)*fp1 - (s_one_sixth)*fp2;
         } else {
           /* CRWENO5 at the interior points */
-          f1 = (one_sixth) * (fm2 + 5*fm1);
-          f2 = (one_sixth) * (5*fm1 + fp1);
-          f3 = (one_sixth) * (fm1 + 5*fp1);
+          f1 = (s_one_sixth) * (fm2 + 5*fm1);
+          f2 = (s_one_sixth) * (5*fm1 + fp1);
+          f3 = (s_one_sixth) * (fm1 + 5*fp1);
         }
 
         /* calculate WENO weights */
@@ -217,15 +217,15 @@ int Interp1PrimFifthOrderCRWENOChar(
         } else {
           if (upw > 0) {
             for (k=0; k<nvars; k++) {
-              A[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((2*one_third)*w1 + (one_third)*w2)      * L[v*nvars+k];
-              B[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((one_third)*w1 + (2*one_third)*(w2+w3)) * L[v*nvars+k];
-              C[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((one_third)*w3)                         * L[v*nvars+k];
+              A[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((2*s_one_third)*w1 + (s_one_third)*w2)      * L[v*nvars+k];
+              B[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((s_one_third)*w1 + (2*s_one_third)*(w2+w3)) * L[v*nvars+k];
+              C[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((s_one_third)*w3)                         * L[v*nvars+k];
             }
           } else {
             for (k=0; k<nvars; k++) {
-              C[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((2*one_third)*w1 + (one_third)*w2)      * L[v*nvars+k];
-              B[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((one_third)*w1 + (2*one_third)*(w2+w3)) * L[v*nvars+k];
-              A[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((one_third)*w3)                         * L[v*nvars+k];
+              C[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((2*s_one_third)*w1 + (s_one_third)*w2)      * L[v*nvars+k];
+              B[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((s_one_third)*w1 + (2*s_one_third)*(w2+w3)) * L[v*nvars+k];
+              A[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = ((s_one_third)*w3)                         * L[v*nvars+k];
             }
           }
         }

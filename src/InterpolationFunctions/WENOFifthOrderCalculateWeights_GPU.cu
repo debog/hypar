@@ -76,8 +76,8 @@ void WENOFifthOrderCalculateWeightsM_kernel(
     int p = threadIdx.x + (blockDim.x * blockIdx.x);
     if (p < ngrid_points) {
       const int    max_ndims = 3;
-      const double thirteen_by_twelve = 13.0 / 12.0;
-      const double one_fourth = 1.0 / 4.0;
+      const double s_thirteen_by_twelve = 13.0 / 12.0;
+      const double s_one_fourth = 1.0 / 4.0;
 
       int    bounds_inter[max_ndims], indexC[max_ndims], indexI[max_ndims];
       int    qm1L, qm2L, qm3L, qp1L, qp2L, qm1R, qm2R, qm3R, qp1R, qp2R;
@@ -139,32 +139,32 @@ void WENOFifthOrderCalculateWeightsM_kernel(
       p1RU = (uC+qp1R*nvars);
       p2RU = (uC+qp2R*nvars);
 
-      double c1, c2, c3;
+      double s_c1, s_c2, c3;
       if (is_crweno) {
         if (   (is_mpi_ip_zero && (indexI[dir] == 0       ))
             || (is_mpi_ip_proc && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         } else {
           /* CRWENO5 at the interior points */
-          c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-          c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
           c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
         }
       } else {
         /* WENO5 and HCWENO5 */
-        c1 = _WENO_OPTIMAL_WEIGHT_1_;
-        c2 = _WENO_OPTIMAL_WEIGHT_2_;
+        s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+        s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
         c3 = _WENO_OPTIMAL_WEIGHT_3_;
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno_eps,nvars);
-      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno_eps,nvars);
-      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno_eps,nvars);
-      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno_eps,nvars);
+      _WENOWeights_v_M_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno_eps,nvars);
+      _WENOWeights_v_M_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno_eps,nvars);
+      _WENOWeights_v_M_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno_eps,nvars);
+      _WENOWeights_v_M_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno_eps,nvars);
     }
 
     return;
@@ -294,8 +294,8 @@ void WENOFifthOrderCalculateWeightsYC_kernel(
     int p = threadIdx.x + (blockDim.x * blockIdx.x);
     if (p < ngrid_points) {
       const int    max_ndims = 3;
-      const double thirteen_by_twelve = 13.0 / 12.0;
-      const double one_fourth = 1.0 / 4.0;
+      const double s_thirteen_by_twelve = 13.0 / 12.0;
+      const double s_one_fourth = 1.0 / 4.0;
 
       int    bounds_inter[max_ndims], indexC[max_ndims], indexI[max_ndims];
       int    qm1L, qm2L, qm3L, qp1L, qp2L, qm1R, qm2R, qm3R, qp1R, qp2R;
@@ -357,32 +357,32 @@ void WENOFifthOrderCalculateWeightsYC_kernel(
       p1RU = (uC+qp1R*nvars);
       p2RU = (uC+qp2R*nvars);
 
-      double c1, c2, c3;
+      double s_c1, s_c2, c3;
       if (is_crweno) {
         if (   (is_mpi_ip_zero && (indexI[dir] == 0       ))
             || (is_mpi_ip_proc && (indexI[dir] == dim[dir])) ) {
           /* Use WENO5 at the physical boundaries */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         } else {
           /* CRWENO5 at the interior points */
-          c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-          c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
           c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
         }
       } else {
         /* WENO5 and HCWENO5 */
-        c1 = _WENO_OPTIMAL_WEIGHT_1_;
-        c2 = _WENO_OPTIMAL_WEIGHT_2_;
+        s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+        s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
         c3 = _WENO_OPTIMAL_WEIGHT_3_;
       }
 
       /* calculate WENO weights */
-      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno_eps,nvars);
-      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno_eps,nvars);
-      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno_eps,nvars);
-      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno_eps,nvars);
+      _WENOWeights_v_YC_((ww1LF+p*nvars),(ww2LF+p*nvars),(ww3LF+p*nvars),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno_eps,nvars);
+      _WENOWeights_v_YC_((ww1RF+p*nvars),(ww2RF+p*nvars),(ww3RF+p*nvars),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno_eps,nvars);
+      _WENOWeights_v_YC_((ww1LU+p*nvars),(ww2LU+p*nvars),(ww3LU+p*nvars),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno_eps,nvars);
+      _WENOWeights_v_YC_((ww1RU+p*nvars),(ww2RU+p*nvars),(ww3RU+p*nvars),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno_eps,nvars);
     }
 
     return;
@@ -507,8 +507,8 @@ void WENOFifthOrderCalculateWeightsM_kernel(
     int p = threadIdx.x + (blockDim.x * blockIdx.x);
     if (p < npoints_grid) {
       const int    max_ndims = 3;
-      const double thirteen_by_twelve = 13.0 / 12.0;
-      const double one_fourth = 1.0 / 4.0;
+      const double s_thirteen_by_twelve = 13.0 / 12.0;
+      const double s_one_fourth = 1.0 / 4.0;
 
       int    bounds_inter[max_ndims], indexC[max_ndims], indexI[max_ndims];
       int    qm1L, qm2L, qm3L, qp1L, qp2L, qm1R, qm2R, qm3R, qp1R, qp2R;
@@ -583,32 +583,32 @@ void WENOFifthOrderCalculateWeightsM_kernel(
         qp1R += npoints_local_wghosts;
         qp2R += npoints_local_wghosts;
 
-        double c1, c2, c3;
+        double s_c1, s_c2, c3;
         if (is_crweno) {
           if (   (is_mpi_ip_zero && (indexI[dir] == 0       ))
               || (is_mpi_ip_proc && (indexI[dir] == dim[dir])) ) {
             /* Use WENO5 at the physical boundaries */
-            c1 = _WENO_OPTIMAL_WEIGHT_1_;
-            c2 = _WENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
             c3 = _WENO_OPTIMAL_WEIGHT_3_;
           } else {
             /* CRWENO5 at the interior points */
-            c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-            c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
             c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
           }
         } else {
           /* WENO5 and HCWENO5 */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         }
 
         /* calculate WENO weights */
-        _WENOWeights_v_M_Scalar_((ww1LF+p),(ww2LF+p),(ww3LF+p),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno_eps,0);
-        _WENOWeights_v_M_Scalar_((ww1RF+p),(ww2RF+p),(ww3RF+p),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno_eps,0);
-        _WENOWeights_v_M_Scalar_((ww1LU+p),(ww2LU+p),(ww3LU+p),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno_eps,0);
-        _WENOWeights_v_M_Scalar_((ww1RU+p),(ww2RU+p),(ww3RU+p),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno_eps,0);
+        _WENOWeights_v_M_Scalar_((ww1LF+p),(ww2LF+p),(ww3LF+p),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno_eps,0);
+        _WENOWeights_v_M_Scalar_((ww1RF+p),(ww2RF+p),(ww3RF+p),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno_eps,0);
+        _WENOWeights_v_M_Scalar_((ww1LU+p),(ww2LU+p),(ww3LU+p),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno_eps,0);
+        _WENOWeights_v_M_Scalar_((ww1RU+p),(ww2RU+p),(ww3RU+p),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno_eps,0);
         p += npoints_grid;
       }
     }
@@ -743,8 +743,8 @@ void WENOFifthOrderCalculateWeightsYC_kernel(
     int p = threadIdx.x + (blockDim.x * blockIdx.x);
     if (p < npoints_grid) {
       const int    max_ndims = 3;
-      const double thirteen_by_twelve = 13.0 / 12.0;
-      const double one_fourth = 1.0 / 4.0;
+      const double s_thirteen_by_twelve = 13.0 / 12.0;
+      const double s_one_fourth = 1.0 / 4.0;
 
       int    bounds_inter[max_ndims], indexC[max_ndims], indexI[max_ndims];
       int    qm1L, qm2L, qm3L, qp1L, qp2L, qm1R, qm2R, qm3R, qp1R, qp2R;
@@ -819,32 +819,32 @@ void WENOFifthOrderCalculateWeightsYC_kernel(
         qp1R += npoints_local_wghosts;
         qp2R += npoints_local_wghosts;
 
-        double c1, c2, c3;
+        double s_c1, s_c2, c3;
         if (is_crweno) {
           if (   (is_mpi_ip_zero && (indexI[dir] == 0       ))
               || (is_mpi_ip_proc && (indexI[dir] == dim[dir])) ) {
             /* Use WENO5 at the physical boundaries */
-            c1 = _WENO_OPTIMAL_WEIGHT_1_;
-            c2 = _WENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
             c3 = _WENO_OPTIMAL_WEIGHT_3_;
           } else {
             /* CRWENO5 at the interior points */
-            c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
-            c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
+            s_c1 = _CRWENO_OPTIMAL_WEIGHT_1_;
+            s_c2 = _CRWENO_OPTIMAL_WEIGHT_2_;
             c3 = _CRWENO_OPTIMAL_WEIGHT_3_;
           }
         } else {
           /* WENO5 and HCWENO5 */
-          c1 = _WENO_OPTIMAL_WEIGHT_1_;
-          c2 = _WENO_OPTIMAL_WEIGHT_2_;
+          s_c1 = _WENO_OPTIMAL_WEIGHT_1_;
+          s_c2 = _WENO_OPTIMAL_WEIGHT_2_;
           c3 = _WENO_OPTIMAL_WEIGHT_3_;
         }
 
         /* calculate WENO weights */
-        _WENOWeights_v_YC_Scalar_((ww1LF+p),(ww2LF+p),(ww3LF+p),c1,c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno_eps,0);
-        _WENOWeights_v_YC_Scalar_((ww1RF+p),(ww2RF+p),(ww3RF+p),c1,c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno_eps,0);
-        _WENOWeights_v_YC_Scalar_((ww1LU+p),(ww2LU+p),(ww3LU+p),c1,c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno_eps,0);
-        _WENOWeights_v_YC_Scalar_((ww1RU+p),(ww2RU+p),(ww3RU+p),c1,c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno_eps,0);
+        _WENOWeights_v_YC_Scalar_((ww1LF+p),(ww2LF+p),(ww3LF+p),s_c1,s_c2,c3,m3LF,m2LF,m1LF,p1LF,p2LF,weno_eps,0);
+        _WENOWeights_v_YC_Scalar_((ww1RF+p),(ww2RF+p),(ww3RF+p),s_c1,s_c2,c3,m3RF,m2RF,m1RF,p1RF,p2RF,weno_eps,0);
+        _WENOWeights_v_YC_Scalar_((ww1LU+p),(ww2LU+p),(ww3LU+p),s_c1,s_c2,c3,m3LU,m2LU,m1LU,p1LU,p2LU,weno_eps,0);
+        _WENOWeights_v_YC_Scalar_((ww1RU+p),(ww2RU+p),(ww3RU+p),s_c1,s_c2,c3,m3RU,m2RU,m1RU,p1RU,p2RU,weno_eps,0);
         p += npoints_grid;
       }
     }

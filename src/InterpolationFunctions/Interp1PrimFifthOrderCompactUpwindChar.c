@@ -112,12 +112,12 @@ int Interp1PrimFifthOrderCompactUpwindChar(
   int *dim   = solver->m_dim_local;
 
   /* define some constants */
-  static const double three_by_ten          = 3.0/10.0,
+  static const double s_three_by_ten          = 3.0/10.0,
                       six_by_ten            = 6.0/10.0,
                       one_by_ten            = 1.0/10.0,
-                      one_by_thirty         = 1.0/30.0,
+                      s_one_by_thirty         = 1.0/30.0,
                       nineteen_by_thirty    = 19.0/30.0,
-                      one_third             = 1.0/3.0,
+                      s_one_third             = 1.0/3.0,
                       thirteen_by_sixty     = 13.0/60.0,
                       fortyseven_by_sixty   = 47.0/60.0,
                       twentyseven_by_sixty  = 27.0/60.0,
@@ -193,7 +193,7 @@ int Interp1PrimFifthOrderCompactUpwindChar(
             C[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = 0.0;
             B[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = L[v*nvars+k];
           }
-          F[(Nsys*indexI[dir]+sys)*nvars+v] =   one_by_thirty         * fm3
+          F[(Nsys*indexI[dir]+sys)*nvars+v] =   s_one_by_thirty         * fm3
                                               - thirteen_by_sixty     * fm2
                                               + fortyseven_by_sixty   * fm1
                                               + twentyseven_by_sixty  * fp1
@@ -202,20 +202,20 @@ int Interp1PrimFifthOrderCompactUpwindChar(
           /* 5th order compact upwind at the interior points */
           if (upw > 0) {
             for (k=0; k<nvars; k++) {
-              A[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = three_by_ten * L[v*nvars+k];
+              A[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = s_three_by_ten * L[v*nvars+k];
               B[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = six_by_ten   * L[v*nvars+k];
               C[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = one_by_ten   * L[v*nvars+k];
             }
           } else {
             for (k=0; k<nvars; k++) {
-              C[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = three_by_ten * L[v*nvars+k];
+              C[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = s_three_by_ten * L[v*nvars+k];
               B[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = six_by_ten   * L[v*nvars+k];
               A[(Nsys*indexI[dir]+sys)*nvars*nvars+v*nvars+k] = one_by_ten   * L[v*nvars+k];
             }
           }
-          F[(Nsys*indexI[dir]+sys)*nvars+v] =   one_by_thirty      * fm2
+          F[(Nsys*indexI[dir]+sys)*nvars+v] =   s_one_by_thirty      * fm2
                                               + nineteen_by_thirty * fm1
-                                              + one_third          * fp1;
+                                              + s_one_third          * fp1;
         }
       }
     }

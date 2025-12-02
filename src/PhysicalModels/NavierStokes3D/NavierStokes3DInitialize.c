@@ -122,7 +122,7 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
   NavierStokes3D  *physics = (NavierStokes3D*) solver->m_physics;
   int             ferr     = 0;
 
-  static int count = 0;
+  static int s_count = 0;
 
   if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in NavierStokes3DInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
@@ -160,7 +160,7 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
   /* reading physical model specific inputs - all processes */
   if (!mpi->m_rank) {
     FILE *in;
-    if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
+    if (!s_count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
@@ -522,6 +522,6 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
   if (solver->m_use_gpu) gpuNavierStokes3DInitialize(a_s,a_m);
 #endif
 
-  count++;
+  s_count++;
   return(0);
 }

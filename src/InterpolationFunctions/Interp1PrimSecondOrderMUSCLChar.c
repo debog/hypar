@@ -112,8 +112,8 @@ int Interp1PrimSecondOrderMUSCLChar (
   int *dim   = solver->m_dim_local;
 
   /* define some constants */
-  double one_third = 1.0/3.0;
-  double one_sixth = 1.0/6.0;
+  double s_one_third = 1.0/3.0;
+  double s_one_sixth = 1.0/6.0;
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */

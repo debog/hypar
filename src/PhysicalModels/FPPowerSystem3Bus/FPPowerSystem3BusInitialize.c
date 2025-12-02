@@ -35,7 +35,7 @@ int FPPowerSystem3BusInitialize(
   int                 ferr, N;
   _DECLARE_IERR_;
 
-  static int count = 0;
+  static int s_count = 0;
 
   if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in FPPowerSystem3BusInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
@@ -94,7 +94,7 @@ int FPPowerSystem3BusInitialize(
 
   /* reading physical model specific inputs - all processes */
   FILE *in;
-  if ((!mpi->m_rank) && (!count)) printf("Reading physical model inputs from file \"physics.inp\".\n");
+  if ((!mpi->m_rank) && (!s_count)) printf("Reading physical model inputs from file \"physics.inp\".\n");
   in = fopen("physics.inp","r");
   if (!in) {
     if (!mpi->m_rank) fprintf(stderr,"Error: File \"physics.inp\" not found.\n");
@@ -170,6 +170,6 @@ int FPPowerSystem3BusInitialize(
   solver->HFunction          = FPPowerSystem3BusDiffusion;
   solver->Upwind             = FPPowerSystem3BusUpwind;
 
-  count++;
+  s_count++;
   return(0);
 }

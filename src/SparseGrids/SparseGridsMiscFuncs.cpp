@@ -26,11 +26,11 @@ int SparseGridsSimulation::ComputeSGDimsAndCoeffs()
   m_n_fg = log2(m_sim_fg->solver.m_dim_global[0]);
   int d = m_ndims;
 
-  double c1 = 1;
+  double s_c1 = 1;
   m_combination.clear();
   for (int s = 1; s <= d; s++) {
 
-    double coeff = c1 * cfunc(d-1,s-1);
+    double coeff = s_c1 * cfunc(d-1,s-1);
 
     std::vector<GridDimensions> dims(0);
     GetCTGridSizes((m_n_fg+(m_ndims-1)*(m_imin-1))+d-s, dims);
@@ -44,7 +44,7 @@ int SparseGridsSimulation::ComputeSGDimsAndCoeffs()
       m_combination.push_back(std::pair<double,GridDimensions>(coeff,dims[i]));
     }
 
-    c1 *= -1;
+    s_c1 *= -1;
 
   }
 

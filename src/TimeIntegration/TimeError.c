@@ -37,7 +37,7 @@ int TimeError(
   TimeIntegration     *TS     = (TimeIntegration*) solver->m_time_integrator;
   int                 size    = solver->m_npoints_local_wghosts * solver->m_nvars;
   double              sum     = 0.0, global_sum = 0.0;
-  static const double tolerance = 1e-15;
+  static const double s_tolerance = 1e-15;
   if (!TS) return(0);
 
   if (!strcmp(solver->m_time_scheme,_GLM_GEE_)) {
@@ -105,9 +105,9 @@ int TimeError(
       error[5] = global_sum;
     } else error[3] = error[4] = error[5] = -1;
 
-    if (   (sol_norm[0] > tolerance)
-        && (sol_norm[1] > tolerance)
-        && (sol_norm[2] > tolerance) ) {
+    if (   (sol_norm[0] > s_tolerance)
+        && (sol_norm[1] > s_tolerance)
+        && (sol_norm[2] > s_tolerance) ) {
       error[0] /= sol_norm[0];
       error[1] /= sol_norm[1];
       error[2] /= sol_norm[2];

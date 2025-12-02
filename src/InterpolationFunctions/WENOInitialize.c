@@ -42,7 +42,7 @@ int WENOInitialize(
   MPIVariables    *mpi    = (MPIVariables*) a_m;
   WENOParameters  *weno   = (WENOParameters*) solver->m_interp;
 
-  static int count = 0;
+  static int s_count = 0;
 
   int nvars = solver->m_nvars;
   int ndims = solver->m_ndims;
@@ -65,7 +65,7 @@ int WENOInitialize(
     in = fopen("weno.inp","r");
     if (!in) printf("Warning: File weno.inp not found. Using default parameters for WENO5/CRWENO5/HCWENO5 a_scheme.\n");
     else {
-      if (!count) printf("Reading WENO parameters from weno.inp.\n");
+      if (!s_count) printf("Reading WENO parameters from weno.inp.\n");
       char word[_MAX_STRING_SIZE_];
       ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
@@ -124,7 +124,7 @@ int WENOInitialize(
   /* WENO weight calculation is hard-coded for p=2, so return error if p != 2 in
    * user input file, so that there'a_s no confusion */
   if (weno->m_p != 2.0) {
-    if (!mpi->m_rank && !count) printf("Warning from WENOInitialize(): \"p\" parameter is 2.0. Any other value will be ignored!\n");
+    if (!mpi->m_rank && !s_count) printf("Warning from WENOInitialize(): \"p\" parameter is 2.0. Any other value will be ignored!\n");
   }
 
   weno->m_offset = NULL;
@@ -178,7 +178,7 @@ int WENOInitialize(
                                                             d,
                                                             solver,
                                                             mpi);
-  count++;
+  s_count++;
 
 #if defined(HAVE_CUDA)
   if (solver->m_use_gpu) {

@@ -93,8 +93,8 @@ int Interp1PrimThirdOrderMUSCL(
   int *dim   = solver->m_dim_local;
 
   /* define some constants */
-  double one_third = 1.0/3.0;
-  double one_sixth = 1.0/6.0;
+  double s_one_third = 1.0/3.0;
+  double s_one_sixth = 1.0/6.0;
 
   /* create index and bounds for the outer loop, i.e., to loop over all 1D lines along
      dimension "dir"                                                                    */
@@ -128,7 +128,7 @@ int Interp1PrimThirdOrderMUSCL(
           double limit =  (3*fdiff*bdiff + muscl->m_eps)
                         / (2*(fdiff-bdiff)*(fdiff-bdiff) + 3*fdiff*bdiff + muscl->m_eps);
 
-          fI[p*nvars+v] = m1 +  limit * (one_third*fdiff + one_sixth*bdiff);
+          fI[p*nvars+v] = m1 +  limit * (s_one_third*fdiff + s_one_sixth*bdiff);
         }
       }
     }
@@ -156,7 +156,7 @@ int Interp1PrimThirdOrderMUSCL(
           double limit =  (3*fdiff*bdiff + muscl->m_eps)
                         / (2*(fdiff-bdiff)*(fdiff-bdiff) + 3*fdiff*bdiff + muscl->m_eps);
 
-          fI[p*nvars+v] = p1 -  limit * (one_third*fdiff + one_sixth*bdiff);
+          fI[p*nvars+v] = p1 -  limit * (s_one_third*fdiff + s_one_sixth*bdiff);
         }
       }
     }

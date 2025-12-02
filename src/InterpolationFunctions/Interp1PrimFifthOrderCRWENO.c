@@ -102,8 +102,8 @@ int Interp1PrimFifthOrderCRWENO(
   int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
-  static const double one_third          = 1.0/3.0;
-  static const double one_sixth          = 1.0/6.0;
+  static const double s_one_third          = 1.0/3.0;
+  static const double s_one_sixth          = 1.0/6.0;
 
   double *ww1, *ww2, *ww3;
   ww1 = weno->m_w1 + (upw < 0 ? 2*weno->m_size : 0) + (uflag ? weno->m_size : 0) + weno->m_offset[dir];
@@ -161,14 +161,14 @@ int Interp1PrimFifthOrderCRWENO(
       if (   ((mpi->m_ip[dir] == 0                ) && (indexI[dir] == 0       ))
           || ((mpi->m_ip[dir] == mpi->m_iproc[dir]-1) && (indexI[dir] == dim[dir])) ) {
         /* Use WENO5 at the physical boundaries */
-        _ArrayAXBYCZ_(f1,(2*one_sixth),fm3,(-7*one_sixth) ,fm2,(11*one_sixth) ,fm1,nvars);
-        _ArrayAXBYCZ_(f2,(-one_sixth) ,fm2,(5*one_sixth)  ,fm1,(2*one_sixth)  ,fp1,nvars);
-        _ArrayAXBYCZ_(f3,(2*one_sixth),fm1,(5*one_sixth)  ,fp1,(-one_sixth)   ,fp2,nvars);
+        _ArrayAXBYCZ_(f1,(2*s_one_sixth),fm3,(-7*s_one_sixth) ,fm2,(11*s_one_sixth) ,fm1,nvars);
+        _ArrayAXBYCZ_(f2,(-s_one_sixth) ,fm2,(5*s_one_sixth)  ,fm1,(2*s_one_sixth)  ,fp1,nvars);
+        _ArrayAXBYCZ_(f3,(2*s_one_sixth),fm1,(5*s_one_sixth)  ,fp1,(-s_one_sixth)   ,fp2,nvars);
       } else {
         /* CRWENO5 at the interior points */
-        _ArrayAXBY_(f1,(one_sixth)  ,fm2,(5*one_sixth),fm1,nvars);
-        _ArrayAXBY_(f2,(5*one_sixth),fm1,(one_sixth)  ,fp1,nvars);
-        _ArrayAXBY_(f3,(one_sixth)  ,fm1,(5*one_sixth),fp1,nvars);
+        _ArrayAXBY_(f1,(s_one_sixth)  ,fm2,(5*s_one_sixth),fm1,nvars);
+        _ArrayAXBY_(f2,(5*s_one_sixth),fm1,(s_one_sixth)  ,fp1,nvars);
+        _ArrayAXBY_(f3,(s_one_sixth)  ,fm1,(5*s_one_sixth),fp1,nvars);
       }
 
       /* retrieve the WENO weights */
@@ -184,13 +184,13 @@ int Interp1PrimFifthOrderCRWENO(
         _ArraySetValue_     ((C+Nsys*indexI[dir]+sys*nvars),nvars,0.0)
       } else {
         if (upw > 0) {
-          _ArrayAXBY_       ((A+Nsys*indexI[dir]+sys*nvars),(2*one_third) ,w1,(one_third)  ,w2,nvars);
-          _ArrayAXBYCZ_     ((B+Nsys*indexI[dir]+sys*nvars),(one_third)   ,w1,(2*one_third),w2,(2*one_third),w3,nvars);
-          _ArrayScaleCopy1D_(w3,(one_third),(C+Nsys*indexI[dir]+sys*nvars),nvars);
+          _ArrayAXBY_       ((A+Nsys*indexI[dir]+sys*nvars),(2*s_one_third) ,w1,(s_one_third)  ,w2,nvars);
+          _ArrayAXBYCZ_     ((B+Nsys*indexI[dir]+sys*nvars),(s_one_third)   ,w1,(2*s_one_third),w2,(2*s_one_third),w3,nvars);
+          _ArrayScaleCopy1D_(w3,(s_one_third),(C+Nsys*indexI[dir]+sys*nvars),nvars);
         } else {
-          _ArrayAXBY_       ((C+Nsys*indexI[dir]+sys*nvars),(2*one_third) ,w1,(one_third)  ,w2,nvars);
-          _ArrayAXBYCZ_     ((B+Nsys*indexI[dir]+sys*nvars),(one_third)   ,w1,(2*one_third),w2,(2*one_third),w3,nvars);
-          _ArrayScaleCopy1D_(w3,(one_third),(A+Nsys*indexI[dir]+sys*nvars),nvars);
+          _ArrayAXBY_       ((C+Nsys*indexI[dir]+sys*nvars),(2*s_one_third) ,w1,(s_one_third)  ,w2,nvars);
+          _ArrayAXBYCZ_     ((B+Nsys*indexI[dir]+sys*nvars),(s_one_third)   ,w1,(2*s_one_third),w2,(2*s_one_third),w3,nvars);
+          _ArrayScaleCopy1D_(w3,(s_one_third),(A+Nsys*indexI[dir]+sys*nvars),nvars);
         }
       }
       _ArrayMultiply3Add1D_ ((R+Nsys*indexI[dir]+sys*nvars),w1,f1,w2,f2,w3,f3,nvars);

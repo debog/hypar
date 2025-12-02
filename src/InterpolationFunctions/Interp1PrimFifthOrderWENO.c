@@ -93,7 +93,7 @@ int Interp1PrimFifthOrderWENO(
   int *stride= solver->m_stride_with_ghosts;
 
   /* define some constants */
-  static const double one_sixth          = 1.0/6.0;
+  static const double s_one_sixth          = 1.0/6.0;
 
   double *ww1, *ww2, *ww3;
   ww1 = weno->m_w1 + (upw < 0 ? 2*weno->m_size : 0) + (uflag ? weno->m_size : 0) + weno->m_offset[dir];
@@ -145,9 +145,9 @@ int Interp1PrimFifthOrderWENO(
 
       /* Candidate stencils and their optimal weights*/
       double f1[nvars], f2[nvars], f3[nvars];
-      _ArrayAXBYCZ_(f1,(2*one_sixth),fm3,(-7*one_sixth) ,fm2,(11*one_sixth) ,fm1,nvars);
-      _ArrayAXBYCZ_(f2,(-one_sixth) ,fm2,(5*one_sixth)  ,fm1,(2*one_sixth)  ,fp1,nvars);
-      _ArrayAXBYCZ_(f3,(2*one_sixth),fm1,(5*one_sixth)  ,fp1,(-one_sixth)   ,fp2,nvars);
+      _ArrayAXBYCZ_(f1,(2*s_one_sixth),fm3,(-7*s_one_sixth) ,fm2,(11*s_one_sixth) ,fm1,nvars);
+      _ArrayAXBYCZ_(f2,(-s_one_sixth) ,fm2,(5*s_one_sixth)  ,fm1,(2*s_one_sixth)  ,fp1,nvars);
+      _ArrayAXBYCZ_(f3,(2*s_one_sixth),fm1,(5*s_one_sixth)  ,fp1,(-s_one_sixth)   ,fp2,nvars);
 
       /* calculate WENO weights */
       double *w1,*w2,*w3;

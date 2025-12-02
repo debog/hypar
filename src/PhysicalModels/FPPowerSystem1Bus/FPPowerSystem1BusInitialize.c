@@ -26,7 +26,7 @@ int FPPowerSystem1BusInitialize(void *a_s,void *a_m)
   int                 ferr;
   _DECLARE_IERR_;
 
-  static int count = 0;
+  static int s_count = 0;
 
   if (solver->m_nvars != _MODEL_NVARS_) {
     fprintf(stderr,"Error in FPPowerSystem1BusInitialize(): nvars has to be %d.\n",_MODEL_NVARS_);
@@ -50,7 +50,7 @@ int FPPowerSystem1BusInitialize(void *a_s,void *a_m)
   /* reading physical model specific inputs */
   if (!mpi->m_rank) {
     FILE *in;
-    if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
+    if (!s_count) printf("Reading physical model inputs from file \"physics.inp\".\n");
     in = fopen("physics.inp","r");
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
@@ -116,6 +116,6 @@ int FPPowerSystem1BusInitialize(void *a_s,void *a_m)
   }
 */
 
-  count++;
+  s_count++;
   return(0);
 }

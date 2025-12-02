@@ -49,7 +49,7 @@ int SecondDerivativeFourthOrderCentral(
   int nvars  = solver->m_nvars;
   int *dim   = solver->m_dim_local;
 
-  static double one_twelve = 1.0/12.0;
+  static double s_one_twelve = 1.0/12.0;
 
   if ((!a_D2f) || (!a_f)) {
     fprintf(stderr, "Error in SecondDerivativeFourthOrder(): input arrays not allocated.\n");
@@ -76,7 +76,7 @@ int SecondDerivativeFourthOrderCentral(
       indexC[a_dir] = i+1; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp1);
       indexC[a_dir] = i+2; _ArrayIndex1D_(ndims,dim,indexC,ghosts,qp2);
       for (v=0; v<nvars; v++)
-        a_D2f[qC*nvars+v] = (-a_f[qm2*nvars+v]+16*a_f[qm1*nvars+v]-30*a_f[qC*nvars+v]+16*a_f[qp1*nvars+v]-a_f[qp2*nvars+v])*one_twelve;
+        a_D2f[qC*nvars+v] = (-a_f[qm2*nvars+v]+16*a_f[qm1*nvars+v]-30*a_f[qC*nvars+v]+16*a_f[qp1*nvars+v]-a_f[qp2*nvars+v])*s_one_twelve;
     }
     _ArrayIncrementIndex_(ndims,bounds_outer,index_outer,done);
   }

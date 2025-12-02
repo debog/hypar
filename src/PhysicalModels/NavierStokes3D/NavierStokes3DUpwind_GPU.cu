@@ -10,7 +10,7 @@
 #include <physicalmodels/navierstokes3d.h>
 #include <hypar.h>
 
-static const int dummy = 1;
+static const int s_dummy = 1;
 
 #ifdef CUDA_VAR_ORDERDING_AOS
 
@@ -63,7 +63,7 @@ void gpuNavierStokes3DUpwindRusanov_kernel(
     _NavierStokes3DGetFlowVar_((u+_MODEL_NVARS_*pR),_NavierStokes3D_stride_,rho,vel[0],vel[1],vel[2],E,P,gamma);
     c = sqrt(gamma*P/rho);
     double alphaR = c + absolute(vel[dir]);
-    _NavierStokes3DGetFlowVar_(uavg,dummy,rho,vel[0],vel[1],vel[2],E,P,gamma);
+    _NavierStokes3DGetFlowVar_(uavg,s_dummy,rho,vel[0],vel[1],vel[2],E,P,gamma);
     c = sqrt(gamma*P/rho);
     double alphaavg = c + absolute(vel[dir]);
 
@@ -174,9 +174,9 @@ void gpuNavierStokes3DUpwindRoe_kernel(
     udiff[4] = 0.5 * (uR[p+4] - uL[p+4]);
 
     _NavierStokes3DRoeAverage_        (uavg,_NavierStokes3D_stride_,(u+_MODEL_NVARS_*pL),(u+_MODEL_NVARS_*pR),gamma);
-    _NavierStokes3DEigenvalues_       (uavg,dummy,D,gamma,dir);
-    _NavierStokes3DLeftEigenvectors_  (uavg,dummy,L,gamma,dir);
-    _NavierStokes3DRightEigenvectors_ (uavg,dummy,R,gamma,dir);
+    _NavierStokes3DEigenvalues_       (uavg,s_dummy,D,gamma,dir);
+    _NavierStokes3DLeftEigenvectors_  (uavg,s_dummy,L,gamma,dir);
+    _NavierStokes3DRightEigenvectors_ (uavg,s_dummy,R,gamma,dir);
 
     /* Harten's Entropy Fix - Page 362 of Leveque */
     int k;
@@ -301,7 +301,7 @@ void gpuNavierStokes3DUpwindRusanov_kernel(
     _NavierStokes3DGetFlowVar_((u+pR),npoints_local_wghosts,rho,vel[0],vel[1],vel[2],E,P,gamma);
     c = sqrt(gamma*P/rho);
     double alphaR = c + absolute(vel[dir]);
-    _NavierStokes3DGetFlowVar_(uavg,dummy,rho,vel[0],vel[1],vel[2],E,P,gamma);
+    _NavierStokes3DGetFlowVar_(uavg,s_dummy,rho,vel[0],vel[1],vel[2],E,P,gamma);
     c = sqrt(gamma*P/rho);
     double alphaavg = c + absolute(vel[dir]);
 
@@ -411,9 +411,9 @@ void gpuNavierStokes3DUpwindRoe_kernel(
     udiff[4] = 0.5 * (uR[p+4*npoints_grid] - uL[p+4*npoints_grid]);
 
     _NavierStokes3DRoeAverage_        (uavg,npoints_local_wghosts,(u+pL),(u+pR),gamma);
-    _NavierStokes3DEigenvalues_       (uavg,dummy,D,gamma,dir);
-    _NavierStokes3DLeftEigenvectors_  (uavg,dummy,L,gamma,dir);
-    _NavierStokes3DRightEigenvectors_ (uavg,dummy,R,gamma,dir);
+    _NavierStokes3DEigenvalues_       (uavg,s_dummy,D,gamma,dir);
+    _NavierStokes3DLeftEigenvectors_  (uavg,s_dummy,L,gamma,dir);
+    _NavierStokes3DRightEigenvectors_ (uavg,s_dummy,R,gamma,dir);
 
     /* Harten's Entropy Fix - Page 362 of Leveque */
     int k;
