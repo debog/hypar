@@ -58,7 +58,7 @@ int VlasovWriteSpatialField( void   *a_s,         /*!< Solver object of type #Hy
   /* gather the spatial coordinates into a global array */
   double *xg;
   {
-    int size_g = param->npts_global_x;
+    int size_g = param->m_npts_global_x;
     xg = (double*) calloc (size_g, sizeof(double));
     _ArraySetValue_(xg, size_g, 0.0);
 
@@ -80,7 +80,7 @@ int VlasovWriteSpatialField( void   *a_s,         /*!< Solver object of type #Hy
   /* gather the field into a global array */
   double *field_g;
   {
-    int size_g = param->npts_global_x * param->m_ndims_x;
+    int size_g = param->m_npts_global_x * param->m_ndims_x;
     field_g = (double*) calloc (size_g, sizeof(double));
     _ArraySetValue_(field_g, size_g, 0.0);
 

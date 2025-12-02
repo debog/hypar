@@ -50,7 +50,7 @@ static int SetEFieldPrescribed( double* a_u,/*!< Conserved solution */
 
   HyPar *solver = (HyPar*)  a_s;
   Vlasov *param  = (Vlasov*) solver->m_physics;
-  MPIVariables *mpi = (MPIVariables *) param->m_m_mpi;
+  MPIVariables *mpi = (MPIVariables *) param->m_mpi;
 
   int* dim_local = solver->m_dim_local;
   int ghosts = solver->m_ghosts;
@@ -96,7 +96,7 @@ static int SetEFieldSelfConsistent(double* a_u,/*!< Conserved solution */
 {
   HyPar  *solver = (HyPar*)  a_s;
   Vlasov *param  = (Vlasov*) solver->m_physics;
-  MPIVariables *mpi = (MPIVariables *) param->m_m_mpi;
+  MPIVariables *mpi = (MPIVariables *) param->m_mpi;
 
   if (param->m_ndims_x > 1) {
     fprintf(stderr,"Error in SetEFieldSelfConsistent():\n");

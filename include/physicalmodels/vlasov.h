@@ -69,13 +69,13 @@ typedef struct vlasov_parameters {
   int m_npts_local_x;
 
   /*! Number of spatial grid points (global) */
-  long npts_global_x;
+  long m_npts_global_x;
 
   /*! Number of spatial grid points with ghosts (local) */
   int m_npts_local_x_wghosts;
 
   /*! Number of spatial grid points with ghosts (global) */
-  long npts_global_x_wghosts;
+  long m_npts_global_x_wghosts;
 
   /*! electric field */
   double *m_e_field;
@@ -84,7 +84,7 @@ typedef struct vlasov_parameters {
   double *m_potential;
 
   /*! Pointer to MPI object of type #MPIVariables */
-  void  *m_m_mpi;
+  void  *m_mpi;
 
   /*! Solve Vlasov equation in the log form */
   int m_use_log_form;
@@ -94,28 +94,28 @@ typedef struct vlasov_parameters {
   /*! Buffer sum */
   double *m_sum_buffer;
   /*! Forward FFT plan */
-  fftw_plan plan_forward_e;
+  fftw_plan m_plan_forward_e;
   /*! Backward FFT plan */
-  fftw_plan plan_backward_e;
+  fftw_plan m_plan_backward_e;
   /*! buffer */
-  fftw_complex *phys_buffer_e;
+  fftw_complex *m_phys_buffer_e;
   /*! buffer */
-  fftw_complex *fourier_buffer_e;
+  fftw_complex *m_fourier_buffer_e;
   /*! */
-  ptrdiff_t alloc_local;
+  ptrdiff_t m_alloc_local;
   /*! */
-  ptrdiff_t local_ni, local_i_start;
+  ptrdiff_t m_local_ni, m_local_i_start;
   /*! */
-  ptrdiff_t local_no, local_o_start;
+  ptrdiff_t m_local_no, m_local_o_start;
 
   /*! Forward FFT plan */
-  fftw_plan plan_forward_phi;
+  fftw_plan m_plan_forward_phi;
   /*! Backward FFT plan */
-  fftw_plan plan_backward_phi;
+  fftw_plan m_plan_backward_phi;
   /*! buffer */
-  fftw_complex *phys_buffer_phi;
+  fftw_complex *m_phys_buffer_phi;
   /*! buffer */
-  fftw_complex *fourier_buffer_phi;
+  fftw_complex *m_fourier_buffer_phi;
 #endif
 
 } Vlasov;

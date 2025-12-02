@@ -10,7 +10,7 @@
 /*! Assign the function pointers for boundary condition application depending on the boundary
     type, for a given boundary object */
 int BCInitialize( void *a_b, /*!< Boundary object of type #DomainBoundary*/
-                  int flag_gpu  /*!< Flag to indicate if GPU is being used */ )
+                  int a_flag_gpu  /*!< Flag to indicate if GPU is being used */ )
 {
   DomainBoundary *boundary = (DomainBoundary*) a_b;
 

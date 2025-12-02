@@ -150,13 +150,13 @@ int VlasovInitialize(void *a_s, /*!< Solver object of type #HyPar */
   /* compute local number of x-space points with ghosts */
   physics->m_npts_local_x_wghosts = 1;
   physics->m_npts_local_x = 1;
-  physics->npts_global_x_wghosts = 1;
-  physics->npts_global_x = 1;
+  physics->m_npts_global_x_wghosts = 1;
+  physics->m_npts_global_x = 1;
   for (int d=0; d<physics->m_ndims_x; d++) {
     physics->m_npts_local_x_wghosts *= (dim_local[d]+2*ghosts);
     physics->m_npts_local_x *= dim_local[d];
-    physics->npts_global_x_wghosts *= (dim_global[d]+2*ghosts);
-    physics->npts_global_x *= dim_global[d];
+    physics->m_npts_global_x_wghosts *= (dim_global[d]+2*ghosts);
+    physics->m_npts_global_x *= dim_global[d];
   }
 
   /* allocate array to hold the electric field (needs to have ghosts);
@@ -170,7 +170,7 @@ int VlasovInitialize(void *a_s, /*!< Solver object of type #HyPar */
                                         sizeof(double)  );
 
   /* Put the mpi object in the params for access in other functions */
-  physics->m_m_mpi = a_m;
+  physics->m_mpi = a_m;
 
   if (physics->m_self_consistent_electric_field) {
 #ifdef fftw

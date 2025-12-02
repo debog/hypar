@@ -10,7 +10,7 @@
 
 /*! Cleans up a boundary object of type #DomainBoundary */
 int BCCleanup(  void *a_b, /*!< Boundary object of type #DomainBoundary*/
-                int flag_gpu /*!< Flag indicating if GPU is being used */ )
+                int a_flag_gpu /*!< Flag indicating if GPU is being used */ )
 {
   DomainBoundary *boundary = (DomainBoundary*) a_b;
   free(boundary->m_xmin);

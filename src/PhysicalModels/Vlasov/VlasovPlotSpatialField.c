@@ -63,7 +63,7 @@ int VlasovPlotSpatialField( void*   a_s,         /*!< Solver object of type #HyP
   /* gather the spatial coordinates into a global array */
   double *xg;
   {
-    int size_g = param->npts_global_x;
+    int size_g = param->m_npts_global_x;
     xg = (double*) calloc (size_g, sizeof(double));
     _ArraySetValue_(xg, size_g, 0.0);
 
@@ -85,7 +85,7 @@ int VlasovPlotSpatialField( void*   a_s,         /*!< Solver object of type #HyP
   /* gather the field into a global array */
   double *field_g;
   {
-    int size_g = param->npts_global_x * param->m_ndims_x;
+    int size_g = param->m_npts_global_x * param->m_ndims_x;
     field_g = (double*) calloc (size_g, sizeof(double));
     _ArraySetValue_(field_g, size_g, 0.0);
 
@@ -130,12 +130,12 @@ int VlasovPlotSpatialField( void*   a_s,         /*!< Solver object of type #HyP
       PyTuple_SetItem(py_plt_func_args, 3, py_obj);
     }
     {
-      npy_intp shape[1] = {param->npts_global_x};
+      npy_intp shape[1] = {param->m_npts_global_x};
       PyObject* x_arr = PyArray_SimpleNewFromData(1,shape,NPY_DOUBLE,xg);
       PyTuple_SetItem(py_plt_func_args, 4, x_arr);
     }
     {
-      npy_intp shape[1] = {param->npts_global_x * param->m_ndims_x};
+      npy_intp shape[1] = {param->m_npts_global_x * param->m_ndims_x};
       PyObject* u_arr = PyArray_SimpleNewFromData(1,shape,NPY_DOUBLE,field_g);
       PyTuple_SetItem(py_plt_func_args, 5, u_arr);
     }
