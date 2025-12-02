@@ -16,19 +16,19 @@ int VlasovCleanup(void *a_s /*!< Solver object of type #HyPar */)
 
 #ifdef fftw
   if(physics->m_self_consistent_electric_field) {
-    free(physics->sum_buffer);
+    free(physics->m_sum_buffer);
 
-    fftw_destroy_plan(physics->plan_forward_e);
-    fftw_destroy_plan(physics->plan_backward_e);
+    fftw_destroy_plan(physics->m_plan_forward_e);
+    fftw_destroy_plan(physics->m_plan_backward_e);
 
-    fftw_free(physics->phys_buffer_e);
-    fftw_free(physics->fourier_buffer_e);
+    fftw_free(physics->m_phys_buffer_e);
+    fftw_free(physics->m_fourier_buffer_e);
 
-    fftw_destroy_plan(physics->plan_forward_phi);
-    fftw_destroy_plan(physics->plan_backward_phi);
+    fftw_destroy_plan(physics->m_plan_forward_phi);
+    fftw_destroy_plan(physics->m_plan_backward_phi);
 
-    fftw_free(physics->phys_buffer_phi);
-    fftw_free(physics->fourier_buffer_phi);
+    fftw_free(physics->m_phys_buffer_phi);
+    fftw_free(physics->m_fourier_buffer_phi);
   }
 #endif
 

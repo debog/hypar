@@ -189,52 +189,52 @@ int VlasovInitialize(void *a_s, /*!< Solver object of type #HyPar */
     }
 
     /* Create a scratch buffer for moving between real and complex values */
-    physics->sum_buffer = (double*) calloc(dim_local[0], sizeof(double));
+    physics->m_sum_buffer = (double*) calloc(dim_local[0], sizeof(double));
 
     /* Initialize FFTW and set up data buffers used for the transforms */
     fftw_mpi_init();
-    physics->alloc_local = fftw_mpi_local_size_1d(dim_global[0], mpi->m_comm[0],
+    physics->m_alloc_local = fftw_mpi_local_size_1d(dim_global[0], mpi->m_comm[0],
                                                   FFTW_FORWARD, 0,
-                                                  &physics->local_ni,
-                                                  &physics->local_i_start,
-                                                  &physics->local_no,
-                                                  &physics->local_o_start);
-    if (dim_local[0] != physics->local_ni) {
+                                                  &physics->m_local_ni,
+                                                  &physics->m_local_i_start,
+                                                  &physics->m_local_no,
+                                                  &physics->m_local_o_start);
+    if (dim_local[0] != physics->m_local_ni) {
       fprintf(stderr,"Error in VlasovInitialize(): The FFTW data distribution is incompatible with the HyPar one.\n");
       fprintf(stderr,"Decompose the spatial dimension so that the degrees of freedom are evenly divided.\n");
       return(1);
     }
 
-    physics->phys_buffer_e = fftw_alloc_complex(physics->alloc_local);
-    physics->fourier_buffer_e = fftw_alloc_complex(physics->alloc_local);
+    physics->m_phys_buffer_e = fftw_alloc_complex(physics->m_alloc_local);
+    physics->m_fourier_buffer_e = fftw_alloc_complex(physics->m_alloc_local);
 
-    physics->plan_forward_e = fftw_mpi_plan_dft_1d(dim_global[0],
-                                                 physics->phys_buffer_e,
-                                                 physics->fourier_buffer_e,
+    physics->m_plan_forward_e = fftw_mpi_plan_dft_1d(dim_global[0],
+                                                 physics->m_phys_buffer_e,
+                                                 physics->m_fourier_buffer_e,
                                                  mpi->m_comm[0],
                                                  FFTW_FORWARD,
                                                  FFTW_ESTIMATE);
 
-    physics->plan_backward_e = fftw_mpi_plan_dft_1d(dim_global[0],
-                                                  physics->fourier_buffer_e,
-                                                  physics->phys_buffer_e,
+    physics->m_plan_backward_e = fftw_mpi_plan_dft_1d(dim_global[0],
+                                                  physics->m_fourier_buffer_e,
+                                                  physics->m_phys_buffer_e,
                                                   mpi->m_comm[0],
                                                   FFTW_BACKWARD,
                                                   FFTW_ESTIMATE);
 
-    physics->phys_buffer_phi = fftw_alloc_complex(physics->alloc_local);
-    physics->fourier_buffer_phi = fftw_alloc_complex(physics->alloc_local);
+    physics->m_phys_buffer_phi = fftw_alloc_complex(physics->m_alloc_local);
+    physics->m_fourier_buffer_phi = fftw_alloc_complex(physics->m_alloc_local);
 
-    physics->plan_forward_phi = fftw_mpi_plan_dft_1d(dim_global[0],
-                                                 physics->phys_buffer_phi,
-                                                 physics->fourier_buffer_phi,
+    physics->m_plan_forward_phi = fftw_mpi_plan_dft_1d(dim_global[0],
+                                                 physics->m_phys_buffer_phi,
+                                                 physics->m_fourier_buffer_phi,
                                                  mpi->m_comm[0],
                                                  FFTW_FORWARD,
                                                  FFTW_ESTIMATE);
 
-    physics->plan_backward_phi = fftw_mpi_plan_dft_1d(dim_global[0],
-                                                  physics->fourier_buffer_phi,
-                                                  physics->phys_buffer_phi,
+    physics->m_plan_backward_phi = fftw_mpi_plan_dft_1d(dim_global[0],
+                                                  physics->m_fourier_buffer_phi,
+                                                  physics->m_phys_buffer_phi,
                                                   mpi->m_comm[0],
                                                   FFTW_BACKWARD,
                                                   FFTW_ESTIMATE);

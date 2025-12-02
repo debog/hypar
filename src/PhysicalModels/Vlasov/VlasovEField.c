@@ -117,21 +117,21 @@ static int SetEFieldSelfConsistent(double* a_u,/*!< Conserved solution */
   int  ghosts = solver->m_ghosts;
   int  ndims  = solver->m_ndims;
 
-  double       *sum_buffer       = param->sum_buffer;
+  double       *sum_buffer       = param->m_sum_buffer;
   double       *field            = param->m_e_field;
-  fftw_complex *phys_buffer_e    = param->phys_buffer_e;
-  fftw_complex *fourier_buffer_e = param->fourier_buffer_e;
-  fftw_plan     plan_forward_e   = param->plan_forward_e;
-  fftw_plan     plan_backward_e  = param->plan_backward_e;
-  ptrdiff_t     local_ni         = param->local_ni;
-  ptrdiff_t     local_i_start    = param->local_i_start;
-  ptrdiff_t     local_no         = param->local_no;
-  ptrdiff_t     local_o_start    = param->local_o_start;
+  fftw_complex *phys_buffer_e    = param->m_phys_buffer_e;
+  fftw_complex *fourier_buffer_e = param->m_fourier_buffer_e;
+  fftw_plan     plan_forward_e   = param->m_plan_forward_e;
+  fftw_plan     plan_backward_e  = param->m_plan_backward_e;
+  ptrdiff_t     local_ni         = param->m_local_ni;
+  ptrdiff_t     local_i_start    = param->m_local_i_start;
+  ptrdiff_t     local_no         = param->m_local_no;
+  ptrdiff_t     local_o_start    = param->m_local_o_start;
 
-  fftw_complex *phys_buffer_phi    = param->phys_buffer_phi;
-  fftw_complex *fourier_buffer_phi = param->fourier_buffer_phi;
-  fftw_plan     plan_forward_phi   = param->plan_forward_phi;
-  fftw_plan     plan_backward_phi  = param->plan_backward_phi;
+  fftw_complex *phys_buffer_phi    = param->m_phys_buffer_phi;
+  fftw_complex *fourier_buffer_phi = param->m_fourier_buffer_phi;
+  fftw_plan     plan_forward_phi   = param->m_plan_forward_phi;
+  fftw_plan     plan_backward_phi  = param->m_plan_backward_phi;
 
   int index[ndims], bounds[ndims], bounds_noghost[ndims], offset[ndims];
 
