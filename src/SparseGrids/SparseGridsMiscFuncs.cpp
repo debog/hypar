@@ -399,16 +399,16 @@ int SparseGridsSimulation::InitializeSolversBarebones( SimulationObject *sim /*!
   /* Solution plotting function */
   strcpy(solver->m_plotfilename_extn,".png");
 #ifdef with_python
-  solver->m_py_plt_func = NULL;
-  solver->m_py_plt_func_args = NULL;
+  solver->py_plt_func = NULL;
+  solver->py_plt_func_args = NULL;
   {
     char python_plotting_fname[_MAX_STRING_SIZE_] = "plotSolution";
     PyObject* py_plot_name = PyUnicode_DecodeFSDefault(python_plotting_fname);
     PyObject* py_plot_module = PyImport_Import(py_plot_name);
     Py_DECREF(py_plot_name);
     if (py_plot_module) {
-      solver->m_py_plt_func = PyObject_GetAttrString(py_plot_module, "plotSolution");
-      if (!solver->m_py_plt_func) {
+      solver->py_plt_func = PyObject_GetAttrString(py_plot_module, "plotSolution");
+      if (!solver->py_plt_func) {
         if (!mpi->m_rank) {
           printf("Unable to load plotSolution function from Python module.\n");
         }

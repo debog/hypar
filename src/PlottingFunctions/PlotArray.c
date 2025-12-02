@@ -139,8 +139,8 @@ int PlotArraySerial(int     a_ndims,      /*!< Number of spatial dimensions */
 #ifdef with_python
 #ifdef with_python_numpy
     import_array();
-    PyObject* py_plt_func = (PyObject*) solver->m_py_plt_func;
-    PyObject* py_plt_func_args = (PyObject*) solver->m_py_plt_func_args;
+    PyObject* py_plt_func = (PyObject*) solver->py_plt_func;
+    PyObject* py_plt_func_args = (PyObject*) solver->py_plt_func_args;
     py_plt_func_args = PyTuple_New(7);
     {
       PyObject* py_obj = Py_BuildValue("i", a_ndims);
