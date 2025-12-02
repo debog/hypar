@@ -15,7 +15,7 @@
     Cleans up all allocations related to the WENO-type methods.
 */
 int WENOCleanup(void *a_s, /*!< WENO object of type #WENOParameters */
-                int flag_gpu /*!< flag to indicate if on GPU */ )
+                int a_flag_gpu /*!< flag to indicate if on GPU */ )
 {
   WENOParameters  *weno   = (WENOParameters*) a_s;
 
