@@ -29,3 +29,4 @@ __pycache__
 *.tmp
 doc/README
 .venv/
+test-driver
