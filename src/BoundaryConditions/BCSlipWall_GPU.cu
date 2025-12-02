@@ -167,36 +167,36 @@ extern "C" int gpuBCSlipWallU(
 {
   DomainBoundary *boundary = (DomainBoundary*) b;
 
-  int dim   = boundary->dim;
-  int face  = boundary->face;
+  int dim   = boundary->m_dim;
+  int face  = boundary->m_face;
 
   if (ndims == 2) {
 
     if (boundary->m_on_this_proc) {
       int bounds[ndims];
-      _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
+      _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
       int ngrid_points = 1; for(int i = 0; i < ndims; i++) ngrid_points *= bounds[i];
       int nblocks = (ngrid_points - 1) / GPU_THREADS_PER_BLOCK + 1;
 
-      gpuMemcpy(  boundary->gpu_ie, boundary->ie, ndims*sizeof(int), gpuMemcpyHostToDevice  );
-      gpuMemcpy(  boundary->gpu_is, boundary->is, ndims*sizeof(int), gpuMemcpyHostToDevice  );
+      gpuMemcpy(  boundary->m_gpu_ie, boundary->m_ie, ndims*sizeof(int), gpuMemcpyHostToDevice  );
+      gpuMemcpy(  boundary->m_gpu_is, boundary->m_is, ndims*sizeof(int), gpuMemcpyHostToDevice  );
 
       BCSlipWallU_dim2_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-        ngrid_points, dim, face, ghosts, ndims, nvars, boundary->gamma,
-        gpu_size, boundary->gpu_ie, boundary->gpu_is, boundary->gpu_FlowVelocity, gpu_phi);
+        ngrid_points, dim, face, ghosts, ndims, nvars, boundary->m_gamma,
+        gpu_size, boundary->m_gpu_ie, boundary->m_gpu_is, boundary->m_gpu_FlowVelocity, gpu_phi);
     }
 
   } else if (ndims == 3) {
 
     if (boundary->m_on_this_proc) {
       int bounds[ndims];
-      _ArraySubtract1D_(bounds,boundary->ie,boundary->is,ndims);
+      _ArraySubtract1D_(bounds,boundary->m_ie,boundary->m_is,ndims);
       int ngrid_points = 1; for(int i = 0; i < ndims; i++) ngrid_points *= bounds[i];
       int nblocks = (ngrid_points - 1) / GPU_THREADS_PER_BLOCK + 1;
 
       BCSlipWallU_dim3_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-        ngrid_points, dim, face, ghosts, ndims, nvars, boundary->gamma,
-        gpu_size, boundary->gpu_ie, boundary->gpu_is, boundary->gpu_FlowVelocity, gpu_phi);
+        ngrid_points, dim, face, ghosts, ndims, nvars, boundary->m_gamma,
+        gpu_size, boundary->m_gpu_ie, boundary->m_gpu_is, boundary->m_gpu_FlowVelocity, gpu_phi);
     }
 
   } else {
@@ -304,18 +304,18 @@ extern "C" int gpuBCSlipWallU(
 {
   DomainBoundary *boundary = (DomainBoundary*) b;
 
-  int dim   = boundary->dim;
-  int face  = boundary->face;
+  int dim   = boundary->m_dim;
+  int face  = boundary->m_face;
 
   if (ndims == 3) {
 
     if (boundary->m_on_this_proc) {
-      int nblocks = (boundary->gpu_npoints_bounds - 1) / GPU_THREADS_PER_BLOCK + 1;
+      int nblocks = (boundary->m_gpu_npoints_bounds - 1) / GPU_THREADS_PER_BLOCK + 1;
 
       BCSlipWallU_dim3_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-        boundary->gpu_npoints_bounds, boundary->gpu_npoints_local_wghosts,
-        face, ndims, dim, ghosts, nvars, boundary->gamma,
-        boundary->gpu_bounds, size, boundary->gpu_is, boundary->gpu_FlowVelocity, phi);
+        boundary->m_gpu_npoints_bounds, boundary->m_gpu_npoints_local_wghosts,
+        face, ndims, dim, ghosts, nvars, boundary->m_gamma,
+        boundary->m_gpu_bounds, size, boundary->m_gpu_is, boundary->m_gpu_FlowVelocity, phi);
     }
 
   } else {

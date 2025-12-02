@@ -69,18 +69,18 @@ extern "C" int gpuBCPeriodicU(
   DomainBoundary *boundary = (DomainBoundary*) b;
   MPIVariables   *mpi      = (MPIVariables*)   m;
 
-  int dim   = boundary->dim;
-  int face  = boundary->face;
+  int dim   = boundary->m_dim;
+  int face  = boundary->m_face;
 
   if ((boundary->m_on_this_proc) && (mpi->m_iproc[dim] == 1)) {
     int nblocks;
-    nblocks = (boundary->gpu_npoints_bounds-1) / GPU_THREADS_PER_BLOCK + 1;
+    nblocks = (boundary->m_gpu_npoints_bounds-1) / GPU_THREADS_PER_BLOCK + 1;
 
 #if defined(GPU_STAT)
     cudaEvent_t startEvent, stopEvent;
     float milliseconds = 0;
 
-    int memory_accessed = 2*boundary->gpu_npoints_bounds*nvars*sizeof(double);
+    int memory_accessed = 2*boundary->m_gpu_npoints_bounds*nvars*sizeof(double);
 
     checkCuda( cudaEventCreate(&startEvent));
     checkCuda( cudaEventCreate(&stopEvent));
@@ -88,9 +88,9 @@ extern "C" int gpuBCPeriodicU(
     checkCuda( cudaEventRecord(startEvent, 0) );
 #endif
 
-    BCPeriodicU_kernel<<<nblocks,GPU_THREADS_PER_BLOCK>>>(boundary->gpu_npoints_bounds,
-      boundary->gpu_npoints_local_wghosts, face, ndims, dim, ghosts, nvars,
-      boundary->gpu_bounds, size, boundary->gpu_is, phi
+    BCPeriodicU_kernel<<<nblocks,GPU_THREADS_PER_BLOCK>>>(boundary->m_gpu_npoints_bounds,
+      boundary->m_gpu_npoints_local_wghosts, face, ndims, dim, ghosts, nvars,
+      boundary->m_gpu_bounds, size, boundary->m_gpu_is, phi
     );
     cudaDeviceSynchronize();
 
@@ -175,18 +175,18 @@ extern "C" int gpuBCPeriodicU(
   DomainBoundary *boundary = (DomainBoundary*) b;
   MPIVariables   *mpi      = (MPIVariables*)   m;
 
-  int dim   = boundary->dim;
-  int face  = boundary->face;
+  int dim   = boundary->m_dim;
+  int face  = boundary->m_face;
 
   if ((boundary->m_on_this_proc) && (mpi->m_iproc[dim] == 1)) {
     int nblocks;
-    nblocks = (boundary->gpu_npoints_bounds-1) / GPU_THREADS_PER_BLOCK + 1;
+    nblocks = (boundary->m_gpu_npoints_bounds-1) / GPU_THREADS_PER_BLOCK + 1;
 
 #if defined(GPU_STAT)
     cudaEvent_t startEvent, stopEvent;
     float milliseconds = 0;
 
-    int memory_accessed = 2*boundary->gpu_npoints_bounds*nvars*sizeof(double);
+    int memory_accessed = 2*boundary->m_gpu_npoints_bounds*nvars*sizeof(double);
 
     checkCuda(cudaEventCreate(&startEvent));
     checkCuda(cudaEventCreate(&stopEvent));
@@ -194,9 +194,9 @@ extern "C" int gpuBCPeriodicU(
     checkCuda(cudaEventRecord(startEvent, 0));
 #endif
 
-    BCPeriodicU_kernel<<<nblocks,GPU_THREADS_PER_BLOCK>>>(boundary->gpu_npoints_bounds,
-      boundary->gpu_npoints_local_wghosts, face, ndims, dim, ghosts, nvars,
-      boundary->gpu_bounds, size, boundary->gpu_is, phi
+    BCPeriodicU_kernel<<<nblocks,GPU_THREADS_PER_BLOCK>>>(boundary->m_gpu_npoints_bounds,
+      boundary->m_gpu_npoints_local_wghosts, face, ndims, dim, ghosts, nvars,
+      boundary->m_gpu_bounds, size, boundary->m_gpu_is, phi
     );
     cudaDeviceSynchronize();
 
