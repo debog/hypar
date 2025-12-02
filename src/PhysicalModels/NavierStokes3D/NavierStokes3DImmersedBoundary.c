@@ -53,7 +53,7 @@ int NavierStokes3DIBAdiabatic(void    *a_s, /*!< Solver object of type #HyPar */
       ramp_fac = 0.0;
     } else {
       fprintf(stderr,"Error in NavierStokes3DImmersedBoundary():\n");
-      fprintf(stderr,"  Ramp type %a_s not recognized.\n", param->m_ib_ramp_type);
+      fprintf(stderr,"  Ramp type %s not recognized.\n", param->m_ib_ramp_type);
       return 1;
     }
   }
@@ -153,7 +153,7 @@ int NavierStokes3DIBIsothermal( void    *a_s, /*!< Solver object of type #HyPar 
       ramp_fac = 0.0;
     } else {
       fprintf(stderr,"Error in NavierStokes3DImmersedBoundary():\n");
-      fprintf(stderr,"  Ramp type %a_s not recognized.\n", param->m_ib_ramp_type);
+      fprintf(stderr,"  Ramp type %s not recognized.\n", param->m_ib_ramp_type);
       return 1;
     }
   }

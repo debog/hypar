@@ -91,11 +91,11 @@ int LinearADRInitialize(void *a_s, /*!< Solver object of type #HyPar */
     } else {
 
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")) {
         while (strcmp(word, "end")) {
 
-          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
 
           if (!strcmp(word, "advection_filename")) {
             if (physics->m_constant_advection != -1) {
@@ -108,7 +108,7 @@ int LinearADRInitialize(void *a_s, /*!< Solver object of type #HyPar */
               physics->m_adv_arr_size = solver->m_npoints_local_wghosts*solver->m_ndims*solver->m_nvars;
               physics->m_a = (double*) calloc ( physics->m_adv_arr_size, sizeof(double) );
               _ArraySetValue_(physics->m_a, physics->m_adv_arr_size, 0.0);
-              ferr = fscanf(in,"%a_s",physics->m_adv_filename); if (ferr != 1) return(ferr);
+              ferr = fscanf(in,"%s",physics->m_adv_filename); if (ferr != 1) return(ferr);
             }
           } else if (!strcmp(word, "advection")) {
             if (physics->m_constant_advection != -1) {
@@ -128,12 +128,12 @@ int LinearADRInitialize(void *a_s, /*!< Solver object of type #HyPar */
             for (i=0; i<solver->m_ndims*solver->m_nvars; i++) ferr = fscanf(in,"%lf",&physics->m_d[i]);
             if (ferr != 1) return(1);
           } else if (!strcmp(word, "centered_flux")) {
-            ferr = fscanf(in, "%a_s", physics->m_centered_flux);
+            ferr = fscanf(in, "%s", physics->m_centered_flux);
             if (ferr != 1) return(ferr);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",word,useless);
+            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }

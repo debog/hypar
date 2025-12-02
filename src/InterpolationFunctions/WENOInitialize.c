@@ -67,10 +67,10 @@ int WENOInitialize(
     else {
       if (!count) printf("Reading WENO parameters from weno.inp.\n");
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if      (!strcmp(word,"mapped"     )) { ferr = fscanf(in,"%d" ,&weno->m_mapped     ); if (ferr != 1) return(1); }
           else if (!strcmp(word,"borges"     )) { ferr = fscanf(in,"%d" ,&weno->m_borges     ); if (ferr != 1) return(1); }
           else if (!strcmp(word,"yc"         )) { ferr = fscanf(in,"%d" ,&weno->m_yc         ); if (ferr != 1) return(1); }
@@ -82,8 +82,8 @@ int WENOInitialize(
           else if (!strcmp(word,"tol"        )) { ferr = fscanf(in,"%lf",&weno->m_tol        ); if (ferr != 1) return(1); }
           else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %a_s in file \"weno.inp\" with value %a_s not ",word,useless);
+            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %s in file \"weno.inp\" with value %s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }

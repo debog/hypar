@@ -77,7 +77,7 @@ int TridiagIterJacobi(
   double     norm=0,norm0=0,global_norm=0;
 
 #ifndef serial
-  MPI_Comm  *comm = (MPI_Comm*) m;
+  MPI_Comm  *comm = (MPI_Comm*) a_m;
   int       rank,nproc;
 
   if (comm) {

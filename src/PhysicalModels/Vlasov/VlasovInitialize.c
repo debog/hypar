@@ -79,10 +79,10 @@ int VlasovInitialize(void *a_s, /*!< Solver object of type #HyPar */
     if (in) {
       printf("Reading physical model inputs from file \"physics.inp\".\n");
       char word[_MAX_STRING_SIZE_];
-      int ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+      int ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          int ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+          int ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "self_consistent_electric_field")) {
             /* read whether electric field is self-consistent or prescribed */
             int ferr = fscanf(in,"%d", &physics->m_self_consistent_electric_field);
@@ -101,8 +101,8 @@ int VlasovInitialize(void *a_s, /*!< Solver object of type #HyPar */
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            int ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",
+            int ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",
                    word, useless);
             printf("recognized or extraneous. Ignoring.\n");
           }

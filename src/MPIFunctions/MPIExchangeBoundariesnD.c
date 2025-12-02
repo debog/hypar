@@ -45,7 +45,7 @@ int MPIExchangeBoundariesnD(
                               int     *a_dim,   /*!< Integer array whose elements are the local size along each spatial dimension */
                               int     a_ghosts, /*!< Number of ghost points */
                               void    *a_m,     /*!< MPI object of type #MPIVariables */
-                              double  *var    /*!< The array for which to exchange data and fill in ghost points */
+                              double  *a_var    /*!< The array for which to exchange data and fill in ghost points */
                            )
 {
 #ifndef serial

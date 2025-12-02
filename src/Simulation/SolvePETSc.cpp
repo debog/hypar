@@ -310,7 +310,7 @@ int SolvePETSc( void* a_s, /*!< Array of simulation objects of type #SimulationO
         } else {
 
           if (!a_rank) {
-            fprintf(  stderr,"Invalid input for \"-pc_matrix_type\": %a_s.\n",
+            fprintf(  stderr,"Invalid input for \"-pc_matrix_type\": %s.\n",
                       context.m_precon_matrix_type.c_str());
           }
           PetscFunctionReturn(0);
@@ -577,7 +577,7 @@ int SolvePETSc( void* a_s, /*!< Array of simulation objects of type #SimulationO
         } else {
 
           if (!a_rank) {
-            fprintf(  stderr,"Invalid input for \"-pc_matrix_type\": %a_s.\n",
+            fprintf(  stderr,"Invalid input for \"-pc_matrix_type\": %s.\n",
                       context.m_precon_matrix_type.c_str());
           }
           PetscFunctionReturn(0);
@@ -623,7 +623,7 @@ int SolvePETSc( void* a_s, /*!< Array of simulation objects of type #SimulationO
     } else {
 
       if (!a_rank) {
-        fprintf(stderr, "Time integration type %a_s is not yet supported.\n", time_scheme);
+        fprintf(stderr, "Time integration type %s is not yet supported.\n", time_scheme);
       }
       PetscFunctionReturn(0);
 

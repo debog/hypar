@@ -184,7 +184,7 @@ class SparseGridsSimulation : public Simulation
         fprintf(stderr, "  m_sim_fg is not allocated on rank %d!\n", m_rank);
         return 1;
       }
-      MPI_Comm_dup(MPI_COMM_WORLD, &(m_sim_fg->mpi.world));
+      MPI_Comm_dup(MPI_COMM_WORLD, &(m_sim_fg->mpi.m_world));
       return 0;
     }
 #endif

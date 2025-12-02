@@ -100,7 +100,7 @@ int TridiagLU(
   rank  = 0;
   nproc = 1;
 #else
-  MPI_Comm        *comm = (MPI_Comm*) m;
+  MPI_Comm        *comm = (MPI_Comm*) a_m;
   int             ierr = 0;
   const int       nvar = 4;
 

@@ -40,14 +40,14 @@ int BurgersInitialize(void *a_s, /*!< Solver object of type #HyPar */
     if (in) {
       if (!count) printf("Reading physical model inputs from file \"physics.inp\".\n");
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",
+            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",
                     word, useless);
             printf("recognized or extraneous. Ignoring.\n");
           }

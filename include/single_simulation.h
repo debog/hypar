@@ -147,7 +147,7 @@ class SingleSimulation : public Simulation
     /*! Create duplicate MPI communicators */
     inline int mpiCommDup()
     {
-      MPI_Comm_dup(MPI_COMM_WORLD, &(m_sim->mpi.world));
+      MPI_Comm_dup(MPI_COMM_WORLD, &(m_sim->mpi.m_world));
       return 0;
     }
 #endif

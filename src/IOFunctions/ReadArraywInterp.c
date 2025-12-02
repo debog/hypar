@@ -191,7 +191,7 @@ int ReadArraywInterpSerial( int     a_ndims,          /*!< Number of spatial dim
       else {
         *a_read_flag = 1;
         /* Reading from file */
-        printf("Reading array from ASCII file %a_s (Serial mode).\n",filename);
+        printf("Reading array from ASCII file %s (Serial mode).\n",filename);
         int size,offset;
         /* allocate global solution array */
         size   = 1; for (d=0; d<a_ndims; d++) size *= a_dim_global_src[d]; size *= a_nvars;
@@ -237,7 +237,7 @@ int ReadArraywInterpSerial( int     a_ndims,          /*!< Number of spatial dim
       if (!in) *a_read_flag = 0;
       else {
         *a_read_flag = 1;
-        printf("Reading array from binary file %a_s (Serial mode).\n",filename);
+        printf("Reading array from binary file %s (Serial mode).\n",filename);
         size_t bytes;
         int size;
         /* allocate global solution array */

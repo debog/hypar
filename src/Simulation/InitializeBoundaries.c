@@ -67,16 +67,16 @@ int InitializeBoundaries( void  *a_s,   /*!< Array of simulation objects of type
       if (!in) {
         in = fopen(filename_backup, "r");
         if (!in) {
-          fprintf(stderr,"Error: boundary condition file %a_s or %a_s not found.\n",
+          fprintf(stderr,"Error: boundary condition file %s or %s not found.\n",
                   filename, filename_backup );
           return(1);
         } else {
           if (a_nsims > 1) printf("Domain %d: ", ns);
-          printf("Reading boundary conditions from %a_s.\n", filename_backup);
+          printf("Reading boundary conditions from %s.\n", filename_backup);
         }
       } else {
         if (a_nsims > 1) printf("Domain %d: ", ns);
-        printf("Reading boundary conditions from %a_s.\n", filename);
+        printf("Reading boundary conditions from %s.\n", filename);
       }
 
       /* read number of boundary conditions and allocate */
@@ -96,7 +96,7 @@ int InitializeBoundaries( void  *a_s,   /*!< Array of simulation objects of type
         boundary[nb].m_xmin = (double*) calloc (solver->m_ndims,sizeof(double)); /* deallocated in BCCleanup.c */
         boundary[nb].m_xmax = (double*) calloc (solver->m_ndims,sizeof(double)); /* deallocated in BCCleanup.c */
 
-        ferr = fscanf(in,"%a_s",boundary[nb].m_bctype); if (ferr != 1) return(1);
+        ferr = fscanf(in,"%s",boundary[nb].m_bctype); if (ferr != 1) return(1);
         ferr = fscanf(in,"%d",&boundary[nb].m_dim  ); if (ferr != 1) return(1);
         ferr = fscanf(in,"%d",&boundary[nb].m_face ); if (ferr != 1) return(1);
         for (d=0; d < solver->m_ndims; d++) {
@@ -174,7 +174,7 @@ int InitializeBoundaries( void  *a_s,   /*!< Array of simulation objects of type
           ferr = fscanf(in,"%lf",&boundary[nb].m_FlowDensity);
           for (v = 0; v < solver->m_ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_FlowVelocity[v]);
           ferr = fscanf(in,"%lf",&boundary[nb].m_FlowPressure);
-          ferr = fscanf(in,"%a_s" , boundary[nb].m_UnsteadyDirichletFilename);
+          ferr = fscanf(in,"%s" , boundary[nb].m_UnsteadyDirichletFilename);
         }
 
         if (    (!strcmp(boundary[nb].m_bctype,_THERMAL_SLIP_WALL_))
@@ -184,7 +184,7 @@ int InitializeBoundaries( void  *a_s,   /*!< Array of simulation objects of type
           /* read the wall velocity */
           for (v = 0; v < solver->m_ndims; v++) ferr = fscanf(in,"%lf",&boundary[nb].m_FlowVelocity[v]);
           /* read in the filename where temperature data is available */
-          ferr = fscanf(in,"%a_s" , boundary[nb].m_UnsteadyTemperatureFilename);
+          ferr = fscanf(in,"%s" , boundary[nb].m_UnsteadyTemperatureFilename);
         }
 
         /* if boundary is periodic, let the MPI and HyPar know */

@@ -134,7 +134,7 @@ int WriteArraySerial(
       strcat(filename,solver->m_filename_index);
     }
     strcat(filename,solver->m_solnfilename_extn);
-    printf("Writing solution file %a_s.\n",filename);
+    printf("Writing solution file %s.\n",filename);
     IERR solver->WriteOutput(a_ndims,a_nvars,a_dim_global,xg,ug,filename,
                              solver->m_index); CHECKERR(ierr);
 
@@ -215,7 +215,7 @@ int WriteArrayParallel(
   char filename_root[_MAX_STRING_SIZE_];
   strcpy(filename_root,a_fname_root);
   strcat(filename_root,solver->m_solnfilename_extn);
-  if (!mpi->m_rank) printf("Writing solution file %a_s.xxxx (parallel mode).\n",filename_root);
+  if (!mpi->m_rank) printf("Writing solution file %s.xxxx (parallel mode).\n",filename_root);
 
   /* calculate size of the local grid on this rank */
   int sizex = 0;     for (d=0; d<a_ndims; d++) sizex += a_dim_local[d];
@@ -255,14 +255,14 @@ int WriteArrayParallel(
            and this is not a restart run*/
         out = fopen(filename,"wb");
         if (!out) {
-          fprintf(stderr,"Error in WriteArrayParallel(): File %a_s could not be opened for writing.\n",filename);
+          fprintf(stderr,"Error in WriteArrayParallel(): File %s could not be opened for writing.\n",filename);
           return(1);
         }
       } else {
         /* append to existing file */
         out = fopen(filename,"ab");
         if (!out) {
-          fprintf(stderr,"Error in WriteArrayParallel(): File %a_s could not be opened for appending.\n",filename);
+          fprintf(stderr,"Error in WriteArrayParallel(): File %s could not be opened for appending.\n",filename);
           return(1);
         }
       }
@@ -270,7 +270,7 @@ int WriteArrayParallel(
       /* write a new file / overwrite existing file */
       out = fopen(filename,"wb");
       if (!out) {
-        fprintf(stderr,"Error in WriteArrayParallel(): File %a_s could not be opened for writing.\n",filename);
+        fprintf(stderr,"Error in WriteArrayParallel(): File %s could not be opened for writing.\n",filename);
         return(1);
       }
     }
@@ -279,7 +279,7 @@ int WriteArrayParallel(
     /* Write own data and free buffer */
     bytes = fwrite(buffer,sizeof(double),(sizex+sizeu),out);
     if (bytes != (sizex+sizeu)) {
-      fprintf(stderr,"Error in WriteArrayParallel(): Failed to write data to file %a_s.\n",filename);
+      fprintf(stderr,"Error in WriteArrayParallel(): Failed to write data to file %s.\n",filename);
       return(1);
     }
     free(buffer);
@@ -300,7 +300,7 @@ int WriteArrayParallel(
       /* write the data */
       bytes = fwrite(write_buffer,sizeof(double),write_total_size,out);
       if (bytes != write_total_size) {
-        fprintf(stderr,"Error in WriteArrayParallel(): Failed to write data to file %a_s.\n",filename);
+        fprintf(stderr,"Error in WriteArrayParallel(): Failed to write data to file %s.\n",filename);
         return(1);
       }
       free(write_buffer);

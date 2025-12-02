@@ -38,7 +38,7 @@ where the list of keywords are:\n
 */
 int TridiagLUInit(
                     void *a_r,  /*!< Object of type TridiagLU_Params */
-                    void *c   /*!< MPI communicator */
+                    void *a_c   /*!< MPI communicator */
                  )
 {
   TridiagLU_Params *t = (TridiagLU_Params *) a_r;

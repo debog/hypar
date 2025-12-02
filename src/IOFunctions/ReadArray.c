@@ -52,7 +52,7 @@ int ReadArray(
     CHECKERR(ierr);
 #endif
   } else {
-    fprintf(stderr,"Error: Illegal value (%a_s) for input_mode.\n",solver->m_input_mode);
+    fprintf(stderr,"Error: Illegal value (%s) for input_mode.\n",solver->m_input_mode);
     return(1);
   }
 
@@ -180,7 +180,7 @@ int ReadArraySerial(
       else {
         *a_read_flag = 1;
         /* Reading from file */
-        printf("Reading array from ASCII file %a_s (Serial mode).\n",filename);
+        printf("Reading array from ASCII file %s (Serial mode).\n",filename);
         int size,offset;
         /* allocate global solution array */
         size  = 1; for (d=0; d<a_ndims; d++) size *= a_dim_global[d]; size *= a_nvars;
@@ -226,7 +226,7 @@ int ReadArraySerial(
       if (!in) *a_read_flag = 0;
       else {
         *a_read_flag = 1;
-        printf("Reading array from binary file %a_s (Serial mode).\n",filename);
+        printf("Reading array from binary file %s (Serial mode).\n",filename);
         size_t bytes;
         int size;
         /* allocate global solution array */
@@ -378,7 +378,7 @@ int ReadArrayParallel(
 
   if (*a_read_flag) {
 
-    if (!mpi->m_rank) printf("Reading from binary file %a_s.xxx (parallel mode).\n",filename_root);
+    if (!mpi->m_rank) printf("Reading from binary file %s.xxx (parallel mode).\n",filename_root);
 
     /* calculate size of the local grid on this rank */
     int sizex = 0;     for (d=0; d<a_ndims; d++) sizex += a_dim_local[d];
@@ -402,14 +402,14 @@ int ReadArrayParallel(
 
       in = fopen(filename,"rb");
       if (!in) {
-        fprintf(stderr,"Error in ReadArrayParallel(): File %a_s could not be opened.\n",filename);
+        fprintf(stderr,"Error in ReadArrayParallel(): File %s could not be opened.\n",filename);
         return(1);
       }
 
       /* Read own data */
       bytes = fread(buffer,sizeof(double),(sizex+sizeu),in);
       if (bytes != (sizex+sizeu)) {
-        fprintf(stderr,"Error in ReadArrayParallel(): File %a_s contains insufficient data.\n",filename);
+        fprintf(stderr,"Error in ReadArrayParallel(): File %s contains insufficient data.\n",filename);
         return(1);
       }
 
@@ -425,7 +425,7 @@ int ReadArrayParallel(
         /* read the data */
         bytes = fread(read_buffer,sizeof(double),read_total_size,in);
         if (bytes != read_total_size) {
-          fprintf(stderr,"Error in ReadArrayParallel(): File %a_s contains insufficient data.\n",filename);
+          fprintf(stderr,"Error in ReadArrayParallel(): File %s contains insufficient data.\n",filename);
           return(1);
         }
         /* send the data */
@@ -548,7 +548,7 @@ int ReadArrayMPI_IO(
 
   if (*a_read_flag) {
 
-    if (!mpi->m_rank) printf("Reading from binary file %a_s (MPI-IO mode).\n",filename);
+    if (!mpi->m_rank) printf("Reading from binary file %s (MPI-IO mode).\n",filename);
 
     /* calculate size of the local grid on this rank */
     int sizex = 0;     for (d=0; d<a_ndims; d++) sizex += a_dim_local[d];
@@ -583,7 +583,7 @@ int ReadArrayMPI_IO(
       int         error;
       error = MPI_File_open(mpi->m_IOWorld,filename,MPI_MODE_RDONLY,MPI_INFO_NULL,&in);
       if (error != MPI_SUCCESS) {
-        fprintf(stderr,"Error in ReadArrayMPI_IO(): Unable to open %a_s.\n",filename);
+        fprintf(stderr,"Error in ReadArrayMPI_IO(): Unable to open %s.\n",filename);
         return(1);
       }
 

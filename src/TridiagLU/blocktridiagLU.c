@@ -126,7 +126,7 @@ int BlockTridiagLU(
   rank  = 0;
   nproc = 1;
 #else
-  MPI_Comm        *comm = (MPI_Comm*) m;
+  MPI_Comm        *comm = (MPI_Comm*) a_m;
   const int       nvar = 4;
   int             ierr = 0;
 

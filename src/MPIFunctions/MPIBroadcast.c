@@ -10,7 +10,7 @@ int MPIBroadcast_double(
                           double  *a_x,     /*!< array to broadcast to all ranks */
                           int     a_size,   /*!< size of array to broadcast */
                           int     a_root,   /*!< rank from which to broadcast */
-                          void    *comm   /*!< MPI communicator within which to broadcast */
+                          void    *a_comm   /*!< MPI communicator within which to broadcast */
                        )
 {
 #ifndef serial
@@ -24,7 +24,7 @@ int MPIBroadcast_integer(
                           int   *a_x,     /*!< array to broadcast to all ranks */
                           int   a_size,   /*!< size of array to broadcast */
                           int   a_root,   /*!< rank from which to broadcast */
-                          void  *comm   /*!< MPI communicator within which to broadcast */
+                          void  *a_comm   /*!< MPI communicator within which to broadcast */
                         )
 {
 #ifndef serial
@@ -38,7 +38,7 @@ int MPIBroadcast_character(
                             char  *a_x,   /*!< array to broadcast to all ranks */
                             int   a_size, /*!< size of array to broadcast */
                             int   a_root, /*!< rank from which to broadcast */
-                            void  *comm /*!< MPI communicator within which to broadcast */
+                            void  *a_comm /*!< MPI communicator within which to broadcast */
                           )
 {
 #ifndef serial

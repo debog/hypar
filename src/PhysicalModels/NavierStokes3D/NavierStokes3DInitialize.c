@@ -165,14 +165,14 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
     if (!in) printf("Warning: File \"physics.inp\" not found. Using default values.\n");
     else {
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%a_s",word);
+      ferr = fscanf(in,"%s",word);
       if (ferr != 1) {
         fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
         return 1;
       }
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%a_s",word);
+          ferr = fscanf(in,"%s",word);
           if (ferr != 1) {
             fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
             return 1;
@@ -184,7 +184,7 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
               return 1;
             }
           } else if (!strcmp(word,"upwinding")) {
-            ferr = fscanf(in,"%a_s",physics->m_upw_choice);
+            ferr = fscanf(in,"%s",physics->m_upw_choice);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
@@ -255,13 +255,13 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
               return 1;
             }
           } else if (!strcmp(word,"ib_surface_data")) {
-            ferr = fscanf(in,"%a_s",physics->m_ib_write_surface_data);
+            ferr = fscanf(in,"%s",physics->m_ib_write_surface_data);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
             }
           } else if (!strcmp(word,"ib_wall_type")) {
-            ferr = fscanf(in,"%a_s",physics->m_ib_wall_type);
+            ferr = fscanf(in,"%s",physics->m_ib_wall_type);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
@@ -298,7 +298,7 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
               printf("Warning: no immersed body present; specification of ib_ramp_width unnecessary.\n");
             }
           } else if (!strcmp(word,"ib_ramp_type")) {
-            ferr = fscanf(in,"%a_s",physics->m_ib_ramp_type);
+            ferr = fscanf(in,"%s",physics->m_ib_ramp_type);
             if (ferr != 1) {
               fprintf(stderr, "Read error while reading physics.inp in NavierStokes3DInitialize().\n");
               return 1;
@@ -319,8 +319,8 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
             }
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",word,useless);
+            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }
@@ -371,7 +371,7 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
   if (   ((physics->m_grav_x != 0.0) || (physics->m_grav_y != 0.0) || (physics->m_grav_z != 0.0) )
       && (strcmp(physics->m_upw_choice,_RUSANOV_)) ) {
     if (!mpi->m_rank) {
-      fprintf(stderr,"Error in NavierStokes3DInitialize: %a_s upwinding is needed for flows ",_RUSANOV_);
+      fprintf(stderr,"Error in NavierStokes3DInitialize: %s upwinding is needed for flows ",_RUSANOV_);
       fprintf(stderr,"with gravitational forces.\n");
     }
     return(1);
@@ -379,7 +379,7 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
   /* check that solver has the correct choice of diffusion formulation, if viscous flow */
   if (strcmp(solver->m_spatial_type_par,_NC_2STAGE_) && (physics->m_Re > 0)) {
     if (!mpi->m_rank) {
-      fprintf(stderr,"Error in NavierStokes3DInitialize(): Parabolic term spatial discretization must be \"%a_s\"\n",_NC_2STAGE_);
+      fprintf(stderr,"Error in NavierStokes3DInitialize(): Parabolic term spatial discretization must be \"%s\"\n",_NC_2STAGE_);
     }
     return(1);
   }
@@ -412,7 +412,7 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
       solver->IBFunction = NavierStokes3DIBIsothermal;
     } else {
       fprintf(stderr, "Error in NavierStokes3DInitialize()\n");
-      fprintf(stderr, "  invalid value for IB wall type (%a_s).\n",
+      fprintf(stderr, "  invalid value for IB wall type (%s).\n",
               physics->m_ib_wall_type );
     }
     if (!strcmp(physics->m_ib_write_surface_data,"yes")) {
@@ -436,9 +436,9 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
         solver->Upwind = gpuNavierStokes3DUpwindRusanov;
       } else {
         if (!mpi->m_rank) {
-          fprintf(stderr,"Error in NavierStokes3DInitialize(): %a_s is not a valid upwinding scheme on GPU. ",
+          fprintf(stderr,"Error in NavierStokes3DInitialize(): %s is not a valid upwinding scheme on GPU. ",
                   physics->m_upw_choice);
-          fprintf(stderr,"Choices are %a_s and %a_s.\n",_ROE_,_RUSANOV_);
+          fprintf(stderr,"Choices are %s and %s.\n",_ROE_,_RUSANOV_);
         }
         return(1);
       }
@@ -461,9 +461,9 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
         solver->UpwindFdF = NavierStokes3DUpwindFdFRusanovModified;
       } else {
         if (!mpi->m_rank) {
-          fprintf(stderr,"Error in NavierStokes3DInitialize(): %a_s is not a valid upwinding scheme ",
+          fprintf(stderr,"Error in NavierStokes3DInitialize(): %s is not a valid upwinding scheme ",
                   physics->m_upw_choice);
-          fprintf(stderr,"for use with split hyperbolic flux form. Use %a_s or %a_s.\n",
+          fprintf(stderr,"for use with split hyperbolic flux form. Use %s or %s.\n",
                   _ROE_,_RUSANOV_);
         }
         return(1);
@@ -476,9 +476,9 @@ int NavierStokes3DInitialize( void *a_s, /*!< Solver object of type #HyPar */
       else if (!strcmp(physics->m_upw_choice,_RUSANOV_)) solver->Upwind = NavierStokes3DUpwindRusanov;
       else {
         if (!mpi->m_rank) {
-          fprintf(stderr,"Error in NavierStokes3DInitialize(): %a_s is not a valid upwinding scheme. ",
+          fprintf(stderr,"Error in NavierStokes3DInitialize(): %s is not a valid upwinding scheme. ",
                   physics->m_upw_choice);
-          fprintf(stderr,"Choices are %a_s, %a_s, %a_s, and %a_s.\n",_ROE_,_RF_,_LLF_,_RUSANOV_);
+          fprintf(stderr,"Choices are %s, %s, %s, and %s.\n",_ROE_,_RF_,_LLF_,_RUSANOV_);
         }
         return(1);
       }

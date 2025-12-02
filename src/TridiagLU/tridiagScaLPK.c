@@ -90,7 +90,7 @@ int TridiagScaLPK(
   nproc = 1;
   nglobal=n;
 #else
-  MPI_Comm        *comm = (MPI_Comm*) m;
+  MPI_Comm        *comm = (MPI_Comm*) a_m;
 
   if (comm) {
     MPI_Comm_size(*comm,&nproc);

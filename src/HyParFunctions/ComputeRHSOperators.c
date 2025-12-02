@@ -94,7 +94,7 @@ int ComputeRHSOperators(
     strcat(filename,solver->m_filename_index);
     strcat(filename,".dat");
     printf("ComputeRHSOperators(): Computing linearized matrix operator for FFunction. ndof=%d.\n",ndof);
-    printf("ComputeRHSOperators(): Writing to sparse matrix file %a_s.\n",filename);
+    printf("ComputeRHSOperators(): Writing to sparse matrix file %s.\n",filename);
     fout = fopen(filename,"w");
     fprintf(fout,"%d\n",ndof);
     /* compute the FFunction of u0 */
@@ -145,7 +145,7 @@ int ComputeRHSOperators(
     strcat(filename,solver->m_filename_index);
     strcat(filename,".dat");
     printf("ComputeRHSOperators(): Computing linearized matrix operator for (FFunction-dFFunction). ndof=%d.\n",ndof);
-    printf("ComputeRHSOperators(): Writing to sparse matrix file %a_s.\n",filename);
+    printf("ComputeRHSOperators(): Writing to sparse matrix file %s.\n",filename);
     fout = fopen(filename,"w");
     fprintf(fout,"%d\n",ndof);
     /* compute the FFunction of u0 */
@@ -211,7 +211,7 @@ int ComputeRHSOperators(
     strcat(filename,solver->m_filename_index);
     strcat(filename,".dat");
     printf("ComputeRHSOperators(): Computing linearized matrix operator for dFFunction. ndof=%d.\n",ndof);
-    printf("ComputeRHSOperators(): Writing to sparse matrix file %a_s.\n",filename);
+    printf("ComputeRHSOperators(): Writing to sparse matrix file %s.\n",filename);
     fout = fopen(filename,"w");
     fprintf(fout,"%d\n",ndof);
     /* compute the FFunction of u0 */
@@ -262,7 +262,7 @@ int ComputeRHSOperators(
     strcat(filename,solver->m_filename_index);
     strcat(filename,".dat");
     printf("ComputeRHSOperators(): Computing linearized matrix operator for SFunction. ndof=%d.\n",ndof);
-    printf("ComputeRHSOperators(): Writing to sparse matrix file %a_s.\n",filename);
+    printf("ComputeRHSOperators(): Writing to sparse matrix file %s.\n",filename);
     fout = fopen(filename,"w");
     fprintf(fout,"%d\n",ndof);
     /* compute the FFunction of u0 */

@@ -90,7 +90,7 @@ int TridiagLUGS(
   int         rank,nproc;
 
   /* Parallel compilation */
-  MPI_Comm  *comm = (MPI_Comm*) m;
+  MPI_Comm  *comm = (MPI_Comm*) a_m;
   if (!comm) return(TridiagLU(a,b,c,x,n,ns,context,NULL));
   MPI_Comm_size(*comm,&nproc);
   MPI_Comm_rank(*comm,&rank);

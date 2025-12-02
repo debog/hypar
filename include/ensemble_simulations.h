@@ -161,7 +161,7 @@ class EnsembleSimulation : public Simulation
     inline int mpiCommDup()
     {
       for (int n = 0; n < m_nsims; n++) {
-        MPI_Comm_dup(MPI_COMM_WORLD, &(m_sims[n].mpi.world));
+        MPI_Comm_dup(MPI_COMM_WORLD, &(m_sims[n].mpi.m_world));
       }
       return 0;
     }

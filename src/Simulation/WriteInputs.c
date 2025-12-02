@@ -68,44 +68,44 @@ int WriteInputs ( void  *a_s,     /*!< Array of simulation objects of type #Simu
     if (sim[0].solver.m_use_petsc_ts)
       printf("  Time integration scheme                    : PETSc \n"                            );
     else {
-      printf("  Time integration scheme                    : %a_s ",sim[0].solver.m_time_scheme             );
+      printf("  Time integration scheme                    : %s ",sim[0].solver.m_time_scheme             );
       if (strcmp(sim[0].solver.m_time_scheme,_FORWARD_EULER_)) {
-        printf("(%a_s)",sim[0].solver.m_time_scheme_type                                                    );
+        printf("(%s)",sim[0].solver.m_time_scheme_type                                                    );
       }
       printf("\n");
     }
 #else
-    printf("  Time integration scheme                    : %a_s ",sim[0].solver.m_time_scheme               );
+    printf("  Time integration scheme                    : %s ",sim[0].solver.m_time_scheme               );
     if (strcmp(sim[0].solver.m_time_scheme,_FORWARD_EULER_)) {
-      printf("(%a_s)",sim[0].solver.m_time_scheme_type                                                      );
+      printf("(%s)",sim[0].solver.m_time_scheme_type                                                      );
     }
     printf("\n");
 #endif
-    printf("  Spatial discretization scheme (hyperbolic) : %a_s\n"     ,sim[0].solver.m_spatial_scheme_hyp  );
-    printf("  Split hyperbolic flux term?                : %a_s\n"     ,sim[0].solver.m_split_hyperbolic_flux );
-    printf("  Interpolation type for hyperbolic term     : %a_s\n"     ,sim[0].solver.m_interp_type         );
-    printf("  Spatial discretization type   (parabolic ) : %a_s\n"     ,sim[0].solver.m_spatial_type_par    );
-    printf("  Spatial discretization scheme (parabolic ) : %a_s\n"     ,sim[0].solver.m_spatial_scheme_par  );
+    printf("  Spatial discretization scheme (hyperbolic) : %s\n"     ,sim[0].solver.m_spatial_scheme_hyp  );
+    printf("  Split hyperbolic flux term?                : %s\n"     ,sim[0].solver.m_split_hyperbolic_flux );
+    printf("  Interpolation type for hyperbolic term     : %s\n"     ,sim[0].solver.m_interp_type         );
+    printf("  Spatial discretization type   (parabolic ) : %s\n"     ,sim[0].solver.m_spatial_type_par    );
+    printf("  Spatial discretization scheme (parabolic ) : %s\n"     ,sim[0].solver.m_spatial_scheme_par  );
     printf("  Time Step                                  : %E\n"     ,sim[0].solver.m_dt                  );
-    printf("  Check for conservation                     : %a_s\n"     ,sim[0].solver.m_conservation_check   );
+    printf("  Check for conservation                     : %s\n"     ,sim[0].solver.m_conservation_check   );
     printf("  Screen output iterations                   : %d\n"     ,sim[0].solver.m_screen_op_iter      );
     printf("  File output iterations                     : %d\n"     ,sim[0].solver.m_file_op_iter        );
-    printf("  Initial solution file type                 : %a_s\n"     ,sim[0].solver.m_ip_file_type        );
-    printf("  Initial solution read mode                 : %a_s"       ,sim[0].solver.m_input_mode          );
+    printf("  Initial solution file type                 : %s\n"     ,sim[0].solver.m_ip_file_type        );
+    printf("  Initial solution read mode                 : %s"       ,sim[0].solver.m_input_mode          );
     if (strcmp(sim[0].solver.m_input_mode,"serial"))    printf("  [%d file IO a_rank(a_s)]\n",sim[0].mpi.m_N_IORanks  );
     else                                        printf("\n");
-    printf("  Solution file write mode                   : %a_s"       ,sim[0].solver.m_output_mode         );
+    printf("  Solution file write mode                   : %s"       ,sim[0].solver.m_output_mode         );
     if (strcmp(sim[0].solver.m_output_mode,"serial"))   printf("  [%d file IO a_rank(a_s)]\n",sim[0].mpi.m_N_IORanks  );
     else                                        printf("\n");
-    printf("  Solution file format                       : %a_s\n"     ,sim[0].solver.m_op_file_format      );
-    printf("  Overwrite solution file                    : %a_s\n"     ,sim[0].solver.m_op_overwrite        );
+    printf("  Solution file format                       : %s\n"     ,sim[0].solver.m_op_file_format      );
+    printf("  Overwrite solution file                    : %s\n"     ,sim[0].solver.m_op_overwrite        );
 #if defined(HAVE_CUDA)
-    printf("  Use GPU                                    : %a_s\n"     ,(sim[0].solver.m_use_gpu == 1)? "yes" : "no");
+    printf("  Use GPU                                    : %s\n"     ,(sim[0].solver.m_use_gpu == 1)? "yes" : "no");
     printf("  GPU device no                              : %d\n"     ,(sim[0].solver.m_gpu_device_no));
 #endif
-    printf("  Physical model                             : %a_s\n"     ,sim[0].solver.m_model               );
+    printf("  Physical model                             : %s\n"     ,sim[0].solver.m_model               );
     if (sim[0].solver.m_flag_ib) {
-      printf("  Immersed Body                              : %a_s\n"     ,sim[0].solver.m_ib_filename         );
+      printf("  Immersed Body                              : %s\n"     ,sim[0].solver.m_ib_filename         );
     }
   }
 

@@ -345,7 +345,7 @@ int NavierStokes3DIBForces( void*   a_s,  /*!< Solver object of type #HyPar */
   }
   strcat(surface_filename,".dat");
   if (!mpi->m_rank) {
-    printf("Writing immersed body surface data file %a_s.\n",surface_filename);
+    printf("Writing immersed body surface data file %s.\n",surface_filename);
   }
   ierr = WriteSurfaceData(  mpi,
                             IB,

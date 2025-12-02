@@ -45,18 +45,18 @@ int FPDoubleWellInitialize(void *a_s,void *a_m)
       return(1);
     } else {
       char word[_MAX_STRING_SIZE_];
-      ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+      ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
       if (!strcmp(word, "begin")){
         while (strcmp(word, "end")){
-          ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+          ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
           if (!strcmp(word, "q")) {
             /* read diffusion coefficient */
             ferr = fscanf(in,"%lf",&physics->m_q);
             if (ferr != 1) return(1);
           } else if (strcmp(word,"end")) {
             char useless[_MAX_STRING_SIZE_];
-            ferr = fscanf(in,"%a_s",useless); if (ferr != 1) return(ferr);
-            printf("Warning: keyword %a_s in file \"physics.inp\" with value %a_s not ",word,useless);
+            ferr = fscanf(in,"%s",useless); if (ferr != 1) return(ferr);
+            printf("Warning: keyword %s in file \"physics.inp\" with value %s not ",word,useless);
             printf("recognized or extraneous. Ignoring.\n");
           }
         }

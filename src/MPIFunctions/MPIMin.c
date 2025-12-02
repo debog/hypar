@@ -16,7 +16,7 @@ int MPIMin_integer(
                     int   *a_global, /*!< array to contain the global minimums */
                     int   *a_var,    /*!< the local array */
                     int   a_size,    /*!< size of the local array */
-                    void  *comm    /*!< MPI communicator */
+                    void  *a_comm    /*!< MPI communicator */
                   )
 {
 #ifdef serial
@@ -39,7 +39,7 @@ int MPIMin_double(
                     double  *a_global, /*!< array to contain the global minimums */
                     double  *a_var,    /*!< the local array */
                     int     a_size,    /*!< size of the local array */
-                    void    *comm    /*!< MPI communicator */
+                    void    *a_comm    /*!< MPI communicator */
                  )
 {
 #ifdef serial

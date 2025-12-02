@@ -102,7 +102,7 @@ int TimeInitialize( void  *a_s,     /*!< Array of simulation objects of type #Si
 
     } else {
 
-      fprintf(stderr,"ERROR in TimeInitialize(): %a_s is not yet implemented on GPUs.\n",
+      fprintf(stderr,"ERROR in TimeInitialize(): %s is not yet implemented on GPUs.\n",
               sim[0].solver.m_time_scheme );
       return 1;
 

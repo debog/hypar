@@ -35,7 +35,7 @@ int MPIExchangeBoundaries1D(
                               int     a_N,      /*!< Size of the array */
                               int     a_ghosts, /*!< Number of ghost points */
                               int     a_dir,    /*!< Spatial dimension corresponding to the 1D array */
-                              int     ndims   /*!< Number of spatial dimensions in the simulation */
+                              int     a_ndims   /*!< Number of spatial dimensions in the simulation */
                            )
 {
 #ifndef serial

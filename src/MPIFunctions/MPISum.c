@@ -17,7 +17,7 @@ int MPISum_integer(
                     int   *a_global, /*!< array to contain the global sums */
                     int   *a_var,    /*!< the local array */
                     int   a_size,    /*!< size of the local array */
-                    void  *comm    /*!< MPI communicator */
+                    void  *a_comm    /*!< MPI communicator */
                   )
 {
 #ifdef serial
@@ -40,7 +40,7 @@ int MPISum_double(
                     double  *a_global, /*!< array to contain the global sums */
                     double  *a_var,    /*!< the local array */
                     int     a_size,    /*!< size of the local array */
-                    void    *comm    /*!< MPI communicator */
+                    void    *a_comm    /*!< MPI communicator */
                  )
 {
 #ifdef serial

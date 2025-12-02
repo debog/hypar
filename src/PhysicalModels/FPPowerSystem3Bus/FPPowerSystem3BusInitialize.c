@@ -101,10 +101,10 @@ int FPPowerSystem3BusInitialize(
     return(1);
   } else {
     char word[_MAX_STRING_SIZE_];
-    ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+    ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
     if (!strcmp(word, "begin")){
       while (strcmp(word, "end")){
-        ferr = fscanf(in,"%a_s",word); if (ferr != 1) return(1);
+        ferr = fscanf(in,"%s",word); if (ferr != 1) return(1);
         if      (!strcmp(word,"Pm1_avg"   ))  {ferr=fscanf(in,"%lf",&physics->Pm1_avg   ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"Pm2_avg"   ))  {ferr=fscanf(in,"%lf",&physics->Pm2_avg   ) ;if(ferr!=1)return(1);}
         else if (!strcmp(word,"Pmref_avg" ))  {ferr=fscanf(in,"%lf",&physics->Pmref_avg ) ;if(ferr!=1)return(1);}
