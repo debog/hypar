@@ -206,9 +206,9 @@ extern "C" int gpuHyperbolicFunction(
     int     nvars     = solver->m_nvars;
     int     ghosts    = solver->m_ghosts;
     int     *dim      = solver->m_dim_local;
-    int     size      = solver->npoints_local_wghosts;
-    double  *gpu_x     = solver->gpu_x;
-    double  *gpu_dxinv = solver->gpu_dxinv;
+    int     size      = solver->m_npoints_local_wghosts;
+    double  *gpu_x     = solver->m_gpu_x;
+    double  *gpu_dxinv = solver->m_gpu_dxinv;
     double  *gpu_FluxI_p1, *gpu_FluxI_p2;
 
     LimFlag = (LimFlag && solver->flag_nonlinearinterp && solver->SetInterpLimiterVar);
@@ -238,8 +238,8 @@ extern "C" int gpuHyperbolicFunction(
         /* compute interface fluxes */
         ReconstructHyperbolic(gpu_FluxI,gpu_FluxC,gpu_u,gpu_x+offset,d,solver,mpi,t,LimFlag,UpwindFunction);
 
-        gpu_FluxI_p1 = solver->StageBoundaryBuffer+(solver->gpu_npoints_boundary_offset[d]*nvars);
-        gpu_FluxI_p2 = solver->StageBoundaryBuffer+(solver->gpu_npoints_boundary_offset[d]+solver->gpu_npoints_boundary[d])*nvars;
+        gpu_FluxI_p1 = solver->StageBoundaryBuffer+(solver->m_gpu_npoints_boundary_offset[d]*nvars);
+        gpu_FluxI_p2 = solver->StageBoundaryBuffer+(solver->m_gpu_npoints_boundary_offset[d]+solver->m_gpu_npoints_boundary[d])*nvars;
 
 #if defined(GPU_STAT)
         checkCuda( cudaEventRecord(start, 0) );
@@ -248,13 +248,13 @@ extern "C" int gpuHyperbolicFunction(
         if (ndims == 3) {
           HyperbolicFunction_dim3_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
               npoints_grid, d, nvars, ghosts, offset,
-              solver->gpu_dim_local, gpu_FluxI, gpu_dxinv,
+              solver->m_gpu_dim_local, gpu_FluxI, gpu_dxinv,
               hyp, gpu_FluxI_p1, gpu_FluxI_p2
           );
         } else if (ndims == 2) {
           HyperbolicFunction_dim2_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
               npoints_grid, d, nvars, ghosts, offset,
-              solver->gpu_dim_local, gpu_FluxI, gpu_dxinv,
+              solver->m_gpu_dim_local, gpu_FluxI, gpu_dxinv,
               hyp, gpu_FluxI_p1, gpu_FluxI_p2
           );
         } else {
@@ -274,11 +274,11 @@ extern "C" int gpuHyperbolicFunction(
 #endif
 
         StageBoundaryIntegral_kernel<GPU_THREADS_PER_BLOCK><<<1, GPU_THREADS_PER_BLOCK, GPU_THREADS_PER_BLOCK*nvars*sizeof(double)>>>(
-          solver->gpu_npoints_boundary[d], nvars, -1, gpu_FluxI_p1,
+          solver->m_gpu_npoints_boundary[d], nvars, -1, gpu_FluxI_p1,
           solver->StageBoundaryIntegral + 2*d*nvars
         );
         StageBoundaryIntegral_kernel<GPU_THREADS_PER_BLOCK><<<1, GPU_THREADS_PER_BLOCK, GPU_THREADS_PER_BLOCK*nvars*sizeof(double)>>>(
-          solver->gpu_npoints_boundary[d], nvars, 1, gpu_FluxI_p2,
+          solver->m_gpu_npoints_boundary[d], nvars, 1, gpu_FluxI_p2,
           solver->StageBoundaryIntegral + (2*d+1)*nvars
         );
         cudaDeviceSynchronize();
@@ -288,13 +288,13 @@ extern "C" int gpuHyperbolicFunction(
         checkCuda( cudaEventSynchronize(stop) );
         checkCuda( cudaEventElapsedTime(&milliseconds, start, stop) );
         printf("%-50s GPU time = %.6f dir = %d bandwidth (GB/s) = %.2f\n",
-                "StageBoundaryIntegral", milliseconds*1e-3, d, (1e-6*2*solver->gpu_npoints_boundary[d]*nvars*sizeof(double))/milliseconds);
+                "StageBoundaryIntegral", milliseconds*1e-3, d, (1e-6*2*solver->m_gpu_npoints_boundary[d]*nvars*sizeof(double))/milliseconds);
 #endif
 
         offset += dim[d] + 2*ghosts;
     }
 
-    if (solver->flag_ib) gpuArrayBlockMultiply(hyp, solver->gpu_iblank, size, nvars);
+    if (solver->flag_ib) gpuArrayBlockMultiply(hyp, solver->m_gpu_iblank, size, nvars);
 
 #if defined(GPU_STAT)
     checkCuda(cudaEventDestroy(start));
@@ -496,9 +496,9 @@ extern "C" int gpuHyperbolicFunction(
     int     nvars     = solver->m_nvars;
     int     ghosts    = solver->m_ghosts;
     int     *dim      = solver->m_dim_local;
-    int     size      = solver->npoints_local_wghosts;
-    double  *x        = solver->gpu_x;
-    double  *dxinv    = solver->gpu_dxinv;
+    int     size      = solver->m_npoints_local_wghosts;
+    double  *x        = solver->m_gpu_x;
+    double  *dxinv    = solver->m_gpu_dxinv;
     double  *FluxI_p1, *FluxI_p2;
 
     LimFlag = (LimFlag && solver->flag_nonlinearinterp && solver->SetInterpLimiterVar);
@@ -529,8 +529,8 @@ extern "C" int gpuHyperbolicFunction(
         /* compute interface fluxes */
         ReconstructHyperbolic(FluxI,FluxC,u,x+offset,d,solver,mpi,t,LimFlag,UpwindFunction);
 
-        FluxI_p1 = solver->StageBoundaryBuffer+(solver->gpu_npoints_boundary_offset[d]*nvars);
-        FluxI_p2 = solver->StageBoundaryBuffer+(solver->gpu_npoints_boundary_offset[d]+solver->gpu_npoints_boundary[d])*nvars;
+        FluxI_p1 = solver->StageBoundaryBuffer+(solver->m_gpu_npoints_boundary_offset[d]*nvars);
+        FluxI_p2 = solver->StageBoundaryBuffer+(solver->m_gpu_npoints_boundary_offset[d]+solver->m_gpu_npoints_boundary[d])*nvars;
 
 #if defined(GPU_STAT)
         checkCuda( cudaEventRecord(start, 0) );
@@ -538,7 +538,7 @@ extern "C" int gpuHyperbolicFunction(
         if (ndims == 3) {
           HyperbolicFunction_dim3_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
               npoints_grid, size, npoints_dim_interface, d, nvars, ghosts, offset,
-              solver->gpu_dim_local, FluxI, dxinv,
+              solver->m_gpu_dim_local, FluxI, dxinv,
               hyp, FluxI_p1, FluxI_p2
           );
         } else {
@@ -558,11 +558,11 @@ extern "C" int gpuHyperbolicFunction(
 #endif
 
         StageBoundaryIntegral_kernel<GPU_THREADS_PER_BLOCK><<<1, GPU_THREADS_PER_BLOCK, GPU_THREADS_PER_BLOCK*nvars*sizeof(double)>>>(
-          solver->gpu_npoints_boundary[d], nvars, -1, FluxI_p1,
+          solver->m_gpu_npoints_boundary[d], nvars, -1, FluxI_p1,
           solver->StageBoundaryIntegral + 2*d*nvars
         );
         StageBoundaryIntegral_kernel<GPU_THREADS_PER_BLOCK><<<1, GPU_THREADS_PER_BLOCK, GPU_THREADS_PER_BLOCK*nvars*sizeof(double)>>>(
-          solver->gpu_npoints_boundary[d], nvars, 1, FluxI_p2,
+          solver->m_gpu_npoints_boundary[d], nvars, 1, FluxI_p2,
           solver->StageBoundaryIntegral + (2*d+1)*nvars
         );
         cudaDeviceSynchronize();
@@ -572,12 +572,12 @@ extern "C" int gpuHyperbolicFunction(
         checkCuda( cudaEventSynchronize(stop) );
         checkCuda( cudaEventElapsedTime(&milliseconds, start, stop) );
         printf("%-50s GPU time = %.6f dir = %d bandwidth (GB/s) = %.2f\n",
-                "StageBoundaryIntegral", milliseconds*1e-3, d, (1e-6*2*solver->gpu_npoints_boundary[d]*nvars*sizeof(double))/milliseconds);
+                "StageBoundaryIntegral", milliseconds*1e-3, d, (1e-6*2*solver->m_gpu_npoints_boundary[d]*nvars*sizeof(double))/milliseconds);
 #endif
         offset += dim[d] + 2*ghosts;
     }
 
-    if (solver->flag_ib) gpuArrayBlockMultiply(hyp, solver->gpu_iblank, size, nvars);
+    if (solver->flag_ib) gpuArrayBlockMultiply(hyp, solver->m_gpu_iblank, size, nvars);
 
 #if defined(GPU_STAT)
     checkCuda(cudaEventDestroy(start));

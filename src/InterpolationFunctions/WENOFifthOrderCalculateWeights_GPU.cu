@@ -248,7 +248,7 @@ int gpuWENOFifthOrderCalculateWeightsM(
     WENOFifthOrderCalculateWeightsM_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
         npoints_grid, ndims, dir, ghosts, nvars, weno->size, offset, stride[dir],
         is_crweno, is_mpi_ip_zero, is_mpi_ip_proc, weno->eps,
-        solver->gpu_dim_local, fC, uC, weno->w1, weno->w2, weno->w3
+        solver->m_gpu_dim_local, fC, uC, weno->w1, weno->w2, weno->w3
     );
     cudaDeviceSynchronize();
 
@@ -459,7 +459,7 @@ int gpuWENOFifthOrderCalculateWeightsYC(
     WENOFifthOrderCalculateWeightsYC_kernel<<<nblocks, 256>>>(
         ngrid_points, ndims, dir, ghosts, nvars, weno->size, offset, stride[dir],
         is_crweno, is_mpi_ip_zero, is_mpi_ip_proc, weno->eps,
-        solver->gpu_dim_local, fC, uC, weno->w1, weno->w2, weno->w3
+        solver->m_gpu_dim_local, fC, uC, weno->w1, weno->w2, weno->w3
     );
     checkCuda( cudaEventRecord(stopEvent, 0) );
     checkCuda( cudaEventSynchronize(stopEvent) );
@@ -693,9 +693,9 @@ int gpuWENOFifthOrderCalculateWeightsM(
 #endif
 
     WENOFifthOrderCalculateWeightsM_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-        npoints_grid, solver->npoints_local_wghosts, ndims, dir, ghosts, nvars, weno->size, offset, stride[dir],
+        npoints_grid, solver->m_npoints_local_wghosts, ndims, dir, ghosts, nvars, weno->size, offset, stride[dir],
         is_crweno, is_mpi_ip_zero, is_mpi_ip_proc, weno->eps,
-        solver->gpu_dim_local, fC, uC, weno->w1, weno->w2, weno->w3
+        solver->m_gpu_dim_local, fC, uC, weno->w1, weno->w2, weno->w3
     );
     cudaDeviceSynchronize();
 
@@ -930,9 +930,9 @@ int gpuWENOFifthOrderCalculateWeightsYC(
 #endif
 
   WENOFifthOrderCalculateWeightsYC_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-      npoints_grid, solver->npoints_local_wghosts, ndims, dir, ghosts, nvars, weno->size, offset, stride[dir],
+      npoints_grid, solver->m_npoints_local_wghosts, ndims, dir, ghosts, nvars, weno->size, offset, stride[dir],
       is_crweno, is_mpi_ip_zero, is_mpi_ip_proc, weno->eps,
-      solver->gpu_dim_local, fC, uC, weno->w1, weno->w2, weno->w3
+      solver->m_gpu_dim_local, fC, uC, weno->w1, weno->w2, weno->w3
   );
   cudaDeviceSynchronize();
 

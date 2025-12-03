@@ -172,8 +172,8 @@ extern "C" int gpuNavierStokes2DSource(
   int     ndims      = solver->m_ndims;
   int     ghosts     = solver->m_ghosts;
   int     *dim       = solver->m_dim_local;
-  double  *gpu_x      = solver->gpu_x;
-  double  *gpu_dxinv  = solver->gpu_dxinv;
+  double  *gpu_x      = solver->m_gpu_x;
+  double  *gpu_dxinv  = solver->m_gpu_dxinv;
   double  RT         = param->p0 / param->rho0;
 
   /* Along X-direction */
@@ -194,7 +194,7 @@ extern "C" int gpuNavierStokes2DSource(
     int nblocks = (ngrid_points - 1) / GPU_THREADS_PER_BLOCK + 1;
     NavierStokes2DSource_Xdir_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
       ngrid_points, ghosts, ndims, param->gamma, RT,
-      solver->gpu_dim_local, gpu_dxinv, param->gpu_grav_field_f, SourceI, gpu_u, source
+      solver->m_gpu_dim_local, gpu_dxinv, param->gpu_grav_field_f, SourceI, gpu_u, source
     );
   }
 
@@ -215,7 +215,7 @@ extern "C" int gpuNavierStokes2DSource(
     int nblocks = (ngrid_points - 1) / GPU_THREADS_PER_BLOCK + 1;
     NavierStokes2DSource_Ydir_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
       ngrid_points, ghosts, ndims, param->gamma, RT,
-      solver->gpu_dim_local, gpu_dxinv, param->gpu_grav_field_f, SourceI, gpu_u, source
+      solver->m_gpu_dim_local, gpu_dxinv, param->gpu_grav_field_f, SourceI, gpu_u, source
     );
   }
   return(0);

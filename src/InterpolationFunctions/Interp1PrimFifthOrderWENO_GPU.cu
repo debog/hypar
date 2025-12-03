@@ -191,7 +191,7 @@ extern "C" int gpuInterp1PrimFifthOrderWENO(
 
     Interp1PrimFifthOrderWENO_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
         npoints_grid, ndims, dir, ghosts, nvars, weno->size, offset, stride[dir], upw, uflag,
-        solver->gpu_dim_local, fC, weno->w1, weno->w2, weno->w3, fI
+        solver->m_gpu_dim_local, fC, weno->w1, weno->w2, weno->w3, fI
     );
     cudaDeviceSynchronize();
 
@@ -397,8 +397,8 @@ extern "C" int gpuInterp1PrimFifthOrderWENO(
 #endif
 
     Interp1PrimFifthOrderWENO_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-        npoints_grid, solver->npoints_local_wghosts, ndims, dir, ghosts, nvars, weno->size, offset, stride[dir], upw, uflag,
-        solver->gpu_dim_local, fC, weno->w1, weno->w2, weno->w3, fI
+        npoints_grid, solver->m_npoints_local_wghosts, ndims, dir, ghosts, nvars, weno->size, offset, stride[dir], upw, uflag,
+        solver->m_gpu_dim_local, fC, weno->w1, weno->w2, weno->w3, fI
     );
 #if defined(GPU_STAT)
     checkCuda( cudaEventRecord(stop) );

@@ -99,12 +99,12 @@ extern "C" int gpuNavierStokes2DPreStep(
     double cpu_time = 0.0;
     clock_t cpu_start, cpu_end;
 
-    gpuMemcpy(solver->gpu_u, u, N_grid*_MODEL_NVARS_*sizeof(double), gpuMemcpyHostToDevice);
+    gpuMemcpy(solver->m_gpu_u, u, N_grid*_MODEL_NVARS_*sizeof(double), gpuMemcpyHostToDevice);
     gpuMemcpy(param->gpu_solution, u, N_grid*_MODEL_NVARS_*sizeof(double), gpuMemcpyHostToDevice);
 
     int nblocks = (N_grid - 1) / GPU_THREADS_PER_BLOCK + 1;
     cpu_start = clock();
-    NavierStokes2DPreStep_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(N_grid, param->gamma, solver->gpu_u, param->gpu_fast_jac);
+    NavierStokes2DPreStep_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(N_grid, param->gamma, solver->m_gpu_u, param->gpu_fast_jac);
     cudaDeviceSynchronize();
     cpu_end = clock();
     cpu_time += (double)(cpu_end - cpu_start) / CLOCKS_PER_SEC;

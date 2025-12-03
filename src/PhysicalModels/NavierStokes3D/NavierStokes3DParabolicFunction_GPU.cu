@@ -302,8 +302,8 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   NavierStokes3D  *physics  = (NavierStokes3D*) solver->physics;
 
   int ghosts = solver->m_ghosts;
-  int *dim   = solver->gpu_dim_local;
-  int size   = solver->npoints_local_wghosts;
+  int *dim   = solver->m_gpu_dim_local;
+  int size   = solver->m_npoints_local_wghosts;
 
   gpuMemset(par, 0, size*_MODEL_NVARS_*sizeof(double));
   if (physics->Re <= 0) return (0); /* inviscid flow */
@@ -318,10 +318,10 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   double *QDerivX = physics->gpu_QDerivX;
   double *QDerivY = physics->gpu_QDerivY;
   double *QDerivZ = physics->gpu_QDerivZ;
-  double *dxinv   = solver->gpu_dxinv;
+  double *dxinv   = solver->m_gpu_dxinv;
 
   int nblocks = (size-1)/GPU_THREADS_PER_BLOCK + 1;
-  int nblocks_par = (solver->npoints_local-1)/GPU_THREADS_PER_BLOCK + 1;
+  int nblocks_par = (solver->m_npoints_local-1)/GPU_THREADS_PER_BLOCK + 1;
 
 #if defined(GPU_STAT)
   cudaEvent_t startEvent, stopEvent;
@@ -355,11 +355,11 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   solver->FirstDerivativePar(QDerivY,Q,_YDIR_,1,solver,mpi);
   solver->FirstDerivativePar(QDerivZ,Q,_ZDIR_,1,solver,mpi);
 
-  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
+  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_gpu_dim_local,
                              solver->m_ghosts,mpi,QDerivX);
-  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
+  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_gpu_dim_local,
                              solver->m_ghosts,mpi,QDerivY);
-  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
+  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_gpu_dim_local,
                              solver->m_ghosts,mpi,QDerivY);
 
 #if defined(GPU_STAT)
@@ -419,7 +419,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 #endif
 
   gpuNavierStokes3DParabolicFunction_par_kernel<<<nblocks_par, GPU_THREADS_PER_BLOCK>>>(
-      solver->npoints_local, ghosts, _XDIR_, dim, dxinv, FDeriv, par
+      solver->m_npoints_local, ghosts, _XDIR_, dim, dxinv, FDeriv, par
   );
   cudaDeviceSynchronize();
 
@@ -428,7 +428,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   checkCuda( cudaEventSynchronize(stopEvent) );
   checkCuda( cudaEventElapsedTime(&milliseconds, startEvent, stopEvent) );
 
-  memory_accessed = (solver->npoints_local + 2*solver->npoints_local*_MODEL_NVARS_)*sizeof(double);
+  memory_accessed = (solver->m_npoints_local + 2*solver->m_npoints_local*_MODEL_NVARS_)*sizeof(double);
   printf("%-50s GPU time (secs) = %.6f bandwidth (GB/s) = %6.2f\n",
           "NavierStokes3DParabolicFunction_par", milliseconds*1e-3,
           (1e-6*(memory_accessed)/milliseconds));
@@ -458,7 +458,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 
   solver->FirstDerivativePar(FDeriv,FViscous,_YDIR_,1,solver,mpi);
   gpuNavierStokes3DParabolicFunction_par_kernel<<<nblocks_par, GPU_THREADS_PER_BLOCK>>>(
-      solver->npoints_local, ghosts, _YDIR_, dim, dxinv, FDeriv, par
+      solver->m_npoints_local, ghosts, _YDIR_, dim, dxinv, FDeriv, par
   );
   cudaDeviceSynchronize();
 
@@ -485,7 +485,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 
   solver->FirstDerivativePar(FDeriv,FViscous,_ZDIR_,1,solver,mpi);
   gpuNavierStokes3DParabolicFunction_par_kernel<<<nblocks_par, GPU_THREADS_PER_BLOCK>>>(
-      solver->npoints_local, ghosts, _ZDIR_, dim, dxinv, FDeriv, par
+      solver->m_npoints_local, ghosts, _ZDIR_, dim, dxinv, FDeriv, par
   );
   cudaDeviceSynchronize();
 
@@ -494,7 +494,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   checkCuda( cudaEventDestroy(stopEvent) );
 #endif
 
-  if (solver->flag_ib) gpuArrayBlockMultiply(par,solver->gpu_iblank,size,_MODEL_NVARS_);
+  if (solver->flag_ib) gpuArrayBlockMultiply(par,solver->m_gpu_iblank,size,_MODEL_NVARS_);
 
   return (0);
 }
@@ -793,8 +793,8 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   NavierStokes3D  *physics  = (NavierStokes3D*) solver->physics;
 
   int ghosts = solver->m_ghosts;
-  int *dim   = solver->gpu_dim_local;
-  int size   = solver->npoints_local_wghosts;
+  int *dim   = solver->m_gpu_dim_local;
+  int size   = solver->m_npoints_local_wghosts;
 
   gpuMemset(par, 0, size*_MODEL_NVARS_*sizeof(double));
   if (physics->Re <= 0) return (0); /* inviscid flow */
@@ -809,10 +809,10 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   double *QDerivX = physics->gpu_QDerivX;
   double *QDerivY = physics->gpu_QDerivY;
   double *QDerivZ = physics->gpu_QDerivZ;
-  double *dxinv   = solver->gpu_dxinv;
+  double *dxinv   = solver->m_gpu_dxinv;
 
   int nblocks = (size-1)/GPU_THREADS_PER_BLOCK + 1;
-  int nblocks_par = (solver->npoints_local-1)/GPU_THREADS_PER_BLOCK + 1;
+  int nblocks_par = (solver->m_npoints_local-1)/GPU_THREADS_PER_BLOCK + 1;
 
 #if defined(GPU_STAT)
   cudaEvent_t startEvent, stopEvent;
@@ -844,11 +844,11 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   solver->FirstDerivativePar(QDerivY,Q,_YDIR_,1,solver,mpi);
   solver->FirstDerivativePar(QDerivZ,Q,_ZDIR_,1,solver,mpi);
 
-  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
+  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_gpu_dim_local,
                              solver->m_ghosts,mpi,QDerivX);
-  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
+  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_gpu_dim_local,
                              solver->m_ghosts,mpi,QDerivY);
-  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->gpu_dim_local,
+  gpuMPIExchangeBoundariesnD(_MODEL_NDIMS_,_MODEL_NVARS_,solver->m_gpu_dim_local,
                               solver->m_ghosts,mpi,QDerivY);
 
 #if defined(GPU_STAT)
@@ -906,7 +906,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 #endif
 
   gpuNavierStokes3DParabolicFunction_par_kernel<<<nblocks_par, GPU_THREADS_PER_BLOCK>>>(
-      solver->npoints_local, size, ghosts, _XDIR_, dim, dxinv, FDeriv, par
+      solver->m_npoints_local, size, ghosts, _XDIR_, dim, dxinv, FDeriv, par
   );
   cudaDeviceSynchronize();
 
@@ -915,7 +915,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   checkCuda( cudaEventSynchronize(stopEvent) );
   checkCuda( cudaEventElapsedTime(&milliseconds, startEvent, stopEvent) );
 
-  memory_accessed = (solver->npoints_local + 2*solver->npoints_local*_MODEL_NVARS_)*sizeof(double);
+  memory_accessed = (solver->m_npoints_local + 2*solver->m_npoints_local*_MODEL_NVARS_)*sizeof(double);
   printf("%-50s GPU time (secs) = %.6f bandwidth (GB/s) = %6.2f\n",
           "NavierStokes3DParabolicFunction_par", milliseconds*1e-3,
           (1e-6*(memory_accessed)/milliseconds));
@@ -946,7 +946,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 
   solver->FirstDerivativePar(FDeriv,FViscous,_YDIR_,1,solver,mpi);
   gpuNavierStokes3DParabolicFunction_par_kernel<<<nblocks_par, GPU_THREADS_PER_BLOCK>>>(
-      solver->npoints_local, size, ghosts, _YDIR_, dim, dxinv, FDeriv, par
+      solver->m_npoints_local, size, ghosts, _YDIR_, dim, dxinv, FDeriv, par
   );
   cudaDeviceSynchronize();
 
@@ -974,7 +974,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
 
   solver->FirstDerivativePar(FDeriv,FViscous,_ZDIR_,1,solver,mpi);
   gpuNavierStokes3DParabolicFunction_par_kernel<<<nblocks_par, GPU_THREADS_PER_BLOCK>>>(
-      solver->npoints_local, size, ghosts, _ZDIR_, dim, dxinv, FDeriv, par
+      solver->m_npoints_local, size, ghosts, _ZDIR_, dim, dxinv, FDeriv, par
   );
   cudaDeviceSynchronize();
 
@@ -983,7 +983,7 @@ extern "C" int gpuNavierStokes3DParabolicFunction(
   checkCuda( cudaEventDestroy(stopEvent) );
 #endif
 
-  if (solver->flag_ib) gpuArrayBlockMultiply(par,solver->gpu_iblank,size,_MODEL_NVARS_);
+  if (solver->flag_ib) gpuArrayBlockMultiply(par,solver->m_gpu_iblank,size,_MODEL_NVARS_);
 
   return (0);
 }

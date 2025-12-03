@@ -181,7 +181,7 @@ int gpuFirstDerivativeFourthOrderCentral(
 #endif
 
   FirstDerivativeFourthOrderCentral_boundary_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-      N_outer, ghosts, ndims, nvars, dir, solver->gpu_dim_local, f, Df
+      N_outer, ghosts, ndims, nvars, dir, solver->m_gpu_dim_local, f, Df
   );
 
 #if defined(GPU_STAT)
@@ -201,7 +201,7 @@ int gpuFirstDerivativeFourthOrderCentral(
 #endif
 
   FirstDerivativeFourthOrderCentral_interior_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    npoints_grid, ghosts, ndims, nvars, dir, solver->gpu_dim_local, f, Df
+    npoints_grid, ghosts, ndims, nvars, dir, solver->m_gpu_dim_local, f, Df
   );
   cudaDeviceSynchronize();
 
@@ -389,7 +389,7 @@ int gpuFirstDerivativeFourthOrderCentral(
 #endif
 
   FirstDerivativeFourthOrderCentral_boundary_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-      N_outer, solver->npoints_local_wghosts, ghosts, ndims, nvars, dir, solver->gpu_dim_local, f, Df
+      N_outer, solver->m_npoints_local_wghosts, ghosts, ndims, nvars, dir, solver->m_gpu_dim_local, f, Df
   );
 
 #if defined(GPU_STAT)
@@ -409,7 +409,7 @@ int gpuFirstDerivativeFourthOrderCentral(
 #endif
 
   FirstDerivativeFourthOrderCentral_interior_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    npoints_grid, solver->npoints_local_wghosts, ghosts, ndims, nvars, dir, solver->gpu_dim_local, f, Df
+    npoints_grid, solver->npoints_local_wghosts, ghosts, ndims, nvars, dir, solver->m_gpu_dim_local, f, Df
   );
   cudaDeviceSynchronize();
 

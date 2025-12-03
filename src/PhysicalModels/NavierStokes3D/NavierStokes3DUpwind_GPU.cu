@@ -121,7 +121,7 @@ extern "C" int gpuNavierStokes3DUpwindRusanov(
   int nblocks = (npoints_grid-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DUpwindRusanov_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    npoints_grid, dir, solver->m_ghosts, param->gamma, solver->gpu_dim_local,
+    npoints_grid, dir, solver->m_ghosts, param->gamma, solver->m_gpu_dim_local,
     param->gpu_grav_field_g, fL, fR, uL, uR, u, fI
   );
   cudaDeviceSynchronize();
@@ -242,7 +242,7 @@ extern "C" int gpuNavierStokes3DUpwindRoe(
   int nblocks = (npoints_grid-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DUpwindRoe_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    npoints_grid, dir, solver->m_ghosts, param->gamma, solver->gpu_dim_local,
+    npoints_grid, dir, solver->m_ghosts, param->gamma, solver->m_gpu_dim_local,
     param->gpu_grav_field_g, fL, fR, uL, uR, u, fI
   );
   cudaDeviceSynchronize();
@@ -359,7 +359,7 @@ extern "C" int gpuNavierStokes3DUpwindRusanov(
   int nblocks = (npoints_grid-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DUpwindRusanov_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    npoints_grid, solver->npoints_local_wghosts, dir, solver->m_ghosts, param->gamma, solver->gpu_dim_local,
+    npoints_grid, solver->m_npoints_local_wghosts, dir, solver->m_ghosts, param->gamma, solver->m_gpu_dim_local,
     param->gpu_grav_field_g, fL, fR, uL, uR, u, fI
   );
   cudaDeviceSynchronize();
@@ -488,7 +488,7 @@ extern "C" int gpuNavierStokes3DUpwindRoe(
 #endif
 
   gpuNavierStokes3DUpwindRoe_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    npoints_grid, solver->npoints_local_wghosts, dir, solver->m_ghosts, param->gamma, solver->gpu_dim_local,
+    npoints_grid, solver->m_npoints_local_wghosts, dir, solver->m_ghosts, param->gamma, solver->m_gpu_dim_local,
     param->gpu_grav_field_g, fL, fR, uL, uR, u, fI
   );
 

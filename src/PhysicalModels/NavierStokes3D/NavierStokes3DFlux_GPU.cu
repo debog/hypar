@@ -52,10 +52,10 @@ extern "C" int gpuNavierStokes3DFlux(
   HyPar             *solver = (HyPar*)   s;
   NavierStokes3D    *param  = (NavierStokes3D*) solver->physics;
 
-  int nblocks = (solver->npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
+  int nblocks = (solver->m_npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DFlux_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    solver->npoints_local_wghosts, dir, param->gamma, u, f
+    solver->m_npoints_local_wghosts, dir, param->gamma, u, f
   );
   cudaDeviceSynchronize();
 
@@ -104,10 +104,10 @@ extern "C" int gpuNavierStokes3DFlux(
   HyPar             *solver = (HyPar*)   s;
   NavierStokes3D    *param  = (NavierStokes3D*) solver->physics;
 
-  int nblocks = (solver->npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
+  int nblocks = (solver->m_npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DFlux_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    solver->npoints_local_wghosts, dir, param->gamma, u, f
+    solver->m_npoints_local_wghosts, dir, param->gamma, u, f
   );
   cudaDeviceSynchronize();
 

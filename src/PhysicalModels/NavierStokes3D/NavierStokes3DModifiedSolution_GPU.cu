@@ -70,10 +70,10 @@ extern "C" int gpuNavierStokes3DModifiedSolution(
   NavierStokes3D  *param  = (NavierStokes3D*) solver->physics;
 
   double inv_gamma_m1 = 1.0 / (param->gamma-1.0);
-  int nblocks = (solver->npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
+  int nblocks = (solver->m_npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DModifiedSolution_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    solver->npoints_local_wghosts, param->gamma, inv_gamma_m1,
+    solver->m_npoints_local_wghosts, param->gamma, inv_gamma_m1,
     param->gpu_grav_field_f, param->gpu_grav_field_g, u, uC
   );
   cudaDeviceSynchronize();
@@ -143,10 +143,10 @@ extern "C" int gpuNavierStokes3DModifiedSolution(
   NavierStokes3D  *param  = (NavierStokes3D*) solver->physics;
 
   double inv_gamma_m1 = 1.0 / (param->gamma-1.0);
-  int nblocks = (solver->npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
+  int nblocks = (solver->m_npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DModifiedSolution_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    solver->npoints_local_wghosts, param->gamma, inv_gamma_m1,
+    solver->m_npoints_local_wghosts, param->gamma, inv_gamma_m1,
     param->gpu_grav_field_f, param->gpu_grav_field_g, u, uC
   );
   cudaDeviceSynchronize();

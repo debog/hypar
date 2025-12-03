@@ -123,10 +123,10 @@ int gpuNavierStokes3DSourceFunction(
 {
   HyPar           *solver = (HyPar* )         s;
   NavierStokes3D  *param  = (NavierStokes3D*) solver->physics;
-  int             nblocks = (solver->npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
+  int             nblocks = (solver->m_npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DSourceFunction_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    solver->npoints_local_wghosts, dir, param->gpu_grav_field_g, f
+    solver->m_npoints_local_wghosts, dir, param->gpu_grav_field_g, f
   );
   cudaDeviceSynchronize();
 
@@ -217,9 +217,9 @@ extern "C" int gpuNavierStokes3DSource(
   double  *SourceR = solver->fR;
 
   int     ghosts  = solver->m_ghosts;
-  int     *dim    = solver->gpu_dim_local;
-  double  *x      = solver->gpu_x;
-  double  *dxinv  = solver->gpu_dxinv;
+  int     *dim    = solver->m_gpu_dim_local;
+  double  *x      = solver->m_gpu_x;
+  double  *dxinv  = solver->m_gpu_dxinv;
   double  RT      =  param->p0 / param->rho0;
   static double grav[_MODEL_NDIMS_];
 
@@ -227,7 +227,7 @@ extern "C" int gpuNavierStokes3DSource(
   grav[_YDIR_] = param->grav_y;
   grav[_ZDIR_] = param->grav_z;
 
-  int nblocks = (solver->npoints_local-1)/GPU_THREADS_PER_BLOCK + 1;
+  int nblocks = (solver->m_npoints_local-1)/GPU_THREADS_PER_BLOCK + 1;
   for (dir = 0; dir < _MODEL_NDIMS_; dir++) {
     if (grav[dir] != 0.0) {
       /* calculate the split source function exp(-phi/RT) */
@@ -239,7 +239,7 @@ extern "C" int gpuNavierStokes3DSource(
       gpuNavierStokes3DSourceUpwind(SourceI,SourceL,SourceR,u,dir,solver,t);
       /* calculate the final cell-centered source term */
       gpuNavierStokes3DSource_grav_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-        solver->npoints_local, ghosts, dir, param->gamma, RT,
+        solver->m_npoints_local, ghosts, dir, param->gamma, RT,
         dim, dxinv, param->gpu_grav_field_f, SourceI, u, source
       );
     }
@@ -365,10 +365,10 @@ int gpuNavierStokes3DSourceFunction(
 {
   HyPar           *solver = (HyPar* )         s;
   NavierStokes3D  *param  = (NavierStokes3D*) solver->physics;
-  int             nblocks = (solver->npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
+  int             nblocks = (solver->m_npoints_local_wghosts-1)/GPU_THREADS_PER_BLOCK + 1;
 
   gpuNavierStokes3DSourceFunction_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-    solver->npoints_local_wghosts, solver->m_ghosts, dir, solver->gpu_dim_local, param->gpu_grav_field_g, f
+    solver->m_npoints_local_wghosts, solver->m_ghosts, dir, solver->m_gpu_dim_local, param->gpu_grav_field_g, f
   );
   cudaDeviceSynchronize();
 
@@ -458,9 +458,9 @@ extern "C" int gpuNavierStokes3DSource(
   double  *SourceR = solver->fR;
 
   int     ghosts  = solver->m_ghosts;
-  int     *dim    = solver->gpu_dim_local;
-  double  *x      = solver->gpu_x;
-  double  *dxinv  = solver->gpu_dxinv;
+  int     *dim    = solver->m_gpu_dim_local;
+  double  *x      = solver->m_gpu_x;
+  double  *dxinv  = solver->m_gpu_dxinv;
   double  RT      = param->p0 / param->rho0;
   static double grav[_MODEL_NDIMS_];
 
@@ -468,7 +468,7 @@ extern "C" int gpuNavierStokes3DSource(
   grav[_YDIR_] = param->grav_y;
   grav[_ZDIR_] = param->grav_z;
 
-  int nblocks = (solver->npoints_local-1)/GPU_THREADS_PER_BLOCK + 1;
+  int nblocks = (solver->m_npoints_local-1)/GPU_THREADS_PER_BLOCK + 1;
   for (dir = 0; dir < _MODEL_NDIMS_; dir++) {
     if (grav[dir] != 0.0) {
       int bounds_inter[_MODEL_NDIMS_];
@@ -484,7 +484,7 @@ extern "C" int gpuNavierStokes3DSource(
       gpuNavierStokes3DSourceUpwind(SourceI,SourceL,SourceR,u,dir,solver,t);
       /* calculate the final cell-centered source term */
       gpuNavierStokes3DSource_grav_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
-        solver->npoints_local, solver->npoints_local_wghosts, npoints_fluxI,
+        solver->m_npoints_local, solver->m_npoints_local_wghosts, npoints_fluxI,
         ghosts, dir, param->gamma, RT,
         dim, dxinv, param->gpu_grav_field_f, SourceI, u, source
       );

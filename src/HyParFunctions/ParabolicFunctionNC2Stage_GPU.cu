@@ -85,7 +85,7 @@ int ParabolicFunctionNC2Stage_GPU(
   int     nvars  = solver->m_nvars;
   int     ghosts = solver->m_ghosts;
   int     *dim   = solver->m_dim_local;
-  int     size   = solver->npoints_local_wghosts;
+  int     size   = solver->m_npoints_local_wghosts;
 
   if (!solver->HFunction) return(0); /* zero parabolic terms */
   solver->count_par++;
@@ -107,7 +107,7 @@ int ParabolicFunctionNC2Stage_GPU(
       int nblocks = (ngrid_points - 1) / GPU_THREADS_PER_BLOCK + 1;
       ParabolicFunctionNC2Stage_kernel<<<nblocks, GPU_THREADS_PER_BLOCK>>>(
           ghosts, d1, d2, ndims, nvars, ngrid_points,
-          solver->gpu_dim_local, solver->gpu_dxinv, solver->Deriv2, par
+          solver->m_gpu_dim_local, solver->m_gpu_dxinv, solver->Deriv2, par
       );
 
       /*
